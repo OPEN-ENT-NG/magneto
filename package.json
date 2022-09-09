@@ -20,7 +20,7 @@
   },
   "homepage": "",
   "dependencies": {
-    "entcore": "3.12.0",
+    "entcore": "4.6.0",
     "awesome-typescript-loader": "3.2.1",
     "axios": "0.16.2",
     "core-js": "2.4.1",
@@ -36,7 +36,8 @@
     "webpack-stream": "3.2.0",
     "yargs": "^8.0.2",
     "entcore-toolkit": "^1.0.1",
-    "tsconfig-paths-webpack-plugin": "^3.2.0"
+    "tsconfig-paths-webpack-plugin": "^3.2.0",
+    "rxjs": "5.4.2"
   },
   "devDependencies": {
     "@types/angular": "1.7.4",

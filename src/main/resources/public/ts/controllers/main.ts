@@ -1,5 +1,5 @@
-import {ng} from 'entcore';
-import {ILocationService, IScope, IWindowService} from "angular";
+import {ng, template} from 'entcore';
+import {IScope, IWindowService} from "angular";
 
 declare let window: any;
 
@@ -10,13 +10,13 @@ interface IViewModel {
 class Controller implements ng.IController, IViewModel {
 
 	constructor(private $scope: IScope,
-				private $location:ILocationService,
+				private $route: any,
 				private $window: IWindowService) {
 		this.$scope['vm'] = this;
 	}
 
 	$onInit() {
-		route({
+		this.$route({
 			list: () => {
 				template.open('main', `second-page`);
 			},

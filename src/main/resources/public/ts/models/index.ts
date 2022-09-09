@@ -1,1 +1,1 @@
-export * from './todolist.model';
+export * from './magneto.model';

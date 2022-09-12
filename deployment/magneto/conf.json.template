@@ -1,0 +1,18 @@
+    {
+      "name": "fr.cgi~magneto~0.1-SNAPSHOT",
+      "config": {
+        "main" : "fr.cgi.magneto.Magneto",
+        "port" : 8205,
+        "app-name" : "Magneto",
+    	"app-address" : "/magneto",
+    	"app-icon" : "Magneto-large",
+        "host": "${host}",
+        "ssl" : $ssl,
+        "auto-redeploy": false,
+        "userbook-host": "${host}",
+        "integration-mode" : "HTTP",
+        "app-registry.port" : 8012,
+        "mode" : "${mode}",
+        "entcore.port" : 8009
+      }
+    }

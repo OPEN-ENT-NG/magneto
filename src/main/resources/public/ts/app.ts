@@ -17,7 +17,10 @@ for (let service in services) {
 
 routes.define(function($routeProvider){
 	$routeProvider
+		.when('/', {
+			action: 'boards'
+		})
 		.otherwise({
-			action: 'defaultView'
+			redirectTo: '/'
 		});
 })

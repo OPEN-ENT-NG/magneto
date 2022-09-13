@@ -17,14 +17,8 @@ class Controller implements ng.IController, IViewModel {
 
 	$onInit() {
 		this.$route({
-			list: () => {
-				template.open('main', `second-page`);
-			},
-			list2: () => {
-				template.open('main', `third-page`);
-			},
-			defaultView: () => {
-				template.open('main', `main`);
+			boards: () => {
+				template.open('main', `boards`);
 			}
 		});
 	}

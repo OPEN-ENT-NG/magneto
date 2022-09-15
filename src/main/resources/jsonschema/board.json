@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "imageUrl": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "folderId": {
+      "type": "number"
+    },
+    "public": {
+      "type": "boolean"
+    },
+    "shared": {
+      "type": "boolean"
+    },
+    "deleted": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

@@ -53,6 +53,7 @@
                         has-duplicate="vm.board.myRights.contrib !== undefined"
                         on-duplicate="vm.submitDuplicateCard"
                         has-preview="true"
+                        selector-resize="'.card-list-scrollable'"
                         on-preview="vm.openPreview">
                 </card-list>
             </div>
@@ -61,6 +62,7 @@
                        selected-card-ids="vm.selectedCardIds"
                        has-caption="false"
                        has-duplicate="true"
+                       selector-resize="'.card-list-scrollable'"
                        on-duplicate="vm.submitDuplicateCard"
                        has-preview="true"
                        on-preview="vm.openPreview">

@@ -6,10 +6,12 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.model.MongoQuery;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.service.BoardService;
 import fr.cgi.magneto.service.FolderService;
+import fr.cgi.magneto.service.SectionService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
 import fr.wseduc.webutils.I18n;
@@ -33,6 +35,7 @@ public class DefaultBoardService implements BoardService {
     private final MongoDb mongoDb;
     private final String collection;
     private final FolderService folderService;
+    private final SectionService sectionService;
     protected static final Logger log = LoggerFactory.getLogger(DefaultBoardService.class);
 
 
@@ -40,17 +43,27 @@ public class DefaultBoardService implements BoardService {
         this.collection = collection;
         this.mongoDb = mongo;
         this.folderService = serviceFactory.folderService();
+        this.sectionService = serviceFactory.sectionService();
     }
 
     @Override
-    public Future<JsonObject> create(UserInfos user, JsonObject board) {
+    public Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, HttpServerRequest request) {
         Promise<JsonObject> promise = Promise.promise();
         BoardPayload createBoard = new BoardPayload(board);
         String newId = UUID.randomUUID().toString();
+        List<Future> createBoardFutures = new ArrayList<>();
+        // Create new section and update board if layout is different of free
+        if (!createBoard.isLayoutFree() && defaultSection) {
+            String newSectionId = UUID.randomUUID().toString();
+            createBoard.setSectionIds(Collections.singletonList(newSectionId));
+            SectionPayload createSection = new SectionPayload(newId)
+                    .setTitle(I18n.getInstance().translate("magneto.section.default.title", getHost(request), I18n.acceptLanguage(request)));
+            createBoardFutures.add(this.sectionService.create(createSection, newSectionId));
+        }
         createBoard.setOwnerId(user.getUserId());
         createBoard.setOwnerName(user.getFirstName() + " " + user.getLastName());
-
-        this.createBoard(createBoard, newId)
+        createBoardFutures.add(this.createBoard(createBoard, newId));
+        CompositeFuture.all(createBoardFutures)
                 .compose(success -> this.updateFolderOnBoardCreate(user.getUserId(), createBoard, newId))
                 .onFailure(promise::fail)
                 .onSuccess(res -> promise.complete(new JsonObject().put(Field.ID, newId)));
@@ -136,9 +149,13 @@ public class DefaultBoardService implements BoardService {
     public Future<JsonObject> delete(String userId, List<String> boardIds) {
         Promise<JsonObject> promise = Promise.promise();
         this.deleteBoards(userId, boardIds)
-                .compose(success -> this.folderService.updateOldFolder(boardIds))
+                .compose(success -> {
+                    Future<JsonObject> deleteSectionsFuture = this.sectionService.deleteByBoards(boardIds);
+                    Future<JsonObject> updateFolderFuture = this.folderService.updateOldFolder(boardIds);
+                    return CompositeFuture.all(deleteSectionsFuture, updateFolderFuture);
+                })
                 .onFailure(promise::fail)
-                .onSuccess(promise::complete);
+                .onSuccess(success -> promise.complete(new JsonObject()));
 
         return promise.future();
     }
@@ -291,8 +308,16 @@ public class DefaultBoardService implements BoardService {
 
         query.matchRegex(searchText, Arrays.asList(Field.TITLE, Field.DESCRIPTION, Field.TAGS))
                 .sort(sortBy, -1)
-                .lookUp(CollectionsConstant.FOLDER_COLLECTION, Field._ID, Field.BOARDIDS, Field.FOLDERS);
-
+                .lookUp(CollectionsConstant.FOLDER_COLLECTION, Field._ID, Field.BOARDIDS, Field.FOLDERS)
+                .lookUp(CollectionsConstant.SECTION_COLLECTION, Field.SECTIONIDS, Field._ID, Field.SECTIONS)
+                .addFields(Field.NBCARDSSECTIONS, new JsonObject().put(Mongo.SUM, new JsonObject().put(
+                                        Mongo.MAP, new JsonObject()
+                                                .put(Mongo.INPUT, String.format("$%s", Field.SECTIONS))
+                                                .put(Mongo.AS, Field.SECTION)
+                                                .put(Mongo.IN_MAP, new JsonObject().put(Mongo.SIZE, String.format("$$%s.%s", Field.SECTION, Field.CARDIDS)))
+                                )
+                        )
+                );
 
         if (!getCount) {
             if (page != null) {
@@ -304,6 +329,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.IMAGEURL, 1)
                             .put(Field.LAYOUTTYPE, 1)
                             .put(Field.NBCARDS, new JsonObject().put(Mongo.SIZE, String.format("$%s", Field.CARDIDS)))
+                            .put(Field.NBCARDSSECTIONS, 1)
                             .put(Field.MODIFICATIONDATE, 1)
                             .put(Field.FOLDERID, new JsonObject().put(Mongo.FILTER,
                                     new JsonObject()
@@ -342,6 +368,7 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.TITLE, 1)
                 .put(Field.IMAGEURL, 1)
                 .put(Field.NBCARDS, 1)
+                .put(Field.NBCARDSSECTIONS, 1)
                 .put(Field.MODIFICATIONDATE, 1)
                 .put(Field.FOLDERID, String.format("$%s.%s", Field.FOLDERID, Field._ID))
                 .put(Field.DESCRIPTION, 1)
@@ -390,6 +417,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.TITLE, 1)
                         .put(Field.IMAGEURL, 1)
                         .put(Field.CREATIONDATE, 1)
+                        .put(Field.SECTIONIDS, 1)
                         .put(Field.CARDIDS, 1)
                         .put(Field.LAYOUTTYPE, 1)
                         .put(Field.MODIFICATIONDATE, 1)

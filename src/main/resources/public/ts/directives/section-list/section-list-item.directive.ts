@@ -1,18 +1,19 @@
-import {angular, ng} from "entcore";
-import {IAugmentedJQuery, ILocationService, IParseService, IScope, IWindowService} from "angular";
+import {angular, ng, toasts} from "entcore";
+import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Card} from "../../models";
-import {DateUtils} from "../../utils/date.utils";
-import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
+import {
+    Board,
+    Card,
+    IBoardsParamsRequest,
+    ISectionBoardParamsRequest,
+    ISectionDeleteParams,
+    Section,
+    SectionForm
+} from "../../models";
+import {sectionsService} from "../../services";
 import {safeApply} from "../../utils/safe-apply.utils";
 
-interface IViewModel extends ng.IController, ICardListItemProps {
-    formatDate(date: string): string;
-
-    formatDateModification(date: string): string;
-
-    hasOptions(): boolean;
-
+interface IViewModel extends ng.IController, ISectionListItemProps {
     openEdit?(card: Card): void;
 
     openDuplicate?(card: Card): void;
@@ -21,132 +22,103 @@ interface IViewModel extends ng.IController, ICardListItemProps {
 
     openDelete?(card: Card): void;
 
+    openDeleteSection?(section: Section): void;
+
+    openDuplicateSection?(section: Section): void;
+
     openPreview?(card: Card): void;
 
     openTransfer?(card: Card): void;
 
-    openCardOptions?(): Promise<void>;
+    formatSectionSelector(section: Section): string;
+
+    updateSection(section: Section): Promise<void>;
+
+    refresh?(): void;
+
+    openSectionOptions?(): Promise<void>;
 
     isDisplayedOptions: boolean;
-    isSelected: boolean;
-
 
 }
 
-interface ICardListItemProps {
-    card: Card;
-
-    isDraggable: boolean;
-    hasCaption: boolean;
-    selectorResize: string;
-
-    hasEdit: boolean;
+interface ISectionListItemProps {
     onEdit?;
-    hasDuplicate: boolean;
     onDuplicate?;
-    hasHide: boolean;
     onHide?;
-    hasDelete: boolean;
     onDelete?;
-    hasPreview: boolean;
+    onDeleteSection?;
+    onDuplicateSection?;
     onPreview?;
-    hasTransfer: boolean;
     onTransfer?;
+    onMove?;
 }
 
-interface ICardListItemScope extends IScope, ICardListItemProps {
+interface ISectionListItemScope extends IScope, ISectionListItemProps {
     vm: IViewModel;
 }
 
 class Controller implements IViewModel {
 
-    card: Card;
+    board: Board;
+    section: Section;
+    newSection: SectionForm;
     isDisplayedOptions: boolean;
-    isDraggable: boolean;
-
-    hasCaption: boolean;
-
-    hasEdit: boolean;
-    hasDuplicate: boolean;
-    hasHide: boolean;
-    hasDelete: boolean;
-    hasPreview: boolean;
-    hasTransfer: boolean;
-
-    selectorResize: string;
-    isSelected: boolean;
-    RESOURCE_TYPES: typeof RESOURCE_TYPE;
 
 
-    constructor(private $scope: ICardListItemScope,
+    constructor(private $scope: ISectionListItemScope,
                 private $location: ILocationService,
                 private $window: IWindowService) {
-        this.RESOURCE_TYPES = RESOURCE_TYPE;
         this.isDisplayedOptions = false;
-        this.isSelected = false;
+
     }
 
-    $onInit() {
+    $onInit = (): void => {
+        this.newSection = new SectionForm().buildNew(this.board.id);
     }
 
     $onDestroy() {
     }
 
-    formatDateModification = (date: string): string => {
-        return DateUtils.createdSince(date, DateUtils.FORMAT["DAY-MONTH-HALFYEAR"])
+    formatSectionSelector = (section: Section): string => {
+        return "#section-" + section.id;
     }
 
-    formatDate = (date: string): string => {
-        return DateUtils.format(date, DateUtils.FORMAT["DAY-MONTH-HALFYEAR-HOUR-MIN-SEC"])
-    }
-
-
-    getLastUserId = (card: Card): string => {
-        return !!card.lastModifierId ? card.lastModifierId : card.ownerId;
-    }
-
-    getLastUserName = (card: Card): string => {
-        return !!card.lastModifierName ? card.lastModifierName : card.ownerName;
-    }
-
-    hasOptions = (): boolean => {
-        return this.hasDelete || this.hasPreview || this.hasEdit || this.hasHide || this.hasDuplicate;
+    updateSection = async (section: Section): Promise<void> => {
+        let updateSection: SectionForm = new SectionForm().build(section);
+        updateSection.cardIds = [];
+        await sectionsService.update(updateSection);
+        this.$scope.vm.refresh();
     }
 
 }
 
 function directive($parse: IParseService) {
     return {
-        replace: true,
         restrict: 'E',
-        templateUrl: `${RootsConst.directive}card-list/card-list-item.html`,
+        templateUrl: `${RootsConst.directive}section-list/section-list-item.html`,
         scope: {
-            card: '=',
-            isSelected: '=',
-            isDraggable: '=',
-            hasCaption: '=',
-            hasEdit: '=',
+            board: '=',
+            section: '=',
             onEdit: '&',
-            hasDuplicate: '=',
             onDuplicate: '&',
-            hasHide: '=',
             onHide: '&',
-            hasDelete: '=',
             onDelete: '&',
-            hasPreview: '=',
+            onDeleteSection: '&',
+            onDuplicateSection: '&',
             onPreview: '&',
-            hasTransfer: '=',
             onTransfer: '&',
-            selectorResize: '='
+            onMove: '&'
         },
         controllerAs: 'vm',
         bindToController: true,
         controller: ['$scope', '$location', '$window', '$parse', Controller],
         /* interaction DOM/element */
-        link: function ($scope: ICardListItemScope,
+        link: function ($scope: ISectionListItemScope,
                         element: ng.IAugmentedJQuery,
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
+
             $(document).bind('click', (event: JQueryEventObject): void => {
                 if(!element.find(event.target).length && vm.isDisplayedOptions) {
                     vm.isDisplayedOptions = false;
@@ -155,9 +127,9 @@ function directive($parse: IParseService) {
             });
 
             let repositionActionOptions = (): void => {
-                let windowElem: JQuery = vm.selectorResize ? $(vm.selectorResize): $(window);
+                let windowElem: JQuery = $(vm.formatSectionSelector(vm.section));
                 let actionOptionsElem: JQuery =
-                    $("#options-" + vm.card.id);
+                    $("#options-" + vm.section.id);
                 let repositionClass: string = 'reposition';
                 // if element position element is left sided, we want to check right sided position to see if it goes
                 // out of the screen, so we add 2 times the element width.
@@ -178,7 +150,7 @@ function directive($parse: IParseService) {
                 repositionActionOptions();
             });
 
-            vm.openCardOptions = async (): Promise<void> => {
+            vm.openSectionOptions = async (): Promise<void> => {
                 vm.isDisplayedOptions = !vm.isDisplayedOptions;
                 await safeApply($scope);
                 if (vm.isDisplayedOptions) repositionActionOptions();
@@ -200,6 +172,14 @@ function directive($parse: IParseService) {
                 $parse($scope.vm.onDelete())(card);
             }
 
+            vm.openDeleteSection = (section: Section): void => {
+                $parse($scope.vm.onDeleteSection())(section);
+            }
+
+            vm.openDuplicateSection = (section: Section): void => {
+                $parse($scope.vm.onDuplicateSection())(section);
+            }
+
             vm.openPreview = (card: Card): void => {
                 $parse($scope.vm.onPreview())(card);
             }
@@ -207,8 +187,12 @@ function directive($parse: IParseService) {
             vm.openTransfer = (card: Card): void => {
                 $parse($scope.vm.onTransfer())(card);
             }
+
+            vm.refresh= (): void => {
+                $parse($scope.vm.onMove())({});
+            }
         }
     }
 }
 
-export const cardListItem = ng.directive('cardListItem', directive)
+export const sectionListItem= ng.directive('sectionListItem', directive)

@@ -4,6 +4,7 @@ import {RootsConst} from "../../core/constants/roots.const";
 import {BoardForm, Card} from "../../models";
 import {create} from 'sortablejs';
 import {boardsService} from "../../services";
+import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
 
 interface IViewModel extends ng.IController, ICardListProps {
     openEdit?(card: Card): void;
@@ -25,8 +26,11 @@ interface ICardListProps {
     cards: Array<Card>;
     selectedCardIds: Array<string>;
 
+    layout: LAYOUT_TYPE;
+
     isDraggable: boolean;
     isScrollable: boolean;
+    selectorResize: string;
 
     hasCaption: boolean;
 
@@ -53,8 +57,11 @@ class Controller implements IViewModel {
 
     cards: Array<Card>;
     selectedCardIds: Array<string>;
+    layout: LAYOUT_TYPE;
     isDraggable: boolean;
     isScrollable: boolean;
+    selectorResize: string;
+
 
     hasCaption: boolean;
 
@@ -105,6 +112,7 @@ function directive($parse: IParseService) {
         templateUrl: `${RootsConst.directive}card-list/card-list.html`,
         scope: {
             cards: '=',
+            layout: '=',
             selectedCardIds: '=',
             isDraggable: '=',
             isScrollable: '=',
@@ -121,7 +129,8 @@ function directive($parse: IParseService) {
             onPreview: '&',
             hasTransfer: '=',
             onTransfer: '&',
-            onMove: '&'
+            onMove: '&',
+            selectorResize: '='
         },
         controllerAs: 'vm',
         bindToController: true,

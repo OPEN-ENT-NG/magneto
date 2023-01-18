@@ -3,6 +3,7 @@ package fr.cgi.magneto.service;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import io.vertx.core.*;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.*;
 import org.entcore.common.user.UserInfos;
 
@@ -16,9 +17,11 @@ public interface BoardService {
      *
      * @param user  User Object containing user id and displayed name
      * @param board JsonObjet Board to create
+     * @param defaultSection Boolean Create a seciton by default or no
+     * @param request HttpServerRequest Request containing I18n keys
      * @return Future {@link Future <JsonObject>} containing newly created board
      */
-    Future<JsonObject> create(UserInfos user, JsonObject board);
+    Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, HttpServerRequest request);
 
     /**
      * Update a board

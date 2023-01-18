@@ -4,6 +4,7 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.model.Model;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
@@ -27,7 +28,9 @@ public class Board implements Model<Board> {
     private boolean isPublic;
     private String folderId;
     private List<Card> cards;
+    private List<Section> sections;
     private List<String> tags;
+    private String layoutType;
 
     @SuppressWarnings("unchecked")
     public Board(JsonObject board) {
@@ -113,6 +116,14 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    public JsonArray getShared() {
+        return shared;
+    }
+    public Board setShared(JsonArray shared) {
+        this.shared = shared;
+        return this;
+    }
+
     public String getCreationDate() {
         return creationDate;
     }
@@ -160,7 +171,11 @@ public class Board implements Model<Board> {
     }
 
     public List<Card> cards() {
-        return this.cards;
+        return this.layoutType != null ? this.layoutType.equals(Field.FREE) ? this.cards : this.getCardsSection() : new ArrayList<>();
+    }
+
+    public List<String> cardIds() {
+       return this.cards().stream().map(Card::getId).collect(Collectors.toList());
     }
 
     public Board setCards(List<Card> cards) {
@@ -227,8 +242,8 @@ public class Board implements Model<Board> {
 
     @Override
     public JsonObject toJson() {
-        JsonArray cardsArray =
-                new JsonArray(this.cards().stream().map(Card::getId).collect(Collectors.toList()));
+        JsonArray cardsArray = new JsonArray(this.cardIds());
+        JsonArray sectionArray = new JsonArray(this.sectionIds());
         return new JsonObject()
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
@@ -236,6 +251,7 @@ public class Board implements Model<Board> {
                 .put(Field.DESCRIPTION, this.getDescription())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.CARDIDS, cardsArray)
+                .put(Field.SECTIONIDS, sectionArray)
                 .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.DELETED, this.isDeleted())
                 .put(Field.PUBLIC, this.isPublic())
@@ -245,7 +261,7 @@ public class Board implements Model<Board> {
                 .put(Field.SHARED, this.shared)
                 .put(Field.LAYOUTTYPE, this.getLayoutType())
                 .put(Field.TAGS, this.tags());
-}
+    }
 
     @Override
     public Board model(JsonObject board) {

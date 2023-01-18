@@ -5,20 +5,21 @@ import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.model.Section;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.security.*;
-import fr.cgi.magneto.service.BoardService;
-import fr.cgi.magneto.service.CardService;
-import fr.cgi.magneto.service.FolderService;
-import fr.cgi.magneto.service.ServiceFactory;
+import fr.cgi.magneto.service.*;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -37,15 +38,17 @@ import static fr.cgi.magneto.core.enums.Events.CREATE_BOARD;
 public class BoardController extends ControllerHelper {
 
     private final EventStore eventStore;
-
     private final BoardService boardService;
     private final CardService cardService;
+    private final SectionService sectionService;
+
     private final FolderService folderService;
 
 
     public BoardController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
         this.cardService = serviceFactory.cardService();
+        this.sectionService = serviceFactory.sectionService();
         this.folderService = serviceFactory.folderService();
         this.eventStore = EventStoreFactory.getFactory().getEventStore(Magneto.class.getSimpleName());
     }
@@ -133,7 +136,7 @@ public class BoardController extends ControllerHelper {
     public void create(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "board", board ->
                 UserUtils.getUserInfos(eb, request, user ->
-                        boardService.create(user, board)
+                        boardService.create(user, board, true, request)
                                 .onFailure(err -> renderError(request))
                                 .onSuccess(result -> {
                                     eventStore.createAndStoreEvent(CREATE_BOARD.name(), request);
@@ -151,37 +154,66 @@ public class BoardController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, user -> {
             String boardId = request.getParam(Field.BOARDID);
             Map<String, Future<?>> futures = new HashMap<>();
+            JsonObject futuresInfos = new JsonObject();
 
             boardService.getBoards(Collections.singletonList(boardId))
                     .compose(boardResult -> {
                         if (!boardResult.isEmpty()) {
-                            JsonObject duplicateBoard = boardResult.get(0).toJson();
-                            duplicateBoard.remove(Field._ID);
-                            duplicateBoard.put(Field.SHARED, new JsonArray());
-                            duplicateBoard.put(Field.PUBLIC, false);
+                            Board duplicateBoard = boardResult.get(0);
+                            futuresInfos.put(Field.BOARD, duplicateBoard.toJson());
+                            Future<JsonObject> getCardsFuture = Future.succeededFuture();
+                            Future<List<Section>> getSectionsFuture = Future.succeededFuture();
 
-                            Future<List<Card>> getCardsFuture = cardService.getCards(boardResult.get(0).cards().stream().map(Card::getId).collect(Collectors.toList()));
-                            Future<JsonObject> createBoardFuture = boardService.create(user, duplicateBoard);
+                            if (!duplicateBoard.isLayoutFree()) {
+                                getSectionsFuture = sectionService.getSectionsByBoardId(duplicateBoard.getId());
+                                futures.put(Field.SECTION, getSectionsFuture);
+                            }
+                            getCardsFuture = cardService.getAllCardsByBoard(duplicateBoard, null);
                             futures.put(Field.CARDS, getCardsFuture);
+
+                            // Reset new board
+                            duplicateBoard.setId(null);
+                            duplicateBoard.setPublic(false);
+                            duplicateBoard.setShared(new JsonArray());
+                            Future<JsonObject> createBoardFuture = boardService.create(user, duplicateBoard.toJson(), false, request);
                             futures.put(Field.BOARD, createBoardFuture);
-                            return CompositeFuture.all(getCardsFuture, createBoardFuture);
+                            return CompositeFuture.all(getCardsFuture, getSectionsFuture, createBoardFuture);
                         } else {
                             return Future.failedFuture(String.format("[Magneto%s::duplicate] " +
                                     "No board found with id %s", this.getClass().getSimpleName(), boardId));
                         }
                     })
                     .compose(result -> {
-                        List<Card> duplicateCards = (List<Card>) futures.get(Field.CARDS).result();
-                        // If no cards in board, no duplicate
-                        if (duplicateCards.isEmpty()) {
-                            return Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result());
-                        } else {
+                        if (result.succeeded()) {
                             String duplicateBoard = ((JsonObject) futures.get(Field.BOARD).result()).getString(Field.ID);
-                            return cardService.duplicateCards(duplicateBoard, duplicateCards, user);
+                            JsonArray duplicateCardsArray = ((JsonObject) futures.get(Field.CARDS).result()).getJsonArray(Field.ALL);
+                            List<Card> duplicateCards = duplicateCardsArray.getList();
+                            List<Future> duplicateFuture = new ArrayList<>();
+
+                            if (!futuresInfos.getJsonObject(Field.BOARD).getString(Field.LAYOUTTYPE).equals(Field.FREE)) {
+                                List<Section> duplicateSection = (List<Section>) futures.get(Field.SECTION).result();
+                                // If no section in board, no duplicate
+                                if (duplicateSection.isEmpty()) {
+                                    duplicateFuture.add(Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result()));
+                                } else {
+                                    duplicateFuture.add(sectionService.duplicateSections(duplicateBoard, duplicateSection, duplicateCards, true, user));
+                                }
+                            } else {
+                                // If no cards in board, no duplicate
+                                if (duplicateCards.isEmpty()) {
+                                    duplicateFuture.add(Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result()));
+                                } else {
+                                    duplicateFuture.add(cardService.duplicateCards(duplicateBoard, duplicateCards, null, user));
+                                }
+                            }
+                            return CompositeFuture.all(duplicateFuture);
+                        } else {
+                            return Future.failedFuture(String.format("[Magneto%s::duplicate] " +
+                                    "No board found with id %s", this.getClass().getSimpleName(), boardId));
                         }
                     })
                     .onFailure(err -> renderError(request))
-                    .onSuccess(result -> renderJson(request, result));
+                    .onSuccess(result -> renderJson(request, new JsonObject()));
         });
     }
 
@@ -190,19 +222,57 @@ public class BoardController extends ControllerHelper {
     @ResourceFilter(ManageBoardRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @Trace(Actions.BOARD_UPDATE)
+    @SuppressWarnings("unchecked")
     public void update(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "boardUpdate", board -> {
             String boardId = request.getParam(Field.ID);
             UserUtils.getUserInfos(eb, request, user -> {
-                BoardPayload updateBoard = new BoardPayload(board)
-                        .setId(boardId)
-                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
-
-                boardService.update(updateBoard)
+                boardService.getBoards(Collections.singletonList(boardId))
+                        .compose(boards -> {
+                            if (!boards.isEmpty()) {
+                                BoardPayload updateBoard = new BoardPayload(board)
+                                        .setId(boardId)
+                                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+                                Board currentBoard = boards.get(0);
+                                return this.addCardsToUpdate(updateBoard, currentBoard, request)
+                                        .compose(boardUpdated -> boardService.update(new BoardPayload(boardUpdated)));
+                            } else {
+                                return Future.failedFuture(String.format("[Magneto%s::update] " +
+                                        "No board found with id %s", this.getClass().getSimpleName(), boardId));
+                            }
+                        })
                         .onFailure(err -> renderError(request))
-                        .onSuccess(result -> renderJson(request, result));
+                        .onSuccess(result -> renderJson(request, new JsonObject()));
             });
         });
+    }
+
+    private Future<JsonObject> addCardsToUpdate(BoardPayload updateBoard, Board currentBoard, HttpServerRequest request) {
+        Promise<JsonObject> promise = Promise.promise();
+        List<Future> updateBoardFutures = new ArrayList<>();
+
+        if (currentBoard.isLayoutFree() && !updateBoard.isLayoutFree()) {
+            SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.cardIds());
+            if (currentBoard.sectionIds().isEmpty()) {
+                String sectionId = UUID.randomUUID().toString();
+                sectionPayload.setTitle(I18n.getInstance().translate("magneto.section.default.title", getHost(request), I18n.acceptLanguage(request)));
+                updateBoard.addSection(sectionId);
+                updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));
+            } else {
+                updateBoardFutures.add(sectionService.update(sectionPayload.setId(currentBoard.sectionIds().get(0))));
+            }
+            promise.complete(updateBoard.toJson());
+        } else if (!currentBoard.isLayoutFree() && updateBoard.isLayoutFree()) {
+            cardService.getAllCardsByBoard(currentBoard, null)
+                    .compose(cards -> {
+                        List<Card> cardsList = cards.getJsonArray(Field.ALL).getList();
+                        List<String> cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());
+                        updateBoard.setCardIds(cardIds);
+                        promise.complete(updateBoard.toJson());
+                        return Future.succeededFuture();
+                    });
+        }
+        return promise.future();
     }
 
 
@@ -274,4 +344,6 @@ public class BoardController extends ControllerHelper {
                             .onSuccess(result -> renderJson(request, result));
                 }));
     }
+
+
 }

@@ -14,6 +14,7 @@ interface IScrollProps {
 
     loadingMode: boolean;
     querySelector: string;
+    isHorizontal: boolean;
     scrollEventer: InfiniteScrollService;
 }
 
@@ -25,12 +26,14 @@ class Controller implements IViewModel {
     loading: boolean;
     loadingMode: boolean;
     querySelector: string;
+    isHorizontal: boolean;
+
 
     scrollEventer: InfiniteScrollService;
 
-    private currentscrollHeight: number = 0;
+    private currentscrollSize: number = 0;
     // latest height once scroll will reach
-    private latestHeightBottom: number = 300;
+    private latestSize: number = 300;
 
     scrolled: () => void;
 
@@ -41,34 +44,39 @@ class Controller implements IViewModel {
     $onInit = () => {
         this.loading = false;
         // If somewhere in your controller you have to reinitialise anything that should "reset" your dom height
-        // We reset currentscrollHeight
-        this.scrollEventer.getInfiniteScroll().subscribe(() => this.currentscrollHeight = 0);
+        // We reset currentscrollSize
+        this.scrollEventer.getInfiniteScroll().subscribe(() => this.currentscrollSize = 0);
         if (!!this.querySelector)
-            this.latestHeightBottom = 150;
+            this.latestSize = 150;
         this.scroll();
     };
 
     scroll = async (): Promise<void> => {
-        let scrollHeight: number;
+        let scrollSize: number;
         let scrollPos: number;
 
         if (!!this.querySelector) {
-            scrollHeight = angular.element(document.querySelector(this.querySelector))[0].scrollHeight as number;
-            scrollPos = Math.floor(angular.element(document.querySelector(this.querySelector)).height() + angular.element(document.querySelector(this.querySelector)).scrollTop());
+            if(this.isHorizontal) {
+                scrollSize = angular.element(document.querySelector(this.querySelector))[0].scrollWidth as number;
+                scrollPos = Math.floor(angular.element(document.querySelector(this.querySelector)).width() + angular.element(document.querySelector(this.querySelector)).scrollLeft());
+            } else {
+                scrollSize = angular.element(document.querySelector(this.querySelector))[0].scrollHeight as number;
+                scrollPos = Math.floor(angular.element(document.querySelector(this.querySelector)).height() + angular.element(document.querySelector(this.querySelector)).scrollTop());
+            }
         } else {
-            scrollHeight = $(document).height() as number;
+            scrollSize = $(document).height() as number;
             scrollPos = Math.floor($(window).height() + $(window).scrollTop());
         }
 
 
-        const isBottom: boolean = scrollHeight - this.latestHeightBottom < scrollPos;
+        const isEnd: boolean = scrollSize - this.latestSize < scrollPos;
 
-        if (isBottom && this.currentscrollHeight < scrollHeight) {
+        if (isEnd && this.currentscrollSize < scrollSize) {
             if (this.loadingMode) this.loading = true;
             await this.scrolled();
             if (this.loadingMode) this.loading = false;
             // Storing the latest scroll that has been the longest one in order to not redo the scrolled() each time
-            this.currentscrollHeight = scrollHeight;
+            this.currentscrollSize = scrollSize;
         }
     }
 
@@ -86,6 +94,7 @@ function directive() {
             scrolled: '&',
             querySelector: '=?',
             loadingMode: '=?',
+            isHorizontal: '=?',
             scrollEventer: '='
         },
         controllerAs: 'vm',

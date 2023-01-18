@@ -9,8 +9,10 @@ export interface IBoardItemResponse {
     description: string;
     imageUrl: string;
     cardIds: Array<string>;
+    sections: Array<Section>;
     tags: Array<string>;
     nbCards: number;
+    nbCardsSections: number;
     modificationDate: string;
     creationDate: string;
     folderId: string;
@@ -45,6 +47,7 @@ export interface IBoardPayload {
     imageUrl?: string;
     folderId?: string;
     cardIds?: Array<string>;
+    sections?: Array<Section>;
     tags?: Array<string>;
     public?: boolean;
     layoutType?: LAYOUT_TYPE;
@@ -62,6 +65,7 @@ export class BoardForm {
     private _imageUrl: string;
     private _folderId: string;
     private _cardIds: Array<string>;
+    private _sections: Array<Section>;
     private _public: boolean;
     private _tags: Array<string>;
     private _tagsTextInput: string;
@@ -74,6 +78,7 @@ export class BoardForm {
         this._imageUrl = null;
         this._folderId = null;
         this._cardIds = null;
+        this._sections = null;
         this._public = false;
         this._tags = null;
         this._layoutType = LAYOUT_TYPE.FREE;
@@ -142,6 +147,14 @@ export class BoardForm {
         this._cardIds = value;
     }
 
+    get sections(): Array<Section> {
+        return this._sections;
+    }
+
+    set sections(value: Array<Section>) {
+        this._sections = value;
+    }
+
     get tags(): Array<string> {
         return this._tags;
     }
@@ -185,7 +198,7 @@ export class BoardForm {
 
     toJSON(): IBoardPayload {
 
-        let payload : IBoardPayload = {};
+        let payload: IBoardPayload = {};
 
         if (this.title) {
             payload.title = this.title;
@@ -204,6 +217,10 @@ export class BoardForm {
             payload.cardIds = this.cardIds;
         }
 
+        if (this.sections) {
+            payload.sections = this.sections;
+        }
+
         if (this.tags) {
             payload.tags = this.tags;
         }
@@ -216,7 +233,7 @@ export class BoardForm {
             payload.public = this.public;
         }
 
-        if (this.id && this.id != '')  {
+        if (this.id && this.id != '') {
             payload.id = this.id;
         }
 
@@ -230,10 +247,12 @@ export class Board implements Shareable {
     private _imageUrl: string;
     private _description: string;
     private _cardIds: Array<string>;
+    private _sections: Array<Section>;
     private _tags: Array<string>;
     private _layoutType: LAYOUT_TYPE;
     private _tagsTextInput: string;
     private _nbCards: number;
+    private _nbCardsSections: number;
     private _modificationDate: string;
     private _creationDate: string;
     private _folderId: string;
@@ -243,7 +262,7 @@ export class Board implements Shareable {
 
     // Share resource properties
     public shared: any[];
-    public owner: {userId: string, displayName: string};
+    public owner: { userId: string, displayName: string };
     public myRights: any;
 
 
@@ -262,6 +281,7 @@ export class Board implements Shareable {
             .replace(/,/g, ' ') : '';
 
         this._nbCards = data.nbCards;
+        this._nbCardsSections = data.nbCardsSections;
         this._modificationDate = data.modificationDate;
         this._creationDate = data.creationDate;
         this._folderId = data.folderId;
@@ -292,8 +312,20 @@ export class Board implements Shareable {
         return this._cardIds;
     }
 
+    get sections(): Array<Section> {
+        return this._sections;
+    }
+
+    set sections(value: Array<Section>) {
+        this._sections = value;
+    }
+
     get nbCards(): number {
         return this._nbCards;
+    }
+
+    get nbCardsSections(): number {
+        return this._nbCardsSections;
     }
 
     get modificationDate(): string {

@@ -1,5 +1,6 @@
 import {FOLDER_TYPE} from "../core/enums/folder-type.enum";
-import {_, Behaviours, model, Shareable} from "entcore";
+import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
+import {Behaviours, model, Shareable} from "entcore";
 
 export interface IBoardItemResponse {
     _id: string;
@@ -13,6 +14,7 @@ export interface IBoardItemResponse {
     creationDate: string;
     folderId: string;
     shared: any[];
+    layoutType: LAYOUT_TYPE;
     deleted: boolean;
     public: boolean;
     ownerId: string;
@@ -44,7 +46,9 @@ export interface IBoardPayload {
     cardIds?: Array<string>;
     tags?: Array<string>;
     public?: boolean;
+    layoutType?: LAYOUT_TYPE;
 }
+
 
 export class BoardForm {
     private _id: string;
@@ -56,6 +60,7 @@ export class BoardForm {
     private _public: boolean;
     private _tags: Array<string>;
     private _tagsTextInput: string;
+    private _layoutType: LAYOUT_TYPE;
 
     constructor() {
         this._id = null;
@@ -66,6 +71,7 @@ export class BoardForm {
         this._cardIds = null;
         this._public = false;
         this._tags = null;
+        this._layoutType = LAYOUT_TYPE.FREE;
         this._tagsTextInput = null;
     }
 
@@ -78,7 +84,7 @@ export class BoardForm {
         this.tags = board.tags;
         this.tagsTextInput = board.tagsTextInput;
         this.public = board.public;
-
+        this.layoutType = board.layoutType;
         return this;
     }
 
@@ -139,6 +145,14 @@ export class BoardForm {
         this._tags = value;
     }
 
+    get layoutType(): LAYOUT_TYPE {
+        return this._layoutType;
+    }
+
+    set layoutType(value: LAYOUT_TYPE) {
+        this._layoutType = value;
+    }
+
     get tagsTextInput(): string {
         return this._tagsTextInput;
     }
@@ -155,9 +169,13 @@ export class BoardForm {
         this._public = value;
     }
 
+    isLayoutFree(): boolean {
+        return this.layoutType == LAYOUT_TYPE.FREE;
+    }
+
     isValid(): boolean {
         return this.title !== null && this.title !== '' &&
-            this.imageUrl != null && this.imageUrl !== ''
+            this.imageUrl != null && this.imageUrl !== '' && this.layoutType !== null;
     }
 
     toJSON(): IBoardPayload {
@@ -185,6 +203,10 @@ export class BoardForm {
             payload.tags = this.tags;
         }
 
+        if (this.layoutType) {
+            payload.layoutType = this.layoutType;
+        }
+
         if (this.public) {
             payload.public = this.public;
         }
@@ -204,6 +226,7 @@ export class Board implements Shareable {
     private _description: string;
     private _cardIds: Array<string>;
     private _tags: Array<string>;
+    private _layoutType: LAYOUT_TYPE;
     private _tagsTextInput: string;
     private _nbCards: number;
     private _modificationDate: string;
@@ -225,6 +248,7 @@ export class Board implements Shareable {
         this._imageUrl = data.imageUrl;
         this._description = data.description;
         this._cardIds = data.cardIds;
+        this._layoutType = data.layoutType;
         this._tags = data.tags;
         this._tagsTextInput = data.tags ? data.tags
             .map((tag: string) => '#' + tag)
@@ -288,6 +312,14 @@ export class Board implements Shareable {
 
     set folderId(value: string) {
         this._folderId = value;
+    }
+
+    get layoutType(): LAYOUT_TYPE {
+        return this._layoutType;
+    }
+
+    set layoutType(value: LAYOUT_TYPE) {
+        this._layoutType = value;
     }
 
     get tags(): Array<string> {

@@ -1,4 +1,5 @@
 import {Board, BoardForm, Boards} from "../board.model";
+import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
 
 describe('BoardModel', () => {
    it('test Board initialization', done => {
@@ -13,6 +14,7 @@ describe('BoardModel', () => {
            creationDate: 'creationDate',
            folderId: 'folderId',
            shared: [],
+           layoutType: LAYOUT_TYPE.FREE,
            ownerId: 'ownerId',
            ownerName: 'ownerName',
            tags: ['tag1', 'tag2'],
@@ -45,6 +47,7 @@ describe('BoardModel', () => {
                    imageUrl: 'imageUrl',
                    description: 'description',
                    cardIds: ["card123"],
+                   layoutType: LAYOUT_TYPE.FREE,
                    nbCards: 0,
                    modificationDate: 'modificationDate',
                    creationDate: 'creationDate',
@@ -95,6 +98,7 @@ describe('BoardModel', () => {
         const formJSON1 = {
             title: 'title',
             description: 'description',
+            layoutType: LAYOUT_TYPE.FREE,
             imageUrl: 'imageUrl'
         }
 
@@ -102,6 +106,7 @@ describe('BoardModel', () => {
             id: 'id',
             title: 'title',
             description: 'description',
+            layoutType: LAYOUT_TYPE.FREE,
             imageUrl: 'imageUrl'
         }
 

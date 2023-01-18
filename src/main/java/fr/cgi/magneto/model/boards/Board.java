@@ -27,6 +27,7 @@ public class Board implements Model<Board> {
     private String folderId;
     private List<Card> cards;
     private List<String> tags;
+    private String layoutType;
 
     @SuppressWarnings("unchecked")
     public Board(JsonObject board) {
@@ -39,6 +40,7 @@ public class Board implements Model<Board> {
         this.isPublic = board.getBoolean(Field.PUBLIC, false);
         this.folderId = board.getString(Field.FOLDERID);
         this.modificationDate = board.getString(Field.MODIFICATIONDATE);
+        this.layoutType = board.getString(Field.LAYOUTTYPE);
         JsonArray cardsArray = new JsonArray(((List<String>) board.getJsonArray(Field.CARDIDS, new JsonArray()).getList())
                 .stream()
                 .map(id -> new JsonObject().put(Field._ID, id))
@@ -161,6 +163,19 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    public String getLayoutType() {
+        return this.layoutType;
+    }
+
+    public Board setLayoutType(String layoutType) {
+        this.layoutType = layoutType;
+        return this;
+    }
+
+    public boolean isLayoutFree() {
+        return this.layoutType.equals(Field.FREE);
+    }
+
     public List<String> tags() {
         return this.tags;
     }
@@ -188,6 +203,7 @@ public class Board implements Model<Board> {
                 .put(Field.OWNERID, this.getOwnerId())
                 .put(Field.OWNERNAME, this.getOwnerName())
                 .put(Field.SHARED, this.shared)
+                .put(Field.LAYOUTTYPE, this.getLayoutType())
                 .put(Field.TAGS, this.tags());
 }
 

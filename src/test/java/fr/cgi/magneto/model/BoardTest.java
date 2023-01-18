@@ -15,6 +15,7 @@ public class BoardTest {
             .put("title", "title")
             .put("imageUrl", "imageUrl")
             .put("description", "description")
+            .put("layoutType", "free")
             .put("modificationDate", "modificationDate")
             .put("cardIds", new JsonArray().add("cardId1").add("cardId2"))
             .putNull("creationDate")
@@ -39,6 +40,7 @@ public class BoardTest {
                 !board.getId().isEmpty() &&
                 !board.getTitle().isEmpty() &&
                 !board.getImageUrl().isEmpty() &&
+                !board.getLayoutType().isEmpty() &&
                 !board.getDescription().isEmpty() &&
                 !board.getOwnerId().isEmpty() &&
                 !board.getOwnerName().isEmpty() &&

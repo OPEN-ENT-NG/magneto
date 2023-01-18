@@ -24,6 +24,9 @@
     "deleted": {
       "type": "boolean"
     },
+    "layoutType": {
+      "type": "string"
+    },
     "cardIds": {
       "type": "array",
       "items": {

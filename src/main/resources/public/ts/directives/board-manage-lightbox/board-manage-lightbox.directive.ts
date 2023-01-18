@@ -83,6 +83,7 @@ function directive($parse: IParseService) {
                     form.folderId = vm.folderId;
                     form.tags = vm.form.tags;
                     form.public = vm.form.public;
+                    form.layoutType = vm.form.layoutType;
 
                     if (vm.isUpdate) {
                         await boardsService.updateBoard(vm.form.id, form);

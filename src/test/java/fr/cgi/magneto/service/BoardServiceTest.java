@@ -105,6 +105,7 @@ public class BoardServiceTest {
                "        \"_id\": 1,\n" +
                "        \"title\": 1,\n" +
                "        \"imageUrl\": 1,\n" +
+               "        \"layoutType\": 1,\n" +
                "        \"nbCards\": 1,\n" +
                "        \"modificationDate\": 1,\n" +
                "        \"folderId\": \"$folderId._id\",\n" +

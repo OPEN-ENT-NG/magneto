@@ -12,9 +12,11 @@ import fr.cgi.magneto.service.BoardService;
 import fr.cgi.magneto.service.FolderService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.webutils.I18n;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -22,9 +24,7 @@ import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class DefaultBoardService implements BoardService {
 
@@ -300,6 +300,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field._ID, 1)
                             .put(Field.TITLE, 1)
                             .put(Field.IMAGEURL, 1)
+                            .put(Field.LAYOUTTYPE, 1)
                             .put(Field.NBCARDS, new JsonObject().put(Mongo.SIZE, String.format("$%s", Field.CARDIDS)))
                             .put(Field.MODIFICATIONDATE, 1)
                             .put(Field.FOLDERID, new JsonObject().put(Mongo.FILTER,
@@ -346,6 +347,7 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.OWNERNAME, 1)
                 .put(Field.SHARED, 1)
                 .put(Field.TAGS, 1)
+                .put(Field.LAYOUTTYPE, 1)
                 .put(Field.PUBLIC, 1));
         if (getCount) {
             query = query.count();
@@ -387,6 +389,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.IMAGEURL, 1)
                         .put(Field.CREATIONDATE, 1)
                         .put(Field.CARDIDS, 1)
+                        .put(Field.LAYOUTTYPE, 1)
                         .put(Field.MODIFICATIONDATE, 1)
                         .put(Field.DESCRIPTION, 1)
                         .put(Field.OWNERID, 1)

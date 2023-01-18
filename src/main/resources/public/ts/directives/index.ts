@@ -1,6 +1,7 @@
 export * from './board-list/board-list.directive';
 export * from './board-list/board-list-item.directive';
 export * from './board-manage-lightbox/board-manage-lightbox.directive';
+export * from './board-manage-lightbox/board-layout-type/board-layout-type.directive';
 export * from './card-display/card-display.directive';
 export * from './card-preview-lightbox/card-preview-lightbox.directive';
 export * from './card-list/card-list.directive';

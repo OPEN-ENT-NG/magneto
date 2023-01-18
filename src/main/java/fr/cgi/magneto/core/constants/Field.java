@@ -50,6 +50,8 @@ public class Field {
     public static final String FOLDERS = "folders";
     public static final String TAGS = "tags";
 
+    public static final String LAYOUTTYPE = "layoutType";
+
     public static final String OWNER = "owner";
     public static final String USERID = "userId";
     public static final String GROUPID = "groupId";
@@ -106,4 +108,15 @@ public class Field {
 
     public static final String BOARD = "board";
 
+    public static final String FREE = "free";
+    public static final String VERTICAL = "vertical";
+    public static final String HORIZONTAL = "horizontal";
+
+    public static final String SECTIONID = "sectionId";
+
+    public static final String DELETECARDS = "deleteCards";
+
+    public static final String SECTION = "section";
+    public static final String SECTIONS = "sections";
+    public static final String NBCARDSSECTIONS = "nbCardsSections";
 }

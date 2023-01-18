@@ -9,6 +9,7 @@ import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +40,12 @@ public class Board implements Model<Board> {
         this.isPublic = board.getBoolean(Field.PUBLIC, false);
         this.folderId = board.getString(Field.FOLDERID);
         this.modificationDate = board.getString(Field.MODIFICATIONDATE);
+        this.layoutType = board.getString(Field.LAYOUTTYPE);
+        JsonArray sectionsArray = new JsonArray(((List<String>) board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList())
+                .stream()
+                .map(id -> new JsonObject().put(Field._ID, id))
+                .collect(Collectors.toList()));
+        this.sections = ModelHelper.toList(sectionsArray, Section.class);
         JsonArray cardsArray = new JsonArray(((List<String>) board.getJsonArray(Field.CARDIDS, new JsonArray()).getList())
                 .stream()
                 .map(id -> new JsonObject().put(Field._ID, id))
@@ -161,6 +168,54 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    public List<Section> sections() {
+        return this.sections;
+    }
+
+    public List<String> getCardsBySection(List<String> sectionIds) {
+        List<String> cardIds = new ArrayList<>();
+        this.sections.forEach((section) -> {
+            if (sectionIds.contains(section.getId())) {
+                cardIds.addAll(section.getCardIds());
+            }
+        });
+        return cardIds;
+    }
+
+    public List<Card> getCardsSection() {
+        List<Card> cards = new ArrayList<>();
+        this.sections.forEach((section) -> {
+            JsonArray cardsArray = new JsonArray(section.getCardIds()
+                    .stream()
+                    .map(id -> new JsonObject().put(Field._ID, id))
+                    .collect(Collectors.toList()));
+            cards.addAll(ModelHelper.toList(cardsArray, Card.class));
+        });
+        return cards;
+    }
+
+    public Board setSections(List<Section> sections) {
+        this.sections = sections;
+        return this;
+    }
+
+    public List<String> sectionIds() {
+        return this.sections().stream().map(Section::getId).collect(Collectors.toList());
+    }
+
+    public String getLayoutType() {
+        return this.layoutType;
+    }
+
+    public Board setLayoutType(String layoutType) {
+        this.layoutType = layoutType;
+        return this;
+    }
+
+    public boolean isLayoutFree() {
+        return this.layoutType.equals(Field.FREE);
+    }
+
     public List<String> tags() {
         return this.tags;
     }
@@ -188,6 +243,7 @@ public class Board implements Model<Board> {
                 .put(Field.OWNERID, this.getOwnerId())
                 .put(Field.OWNERNAME, this.getOwnerName())
                 .put(Field.SHARED, this.shared)
+                .put(Field.LAYOUTTYPE, this.getLayoutType())
                 .put(Field.TAGS, this.tags());
 }
 

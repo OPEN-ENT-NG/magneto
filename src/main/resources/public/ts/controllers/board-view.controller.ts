@@ -3,6 +3,7 @@ import {IScope, IWindowService} from "angular";
 import {cardsService, IBoardsService, ICardsService} from "../services";
 import {
     Board,
+    BoardForm,
     Boards,
     BoardForm,
     Card,
@@ -12,11 +13,13 @@ import {
     ICardsBoardParamsRequest, ILinkerParams
 } from "../models";
 import {safeApply} from "../utils/safe-apply.utils";
-import {AxiosError, AxiosResponse} from "axios";
+import {AxiosError} from "axios";
 import {InfiniteScrollService} from "../shared/services";
 import {EventBusService} from "../shared/event-bus-service/event-bus-sockjs.service";
-import * as SockJS from "sockjs-client";
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
+import {ISectionsService} from "../services/sections.service";
+import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
+import {Sections} from "../models/section.model";
 
 interface IViewModel extends ng.IController {
 

@@ -18,6 +18,7 @@ public class BoardPayload implements Model<BoardPayload> {
     private String creationDate;
     private String modificationDate;
     private String folderId;
+    private String layoutType;
     private List<String> cardIds;
     private List<String> tags;
     private boolean isPublic;
@@ -35,6 +36,7 @@ public class BoardPayload implements Model<BoardPayload> {
         this.ownerId = board.getString(Field.OWNERID);
         this.ownerName = board.getString(Field.OWNERNAME);
         this.folderId = board.getString(Field.FOLDERID);
+        this.layoutType = board.getString(Field.LAYOUTTYPE);
         this.cardIds = !board.getJsonArray(Field.CARDIDS, new JsonArray()).isEmpty() ?
                 board.getJsonArray(Field.CARDIDS, new JsonArray()).getList() : null;
         this.tags = !board.getJsonArray(Field.TAGS, new JsonArray()).isEmpty() ?
@@ -118,6 +120,19 @@ public class BoardPayload implements Model<BoardPayload> {
         return this;
     }
 
+    public String getLayoutType() {
+        return layoutType;
+    }
+
+    public BoardPayload setLayoutType(String layoutType) {
+        this.layoutType = layoutType;
+        return this;
+    }
+
+    public boolean isLayoutFree() {
+        return this.layoutType.equals(Field.FREE);
+    }
+
     public String getModificationDate() {
         return modificationDate;
     }
@@ -190,6 +205,10 @@ public class BoardPayload implements Model<BoardPayload> {
 
         if (this.getTags() != null) {
             json.put(Field.TAGS, new JsonArray(this.getTags()));
+        }
+
+        if (this.getLayoutType() != null) {
+            json.put(Field.LAYOUTTYPE, this.getLayoutType());
         }
 
         json.put(Field.PUBLIC, this.isPublic());

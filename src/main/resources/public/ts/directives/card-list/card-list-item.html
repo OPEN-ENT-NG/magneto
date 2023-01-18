@@ -27,8 +27,8 @@
         </div>
     </div>
     <card-list-item-options
-            ng-if="vm.isDisplayedOptions"
-            card="vm.card"
+            ng-show="vm.isDisplayedOptions"
+            options="vm.card"
             has-edit="vm.hasEdit"
             on-edit="vm.openEdit"
             has-delete="vm.hasDelete"

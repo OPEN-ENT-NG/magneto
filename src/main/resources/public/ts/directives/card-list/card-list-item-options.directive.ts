@@ -1,7 +1,7 @@
 import {ng} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Card} from "../../models";
+import {Card, Section} from "../../models";
 
 interface IViewModel extends ng.IController, ICardListItemOptionsProps {
     openEdit?(): void;
@@ -13,7 +13,7 @@ interface IViewModel extends ng.IController, ICardListItemOptionsProps {
 }
 
 interface ICardListItemOptionsProps {
-    card: Card;
+    options: Card | Section;
     isDisplayed: boolean;
     hasEdit: boolean;
     onEdit?;
@@ -35,7 +35,7 @@ interface ICardListItemOptionsScope extends IScope, ICardListItemOptionsProps {
 
 class Controller implements IViewModel {
 
-    card: Card;
+    options: Card | Section;
     isDisplayed: boolean;
     hasEdit: boolean;
     hasDuplicate: boolean;
@@ -63,7 +63,7 @@ function directive($parse: IParseService) {
         restrict: 'E',
         templateUrl: `${RootsConst.directive}card-list/card-list-item-options.html`,
         scope: {
-            card: '=',
+            options: '=',
             isDisplayed: '=',
             hasEdit: '=',
             onEdit: '&',
@@ -92,42 +92,42 @@ function directive($parse: IParseService) {
                 element.click(function (event) {
                     event.stopPropagation();
                 });
-               $parse($scope.vm.onEdit())(vm.card);
+               $parse($scope.vm.onEdit())(vm.options);
             }
 
             vm.openDuplicate = (): void => {
                 element.click(function (event) {
                     event.stopPropagation();
                 });
-                $parse($scope.vm.onDuplicate())(vm.card);
+                $parse($scope.vm.onDuplicate())(vm.options);
             }
 
             vm.openHide = (): void => {
                 element.click(function (event) {
                     event.stopPropagation();
                 });
-                $parse($scope.vm.onHide())(vm.card);
+                $parse($scope.vm.onHide())(vm.options);
             }
 
             vm.openDelete = (): void => {
                 element.click(function (event) {
                     event.stopPropagation();
                 });
-                $parse($scope.vm.onDelete())(vm.card);
+                $parse($scope.vm.onDelete())(vm.options);
             }
 
             vm.openPreview = (): void => {
                 element.click(function (event) {
                     event.stopPropagation();
                 });
-                $parse($scope.vm.onPreview())(vm.card);
+                $parse($scope.vm.onPreview())(vm.options);
             }
 
             vm.openTransfer = (): void => {
                 element.click(function (event) {
                     event.stopPropagation();
                 });
-                $parse($scope.vm.onTransfer())(vm.card);
+                $parse($scope.vm.onTransfer())(vm.options);
             }
         }
     }

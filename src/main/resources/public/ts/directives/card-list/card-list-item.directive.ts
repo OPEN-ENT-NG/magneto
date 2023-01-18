@@ -25,6 +25,8 @@ interface IViewModel extends ng.IController, ICardListItemProps {
 
     openTransfer?(card: Card): void;
 
+    openLock?(card: Card): void;
+
     openCardOptions?(): Promise<void>;
 
     isDisplayedOptions: boolean;
@@ -38,6 +40,7 @@ interface ICardListItemProps {
 
     isDraggable: boolean;
     hasCaption: boolean;
+    selectorResize: string;
 
     hasEdit: boolean;
     onEdit?;
@@ -51,6 +54,8 @@ interface ICardListItemProps {
     onPreview?;
     hasTransfer: boolean;
     onTransfer?;
+    hasLock: boolean;
+    onLock?;
 }
 
 interface ICardListItemScope extends IScope, ICardListItemProps {
@@ -72,6 +77,8 @@ class Controller implements IViewModel {
     hasPreview: boolean;
     hasTransfer: boolean;
 
+    selectorResize: string;
+    hasLock: boolean;
 
     isSelected: boolean;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
@@ -135,7 +142,10 @@ function directive($parse: IParseService) {
             hasPreview: '=',
             onPreview: '&',
             hasTransfer: '=',
-            onTransfer: '&'
+            onTransfer: '&',
+            selectorResize: '=',
+            hasLock: '=',
+            onLock: '&'
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -148,14 +158,14 @@ function directive($parse: IParseService) {
             $(document).bind('click', (event: JQueryEventObject): void => {
                 if(!element.find(event.target).length && vm.isDisplayedOptions) {
                     vm.isDisplayedOptions = false;
-                    $scope.$apply();
                 }
+                safeApply($scope);
             });
 
             let repositionActionOptions = (): void => {
-                let windowElem: JQuery = vm.hasCaption ? $(window) : $(".card-list-scrollable");
+                let windowElem: JQuery = vm.selectorResize ? $(vm.selectorResize): $(window);
                 let actionOptionsElem: JQuery =
-                    $("#options");
+                    $("#options-" + vm.card.id);
                 let repositionClass: string = 'reposition';
                 // if element position element is left sided, we want to check right sided position to see if it goes
                 // out of the screen, so we add 2 times the element width.
@@ -178,7 +188,7 @@ function directive($parse: IParseService) {
 
             vm.openCardOptions = async (): Promise<void> => {
                 vm.isDisplayedOptions = !vm.isDisplayedOptions;
-                await safeApply($scope); // waiting dom recalculate
+                await safeApply($scope);
                 if (vm.isDisplayedOptions) repositionActionOptions();
             }
 
@@ -204,6 +214,10 @@ function directive($parse: IParseService) {
 
             vm.openTransfer = (card: Card): void => {
                 $parse($scope.vm.onTransfer())(card);
+            }
+
+            vm.openLock = (card: Card): void => {
+                $parse($scope.vm.onLock())(card);
             }
         }
     }

@@ -417,8 +417,16 @@ public class DefaultBoardService implements BoardService {
 
         query.matchRegex(searchText, Arrays.asList(Field.TITLE, Field.DESCRIPTION, Field.TAGS))
                 .sort(sortBy, -1)
-                .lookUp(CollectionsConstant.FOLDER_COLLECTION, Field._ID, Field.BOARDIDS, Field.FOLDERS);
-
+                .lookUp(CollectionsConstant.FOLDER_COLLECTION, Field._ID, Field.BOARDIDS, Field.FOLDERS)
+                .lookUp(CollectionsConstant.SECTION_COLLECTION, Field.SECTIONIDS, Field._ID, Field.SECTIONS)
+                .addFields(Field.NBCARDSSECTIONS, new JsonObject().put(Mongo.SUM, new JsonObject().put(
+                                        Mongo.MAP, new JsonObject()
+                                                .put(Mongo.INPUT, String.format("$%s", Field.SECTIONS))
+                                                .put(Mongo.AS, Field.SECTION)
+                                                .put(Mongo.IN_MAP, new JsonObject().put(Mongo.SIZE, String.format("$$%s.%s", Field.SECTION, Field.CARDIDS)))
+                                )
+                        )
+                );
 
         if (!getCount) {
             if (page != null) {
@@ -430,6 +438,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.IMAGEURL, 1)
                             .put(Field.LAYOUTTYPE, 1)
                             .put(Field.NBCARDS, new JsonObject().put(Mongo.SIZE, String.format("$%s", Field.CARDIDS)))
+                            .put(Field.NBCARDSSECTIONS, 1)
                             .put(Field.MODIFICATIONDATE, 1)
                             .put(Field.FOLDERID, new JsonObject().put(Mongo.FILTER,
                                     new JsonObject()
@@ -468,6 +477,7 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.TITLE, 1)
                 .put(Field.IMAGEURL, 1)
                 .put(Field.NBCARDS, 1)
+                .put(Field.NBCARDSSECTIONS, 1)
                 .put(Field.MODIFICATIONDATE, 1)
                 .put(Field.FOLDERID, String.format("$%s.%s", Field.FOLDERID, Field._ID))
                 .put(Field.DESCRIPTION, 1)

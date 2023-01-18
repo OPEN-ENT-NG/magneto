@@ -3,9 +3,11 @@ import {ILocationService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board} from "../../models";
 import {DateUtils} from "../../utils/date.utils";
+import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
 
 interface IViewModel extends ng.IController, IBoardListItemProps {
     formatDate(date: string): string;
+    getNbCards(): number;
 }
 
 interface IBoardListItemProps {
@@ -35,6 +37,10 @@ class Controller implements IViewModel {
 
     formatDate = (date: string): string => {
         return DateUtils.format(date, DateUtils.FORMAT["DAY-MONTH-YEAR-LETTER"])
+    }
+
+    getNbCards = (): number => {
+        return this.board.layoutType == LAYOUT_TYPE.FREE ? this.board.nbCards : this.board.nbCardsSections;
     }
 
 }

@@ -13,8 +13,8 @@
         <!--Board nb of magnets-->
         <div class="board-list-item-infos-nb-cards">
             <i class="magneto-magnet"></i>
-            <span ng-if="vm.board.nbCards != 1"><b>[[vm.board.nbCards]]</b>&nbsp;<i18n>magneto.magnets</i18n></span>
-            <span ng-if="vm.board.nbCards == 1"><b>[[vm.board.nbCards]]</b>&nbsp;<i18n>magneto.magnet</i18n></span>
+            <span ng-if="vm.getNbCards() != 1"><b>[[vm.getNbCards()]]</b>&nbsp;<i18n>magneto.magnets</i18n></span>
+            <span ng-if="vm.getNbCards() == 1"><b>[[vm.getNbCards()]]</b>&nbsp;<i18n>magneto.magnet</i18n></span>
         </div>
         <div class="board-list-item-infos-date-icons">
             <div class="infos-date">

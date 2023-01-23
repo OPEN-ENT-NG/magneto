@@ -45,7 +45,6 @@ describe('CardsService', () => {
         mock.onGet(`/magneto/cards/${params.boardId}`)
             .reply(200, data);
 
-
         cardsService.getAllCardsByBoard(params).then(res => {
             expect(res).toEqual(data);
             done();

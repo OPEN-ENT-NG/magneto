@@ -66,7 +66,7 @@ class Controller implements IViewModel {
     }
 
     getDescriptionHTML = (description: string): string => {
-        return !!description ? this.$sce.trustAsHtml(description.toString()) : null;
+        return !!description ? this.$sce.trustAsHtml(description) : null;
     }
 
     getOwnerText = (): string => {

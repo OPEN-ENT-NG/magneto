@@ -1,0 +1,32 @@
+<div class="sections-list sections-list-[[vm.board.layoutType]]">
+    <section-list-item
+            ng-repeat="section in vm.board.sections"
+            board="vm.board"
+            section="section"
+            on-move="vm.getBoard"
+            on-edit="vm.openEdit"
+            on-duplicate="vm.openDuplicate"
+            on-delete="vm.openDelete"
+            on-delete-section="vm.openDeleteSectionLightbox"
+            on-duplicate-section="vm.duplicateSection"
+            on-preview="vm.openPreview"
+            on-transfer="vm.openTransfer"
+            class="scrollbar sections-list-content sections-list-content-[[vm.board.layoutType]]">
+    </section-list-item>
+    <div ng-if="vm.board.myRights.publish !== undefined"
+         class="sections-list-content sections-list-content-[[vm.board.layoutType]]">
+        <div class="sections-list-content-container" tabindex="0">
+            <input type="text" class="sections-list-content-title input"
+                   ng-keyup="$event.keyCode == 13 ? vm.createSection(vm.newSection) : null"
+                   ng-model="vm.newSection.title" i18n-placeholder="magneto.section.insert.title"/>
+        </div>
+    </div>
+
+    <!-- Section deletion modal -->
+    <section-delete-lightbox
+            display="vm.displayDeleteSectionLightbox"
+            on-submit="vm.onFormSubmit"
+            section-ids="[vm.selectedSection.id]"
+            board-id="vm.board.id">
+    </section-delete-lightbox>
+</div>

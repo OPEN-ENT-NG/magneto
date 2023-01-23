@@ -1,0 +1,35 @@
+<div id="section-[[vm.section.id]]">
+    <div class="sections-list-content-container" tabindex="0">
+        <input ng-readonly="vm.board.myRights.publish === undefined" type="text"
+               class="sections-list-content-title input"
+               ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null" ng-model="vm.section.title"/>
+        <i class="magneto-card-settings" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
+        <card-list-item-options
+                ng-show="vm.isDisplayedOptions"
+                card="vm.section"
+                has-delete="true"
+                on-delete="vm.openDeleteSection"
+                has-duplicate="true"
+                on-duplicate="vm.openDuplicateSection">
+        </card-list-item-options>
+    </div>
+    <card-list
+            ng-if="vm.board.id && !vm.isLoading"
+            layout="vm.board.layoutType"
+            is-draggable="vm.board.myRights.publish !== undefined"
+            has-caption="true"
+            cards="vm.section.cards"
+            on-move="vm.onMove"
+            board-display="false"
+            has-edit="vm.board.myRights.publish !== undefined"
+            on-edit="vm.openEdit"
+            has-duplicate="vm.board.myRights.contrib !== undefined"
+            on-duplicate="vm.openDuplicate"
+            has-delete="vm.board.myRights.manager !== undefined"
+            on-delete="vm.openDelete"
+            has-preview="vm.board.myRights.read !== undefined || vm.board.public"
+            on-preview="vm.openPreview"
+            has-transfer="vm.board.myRights.publish != undefined"
+            on-transfer="vm.openTransfer">
+    </card-list>
+</div>

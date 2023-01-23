@@ -1,4 +1,4 @@
-<div id="card-list" class="card-list flex-row f-wrap">
+<div id="card-list" class="card-list card-list-[[vm.layout]] flex-row scrollbar">
     <card-list-item ng-repeat="card in vm.cards"
                     ng-click="vm.selectCard(card._id)"
                     ng-dblclick="vm.hasEdit ? vm.openEdit(card) : vm.hasPreview ? vm.openPreview(card) : null"

@@ -12,6 +12,7 @@ export interface IBoardItemResponse {
     sections: Array<Section>;
     tags: Array<string>;
     nbCards: number;
+    nbCardsSections: number;
     modificationDate: string;
     creationDate: string;
     folderId: string;
@@ -252,6 +253,7 @@ export class Board implements Shareable {
     private _layoutType: LAYOUT_TYPE;
     private _tagsTextInput: string;
     private _nbCards: number;
+    private _nbCardsSections: number;
     private _modificationDate: string;
     private _creationDate: string;
     private _folderId: string;
@@ -280,6 +282,7 @@ export class Board implements Shareable {
             .replace(/,/g, ' ') : '';
 
         this._nbCards = data.nbCards;
+        this._nbCardsSections = data.nbCardsSections;
         this._modificationDate = data.modificationDate;
         this._creationDate = data.creationDate;
         this._folderId = data.folderId;
@@ -320,6 +323,10 @@ export class Board implements Shareable {
 
     get nbCards(): number {
         return this._nbCards;
+    }
+
+    get nbCardsSections(): number {
+        return this._nbCardsSections;
     }
 
     get modificationDate(): string {

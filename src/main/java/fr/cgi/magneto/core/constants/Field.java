@@ -119,5 +119,6 @@ public class Field {
     public static final String DELETECARDS = "deleteCards";
 
     public static final String SECTION = "section";
-
+    public static final String SECTIONS = "sections";
+    public static final String NBCARDSSECTIONS = "nbCardsSections";
 }

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "sectionIds": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "boardId": {
+      "type": "string"
+    },
+    "deleteCards": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "sectionIds"
+  ]
+}

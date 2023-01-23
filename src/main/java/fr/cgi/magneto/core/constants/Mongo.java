@@ -49,4 +49,7 @@ public class Mongo {
     public static final String ARRAYELEMAT = "$arrayElemAt";
     public static final String _ID = "_id";
     public static final String FIRST = "$first";
+    public static final String SUM = "$sum";
+    public static final String MAP = "$map";
+    public static final String IN_MAP = "in";
 }

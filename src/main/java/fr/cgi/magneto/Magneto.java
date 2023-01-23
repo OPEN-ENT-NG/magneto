@@ -32,13 +32,14 @@ public class Magneto extends BaseServer {
 		conf.setCollection(CollectionsConstant.BOARD_COLLECTION);
 		conf.setResourceIdLabel(Field._ID);
 
+		// TODO see if needed
 		setDefaultResourceFilter(new ShareAndOwner());
-
 
 		addController(new MagnetoController(serviceFactory));
 		addController(new BoardController(serviceFactory));
 		addController(new CardController(serviceFactory));
 		addController(new FolderController(serviceFactory));
+		addController(new SectionController(serviceFactory));
 
 		final EventBus eb = getEventBus(vertx);
 

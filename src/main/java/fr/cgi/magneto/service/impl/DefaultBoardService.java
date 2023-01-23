@@ -6,11 +6,12 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.model.MongoQuery;
+import fr.cgi.magneto.model.Section;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
-import fr.cgi.magneto.service.BoardService;
-import fr.cgi.magneto.service.FolderService;
-import fr.cgi.magneto.service.ServiceFactory;
+import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.service.*;
 import fr.wseduc.mongodb.MongoDb;
 import fr.wseduc.webutils.I18n;
 import io.vertx.core.CompositeFuture;
@@ -25,12 +26,18 @@ import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static fr.wseduc.webutils.http.Renders.getHost;
 
 public class DefaultBoardService implements BoardService {
 
     private final MongoDb mongoDb;
     private final String collection;
     private final FolderService folderService;
+    private final SectionService sectionService;
+    private final CardService cardService;
+
     protected static final Logger log = LoggerFactory.getLogger(DefaultBoardService.class);
 
 
@@ -38,17 +45,28 @@ public class DefaultBoardService implements BoardService {
         this.collection = collection;
         this.mongoDb = mongo;
         this.folderService = serviceFactory.folderService();
+        this.cardService = serviceFactory.cardService();
+        this.sectionService = serviceFactory.sectionService();
     }
 
     @Override
-    public Future<JsonObject> create(UserInfos user, JsonObject board) {
+    public Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, HttpServerRequest request) {
         Promise<JsonObject> promise = Promise.promise();
         BoardPayload createBoard = new BoardPayload(board);
         String newId = UUID.randomUUID().toString();
+        List<Future> createBoardFutures = new ArrayList<>();
+        // Create new section and update board if layout is different of free
+        if (!createBoard.isLayoutFree() && defaultSection) {
+            String newSectionId = UUID.randomUUID().toString();
+            createBoard.setSectionIds(Collections.singletonList(newSectionId));
+            SectionPayload createSection = new SectionPayload(newId)
+                    .setTitle(I18n.getInstance().translate("magneto.section.default.title", getHost(request), I18n.acceptLanguage(request)));
+            createBoardFutures.add(this.sectionService.create(createSection, newSectionId));
+        }
         createBoard.setOwnerId(user.getUserId());
         createBoard.setOwnerName(user.getFirstName() + " " + user.getLastName());
-
-        this.createBoard(createBoard, newId)
+        createBoardFutures.add(this.createBoard(createBoard, newId));
+        CompositeFuture.all(createBoardFutures)
                 .compose(success -> this.updateFolderOnBoardCreate(user.getUserId(), createBoard, newId))
                 .onFailure(promise::fail)
                 .onSuccess(res -> promise.complete(new JsonObject().put(Field.ID, newId)));
@@ -105,8 +123,118 @@ public class DefaultBoardService implements BoardService {
                 promise.fail(message);
                 return;
             }
-            promise.complete(results.right().getValue().put(Field.CARDIDS, board.getCardIds()));
+            promise.complete(results.right().getValue());
         }));
+        return promise.future();
+    }
+
+    public Future<JsonObject> duplicate(String boardId, UserInfos user, HttpServerRequest request) {
+        Promise<JsonObject> promise = Promise.promise();
+        Map<String, Future<?>> futures = new HashMap<>();
+        JsonObject futuresInfos = new JsonObject();
+        this.getBoards(Collections.singletonList(boardId))
+                .compose(boardResult -> {
+                    if (!boardResult.isEmpty()) {
+                        Board duplicateBoard = boardResult.get(0);
+
+                        // Store board infos for scope
+                        futuresInfos.put(Field.BOARD, duplicateBoard.toJson());
+
+                        Future<JsonObject> getCardsFuture;
+                        Future<List<Section>> getSectionsFuture = Future.succeededFuture(); // Succeeded by default because not necessary everytime
+
+                        // If the layout is different from Free, we get sections from the board
+                        if (!duplicateBoard.isLayoutFree()) {
+                            getSectionsFuture = sectionService.getSectionsByBoardId(duplicateBoard.getId());
+                            futures.put(Field.SECTION, getSectionsFuture);
+                        }
+
+                        // Get all cards from the board
+                        getCardsFuture = cardService.getAllCardsByBoard(duplicateBoard, null);
+                        futures.put(Field.CARDS, getCardsFuture);
+
+                        // Reset new board
+                        duplicateBoard.reset();
+                        Future<JsonObject> createBoardFuture = this.create(user, duplicateBoard.toJson(), false, request);
+                        futures.put(Field.BOARD, createBoardFuture);
+                        return CompositeFuture.all(getCardsFuture, getSectionsFuture, createBoardFuture);
+                    } else {
+                        String message = String.format("[Magneto%s::duplicate] " +
+                                "No board found with id %s", this.getClass().getSimpleName(), boardId);
+                        promise.fail(message);
+                        return Future.failedFuture(message);
+                    }
+                })
+                .compose(result -> {
+                    if (result.succeeded()) {
+                        String duplicateBoard = ((JsonObject) futures.get(Field.BOARD).result()).getString(Field.ID);
+
+                        JsonArray duplicateCardsArray = ((JsonObject) futures.get(Field.CARDS).result()).getJsonArray(Field.ALL);
+                        List<Card> duplicateCards = duplicateCardsArray.getList();
+                        List<Future> duplicateFuture = new ArrayList<>();
+
+                        // Check if layout of the board to duplicate is not free
+                        if (!futuresInfos.getJsonObject(Field.BOARD).getString(Field.LAYOUTTYPE).equals(Field.FREE)) {
+                            List<Section> duplicateSection = (List<Section>) futures.get(Field.SECTION).result();
+                            // If no section in board, no duplicate
+                            if (duplicateSection.isEmpty()) {
+                                duplicateFuture.add(Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result()));
+                            } else {
+                                duplicateFuture.add(sectionService.duplicateSections(duplicateBoard, duplicateSection, duplicateCards, true, user));
+                            }
+                        } else {
+                            // If no cards in board, no duplicate
+                            if (duplicateCards.isEmpty()) {
+                                duplicateFuture.add(Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result()));
+                            } else {
+                                duplicateFuture.add(cardService.duplicateCards(duplicateBoard, duplicateCards, null, user));
+                            }
+                        }
+                        return CompositeFuture.all(duplicateFuture);
+                    } else {
+                        String message = String.format("[Magneto%s::duplicate] " +
+                                "Failed to retrieve cards/sections from board with id %s", this.getClass().getSimpleName(), boardId);
+                        promise.fail(message);
+                        return Future.failedFuture(message);
+                    }
+                })
+                .onFailure(promise::fail)
+                .onSuccess(success -> promise.complete());
+        return promise.future();
+    }
+
+    public Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, HttpServerRequest request) {
+        Promise<JsonObject> promise = Promise.promise();
+        List<Future> updateBoardFutures = new ArrayList<>();
+
+        // Check if we are changing the layout from free to section
+        if (currentBoard.isLayoutFree() && !updateBoard.isLayoutFree()) {
+            SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.cardIds());
+
+            // Check if the board have already sections or not
+            if (currentBoard.sectionIds().isEmpty()) {
+                String sectionId = UUID.randomUUID().toString();
+                sectionPayload.setTitle(I18n.getInstance().translate("magneto.section.default.title", getHost(request), I18n.acceptLanguage(request)));
+                updateBoard.addSection(sectionId);
+                updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));
+            } else {
+                updateBoardFutures.add(sectionService.update(sectionPayload.setId(currentBoard.sectionIds().get(0))));
+            }
+            promise.complete(updateBoard.toJson());
+
+            // Check if we are changing the layout from section to free
+        } else if (!currentBoard.isLayoutFree() && updateBoard.isLayoutFree()) {
+            cardService.getAllCardsByBoard(currentBoard, null)
+                    .compose(cards -> {
+                        List<Card> cardsList = cards.getJsonArray(Field.ALL).getList();
+                        List<String> cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());
+                        updateBoard.setCardIds(cardIds);
+                        promise.complete(updateBoard.toJson());
+                        return Future.succeededFuture();
+                    });
+        } else {
+            promise.complete(updateBoard.toJson());
+        }
         return promise.future();
     }
 
@@ -388,6 +516,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.TITLE, 1)
                         .put(Field.IMAGEURL, 1)
                         .put(Field.CREATIONDATE, 1)
+                        .put(Field.SECTIONIDS, 1)
                         .put(Field.CARDIDS, 1)
                         .put(Field.LAYOUTTYPE, 1)
                         .put(Field.MODIFICATIONDATE, 1)

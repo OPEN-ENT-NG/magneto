@@ -20,9 +20,11 @@ public class Field {
     public static final String _ID = "_id";
     public static final String SEARCHTEXT = "searchText";
     public static final String FOLDERID = "folderId";
+
     public static final String OLDFOLDERID = "oldFolderId";
     public static final String PUBLIC = "public";
     public static final String ISPUBLIC = "isPublic";
+
     public static final String SHARED = "shared";
     public static final String ISSHARED = "isShared";
     public static final String SORTBY = "sortBy";
@@ -30,6 +32,7 @@ public class Field {
 
     public static final String DELETED = "deleted";
     public static final String ISDELETED = "isDeleted";
+
     public static final String OWNERID = "ownerId";
     public static final String OWNERNAME = "ownerName";
     public static final String TITLE = "title";
@@ -39,7 +42,7 @@ public class Field {
     public static final String MODIFICATIONDATE = "modificationDate";
     public static final String CREATIONDATE = "creationDate";
     public static final String DESCRIPTION = "description";
-    public static final String CARDID = "cardId";
+    public static final String SECTIONIDS = "sectionIds";
     public static final String CARDIDS = "cardIds";
     public static final String BOARDIDS = "boardIds";
     public static final String PARENTID = "parentId";
@@ -85,7 +88,6 @@ public class Field {
     public static final String OK = "ok";
 
 
-
     // METADATA FIELD
 
     public static final String NAME = "name";
@@ -111,4 +113,11 @@ public class Field {
     public static final String FREE = "free";
     public static final String VERTICAL = "vertical";
     public static final String HORIZONTAL = "horizontal";
+
+    public static final String SECTIONID = "sectionId";
+
+    public static final String DELETECARDS = "deleteCards";
+
+    public static final String SECTION = "section";
+
 }

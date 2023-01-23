@@ -3,6 +3,7 @@ package fr.cgi.magneto.service;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import io.vertx.core.*;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.*;
 import org.entcore.common.user.UserInfos;
 
@@ -16,9 +17,11 @@ public interface BoardService {
      *
      * @param user  User Object containing user id and displayed name
      * @param board JsonObjet Board to create
+     * @param defaultSection Boolean Create a seciton by default or no
+     * @param request HttpServerRequest Request containing I18n keys
      * @return Future {@link Future <JsonObject>} containing newly created board
      */
-    Future<JsonObject> create(UserInfos user, JsonObject board);
+    Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, HttpServerRequest request);
 
     /**
      * Update a board
@@ -29,11 +32,33 @@ public interface BoardService {
     Future<JsonObject> update(BoardPayload board);
 
     /**
-     * Get boards by id
+     * Update layout cards configuration in board
      *
-     * @param boardIds Board ids to get data
-     * @return Future {@link Future <JsonObject>} containing a list of board
+     * @param updateBoard {@link BoardPayload} Board to update
+     * @param currentBoard {@link Board} Board infos
+     * @param request HttpServerRequest Request containing I18n keys
+     * @return Future {@link Future <JsonObject>} containing updated board
      */
+    Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, HttpServerRequest request);
+
+        /**
+         * Duplicate a board
+         *
+         * @param boardId Board identifier to duplicate
+         * @param user User who duplicate
+         * @param request Request to get i18n infos (default title)
+         * @return Future {@link Future <JsonObject>} containing duplicated board
+         */
+
+    Future<JsonObject> duplicate(String boardId, UserInfos user, HttpServerRequest request);
+
+
+        /**
+         * Get boards by id
+         *
+         * @param boardIds Board ids to get data
+         * @return Future {@link Future <JsonObject>} containing a list of board
+         */
     Future<List<Board>> getBoards(List<String> boardIds);
 
 

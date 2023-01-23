@@ -20,9 +20,11 @@ public class BoardPayloadTest {
             .put("modificationDate", "modificationDate")
             .put("deleted", false)
             .put("public", false)
-            .put("cardIds", new JsonArray());
+            .put("cardIds", new JsonArray())
+            .put("sectionIds", new JsonArray());
 
     JsonObject boardUpdateJsonObject_1 = new JsonObject()
+            .put("_id", "id")
             .put("title", "title")
             .put("imageUrl", "imageUrl")
             .put("description", "description")

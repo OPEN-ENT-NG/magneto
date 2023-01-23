@@ -18,6 +18,7 @@ public class BoardTest {
             .put("layoutType", "free")
             .put("modificationDate", "modificationDate")
             .put("cardIds", new JsonArray().add("cardId1").add("cardId2"))
+            .put("sectionIds", new JsonArray())
             .putNull("creationDate")
             .put("deleted", false)
             .put("public", false)

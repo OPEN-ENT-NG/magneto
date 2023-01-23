@@ -4,11 +4,13 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.model.Model;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ public class Board implements Model<Board> {
     private boolean isPublic;
     private String folderId;
     private List<Card> cards;
+    private List<Section> sections;
     private List<String> tags;
     private String layoutType;
 
@@ -41,6 +44,11 @@ public class Board implements Model<Board> {
         this.folderId = board.getString(Field.FOLDERID);
         this.modificationDate = board.getString(Field.MODIFICATIONDATE);
         this.layoutType = board.getString(Field.LAYOUTTYPE);
+        JsonArray sectionsArray = new JsonArray(((List<String>) board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList())
+                .stream()
+                .map(id -> new JsonObject().put(Field._ID, id))
+                .collect(Collectors.toList()));
+        this.sections = ModelHelper.toList(sectionsArray, Section.class);
         JsonArray cardsArray = new JsonArray(((List<String>) board.getJsonArray(Field.CARDIDS, new JsonArray()).getList())
                 .stream()
                 .map(id -> new JsonObject().put(Field._ID, id))
@@ -108,6 +116,14 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    public JsonArray getShared() {
+        return shared;
+    }
+    public Board setShared(JsonArray shared) {
+        this.shared = shared;
+        return this;
+    }
+
     public String getCreationDate() {
         return creationDate;
     }
@@ -155,12 +171,51 @@ public class Board implements Model<Board> {
     }
 
     public List<Card> cards() {
-        return this.cards;
+        return this.layoutType != null ? this.layoutType.equals(Field.FREE) ? this.cards : this.getCardsSection() : new ArrayList<>();
+    }
+
+    public List<String> cardIds() {
+       return this.cards().stream().map(Card::getId).collect(Collectors.toList());
     }
 
     public Board setCards(List<Card> cards) {
         this.cards = cards;
         return this;
+    }
+
+    public List<Section> sections() {
+        return this.sections;
+    }
+
+    public List<String> getCardsBySection(List<String> sectionIds) {
+        List<String> cardIds = new ArrayList<>();
+        this.sections.forEach((section) -> {
+            if (sectionIds.contains(section.getId())) {
+                cardIds.addAll(section.getCardIds());
+            }
+        });
+        return cardIds;
+    }
+
+    public List<Card> getCardsSection() {
+        List<Card> cards = new ArrayList<>();
+        this.sections.forEach((section) -> {
+            JsonArray cardsArray = new JsonArray(section.getCardIds()
+                    .stream()
+                    .map(id -> new JsonObject().put(Field._ID, id))
+                    .collect(Collectors.toList()));
+            cards.addAll(ModelHelper.toList(cardsArray, Card.class));
+        });
+        return cards;
+    }
+
+    public Board setSections(List<Section> sections) {
+        this.sections = sections;
+        return this;
+    }
+
+    public List<String> sectionIds() {
+        return this.sections().stream().map(Section::getId).collect(Collectors.toList());
     }
 
     public String getLayoutType() {
@@ -185,10 +240,17 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    public Board reset() {
+        this.setId(null);
+        this.setPublic(false);
+        this.setShared(new JsonArray());
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
-        JsonArray cardsArray =
-                new JsonArray(this.cards().stream().map(Card::getId).collect(Collectors.toList()));
+        JsonArray cardsArray = new JsonArray(this.cardIds());
+        JsonArray sectionArray = new JsonArray(this.sectionIds());
         return new JsonObject()
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
@@ -196,6 +258,7 @@ public class Board implements Model<Board> {
                 .put(Field.DESCRIPTION, this.getDescription())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.CARDIDS, cardsArray)
+                .put(Field.SECTIONIDS, sectionArray)
                 .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.DELETED, this.isDeleted())
                 .put(Field.PUBLIC, this.isPublic())
@@ -205,7 +268,7 @@ public class Board implements Model<Board> {
                 .put(Field.SHARED, this.shared)
                 .put(Field.LAYOUTTYPE, this.getLayoutType())
                 .put(Field.TAGS, this.tags());
-}
+    }
 
     @Override
     public Board model(JsonObject board) {

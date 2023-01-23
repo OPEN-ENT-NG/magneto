@@ -1,6 +1,13 @@
 import {ng} from 'entcore'
 import http, {AxiosResponse} from 'axios';
-import {Card, CardForm, Cards, ICardsBoardParamsRequest, ICardsParamsRequest} from "../models";
+import {
+    Card,
+    CardForm,
+    Cards,
+    ICardsBoardParamsRequest,
+    ICardsParamsRequest,
+    ICardsSectionParamsRequest
+} from "../models";
 
 
 export interface ICardsService {
@@ -8,6 +15,8 @@ export interface ICardsService {
     getAllCardsCollection(params: ICardsParamsRequest): Promise<Cards>;
 
     getAllCardsByBoard(params: ICardsParamsRequest): Promise<Cards>;
+
+    getAllCardsBySection(params: ICardsSectionParamsRequest): Promise<Cards>;
 
     getCardById(params): Promise<Card>;
 
@@ -32,8 +41,14 @@ export const cardsService: ICardsService = {
     },
 
     getAllCardsByBoard: async (params: ICardsParamsRequest): Promise<Cards> => {
-        let urlParams: string = !!params.page ? `?page=${params.page}` : '';
+        let urlParams: string = params.page !== null && params.page !== undefined ? `?page=${params.page}` : '';
         return http.get(`/magneto/cards/${params.boardId}${urlParams}`)
+            .then((res: AxiosResponse) => new Cards(res.data));
+    },
+
+    getAllCardsBySection: async (params: ICardsSectionParamsRequest): Promise<Cards> => {
+        let urlParams: string = params.page !== null ? `?page=${params.page}` : '';
+        return http.get(`/magneto/cards/section/${params.sectionId}${urlParams}`)
             .then((res: AxiosResponse) => new Cards(res.data));
     },
 

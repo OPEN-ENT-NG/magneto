@@ -54,13 +54,15 @@
             </board-nav>
         </div>
 
-        <div class="cell board-container-body-list">
-            <div class="empty-state" ng-if="vm.cards.length == 0" ng-show="!vm.isLoading">
+        <div class="cell board-container-body-list scrollbar">
+            <div class="empty-state" ng-if="vm.cards.length == 0 && vm.board.isLayoutFree()"
+                 ng-show="!vm.isLoading">
                 <i18n>magneto.add.content.from.menu</i18n>
                 <i class="magneto-arrow-left"></i>
             </div>
             <card-list
-                    ng-if="vm.board.id && !vm.isLoading"
+                    ng-if="vm.board.id && !vm.isLoading && vm.board.isLayoutFree()"
+                    layout="vm.board.layoutType"
                     is-draggable="vm.board.myRights.publish !== undefined"
                     has-caption="true"
                     cards="vm.cards"
@@ -77,6 +79,17 @@
                     has-transfer="vm.board.myRights.publish != undefined"
                     on-transfer="vm.openTransferResourceLightbox">
             </card-list>
+            <section-list
+                    ng-if="!!vm.board.layoutType && !vm.board.isLayoutFree()"
+                    board="vm.board"
+                    on-move="vm.getBoard"
+                    on-edit="vm.openEditResourceLightbox"
+                    on-duplicate="vm.openTransferDuplicateResourceLightbox"
+                    on-delete="vm.openDeleteResourceLightbox"
+                    on-preview="vm.openPreviewResourceLightbox"
+                    on-transfer="vm.openTransferResourceLightbox"
+                    on-submit="vm.onFormSubmit">
+            </section-list>
             <div ng-show="vm.isLoading" class="centered-text">
                 <loader min-height="'250px'"></loader>
             </div>

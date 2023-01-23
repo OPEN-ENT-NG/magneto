@@ -35,6 +35,11 @@ export interface ICardsParamsRequest {
     isShared?: boolean;
 }
 
+export interface ICardsSectionParamsRequest {
+    page?: number,
+    sectionId?: string;
+}
+
 export interface ICardsBoardParamsRequest {
     cardIds: Array<string>,
     boardId: string;

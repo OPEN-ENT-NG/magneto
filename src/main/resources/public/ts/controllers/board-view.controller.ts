@@ -1,23 +1,25 @@
-import {ng, notify, toasts} from "entcore";
+import {ng, notify} from "entcore";
 import {IScope, IWindowService} from "angular";
-import {cardsService, IBoardsService, ICardsService} from "../services";
+import {IBoardsService, ICardsService, ISectionsService} from "../services";
 import {
     Board,
-    Boards,
     BoardForm,
+    Boards,
     Card,
     CardForm,
     Cards,
     ICardsParamsRequest,
-    ICardsBoardParamsRequest, ILinkerParams
+    ICardsSectionParamsRequest,
+    ILinkerParams,
+    Section,
+    Sections
 } from "../models";
 import {safeApply} from "../utils/safe-apply.utils";
-import {AxiosError, AxiosResponse} from "axios";
+import {AxiosError} from "axios";
 import {InfiniteScrollService} from "../shared/services";
 import {EventBusService} from "../shared/event-bus-service/event-bus-sockjs.service";
-import * as SockJS from "sockjs-client";
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
-
+import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
 interface IViewModel extends ng.IController {
 
     displayCardLightbox: boolean;
@@ -31,7 +33,7 @@ interface IViewModel extends ng.IController {
     displayBoardPropertiesLightbox: boolean;
     displayCollectionLightbox: boolean;
     displayLinkerLightbox: boolean;
-    displayVideoResourceLightbox : boolean
+    displayVideoResourceLightbox: boolean
 
     cardForm: CardForm;
     selectedCard: Card;
@@ -56,18 +58,29 @@ interface IViewModel extends ng.IController {
     getCards(): Promise<void>;
 
     openAddResourceLightbox(resourceType: RESOURCE_TYPE): void;
+
     openEditResourceLightbox(card: Card): void;
+
     openReading(): void;
+
     onFormSubmit(): Promise<void>;
+
     onBoardFormSubmit(): Promise<void>;
+
+    resetBoardView(): Promise<void>;
+
     onScroll(): void;
 
     resetCards(): void;
 
-    onFileSelected(file: any) : Promise<void>;
-    onVideoSelected(videoHtml: string) : void;
-    onLinkSubmit(form: {url: "", title: ""}) : void;
+    onFileSelected(file: any): Promise<void>;
+
+    onVideoSelected(videoHtml: string): void;
+
+    onLinkSubmit(form: { url: "", title: "" }): void;
+
     getMediaLibraryFileFormat(): string;
+
     openBoardPropertiesForm(): void;
 }
 
@@ -92,7 +105,7 @@ class Controller implements IViewModel {
     displayMediaLibraryLightbox: boolean;
     displayCollectionLightbox: boolean;
     displayAudioMediaLibraryLightbox: boolean;
-    displayVideoResourceLightbox : boolean;
+    displayVideoResourceLightbox: boolean;
 
     displayBoardPropertiesLightbox: boolean;
     displayLinkerLightbox: boolean;
@@ -117,6 +130,7 @@ class Controller implements IViewModel {
                 private $sce: ng.ISCEService,
                 private $timeout: ng.ITimeoutService,
                 private $window: IWindowService,
+                private sectionsServices: ISectionsService,
                 private boardsService: IBoardsService,
                 private cardsService: ICardsService) {
         this.$scope.vm = this;
@@ -151,8 +165,11 @@ class Controller implements IViewModel {
 
         this.isLoading = true;
 
-        await this.getBoard();
-        await this.getCards();
+        this.getBoard().then(async () => {
+            if (this.board.layoutType == LAYOUT_TYPE.FREE) {
+                await this.getCards();
+            }
+        });
     }
 
     /**
@@ -247,10 +264,18 @@ class Controller implements IViewModel {
 
     /**
      * Callback on form submit:
-     * - refresh cards
+     * - refresh cards and hide lightbox
      */
     onFormSubmit = async (): Promise<void> => {
         this.displayMediaLibraryLightbox = false;
+        await this.resetBoardView();
+    }
+
+    /**
+     * Callback on form submit:
+     * - refresh all cards from board
+     */
+    resetBoardView = async (): Promise<void> => {
         this.resetCards();
         await Promise.all([this.getCards(), this.getBoard()]);
     }
@@ -261,9 +286,15 @@ class Controller implements IViewModel {
     getBoard = async (): Promise<void> => {
         this.isLoading = true;
         return this.boardsService.getBoardsByIds([this.filter.boardId])
-            .then((res: Boards) => {
+            .then(async (res: Boards) => {
                 if (!!res) {
                     this.board = res.all[0];
+                    if (this.board.layoutType != LAYOUT_TYPE.FREE) {
+                        this.sectionsServices.getSectionsByBoard(this.filter.boardId).then((sections: Sections) => {
+                            this.board.sections = sections.all;
+                            this.getCardsBySectionBoard();
+                        });
+                    }
                 }
                 this.isLoading = false;
                 safeApply(this.$scope);
@@ -287,6 +318,36 @@ class Controller implements IViewModel {
             .then((res: Cards) => {
                 if (res.all && res.all.length > 0) {
                     this.cards.push(...res.all);
+                }
+                this.isLoading = false;
+                safeApply(this.$scope);
+            })
+            .catch((err: AxiosError) => {
+                this.isLoading = false;
+                notify.error(err.message)
+            });
+    }
+
+    /**
+     * Fetch board cards for all sections.
+     */
+    getCardsBySectionBoard = async (): Promise<void> => {
+        await Promise.all(this.board.sections.map((section) => this.getCardsBySection(section)));
+    }
+
+    /**
+     * Fetch board cards by section.
+     */
+    getCardsBySection = async (section: Section): Promise<void> => {
+        this.isLoading = true;
+        const params: ICardsSectionParamsRequest = {
+            page: section.page,
+            sectionId: section.id
+        };
+        this.cardsService.getAllCardsBySection(params)
+            .then((res: Cards) => {
+                if (res.all && res.all.length > 0) {
+                    section.cards.push(...res.all);
                 }
                 this.isLoading = false;
                 safeApply(this.$scope);
@@ -334,7 +395,7 @@ class Controller implements IViewModel {
     /**
      * Callback on video form submit
      */
-    onVideoSelected = () : void => {
+    onVideoSelected = (): void => {
         this.displayVideoResourceLightbox = false;
 
         // Video from workspace
@@ -355,7 +416,7 @@ class Controller implements IViewModel {
      * Callback on link form submit
      * @param form
      */
-    onLinkSubmit = (form: ILinkerParams) : void => {
+    onLinkSubmit = (form: ILinkerParams): void => {
         this.cardForm.resourceUrl = this.$sce.trustAsResourceUrl(form.link).toString();
         this.cardForm.title = form.title;
         this.$timeout(() => {
@@ -400,4 +461,4 @@ class Controller implements IViewModel {
 }
 
 export const boardViewController = ng.controller('BoardViewController',
-    ['$scope', '$route', '$location','$sce', '$timeout', '$window', 'BoardsService', 'CardsService', Controller]);
+    ['$scope', '$route', '$location', '$sce', '$timeout', '$window', 'SectionsService', 'BoardsService', 'CardsService', Controller]);

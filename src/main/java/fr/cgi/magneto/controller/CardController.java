@@ -4,6 +4,8 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.model.Section;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -13,6 +15,7 @@ import fr.cgi.magneto.security.ViewRight;
 import fr.cgi.magneto.security.WriteBoardRight;
 import fr.cgi.magneto.service.BoardService;
 import fr.cgi.magneto.service.CardService;
+import fr.cgi.magneto.service.SectionService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -20,6 +23,7 @@ import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -30,10 +34,7 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.Trace;
 import org.entcore.common.user.UserUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static fr.cgi.magneto.core.enums.Events.CREATE_MAGNET;
@@ -43,10 +44,13 @@ public class CardController extends ControllerHelper {
     private final EventStore eventStore;
     private final CardService cardService;
     private final BoardService boardService;
+    private final SectionService sectionService;
+
 
     public CardController(ServiceFactory serviceFactory) {
         this.cardService = serviceFactory.cardService();
         this.boardService = serviceFactory.boardService();
+        this.sectionService = serviceFactory.sectionService();
         this.eventStore = EventStoreFactory.getFactory().getEventStore(Magneto.class.getSimpleName());
     }
 
@@ -83,10 +87,30 @@ public class CardController extends ControllerHelper {
             String boardId = request.getParam(Field.BOARDID);
             Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
             boardService.getBoards(Collections.singletonList(boardId))
-                    .compose(board -> cardService.getAllCardsByBoard(user, board.get(0), page, false))
+                    .compose(board -> cardService.getAllCardsByBoard(board.get(0), page))
                     .onSuccess(result -> renderJson(request, result))
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::getAllCardsByBoardId] Failed to get all cards : %s",
+                                this.getClass().getSimpleName(), fail.getMessage());
+                        log.error(message);
+                        renderError(request);
+                    });
+        });
+    }
+
+    @Get("/cards/section/:sectionId")
+    @ApiDoc("Get all cards by section id")
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void getAllCardsBySectionId(HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            String sectionId = request.getParam(Field.SECTIONID);
+            Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
+            sectionService.get(Collections.singletonList(sectionId))
+                    .compose(sections -> cardService.getAllCardsBySection(sections.get(0), page))
+                    .onSuccess(result -> renderJson(request, result))
+                    .onFailure(fail -> {
+                        String message = String.format("[Magneto@%s::getAllCardsBySectionId] Failed to get all cards : %s",
                                 this.getClass().getSimpleName(), fail.getMessage());
                         log.error(message);
                         renderError(request);
@@ -123,25 +147,12 @@ public class CardController extends ControllerHelper {
                     CardPayload cardPayload = new CardPayload(body)
                             .setOwnerId(user.getUserId())
                             .setOwnerName(user.getUsername());
-                    String newId = UUID.randomUUID().toString();
-                    Future<JsonObject> createCardFuture = cardService.create(cardPayload, newId);
-                    Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(cardPayload.getBoardId()));
-                    CompositeFuture.all(createCardFuture, getBoardFuture)
-                            .compose(result -> {
-                                if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
-                                    BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
-                                    boardPayload.addCards(Collections.singletonList(newId));
-                                    return cardService.updateBoard(boardPayload);
-                                } else {
-                                    return Future.failedFuture(String.format("[Magneto%s::createCard] " +
-                                            "No card found with id %s", this.getClass().getSimpleName(), newId));
-                                }
-                            })
+                    this.cardService.createCardLayout(cardPayload)
                             .onFailure(err -> renderError(request))
-                            .onSuccess(res -> {
+                            .onSuccess(result -> {
                                 eventStore.createAndStoreEvent(CREATE_MAGNET.name(), request);
-                                renderJson(request, res);
-                            });
+                                renderJson(request, result);
+                            });;
                 }));
     }
 
@@ -155,7 +166,7 @@ public class CardController extends ControllerHelper {
             CardPayload updateCard = new CardPayload(card)
                     .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
             UserUtils.getUserInfos(eb, request, user -> {
-                Future<JsonObject> updateCardFuture = cardService.update(user, updateCard);
+                Future<JsonObject> updateCardFuture = cardService.update(updateCard);
                 Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(updateCard.getBoardId()));
                 CompositeFuture.all(updateCardFuture, getBoardFuture)
                         .compose(result -> {
@@ -188,7 +199,7 @@ public class CardController extends ControllerHelper {
                 List<String> cardIds = duplicateCard.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
                 String boardId = duplicateCard.getString(Field.BOARDID);
                 cardService.getCards(cardIds)
-                        .compose(cards -> cardService.duplicateCards(boardId, cards, user))
+                        .compose(cards -> cardService.duplicateCards(boardId, cards, null, user))
                         .onSuccess(res -> {
                             eventStore.createAndStoreEvent(CREATE_MAGNET.name(), request);
                             renderJson(request, res);
@@ -208,7 +219,7 @@ public class CardController extends ControllerHelper {
                 String oldBoardId = updateCard.getBoardId();
                 updateCard.setBoardId(moveCard.getString(Field.BOARDID));
 
-                Future<JsonObject> updateCardFuture = cardService.update(user, updateCard);
+                Future<JsonObject> updateCardFuture = cardService.update(updateCard);
                 Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(moveCard.getString(Field.BOARDID)));
                 CompositeFuture.all(updateCardFuture, getBoardFuture)
                         .compose(result -> {
@@ -254,7 +265,7 @@ public class CardController extends ControllerHelper {
                 UserUtils.getUserInfos(eb, request, user -> {
                             List<String> cardIds = cards.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
                             String boardId = request.getParam(Field.BOARDID);
-                            Future<JsonObject> deleteCardsFuture = cardService.deleteCards(user.getUserId(), cardIds);
+                            Future<JsonObject> deleteCardsFuture = cardService.deleteCards(cardIds);
                             Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(boardId));
                             CompositeFuture.all(deleteCardsFuture, getBoardFuture)
                                     .compose(result -> {

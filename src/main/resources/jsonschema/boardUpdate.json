@@ -37,6 +37,16 @@
         ]
       }
     },
+    "sections": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
     "tags": {
       "type": "array",
       "items": {

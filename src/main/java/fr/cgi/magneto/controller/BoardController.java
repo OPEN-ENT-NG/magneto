@@ -7,12 +7,8 @@ import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
-import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.security.*;
-import fr.cgi.magneto.service.BoardService;
-import fr.cgi.magneto.service.CardService;
-import fr.cgi.magneto.service.FolderService;
-import fr.cgi.magneto.service.ServiceFactory;
+import fr.cgi.magneto.service.*;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -29,7 +25,9 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.Trace;
 import org.entcore.common.user.UserUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static fr.cgi.magneto.core.enums.Events.CREATE_BOARD;
@@ -37,14 +35,16 @@ import static fr.cgi.magneto.core.enums.Events.CREATE_BOARD;
 public class BoardController extends ControllerHelper {
 
     private final EventStore eventStore;
-
     private final BoardService boardService;
+
+    private final SectionService sectionService;
     private final CardService cardService;
     private final FolderService folderService;
 
 
     public BoardController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
+        this.sectionService = serviceFactory.sectionService();
         this.cardService = serviceFactory.cardService();
         this.folderService = serviceFactory.folderService();
         this.eventStore = EventStoreFactory.getFactory().getEventStore(Magneto.class.getSimpleName());
@@ -133,7 +133,7 @@ public class BoardController extends ControllerHelper {
     public void create(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "board", board ->
                 UserUtils.getUserInfos(eb, request, user ->
-                        boardService.create(user, board)
+                        boardService.create(user, board, true, request)
                                 .onFailure(err -> renderError(request))
                                 .onSuccess(result -> {
                                     eventStore.createAndStoreEvent(CREATE_BOARD.name(), request);
@@ -150,36 +150,7 @@ public class BoardController extends ControllerHelper {
     public void duplicate(HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             String boardId = request.getParam(Field.BOARDID);
-            Map<String, Future<?>> futures = new HashMap<>();
-
-            boardService.getBoards(Collections.singletonList(boardId))
-                    .compose(boardResult -> {
-                        if (!boardResult.isEmpty()) {
-                            JsonObject duplicateBoard = boardResult.get(0).toJson();
-                            duplicateBoard.remove(Field._ID);
-                            duplicateBoard.put(Field.SHARED, new JsonArray());
-                            duplicateBoard.put(Field.PUBLIC, false);
-
-                            Future<List<Card>> getCardsFuture = cardService.getCards(boardResult.get(0).cards().stream().map(Card::getId).collect(Collectors.toList()));
-                            Future<JsonObject> createBoardFuture = boardService.create(user, duplicateBoard);
-                            futures.put(Field.CARDS, getCardsFuture);
-                            futures.put(Field.BOARD, createBoardFuture);
-                            return CompositeFuture.all(getCardsFuture, createBoardFuture);
-                        } else {
-                            return Future.failedFuture(String.format("[Magneto%s::duplicate] " +
-                                    "No board found with id %s", this.getClass().getSimpleName(), boardId));
-                        }
-                    })
-                    .compose(result -> {
-                        List<Card> duplicateCards = (List<Card>) futures.get(Field.CARDS).result();
-                        // If no cards in board, no duplicate
-                        if (duplicateCards.isEmpty()) {
-                            return Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result());
-                        } else {
-                            String duplicateBoard = ((JsonObject) futures.get(Field.BOARD).result()).getString(Field.ID);
-                            return cardService.duplicateCards(duplicateBoard, duplicateCards, user);
-                        }
-                    })
+            boardService.duplicate(boardId, user, request)
                     .onFailure(err -> renderError(request))
                     .onSuccess(result -> renderJson(request, result));
         });
@@ -190,21 +161,30 @@ public class BoardController extends ControllerHelper {
     @ResourceFilter(ManageBoardRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @Trace(Actions.BOARD_UPDATE)
+    @SuppressWarnings("unchecked")
     public void update(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "boardUpdate", board -> {
             String boardId = request.getParam(Field.ID);
             UserUtils.getUserInfos(eb, request, user -> {
-                BoardPayload updateBoard = new BoardPayload(board)
-                        .setId(boardId)
-                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
-
-                boardService.update(updateBoard)
+                boardService.getBoards(Collections.singletonList(boardId))
+                        .compose(boards -> {
+                            if (!boards.isEmpty()) {
+                                BoardPayload updateBoard = new BoardPayload(board)
+                                        .setId(boardId)
+                                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+                                Board currentBoard = boards.get(0);
+                                return boardService.updateLayoutCards(updateBoard, currentBoard, request)
+                                        .compose(boardUpdated -> boardService.update(new BoardPayload(boardUpdated)));
+                            } else {
+                                return Future.failedFuture(String.format("[Magneto%s::update] " +
+                                        "No board found with id %s", this.getClass().getSimpleName(), boardId));
+                            }
+                        })
                         .onFailure(err -> renderError(request))
-                        .onSuccess(result -> renderJson(request, result));
+                        .onSuccess(result -> renderJson(request, new JsonObject()));
             });
         });
     }
-
 
     @Put("/boards/predelete")
     @ApiDoc("Pre delete boards")
@@ -248,9 +228,10 @@ public class BoardController extends ControllerHelper {
         RequestUtils.bodyToJson(request, pathPrefix + "boardList", boards ->
                 UserUtils.getUserInfos(eb, request, user -> {
                     List<String> boardIds = boards.getJsonArray(Field.BOARDIDS).getList();
+                    Future<JsonObject> removeSectionFuture = sectionService.deleteByBoards(boardIds);
                     Future<JsonObject> removeCardsFuture = cardService.deleteCardsByBoards(boardIds);
                     Future<JsonObject> removeBoardsFuture = boardService.delete(user.getUserId(), boardIds);
-                    CompositeFuture.all(removeCardsFuture, removeBoardsFuture)
+                    CompositeFuture.all(removeCardsFuture, removeBoardsFuture, removeSectionFuture)
                             .onFailure(err -> renderError(request))
                             .onSuccess(result -> renderJson(request, new JsonObject()
                                     .put(Field.NBBOARDS, removeBoardsFuture.result())
@@ -274,4 +255,6 @@ public class BoardController extends ControllerHelper {
                             .onSuccess(result -> renderJson(request, result));
                 }));
     }
+
+
 }

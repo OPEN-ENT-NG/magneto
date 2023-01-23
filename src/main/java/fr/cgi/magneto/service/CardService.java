@@ -1,5 +1,7 @@
 package fr.cgi.magneto.service;
 
+import fr.cgi.magneto.model.Section;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -17,28 +19,34 @@ public interface CardService {
      * Create a Card
      *
      * @param card Card to create {@link CardPayload}
-     * @param id Generated identifier for new card
+     * @param id   Generated identifier for new card
      * @return Future {@link Future <JsonObject>} containing newly created card
      */
     Future<JsonObject> create(CardPayload card, String id);
 
     /**
+     * Create a Card and adding it to section or not depending on layout
+     *
+     * @param card Card to create {@link CardPayload}
+     * @return Future {@link Future <JsonObject>} containing newly created card
+     */
+    Future<JsonObject> createCardLayout(CardPayload card);
+
+    /**
      * Update a card
      *
-     * @param user User Object containing user id and displayed name
      * @param card Card to update
      * @return Future {@link Future <JsonObject>} containing updated card
      */
-    Future<JsonObject> update(UserInfos user, CardPayload card);
+    Future<JsonObject> update(CardPayload card);
 
     /**
      * Delete cards
      *
-     * @param userId  User identifier
      * @param cardIds List of card identifiers
      * @return Future {@link Future <JsonObject>} containing list of deleted cards
      */
-    Future<JsonObject> deleteCards(String userId, List<String> cardIds);
+    Future<JsonObject> deleteCards(List<String> cardIds);
 
     /**
      * Get all cards
@@ -73,25 +81,33 @@ public interface CardService {
     Future<JsonObject> deleteCardsByBoards(List<String> boardIds);
 
     /**
-     * Get all cards
+     * Get all cards by board
      *
-     * @param user      User Object containing user id and displayed name
-     * @param board     Board object
-     * @param page      Page number
-     * @param isSection fetch sections if true
+     * @param board Board object
+     * @param page  Page number
      * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
      */
-    Future<JsonObject> getAllCardsByBoard(UserInfos user, Board board, Integer page, boolean isSection);
+    Future<JsonObject> getAllCardsByBoard(Board board, Integer page);
+
+    /**
+     * Get all cards by section
+     *
+     * @param section Section object
+     * @param page    Page number
+     * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
+     */
+    Future<JsonObject> getAllCardsBySection(Section section, Integer page);
 
     /**
      * Duplicate cards
      *
      * @param boardId Board identifiers
-     * @param cards   List of card
+     * @param cards   List of card to duplicate
+     * @param section   Section where cards are duplicate
      * @param user    {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing status of duplicate
      */
-    Future<JsonObject> duplicateCards(String boardId, List<Card> cards, UserInfos user);
+    Future<JsonObject> duplicateCards(String boardId, List<Card> cards, SectionPayload section, UserInfos user);
 
     /**
      * Update board

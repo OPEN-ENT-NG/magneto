@@ -21,4 +21,6 @@ public class Actions {
 
     // A user deletes a card
     public static final String CARD_DELETION = "CARD_DELETION";
+
+    public static final String SECTION_CREATION = "SECTION_CREATION";
 }

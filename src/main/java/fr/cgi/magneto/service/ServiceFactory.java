@@ -20,6 +20,7 @@ public class ServiceFactory {
 
     private final FolderService folderService;
     private final BoardService boardService;
+    private final CardService cardService;
 
     public ServiceFactory(Vertx vertx, Storage storage, MagnetoConfig magnetoConfig, Neo4j neo4j, Sql sql, MongoDb mongoDb) {
         this.vertx = vertx;
@@ -30,6 +31,7 @@ public class ServiceFactory {
         this.mongoDb = mongoDb;
 
         this.folderService = new DefaultFolderService(CollectionsConstant.FOLDER_COLLECTION, mongoDb, this);
+        this.cardService = new DefaultCardService(CollectionsConstant.CARD_COLLECTION, mongoDb, this);
         this.boardService = new DefaultBoardService(CollectionsConstant.BOARD_COLLECTION, mongoDb, this);
     }
 
@@ -46,12 +48,17 @@ public class ServiceFactory {
     }
 
     public CardService cardService() {
-        return new DefaultCardService(CollectionsConstant.CARD_COLLECTION, mongoDb, this);
+        return this.cardService;
+    }
+
+    public SectionService sectionService() {
+      return new DefaultSectionService(CollectionsConstant.SECTION_COLLECTION, mongoDb, this);
     }
 
     public FolderService folderService() {
         return this.folderService;
     }
+
 
     public WorkspaceService workSpaceService() {
         return new DefaultWorkspaceService(vertx);

@@ -1,12 +1,14 @@
 package fr.cgi.magneto.model.boards;
 
-import fr.cgi.magneto.core.constants.*;
-import fr.cgi.magneto.helper.*;
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.Model;
-import fr.cgi.magneto.model.cards.Card;
-import io.vertx.core.json.*;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class BoardPayload implements Model<BoardPayload> {
     private String _id;
@@ -20,6 +22,8 @@ public class BoardPayload implements Model<BoardPayload> {
     private String folderId;
     private String layoutType;
     private List<String> cardIds;
+    private List<String> sectionIds;
+
     private List<String> tags;
     private boolean isPublic;
 
@@ -39,6 +43,8 @@ public class BoardPayload implements Model<BoardPayload> {
         this.layoutType = board.getString(Field.LAYOUTTYPE);
         this.cardIds = !board.getJsonArray(Field.CARDIDS, new JsonArray()).isEmpty() ?
                 board.getJsonArray(Field.CARDIDS, new JsonArray()).getList() : null;
+        this.sectionIds = !board.getJsonArray(Field.SECTIONIDS, new JsonArray()).isEmpty() ?
+                board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList() : null;
         this.tags = !board.getJsonArray(Field.TAGS, new JsonArray()).isEmpty() ?
                 board.getJsonArray(Field.TAGS, new JsonArray()).getList() : null;
         this.isPublic = board.getBoolean(Field.PUBLIC, false);
@@ -151,6 +157,15 @@ public class BoardPayload implements Model<BoardPayload> {
         return this;
     }
 
+    public List<String> getSectionIds() {
+        return sectionIds;
+    }
+
+    public BoardPayload setSectionIds(List<String> sectionIds) {
+        this.sectionIds = sectionIds;
+        return this;
+    }
+
     public List<String> getTags() {
         return tags;
     }
@@ -161,16 +176,47 @@ public class BoardPayload implements Model<BoardPayload> {
     }
 
     public BoardPayload addCards(List<String> cardIds) {
-        if (this.cardIds == null)
-            this.cardIds = new ArrayList<>();
-        if(cardIds != null) {
-            cardIds.forEach((id) -> this.cardIds.add(0, id));
+        if (cardIds != null) {
+            if (this.cardIds != null) {
+                this.cardIds.addAll(0, cardIds);
+            } else {
+                this.cardIds = cardIds;
+            }
+        }
+        return this;
+    }
+
+    public BoardPayload addSection(String sectionId) {
+        if (sectionId != null) {
+            if (this.sectionIds != null) {
+                this.sectionIds.add(sectionId);
+            } else {
+                this.sectionIds = Collections.singletonList(sectionId);
+            }
+        }
+        return this;
+    }
+
+    public BoardPayload addSections(List<String> sectionIds) {
+        if (sectionIds != null) {
+            if (this.sectionIds != null) {
+                this.sectionIds.addAll(sectionIds);
+            } else {
+                this.sectionIds = sectionIds;
+            }
+        }
+        return this;
+    }
+
+    public BoardPayload removeSectionIds(List<String> sectionIds) {
+        if (sectionIds != null) {
+            sectionIds.forEach((id) -> this.sectionIds.remove(id));
         }
         return this;
     }
 
     public BoardPayload removeCardIds(List<String> cardIds) {
-        if(cardIds != null) {
+        if (cardIds != null) {
             cardIds.forEach((id) -> this.cardIds.remove(id));
         }
         return this;
@@ -189,6 +235,10 @@ public class BoardPayload implements Model<BoardPayload> {
     public JsonObject toJson() {
 
         JsonObject json = new JsonObject();
+
+        if (this.getId() != null) {
+            json.put(Field._ID, this.getId());
+        }
         if (this.getTitle() != null) {
             json.put(Field.TITLE, this.getTitle());
         }
@@ -201,6 +251,10 @@ public class BoardPayload implements Model<BoardPayload> {
 
         if (this.getCardIds() != null && this.getId() != null) {
             json.put(Field.CARDIDS, new JsonArray(this.getCardIds()));
+        }
+
+        if (this.getSectionIds() != null && this.getId() != null) {
+            json.put(Field.SECTIONIDS, new JsonArray(this.getSectionIds()));
         }
 
         if (this.getTags() != null) {
@@ -220,7 +274,8 @@ public class BoardPayload implements Model<BoardPayload> {
                     .put(Field.DELETED, false)
                     .put(Field.OWNERID, this.getOwnerId())
                     .put(Field.OWNERNAME, this.getOwnerName())
-                    .put(Field.CARDIDS, new JsonArray());
+                    .put(Field.CARDIDS, new JsonArray())
+                    .put(Field.SECTIONIDS, this.getSectionIds() != null ? this.getSectionIds() : new JsonArray());
         }
 
         return json;

@@ -6,7 +6,7 @@
         <i class="magneto-card-settings" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
         <card-list-item-options
                 ng-show="vm.isDisplayedOptions"
-                card="vm.section"
+                options="vm.section"
                 has-delete="true"
                 on-delete="vm.openDeleteSection"
                 has-duplicate="true"
@@ -15,6 +15,7 @@
     </div>
     <card-list
             ng-if="vm.board.id && !vm.isLoading"
+            selector-resize="vm.formatSectionSelector(vm.section)"
             layout="vm.board.layoutType"
             is-draggable="vm.board.myRights.publish !== undefined"
             has-caption="true"

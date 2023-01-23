@@ -30,6 +30,7 @@ interface ICardListProps {
 
     isDraggable: boolean;
     isScrollable: boolean;
+    selectorResize: string;
 
     hasCaption: boolean;
 
@@ -59,6 +60,8 @@ class Controller implements IViewModel {
     layout: LAYOUT_TYPE;
     isDraggable: boolean;
     isScrollable: boolean;
+    selectorResize: string;
+
 
     hasCaption: boolean;
 
@@ -126,7 +129,8 @@ function directive($parse: IParseService) {
             onPreview: '&',
             hasTransfer: '=',
             onTransfer: '&',
-            onMove: '&'
+            onMove: '&',
+            selectorResize: '='
         },
         controllerAs: 'vm',
         bindToController: true,

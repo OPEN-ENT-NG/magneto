@@ -1,4 +1,4 @@
-import {ng, toasts} from "entcore";
+import {angular, ng, toasts} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board, Card, Section, SectionForm} from "../../models";
@@ -70,6 +70,10 @@ class Controller implements IViewModel {
     $onDestroy() {
     }
 
+    formatSectionSelector = (section: Section): string => {
+        return "#section-" + section.id;
+    }
+
     updateSection = async (section: Section): Promise<void> => {
         let updateSection: SectionForm = new SectionForm().build(section);
         updateSection.cardIds = [];
@@ -118,9 +122,34 @@ function directive($parse: IParseService) {
                 safeApply($scope);
             });
 
+            let repositionActionOptions = (): void => {
+                let windowElem: JQuery = $(vm.formatSectionSelector(vm.section));
+                let actionOptionsElem: JQuery =
+                    $("#options-" + vm.section.id);
+                let repositionClass: string = 'reposition';
+                // if element position element is left sided, we want to check right sided position to see if it goes
+                // out of the screen, so we add 2 times the element width.
+                if(actionOptionsElem.length > 0) {
+                    let actionOptionX: number =
+                        actionOptionsElem.offset().left +
+                        (actionOptionsElem.width() * (actionOptionsElem.hasClass(repositionClass) ? 2 : 1));
+
+                    if (actionOptionX >= windowElem.width() && !actionOptionsElem.hasClass(repositionClass))
+                        actionOptionsElem.addClass(repositionClass);
+                    else if (actionOptionX < windowElem.width() && actionOptionsElem.hasClass(repositionClass))
+                        actionOptionsElem.removeClass(repositionClass)
+                }
+            };
+
+            angular.element(window).bind('resize', async (): Promise<void> => {
+                await safeApply($scope); // waiting dom recalculate
+                repositionActionOptions();
+            });
+
             vm.openSectionOptions = async (): Promise<void> => {
                 vm.isDisplayedOptions = !vm.isDisplayedOptions;
                 await safeApply($scope);
+                if (vm.isDisplayedOptions) repositionActionOptions();
             }
 
             vm.openEdit = (card: Card): void => {

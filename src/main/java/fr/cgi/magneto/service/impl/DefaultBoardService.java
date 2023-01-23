@@ -262,9 +262,13 @@ public class DefaultBoardService implements BoardService {
     public Future<JsonObject> delete(String userId, List<String> boardIds) {
         Promise<JsonObject> promise = Promise.promise();
         this.deleteBoards(userId, boardIds)
-                .compose(success -> this.folderService.updateOldFolder(boardIds))
+                .compose(success -> {
+                    Future<JsonObject> deleteSectionsFuture = this.sectionService.deleteByBoards(boardIds);
+                    Future<JsonObject> updateFolderFuture = this.folderService.updateOldFolder(boardIds);
+                    return CompositeFuture.all(deleteSectionsFuture, updateFolderFuture);
+                })
                 .onFailure(promise::fail)
-                .onSuccess(promise::complete);
+                .onSuccess(success -> promise.complete(new JsonObject().put(Field.STATUS, Field.OK)));
 
         return promise.future();
     }

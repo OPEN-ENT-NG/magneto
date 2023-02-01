@@ -349,11 +349,18 @@ public class CardController extends ControllerHelper {
 
     private void addCardsLayout(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
                                 Board currentBoard, String defaultTitle) {
+
+        // Update modification date from board
+        BoardPayload boardToUpdate = new BoardPayload()
+                .setId(currentBoard.getId())
+                .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+
         if(getSectionFuture.result().isEmpty()) {
             String newId = UUID.randomUUID().toString();
             SectionPayload sectionToCreate = new SectionPayload(currentBoard.getId())
                     .setTitle(defaultTitle)
                     .addCardIds(Collections.singletonList(updateCard.getId()));
+            boardToUpdate.addSection(newId);
             updateBoardsFutures.add(sectionService.create(sectionToCreate, newId));
         } else {
             Section sectionToUpdate = getSectionFuture.result().get(0);
@@ -363,11 +370,6 @@ public class CardController extends ControllerHelper {
             updateBoardsFutures.add(sectionService.update(new SectionPayload(sectionToUpdate.toJson())));
         }
 
-
-        // Update modification date from board
-        BoardPayload boardToUpdate = new BoardPayload()
-                .setId(currentBoard.getId())
-                .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
         updateBoardsFutures.add(boardService.update(boardToUpdate));
     }
 

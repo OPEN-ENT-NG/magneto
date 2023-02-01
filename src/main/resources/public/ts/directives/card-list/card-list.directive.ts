@@ -174,27 +174,36 @@ function directive($parse: IParseService) {
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
 
-            const cardList: Element = document.getElementById("card-list");
-            if (cardList && vm.isDraggable) {
-                create(cardList, {
-                    animation: 150,
-                    delay: 150,
-                    delayOnTouchOnly: true,
-                    onUpdate: async (evt) => {
-                        if (vm.isDraggable && vm.cards && vm.cards.length > 0) {
-                            vm.cardIds = vm.cards.map((card: Card) => card.id);
-                            let movedCardId: string = vm.cardIds[evt.oldIndex];
-                            let newCardIndex: number = evt.newIndex;
-                            vm.cardIds.splice(evt.oldIndex, 1);
-                            vm.cardIds.splice(newCardIndex, 0, movedCardId);
-                            let form: BoardForm = new BoardForm();
-                            form.cardIds = vm.cardIds;
-                            await boardsService.updateBoard(vm.cards[0].boardId, form);
-                            $parse($scope.vm.onMove())({});
-                        }
+            $(document).ready(() => {
+                if (vm.layout == LAYOUT_TYPE.FREE) {
+                    const cardList: Element = document.getElementById("card-list");
+                    if (cardList && vm.isDraggable) {
+                        create(cardList, {
+                            animation: 150,
+                            delay: 150,
+                            forceAutoScrollFallback: true,
+                            scroll: true, // or HTMLElement
+                            scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
+                            scrollSpeed: 30, // px*/
+                            delayOnTouchOnly: true,
+                            onUpdate: async (evt) => {
+                                if (vm.isDraggable && vm.cards && vm.cards.length > 0) {
+                                    vm.cardIds = vm.cards.map((card: Card) => card.id);
+                                    let movedCardId: string = vm.cardIds[evt.oldIndex];
+                                    let newCardIndex: number = evt.newIndex;
+                                    vm.cardIds.splice(evt.oldIndex, 1);
+                                    vm.cardIds.splice(newCardIndex, 0, movedCardId);
+                                    let form: BoardForm = new BoardForm();
+                                    form.cardIds = vm.cardIds;
+                                    await boardsService.updateBoard(vm.cards[0].boardId, form);
+                                    $parse($scope.vm.onMove())({});
+                                }
+                            }
+                        });
                     }
-                });
-            }
+                }
+            })
+
 
             vm.openEdit = (card: Card): void => {
                 $parse($scope.vm.onEdit())(card);

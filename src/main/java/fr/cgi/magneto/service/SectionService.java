@@ -2,6 +2,7 @@ package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
+import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -26,6 +27,8 @@ public interface SectionService {
      * @return Future {@link Future <JsonObject>} containing list of sections
      */
     Future<List<Section>> getSectionsByBoardId(String boardId);
+
+    Future<List<Section>> getSectionsByBoard(Board board);
 
     /**
      * Create a section

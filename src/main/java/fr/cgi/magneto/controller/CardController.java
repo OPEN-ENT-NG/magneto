@@ -4,6 +4,7 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
@@ -20,10 +21,10 @@ import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -147,7 +148,8 @@ public class CardController extends ControllerHelper {
                     CardPayload cardPayload = new CardPayload(body)
                             .setOwnerId(user.getUserId())
                             .setOwnerName(user.getUsername());
-                    this.cardService.createCardLayout(cardPayload)
+                    I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+                    this.cardService.createCardLayout(cardPayload, i18nHelper)
                             .onFailure(err -> renderError(request))
                             .onSuccess(result -> {
                                 eventStore.createAndStoreEvent(CREATE_MAGNET.name(), request);
@@ -213,12 +215,13 @@ public class CardController extends ControllerHelper {
     public void moveCard(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "moveCard", moveCard -> {
             UserUtils.getUserInfos(eb, request, user -> {
+                I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+                String oldBoardId = moveCard.getJsonObject(Field.CARD).getString(Field.BOARDID);
                 CardPayload updateCard = new CardPayload(moveCard.getJsonObject(Field.CARD))
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getFirstName() + " " + user.getLastName())
                         .setBoardId(moveCard.getString(Field.BOARDID));
-                String oldBoardId = updateCard.getBoardId();
 
                 Future<JsonObject> updateCardFuture = cardService.update(updateCard);
                 Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(moveCard.getString(Field.BOARDID)));
@@ -238,7 +241,8 @@ public class CardController extends ControllerHelper {
                                     this.addCards(updateCard, updateBoardsFutures, currentBoard);
                                 } else {
                                     // Add cards ids to new board for section
-                                    this.addCardsLayout(updateCard, getSectionFuture, updateBoardsFutures, currentBoard);
+                                    String defaultTitle = i18nHelper.translate("magneto.section.default.title");
+                                    this.addCardsLayout(updateCard, getSectionFuture, updateBoardsFutures, currentBoard, defaultTitle);
                                 }
 
                                 // Remove cards in old board
@@ -344,12 +348,21 @@ public class CardController extends ControllerHelper {
     }
 
     private void addCardsLayout(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
-                                Board currentBoard) {
-        Section sectionToUpdate = getSectionFuture.result().get(0);
-        sectionToUpdate = sectionToUpdate
-                .setId(currentBoard.sections().get(0).getId()) // no rights to remove all section, so we can always check get(0)
-                .addCardIds(Collections.singletonList(updateCard.getId()));
-        updateBoardsFutures.add(sectionService.update(new SectionPayload(sectionToUpdate.toJson())));
+                                Board currentBoard, String defaultTitle) {
+        if(getSectionFuture.result().isEmpty()) {
+            String newId = UUID.randomUUID().toString();
+            SectionPayload sectionToCreate = new SectionPayload(currentBoard.getId())
+                    .setTitle(defaultTitle)
+                    .addCardIds(Collections.singletonList(updateCard.getId()));
+            updateBoardsFutures.add(sectionService.create(sectionToCreate, newId));
+        } else {
+            Section sectionToUpdate = getSectionFuture.result().get(0);
+            sectionToUpdate = sectionToUpdate
+                    .setId(currentBoard.sections().get(0).getId()) // no rights to remove all section, so we can always check get(0)
+                    .addCardIds(Collections.singletonList(updateCard.getId()));
+            updateBoardsFutures.add(sectionService.update(new SectionPayload(sectionToUpdate.toJson())));
+        }
+
 
         // Update modification date from board
         BoardPayload boardToUpdate = new BoardPayload()

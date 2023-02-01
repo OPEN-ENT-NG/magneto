@@ -1,13 +1,13 @@
 package fr.cgi.magneto.service;
 
+import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
-import io.vertx.core.*;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.*;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
-import java.util.*;
+import java.util.List;
 
 
 public interface BoardService {
@@ -15,13 +15,13 @@ public interface BoardService {
     /**
      * Create a Board
      *
-     * @param user  User Object containing user id and displayed name
-     * @param board JsonObjet Board to create
+     * @param user           User Object containing user id and displayed name
+     * @param board          JsonObjet Board to create
      * @param defaultSection Boolean Create a seciton by default or no
-     * @param request HttpServerRequest Request containing I18n keys
+     * @param i18n           I18nHelper Containing I18n keys
      * @return Future {@link Future <JsonObject>} containing newly created board
      */
-    Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, HttpServerRequest request);
+    Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, I18nHelper i18n);
 
     /**
      * Update a board
@@ -34,31 +34,31 @@ public interface BoardService {
     /**
      * Update layout cards configuration in board
      *
-     * @param updateBoard {@link BoardPayload} Board to update
+     * @param updateBoard  {@link BoardPayload} Board to update
      * @param currentBoard {@link Board} Board infos
-     * @param request HttpServerRequest Request containing I18n keys
+     * @param i18n         I18nHelper Helper for I18n keys
      * @return Future {@link Future <JsonObject>} containing updated board
      */
-    Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, HttpServerRequest request);
+    Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n);
 
-        /**
-         * Duplicate a board
-         *
-         * @param boardId Board identifier to duplicate
-         * @param user User who duplicate
-         * @param request Request to get i18n infos (default title)
-         * @return Future {@link Future <JsonObject>} containing duplicated board
-         */
+    /**
+     * Duplicate a board
+     *
+     * @param boardId Board identifier to duplicate
+     * @param user    User who duplicate
+     * @param i18n    I18nHelper Helper for I18n keys
+     * @return Future {@link Future <JsonObject>} containing duplicated board
+     */
 
-    Future<JsonObject> duplicate(String boardId, UserInfos user, HttpServerRequest request);
+    Future<JsonObject> duplicate(String boardId, UserInfos user, I18nHelper i18n);
 
 
-        /**
-         * Get boards by id
-         *
-         * @param boardIds Board ids to get data
-         * @return Future {@link Future <JsonObject>} containing a list of board
-         */
+    /**
+     * Get boards by id
+     *
+     * @param boardIds Board ids to get data
+     * @return Future {@link Future <JsonObject>} containing a list of board
+     */
     Future<List<Board>> getBoards(List<String> boardIds);
 
 
@@ -77,10 +77,11 @@ public interface BoardService {
      */
     Future<JsonObject> getAllBoards(UserInfos user, Integer page, String searchText, String folderId,
                                     boolean isPublic, boolean isShared, boolean isDeleted, String sortBy);
+
     /**
      * Get all boards with publish right
      *
-     * @param user    {@link UserInfos} User info
+     * @param user {@link UserInfos} User info
      * @return Future {@link Future <List<Board>} containing list of editable boards
      */
     Future<List<Board>> getAllBoardsEditable(UserInfos user);

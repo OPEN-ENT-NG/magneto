@@ -54,6 +54,7 @@ export class SectionForm {
 
     buildNew(boardId: string): SectionForm {
         this.title = "";
+        this.cardIds = [];
         this.boardId = boardId;
         return this;
     }
@@ -104,12 +105,10 @@ export class SectionForm {
         if (this.boardId) {
             payload.boardId = this.boardId;
         }
-        if (this.cardIds && this.cardIds.length > 0) {
-            payload.cardIds = this.cardIds;
-        }
         if (this.id && this.id != '') {
             payload.id = this.id;
         }
+        payload.cardIds = this.cardIds;
         return payload;
     }
 }

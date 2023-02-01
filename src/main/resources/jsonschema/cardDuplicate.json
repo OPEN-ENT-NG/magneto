@@ -6,6 +6,9 @@
     "boardId": {
       "type": "string"
     },
+    "sectionId": {
+      "type": "string"
+    },
     "cardIds": {
       "type": "array",
       "items": {

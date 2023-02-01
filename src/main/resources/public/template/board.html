@@ -88,6 +88,7 @@
             <section-list
                     ng-if="!!vm.board.layoutType && !vm.board.isLayoutFree()"
                     board="vm.board"
+                    on-drag="vm.initDrag"
                     on-move="vm.getBoard"
                     on-edit="vm.openEditResourceLightbox"
                     on-duplicate="vm.openTransferDuplicateResourceLightbox"

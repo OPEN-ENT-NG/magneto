@@ -1,5 +1,6 @@
 package fr.cgi.magneto.service;
 
+import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
@@ -28,9 +29,10 @@ public interface CardService {
      * Create a Card and adding it to section or not depending on layout
      *
      * @param card Card to create {@link CardPayload}
+     * @param i18n I18nHelper Helper for I18n keys
      * @return Future {@link Future <JsonObject>} containing newly created card
      */
-    Future<JsonObject> createCardLayout(CardPayload card);
+    Future<JsonObject> createCardLayout(CardPayload card, I18nHelper i18n);
 
     /**
      * Update a card
@@ -103,7 +105,7 @@ public interface CardService {
      *
      * @param boardId Board identifiers
      * @param cards   List of card to duplicate
-     * @param section   Section where cards are duplicate
+     * @param section Section where cards are duplicate
      * @param user    {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing status of duplicate
      */

@@ -47,7 +47,7 @@ export interface IBoardPayload {
     imageUrl?: string;
     folderId?: string;
     cardIds?: Array<string>;
-    sections?: Array<Section>;
+    sectionIds?: Array<string>;
     tags?: Array<string>;
     public?: boolean;
     layoutType?: LAYOUT_TYPE;
@@ -66,7 +66,7 @@ export class BoardForm {
     private _imageUrl: string;
     private _folderId: string;
     private _cardIds: Array<string>;
-    private _sections: Array<Section>;
+    private _sectionIds: Array<string>;
     private _public: boolean;
     private _tags: Array<string>;
     private _tagsTextInput: string;
@@ -79,7 +79,7 @@ export class BoardForm {
         this._imageUrl = null;
         this._folderId = null;
         this._cardIds = null;
-        this._sections = null;
+        this._sectionIds = null;
         this._public = false;
         this._tags = null;
         this._layoutType = LAYOUT_TYPE.FREE;
@@ -148,12 +148,12 @@ export class BoardForm {
         this._cardIds = value;
     }
 
-    get sections(): Array<Section> {
-        return this._sections;
+    get sectionsIds(): Array<string> {
+        return this._sectionIds;
     }
 
-    set sections(value: Array<Section>) {
-        this._sections = value;
+    set sectionsIds(value: Array<string>) {
+        this._sectionIds = value;
     }
 
     get tags(): Array<string> {
@@ -218,8 +218,8 @@ export class BoardForm {
             payload.cardIds = this.cardIds;
         }
 
-        if (this.sections) {
-            payload.sections = this.sections;
+        if (this.sectionsIds) {
+            payload.sectionIds = this.sectionsIds;
         }
 
         if (this.tags) {
@@ -317,6 +317,10 @@ export class Board implements Shareable {
         return this._sections;
     }
 
+    get sectionsIds(): Array<String> {
+        return this._sections.map(section => section.id);
+    }
+
     set sections(value: Array<Section>) {
         this._sections = value;
     }
@@ -375,6 +379,10 @@ export class Board implements Shareable {
 
     set tags(value: Array<string>) {
         this._tags = value;
+    }
+
+    sortSections(value: Array<String>)  {
+        return this._sections.sort((a, b) => value.indexOf(a.id) - value.indexOf(b.id));
     }
 
     isMyBoard(): boolean {

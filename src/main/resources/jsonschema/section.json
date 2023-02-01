@@ -8,6 +8,16 @@
     },
     "boardId": {
       "type": ["string"]
+    },
+    "cardIds": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          }
+        ]
+      }
     }
   },
   "required": [

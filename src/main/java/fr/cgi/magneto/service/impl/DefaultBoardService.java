@@ -4,6 +4,7 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.Section;
@@ -50,7 +51,7 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
-    public Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, HttpServerRequest request) {
+    public Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, I18nHelper i18n) {
         Promise<JsonObject> promise = Promise.promise();
         BoardPayload createBoard = new BoardPayload(board);
         String newId = UUID.randomUUID().toString();
@@ -60,7 +61,7 @@ public class DefaultBoardService implements BoardService {
             String newSectionId = UUID.randomUUID().toString();
             createBoard.setSectionIds(Collections.singletonList(newSectionId));
             SectionPayload createSection = new SectionPayload(newId)
-                    .setTitle(I18n.getInstance().translate("magneto.section.default.title", getHost(request), I18n.acceptLanguage(request)));
+                    .setTitle(i18n.translate("magneto.section.default.title"));
             createBoardFutures.add(this.sectionService.create(createSection, newSectionId));
         }
         createBoard.setOwnerId(user.getUserId());
@@ -128,7 +129,7 @@ public class DefaultBoardService implements BoardService {
         return promise.future();
     }
 
-    public Future<JsonObject> duplicate(String boardId, UserInfos user, HttpServerRequest request) {
+    public Future<JsonObject> duplicate(String boardId, UserInfos user, I18nHelper i18n) {
         Promise<JsonObject> promise = Promise.promise();
         Map<String, Future<?>> futures = new HashMap<>();
         JsonObject futuresInfos = new JsonObject();
@@ -155,7 +156,7 @@ public class DefaultBoardService implements BoardService {
 
                         // Reset new board
                         duplicateBoard.reset();
-                        Future<JsonObject> createBoardFuture = this.create(user, duplicateBoard.toJson(), false, request);
+                        Future<JsonObject> createBoardFuture = this.create(user, duplicateBoard.toJson(), false, i18n);
                         futures.put(Field.BOARD, createBoardFuture);
                         return CompositeFuture.all(getCardsFuture, getSectionsFuture, createBoardFuture);
                     } else {
@@ -203,7 +204,7 @@ public class DefaultBoardService implements BoardService {
         return promise.future();
     }
 
-    public Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, HttpServerRequest request) {
+    public Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n) {
         Promise<JsonObject> promise = Promise.promise();
         List<Future> updateBoardFutures = new ArrayList<>();
 
@@ -211,15 +212,11 @@ public class DefaultBoardService implements BoardService {
         if (currentBoard.isLayoutFree() && !updateBoard.isLayoutFree()) {
             SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.cardIds());
 
-            // Check if the board have already sections or not
-            if (currentBoard.sectionIds().isEmpty()) {
-                String sectionId = UUID.randomUUID().toString();
-                sectionPayload.setTitle(I18n.getInstance().translate("magneto.section.default.title", getHost(request), I18n.acceptLanguage(request)));
-                updateBoard.addSection(sectionId);
-                updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));
-            } else {
-                updateBoardFutures.add(sectionService.update(sectionPayload.setId(currentBoard.sectionIds().get(0))));
-            }
+            String sectionId = UUID.randomUUID().toString();
+            sectionPayload.setTitle(i18n.translate("magneto.section.default.title"));
+            updateBoard.addSection(sectionId);
+            updateBoard.setCardIds(new ArrayList<>());
+            updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));
             promise.complete(updateBoard.toJson());
 
             // Check if we are changing the layout from section to free
@@ -229,6 +226,8 @@ public class DefaultBoardService implements BoardService {
                         List<Card> cardsList = cards.getJsonArray(Field.ALL).getList();
                         List<String> cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());
                         updateBoard.setCardIds(cardIds);
+                        updateBoardFutures.add(sectionService.deleteByBoards(Collections.singletonList(updateBoard.getId())));
+                        updateBoard.setSectionIds(new ArrayList<>());
                         promise.complete(updateBoard.toJson());
                         return Future.succeededFuture();
                     });

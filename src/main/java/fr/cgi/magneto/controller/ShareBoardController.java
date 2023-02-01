@@ -1,15 +1,20 @@
 package fr.cgi.magneto.controller;
 
-import fr.cgi.magneto.core.constants.*;
-import fr.cgi.magneto.security.*;
-import fr.wseduc.rs.*;
-import fr.wseduc.security.*;
-import fr.wseduc.webutils.*;
-import io.vertx.core.http.*;
-import io.vertx.core.json.*;
-import org.entcore.common.controller.*;
-import org.entcore.common.http.filter.*;
-import org.entcore.common.user.*;
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.Rights;
+import fr.cgi.magneto.helper.I18nHelper;
+import fr.cgi.magneto.security.GetSharesRight;
+import fr.wseduc.rs.ApiDoc;
+import fr.wseduc.rs.Get;
+import fr.wseduc.rs.Put;
+import fr.wseduc.security.ActionType;
+import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.I18n;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonObject;
+import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.user.UserUtils;
 
 public class ShareBoardController extends ControllerHelper {
     public ShareBoardController() {
@@ -46,6 +51,7 @@ public class ShareBoardController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void shareResource(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
+            I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
             if (user != null) {
                 final String id = request.params().get(Field.ID);
                 if (id == null || id.trim().isEmpty()) {
@@ -59,16 +65,13 @@ public class ShareBoardController extends ControllerHelper {
 
                 JsonObject pushNotif = new JsonObject()
                         .put(Field.TITLE, "push.notif.magneto.share")
-                        .put(Field.BODY, user.getUsername() + " " + I18n.getInstance().translate("magneto.shared.push.notif.body",
-                                getHost(request), I18n.acceptLanguage(request)));
-
+                        .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
                 params.put(Field.PUSHNOTIF, pushNotif);
 
                 shareResource(request, "magneto.share", false, params, Field.TITLE);
             }
         });
     }
-
 
 
 }

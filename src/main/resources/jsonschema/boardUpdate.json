@@ -3,6 +3,9 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "id": {
+      "type": ["string", "null"]
+    },
     "title": {
       "type": ["string", "null"]
     },
@@ -37,12 +40,12 @@
         ]
       }
     },
-    "sections": {
+    "sectionIds": {
       "type": "array",
       "items": {
         "anyOf": [
           {
-            "type": "object"
+            "type": "string"
           }
         ]
       }

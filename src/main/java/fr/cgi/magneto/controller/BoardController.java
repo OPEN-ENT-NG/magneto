@@ -5,6 +5,7 @@ import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.security.*;
@@ -12,6 +13,7 @@ import fr.cgi.magneto.service.*;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -132,13 +134,16 @@ public class BoardController extends ControllerHelper {
     @Trace(Actions.BOARD_CREATION)
     public void create(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "board", board ->
-                UserUtils.getUserInfos(eb, request, user ->
-                        boardService.create(user, board, true, request)
-                                .onFailure(err -> renderError(request))
-                                .onSuccess(result -> {
-                                    eventStore.createAndStoreEvent(CREATE_BOARD.name(), request);
-                                    renderJson(request, result);
-                                })));
+                UserUtils.getUserInfos(eb, request, user -> {
+                            I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+                            boardService.create(user, board, true, i18nHelper)
+                                    .onFailure(err -> renderError(request))
+                                    .onSuccess(result -> {
+                                        eventStore.createAndStoreEvent(CREATE_BOARD.name(), request);
+                                        renderJson(request, result);
+                                    });
+                        }
+                ));
     }
 
     @Put("/board/duplicate/:boardId")
@@ -150,7 +155,8 @@ public class BoardController extends ControllerHelper {
     public void duplicate(HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             String boardId = request.getParam(Field.BOARDID);
-            boardService.duplicate(boardId, user, request)
+            I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+            boardService.duplicate(boardId, user, i18nHelper)
                     .onFailure(err -> renderError(request))
                     .onSuccess(result -> renderJson(request, result));
         });
@@ -173,7 +179,8 @@ public class BoardController extends ControllerHelper {
                                         .setId(boardId)
                                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
                                 Board currentBoard = boards.get(0);
-                                return boardService.updateLayoutCards(updateBoard, currentBoard, request)
+                                I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+                                return boardService.updateLayoutCards(updateBoard, currentBoard, i18nHelper)
                                         .compose(boardUpdated -> boardService.update(new BoardPayload(boardUpdated)));
                             } else {
                                 return Future.failedFuture(String.format("[Magneto%s::update] " +

@@ -56,7 +56,16 @@ public class SectionController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getSectionsByBoardId(HttpServerRequest request) {
         String boardId = request.getParam(Field.BOARDID);
-        sectionService.getSectionsByBoardId(boardId)
+        boardService.getBoards(Collections.singletonList(boardId))
+                .compose(boards -> {
+                    if (boards.isEmpty()) {
+                        String message = String.format("[Magneto@%s::getSectionsByBoardId] Failed to get boards with board id : %s",
+                                this.getClass().getSimpleName(), boardId);
+                        return Future.failedFuture(message);
+                    } else {
+                        return sectionService.getSectionsByBoard(boards.get(0));
+                    }
+                })
                 .onFailure(err -> {
                     String message = String.format("[Magneto@%s::getSectionsByBoardId] Failed to get all sections by board id : %s",
                             this.getClass().getSimpleName(), err.getMessage());

@@ -5,6 +5,7 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.helper.PromiseHelper;
 import fr.cgi.magneto.model.Metadata;
@@ -68,7 +69,7 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<JsonObject> createCardLayout(CardPayload cardPayload) {
+    public Future<JsonObject> createCardLayout(CardPayload cardPayload, I18nHelper i18n) {
         Promise<JsonObject> promise = Promise.promise();
         String newId = UUID.randomUUID().toString();
 
@@ -87,9 +88,23 @@ public class DefaultCardService implements CardService {
                             boardPayload.addCards(Collections.singletonList(newId));
                         } else {
                             // If layout is section = We update the first section, and we add new card id into it
-                            SectionPayload updateSection = new SectionPayload(getSectionsFuture.result().get(0).toJson());
-                            updateSection.addCardIds(Collections.singletonList(newId));
-                            createCardFutures.add(this.serviceFactory.sectionService().update(updateSection));
+                            Section firstSection = getSectionsFuture.result()
+                                    .stream()
+                                    .filter(section -> section.getId().equals(boardPayload.getSectionIds().get(0)))
+                                    .findFirst()
+                                    .orElse(null);
+                            if (firstSection != null) {
+                                SectionPayload updateSection = new SectionPayload(firstSection.toJson());
+                                updateSection.addCardIds(Collections.singletonList(newId));
+                                createCardFutures.add(this.serviceFactory.sectionService().update(updateSection));
+                            } else {
+                                SectionPayload createSection = new SectionPayload(boardPayload.getId())
+                                        .setTitle(i18n.translate("magneto.section.default.title"));
+                                createSection.addCardIds(Collections.singletonList(newId));
+                                String newSectionId = UUID.randomUUID().toString();
+                                boardPayload.addSection(newSectionId);
+                                createCardFutures.add(this.serviceFactory.sectionService().create(createSection, newSectionId));
+                            }
                         }
                         createCardFutures.add(this.updateBoard(boardPayload));
                         return CompositeFuture.all(createCardFutures);
@@ -323,12 +338,26 @@ public class DefaultCardService implements CardService {
                         // and we add cards in the section
                         return this.serviceFactory.sectionService().getSectionsByBoardId(boardId)
                                 .compose(sections -> {
-                                    SectionPayload sectionToUpdate = new SectionPayload(sections.get(0).toJson());
+                                    SectionPayload sectionToUpdate = new SectionPayload();
                                     if (section != null) {
                                         sectionToUpdate = section;
+                                        sectionToUpdate.addCardIds(newCardIds);
+                                        return this.serviceFactory.sectionService().update(sectionToUpdate);
+                                    } else {
+                                        Section firstSection = sections
+                                                .stream()
+                                                .filter(sectionResult -> sectionResult.getId().equals(boardPayload.getSectionIds().get(0)))
+                                                .findFirst()
+                                                .orElse(null);
+                                        if (firstSection != null) {
+                                            firstSection.addCardIds(newCardIds);
+                                            return this.serviceFactory.sectionService().update(new SectionPayload(firstSection.toJson()));
+                                        } else {
+                                            String message = String.format("[Magneto@%s::duplicateCardsFuture] Failed to duplicate card in section : no sections found",
+                                                    this.getClass().getSimpleName());
+                                            return Future.failedFuture(message);
+                                        }
                                     }
-                                    sectionToUpdate.addCardIds(newCardIds);
-                                    return this.serviceFactory.sectionService().update(sectionToUpdate);
                                 });
                     }
                 })
@@ -582,7 +611,7 @@ public class DefaultCardService implements CardService {
             query.match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, cardIds)))
                     .addFields(Field.INDEX, new JsonObject()
                             .put(Mongo.INDEX_OF_ARRAY, new JsonArray()
-                                    .add(cardIds)
+                                .add(cardIds)
                                     .add('$' + Field._ID)
                             )
                     )

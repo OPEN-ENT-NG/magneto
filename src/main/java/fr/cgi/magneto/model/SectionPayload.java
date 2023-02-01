@@ -18,8 +18,7 @@ public class SectionPayload implements Model {
     public SectionPayload(JsonObject section) {
         this._id = section.getString(Field._ID, null);
         this.title = section.getString(Field.TITLE);
-        this.cardIds = !section.getJsonArray(Field.CARDIDS, new JsonArray()).isEmpty() ?
-                section.getJsonArray(Field.CARDIDS, new JsonArray()).getList() : null;
+        this.cardIds = section.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
         this.boardId = section.getString(Field.BOARDID);
     }
 

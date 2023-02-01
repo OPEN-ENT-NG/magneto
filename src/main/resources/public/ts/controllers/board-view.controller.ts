@@ -1,6 +1,8 @@
 import {model, ng, notify} from "entcore";
 import {IScope, IWindowService} from "angular";
-import {IBoardsService, ICardsService, ISectionsService} from "../services";
+import {IBoardsService, ICardsService, ISectionsService, sectionsService} from "../services";
+import {create} from 'sortablejs';
+
 import {
     Board,
     BoardForm,
@@ -12,6 +14,7 @@ import {
     ICardsSectionParamsRequest,
     ILinkerParams,
     Section,
+    SectionForm,
     Sections
 } from "../models";
 import {safeApply} from "../utils/safe-apply.utils";
@@ -20,6 +23,7 @@ import {InfiniteScrollService} from "../shared/services";
 import {EventBusService} from "../shared/event-bus-service/event-bus-sockjs.service";
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
 import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
+
 interface IViewModel extends ng.IController {
 
     displayCardLightbox: boolean;
@@ -50,6 +54,8 @@ interface IViewModel extends ng.IController {
     };
 
     isLoading: boolean;
+
+    nestedSortables: any[];
 
     infiniteScrollService: InfiniteScrollService;
 
@@ -82,6 +88,8 @@ interface IViewModel extends ng.IController {
     getMediaLibraryFileFormat(): string;
 
     openBoardPropertiesForm(): void;
+
+    onEndDragAndDrop(evt: any): Promise<void>;
 }
 
 interface IBoardViewScope extends IScope {
@@ -116,6 +124,8 @@ class Controller implements IViewModel {
     videoUrl: string;
 
     isLoading: boolean;
+
+    nestedSortables: any[];
 
     filter: {
         page: number,
@@ -164,6 +174,7 @@ class Controller implements IViewModel {
         };
 
         this.isLoading = true;
+        this.nestedSortables = [];
 
         this.getBoard().then(async () => {
             if (this.board.layoutType == LAYOUT_TYPE.FREE) {
@@ -278,7 +289,7 @@ class Controller implements IViewModel {
      */
     onFormSubmit = async (): Promise<void> => {
         this.displayMediaLibraryLightbox = false;
-        await this.resetBoardView();
+        await this.resetBoardView()
     }
 
     /**
@@ -291,6 +302,78 @@ class Controller implements IViewModel {
         safeApply(this.$scope);
     }
 
+    initDrag = (): void => {
+        // Loop through each nested sortable element for DragAndDrop
+        for (let i = 0; i < this.nestedSortables.length; i++) {
+            this.nestedSortables[i].destroy();
+        }
+        this.nestedSortables = [];
+
+        const cardList: NodeListOf<Element> = document.querySelectorAll(".card-list");
+        for (let i = 0; i < cardList.length; i++) {
+            this.nestedSortables.push(create(cardList[i], {
+                group: 'nested',
+                animation: 150,
+                delay: 150,
+                forceAutoScrollFallback: true,
+                scroll: true, // or HTMLElement
+                scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
+                scrollSpeed: 30, // px*/
+                delayOnTouchOnly: true,
+                onEnd: async (evt) => {
+                    await this.onEndDragAndDrop(evt);
+                }
+            }));
+        }
+
+        const sectionList: Element = document.getElementById("section-list");
+        this.nestedSortables.push(create(sectionList, {
+            animation: 300,
+            easing: "cubic-bezier(1, 0, 0, 1)",
+            delay: 150,
+            draggable: ".scrollbar",
+            forceAutoScrollFallback: true,
+            scroll: true, // or HTMLElement
+            scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
+            scrollSpeed: 30, // px*/
+            delayOnTouchOnly: true,
+            onUpdate: async (evt) => {
+                let form: BoardForm = new BoardForm().build(this.board);
+                let sectionIds: Array<string> = this.board.sections.map((section: Section) => section.id);
+                let oldSectionId: string = sectionIds[evt.oldIndex];
+                let newSectionIndex: number = evt.newIndex;
+                sectionIds.splice(evt.oldIndex, 1);
+                sectionIds.splice(newSectionIndex, 0, oldSectionId);
+                form.sectionsIds = sectionIds;
+                this.boardsService.updateBoard(this.board.id, form)
+                    .then(async res => {
+                        if (res.status == 200 || res.status == 201) {
+                            this.board.sections = this.board.sortSections(sectionIds);
+                        }
+                    });
+            }
+        }));
+        safeApply(this.$scope);
+    }
+
+    onEndDragAndDrop = async (evt: any): Promise<void> => {
+        let newNestedSectionId: string = evt.to.id.replace("section-container-", "");
+        let oldNestedContainerId: string = evt.from.id.replace("section-container-", "");
+        let oldSection: Section = oldNestedContainerId ? (this.board.sections.filter(e => e instanceof Section && e.id === oldNestedContainerId)[0]) as Section : null;
+        let newSection: Section = newNestedSectionId ? (this.board.sections.filter(e => e instanceof Section && e.id === newNestedSectionId)[0]) as Section : null;
+
+        let movedCardId: string = oldSection.cardIds[evt.oldIndex];
+        let newCardIndex: number = evt.newIndex;
+
+        oldSection.cardIds.splice(evt.oldIndex, 1);
+        newSection.cardIds.splice(newCardIndex, 0, movedCardId);
+
+        await Promise.all([
+            sectionsService.update(new SectionForm().build(oldSection)),
+            sectionsService.update(new SectionForm().build(newSection))
+        ])
+    };
+
     /**
      * Fetch board infos.
      */
@@ -300,10 +383,12 @@ class Controller implements IViewModel {
             .then(async (res: Boards) => {
                 if (!!res) {
                     this.board = res.all[0];
+                    safeApply(this.$scope);
                     if (this.board.layoutType != LAYOUT_TYPE.FREE) {
-                        this.sectionsServices.getSectionsByBoard(this.filter.boardId).then((sections: Sections) => {
+                        this.sectionsServices.getSectionsByBoard(this.filter.boardId).then(async (sections: Sections) => {
                             this.board.sections = sections.all;
-                            this.getCardsBySectionBoard();
+                            await this.getCardsBySectionBoard();
+                            setTimeout(this.initDrag, 500);
                         });
                     }
                 }
@@ -342,7 +427,10 @@ class Controller implements IViewModel {
      * Fetch board cards for all sections.
      */
     getCardsBySectionBoard = async (): Promise<void> => {
-        await Promise.all(this.board.sections.map((section) => this.getCardsBySection(section)));
+        let promises: Promise<void>[] = [];
+        this.board.sections.forEach((section) => promises.push(this.getCardsBySection(section)));
+        await Promise.all(promises);
+        safeApply(this.$scope);
     }
 
     /**
@@ -354,18 +442,12 @@ class Controller implements IViewModel {
             page: section.page,
             sectionId: section.id
         };
-        this.cardsService.getAllCardsBySection(params)
-            .then((res: Cards) => {
-                if (res.all && res.all.length > 0) {
-                    section.cards.push(...res.all);
-                }
-                this.isLoading = false;
-                safeApply(this.$scope);
-            })
-            .catch((err: AxiosError) => {
-                this.isLoading = false;
-                notify.error(err.message)
-            });
+
+        const cards = await this.cardsService.getAllCardsBySection(params);
+        if(!!cards.all && cards.all.length > 0) {
+            section.cards.push(...cards.all);
+        }
+        this.isLoading = false;
     }
 
     /**

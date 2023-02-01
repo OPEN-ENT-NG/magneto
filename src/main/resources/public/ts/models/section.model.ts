@@ -91,6 +91,10 @@ export class SectionForm {
         this._cardIds = value;
     }
 
+    addCardId(value: string) {
+        this._cardIds.push(value);
+    }
+
     isValid(): boolean {
         return this.title !== null && this.title !== '';
     }

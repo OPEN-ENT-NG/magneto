@@ -21,6 +21,8 @@
                    ng-keyup="$event.keyCode == 13 ? vm.createSection(vm.newSection) : null"
                    ng-model="vm.newSection.title" i18n-placeholder="magneto.section.insert.title"/>
         </div>
+        <div class="card-list card-list-[[vm.board.layoutType]] flex-row">
+        </div>
     </div>
 
     <!-- Section deletion modal -->

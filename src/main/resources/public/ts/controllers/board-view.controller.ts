@@ -1,4 +1,4 @@
-import {model, ng, notify} from "entcore";
+import {model, ng, idiom as lang, notify} from "entcore";
 import {IScope, IWindowService} from "angular";
 import {IBoardsService, ICardsService, ISectionsService, sectionsService} from "../services";
 import {create} from 'sortablejs';
@@ -66,7 +66,9 @@ interface IViewModel extends ng.IController {
     openAddResourceLightbox(resourceType: RESOURCE_TYPE): void;
 
     openEditResourceLightbox(card: Card): void;
+
     openLockResource(card: Card): void;
+
     openReading(): void;
 
     onFormSubmit(): Promise<void>;
@@ -358,20 +360,40 @@ class Controller implements IViewModel {
 
     onEndDragAndDrop = async (evt: any): Promise<void> => {
         let newNestedSectionId: string = evt.to.id.replace("section-container-", "");
-        let oldNestedContainerId: string = evt.from.id.replace("section-container-", "");
-        let oldSection: Section = oldNestedContainerId ? (this.board.sections.filter(e => e instanceof Section && e.id === oldNestedContainerId)[0]) as Section : null;
-        let newSection: Section = newNestedSectionId ? (this.board.sections.filter(e => e instanceof Section && e.id === newNestedSectionId)[0]) as Section : null;
+        if (newNestedSectionId.length > 0) {
+            let oldNestedContainerId: string = evt.from.id.replace("section-container-", "");
+            let oldSection: Section = oldNestedContainerId ? (this.board.sections.filter(e => e instanceof Section && e.id === oldNestedContainerId)[0]) as Section : null;
+            let newSection: Section = newNestedSectionId ? (this.board.sections.filter(e => e instanceof Section && e.id === newNestedSectionId)[0]) as Section : null;
 
-        let movedCardId: string = oldSection.cardIds[evt.oldIndex];
-        let newCardIndex: number = evt.newIndex;
+            let movedCardId: string = oldSection.cardIds[evt.oldIndex];
+            let newCardIndex: number = evt.newIndex;
 
-        oldSection.cardIds.splice(evt.oldIndex, 1);
-        newSection.cardIds.splice(newCardIndex, 0, movedCardId);
+            oldSection.cardIds.splice(evt.oldIndex, 1);
+            newSection.cardIds.splice(newCardIndex, 0, movedCardId);
 
-        await Promise.all([
-            sectionsService.update(new SectionForm().build(oldSection)),
-            sectionsService.update(new SectionForm().build(newSection))
-        ])
+            await Promise.all([
+                sectionsService.update(new SectionForm().build(oldSection)),
+                sectionsService.update(new SectionForm().build(newSection))
+            ])
+        } else {
+            let oldNestedContainerId: string = evt.from.id.replace("section-container-", "");
+            let oldSection: Section = oldNestedContainerId ? (this.board.sections.filter(e => e instanceof Section && e.id === oldNestedContainerId)[0]) as Section : null;
+            let movedCardId: string = oldSection.cardIds[evt.oldIndex];
+            let newSection: SectionForm = new SectionForm().buildNew(this.board.id);
+            newSection.addCardId(movedCardId);
+            newSection.title = lang.translate("magneto.section.default.title");
+            oldSection.cardIds.splice(evt.oldIndex, 1);
+
+            // Remove card from the dom
+            const originalElement: any = evt.item;
+            originalElement.parentNode.removeChild(originalElement);
+
+            await Promise.all([
+                sectionsService.update(new SectionForm().build(oldSection)),
+                sectionsService.create(newSection)
+            ])
+            await this.getBoard();
+        }
     };
 
     /**
@@ -383,7 +405,6 @@ class Controller implements IViewModel {
             .then(async (res: Boards) => {
                 if (!!res) {
                     this.board = res.all[0];
-                    safeApply(this.$scope);
                     if (this.board.layoutType != LAYOUT_TYPE.FREE) {
                         this.sectionsServices.getSectionsByBoard(this.filter.boardId).then(async (sections: Sections) => {
                             this.board.sections = sections.all;

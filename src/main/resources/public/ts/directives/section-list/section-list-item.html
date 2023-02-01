@@ -38,4 +38,12 @@
             on-lock="vm.openLock"
             on-loaded="vm.onLoaded">
     </card-list>
+
+    <infinite-scroll scrolled="vm.onScroll()"
+                     loading-mode="false"
+                     is-horizontal="vm.board.isLayoutHorizontal()"
+                     query-selector="vm.formatSectionContainerSelector(vm.section, false)"
+                     scroll-eventer="vm.infiniteScrollService"
+                     ng-if="vm.isDomLoaded">
+    </infinite-scroll>
 </div>

@@ -65,6 +65,7 @@
             <card-list
                     ng-if="vm.board.id && !vm.isLoading && vm.board.isLayoutFree()"
                     layout="vm.board.layoutType"
+                    selector-identifier="'card-list'"
                     is-draggable="vm.board.myRights.publish !== undefined"
                     has-caption="true"
                     cards="vm.cards"
@@ -178,7 +179,8 @@
                 display="vm.displayPreviewCardLightbox">
         </card-preview-lightbox>
 
-        <infinite-scroll scrolled="vm.onScroll()"
+        <infinite-scroll ng-if="vm.board.isLayoutFree()"
+                         scrolled="vm.onScroll()"
                          loading-mode="true"
                          scroll-eventer="vm.infiniteScrollService">
         </infinite-scroll>

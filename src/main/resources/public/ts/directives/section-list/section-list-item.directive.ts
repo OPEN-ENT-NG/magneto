@@ -1,9 +1,11 @@
-import {angular, ng, toasts} from "entcore";
-import {ILocationService, IParseService, IScope, IWindowService} from "angular";
+import {angular, ng, notify, toasts} from "entcore";
+import {IParseService, IScope} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Board, Card, Section, SectionForm} from "../../models";
-import {sectionsService} from "../../services";
+import {Board, Card, Cards, ICardsSectionParamsRequest, Section, SectionForm} from "../../models";
+import {cardsService, sectionsService} from "../../services";
 import {safeApply} from "../../utils/safe-apply.utils";
+import {AxiosError} from "axios";
+import {InfiniteScrollService} from "../../shared/services";
 
 interface IViewModel extends ng.IController, ISectionListItemProps {
     openEdit?(card: Card): void;
@@ -29,6 +31,12 @@ interface IViewModel extends ng.IController, ISectionListItemProps {
     refresh?(): void;
 
     openSectionOptions?(): Promise<void>;
+
+    formatSectionSelector(section: Section): string;
+
+    formatSectionContainerSelector(section: Section, isIdentifier: boolean): string;
+
+    onLoaded(): void;
 
     isDisplayedOptions: boolean;
 
@@ -56,14 +64,19 @@ class Controller implements IViewModel {
     board: Board;
     section: Section;
     newSection: SectionForm;
+
+    infiniteScrollService: InfiniteScrollService;
+
+    isLoading: boolean;
     isDisplayedOptions: boolean;
+    isDomLoaded: boolean;
 
 
-    constructor(private $scope: ISectionListItemScope,
-                private $location: ILocationService,
-                private $window: IWindowService) {
+    constructor(private $scope: ISectionListItemScope) {
         this.isDisplayedOptions = false;
-
+        this.isLoading = false;
+        this.isDomLoaded = false;
+        this.infiniteScrollService = new InfiniteScrollService();
     }
 
     $onInit = (): void => {
@@ -77,6 +90,10 @@ class Controller implements IViewModel {
         return "#section-" + section.id;
     }
 
+    formatSectionContainerSelector = (section: Section, isIdentifier: boolean): string => {
+        return isIdentifier ? "section-container-" + section.id : "#section-container-" + section.id;
+    }
+
     updateSection = async (section: Section): Promise<void> => {
         let updateSection: SectionForm = new SectionForm().build(section);
         updateSection.cardIds = [];
@@ -88,6 +105,45 @@ class Controller implements IViewModel {
             }
         });
         this.$scope.vm.refresh();
+    }
+
+    /**
+     * Callback on infinite scroll
+     */
+    onScroll = async (): Promise<void> => {
+        if (this.section.cards && this.section.cards.length > 0) {
+            this.section.page++;
+            await this.getCardsBySection();
+        }
+    }
+
+    /**
+     * Fetch board cards by section.
+     */
+    getCardsBySection = async (): Promise<void> => {
+        this.isLoading = true;
+        const params: ICardsSectionParamsRequest = {
+            page: this.section.page,
+            sectionId: this.section.id
+        };
+        cardsService.getAllCardsBySection(params)
+            .then((res: Cards) => {
+                if (res.all && res.all.length > 0) {
+                    this.section.cards.push(...res.all);
+                    this.infiniteScrollService.updateScroll();
+                }
+                this.isLoading = false;
+                safeApply(this.$scope);
+            })
+            .catch((err: AxiosError) => {
+                this.isLoading = false;
+                notify.error(err.message);
+            });
+    }
+
+    onLoaded = (): void => {
+        this.isDomLoaded = true;
+        safeApply(this.$scope);
     }
 
 }

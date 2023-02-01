@@ -32,6 +32,7 @@ interface ICardListProps {
     isDraggable: boolean;
     isScrollable: boolean;
     selectorResize: string;
+    selectorIdentifier: string;
 
     hasCaption: boolean;
 
@@ -51,6 +52,8 @@ interface ICardListProps {
     hasLock: boolean;
     onLock?;
     onMove?;
+
+    onLoaded?;
 }
 
 interface ICardListScope extends IScope, ICardListProps {
@@ -65,6 +68,7 @@ class Controller implements IViewModel {
     isDraggable: boolean;
     isScrollable: boolean;
     selectorResize: string;
+    selectorIdentifier: string;
 
 
     hasCaption: boolean;
@@ -157,7 +161,9 @@ function directive($parse: IParseService) {
             hasLock: '=',
             onLock: '&',
             onMove: '&',
-            selectorResize: '='
+            onLoaded: '&',
+            selectorResize: '=',
+            selectorIdentifier: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -217,6 +223,11 @@ function directive($parse: IParseService) {
             vm.openLock = (card: Card): void => {
                 $parse($scope.vm.onLock())(card);
             }
+
+            $(document).ready(() => {
+                $parse($scope.vm.onLoaded())({});
+            });
+
         }
     }
 }

@@ -288,6 +288,7 @@ class Controller implements IViewModel {
     resetBoardView = async (): Promise<void> => {
         this.resetCards();
         await Promise.all([this.getCards(), this.getBoard()]);
+        safeApply(this.$scope);
     }
 
     /**
@@ -307,7 +308,6 @@ class Controller implements IViewModel {
                     }
                 }
                 this.isLoading = false;
-                safeApply(this.$scope);
             })
             .catch((err: AxiosError) => {
                 this.isLoading = false;

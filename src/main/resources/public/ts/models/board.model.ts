@@ -384,6 +384,14 @@ export class Board implements Shareable {
     isLayoutFree(): boolean {
         return this.layoutType == LAYOUT_TYPE.FREE;
     }
+
+    isLayoutHorizontal(): boolean {
+        return this.layoutType == LAYOUT_TYPE.HORIZONTAL;
+    }
+
+    isLayoutVertical(): boolean {
+        return this.layoutType == LAYOUT_TYPE.VERTICAL;
+    }
 }
 
 export class Boards {

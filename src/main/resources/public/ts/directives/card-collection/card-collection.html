@@ -48,6 +48,7 @@
                 </div>
                 <card-list
                         cards="collection.cards"
+                        selector-identifier="card-list"
                         selected-card-ids="vm.selectedCardIds"
                         has-caption="false"
                         has-duplicate="vm.board.myRights.contrib !== undefined"
@@ -59,6 +60,7 @@
             </div>
             <card-list ng-hide="vm.displayBoard"
                        cards="vm.cards"
+                       selector-identifier="card-list"
                        selected-card-ids="vm.selectedCardIds"
                        has-caption="false"
                        has-duplicate="true"

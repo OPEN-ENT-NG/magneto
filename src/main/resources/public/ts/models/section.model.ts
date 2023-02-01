@@ -157,6 +157,10 @@ export class Section {
         return this._page;
     }
 
+    set page(value: number) {
+        this._page = value;
+    }
+
     get cards(): Card[] {
         return this._cards;
     }

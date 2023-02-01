@@ -24,6 +24,7 @@ describe("BoardReadController", () => {
         lastModifierName: "lastModifierName",
         boardId: "boardId",
         parentId: "parentId",
+        locked: false,
         metadata: null
     });
 

@@ -607,6 +607,7 @@ public class DefaultCardService implements CardService {
                     .put(Field.MODIFICATIONDATE, 1)
                     .put(Field.BOARDID, 1)
                     .put(Field.PARENTID, 1)
+                    .put(Field.ISLOCKED, 1)
                     .put(Field.LASTMODIFIERID, 1)
                     .put(Field.LASTMODIFIERNAME, 1));
         }
@@ -635,6 +636,7 @@ public class DefaultCardService implements CardService {
                     .put(Field.TITLE, 1)
                     .put(Field.CAPTION, 1)
                     .put(Field.DESCRIPTION, 1)
+                    .put(Field.ISLOCKED, 1)
                     .put(Field.OWNERID, 1)
                     .put(Field.OWNERNAME, 1)
                     .put(Field.RESOURCETYPE, 1)

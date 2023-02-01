@@ -11,6 +11,7 @@
             on-duplicate-section="vm.duplicateSection"
             on-preview="vm.openPreview"
             on-transfer="vm.openTransfer"
+            on-lock="vm.openLock"
             class="scrollbar sections-list-content sections-list-content-[[vm.board.layoutType]]">
     </section-list-item>
     <div ng-if="vm.board.myRights.publish !== undefined"

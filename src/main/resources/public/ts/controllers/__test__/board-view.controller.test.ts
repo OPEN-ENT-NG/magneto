@@ -24,6 +24,7 @@ describe("BoardViewController", () => {
         lastModifierName: "lastModifierName",
         boardId: "boardId",
         parentId: "parentId",
+        locked: false,
         metadata: null
     });
 

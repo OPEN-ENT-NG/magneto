@@ -17,6 +17,8 @@ interface IViewModel extends ng.IController, ISectionListProps {
 
     openTransfer?(card: Card): void;
 
+    openLock?(card: Card): void;
+
     onFormSubmit?(): void;
 
     createSection(section: SectionForm): Promise<void>;
@@ -38,6 +40,7 @@ interface ISectionListProps {
     onTransfer?;
     onMove?;
     onSubmit?;
+    onLock?;
 }
 
 interface ISectionListScope extends IScope, ISectionListProps {
@@ -84,7 +87,6 @@ class Controller implements IViewModel {
         } catch (e) {
             throw e;
         }
-
     }
 
     /**
@@ -94,7 +96,6 @@ class Controller implements IViewModel {
         this.selectedSection = section;
         this.displayDeleteSectionLightbox = true;
     }
-
 }
 
 function directive($parse: IParseService) {
@@ -110,7 +111,8 @@ function directive($parse: IParseService) {
             onPreview: '&',
             onTransfer: '&',
             onMove: '&',
-            onSubmit: '&'
+            onSubmit: '&',
+            onLock: '&'
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -143,6 +145,10 @@ function directive($parse: IParseService) {
 
             vm.openTransfer = (card: Card): void => {
                 $parse($scope.vm.onTransfer())(card);
+            }
+
+            vm.openLock = (card: Card): void => {
+                $parse($scope.vm.onLock())(card);
             }
 
             /**

@@ -25,6 +25,9 @@
             <!-- Card caption -->
             <span tooltip="[[vm.card.caption]]" ng-if="!!vm.card.caption" class="card-list-item-caption">[[vm.card.caption]]</span>
         </div>
+        <div class="card-list-item-infos-locked" ng-if="vm.card.locked">
+            <i class="magneto-lock" aria-hidden="true" tooltip="magneto.card.locked.tooltip"></i>
+        </div>
     </div>
     <card-list-item-options
             ng-show="vm.isDisplayedOptions"
@@ -39,7 +42,11 @@
             on-duplicate="vm.openDuplicate"
             has-preview="vm.hasPreview"
             on-preview="vm.openPreview"
+            has-preview="vm.hasLock"
+            on-preview="vm.openLock"
             has-transfer="vm.hasTransfer"
-            on-transfer="vm.openTransfer">
+            on-transfer="vm.openTransfer"
+            has-lock="vm.hasLock"
+            on-lock="vm.openLock">
     </card-list-item-options>
 </div>

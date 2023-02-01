@@ -7,7 +7,8 @@
             <h1 ng-click="vm.goToBoards()" class="cell paddingRight">
                 <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                      alt="" src="/magneto/public/img/uni-magneto.png">
-                <i18n>magneto.title</i18n> / [[vm.board.title]]
+                <i18n>magneto.title</i18n>
+                / [[vm.board.title]]
             </h1>
             <button ng-if="vm.cards.length > 0" class="right-magnet create-button" ng-click="vm.openReading()">
                 <i18n>magneto.reading.board</i18n>
@@ -28,7 +29,8 @@
                 <h1 ng-click="vm.goToBoards()" class="cell paddingRight">
                     <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                          alt="" src="/magneto/public/img/uni-magneto.png">
-                    <i18n>magneto.title</i18n> / [[vm.board.title]]
+                    <i18n>magneto.title</i18n>
+                    / [[vm.board.title]]
                 </h1>
 
             </div>
@@ -68,6 +70,7 @@
                     cards="vm.cards"
                     on-move="vm.getBoard"
                     board-display="false"
+                    board-right="vm.board.myRights"
                     has-edit="vm.board.myRights.publish !== undefined"
                     on-edit="vm.openEditResourceLightbox"
                     has-duplicate="vm.board.myRights.contrib !== undefined"
@@ -76,6 +79,8 @@
                     on-delete="vm.openDeleteResourceLightbox"
                     has-preview="vm.board.myRights.read !== undefined || vm.board.public"
                     on-preview="vm.openPreviewResourceLightbox"
+                    has-lock="vm.board.myRights.manager !== undefined"
+                    on-lock="vm.openLockResource"
                     has-transfer="vm.board.myRights.publish != undefined"
                     on-transfer="vm.openTransferResourceLightbox">
             </card-list>
@@ -88,7 +93,8 @@
                     on-delete="vm.openDeleteResourceLightbox"
                     on-preview="vm.openPreviewResourceLightbox"
                     on-transfer="vm.openTransferResourceLightbox"
-                    on-submit="vm.onFormSubmit">
+                    on-submit="vm.onFormSubmit"
+                    on-lock="vm.openLockResource">
             </section-list>
             <div ng-show="vm.isLoading" class="centered-text">
                 <loader min-height="'250px'"></loader>
@@ -136,9 +142,9 @@
         </board-manage-lightbox>
 
         <media-library-lightbox
-            display="vm.displayMediaLibraryLightbox"
-            file-format="vm.getMediaLibraryFileFormat()"
-            on-submit="vm.onFileSelected">
+                display="vm.displayMediaLibraryLightbox"
+                file-format="vm.getMediaLibraryFileFormat()"
+                on-submit="vm.onFileSelected">
         </media-library-lightbox>
 
         <!-- Media Library for sound only -->

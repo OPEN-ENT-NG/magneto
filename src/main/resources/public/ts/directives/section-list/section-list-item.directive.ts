@@ -22,6 +22,8 @@ interface IViewModel extends ng.IController, ISectionListItemProps {
 
     openTransfer?(card: Card): void;
 
+    openLock?(card: Card): void;
+
     updateSection(section: Section): Promise<void>;
 
     refresh?(): void;
@@ -42,6 +44,7 @@ interface ISectionListItemProps {
     onPreview?;
     onTransfer?;
     onMove?;
+    onLock?;
 }
 
 interface ISectionListItemScope extends IScope, ISectionListItemProps {
@@ -104,11 +107,12 @@ function directive($parse: IParseService) {
             onDuplicateSection: '&',
             onPreview: '&',
             onTransfer: '&',
-            onMove: '&'
+            onMove: '&',
+            onLock: '&'
         },
         controllerAs: 'vm',
         bindToController: true,
-        controller: ['$scope', '$location', '$window', '$parse', Controller],
+        controller: ['$scope', '$parse', Controller],
         /* interaction DOM/element */
         link: function ($scope: ISectionListItemScope,
                         element: ng.IAugmentedJQuery,
@@ -182,6 +186,10 @@ function directive($parse: IParseService) {
 
             vm.openTransfer = (card: Card): void => {
                 $parse($scope.vm.onTransfer())(card);
+            }
+
+            vm.openLock = (card: Card): void => {
+                $parse($scope.vm.onLock())(card);
             }
 
             vm.refresh = (): void => {

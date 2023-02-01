@@ -25,6 +25,7 @@ public class CardPayloadTest {
             .put("lastModifierName", n)
             .put("creationDate", "creationDate")
             .put("modificationDate", "modificationDate")
+            .put("isLocked", false)
             .put("parentId", "parentId")
             .put("boardId", "boardId");
 
@@ -35,6 +36,7 @@ public class CardPayloadTest {
             .put("resourceUrl", "resourceUrl")
             .put("caption", "caption")
             .put("boardId", n)
+            .put("isLocked", false)
             .put("description", "description")
             .put("lastModifierId", "lastModifierId")
             .put("lastModifierName", "lastModifierName")

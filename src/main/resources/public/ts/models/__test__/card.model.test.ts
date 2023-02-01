@@ -7,6 +7,7 @@ describe("CardModel", () => {
             title: 'title',
             description: 'description',
             caption: 'caption',
+            locked: false,
             resourceId: 'resourceId',
             resourceUrl: 'resourceUrl',
             resourceType: 'resourceType',

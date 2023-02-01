@@ -25,6 +25,7 @@ public class CardTest {
             .put("ownerId", "ownerId")
             .put("ownerName", "ownerName")
             .put("boardId", "boardId")
+            .put("isLocked", false)
             .putNull("metadata")
             .putNull("parentId")
             .put("caption", "caption");

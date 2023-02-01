@@ -5,6 +5,7 @@ export interface ICardItemResponse {
     title: string;
     description: string;
     caption: string;
+    locked: boolean;
     resourceId: string;
     resourceType: string;
     resourceUrl: string;
@@ -52,6 +53,7 @@ export interface ICardPayload {
     caption: string;
     resourceId: string;
     resourceType: string;
+    locked?: boolean;
     resourceUrl?: string;
     boardId: string;
 }
@@ -71,6 +73,7 @@ export class CardForm {
     private _title: string;
     private _description: string;
     private _caption: string;
+    private _locked: boolean;
     private _resourceId: string;
     private _resourceType: string;
     private _resourceUrl: string;
@@ -89,6 +92,7 @@ export class CardForm {
         this._resourceFileName = '';
         this._resourceType = '';
         this._boardId = '';
+        this._locked = false;
         this._sectionId = 0;
     }
 
@@ -101,6 +105,7 @@ export class CardForm {
         this._resourceUrl = card.resourceUrl;
         this._resourceType = card.resourceType;
         this._boardId = card.boardId;
+        this._locked = card.locked;
         this._sectionId = 0;
         return this;
     }
@@ -169,6 +174,14 @@ export class CardForm {
         return this._boardId;
     }
 
+    get locked(): boolean {
+        return this._locked;
+    }
+
+    set locked(value: boolean) {
+        this._locked = value;
+    }
+
     set boardId(value: string) {
         this._boardId = value;
     }
@@ -199,6 +212,7 @@ export class CardForm {
             title: this.title,
             description: this.description,
             caption: this.caption,
+            locked: this.locked,
             resourceId: this.resourceId,
             resourceType: this.resourceType,
             resourceUrl: this.resourceUrl,
@@ -220,6 +234,7 @@ export class Card {
     private _resourceUrl: string;
     private _description: string;
     private _caption: string;
+    private _locked: boolean;
     private _ownerId: string;
     private _ownerName: string
     private _modificationDate: string;
@@ -239,6 +254,7 @@ export class Card {
         this._resourceUrl = data.resourceUrl;
         this._description = data.description;
         this._caption = data.caption;
+        this._locked = data.locked;
         this._modificationDate = data.modificationDate;
         this._creationDate = data.creationDate;
         this._ownerId = data.ownerId;
@@ -266,6 +282,10 @@ export class Card {
 
     get caption(): string {
         return this._caption;
+    }
+
+    get locked(): boolean {
+        return this._locked;
     }
 
     get resourceId(): string {

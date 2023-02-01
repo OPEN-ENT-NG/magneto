@@ -1,4 +1,4 @@
-import {ng, notify} from "entcore";
+import {model, ng, notify} from "entcore";
 import {IScope, IWindowService} from "angular";
 import {IBoardsService, ICardsService, ISectionsService} from "../services";
 import {
@@ -60,7 +60,7 @@ interface IViewModel extends ng.IController {
     openAddResourceLightbox(resourceType: RESOURCE_TYPE): void;
 
     openEditResourceLightbox(card: Card): void;
-
+    openLockResource(card: Card): void;
     openReading(): void;
 
     onFormSubmit(): Promise<void>;
@@ -244,6 +244,16 @@ class Controller implements IViewModel {
     openDeleteResourceLightbox = (card: Card): void => {
         this.selectedCard = card;
         this.displayDeleteCardLightbox = true;
+    }
+
+    /**
+     * Open card lock.
+     */
+    openLockResource = async (card: Card): Promise<void> => {
+        this.cardForm = new CardForm().build(card);
+        this.cardForm.locked = !this.cardForm.locked;
+        await this.cardsService.updateCard(this.cardForm);
+        await this.onFormSubmit();
     }
 
     /**

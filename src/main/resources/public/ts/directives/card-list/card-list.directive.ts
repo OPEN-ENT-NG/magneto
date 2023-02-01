@@ -1,4 +1,4 @@
-import {ng} from "entcore";
+import {model, ng} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {BoardForm, Card} from "../../models";
@@ -19,6 +19,7 @@ interface IViewModel extends ng.IController, ICardListProps {
 
     openTransfer?(card: Card): void;
 
+    openLock?(card: Card): void;
 
 }
 
@@ -34,6 +35,7 @@ interface ICardListProps {
 
     hasCaption: boolean;
 
+    boardRight?: any;
     hasEdit: boolean;
     onEdit?;
     hasDuplicate: boolean;
@@ -46,6 +48,8 @@ interface ICardListProps {
     onPreview?;
     hasTransfer: boolean;
     onTransfer?;
+    hasLock: boolean;
+    onLock?;
     onMove?;
 }
 
@@ -65,12 +69,14 @@ class Controller implements IViewModel {
 
     hasCaption: boolean;
 
+    boardRight: any;
     hasEdit: boolean;
     hasDuplicate: boolean;
     hasHide: boolean;
     hasDelete: boolean;
     hasPreview: boolean;
     hasTransfer: boolean;
+    hasLock: boolean;
 
 
     constructor(private $scope: ICardListScope,
@@ -104,6 +110,24 @@ class Controller implements IViewModel {
         }
     }
 
+    canLock = (card: Card): boolean => {
+        return !!this.hasLock && (card.ownerId == model.me.userId && this.boardRight.publish !== undefined) || this.boardRight.manager !== undefined;
+    }
+
+    canEdit = (card: Card): boolean => {
+        return !!this.hasEdit &&
+            (card.ownerId == model.me.userId && this.boardRight.publish !== undefined)
+            || this.boardRight.manager !== undefined
+            || (this.boardRight.publish && !card.locked);
+    }
+
+    canDuplicate = (card: Card): boolean => {
+        return !!this.hasEdit &&
+            card.ownerId == model.me.userId && this.boardRight.boardRight !== undefined
+            || this.boardRight.manager !== undefined
+            || (this.boardRight.contrib && !card.locked);
+    }
+
 }
 
 function directive($parse: IParseService) {
@@ -117,6 +141,7 @@ function directive($parse: IParseService) {
             isDraggable: '=',
             isScrollable: '=',
             hasCaption: '=',
+            boardRight: '=',
             hasEdit: '=',
             onEdit: '&',
             hasDuplicate: '=',
@@ -129,6 +154,8 @@ function directive($parse: IParseService) {
             onPreview: '&',
             hasTransfer: '=',
             onTransfer: '&',
+            hasLock: '=',
+            onLock: '&',
             onMove: '&',
             selectorResize: '='
         },
@@ -185,6 +212,10 @@ function directive($parse: IParseService) {
 
             vm.openTransfer = (card: Card): void => {
                 $parse($scope.vm.onTransfer())(card);
+            }
+
+            vm.openLock = (card: Card): void => {
+                $parse($scope.vm.onLock())(card);
             }
         }
     }

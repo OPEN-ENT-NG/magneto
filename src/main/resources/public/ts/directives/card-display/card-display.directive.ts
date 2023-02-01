@@ -70,7 +70,7 @@ class Controller implements IViewModel {
     }
 
     getOwnerText = (): string => {
-        return I18nUtils.getWithParams("magneto.card.saved.by", [this.card.ownerName, this.getLastUserName()]);
+        return !!this.card ? I18nUtils.getWithParams("magneto.card.saved.by", [this.card.ownerName, this.getLastUserName()]) : "";
     }
 
 }

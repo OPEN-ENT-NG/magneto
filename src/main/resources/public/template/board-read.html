@@ -5,10 +5,34 @@
         <span><i18n>magneto.return</i18n></span>
     </button>
 
-    <!-- Card display -->
-    <card-display
-            card="vm.card">
-    </card-display>
+    <div class="section-container">
+        <nav ng-if="!vm.board.isLayoutFree()" class="nav-container">
+            <ul>
+                <li class="li-container">
+                    <span>[[vm.section.title]] </span>
+                    <div>
+                        <i ng-if="!vm.filter.showSection" class="magneto-chevron-down show-section"
+                           ng-click="vm.openSection()"></i>
+                        <i  ng-if="vm.filter.showSection" class="magneto-chevron-up show-section"
+                           ng-click="vm.openSection()"></i>
+                    </div>
+                <li ng-show="vm.filter.showSection">
+                    <ul>
+                        <li ng-repeat="section in vm.board.sections | filter: vm.sectionFilter"
+                            ng-click="vm.changeSection(section)"
+                            class="truncate">[[section.title]]
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Card display -->
+        <card-display
+                card="vm.card">
+        </card-display>
+    </div>
+
 
     <!-- Navigation icons -->
     <i class="magneto-chevron-left nav-left" ng-if="vm.filter.page > 0" ng-click="vm.previousPage()"></i>

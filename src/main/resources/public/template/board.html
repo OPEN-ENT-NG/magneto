@@ -10,7 +10,7 @@
                 <i18n>magneto.title</i18n>
                 / [[vm.board.title]]
             </h1>
-            <button ng-if="vm.cards.length > 0" class="right-magnet create-button" ng-click="vm.openReading()">
+            <button ng-if="vm.board.isLayoutFree() ? vm.cards.length > 0 : vm.board.hasCardsSection()" class="right-magnet create-button" ng-click="vm.openReading()">
                 <i18n>magneto.reading.board</i18n>
             </button>
             <div class="cell right-magnet board-container-header-date">

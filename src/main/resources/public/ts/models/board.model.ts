@@ -1,6 +1,6 @@
 import {FOLDER_TYPE} from "../core/enums/folder-type.enum";
-import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
 import {Behaviours, model, Shareable} from "entcore";
+import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
 import {Section} from "./section.model";
 
 export interface IBoardItemResponse {
@@ -197,6 +197,7 @@ export class BoardForm {
             this.imageUrl != null && this.imageUrl !== '' && this.layoutType !== null;
     }
 
+
     toJSON(): IBoardPayload {
 
         let payload: IBoardPayload = {};
@@ -379,6 +380,14 @@ export class Board implements Shareable {
 
     set tags(value: Array<string>) {
         this._tags = value;
+    }
+
+    hasCardsSection() : boolean {
+        return !!this._sections ? this._sections.some(section => section.cards.length > 0) : false;
+    }
+
+    cardIdsSection(): Array<string> {
+        return !!this._sections ? this._sections.reduce((acc, section) => [...acc, ...section.cardIds], []) : [];
     }
 
     sortSections(value: Array<String>)  {

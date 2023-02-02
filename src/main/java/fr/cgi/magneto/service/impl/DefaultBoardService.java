@@ -65,7 +65,7 @@ public class DefaultBoardService implements BoardService {
             createBoardFutures.add(this.sectionService.create(createSection, newSectionId));
         }
         createBoard.setOwnerId(user.getUserId());
-        createBoard.setOwnerName(user.getFirstName() + " " + user.getLastName());
+        createBoard.setOwnerName(user.getUsername());
         createBoardFutures.add(this.createBoard(createBoard, newId));
         CompositeFuture.all(createBoardFutures)
                 .compose(success -> this.updateFolderOnBoardCreate(user.getUserId(), createBoard, newId))
@@ -129,6 +129,7 @@ public class DefaultBoardService implements BoardService {
         return promise.future();
     }
 
+    @SuppressWarnings("unchecked")
     public Future<JsonObject> duplicate(String boardId, UserInfos user, I18nHelper i18n) {
         Promise<JsonObject> promise = Promise.promise();
         Map<String, Future<?>> futures = new HashMap<>();
@@ -177,6 +178,14 @@ public class DefaultBoardService implements BoardService {
                         // Check if layout of the board to duplicate is not free
                         if (!futuresInfos.getJsonObject(Field.BOARD).getString(Field.LAYOUTTYPE).equals(Field.FREE)) {
                             List<Section> duplicateSection = (List<Section>) futures.get(Field.SECTION).result();
+
+                            List<String> duplicateSectionIds = futuresInfos
+                                    .getJsonObject(Field.BOARD, new JsonObject())
+                                    .getJsonArray(Field.SECTIONIDS, new JsonArray())
+                                    .getList();
+
+                            duplicateSection.sort(Comparator.comparing(section-> duplicateSectionIds.indexOf(section.getId())));
+
                             // If no section in board, no duplicate
                             if (duplicateSection.isEmpty()) {
                                 duplicateFuture.add(Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result()));
@@ -188,6 +197,11 @@ public class DefaultBoardService implements BoardService {
                             if (duplicateCards.isEmpty()) {
                                 duplicateFuture.add(Future.succeededFuture((JsonObject) futures.get(Field.BOARD).result()));
                             } else {
+                                List<String> duplicateCardIds = futuresInfos
+                                        .getJsonObject(Field.BOARD)
+                                        .getJsonArray(Field.CARDIDS)
+                                        .getList();
+                                duplicateCards.sort(Comparator.comparing(card -> duplicateCardIds.indexOf(card.getId())));
                                 duplicateFuture.add(cardService.duplicateCards(duplicateBoard, duplicateCards, null, user));
                             }
                         }

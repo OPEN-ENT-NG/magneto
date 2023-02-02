@@ -62,13 +62,13 @@ function directive($parse: IParseService) {
 
 
             vm.submit = async (): Promise<void> => {
-                let updateBoard: BoardForm = new BoardForm();
+                let updateBoard: BoardForm = new BoardForm().build(vm.board);
                 updateBoard.public = !vm.board.public;
                 if (!vm.board.public) {
                     updateBoard.tags = vm.board.tags;
                 }
                 boardsService.updateBoard($scope.vm.board.id, updateBoard)
-                    .then((response: AxiosResponse) => {
+                    .then(() => {
                         $parse($scope.vm.onSubmit())({});
                         vm.closeForm();
                     });

@@ -1,4 +1,4 @@
-import {model, ng, idiom as lang, notify} from "entcore";
+import {idiom as lang, ng, notify} from "entcore";
 import {IScope, IWindowService} from "angular";
 import {IBoardsService, ICardsService, ISectionsService, sectionsService} from "../services";
 import {create} from 'sortablejs';
@@ -305,57 +305,59 @@ class Controller implements IViewModel {
     }
 
     initDrag = (): void => {
-        // Loop through each nested sortable element for DragAndDrop
-        for (let i = 0; i < this.nestedSortables.length; i++) {
-            this.nestedSortables[i].destroy();
-        }
-        this.nestedSortables = [];
+        if (this.board.myRights.publish !== undefined) {
+            // Loop through each nested sortable element for DragAndDrop
+            for (let i = 0; i < this.nestedSortables.length; i++) {
+                this.nestedSortables[i].destroy();
+            }
+            this.nestedSortables = [];
 
-        const cardList: NodeListOf<Element> = document.querySelectorAll(".card-list");
-        for (let i = 0; i < cardList.length; i++) {
-            this.nestedSortables.push(create(cardList[i], {
-                group: 'nested',
-                animation: 150,
+            const cardList: NodeListOf<Element> = document.querySelectorAll(".card-list");
+            for (let i = 0; i < cardList.length; i++) {
+                this.nestedSortables.push(create(cardList[i], {
+                    group: 'nested',
+                    animation: 150,
+                    delay: 150,
+                    forceAutoScrollFallback: true,
+                    scroll: true, // or HTMLElement
+                    scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
+                    scrollSpeed: 30, // px*/
+                    delayOnTouchOnly: true,
+                    onEnd: async (evt) => {
+                        await this.onEndDragAndDrop(evt);
+                    }
+                }));
+            }
+
+            const sectionList: Element = document.getElementById("section-list");
+            this.nestedSortables.push(create(sectionList, {
+                animation: 300,
+                easing: "cubic-bezier(1, 0, 0, 1)",
                 delay: 150,
+                draggable: ".scrollbar",
                 forceAutoScrollFallback: true,
                 scroll: true, // or HTMLElement
                 scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
                 scrollSpeed: 30, // px*/
                 delayOnTouchOnly: true,
-                onEnd: async (evt) => {
-                    await this.onEndDragAndDrop(evt);
+                onUpdate: async (evt) => {
+                    let form: BoardForm = new BoardForm().build(this.board);
+                    let sectionIds: Array<string> = this.board.sections.map((section: Section) => section.id);
+                    let oldSectionId: string = sectionIds[evt.oldIndex];
+                    let newSectionIndex: number = evt.newIndex;
+                    sectionIds.splice(evt.oldIndex, 1);
+                    sectionIds.splice(newSectionIndex, 0, oldSectionId);
+                    form.sectionsIds = sectionIds;
+                    this.boardsService.updateBoard(this.board.id, form)
+                        .then(async res => {
+                            if (res.status == 200 || res.status == 201) {
+                                this.board.sections = this.board.sortSections(sectionIds);
+                            }
+                        });
                 }
             }));
+            safeApply(this.$scope);
         }
-
-        const sectionList: Element = document.getElementById("section-list");
-        this.nestedSortables.push(create(sectionList, {
-            animation: 300,
-            easing: "cubic-bezier(1, 0, 0, 1)",
-            delay: 150,
-            draggable: ".scrollbar",
-            forceAutoScrollFallback: true,
-            scroll: true, // or HTMLElement
-            scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
-            scrollSpeed: 30, // px*/
-            delayOnTouchOnly: true,
-            onUpdate: async (evt) => {
-                let form: BoardForm = new BoardForm().build(this.board);
-                let sectionIds: Array<string> = this.board.sections.map((section: Section) => section.id);
-                let oldSectionId: string = sectionIds[evt.oldIndex];
-                let newSectionIndex: number = evt.newIndex;
-                sectionIds.splice(evt.oldIndex, 1);
-                sectionIds.splice(newSectionIndex, 0, oldSectionId);
-                form.sectionsIds = sectionIds;
-                this.boardsService.updateBoard(this.board.id, form)
-                    .then(async res => {
-                        if (res.status == 200 || res.status == 201) {
-                            this.board.sections = this.board.sortSections(sectionIds);
-                        }
-                    });
-            }
-        }));
-        safeApply(this.$scope);
     }
 
     onEndDragAndDrop = async (evt: any): Promise<void> => {
@@ -465,7 +467,7 @@ class Controller implements IViewModel {
         };
 
         const cards = await this.cardsService.getAllCardsBySection(params);
-        if(!!cards.all && cards.all.length > 0) {
+        if (!!cards.all && cards.all.length > 0) {
             section.cards.push(...cards.all);
         }
         this.isLoading = false;

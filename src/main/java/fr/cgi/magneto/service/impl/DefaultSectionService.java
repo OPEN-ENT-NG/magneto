@@ -192,7 +192,6 @@ public class DefaultSectionService implements SectionService {
                     // Check if board and section are not empty
                     if (result.succeeded() && !getBoardFuture.result().isEmpty() && !getSectionsFuture.result().isEmpty()) {
                         Board currentBoard = getBoardFuture.result().get(0);
-                        currentBoard.setSections(getSectionsFuture.result());
                         BoardPayload boardToUpdate = new BoardPayload()
                                 .setId(currentBoard.getId())
                                 .setSectionIds(currentBoard.sections()
@@ -274,6 +273,8 @@ public class DefaultSectionService implements SectionService {
                     .stream()
                     .filter(card -> section.getCardIds().contains(card.getId()))
                     .collect(Collectors.toList());
+            cardsFilter.sort(Comparator.comparing(card -> section.getCardIds().indexOf(card.getId())));
+
             SectionPayload sectionPayload = new SectionPayload(section.toJson())
                     .setId(null)
                     .setBoardId(boardId)

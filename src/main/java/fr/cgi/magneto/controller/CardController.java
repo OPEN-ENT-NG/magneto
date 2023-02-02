@@ -169,7 +169,7 @@ public class CardController extends ControllerHelper {
                 CardPayload updateCard = new CardPayload(card)
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
-                        .setLastModifierName(user.getFirstName() + " " + user.getLastName());
+                        .setLastModifierName(user.getUsername());
                 Future<JsonObject> updateCardFuture = cardService.update(updateCard);
                 Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(updateCard.getBoardId()));
                 CompositeFuture.all(updateCardFuture, getBoardFuture)
@@ -220,7 +220,7 @@ public class CardController extends ControllerHelper {
                 CardPayload updateCard = new CardPayload(moveCard.getJsonObject(Field.CARD))
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
-                        .setLastModifierName(user.getFirstName() + " " + user.getLastName())
+                        .setLastModifierName(user.getUsername())
                         .setBoardId(moveCard.getString(Field.BOARDID));
 
                 Future<JsonObject> updateCardFuture = cardService.update(updateCard);

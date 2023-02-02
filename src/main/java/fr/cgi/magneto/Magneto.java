@@ -40,6 +40,7 @@ public class Magneto extends BaseServer {
 		addController(new CardController(serviceFactory));
 		addController(new FolderController(serviceFactory));
 		addController(new SectionController(serviceFactory));
+		addController(new AuthController(serviceFactory));
 
 		final EventBus eb = getEventBus(vertx);
 

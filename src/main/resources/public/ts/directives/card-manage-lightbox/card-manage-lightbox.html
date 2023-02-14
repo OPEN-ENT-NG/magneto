@@ -60,6 +60,12 @@
             <i18n>magneto.card.description</i18n>&nbsp;:
             <editor ng-model="vm.form.description" class="card-manage-lightbox-body-description-padding"></editor>
         </div>
+        <div ng-if="vm.hasSection()" class="row vertical-spacing card-manage-lightbox-body-description">
+            <i18n>magneto.card.section</i18n>&nbsp;:
+            <select ng-model="vm.selectedSection"
+                    ng-options="section.title for section in vm.board.sections">
+            </select>
+        </div>
     </section>
     <!-- Form submit/cancel buttons -->
     <section>

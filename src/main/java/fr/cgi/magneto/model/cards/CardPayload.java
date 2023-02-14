@@ -25,6 +25,8 @@ public class CardPayload implements Model<CardPayload> {
     private boolean isLocked;
     private String parentId;
     private String boardId;
+    private String sectionId;
+
 
     public CardPayload(JsonObject card) {
         this.id = card.getString(Field.ID, null);
@@ -41,6 +43,7 @@ public class CardPayload implements Model<CardPayload> {
         this.description = card.getString(Field.DESCRIPTION);
         this.parentId = card.getString(Field.PARENTID);
         this.boardId = card.getString(Field.BOARDID);
+        this.sectionId = card.getString(Field.SECTIONID);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -180,6 +183,15 @@ public class CardPayload implements Model<CardPayload> {
 
     public CardPayload setResourceVideoUrl(String resourceUrl) {
         this.resourceUrl = resourceUrl;
+        return this;
+    }
+
+    public String getSectionId() {
+        return sectionId;
+    }
+
+    public CardPayload setSectionId(String sectionId) {
+        this.sectionId = sectionId;
         return this;
     }
 

@@ -1,7 +1,7 @@
 import {ng} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {CardForm} from "../../models";
+import {Board, CardForm, Section} from "../../models";
 import {cardsService} from "../../services";
 import {EXTENSION_FORMAT} from "../../core/constants/extension-format.const";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
@@ -13,6 +13,8 @@ interface IViewModel extends ng.IController, ICardManageProps {
 
     isFormValid(): boolean;
 
+    hasSection(): boolean;
+
     closeForm(): void;
 
     getFileExtension(): string;
@@ -22,7 +24,7 @@ interface ICardManageProps {
     display: boolean;
     isUpdate: boolean;
     form: CardForm;
-    boardId: string;
+    board: Board;
     onSubmit?;
 }
 
@@ -35,8 +37,9 @@ class Controller implements IViewModel {
     display: boolean;
     isUpdate: boolean;
     form: CardForm;
-    boardId: string;
+    board: Board;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
+    selectedSection: Section;
 
     constructor(private $scope: ICardManageScope,
                 private $location: ILocationService,
@@ -45,10 +48,16 @@ class Controller implements IViewModel {
     }
 
     $onInit() {
+        this.selectedSection = this.board.sections && this.board.sections.length > 0 ? this.board.sections[0] : null;
     }
 
     isFormValid = (): boolean => {
         return this.form.isValid();
+    }
+
+    hasSection = (): boolean => {
+        return !!this.board &&
+            !this.board.isLayoutFree() && this.board.sections.length > 0 && !this.isUpdate;
     }
 
     videoIsFromWorkspace = (): boolean => {
@@ -96,7 +105,7 @@ function directive($parse: IParseService) {
             display: '=',
             isUpdate: '=',
             form: '=',
-            boardId: '=',
+            board: '=',
             onSubmit: '&'
         },
         controllerAs: 'vm',
@@ -110,10 +119,14 @@ function directive($parse: IParseService) {
 
             vm.submitCard = async (): Promise<void> => {
                 vm.closeForm();
-                vm.form.boardId = vm.boardId;
+                vm.form.boardId = vm.board.id;
                 vm.form.resourceUrl = vm.form.resourceUrl ? vm.form.resourceUrl.toString(): null;
                 try {
+                    if(!vm.board.isLayoutFree() && vm.board.sections.length > 0 && !vm.isUpdate) {
+                        vm.form.sectionId = vm.selectedSection.id;
+                    }
                     vm.isUpdate ? await cardsService.updateCard(vm.form) : await cardsService.createCard(vm.form);
+
                 } catch (e) {
                     console.error(e);
                 }

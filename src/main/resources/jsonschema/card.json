@@ -27,8 +27,8 @@
     "parentId": {
       "type": "number"
     },
-    "sectionIndex": {
-      "type": "number"
+    "sectionId": {
+      "type": "string"
     },
     "boardId": {
       "type": "string"

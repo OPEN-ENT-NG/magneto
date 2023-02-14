@@ -1,8 +1,9 @@
 <div id="section-[[vm.section.id]]">
     <div class="sections-list-content-container" tabindex="0">
-        <input ng-readonly="vm.board.myRights.publish === undefined" type="text"
-               class="sections-list-content-title input"
-               ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null" ng-model="vm.section.title"/>
+        <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-list-content-title input"
+               ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null"
+               ng-blur="vm.updateSection(vm.section)"
+               ng-model="vm.section.title"/>
         <i class="magneto-card-settings" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
         <card-list-item-options
                 ng-show="vm.isDisplayedOptions"

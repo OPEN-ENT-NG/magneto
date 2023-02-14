@@ -118,7 +118,7 @@ describe("BoardViewController", () => {
         expect(boardViewControllerTest.cardForm.resourceType).toEqual(card.resourceType);
         expect(boardViewControllerTest.cardForm.resourceUrl).toEqual(card.resourceUrl);
         expect(boardViewControllerTest.cardForm.boardId).toEqual(card.boardId);
-        expect(boardViewControllerTest.cardForm.sectionId).toEqual(0);
+        expect(boardViewControllerTest.cardForm.sectionId).toEqual(null);
         expect(boardViewControllerTest.displayUpdateCardLightbox).toEqual(true);
         expect(boardViewControllerTest.displayCardLightbox).toEqual(true);
         done();

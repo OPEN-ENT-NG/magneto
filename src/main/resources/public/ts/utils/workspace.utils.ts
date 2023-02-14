@@ -16,7 +16,9 @@ export class WorkspaceUtils {
 
     static getExtensionType = (extension: string): string => {
         for(let extensionElement in EXTENSION_FORMAT) {
-            if(extensionElement.includes(extension)) return extensionElement;
+            if(EXTENSION_FORMAT[extensionElement].includes(extension)) {
+                return RESOURCE_TYPE[extensionElement];
+            }
         }
         return RESOURCE_TYPE.DEFAULT
     }

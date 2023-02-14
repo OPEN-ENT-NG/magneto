@@ -66,7 +66,7 @@ describe("CardModel", () => {
         cardForm.resourceFileName = '';
         cardForm.resourceUrl = '';
         cardForm.boardId = '';
-        cardForm.sectionId = 0;
+        cardForm.sectionId = '';
         done();
     });
 

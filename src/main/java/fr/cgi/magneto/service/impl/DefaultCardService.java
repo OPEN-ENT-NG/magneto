@@ -87,16 +87,23 @@ public class DefaultCardService implements CardService {
                         if (boardPayload.isLayoutFree()) {
                             boardPayload.addCards(Collections.singletonList(newId));
                         } else {
-                            // If layout is section = We update the first section, and we add new card id into it
-                            Section firstSection = getSectionsFuture.result()
-                                    .stream()
-                                    .filter(section -> section.getId().equals(boardPayload.getSectionIds().get(0)))
-                                    .findFirst()
-                                    .orElse(null);
-                            if (firstSection != null) {
-                                SectionPayload updateSection = new SectionPayload(firstSection.toJson());
-                                updateSection.addCardIds(Collections.singletonList(newId));
-                                createCardFutures.add(this.serviceFactory.sectionService().update(updateSection));
+                            if (cardPayload.getSectionId() != null && !getSectionsFuture.result().isEmpty()) {
+                                // If layout is section = We update the section selected, and we add new card id into it
+                                Section updatedSection = getSectionsFuture.result()
+                                        .stream()
+                                        .filter(section -> section.getId().equals(cardPayload.getSectionId()))
+                                        .findFirst()
+                                        .orElse(null);
+                                if (updatedSection != null) {
+                                    SectionPayload updateSection = new SectionPayload(updatedSection.toJson());
+                                    updateSection.addCardIds(Collections.singletonList(newId));
+                                    createCardFutures.add(this.serviceFactory.sectionService().update(updateSection));
+                                } else {
+                                    String message = String.format("[Magneto%s::createCardLayout] " +
+                                            "No card found with id %s", this.getClass().getSimpleName(), newId);
+                                    promise.fail(message);
+                                    return Future.failedFuture(message);
+                                }
                             } else {
                                 SectionPayload createSection = new SectionPayload(boardPayload.getId())
                                         .setTitle(i18n.translate("magneto.section.default.title"));
@@ -116,7 +123,7 @@ public class DefaultCardService implements CardService {
                     }
                 })
                 .onFailure(promise::fail)
-                .onSuccess(success -> promise.complete(createCardFuture.result()));
+                .onSuccess(success -> promise.complete(new JsonObject().put(Field.ID, newId)));
 
         return promise.future();
     }
@@ -134,7 +141,7 @@ public class DefaultCardService implements CardService {
                 promise.fail(message);
                 return;
             }
-            promise.complete(results.right().getValue());
+            promise.complete(new JsonObject().put(Field.ID, card.getId()));
         }));
         return promise.future();
     }
@@ -611,7 +618,7 @@ public class DefaultCardService implements CardService {
             query.match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, cardIds)))
                     .addFields(Field.INDEX, new JsonObject()
                             .put(Mongo.INDEX_OF_ARRAY, new JsonArray()
-                                .add(cardIds)
+                                    .add(cardIds)
                                     .add('$' + Field._ID)
                             )
                     )

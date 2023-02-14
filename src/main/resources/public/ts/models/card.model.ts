@@ -57,6 +57,7 @@ export interface ICardPayload {
     locked?: boolean;
     resourceUrl?: string;
     boardId: string;
+    sectionId?: string;
 }
 
 export interface IMetadata {
@@ -80,7 +81,7 @@ export class CardForm {
     private _resourceUrl: string;
     private _resourceFileName: string;
     private _boardId: string;
-    private _sectionId: number;
+    private _sectionId: string;
 
 
     constructor() {
@@ -94,7 +95,7 @@ export class CardForm {
         this._resourceType = '';
         this._boardId = '';
         this._locked = false;
-        this._sectionId = 0;
+        this._sectionId = null;
     }
 
     build(card: Card): CardForm {
@@ -107,7 +108,7 @@ export class CardForm {
         this._resourceType = card.resourceType;
         this._boardId = card.boardId;
         this._locked = card.locked;
-        this._sectionId = 0;
+        this._sectionId = null;
         return this;
     }
 
@@ -187,11 +188,11 @@ export class CardForm {
         this._boardId = value;
     }
 
-    get sectionId(): number {
+    get sectionId(): string {
         return this._sectionId;
     }
 
-    set sectionId(value: number) {
+    set sectionId(value: string) {
         this._sectionId = value;
     }
 
@@ -217,9 +218,10 @@ export class CardForm {
             resourceId: this.resourceId,
             resourceType: this.resourceType,
             resourceUrl: this.resourceUrl,
-            boardId: this.boardId,
+            boardId: this.boardId
         };
 
+        if (this.sectionId && this.sectionId != '') payload.sectionId = this.sectionId;
         if (this.id && this.id != '') payload.id = this.id;
 
         return payload;

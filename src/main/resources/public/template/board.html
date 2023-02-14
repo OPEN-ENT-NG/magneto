@@ -82,7 +82,7 @@
                     on-delete="vm.openDeleteResourceLightbox"
                     has-preview="vm.board.myRights.read !== undefined || vm.board.public"
                     on-preview="vm.openPreviewResourceLightbox"
-                    has-lock="vm.board.myRights.manager !== undefined"
+                    has-lock="vm.board.myRights.publish !== undefined"
                     on-lock="vm.openLockResource"
                     has-transfer="vm.board.myRights.publish != undefined"
                     on-transfer="vm.openTransferResourceLightbox">

@@ -15,6 +15,8 @@ interface IViewModel extends ng.IController, ICardListItemProps {
     formatVideoUrl(url: string): string;
 
     getDescriptionHTML(description: string): string;
+
+    getApplication(): string;
 }
 
 interface ICardListItemProps {
@@ -62,6 +64,17 @@ class Controller implements IViewModel {
 
     getDescriptionHTML = (description: string): string => {
         return !!description ? this.$sce.trustAsHtml(description) : null;
+    }
+
+    getApplication(): string {
+        if (!this.card || !this.card.resourceUrl) {
+            return "default";
+        }
+        const parts: string[] = this.card.resourceUrl.split("/");
+        if (parts.length < 4) {
+            return "default";
+        }
+        return parts[3].replace("#", "");
     }
 
     formatVideoUrl = (url: string): string => {

@@ -39,4 +39,5 @@ export * from './share-panel-lightbox/share-panel-lightbox.directive';
 export * from './board-publish-lightbox/board-publish-lightbox.directive';
 export * from './board-keywords-input/board-keywords-input.directive';
 export * from './loader/loader.directive';
+export * from './on-error-src/on-error-src.directive';
 export * from './drag/dropzoneOverlay';

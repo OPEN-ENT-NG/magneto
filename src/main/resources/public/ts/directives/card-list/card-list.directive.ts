@@ -115,7 +115,7 @@ class Controller implements IViewModel {
     }
 
     canLock = (card: Card): boolean => {
-        return !!this.hasLock && (card.ownerId == model.me.userId && this.boardRight.publish !== undefined) || this.boardRight.manager !== undefined;
+        return !!this.hasLock && (card.ownerId == model.me.userId || this.boardRight.manager !== undefined);
     }
 
     canEdit = (card: Card): boolean => {

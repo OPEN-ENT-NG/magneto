@@ -1,4 +1,4 @@
-import {idiom as lang, ng, notify} from "entcore";
+import {Document, idiom as lang, ng, notify, toasts, workspace} from "entcore";
 import {IScope, IWindowService} from "angular";
 import {IBoardsService, ICardsService, ISectionsService, sectionsService} from "../services";
 import {create} from 'sortablejs';
@@ -13,6 +13,7 @@ import {
     ICardsParamsRequest,
     ICardsSectionParamsRequest,
     ILinkerParams,
+    IMetadata,
     Section,
     SectionForm,
     Sections
@@ -23,6 +24,8 @@ import {InfiniteScrollService} from "../shared/services";
 import {EventBusService} from "../shared/event-bus-service/event-bus-sockjs.service";
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
 import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
+import {Draggable} from "../models/draggable.model";
+import {WorkspaceUtils} from "../utils/workspace.utils";
 
 interface IViewModel extends ng.IController {
 
@@ -92,6 +95,9 @@ interface IViewModel extends ng.IController {
     openBoardPropertiesForm(): void;
 
     onEndDragAndDrop(evt: any): Promise<void>;
+
+    initDraggable(): void;
+
 }
 
 interface IBoardViewScope extends IScope {
@@ -128,6 +134,7 @@ class Controller implements IViewModel {
     isLoading: boolean;
 
     nestedSortables: any[];
+    draggable: Draggable;
 
     filter: {
         page: number,
@@ -177,6 +184,8 @@ class Controller implements IViewModel {
 
         this.isLoading = true;
         this.nestedSortables = [];
+        this.initDraggable();
+
 
         this.getBoard().then(async () => {
             if (this.board.layoutType == LAYOUT_TYPE.FREE) {
@@ -302,6 +311,45 @@ class Controller implements IViewModel {
         this.resetCards();
         await Promise.all([this.getCards(), this.getBoard()]);
         safeApply(this.$scope);
+    }
+
+    initDraggable = (): void => {
+        const that = this;
+        this.draggable = {
+            dragHoverHandler(event: DragEvent): void {
+                event.preventDefault();
+            },
+            async dragDropFilesHandler(files: FileList): Promise<void> {
+                workspace.v2.service.createDocument(files[0], new Document(), null)
+                    .then(async result => {
+                        if (!!result) {
+                            that.cardForm = new CardForm();
+                            that.cardForm.resourceType = WorkspaceUtils.getExtension(<IMetadata>result.metadata);
+                            that.displayUpdateCardLightbox = false;
+
+                            switch (that.cardForm.resourceType) {
+                                case RESOURCE_TYPE.IMAGE:
+                                    await that.onFileSelected(result);
+                                    break;
+                                case RESOURCE_TYPE.VIDEO:
+                                    that.videoUrl = result.link;
+                                    that.onVideoSelected();
+                                    break;
+                                case RESOURCE_TYPE.AUDIO:
+                                    await that.onFileSelected(result);
+                                    break;
+                                default:
+                                    that.cardForm.resourceType = RESOURCE_TYPE.FILE;
+                                    await that.onFileSelected(result);
+                                    break;
+                            }
+                        } else {
+                            toasts.warning('magneto.dropzone.create.error')
+                        }
+                    });
+            }
+        };
+
     }
 
     initDrag = (): void => {
@@ -515,7 +563,9 @@ class Controller implements IViewModel {
 
         // Video from workspace
         if (this.videoUrl.includes("workspace")) {
-            this.cardForm.resourceUrl = this.videoUrl.split("src=\"")[1].split('\"')[0];
+            const regex = /\/workspace\/document\/[a-f0-9-]+/;
+            const match = regex.exec(this.videoUrl);
+            this.cardForm.resourceUrl = match[0];
         }
         // Video from URL
         else {

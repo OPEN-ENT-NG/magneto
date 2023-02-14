@@ -1,0 +1,17 @@
+<div class="dropzone-overlay default flex-row center-component" ng-show="vm.visible">
+  <!--MESSAGE INFO-->
+  <div class="default flex-row align-center message-box" ng-if="vm.showInfo()">
+    <div class="twelve horizontal-spacing-twice vertical-spacing-four flex-row align-center">
+      <i class="horizontal-spacing cloud-upload primary-color"></i>
+      <em class=" flex-all-remains"><i18n>magneto.dropzone.overlay.label</i18n></em>
+    </div>
+  </div>
+  <!--MESSAGE ERROR-->
+  <div class="default flex-row align-center message-box"  ng-if="vm.showWarning()">
+    <div class="twelve horizontal-spacing-twice vertical-spacing-four flex-row align-center">
+      <i class="horizontal-spacing close warning-color"></i>
+      <em class=" flex-all-remains"><i18n>magneto.dropzone.overlay.warning</i18n><br/><i18n>magneto.dropzone.overlay.solution</i18n></em>
+      <button class="left-spacing no-margin-bottom" ng-click="vm.hide()"><i18n><span class="no-style ng-scope"><i18n>magneto.dropzone.overlay.action</i18n></span></i18n></button>
+    </div>
+  </div>
+</div>

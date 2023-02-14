@@ -57,6 +57,8 @@
         </div>
 
         <div class="cell board-container-body-list scrollbar">
+            <dropzone-overlay on-import="vm.draggable.dragDropFilesHandler($event)" can-drop="vm.board.myRights.publish !== undefined">
+            </dropzone-overlay>
             <div class="empty-state" ng-if="vm.cards.length == 0 && vm.board.isLayoutFree()"
                  ng-show="!vm.isLoading">
                 <i18n>magneto.add.content.from.menu</i18n>

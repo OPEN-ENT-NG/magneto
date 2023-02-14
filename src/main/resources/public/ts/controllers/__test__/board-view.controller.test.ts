@@ -5,6 +5,7 @@ import {ng} from "../../models/__mocks__/entcore";
 import {BoardsService, CardsService} from "../../services";
 import {Card, CardForm} from "../../models";
 
+
 describe("BoardViewController", () => {
 
     let boardViewControllerTest: any;

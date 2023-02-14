@@ -1,10 +1,24 @@
 import {Behaviours, model} from 'entcore';
 import {rights} from "./magnetoBehaviours";
+import {boardsService} from "./services";
 
 export const MAGNETO_APP = "magneto";
 
 Behaviours.register(MAGNETO_APP, {
     rights,
+    dependencies: {},
+    loadResources: async function(): Promise<any> {
+        const data = await boardsService.getAllBoardsEditable();
+        this.resources = data.all.map(board => {
+            return {
+                id: board.id,
+                icon: board.imageUrl,
+                title: board.title,
+                ownerName: board.owner.displayName,
+                path: `${window.location.origin}/magneto#/board/view/${board.id}`
+            }
+        });
+    },
     resource: function (resource: any) {
         let rightsContainer = resource;
         if (resource && !resource.myRights) {

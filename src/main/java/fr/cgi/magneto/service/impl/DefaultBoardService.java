@@ -24,6 +24,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.mongodb.MongoDbResult;
+import org.entcore.common.sql.Sql;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
@@ -530,7 +531,9 @@ public class DefaultBoardService implements BoardService {
         );
         query.project(new JsonObject()
                 .put(Field._ID, 1)
-                .put(Field.TITLE, 1));
+                .put(Field.TITLE, 1)
+                .put(Field.IMAGEURL, 1)
+                .put(Field.OWNERNAME, 1));
         return query.getAggregate();
     }
 

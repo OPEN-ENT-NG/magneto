@@ -42,8 +42,9 @@
                 <span>[[vm.form.resourceFileName]]</span>
             </div>
             <!-- Link preview -->
-            <div class="cell card-manage-lightbox-body-resource-link" ng-if="vm.form.resourceType == 'link'">
-                <a href="[[vm.form.resourceUrl]]" title="[[vm.form.title]]">[[vm.form.resourceUrl]]</a>
+            <div class="twelve cell card-manage-lightbox-body-caption vertical-spacing" ng-if="vm.form.resourceType == 'link'">
+                <span><i18n >magneto.link.address</i18n>&nbsp;:</span>
+                <input type="text" data-ng-model="vm.form.resourceUrl" class="eleven cell">
             </div>
         </div>
         <div ng-if="vm.form.resourceType !== 'link'"

@@ -58,6 +58,9 @@ interface IViewModel extends ng.IController {
 
     isLoading: boolean;
 
+    isSortable: boolean;
+
+
     nestedSortables: any[];
 
     infiniteScrollService: InfiniteScrollService;
@@ -133,6 +136,8 @@ class Controller implements IViewModel {
 
     isLoading: boolean;
 
+    isSortable: boolean;
+
     nestedSortables: any[];
     draggable: Draggable;
 
@@ -183,6 +188,7 @@ class Controller implements IViewModel {
         };
 
         this.isLoading = true;
+        this.isSortable = true;
         this.nestedSortables = [];
         this.initDraggable();
 
@@ -373,6 +379,12 @@ class Controller implements IViewModel {
                     delayOnTouchOnly: true,
                     onEnd: async (evt) => {
                         await this.onEndDragAndDrop(evt);
+                        this.isSortable = true;
+                        safeApply(this.$scope);
+                    },
+                    onStart: () => {
+                        this.isSortable = false;
+                        safeApply(this.$scope);
                     }
                 }));
             }
@@ -400,8 +412,14 @@ class Controller implements IViewModel {
                         .then(async res => {
                             if (res.status == 200 || res.status == 201) {
                                 this.board.sections = this.board.sortSections(sectionIds);
+                                this.isSortable = true;
+                                safeApply(this.$scope);
                             }
                         });
+                },
+                onStart: () => {
+                    this.isSortable = false;
+                    safeApply(this.$scope);
                 }
             }));
             safeApply(this.$scope);
@@ -464,6 +482,7 @@ class Controller implements IViewModel {
                     }
                 }
                 this.isLoading = false;
+                safeApply(this.$scope);
             })
             .catch((err: AxiosError) => {
                 this.isLoading = false;

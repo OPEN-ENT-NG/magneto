@@ -57,7 +57,8 @@
         </div>
 
         <div class="cell board-container-body-list scrollbar">
-            <dropzone-overlay on-import="vm.draggable.dragDropFilesHandler($event)" can-drop="vm.board.myRights.publish !== undefined">
+            <dropzone-overlay on-import="vm.draggable.dragDropFilesHandler($event)" can-drop="vm.board.myRights.publish !== undefined"
+                              ng-if="vm.isSortable">
             </dropzone-overlay>
             <div class="empty-state" ng-if="vm.cards.length == 0 && vm.board.isLayoutFree()"
                  ng-show="!vm.isLoading">
@@ -68,6 +69,7 @@
                     ng-if="vm.board.id && !vm.isLoading && vm.board.isLayoutFree()"
                     layout="vm.board.layoutType"
                     selector-identifier="'card-list'"
+                    is-sortable="vm.isSortable"
                     is-draggable="vm.board.myRights.publish !== undefined"
                     has-caption="true"
                     cards="vm.cards"

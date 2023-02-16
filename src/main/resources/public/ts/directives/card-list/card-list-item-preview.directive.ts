@@ -71,10 +71,13 @@ class Controller implements IViewModel {
             return "default";
         }
         const parts: string[] = this.card.resourceUrl.split("/");
-        if (parts.length < 4) {
+        if (parts.length == 0) {
             return "default";
+        } else {
+            return parts[0] == "" ?
+                (parts.length > 1 ? parts[1].replace("#", "") : "default") : // case url is ODE type : /magneto#/etc..
+                (parts.length > 3 ? parts[3].replace("#", "") : "default"); // case url is Formulaire type http://plateform/formulaire#
         }
-        return parts[3].replace("#", "");
     }
 
     formatVideoUrl = (url: string): string => {

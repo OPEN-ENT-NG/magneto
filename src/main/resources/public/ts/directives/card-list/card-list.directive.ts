@@ -30,6 +30,7 @@ interface ICardListProps {
     layout: LAYOUT_TYPE;
 
     isDraggable: boolean;
+    isSortable: boolean;
     isScrollable: boolean;
     selectorResize: string;
     selectorIdentifier: string;
@@ -66,6 +67,7 @@ class Controller implements IViewModel {
     selectedCardIds: Array<string>;
     layout: LAYOUT_TYPE;
     isDraggable: boolean;
+    isSortable: boolean;
     isScrollable: boolean;
     selectorResize: string;
     selectorIdentifier: string;
@@ -143,6 +145,7 @@ function directive($parse: IParseService) {
             layout: '=',
             selectedCardIds: '=',
             isDraggable: '=',
+            isSortable: '=',
             isScrollable: '=',
             hasCaption: '=',
             boardRight: '=',
@@ -186,6 +189,10 @@ function directive($parse: IParseService) {
                             scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
                             scrollSpeed: 30, // px*/
                             delayOnTouchOnly: true,
+                            onStart: () => {
+                                vm.isSortable = false;
+                                $scope.$apply();
+                            },
                             onUpdate: async (evt) => {
                                 if (vm.isDraggable && vm.cards && vm.cards.length > 0) {
                                     vm.cardIds = vm.cards.map((card: Card) => card.id);
@@ -195,11 +202,17 @@ function directive($parse: IParseService) {
                                     vm.cardIds.splice(newCardIndex, 0, movedCardId);
                                     let form: BoardForm = new BoardForm();
                                     form.cardIds = vm.cardIds;
+                                    vm.cards = vm.cards.sort(function(a, b) {
+                                        return vm.cardIds.indexOf(a.id) - vm.cardIds.indexOf(b.id);
+                                    });
                                     await boardsService.updateBoard(vm.cards[0].boardId, form);
+                                    vm.isSortable = true;
+                                    $scope.$apply();
                                     $parse($scope.vm.onMove())({});
                                 }
                             }
                         });
+
                     }
                 }
             })

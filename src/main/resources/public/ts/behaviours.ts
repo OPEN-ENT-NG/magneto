@@ -15,7 +15,7 @@ Behaviours.register(MAGNETO_APP, {
                 icon: board.imageUrl,
                 title: board.title,
                 ownerName: board.owner.displayName,
-                path: `${window.location.origin}/magneto#/board/view/${board.id}`
+                path: `/magneto#/board/view/${board.id}`
             }
         });
     },

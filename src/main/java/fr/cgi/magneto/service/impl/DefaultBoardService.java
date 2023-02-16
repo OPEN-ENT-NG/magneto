@@ -14,23 +14,18 @@ import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.mongodb.MongoDb;
-import fr.wseduc.webutils.I18n;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.mongodb.MongoDbResult;
-import org.entcore.common.sql.Sql;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static fr.wseduc.webutils.http.Renders.getHost;
 
 public class DefaultBoardService implements BoardService {
 
@@ -454,6 +449,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field._ID, 1)
                             .put(Field.TITLE, 1)
                             .put(Field.IMAGEURL, 1)
+                            .put(Field.BACKGROUNDURL, 1)
                             .put(Field.LAYOUTTYPE, 1)
                             .put(Field.NBCARDS, new JsonObject().put(Mongo.SIZE, String.format("$%s", Field.CARDIDS)))
                             .put(Field.NBCARDSSECTIONS, 1)
@@ -494,6 +490,7 @@ public class DefaultBoardService implements BoardService {
                 .put(Field._ID, 1)
                 .put(Field.TITLE, 1)
                 .put(Field.IMAGEURL, 1)
+                .put(Field.BACKGROUNDURL, 1)
                 .put(Field.NBCARDS, 1)
                 .put(Field.NBCARDSSECTIONS, 1)
                 .put(Field.MODIFICATIONDATE, 1)
@@ -533,6 +530,7 @@ public class DefaultBoardService implements BoardService {
                 .put(Field._ID, 1)
                 .put(Field.TITLE, 1)
                 .put(Field.IMAGEURL, 1)
+                .put(Field.BACKGROUNDURL, 1)
                 .put(Field.OWNERNAME, 1));
         return query.getAggregate();
     }
@@ -545,6 +543,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field._ID, 1)
                         .put(Field.TITLE, 1)
                         .put(Field.IMAGEURL, 1)
+                        .put(Field.BACKGROUNDURL, 1)
                         .put(Field.CREATIONDATE, 1)
                         .put(Field.SECTIONIDS, 1)
                         .put(Field.CARDIDS, 1)

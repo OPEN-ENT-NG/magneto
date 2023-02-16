@@ -58,7 +58,7 @@ interface IViewModel extends ng.IController {
 
     isLoading: boolean;
 
-    isSortable: boolean;
+    isDraggable: boolean;
 
 
     nestedSortables: any[];
@@ -136,7 +136,7 @@ class Controller implements IViewModel {
 
     isLoading: boolean;
 
-    isSortable: boolean;
+    isDraggable: boolean;
 
     nestedSortables: any[];
     draggable: Draggable;
@@ -188,7 +188,7 @@ class Controller implements IViewModel {
         };
 
         this.isLoading = true;
-        this.isSortable = true;
+        this.isDraggable = true;
         this.nestedSortables = [];
         this.initDraggable();
 
@@ -379,11 +379,11 @@ class Controller implements IViewModel {
                     delayOnTouchOnly: true,
                     onEnd: async (evt) => {
                         await this.onEndDragAndDrop(evt);
-                        this.isSortable = true;
+                        this.isDraggable = true;
                         safeApply(this.$scope);
                     },
                     onStart: () => {
-                        this.isSortable = false;
+                        this.isDraggable = false;
                         safeApply(this.$scope);
                     }
                 }));
@@ -412,13 +412,13 @@ class Controller implements IViewModel {
                         .then(async res => {
                             if (res.status == 200 || res.status == 201) {
                                 this.board.sections = this.board.sortSections(sectionIds);
-                                this.isSortable = true;
+                                this.isDraggable = true;
                                 safeApply(this.$scope);
                             }
                         });
                 },
                 onStart: () => {
-                    this.isSortable = false;
+                    this.isDraggable = false;
                     safeApply(this.$scope);
                 }
             }));
@@ -545,7 +545,11 @@ class Controller implements IViewModel {
      */
     onBoardFormSubmit = async (): Promise<void> => {
         this.displayBoardPropertiesLightbox = false;
-        await this.getBoard();
+        this.getBoard().then(async () => {
+            if (this.board.layoutType == LAYOUT_TYPE.FREE) {
+                await this.getCards();
+            }
+        });
         safeApply(this.$scope);
     }
 

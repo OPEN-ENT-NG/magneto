@@ -37,6 +37,8 @@ public class Field {
     public static final String OWNERNAME = "ownerName";
     public static final String TITLE = "title";
     public static final String IMAGEURL = "imageUrl";
+    public static final String BACKGROUNDURL = "backgroundUrl";
+
     public static final String NBCARDS = "nbCards";
     public static final String NBBOARDS = "nbBoards";
     public static final String MODIFICATIONDATE = "modificationDate";

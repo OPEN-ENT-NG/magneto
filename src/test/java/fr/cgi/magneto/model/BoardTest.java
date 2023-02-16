@@ -14,6 +14,7 @@ public class BoardTest {
             .put("_id", "id")
             .put("title", "title")
             .put("imageUrl", "imageUrl")
+            .put("backgroundUrl", "backgroundUrl")
             .put("description", "description")
             .put("layoutType", "free")
             .put("modificationDate", "modificationDate")
@@ -41,6 +42,7 @@ public class BoardTest {
                 !board.getId().isEmpty() &&
                 !board.getTitle().isEmpty() &&
                 !board.getImageUrl().isEmpty() &&
+                !board.getBackgroundUrl().isEmpty() &&
                 !board.getLayoutType().isEmpty() &&
                 !board.getDescription().isEmpty() &&
                 !board.getOwnerId().isEmpty() &&

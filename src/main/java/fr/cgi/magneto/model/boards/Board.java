@@ -19,6 +19,7 @@ public class Board implements Model<Board> {
     private String _id;
     private String title;
     private String imageUrl;
+    private String backgroundUrl;
     private String description;
     private User owner;
     private JsonArray shared;
@@ -37,6 +38,7 @@ public class Board implements Model<Board> {
         this._id = board.getString(Field._ID, null);
         this.title = board.getString(Field.TITLE);
         this.imageUrl = board.getString(Field.IMAGEURL);
+        this.backgroundUrl = board.getString(Field.BACKGROUNDURL);
         this.description = board.getString(Field.DESCRIPTION);
         this.owner = new User(board.getString(Field.OWNERID), board.getString(Field.OWNERNAME));
         this.shared = board.getJsonArray(Field.SHARED, new JsonArray());
@@ -86,6 +88,15 @@ public class Board implements Model<Board> {
 
     public Board setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+        return this;
+    }
+
+    public String getBackgroundUrl() {
+        return backgroundUrl;
+    }
+
+    public Board setBackgroundUrl(String backgroundUrl) {
+        this.backgroundUrl = backgroundUrl;
         return this;
     }
 
@@ -255,6 +266,7 @@ public class Board implements Model<Board> {
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.IMAGEURL, this.getImageUrl())
+                .put(Field.BACKGROUNDURL, this.getBackgroundUrl())
                 .put(Field.DESCRIPTION, this.getDescription())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.CARDIDS, cardsArray)

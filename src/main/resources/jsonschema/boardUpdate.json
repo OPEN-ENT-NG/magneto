@@ -12,6 +12,9 @@
     "imageUrl": {
       "type": ["string", "null"]
     },
+    "backgroundUrl": {
+      "type": ["string", "null"]
+    },
     "description": {
       "type": ["string", "null"]
     },

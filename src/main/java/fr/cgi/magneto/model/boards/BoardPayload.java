@@ -14,6 +14,7 @@ public class BoardPayload implements Model<BoardPayload> {
     private String _id;
     private String title;
     private String imageUrl;
+    private String backgroundUrl;
     private String description;
     private String ownerId;
     private String ownerName;
@@ -36,6 +37,7 @@ public class BoardPayload implements Model<BoardPayload> {
         this._id = board.getString(Field._ID, null);
         this.title = board.getString(Field.TITLE);
         this.imageUrl = board.getString(Field.IMAGEURL);
+        this.backgroundUrl = board.getString(Field.BACKGROUNDURL);
         this.description = board.getString(Field.DESCRIPTION);
         this.ownerId = board.getString(Field.OWNERID);
         this.ownerName = board.getString(Field.OWNERNAME);
@@ -78,6 +80,15 @@ public class BoardPayload implements Model<BoardPayload> {
 
     public BoardPayload setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+        return this;
+    }
+
+    public String getBackgroundUrl() {
+        return backgroundUrl;
+    }
+
+    public BoardPayload setBackgroundUrl(String backgroundUrl) {
+        this.backgroundUrl = backgroundUrl;
         return this;
     }
 
@@ -244,6 +255,9 @@ public class BoardPayload implements Model<BoardPayload> {
         }
         if (this.getImageUrl() != null) {
             json.put(Field.IMAGEURL, this.getImageUrl());
+        }
+        if (this.getBackgroundUrl() != null) {
+            json.put(Field.BACKGROUNDURL, this.getBackgroundUrl());
         }
         if (this.getDescription() != null) {
             json.put(Field.DESCRIPTION, this.getDescription());

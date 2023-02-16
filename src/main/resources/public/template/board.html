@@ -46,7 +46,9 @@
         </div>
     </div>
 
-    <div class="twelve cell board-container-body">
+    <div class="twelve cell board-container-body"
+         ng-class="{'no-background-image': !vm.board.backgroundUrl }"
+         ng-style="{'background-image': vm.board.backgroundUrl ? 'url(' + vm.board.backgroundUrl + ')' : 'none'}">
         <div class="cell board-container-body-nav">
             <board-nav
                     ng-if="vm.board.myRights.publish"
@@ -58,7 +60,7 @@
 
         <div class="cell board-container-body-list scrollbar">
             <dropzone-overlay on-import="vm.draggable.dragDropFilesHandler($event)" can-drop="vm.board.myRights.publish !== undefined"
-                              ng-if="vm.isSortable">
+                              ng-if="vm.isDraggable">
             </dropzone-overlay>
             <div class="empty-state" ng-if="vm.cards.length == 0 && vm.board.isLayoutFree()"
                  ng-show="!vm.isLoading">
@@ -69,8 +71,8 @@
                     ng-if="vm.board.id && !vm.isLoading && vm.board.isLayoutFree()"
                     layout="vm.board.layoutType"
                     selector-identifier="'card-list'"
-                    is-sortable="vm.isSortable"
-                    is-draggable="vm.board.myRights.publish !== undefined"
+                    is-draggable="vm.isDraggable"
+                    is-sortable="vm.board.myRights.publish !== undefined"
                     has-caption="true"
                     cards="vm.cards"
                     on-move="vm.getBoard"

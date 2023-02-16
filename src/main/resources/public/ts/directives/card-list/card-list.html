@@ -3,7 +3,7 @@
                     ng-click="vm.selectCard(card._id)"
                     ng-dblclick="vm.canEdit(card) ? vm.openEdit(card) : vm.hasPreview ? vm.openPreview(card) : null"
                     is-selected="vm.isCardSelected(card._id)"
-                    is-draggable="vm.isDraggable"
+                    is-sortable="vm.isSortable"
                     card="card"
                     has-caption="vm.hasCaption"
                     has-duplicate="!!vm.boardRight ? vm.canDuplicate(card) : vm.hasDuplicate"

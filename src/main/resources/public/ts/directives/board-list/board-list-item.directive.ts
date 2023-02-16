@@ -1,4 +1,4 @@
-import {ng} from "entcore";
+import {ng, idiom as lang} from "entcore";
 import {ILocationService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board} from "../../models";
@@ -8,6 +8,7 @@ import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
 interface IViewModel extends ng.IController, IBoardListItemProps {
     formatDate(date: string): string;
     getNbCards(): number;
+    getSharedOwner(): string;
 }
 
 interface IBoardListItemProps {
@@ -33,6 +34,10 @@ class Controller implements IViewModel {
     }
 
     $onDestroy() {
+    }
+
+    getSharedOwner = (): string => {
+        return lang.translate("magneto.board.owner") + " : " + this.board.owner.displayName;
     }
 
     formatDate = (date: string): string => {

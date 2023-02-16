@@ -8,6 +8,7 @@ export interface IBoardItemResponse {
     title: string;
     description: string;
     imageUrl: string;
+    backgroundUrl: string;
     cardIds: Array<string>;
     sections: Array<Section>;
     tags: Array<string>;
@@ -45,6 +46,7 @@ export interface IBoardPayload {
     title?: string;
     description?: string;
     imageUrl?: string;
+    backgroundUrl?: string;
     folderId?: string;
     cardIds?: Array<string>;
     sectionIds?: Array<string>;
@@ -64,6 +66,7 @@ export class BoardForm {
     private _title: string;
     private _description: string;
     private _imageUrl: string;
+    private _backgroundUrl: string;
     private _folderId: string;
     private _cardIds: Array<string>;
     private _sectionIds: Array<string>;
@@ -77,6 +80,7 @@ export class BoardForm {
         this._title = null;
         this._description = null;
         this._imageUrl = null;
+        this._backgroundUrl = null;
         this._folderId = null;
         this._cardIds = null;
         this._sectionIds = null;
@@ -91,6 +95,7 @@ export class BoardForm {
         this.title = board.title;
         this.description = board.description;
         this.imageUrl = board.imageUrl;
+        this.backgroundUrl = board.backgroundUrl;
         this.folderId = board.folderId;
         this.tags = board.tags;
         this.tagsTextInput = board.tagsTextInput;
@@ -129,6 +134,14 @@ export class BoardForm {
 
     set imageUrl(value: string) {
         this._imageUrl = value;
+    }
+
+    get backgroundUrl(): string {
+        return this._backgroundUrl;
+    }
+
+    set backgroundUrl(value: string) {
+        this._backgroundUrl = value;
     }
 
     get folderId(): string {
@@ -211,6 +224,11 @@ export class BoardForm {
         if (this.imageUrl) {
             payload.imageUrl = this.imageUrl;
         }
+
+        if (this.backgroundUrl) {
+            payload.backgroundUrl = this.backgroundUrl;
+        }
+
         if (this.folderId) {
             payload.folderId = this.folderId;
         }
@@ -247,6 +265,7 @@ export class Board implements Shareable {
     private _id: string;
     private _title: string;
     private _imageUrl: string;
+    private _backgroundUrl: string;
     private _description: string;
     private _cardIds: Array<string>;
     private _sections: Array<Section>;
@@ -272,6 +291,7 @@ export class Board implements Shareable {
         this._id = data._id;
         this._title = data.title;
         this._imageUrl = data.imageUrl;
+        this._backgroundUrl = data.backgroundUrl;
         this._description = data.description;
         this._cardIds = data.cardIds;
         this._sections = data.sections;
@@ -308,6 +328,10 @@ export class Board implements Shareable {
 
     get imageUrl(): string {
         return this._imageUrl;
+    }
+
+    get backgroundUrl(): string {
+        return this._backgroundUrl;
     }
 
     get cardIds(): Array<string> {

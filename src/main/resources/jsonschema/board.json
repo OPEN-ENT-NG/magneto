@@ -9,6 +9,9 @@
     "imageUrl": {
       "type": "string"
     },
+    "backgroundUrl": {
+      "type": "string"
+    },
     "description": {
       "type": "string"
     },

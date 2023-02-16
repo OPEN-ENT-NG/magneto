@@ -13,6 +13,7 @@ public class BoardPayloadTest {
     JsonObject boardCreateJsonObject_1 = new JsonObject()
             .put("title", "title")
             .put("imageUrl", "imageUrl")
+            .put("backgroundUrl", "backgroundUrl")
             .put("description", "description")
             .put("ownerId", "ownerId")
             .put("ownerName", "ownerName")
@@ -27,6 +28,7 @@ public class BoardPayloadTest {
             .put("_id", "id")
             .put("title", "title")
             .put("imageUrl", "imageUrl")
+            .put("backgroundUrl", "backgroundUrl")
             .put("description", "description")
             .put("modificationDate", "modificationDate")
             .put("public", false);
@@ -50,6 +52,7 @@ public class BoardPayloadTest {
         boolean isNotEmpty =
                 !board.getTitle().isEmpty() &&
                 !board.getImageUrl().isEmpty() &&
+                !board.getBackgroundUrl().isEmpty() &&
                 !board.getDescription().isEmpty() &&
                 !board.getOwnerId().isEmpty() &&
                 !board.getOwnerName().isEmpty() &&

@@ -38,7 +38,7 @@ interface IViewModel extends ng.IController, ICardListItemProps {
 interface ICardListItemProps {
     card: Card;
 
-    isDraggable: boolean;
+    isSortable: boolean;
     hasCaption: boolean;
     selectorResize: string;
 
@@ -66,7 +66,7 @@ class Controller implements IViewModel {
 
     card: Card;
     isDisplayedOptions: boolean;
-    isDraggable: boolean;
+    isSortable: boolean;
 
     hasCaption: boolean;
 
@@ -129,7 +129,7 @@ function directive($parse: IParseService) {
         scope: {
             card: '=',
             isSelected: '=',
-            isDraggable: '=',
+            isSortable: '=',
             hasCaption: '=',
             hasEdit: '=',
             onEdit: '&',

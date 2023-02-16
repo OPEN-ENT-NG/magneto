@@ -29,8 +29,8 @@ interface ICardListProps {
 
     layout: LAYOUT_TYPE;
 
-    isDraggable: boolean;
     isSortable: boolean;
+    isDraggable: boolean;
     isScrollable: boolean;
     selectorResize: string;
     selectorIdentifier: string;
@@ -66,8 +66,8 @@ class Controller implements IViewModel {
     cards: Array<Card>;
     selectedCardIds: Array<string>;
     layout: LAYOUT_TYPE;
-    isDraggable: boolean;
     isSortable: boolean;
+    isDraggable: boolean;
     isScrollable: boolean;
     selectorResize: string;
     selectorIdentifier: string;
@@ -144,8 +144,8 @@ function directive($parse: IParseService) {
             cards: '=',
             layout: '=',
             selectedCardIds: '=',
-            isDraggable: '=',
             isSortable: '=',
+            isDraggable: '=',
             isScrollable: '=',
             hasCaption: '=',
             boardRight: '=',
@@ -180,7 +180,7 @@ function directive($parse: IParseService) {
             $(document).ready(() => {
                 if (vm.layout == LAYOUT_TYPE.FREE) {
                     const cardList: Element = document.getElementById("card-list");
-                    if (cardList && vm.isDraggable) {
+                    if (cardList && vm.isSortable) {
                         create(cardList, {
                             animation: 150,
                             delay: 150,
@@ -190,11 +190,11 @@ function directive($parse: IParseService) {
                             scrollSpeed: 30, // px*/
                             delayOnTouchOnly: true,
                             onStart: () => {
-                                vm.isSortable = false;
+                                vm.isDraggable = false;
                                 $scope.$apply();
                             },
                             onUpdate: async (evt) => {
-                                if (vm.isDraggable && vm.cards && vm.cards.length > 0) {
+                                if (vm.isSortable && vm.cards && vm.cards.length > 0) {
                                     vm.cardIds = vm.cards.map((card: Card) => card.id);
                                     let movedCardId: string = vm.cardIds[evt.oldIndex];
                                     let newCardIndex: number = evt.newIndex;
@@ -206,7 +206,7 @@ function directive($parse: IParseService) {
                                         return vm.cardIds.indexOf(a.id) - vm.cardIds.indexOf(b.id);
                                     });
                                     await boardsService.updateBoard(vm.cards[0].boardId, form);
-                                    vm.isSortable = true;
+                                    vm.isDraggable = true;
                                     $scope.$apply();
                                     $parse($scope.vm.onMove())({});
                                 }

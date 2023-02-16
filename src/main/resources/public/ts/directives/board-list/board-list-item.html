@@ -1,5 +1,5 @@
 <div class="card board-list-item flex-row f-column"
-    ng-class="{'active': vm.isSelected}">
+     ng-class="{'active': vm.isSelected}">
     <!--Board image-->
     <div class="board-list-item-image flex-row justify-center">
         <img ng-src="[[vm.board.imageUrl]]">
@@ -7,9 +7,10 @@
     <!--Board infos-->
     <div class="board-list-item-infos flex-row">
         <!--Board title-->
-        <span class="board-list-item-infos-title">
-            [[vm.board.title]]
-        </span>
+        <div>
+            <span class="board-list-item-infos-title">[[vm.board.title]] </span>
+        </div>
+
         <!--Board nb of magnets-->
         <div class="board-list-item-infos-nb-cards">
             <i class="magneto-magnet"></i>
@@ -18,11 +19,14 @@
         </div>
         <div class="board-list-item-infos-date-icons">
             <div class="infos-date">
-                <i class="magneto-calendar"></i> [[vm.formatDate(vm.board.modificationDate)]]
+                <i class="magneto-calendar" tooltip="magneto.board.date.update"></i> [[vm.formatDate(vm.board.modificationDate)]]
             </div>
             <div class="infos-icons">
                 <i class="magneto-crown" tooltip="magneto.board.tooltip.my.board" ng-if="vm.board.isMyBoard()"></i>
-                <i class="magneto-share-variant" tooltip="magneto.board.tooltip.shared.board" ng-if="vm.board.shared !== undefined"></i>
+                <i class="magneto-user" tooltip="[[vm.getSharedOwner()]]"
+                   ng-if="!vm.board.isMyBoard() && vm.board.shared !== undefined"></i>
+                <i class="magneto-share-variant" tooltip="magneto.board.tooltip.shared.board"
+                   ng-if="vm.board.shared !== undefined"></i>
                 <i class="magneto-earth" tooltip="magneto.board.tooltip.public.board" ng-if="vm.board.public"></i>
             </div>
         </div>

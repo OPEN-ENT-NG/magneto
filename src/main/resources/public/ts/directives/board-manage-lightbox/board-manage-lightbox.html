@@ -10,9 +10,10 @@
         </h3>
     </section>
     <section class="body board-manage-lightbox-body">
-        <div class="cell board-manage-lightbox-body-image-select">
+        <div class="flex-row f-column">
             <image-select ng-model="vm.form.imageUrl"
-                          default="/img/illustrations/collaborativeeditor-default.png">
+                          default="/img/illustrations/collaborativeeditor-default.png"
+                          class="cell board-manage-lightbox-body-image-select">
             </image-select>
             <span ng-if="!vm.form.imageUrl"
                   class="board-manage-lightbox-body-image-select-choose">
@@ -22,7 +23,8 @@
 
         <div class="row vertical-spacing board-manage-lightbox-body-inputs">
             <div>
-                <i18n>magneto.create.board.title</i18n>*&nbsp;:
+                <i18n>magneto.create.board.title</i18n>
+                *&nbsp;:
                 <input type="text" data-ng-model="vm.form.title" class="twelve cell">
             </div>
             <div>
@@ -32,9 +34,20 @@
             <board-layout-type
                     board="vm.form">
             </board-layout-type>
+
             <board-keywords-input
                     board="vm.form">
             </board-keywords-input>
+
+            <div class="flex-row f-column">
+                <i18n>magneto.board.background.title</i18n>
+
+                <image-select ng-model="vm.form.backgroundUrl"
+                              default="/img/illustrations/collaborativeeditor-default.png"
+                              class="cell board-manage-lightbox-body-image-select small">
+                </image-select>
+                <span class="italic-text"><i18n>magneto.board.background.warning</i18n></span>
+            </div>
         </div>
     </section>
     <!-- Form submit/cancel buttons -->

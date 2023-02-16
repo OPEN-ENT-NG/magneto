@@ -80,6 +80,7 @@ function directive($parse: IParseService) {
                     form.title = vm.form.title;
                     form.description = vm.form.description;
                     form.imageUrl = vm.form.imageUrl;
+                    form.backgroundUrl = vm.form.backgroundUrl;
                     form.folderId = vm.folderId;
                     form.tags = vm.form.tags;
                     form.public = vm.form.public;

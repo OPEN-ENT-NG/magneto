@@ -39,6 +39,13 @@ public class AuthController extends ControllerHelper {
             body.set(Field.REDIRECT_URI, this.magnetoConfig.host() + "/magneto/clipper/redirect?basic_token=" + basicToken + "&extension_url="
                     + URLEncoder.encode(extensionUrl, StandardCharsets.UTF_8.toString()));
 
+
+            log.info(String.format("[Magneto@%s::authAndRedirect] host : %s", this.getClass().getSimpleName(), this.magnetoConfig.host()));
+            log.info(String.format("[Magneto@%s::authAndRedirect] code : %s", this.getClass().getSimpleName(), code));
+            log.info(body.get(Field.REDIRECT_URI));
+            log.info(body.get(Field.GRANT_TYPE));
+            log.info(basicToken);
+
             this.client.postAbs(this.magnetoConfig.host() + "/auth/oauth2/token?grant_type=authorization_code&code="
                             + code + "&redirect_uri=" + this.magnetoConfig.host() + "/magneto/clipper/redirect")
                     .putHeader(Field.AUTHORIZATION, Field.BASIC + " " + basicToken)
@@ -47,6 +54,8 @@ public class AuthController extends ControllerHelper {
                     .sendForm(body, res -> {
                         if (res.succeeded()) {
                             HttpResponse<Buffer> response = res.result();
+                            log.info(String.format("[Magneto@%s::authAndRedirect] Response : %s", this.getClass().getSimpleName(),
+                                    response.bodyAsJsonObject().encodePrettily()));
                             String accessToken = response.bodyAsJsonObject().getString(Field.ACCESS_TOKEN);
                             String refreshToken = response.bodyAsJsonObject().getString(Field.REFRESH_TOKEN);
                             String redirectExtension = extensionUrl + "&access_token=" + accessToken

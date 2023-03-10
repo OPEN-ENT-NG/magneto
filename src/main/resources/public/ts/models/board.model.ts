@@ -238,7 +238,7 @@ export class BoardForm {
             payload.imageUrl = this.imageUrl;
         }
 
-        if (this.backgroundUrl) {
+        if (this.backgroundUrl != null) {
             payload.backgroundUrl = this.backgroundUrl;
         }
 

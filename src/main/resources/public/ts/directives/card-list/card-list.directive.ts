@@ -64,6 +64,7 @@ interface ICardListProps {
     onLoaded?;
 
     hasComments: boolean;
+    simpleView: boolean;
 }
 
 interface ICardListScope extends IScope, ICardListProps {
@@ -94,6 +95,7 @@ class Controller implements IViewModel {
     hasTransfer: boolean;
     hasLock: boolean;
     hasComments: boolean;
+    simpleView: boolean;
 
 
     constructor(private $scope: ICardListScope,
@@ -176,7 +178,8 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
             selectorResize: '=',
             selectorIdentifier: '=',
             cardUpdateEventer: '=',
-            hasComments: '='
+            hasComments: '=',
+            simpleView: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -193,7 +196,7 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
                     vm.cardUpdateEventer.asObservable().subscribe(() => {
                         $timeout(() => {
                             vm.resizeAllCardItems();
-                        }, 400);
+                        }, 200);
                     });
                 }
 
@@ -264,38 +267,42 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
                 $parse($scope.vm.onLock())(card);
             }
 
-            $timeout(() => {
-                vm.resizeAllCardItems();
-            }, 1000);
 
-            $(document).ready(() => {
-                $parse($scope.vm.onLoaded())({});
-            });
+            if (!vm.simpleView) {
+                $timeout(() => {
+                    vm.resizeAllCardItems();
+                }, 800);
 
-            angular.element(window).bind('resize', async (): Promise<void> => {
-                window.addEventListener('resize', vm.resizeAllCardItems);
-            });
+                $(document).ready(() => {
+                    $parse($scope.vm.onLoaded())({});
+                });
 
-            vm.resizeAllCardItems = () => {
-                let allItems = document.getElementsByClassName('card-list-content');
+                angular.element(window).bind('resize', async (): Promise<void> => {
+                    window.addEventListener('resize', vm.resizeAllCardItems);
+                });
+            }
+
+
+
+            vm.resizeAllCardItems = (): void => {
+                let allItems:  HTMLCollectionOf<Element> = document.getElementsByClassName('card-list-content');
                 for (let i = 0; i < allItems.length; i++) {
                     resizeCardItem(allItems[i]);
                 }
             }
 
-            let resizeCardItem = (item) => {
+            let resizeCardItem = (item: any): void => {
 
-                let grid = document.getElementsByClassName('card-list')[0];
-                let rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
-                let rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+                let grid: Element = document.getElementsByClassName('card-list')[0];
+                let rowGap: number = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+                let rowHeight: number = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
 
-                let rowSpan = Math.ceil((item.querySelector('.card-list-item').getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
+                let rowSpan: number = Math.ceil((item.querySelector('.card-list-item').getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
 
                 item.style.gridRowEnd = 'span '+ rowSpan;
             }
 
             vm.resizeAllCardItems();
-
         }
     }
 }

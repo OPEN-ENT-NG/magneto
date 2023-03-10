@@ -48,8 +48,8 @@
                     [[vm.card.caption]]
                 </span>
             </div>
-            <div class="card-list-item-infos-locked" ng-if="vm.card.locked">
-                <i class="magneto-lock" aria-hidden="true" tooltip="magneto.card.locked.tooltip"></i>
+            <div class="card-list-item-infos-locked">
+                <i ng-if="vm.card.locked" class="magneto-lock" aria-hidden="true" tooltip="magneto.card.locked.tooltip"></i>
             </div>
         </div>
         <card-item-comments

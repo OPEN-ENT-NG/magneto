@@ -105,7 +105,8 @@
                     on-preview="vm.openPreviewResourceLightbox"
                     on-transfer="vm.openTransferResourceLightbox"
                     on-submit="vm.onFormSubmit"
-                    on-lock="vm.openLockResource">
+                    on-lock="vm.openLockResource"
+                    card-update-eventer="vm.cardUpdateSubject">
             </section-list>
             <div ng-show="vm.isLoading" class="centered-text">
                 <loader min-height="'250px'"></loader>
@@ -188,7 +189,8 @@
 
         <card-preview-lightbox
                 card="vm.selectedCard"
-                display="vm.displayPreviewCardLightbox">
+                display="vm.displayPreviewCardLightbox"
+                show-comments="vm.board.canComment">
         </card-preview-lightbox>
 
         <infinite-scroll ng-if="vm.board.isLayoutFree()"

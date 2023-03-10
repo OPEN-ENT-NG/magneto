@@ -4,4 +4,9 @@
     <card-display
             card="vm.card">
     </card-display>
+    <!-- Comments panel -->
+    <comments-panel
+            ng-if="vm.card.id !== undefined && vm.showComments"
+            card-id="vm.card.id">
+    </comments-panel>
 </lightbox>

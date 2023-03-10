@@ -68,7 +68,9 @@
                        selector-resize="'.card-list-scrollable'"
                        on-duplicate="vm.submitDuplicateCard"
                        has-preview="true"
-                       on-preview="vm.openPreview">
+                       on-preview="vm.openPreview"
+                       has-comments="false"
+                       simple-view="true">
             </card-list>
         </div>
         <div class="empty-state"
@@ -84,7 +86,8 @@
 
     <card-preview-lightbox
             card="vm.selectedCard"
-            display="vm.displayPreview">
+            display="vm.displayPreview"
+            show-comments="'false'">
     </card-preview-lightbox>
 
     <infinite-scroll

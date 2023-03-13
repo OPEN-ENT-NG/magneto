@@ -21,4 +21,10 @@ public class FakeRight extends ControllerHelper {
         notImplemented(request);
     }
 
+    @Get("/rights/board/comment")
+    @SecuredAction(Rights.COMMENT_BOARD)
+    public void boardComment(HttpServerRequest request) {
+        notImplemented(request);
+    }
+
 }

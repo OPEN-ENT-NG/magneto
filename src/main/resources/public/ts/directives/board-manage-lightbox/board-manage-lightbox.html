@@ -32,7 +32,7 @@
                 <textarea ng-model="vm.form.description" class="twelve cell"></textarea>
             </div>
 
-            <div class="board-manage-lightbox-body-inputs-options">
+            <div class="board-manage-lightbox-body-inputs-options" ng-if="vm.hasRight('comment')">
                 <h2><i18n>magneto.create.board.options</i18n></h2>
                 <label class="checkbox">
                     <input type="checkbox" ng-model="vm.form.canComment">

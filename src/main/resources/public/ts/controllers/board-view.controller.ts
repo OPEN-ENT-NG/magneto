@@ -199,7 +199,7 @@ class Controller implements IViewModel {
 
 
         this.getBoard().then(async () => {
-            if (this.board.layoutType == LAYOUT_TYPE.FREE) {
+            if (this.board && this.board.layoutType == LAYOUT_TYPE.FREE) {
                 await this.getCards();
             }
         });

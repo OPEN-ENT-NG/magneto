@@ -14,13 +14,16 @@
 
 
             </div>
-            <i ng-if="vm.isMyComment()" class="magneto-card-settings two cell" data-ng-click="vm.openCommentOptions(); $event.stopPropagation();"></i>
+            <i ng-if="vm.isMyComment() || vm.canDeleteComment()"
+               class="magneto-card-settings two cell"
+               data-ng-click="vm.openCommentOptions(); $event.stopPropagation();">
+            </i>
             <card-list-item-options
                     ng-show="vm.isDisplayedCommentOptions"
                     options="vm.comment"
-                    has-edit="true"
+                    has-edit="vm.isMyComment()"
                     on-edit="vm.openEdit"
-                    has-delete="true"
+                    has-delete="vm.canDeleteComment()"
                     on-delete="vm.openDelete">
             </card-list-item-options>
         </div>

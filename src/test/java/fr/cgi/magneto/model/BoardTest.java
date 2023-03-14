@@ -15,6 +15,7 @@ public class BoardTest {
             .put("title", "title")
             .put("imageUrl", "imageUrl")
             .put("backgroundUrl", "backgroundUrl")
+            .put("canComment", false)
             .put("description", "description")
             .put("layoutType", "free")
             .put("modificationDate", "modificationDate")

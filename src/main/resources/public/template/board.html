@@ -68,7 +68,7 @@
                 <i class="magneto-arrow-left"></i>
             </div>
             <card-list
-                    ng-if="vm.board.id && !vm.isLoading && vm.board.isLayoutFree()"
+                    ng-if="vm.board.id && !vm.isLoading && vm.board.isLayoutFree() && vm.cardUpdateSubject"
                     layout="vm.board.layoutType"
                     selector-identifier="'card-list'"
                     is-draggable="vm.isDraggable"
@@ -89,7 +89,10 @@
                     has-lock="vm.board.myRights.publish !== undefined"
                     on-lock="vm.openLockResource"
                     has-transfer="vm.board.myRights.publish != undefined"
-                    on-transfer="vm.openTransferResourceLightbox">
+                    on-transfer="vm.openTransferResourceLightbox"
+                    card-update-eventer="vm.cardUpdateSubject"
+                    has-comments="vm.board.canComment"
+            >
             </card-list>
             <section-list
                     ng-if="!!vm.board.layoutType && !vm.board.isLayoutFree()"
@@ -119,6 +122,7 @@
         </card-manage-lightbox>
 
         <card-move-lightbox
+                ng-if="vm.displayTransferCardLightbox"
                 display="vm.displayTransferCardLightbox"
                 form="vm.cardForm"
                 board-id="vm.filter.boardId"

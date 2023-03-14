@@ -1,12 +1,16 @@
-import {model, ng} from "entcore";
+import {angular, model, ng} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {BoardForm, Card} from "../../models";
 import {create} from 'sortablejs';
 import {boardsService} from "../../services";
 import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ICardListProps {
+
+    resizeAllCardItems?(): void;
+
     openEdit?(card: Card): void;
 
     openDuplicate?(card: Card): void;
@@ -35,6 +39,9 @@ interface ICardListProps {
     selectorResize: string;
     selectorIdentifier: string;
 
+    cardUpdateEventer: Subject<void>;
+
+
     hasCaption: boolean;
 
     boardRight?: any;
@@ -55,6 +62,8 @@ interface ICardListProps {
     onMove?;
 
     onLoaded?;
+
+    hasComments: boolean;
 }
 
 interface ICardListScope extends IScope, ICardListProps {
@@ -71,6 +80,7 @@ class Controller implements IViewModel {
     isScrollable: boolean;
     selectorResize: string;
     selectorIdentifier: string;
+    cardUpdateEventer: Subject<void>;
 
 
     hasCaption: boolean;
@@ -83,15 +93,13 @@ class Controller implements IViewModel {
     hasPreview: boolean;
     hasTransfer: boolean;
     hasLock: boolean;
+    hasComments: boolean;
 
 
     constructor(private $scope: ICardListScope,
                 private $location: ILocationService,
                 private $window: IWindowService) {
         this.selectedCardIds = [];
-    }
-
-    $onInit = (): void => {
     }
 
     $onDestroy() {
@@ -136,7 +144,7 @@ class Controller implements IViewModel {
 
 }
 
-function directive($parse: IParseService) {
+function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDirective {
     return {
         restrict: 'E',
         templateUrl: `${RootsConst.directive}card-list/card-list.html`,
@@ -166,11 +174,13 @@ function directive($parse: IParseService) {
             onMove: '&',
             onLoaded: '&',
             selectorResize: '=',
-            selectorIdentifier: '='
+            selectorIdentifier: '=',
+            cardUpdateEventer: '=',
+            hasComments: '='
         },
         controllerAs: 'vm',
         bindToController: true,
-        controller: ['$scope', '$location', '$window', '$parse', Controller],
+        controller: ['$scope', '$location', '$window', '$parse', '$timeout', Controller],
         /* interaction DOM/element */
         link: function ($scope: ICardListScope,
                         element: ng.IAugmentedJQuery,
@@ -178,6 +188,15 @@ function directive($parse: IParseService) {
                         vm: IViewModel) {
 
             $(document).ready(() => {
+
+                if (vm.cardUpdateEventer) {
+                    vm.cardUpdateEventer.asObservable().subscribe(() => {
+                        $timeout(() => {
+                            vm.resizeAllCardItems();
+                        }, 400);
+                    });
+                }
+
                 if (vm.layout == LAYOUT_TYPE.FREE) {
                     const cardList: Element = document.getElementById("card-list");
                     if (cardList && vm.isSortable) {
@@ -208,7 +227,6 @@ function directive($parse: IParseService) {
                                     await boardsService.updateBoard(vm.cards[0].boardId, form);
                                     vm.isDraggable = true;
                                     $scope.$apply();
-                                    $parse($scope.vm.onMove())({});
                                 }
                             }
                         });
@@ -246,9 +264,37 @@ function directive($parse: IParseService) {
                 $parse($scope.vm.onLock())(card);
             }
 
+            $timeout(() => {
+                vm.resizeAllCardItems();
+            }, 1000);
+
             $(document).ready(() => {
                 $parse($scope.vm.onLoaded())({});
             });
+
+            angular.element(window).bind('resize', async (): Promise<void> => {
+                window.addEventListener('resize', vm.resizeAllCardItems);
+            });
+
+            vm.resizeAllCardItems = () => {
+                let allItems = document.getElementsByClassName('card-list-content');
+                for (let i = 0; i < allItems.length; i++) {
+                    resizeCardItem(allItems[i]);
+                }
+            }
+
+            let resizeCardItem = (item) => {
+
+                let grid = document.getElementsByClassName('card-list')[0];
+                let rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+                let rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+
+                let rowSpan = Math.ceil((item.querySelector('.card-list-item').getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
+
+                item.style.gridRowEnd = 'span '+ rowSpan;
+            }
+
+            vm.resizeAllCardItems();
 
         }
     }

@@ -22,7 +22,8 @@ describe('BoardModel', () => {
             ownerName: 'ownerName',
             tags: ['tag1', 'tag2'],
             public: false,
-            deleted: false
+            deleted: false,
+            canComment: false
         }
 
         const board = new Board().build(boardResponse);
@@ -64,7 +65,8 @@ describe('BoardModel', () => {
                     ownerName: 'ownerName',
                     tags: ['tag1', 'tag2'],
                     public: false,
-                    deleted: false
+                    deleted: false,
+                    canComment: false
                 }
             ],
             page: 1,

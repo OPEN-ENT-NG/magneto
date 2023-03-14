@@ -6,8 +6,12 @@ public class Mongo {
     public static final String EQ = "$eq";
     public static final String AND = "$and";
     public static final String LIMIT = "$limit";
+    public static final String IF = "if";
+    public static final String THEN = "then";
+    public static final String ELSE = "else";
     public static final String FILTER = "$filter";
     public static final String MATCH = "$match";
+    public static final String ISARRAY = "$isArray";
     public static final String OPTIONS = "$options";
     public static final String OR = "$or";
 
@@ -38,6 +42,7 @@ public class Mongo {
     public static final String PATH = "path";
     public static final String INPUT = "input";
     public static final String COND = "cond";
+    public static final String $COND = "$cond";
     public static final String NULLOREMPTY = "preserveNullAndEmptyArrays";
     public static final String STARTWITH = "startWith";
     public static final String CONNECTFROMFIELD = "connectFromField";

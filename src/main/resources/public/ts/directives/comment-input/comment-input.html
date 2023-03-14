@@ -1,0 +1,8 @@
+<div class="comment-input">
+    <img class="card-list-item-avatar" ng-src="/userbook/avatar/[[vm.getUserId()]]?thumbnail=48x48"/>
+    <input type="text"
+           maxlength="1000"
+           i18n-placeholder="magneto.add.comment"
+           ng-model="vm.commentInput"
+           ng-keyup="vm.addComment($event)">
+</div>

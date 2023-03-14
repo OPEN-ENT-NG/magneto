@@ -31,6 +31,15 @@
                 <i18n>magneto.create.board.description</i18n>&nbsp;:
                 <textarea ng-model="vm.form.description" class="twelve cell"></textarea>
             </div>
+
+            <div class="board-manage-lightbox-body-inputs-options">
+                <h2><i18n>magneto.create.board.options</i18n></h2>
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="vm.form.canComment">
+                    <span><i18n><span>magneto.create.board.options.comment</span></i18n></span>
+                </label>
+            </div>
+
             <board-layout-type
                     board="vm.form">
             </board-layout-type>

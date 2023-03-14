@@ -5,11 +5,14 @@ import {Board, Boards, Card, Section, Sections} from "../models";
 import {safeApply} from "../utils/safe-apply.utils";
 import {AxiosError} from "axios";
 import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
+import {Subject} from "rxjs";
 
 interface IViewModel {
 
     card: Card;
     board: Board;
+
+    changePageSubject: Subject<string>;
 
     filter: {
         page: number,
@@ -47,6 +50,8 @@ class Controller implements ng.IController, IViewModel {
     section: Section;
     board: Board;
 
+    changePageSubject: Subject<string>;
+
     filter: {
         page: number,
         count: number,
@@ -75,6 +80,8 @@ class Controller implements ng.IController, IViewModel {
         this.getBoard()
             .then(() => this.getCard())
             .then(() => this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length);
+
+        this.changePageSubject = new Subject<string>();
     }
 
     async $onInit(): Promise<void> {
@@ -86,6 +93,7 @@ class Controller implements ng.IController, IViewModel {
     async nextPage(): Promise<void> {
         this.filter.page++;
         await this.getCard();
+        this.changePageSubject.next(this.card.id);
         safeApply(this.$scope);
     }
 
@@ -95,6 +103,7 @@ class Controller implements ng.IController, IViewModel {
     async previousPage(): Promise<void> {
         this.filter.page--;
         await this.getCard();
+        this.changePageSubject.next(this.card.id);
         safeApply(this.$scope);
     }
 

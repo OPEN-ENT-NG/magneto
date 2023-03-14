@@ -41,3 +41,8 @@ export * from './board-keywords-input/board-keywords-input.directive';
 export * from './loader/loader.directive';
 export * from './on-error-src/on-error-src.directive';
 export * from './drag/dropzoneOverlay';
+export * from './card-item-comments/card-item-comments.directive';
+export * from './card-comment/card-comment.directive';
+export * from './comments-panel/comments-panel.directive';
+export * from './comment-input/comment-input.directive';
+export * from './comment-delete-lightbox/comment-delete-lightbox.directive';

@@ -5,6 +5,7 @@ import {Card} from "../../models";
 import {DateUtils} from "../../utils/date.utils";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {safeApply} from "../../utils/safe-apply.utils";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ICardListItemProps {
     formatDate(date: string): string;
@@ -56,6 +57,8 @@ interface ICardListItemProps {
     onTransfer?;
     hasLock: boolean;
     onLock?;
+    cardUpdateEventer: Subject<void>;
+    hasComments: boolean;
 }
 
 interface ICardListItemScope extends IScope, ICardListItemProps {
@@ -77,12 +80,12 @@ class Controller implements IViewModel {
     hasPreview: boolean;
     hasTransfer: boolean;
     hasLock: boolean;
-
+    hasComments: boolean;
 
     selectorResize: string;
     isSelected: boolean;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
-
+    cardUpdateEventer: Subject<void>;
 
     constructor(private $scope: ICardListItemScope,
                 private $location: ILocationService,
@@ -145,7 +148,9 @@ function directive($parse: IParseService) {
             onTransfer: '&',
             hasLock: '=',
             onLock: '&',
-            selectorResize: '='
+            selectorResize: '=',
+            cardUpdateEventer: '=',
+            hasComments: '='
         },
         controllerAs: 'vm',
         bindToController: true,

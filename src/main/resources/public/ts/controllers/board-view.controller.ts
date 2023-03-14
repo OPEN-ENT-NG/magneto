@@ -26,6 +26,7 @@ import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
 import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
 import {Draggable} from "../models/draggable.model";
 import {WorkspaceUtils} from "../utils/workspace.utils";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController {
 
@@ -64,6 +65,7 @@ interface IViewModel extends ng.IController {
     nestedSortables: any[];
 
     infiniteScrollService: InfiniteScrollService;
+    cardUpdateSubject: Subject<void>;
 
     goToBoards(): void;
 
@@ -148,6 +150,8 @@ class Controller implements IViewModel {
 
     infiniteScrollService: InfiniteScrollService;
 
+    cardUpdateSubject: Subject<void>;
+
     constructor(private $scope: IBoardViewScope,
                 private $route: any,
                 private $location: ng.ILocationService,
@@ -159,6 +163,7 @@ class Controller implements IViewModel {
                 private cardsService: ICardsService) {
         this.$scope.vm = this;
         this.infiniteScrollService = new InfiniteScrollService;
+        this.cardUpdateSubject = new Subject<void>();
     }
 
     async $onInit(): Promise<void> {
@@ -503,6 +508,7 @@ class Controller implements IViewModel {
             .then((res: Cards) => {
                 if (res.all && res.all.length > 0) {
                     this.cards.push(...res.all);
+                    this.cardUpdateSubject.next();
                 }
                 this.isLoading = false;
                 safeApply(this.$scope);
@@ -536,6 +542,7 @@ class Controller implements IViewModel {
         const cards = await this.cardsService.getAllCardsBySection(params);
         if (!!cards.all && cards.all.length > 0) {
             section.cards.push(...cards.all);
+            this.cardUpdateSubject.next();
         }
         this.isLoading = false;
     }

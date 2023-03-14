@@ -2,6 +2,7 @@ import {ng} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Card, Section} from "../../models";
+import {CardComment} from "../../models/card-comment.model";
 
 interface IViewModel extends ng.IController, ICardListItemOptionsProps {
     openEdit?(): void;
@@ -14,7 +15,7 @@ interface IViewModel extends ng.IController, ICardListItemOptionsProps {
 }
 
 interface ICardListItemOptionsProps {
-    options: Card | Section;
+    options: Card | Section | CardComment;
     isDisplayed: boolean;
     hasEdit: boolean;
     onEdit?;
@@ -38,7 +39,7 @@ interface ICardListItemOptionsScope extends IScope, ICardListItemOptionsProps {
 
 class Controller implements IViewModel {
 
-    options: Card | Section;
+    options: Card | Section | CardComment;
     isDisplayed: boolean;
     hasEdit: boolean;
     hasDuplicate: boolean;

@@ -214,7 +214,8 @@ public class DefaultCardService implements CardService {
         Promise<List<Card>> promise = Promise.promise();
         getCardsRequest(cardIds)
                 .compose(cards -> {
-                    List<Card> cardList = ModelHelper.toList(cards.getJsonArray(Field.RESULTS), Card.class);
+                    List<Card> cardList = ModelHelper.toList(cards.getJsonObject(Field.CURSOR, new JsonObject())
+                            .getJsonArray(Field.FIRSTBATCH, new JsonArray()), Card.class);
                     return setMetadataCards(cardList);
                 })
                 .onFailure(promise::fail)
@@ -230,8 +231,38 @@ public class DefaultCardService implements CardService {
 
     private Future<JsonObject> getCardsRequest(List<String> cardIds) {
         Promise<JsonObject> promise = Promise.promise();
-        QueryBuilder matcher = QueryBuilder.start(Field._ID).in(cardIds);
-        mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validActionResultHandler(PromiseHelper.handler(promise,
+
+        JsonObject query = new MongoQuery(this.collection)
+                .match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, cardIds)))
+                .project(new JsonObject()
+                    .put(Field._ID, 1)
+                    .put(Field.TITLE, 1)
+                    .put(Field.CAPTION, 1)
+                    .put(Field.DESCRIPTION, 1)
+                    .put(Field.ISLOCKED, 1)
+                    .put(Field.OWNERID, 1)
+                    .put(Field.OWNERNAME, 1)
+                    .put(Field.RESOURCETYPE, 1)
+                    .put(Field.RESOURCEID, 1)
+                    .put(Field.RESOURCEURL, 1)
+                    .put(Field.CREATIONDATE, 1)
+                    .put(Field.MODIFICATIONDATE, 1)
+                    .put(Field.BOARDID, 1)
+                    .put(Field.PARENTID, 1)
+                    .put(Field.LASTMODIFIERID, 1)
+                    .put(Field.LASTMODIFIERNAME, 1)
+                    .put(Field.LASTCOMMENT, new JsonObject()
+                            .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
+                    .put(Field.NBOFCOMMENTS, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
+                                    .put(Mongo.ELSE, 0))))
+                .getAggregate();
+
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
                 String.format("[Magneto@%s::getCardsRequest] Failed to get cards request", this.getClass().getSimpleName()))));
         return promise.future();
     }
@@ -645,7 +676,16 @@ public class DefaultCardService implements CardService {
                     .put(Field.PARENTID, 1)
                     .put(Field.ISLOCKED, 1)
                     .put(Field.LASTMODIFIERID, 1)
-                    .put(Field.LASTMODIFIERNAME, 1));
+                    .put(Field.LASTMODIFIERNAME, 1)
+                    .put(Field.LASTCOMMENT, new JsonObject()
+                            .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
+                    .put(Field.NBOFCOMMENTS, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
+                                    .put(Mongo.ELSE, 0))));
         }
 
         return query.getAggregate();
@@ -683,7 +723,16 @@ public class DefaultCardService implements CardService {
                     .put(Field.BOARDID, 1)
                     .put(Field.PARENTID, 1)
                     .put(Field.LASTMODIFIERID, 1)
-                    .put(Field.LASTMODIFIERNAME, 1));
+                    .put(Field.LASTMODIFIERNAME, 1)
+                    .put(Field.LASTCOMMENT, new JsonObject()
+                            .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
+                    .put(Field.NBOFCOMMENTS, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
+                                    .put(Mongo.ELSE, 0))));
         }
 
         return query.getAggregate();

@@ -154,7 +154,7 @@ public class CardController extends ControllerHelper {
                             .onSuccess(result -> {
                                 eventStore.createAndStoreEvent(CREATE_MAGNET.name(), request);
                                 renderJson(request, result);
-                            });;
+                            });
                 }));
     }
 

@@ -129,6 +129,7 @@ public class BoardServiceTest {
                "            \"title\":1,\n" +
                "            \"imageUrl\":1,\n" +
                "            \"backgroundUrl\":1,\n" +
+               "            \"canComment\":1,\n" +
                "            \"nbCards\":1,\n" +
                "            \"nbCardsSections\":1,\n" +
                "            \"modificationDate\":1,\n" +

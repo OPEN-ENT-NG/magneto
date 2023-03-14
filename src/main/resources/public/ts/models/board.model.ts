@@ -23,6 +23,7 @@ export interface IBoardItemResponse {
     public: boolean;
     ownerId: string;
     ownerName: string;
+    canComment: boolean;
 }
 
 export interface IBoardsResponse {
@@ -53,6 +54,7 @@ export interface IBoardPayload {
     tags?: Array<string>;
     public?: boolean;
     layoutType?: LAYOUT_TYPE;
+    canComment?: boolean;
 }
 
 export interface ISection {
@@ -74,6 +76,7 @@ export class BoardForm {
     private _tags: Array<string>;
     private _tagsTextInput: string;
     private _layoutType: LAYOUT_TYPE;
+    private _canComment: boolean;
 
     constructor() {
         this._id = null;
@@ -88,6 +91,7 @@ export class BoardForm {
         this._tags = null;
         this._layoutType = LAYOUT_TYPE.FREE;
         this._tagsTextInput = null;
+        this._canComment = false;
     }
 
     build(board: Board): BoardForm {
@@ -101,6 +105,7 @@ export class BoardForm {
         this.tagsTextInput = board.tagsTextInput;
         this.public = board.public;
         this.layoutType = board.layoutType;
+        this.canComment = board.canComment;
         return this;
     }
 
@@ -201,6 +206,14 @@ export class BoardForm {
         this._public = value;
     }
 
+    get canComment(): boolean {
+        return this._canComment;
+    }
+
+    set canComment(value: boolean) {
+        this._canComment = value;
+    }
+
     isLayoutFree(): boolean {
         return this.layoutType == LAYOUT_TYPE.FREE;
     }
@@ -253,6 +266,10 @@ export class BoardForm {
             payload.public = this.public;
         }
 
+        if (this.canComment) {
+            payload.canComment = this.canComment;
+        }
+
         if (this.id && this.id != '') {
             payload.id = this.id;
         }
@@ -279,6 +296,7 @@ export class Board implements Shareable {
     private _folderId: string;
     private _public: boolean;
     private _deleted: boolean;
+    private _canComment: boolean;
 
 
     // Share resource properties
@@ -311,6 +329,7 @@ export class Board implements Shareable {
         this.owner = {userId: data.ownerId, displayName: data.ownerName};
         this.shared = data.shared;
         this._deleted = data.deleted;
+        this._canComment = data.canComment;
         return this;
     }
 
@@ -432,6 +451,14 @@ export class Board implements Shareable {
 
     isLayoutVertical(): boolean {
         return this.layoutType == LAYOUT_TYPE.VERTICAL;
+    }
+
+    get canComment(): boolean {
+        return this._canComment;
+    }
+
+    set canComment(value: boolean) {
+        this._canComment = value;
     }
 }
 

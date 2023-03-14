@@ -22,6 +22,7 @@ public class BoardPayload implements Model<BoardPayload> {
     private String modificationDate;
     private String folderId;
     private String layoutType;
+    private boolean canComment;
     private List<String> cardIds;
     private List<String> sectionIds;
 
@@ -43,6 +44,7 @@ public class BoardPayload implements Model<BoardPayload> {
         this.ownerName = board.getString(Field.OWNERNAME);
         this.folderId = board.getString(Field.FOLDERID);
         this.layoutType = board.getString(Field.LAYOUTTYPE);
+        this.canComment = board.getBoolean(Field.CANCOMMENT, false);
         this.cardIds = !board.getJsonArray(Field.CARDIDS, new JsonArray()).isEmpty() ?
                 board.getJsonArray(Field.CARDIDS, new JsonArray()).getList() : null;
         this.sectionIds = !board.getJsonArray(Field.SECTIONIDS, new JsonArray()).isEmpty() ?
@@ -143,6 +145,15 @@ public class BoardPayload implements Model<BoardPayload> {
 
     public BoardPayload setLayoutType(String layoutType) {
         this.layoutType = layoutType;
+        return this;
+    }
+
+    public boolean canComment() {
+        return canComment;
+    }
+
+    public BoardPayload setCanComment(boolean canComment) {
+        this.canComment = canComment;
         return this;
     }
 
@@ -279,6 +290,7 @@ public class BoardPayload implements Model<BoardPayload> {
             json.put(Field.LAYOUTTYPE, this.getLayoutType());
         }
 
+        json.put(Field.CANCOMMENT, this.canComment());
         json.put(Field.PUBLIC, this.isPublic());
         json.put(Field.MODIFICATIONDATE, this.getModificationDate());
 

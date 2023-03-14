@@ -1,7 +1,9 @@
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
+import {CardComment, ICardItemCommentResponse} from "./card-comment.model";
 
 export interface ICardItemResponse {
-    id: string;
+    id?: string;
+    _id?: string;
     title: string;
     description: string;
     caption: string;
@@ -19,6 +21,8 @@ export interface ICardItemResponse {
     boardTitle?: string;
     parentId: string;
     metadata: IMetadata;
+    lastComment?: ICardItemCommentResponse;
+    nbOfComments?: number;
 }
 
 export interface ICardsResponse {
@@ -248,9 +252,11 @@ export class Card {
     private _boardTitle: string;
     private _parentId: string;
     private _metadata: IMetadata;
+    private _nbOfComments: number;
+    private _lastComment: CardComment;
 
     build(data: ICardItemResponse): Card {
-        this._id = data.id;
+        this._id = data._id ? data._id : data.id;
         this._title = data.title;
         this._resourceId = data.resourceId;
         this._resourceType = data.resourceType;
@@ -268,6 +274,8 @@ export class Card {
         this._boardTitle = data.boardTitle;
         this._parentId = data.parentId;
         this._metadata = data.metadata;
+        this._nbOfComments = data.nbOfComments;
+        this._lastComment = new CardComment().build(data.lastComment);
         return this;
     }
 
@@ -377,6 +385,22 @@ export class Card {
 
     set resourceUrl(value: string) {
         this._resourceUrl = value;
+    }
+
+    get nbOfComments(): number {
+        return this._nbOfComments;
+    }
+
+    set nbOfComments(value: number) {
+        this._nbOfComments = value;
+    }
+
+    get lastComment(): CardComment {
+        return this._lastComment;
+    }
+
+    set lastComment(value: CardComment) {
+        this._lastComment = value;
     }
 
     isType = (resourceType: string): boolean => {

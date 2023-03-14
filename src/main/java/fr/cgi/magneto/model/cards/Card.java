@@ -27,6 +27,8 @@ public class Card implements Model<Card> {
     private String boardTitle;
     private boolean isLocked;
     private Metadata metadata;
+    private JsonObject lastComment;
+    private Integer nbOfComments;
 
 
     public Card(JsonObject card) {
@@ -46,6 +48,8 @@ public class Card implements Model<Card> {
         this.modificationDate = card.getString(Field.MODIFICATIONDATE);
         this.isLocked = card.getBoolean(Field.ISLOCKED, false);
         this.metadata = null;
+        this.lastComment = card.getJsonObject(Field.LASTCOMMENT, new JsonObject());
+        this.nbOfComments = card.getInteger(Field.NBOFCOMMENTS, 0);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -144,6 +148,15 @@ public class Card implements Model<Card> {
         return this;
     }
 
+    public JsonObject getLastComment() {
+        return lastComment;
+    }
+
+    public Card setLastComment(JsonObject lastComment) {
+        this.lastComment = lastComment;
+        return this;
+    }
+
     public String getParentId() {
         return parentId;
     }
@@ -216,10 +229,19 @@ public class Card implements Model<Card> {
         return this;
     }
 
+    public int getNbOfComments() {
+        return nbOfComments;
+    }
+
+    public Card setNbOfComments(int nbOfComments) {
+        this.nbOfComments = nbOfComments;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
 
-        JsonObject json = new JsonObject()
+        return new JsonObject()
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.RESOURCETYPE, this.getResourceType())
@@ -231,14 +253,14 @@ public class Card implements Model<Card> {
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.LASTMODIFIERID, this.getLastModifierId())
                 .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
+                .put(Field.LASTCOMMENT, this.getLastComment())
+                .put(Field.NBOFCOMMENTS, this.getNbOfComments())
                 .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.OWNERID, this.getOwnerId())
                 .put(Field.METADATA, this.getMetadata() != null ? this.getMetadata().toJson() : null)
                 .put(Field.OWNERNAME, this.getOwnerName())
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.PARENTID, this.getParentId());
-
-        return json;
     }
 
     @Override

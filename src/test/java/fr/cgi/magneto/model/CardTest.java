@@ -21,11 +21,13 @@ public class CardTest {
             .put("lastModifierId", "lastModifierId")
             .put("creationDate", "creationDate")
             .put("modificationDate", "modificationDate")
+            .put("nbOfComments", 0)
             .put("creationDate", "creationDate")
             .put("ownerId", "ownerId")
             .put("ownerName", "ownerName")
             .put("boardId", "boardId")
             .put("isLocked", false)
+            .put("lastComment", new JsonObject())
             .putNull("metadata")
             .putNull("parentId")
             .put("caption", "caption");

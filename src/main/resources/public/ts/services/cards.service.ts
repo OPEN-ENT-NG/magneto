@@ -18,7 +18,7 @@ export interface ICardsService {
 
     getAllCardsBySection(params: ICardsSectionParamsRequest): Promise<Cards>;
 
-    getCardById(params): Promise<Card>;
+    getCardById(id: string): Promise<Card>;
 
     createCard(params: CardForm): Promise<AxiosResponse>;
 

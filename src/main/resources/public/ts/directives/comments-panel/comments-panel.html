@@ -1,0 +1,35 @@
+<div class="magneto-comments-panel" ng-class="{'opened': vm.isOpened}">
+    <div class="magneto-comments-panel-list" ng-if="vm.isOpened">
+
+        <div class="magneto-comments-panel-list-header">
+            <span class="magneto-comments-panel-list-header-title">
+                <i18n>magneto.comments</i18n>
+            </span>
+            <i class="magneto-close" ng-click="vm.closePanel()"></i>
+        </div>
+
+        <div class="magneto-comments-panel-list-items">
+            <div class="magneto-comments-panel-list-items-item" ng-repeat="comment in vm.comments">
+                <card-comment
+                        card-id="vm.cardId"
+                        comment="comment"
+                        on-delete="vm.onCommentDelete">
+                </card-comment>
+            </div>
+        </div>
+
+        <comment-input
+                card-id="vm.cardId"
+                on-submit="vm.onCommentSubmit">
+        </comment-input>
+    </div>
+    <span class="magneto-comments-panel-button" ng-click="vm.togglePanel()">
+        <i class="magneto-comment-outline" aria-hidden="true"></i>
+        <span class="magneto-comments-panel-button-count">[[vm.nbOfComments]]</span>
+    </span>
+
+    <infinite-scroll scrolled="vm.onScroll()"
+                     loading-mode="false"
+                     scroll-eventer="vm.infiniteScrollService">
+    </infinite-scroll>
+</div>

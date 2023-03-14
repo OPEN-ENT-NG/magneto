@@ -68,6 +68,10 @@ public class ServiceFactory {
         return new DefaultWorkspaceService(vertx);
     }
 
+    public CommentService commentService() {
+        return new DefaultCommentService(CollectionsConstant.CARD_COLLECTION, mongoDb);
+    }
+
     // Helpers
     public EventBus eventBus() {
         return this.vertx.eventBus();

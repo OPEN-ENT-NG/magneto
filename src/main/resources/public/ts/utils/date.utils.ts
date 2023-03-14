@@ -57,17 +57,31 @@ export class DateUtils {
                 resultDate = formatDate.format(format);
             }
         } else if (this.moreThan(formatDate, HOURS)) {
-            resultDate = I18nUtils.getWithParams("magneto.card.time.hours", [now.diff(formatDate, HOURS).toString()]);
+            resultDate = this.getTimeText(HOURS, formatDate);
         } else if (this.moreThan(formatDate, MINUTES)) {
-            resultDate = I18nUtils.getWithParams("magneto.card.time.minutes", [now.diff(formatDate, MINUTES).toString()]);
+            resultDate = this.getTimeText(MINUTES, formatDate);
         } else if (this.moreThan(formatDate, SECONDS)) {
-            resultDate = I18nUtils.getWithParams("magneto.card.time.seconds", [now.diff(formatDate, SECONDS).toString()]);
+            resultDate = this.getTimeText(SECONDS, formatDate);
         }
         return resultDate;
     }
 
+    private static getTimeText(type: string, formatDate: Moment): string {
+        if (type != HOURS && type != MINUTES && type != SECONDS)
+            return;
+
+        let timeLength: number = moment().diff(formatDate, type);
+
+        return (timeLength == 1) ? I18nUtils.getWithParams("magneto.card.time.one." + type, [timeLength.toString()]) :
+            I18nUtils.getWithParams("magneto.card.time." + type, [timeLength.toString()]);
+    }
+
     private static moreThan(date: any, format: string): boolean {
         return moment().diff(moment(date), format) > 0;
+    }
+
+    static getCurrentDate(format: string): string {
+        return moment(new Date()).format(format);
     }
 
 }

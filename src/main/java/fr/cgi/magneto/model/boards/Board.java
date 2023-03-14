@@ -33,6 +33,8 @@ public class Board implements Model<Board> {
     private List<String> tags;
     private String layoutType;
 
+    private boolean canComment;
+
     @SuppressWarnings("unchecked")
     public Board(JsonObject board) {
         this._id = board.getString(Field._ID, null);
@@ -46,6 +48,7 @@ public class Board implements Model<Board> {
         this.folderId = board.getString(Field.FOLDERID);
         this.modificationDate = board.getString(Field.MODIFICATIONDATE);
         this.layoutType = board.getString(Field.LAYOUTTYPE);
+        this.canComment = board.getBoolean(Field.CANCOMMENT, false);
         JsonArray sectionsArray = new JsonArray(((List<String>) board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList())
                 .stream()
                 .map(id -> new JsonObject().put(Field._ID, id))
@@ -238,6 +241,15 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    public boolean canComment() {
+        return this.canComment;
+    }
+
+    public Board setCanComment(boolean canComment) {
+        this.canComment = canComment;
+        return this;
+    }
+
     public boolean isLayoutFree() {
         return this.layoutType.equals(Field.FREE);
     }
@@ -279,6 +291,7 @@ public class Board implements Model<Board> {
                 .put(Field.OWNERNAME, this.getOwnerName())
                 .put(Field.SHARED, this.shared)
                 .put(Field.LAYOUTTYPE, this.getLayoutType())
+                .put(Field.CANCOMMENT, this.canComment())
                 .put(Field.TAGS, this.tags());
     }
 

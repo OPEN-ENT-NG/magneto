@@ -55,11 +55,17 @@ public class Field {
     public static final String FOLDERS = "folders";
     public static final String TAGS = "tags";
 
+    public static final String CONTENT = "content";
+
     public static final String LAYOUTTYPE = "layoutType";
+
+    public static final String CANCOMMENT = "canComment";
 
     public static final String OWNER = "owner";
     public static final String USERID = "userId";
     public static final String GROUPID = "groupId";
+
+    public static final String COMMENTS = "comments";
 
     // PAGE FIELD
     public static final String COUNT = "count";
@@ -78,6 +84,8 @@ public class Field {
     public static final String RESOURCEURL = "resourceUrl";
     public static final String LASTMODIFIERID = "lastModifierId";
     public static final String LASTMODIFIERNAME = "lastModifierName";
+    public static final String LASTCOMMENT = "lastComment";
+    public static final String NBOFCOMMENTS = "nbOfComments";
     public static final String CAPTION = "caption";
     public static final String ISLOCKED = "isLocked";
     public static final String LOCKED = "locked";
@@ -112,9 +120,13 @@ public class Field {
 
     public static final String CARD = "card";
 
+    public static final String CARDID = "cardId";
+
     public static final String CARDS = "cards";
 
     public static final String BOARD = "board";
+
+    public static final String COMMENTID = "commentId";
 
     // AUTH
     public static final String CODE = "code";

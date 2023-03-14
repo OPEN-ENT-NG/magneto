@@ -33,6 +33,9 @@
     "layoutType": {
       "type": "string"
     },
+    "canComment": {
+      "type": "boolean"
+    },
     "cardIds": {
       "type": "array",
       "items": {

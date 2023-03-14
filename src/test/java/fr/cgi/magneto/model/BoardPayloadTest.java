@@ -14,6 +14,7 @@ public class BoardPayloadTest {
             .put("title", "title")
             .put("imageUrl", "imageUrl")
             .put("backgroundUrl", "backgroundUrl")
+            .put("canComment", false)
             .put("description", "description")
             .put("ownerId", "ownerId")
             .put("ownerName", "ownerName")
@@ -29,6 +30,7 @@ public class BoardPayloadTest {
             .put("title", "title")
             .put("imageUrl", "imageUrl")
             .put("backgroundUrl", "backgroundUrl")
+            .put("canComment", false)
             .put("description", "description")
             .put("modificationDate", "modificationDate")
             .put("public", false);

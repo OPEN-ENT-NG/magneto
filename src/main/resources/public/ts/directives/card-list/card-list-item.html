@@ -42,21 +42,22 @@
                     card="vm.card">
             </card-list-item-preview>
             <!--Card infos-->
-            <div ng-if="vm.hasCaption" class="card-list-item-infos-caption flex-row">
+            <div class="card-list-item-infos-footer flex-row" ng-if="vm.hasCaption">
                 <!-- Card caption -->
-                <span tooltip="[[vm.card.caption]]" ng-if="!!vm.card.caption" class="card-list-item-infos-caption-tooltip">
+                <span tooltip="[[vm.card.caption]]" class="card-list-item-infos-footer-caption">
                     [[vm.card.caption]]
                 </span>
-            </div>
-            <div class="card-list-item-infos-locked">
-                <i ng-if="vm.card.locked" class="magneto-lock" aria-hidden="true" tooltip="magneto.card.locked.tooltip"></i>
+                <div class="card-list-item-infos-footer-locked">
+                    <i ng-if="vm.card.locked" class="magneto-lock" aria-hidden="true" tooltip="magneto.card.locked.tooltip"></i>
+                </div>
             </div>
         </div>
         <card-item-comments
                 ng-if="vm.hasComments"
                 card="vm.card"
                 card-update-eventer="vm.cardUpdateEventer"
-                board-owner="vm.boardOwner">
+                board-owner="vm.boardOwner"
+                selector-resize="vm.selectorResize">
         </card-item-comments>
     </div>
 </div>

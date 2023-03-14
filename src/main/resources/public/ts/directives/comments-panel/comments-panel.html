@@ -11,9 +11,12 @@
         <div class="magneto-comments-panel-list-items">
             <div class="magneto-comments-panel-list-items-item" ng-repeat="comment in vm.comments">
                 <card-comment
+                        ng-if="vm.boardOwner"
                         card-id="vm.cardId"
                         comment="comment"
-                        on-delete="vm.onCommentDelete">
+                        on-delete="vm.onCommentDelete"
+                        board-owner="vm.boardOwner"
+                        selector-resize="vm.selectorResize">
                 </card-comment>
             </div>
         </div>

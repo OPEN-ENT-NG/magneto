@@ -191,7 +191,8 @@
         <card-preview-lightbox
                 card="vm.selectedCard"
                 display="vm.displayPreviewCardLightbox"
-                show-comments="vm.board.canComment">
+                show-comments="vm.board.canComment"
+                board-owner="vm.board.owner">
         </card-preview-lightbox>
 
         <infinite-scroll ng-if="vm.board.isLayoutFree()"

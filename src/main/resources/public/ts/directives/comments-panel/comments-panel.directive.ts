@@ -7,6 +7,7 @@ import {safeApply} from "../../utils/safe-apply.utils";
 import {AxiosError} from "axios";
 import {InfiniteScrollService} from "../../shared/services";
 import {Subject} from "rxjs";
+import {IBoardOwner} from "../../models";
 
 interface IViewModel extends ng.IController, ICommentsPanelProps {
     comments: CardComment[];
@@ -16,9 +17,6 @@ interface IViewModel extends ng.IController, ICommentsPanelProps {
     filter: {
         page: number;
     }
-
-    changePageEventer: Subject<string>;
-
 
     infiniteScrollService: InfiniteScrollService;
 
@@ -32,6 +30,9 @@ interface IViewModel extends ng.IController, ICommentsPanelProps {
 
 interface ICommentsPanelProps {
     cardId: string;
+    selectorResize: string;
+    changePageEventer: Subject<string>;
+    boardOwner: IBoardOwner;
 }
 
 interface ICommentsPanelScope extends IScope, ICommentsPanelProps {
@@ -44,6 +45,8 @@ class Controller implements IViewModel {
     isOpened: boolean;
     comments: CardComment[];
     nbOfComments: number;
+    boardOwner: IBoardOwner;
+
 
     filter: {
         page: number;
@@ -52,6 +55,8 @@ class Controller implements IViewModel {
     changePageEventer: Subject<string>;
 
     infiniteScrollService: InfiniteScrollService;
+    selectorResize: string;
+
 
     constructor(private $scope: ICommentsPanelScope,
                 private $location: ILocationService,
@@ -137,7 +142,9 @@ function directive($parse: IParseService) {
         templateUrl: `${RootsConst.directive}comments-panel/comments-panel.html`,
         scope: {
             cardId: '=',
-            changePageEventer: '='
+            changePageEventer: '=',
+            boardOwner: '=',
+            selectorResize: '='
         },
         controllerAs: 'vm',
         bindToController: true,

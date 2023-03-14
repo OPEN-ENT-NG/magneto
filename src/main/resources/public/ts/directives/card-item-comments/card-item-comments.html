@@ -6,10 +6,12 @@
     </div>
     <div class="card-item-comments-last" ng-if="vm.card.lastComment">
         <card-comment
-            card-id="vm.card.id"
-            comment="vm.card.lastComment"
-            on-delete="vm.onCommentDelete"
-            board-owner="vm.boardOwner">
+                ng-if="vm.boardOwner"
+                card-id="vm.card.id"
+                comment="vm.card.lastComment"
+                on-delete="vm.onCommentDelete"
+                board-owner="vm.boardOwner"
+                selector-resize="vm.selectorResize">
         </card-comment>
     </div>
     <div class="card-item-comments-content">

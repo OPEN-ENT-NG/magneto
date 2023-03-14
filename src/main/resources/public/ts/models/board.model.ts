@@ -231,7 +231,7 @@ export class BoardForm {
         if (this.title) {
             payload.title = this.title;
         }
-        if (this.description) {
+        if (this.description != null) {
             payload.description = this.description;
         }
         if (this.imageUrl) {

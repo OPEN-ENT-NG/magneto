@@ -6,6 +6,7 @@ import {cardsService, sectionsService} from "../../services";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {AxiosError} from "axios";
 import {InfiniteScrollService} from "../../shared/services";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ISectionListItemProps {
     openEdit?(card: Card): void;
@@ -39,7 +40,6 @@ interface IViewModel extends ng.IController, ISectionListItemProps {
     onLoaded(): void;
 
     isDisplayedOptions: boolean;
-
 }
 
 interface ISectionListItemProps {
@@ -53,6 +53,7 @@ interface ISectionListItemProps {
     onTransfer?;
     onMove?;
     onLock?;
+    cardUpdateEventer: Subject<void>;
 }
 
 interface ISectionListItemScope extends IScope, ISectionListItemProps {
@@ -70,6 +71,7 @@ class Controller implements IViewModel {
     isLoading: boolean;
     isDisplayedOptions: boolean;
     isDomLoaded: boolean;
+    cardUpdateEventer: Subject<void>;
 
 
     constructor(private $scope: ISectionListItemScope) {
@@ -163,7 +165,8 @@ function directive($parse: IParseService) {
             onPreview: '&',
             onTransfer: '&',
             onMove: '&',
-            onLock: '&'
+            onLock: '&',
+            cardUpdateEventer: '='
         },
         controllerAs: 'vm',
         bindToController: true,

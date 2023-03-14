@@ -10,6 +10,7 @@ interface IViewModel extends ng.IController, ICardPreviewProps {
 interface ICardPreviewProps {
     display: boolean;
     card: Card;
+    showComments: boolean;
 }
 
 interface ICardPreviewScope extends IScope, ICardPreviewProps {
@@ -20,6 +21,7 @@ class Controller implements IViewModel {
 
     display: boolean;
     card: Card;
+    showComments: boolean;
 
 
     constructor(private $scope: ICardPreviewScope) {
@@ -43,7 +45,8 @@ function directive() {
         templateUrl: `${RootsConst.directive}card-preview-lightbox/card-preview-lightbox.html`,
         scope: {
             display: '=',
-            card: '='
+            card: '=',
+            showComments: '='
         },
         controllerAs: 'vm',
         bindToController: true,

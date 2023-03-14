@@ -37,7 +37,9 @@
             on-transfer="vm.openTransfer"
             has-lock="vm.board.myRights.publish !== undefined"
             on-lock="vm.openLock"
-            on-loaded="vm.onLoaded">
+            on-loaded="vm.onLoaded"
+            card-update-eventer="vm.cardUpdateEventer"
+            has-comments="vm.board.canComment">
     </card-list>
 
     <infinite-scroll scrolled="vm.onScroll()"

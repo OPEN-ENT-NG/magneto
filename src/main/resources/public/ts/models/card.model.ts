@@ -275,7 +275,8 @@ export class Card {
         this._parentId = data.parentId;
         this._metadata = data.metadata;
         this._nbOfComments = data.nbOfComments;
-        this._lastComment = new CardComment().build(data.lastComment);
+        this._lastComment = (data.nbOfComments != null && data.nbOfComments > 0) ?
+                            new CardComment().build(data.lastComment) : null;
         return this;
     }
 

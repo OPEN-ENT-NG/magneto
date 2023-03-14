@@ -12,7 +12,8 @@
             on-preview="vm.openPreview"
             on-transfer="vm.openTransfer"
             on-lock="vm.openLock"
-            class="scrollbar sections-list-content sections-list-content-[[vm.board.layoutType]]">
+            class="scrollbar sections-list-content sections-list-content-[[vm.board.layoutType]]"
+            card-update-eventer="vm.cardUpdateEventer">
     </section-list-item>
     <div ng-if="vm.board.myRights.publish !== undefined"
          class="sections-list-content sections-list-content-[[vm.board.layoutType]]">

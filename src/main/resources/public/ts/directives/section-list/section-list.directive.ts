@@ -3,6 +3,7 @@ import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board, Card, ISectionBoardParamsRequest, Section, SectionForm} from "../../models";
 import {sectionsService} from "../../services";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ISectionListProps {
     openEdit?(card: Card): void;
@@ -41,6 +42,7 @@ interface ISectionListProps {
     onMove?;
     onSubmit?;
     onLock?;
+    cardUpdateEventer: Subject<void>;
 }
 
 interface ISectionListScope extends IScope, ISectionListProps {
@@ -54,6 +56,7 @@ class Controller implements IViewModel {
 
     selectedSection: Section;
     displayDeleteSectionLightbox: boolean;
+    cardUpdateEventer: Subject<void>;
 
 
     constructor(private $scope: ISectionListScope,
@@ -112,7 +115,8 @@ function directive($parse: IParseService) {
             onTransfer: '&',
             onMove: '&',
             onSubmit: '&',
-            onLock: '&'
+            onLock: '&',
+            cardUpdateEventer: '='
         },
         controllerAs: 'vm',
         bindToController: true,

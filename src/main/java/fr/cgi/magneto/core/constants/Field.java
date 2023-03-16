@@ -159,4 +159,6 @@ public class Field {
     public static final String SECTION = "section";
     public static final String SECTIONS = "sections";
     public static final String NBCARDSSECTIONS = "nbCardsSections";
+
+    public static final String BOARDURL = "boardUrl";
 }

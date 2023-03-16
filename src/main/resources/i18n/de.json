@@ -181,5 +181,7 @@
   "magneto.dropzone.overlay.label": "Déposez le fichier",
   "magneto.dropzone.overlay.warning": "Il est impossible d'importer un dossier",
   "magneto.dropzone.overlay.solution": "Veuillez importer un <b>fichier</b>",
-  "magneto.dropzone.overlay.action": "J'ai compris"
+  "magneto.dropzone.overlay.action": "J'ai compris",
+  "magneto.shared.push.notif.body": "shared a board with you"
+
 }

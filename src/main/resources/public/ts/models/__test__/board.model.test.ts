@@ -110,7 +110,8 @@ describe('BoardModel', () => {
             description: 'description',
             layoutType: LAYOUT_TYPE.FREE,
             imageUrl: 'imageUrl',
-            backgroundUrl: 'backgroundUrl'
+            backgroundUrl: 'backgroundUrl',
+            canComment: true
         }
 
         const formJSON2 = {
@@ -119,7 +120,8 @@ describe('BoardModel', () => {
             description: 'description',
             layoutType: LAYOUT_TYPE.FREE,
             imageUrl: 'imageUrl',
-            backgroundUrl: 'backgroundUrl'
+            backgroundUrl: 'backgroundUrl',
+            canComment: true
         }
 
         let form = new BoardForm();
@@ -127,6 +129,7 @@ describe('BoardModel', () => {
         form.description = 'description';
         form.imageUrl = 'imageUrl';
         form.backgroundUrl = 'backgroundUrl';
+        form.canComment = true;
         expect(form.toJSON()).toEqual(formJSON1);
         form.id = 'id';
         expect(form.toJSON()).toEqual(formJSON2);

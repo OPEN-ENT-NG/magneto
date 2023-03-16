@@ -1,7 +1,7 @@
 import {angular, model, ng} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {BoardForm, Card} from "../../models";
+import {BoardForm, Card, IBoardOwner} from "../../models";
 import {create} from 'sortablejs';
 import {boardsService} from "../../services";
 import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
@@ -65,6 +65,7 @@ interface ICardListProps {
 
     hasComments: boolean;
     simpleView: boolean;
+    boardOwner: IBoardOwner;
 }
 
 interface ICardListScope extends IScope, ICardListProps {
@@ -96,6 +97,7 @@ class Controller implements IViewModel {
     hasLock: boolean;
     hasComments: boolean;
     simpleView: boolean;
+    boardOwner: IBoardOwner;
 
 
     constructor(private $scope: ICardListScope,
@@ -179,7 +181,8 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
             selectorIdentifier: '=',
             cardUpdateEventer: '=',
             hasComments: '=',
-            simpleView: '='
+            simpleView: '=',
+            boardOwner: '='
         },
         controllerAs: 'vm',
         bindToController: true,

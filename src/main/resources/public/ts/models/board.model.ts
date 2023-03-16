@@ -62,6 +62,11 @@ export interface ISection {
     cardIds?: Array<string>;
 }
 
+export interface IBoardOwner {
+    userId: string;
+    displayName: string;
+}
+
 
 export class BoardForm {
     private _id: string;
@@ -266,7 +271,7 @@ export class BoardForm {
             payload.public = this.public;
         }
 
-        if (this.canComment) {
+        if (this.canComment != null) {
             payload.canComment = this.canComment;
         }
 
@@ -301,7 +306,7 @@ export class Board implements Shareable {
 
     // Share resource properties
     public shared: any[];
-    public owner: { userId: string, displayName: string };
+    public owner: IBoardOwner;
     public myRights: any;
 
 

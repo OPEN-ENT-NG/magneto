@@ -1,7 +1,7 @@
 import {angular, ng} from "entcore";
 import {IAugmentedJQuery, ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Card} from "../../models";
+import {Card, IBoardOwner} from "../../models";
 import {DateUtils} from "../../utils/date.utils";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {safeApply} from "../../utils/safe-apply.utils";
@@ -59,6 +59,7 @@ interface ICardListItemProps {
     onLock?;
     cardUpdateEventer: Subject<void>;
     hasComments: boolean;
+    boardOwner: IBoardOwner;
 }
 
 interface ICardListItemScope extends IScope, ICardListItemProps {
@@ -86,6 +87,7 @@ class Controller implements IViewModel {
     isSelected: boolean;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
     cardUpdateEventer: Subject<void>;
+    boardOwner: IBoardOwner;
 
     constructor(private $scope: ICardListItemScope,
                 private $location: ILocationService,
@@ -150,7 +152,8 @@ function directive($parse: IParseService) {
             onLock: '&',
             selectorResize: '=',
             cardUpdateEventer: '=',
-            hasComments: '='
+            hasComments: '=',
+            boardOwner: '='
         },
         controllerAs: 'vm',
         bindToController: true,

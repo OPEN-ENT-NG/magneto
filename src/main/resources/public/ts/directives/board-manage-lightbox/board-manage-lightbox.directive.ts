@@ -3,6 +3,7 @@ import {ILocationService, IScope, IWindowService, IParseService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {boardsService} from "../../services";
 import {BoardForm} from "../../models";
+import {hasRight} from "../../utils/rights.utils";
 
 interface IViewModel extends ng.IController, IBoardManageProps {
     submitBoard?(): Promise<void>;
@@ -10,6 +11,8 @@ interface IViewModel extends ng.IController, IBoardManageProps {
     isFormValid(): boolean;
 
     closeForm(): void;
+
+    hasRight: typeof hasRight;
 }
 
 interface IBoardManageProps {
@@ -31,7 +34,7 @@ class Controller implements IViewModel {
     form: BoardForm;
     folderId: string;
     onSubmit: () => void;
-
+    hasRight: typeof hasRight = hasRight;
 
     constructor(private $scope: IBoardManageScope,
                 private $location: ILocationService,

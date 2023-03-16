@@ -2,13 +2,16 @@ package fr.cgi.magneto.controller;
 
 import fr.cgi.magneto.core.constants.*;
 import fr.cgi.magneto.model.comments.*;
+import fr.cgi.magneto.security.*;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.rs.*;
+import fr.wseduc.security.*;
 import fr.wseduc.webutils.request.*;
 import io.vertx.core.*;
 import io.vertx.core.http.*;
 import io.vertx.core.json.*;
 import org.entcore.common.controller.*;
+import org.entcore.common.http.filter.*;
 import org.entcore.common.user.*;
 
 import java.util.*;
@@ -24,7 +27,8 @@ public class CommentController extends ControllerHelper {
 
     @Get("/card/:cardId/comments")
     @ApiDoc("Get all comments of a card")
-    //TODO droits MAG-170
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getAllComments(HttpServerRequest request) {
         String cardId = request.getParam(Field.CARDID);
 
@@ -60,7 +64,8 @@ public class CommentController extends ControllerHelper {
 
     @Post("/card/:cardId/comment")
     @ApiDoc("Create a comment")
-    //TODO droits MAG-170
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void addComment(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "comment", body ->
                 UserUtils.getUserInfos(eb, request, user -> {
@@ -84,7 +89,8 @@ public class CommentController extends ControllerHelper {
 
     @Put("/card/:cardId/comment/:commentId")
     @ApiDoc("Update a comment")
-    //TODO droits MAG-170
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void updateComment(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "commentUpdate", body ->
         UserUtils.getUserInfos(eb, request, user -> {
@@ -106,7 +112,8 @@ public class CommentController extends ControllerHelper {
 
     @Delete("/card/:cardId/comment/:commentId")
     @ApiDoc("Delete a comment")
-    //TODO droits MAG-170
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void deleteComment(HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             String cardId = request.getParam(Field.CARDID);

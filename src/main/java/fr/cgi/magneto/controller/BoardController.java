@@ -4,8 +4,7 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
-import fr.cgi.magneto.helper.DateHelper;
-import fr.cgi.magneto.helper.I18nHelper;
+import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.security.*;
@@ -136,6 +135,10 @@ public class BoardController extends ControllerHelper {
         RequestUtils.bodyToJson(request, pathPrefix + "board", board ->
                 UserUtils.getUserInfos(eb, request, user -> {
                             I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+                            boolean hasCommRight = WorkflowHelper.hasRight(user, Rights.COMMENT_BOARD);
+                            if (!hasCommRight) {
+                                board.remove(Field.CANCOMMENT);
+                            }
                             boardService.create(user, board, true, i18nHelper)
                                     .onFailure(err -> renderError(request))
                                     .onSuccess(result -> {
@@ -175,6 +178,10 @@ public class BoardController extends ControllerHelper {
                 boardService.getBoards(Collections.singletonList(boardId))
                         .compose(boards -> {
                             if (!boards.isEmpty()) {
+                                boolean hasCommRight = WorkflowHelper.hasRight(user, Rights.COMMENT_BOARD);
+                                if (!hasCommRight) {
+                                    board.remove(Field.CANCOMMENT);
+                                }
                                 BoardPayload updateBoard = new BoardPayload(board)
                                         .setId(boardId)
                                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));

@@ -1,6 +1,8 @@
 package fr.cgi.magneto.service.impl;
 
+import com.mongodb.*;
 import fr.cgi.magneto.core.constants.*;
+import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.*;
 import fr.cgi.magneto.model.comments.*;
@@ -159,27 +161,53 @@ public class DefaultCommentService implements CommentService {
     public Future<Void> deleteComment(String userId, String cardId, String commentId) {
         Promise<Void> promise = Promise.promise();
 
-        JsonObject query = new JsonObject()
-                .put(Field._ID, cardId);
+        this.getBoardOwnerId(cardId)
+                .onFailure(promise::fail)
+                .onSuccess(boardOwnerId -> {
+                    JsonObject query = new JsonObject()
+                            .put(Field._ID, cardId);
 
-        JsonObject update = new JsonObject()
-                .put(Mongo.PULL, new JsonObject()
-                        .put(Field.COMMENTS, new JsonObject()
-                                .put(Field._ID, commentId)
-                                .put(Field.OWNERID, userId)
-                        )
-                );
+                    JsonObject filter = new JsonObject()
+                            .put(Field._ID, commentId);
+                    if (!boardOwnerId.equals(userId)) {
+                        filter.put(Field.OWNERID, userId);
+                    }
 
-        mongoDb.update(this.collection, query, update, MongoDbResult.validActionResultHandler(results -> {
-            if (results.isLeft()) {
-                String message = String.format("[Magneto@%s::deleteComment] Failed to delete comment", this.getClass().getSimpleName());
+                    JsonObject update = new JsonObject()
+                            .put(Mongo.PULL, new JsonObject()
+                                    .put(Field.COMMENTS, filter)
+                            );
 
-                log.error(String.format("%s : %s", message, results.left().getValue()));
+                    mongoDb.update(this.collection, query, update, MongoDbResult.validActionResultHandler(results -> {
+                        if (results.isLeft()) {
+                            String message = String.format("[Magneto@%s::deleteComment] Failed to delete comment", this.getClass().getSimpleName());
+                            log.error(String.format("%s : %s", message, results.left().getValue()));
+                            promise.fail(message);
+                            return;
+                        }
+                        promise.complete();
+                    }));
+                });
+
+        return promise.future();
+    }
+
+
+    private Future<String> getBoardOwnerId(String cardId) {
+        Promise<String> promise = Promise.promise();
+
+        QueryBuilder matcher = QueryBuilder.start(Field.CARDIDS).is(cardId);
+
+        mongoDb.findOne(CollectionsConstant.BOARD_COLLECTION, MongoQueryBuilder.build(matcher), MongoDbResult.validResultHandler(result -> {
+            if (result.isLeft()) {
+                String message = String.format("[Magneto@%s::getBoardOwnerId] Failed to get board owner id", this.getClass().getSimpleName());
+                log.error(String.format("%s. %s", message, result.left().getValue()));
                 promise.fail(message);
                 return;
             }
-            promise.complete();
+            promise.complete(result.right().getValue().getString(Field.OWNERID));
         }));
+
         return promise.future();
     }
 

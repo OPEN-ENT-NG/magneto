@@ -6,6 +6,7 @@ import {DateUtils} from "../../utils/date.utils";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {KEYCODE} from "../../core/constants/keycode.const";
 import {commentsService} from "../../services";
+import {IBoardOwner} from "../../models";
 
 interface IViewModel extends ng.IController, ICardCommentProps {
     isDisplayedCommentOptions: boolean;
@@ -25,6 +26,7 @@ interface IViewModel extends ng.IController, ICardCommentProps {
     formatDateModification(date: string): string;
 
     isMyComment(): boolean;
+    canDeleteComment(): boolean;
 
     onDeleteFormSubmit?(commentId: string): void;
 
@@ -37,6 +39,7 @@ interface ICardCommentProps {
     comment: CardComment;
     cardId: string;
     onDelete?;
+    boardOwner: IBoardOwner;
 }
 
 interface ICardCommentScope extends IScope, ICardCommentProps {
@@ -51,6 +54,7 @@ class Controller implements IViewModel {
     isDisplayedCommentOptions: boolean;
     isUpdateComment: boolean;
     displayDeleteCommentLightbox: boolean;
+    boardOwner: IBoardOwner;
 
 
     constructor(private $scope: ICardCommentScope,
@@ -90,6 +94,10 @@ class Controller implements IViewModel {
         return this.comment ? (this.comment.ownerId === model.me.userId) : false;
     }
 
+    canDeleteComment(): boolean {
+      return this.isMyComment() || (this.boardOwner.userId === model.me.userId);
+    }
+
     updateComment = async ($event: JQueryEventObject): Promise<void> => {
         if ($event.keyCode == KEYCODE.ENTER) {
             commentsService.updateComment(this.cardId, this.comment.id, this.updateCommentContent)
@@ -112,7 +120,8 @@ function directive($parse: IParseService) {
         scope: {
             comment: '=',
             cardId: '=',
-            onDelete: '&'
+            onDelete: '&',
+            boardOwner: '='
         },
         controllerAs: 'vm',
         bindToController: true,

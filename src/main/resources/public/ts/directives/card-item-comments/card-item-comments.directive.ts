@@ -3,7 +3,7 @@ import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {KEYCODE} from "../../core/constants/keycode.const";
 import {cardsService, commentsService} from "../../services";
-import {Card} from "../../models";
+import {Card, IBoardOwner} from "../../models";
 import {CardComment} from "../../models/card-comment.model";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {DateUtils} from "../../utils/date.utils";
@@ -17,6 +17,7 @@ interface IViewModel extends ng.IController, ICardItemCommentsProps {
 interface ICardItemCommentsProps {
     card: Card;
     cardUpdateEventer: Subject<void>;
+    boardOwner: IBoardOwner;
 }
 
 interface ICardItemCommentsScope extends IScope, ICardItemCommentsProps {
@@ -27,7 +28,7 @@ class Controller implements IViewModel {
 
     card: Card;
     cardUpdateEventer: Subject<void>;
-
+    boardOwner: IBoardOwner;
 
     constructor(private $scope: ICardItemCommentsScope,
                 private $location: ILocationService,
@@ -67,7 +68,8 @@ function directive($parse: IParseService) {
         templateUrl: `${RootsConst.directive}card-item-comments/card-item-comments.html`,
         scope: {
             card: '=',
-            cardUpdateEventer: '='
+            cardUpdateEventer: '=',
+            boardOwner: '='
         },
         controllerAs: 'vm',
         bindToController: true,

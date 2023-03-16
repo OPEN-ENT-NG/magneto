@@ -16,6 +16,7 @@ export const rights = {
     workflow: {
         view: 'fr.cgi.magneto.controller.MagnetoController|view',
         manage: 'fr.cgi.magneto.controller.BoardController|create',
-        publish: 'fr.cgi.magneto.controller.FakeRight|boardPublish'
+        publish: 'fr.cgi.magneto.controller.FakeRight|boardPublish',
+        comment: 'fr.cgi.magneto.controller.FakeRight|boardComment'
     }
 };

@@ -1,4 +1,4 @@
-import {angular, ng} from "entcore";
+import {angular, model, ng} from "entcore";
 import {IAugmentedJQuery, ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Card, IBoardOwner} from "../../models";
@@ -13,6 +13,8 @@ interface IViewModel extends ng.IController, ICardListItemProps {
     formatDateModification(date: string): string;
 
     hasOptions(): boolean;
+
+    isMyCard(card: Card): boolean;
 
     openEdit?(card: Card): void;
 
@@ -118,6 +120,10 @@ class Controller implements IViewModel {
 
     getLastUserName = (card: Card): string => {
         return !!card.lastModifierName ? card.lastModifierName : card.ownerName;
+    }
+
+    isMyCard = (card: Card): boolean => {
+        return card.ownerId === model.me.userId;
     }
 
     hasOptions = (): boolean => {

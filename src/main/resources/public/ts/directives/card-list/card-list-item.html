@@ -15,7 +15,7 @@
                     options="vm.card"
                     has-edit="vm.hasEdit"
                     on-edit="vm.openEdit"
-                    has-delete="vm.hasDelete"
+                    has-delete="vm.hasDelete || vm.isMyCard(vm.card)"
                     on-delete="vm.openDelete"
                     has-hide="vm.hasHide"
                     on-hide="vm.openHide"

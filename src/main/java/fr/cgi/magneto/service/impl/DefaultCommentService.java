@@ -169,7 +169,7 @@ public class DefaultCommentService implements CommentService {
 
                     JsonObject filter = new JsonObject()
                             .put(Field._ID, commentId);
-                    if (!boardOwnerId.equals(userId)) {
+                    if (boardOwnerId == null || !boardOwnerId.equals(userId)) {
                         filter.put(Field.OWNERID, userId);
                     }
 

@@ -62,13 +62,14 @@ public class ShareBoardController extends ControllerHelper {
                 JsonObject params = new JsonObject();
                 params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                 params.put(Field.USERNAME, user.getUsername());
+                params.put(Field.BOARDURL, "/magneto#/board/view/" + id);
 
                 JsonObject pushNotif = new JsonObject()
                         .put(Field.TITLE, "push.notif.magneto.share")
                         .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
                 params.put(Field.PUSHNOTIF, pushNotif);
 
-                shareResource(request, "magneto.share", false, params, Field.TITLE);
+                shareResource(request, "magneto.share_board", false, params, Field.TITLE);
             }
         });
     }

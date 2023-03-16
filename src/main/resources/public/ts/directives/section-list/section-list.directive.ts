@@ -78,15 +78,17 @@ class Controller implements IViewModel {
      */
     createSection = async (section: SectionForm): Promise<void> => {
         try {
-            await sectionsService.create(section).then(response => {
-                if (response.status === 200 || response.status === 201) {
-                    toasts.confirm("magneto.create.section.confirm")
-                } else {
-                    toasts.warning("magneto.create.section.error")
-                }
-            });
-            this.newSection = new SectionForm().buildNew(this.board.id);
-            this.$scope.vm.refresh();
+            if (!!section.title) {
+                await sectionsService.create(section).then(response => {
+                    if (response.status === 200 || response.status === 201) {
+                        toasts.confirm("magneto.create.section.confirm");
+                    } else {
+                        toasts.warning("magneto.create.section.error");
+                    }
+                });
+                this.newSection = new SectionForm().buildNew(this.board.id);
+                this.$scope.vm.refresh();
+            }
         } catch (e) {
             throw e;
         }

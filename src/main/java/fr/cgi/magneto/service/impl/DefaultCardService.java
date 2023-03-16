@@ -148,9 +148,17 @@ public class DefaultCardService implements CardService {
 
     @Override
     public Future<JsonObject> deleteCards(List<String> cardIds) {
+        return this.deleteCards(null, cardIds);
+    }
+
+    @Override
+    public Future<JsonObject> deleteCards(String userId, List<String> cardIds) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
                 .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(cardIds)));
+        if (userId != null)
+            query.put(Field.OWNERID, userId);
+
         mongoDb.delete(this.collection, query, MongoDbResult.validActionResultHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::deleteCards] Failed to delete cards",

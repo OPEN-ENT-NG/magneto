@@ -44,10 +44,11 @@ public interface CardService {
 
     /**
      * Delete cards
-     *
+     * @param userId  User identifier
      * @param cardIds List of card identifiers
      * @return Future {@link Future <JsonObject>} containing list of deleted cards
      */
+    Future<JsonObject> deleteCards(String userId, List<String> cardIds);
     Future<JsonObject> deleteCards(List<String> cardIds);
 
     /**

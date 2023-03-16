@@ -276,11 +276,15 @@ public class CardController extends ControllerHelper {
                 UserUtils.getUserInfos(eb, request, user -> {
                             List<String> cardIds = cards.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
                             String boardId = request.getParam(Field.BOARDID);
-                            Future<JsonObject> deleteCardsFuture = cardService.deleteCards(cardIds);
+                            Future<JsonObject> deleteCardsFuture = cardService.deleteCards(user.getUserId(), cardIds);
                             Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(boardId));
                             Future<List<Section>> getSectionFuture = sectionService.getSectionsByBoardId(boardId);
                             CompositeFuture.all(deleteCardsFuture, getBoardFuture, getSectionFuture)
                                     .compose(result -> {
+                                        if (deleteCardsFuture.result().getInteger(Field.NUMBER) != cardIds.size()) {
+                                            return Future.failedFuture(String.format("[Magneto%s::deleteCards] " +
+                                                    "Error removing cards", this.getClass().getSimpleName()));
+                                        }
                                         if (!getBoardFuture.result().isEmpty()) {
                                             Board currentBoard = getBoardFuture.result().get(0);
                                             List<Future> removeCardsFutures = new ArrayList<>();

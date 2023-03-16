@@ -36,7 +36,8 @@
         <comments-panel
                 ng-if="vm.card.id !== undefined && vm.changePageSubject !== undefined && vm.board.canComment"
                 card-id="vm.card.id"
-                change-page-eventer="vm.changePageSubject">
+                change-page-eventer="vm.changePageSubject"
+                board-owner="vm.board.owner">
         </comments-panel>
     </div>
 

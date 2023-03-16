@@ -40,6 +40,7 @@ interface ICardCommentProps {
     cardId: string;
     onDelete?;
     boardOwner: IBoardOwner;
+    selectorResize: string;
 }
 
 interface ICardCommentScope extends IScope, ICardCommentProps {
@@ -55,6 +56,7 @@ class Controller implements IViewModel {
     isUpdateComment: boolean;
     displayDeleteCommentLightbox: boolean;
     boardOwner: IBoardOwner;
+    selectorResize: string;
 
 
     constructor(private $scope: ICardCommentScope,
@@ -95,7 +97,7 @@ class Controller implements IViewModel {
     }
 
     canDeleteComment(): boolean {
-      return this.isMyComment() || (this.boardOwner.userId === model.me.userId);
+      return this.isMyComment() || (this.boardOwner && this.boardOwner.userId === model.me.userId);
     }
 
     updateComment = async ($event: JQueryEventObject): Promise<void> => {
@@ -121,7 +123,8 @@ function directive($parse: IParseService) {
             comment: '=',
             cardId: '=',
             onDelete: '&',
-            boardOwner: '='
+            boardOwner: '=',
+            selectorResize: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -141,9 +144,14 @@ function directive($parse: IParseService) {
             });
 
             let repositionActionOptions = (): void => {
-                let windowElem: JQuery = $(window);
+                let windowElem: JQuery = vm.selectorResize ? $(vm.selectorResize): $(window);
                 let actionOptionsElem: JQuery =
                     $("#options-" + vm.comment.id);
+
+                if (vm.selectorResize === '.card-manage-lightbox') {
+                    actionOptionsElem = $(vm.selectorResize).find("#options-" + vm.comment.id);
+                }
+
                 let repositionClass: string = 'reposition';
                 // if element position element is left sided, we want to check right sided position to see if it goes
                 // out of the screen, so we add 2 times the element width.

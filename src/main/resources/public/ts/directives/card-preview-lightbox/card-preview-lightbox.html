@@ -7,6 +7,9 @@
     <!-- Comments panel -->
     <comments-panel
             ng-if="vm.card.id !== undefined && vm.showComments"
-            card-id="vm.card.id">
+            card-id="vm.card.id"
+            board-owner="vm.boardOwner"
+            card-id="vm.card.id"
+            selector-resize="'.card-manage-lightbox'">
     </comments-panel>
 </lightbox>

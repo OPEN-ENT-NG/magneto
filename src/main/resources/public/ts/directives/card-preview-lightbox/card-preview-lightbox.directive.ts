@@ -1,7 +1,7 @@
 import {ng} from "entcore";
 import {ILocationService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Card} from "../../models";
+import {Card, IBoardOwner} from "../../models";
 
 interface IViewModel extends ng.IController, ICardPreviewProps {
     closeForm(): void;
@@ -11,6 +11,7 @@ interface ICardPreviewProps {
     display: boolean;
     card: Card;
     showComments: boolean;
+    boardOwner: IBoardOwner;
 }
 
 interface ICardPreviewScope extends IScope, ICardPreviewProps {
@@ -22,7 +23,7 @@ class Controller implements IViewModel {
     display: boolean;
     card: Card;
     showComments: boolean;
-
+    boardOwner: IBoardOwner;
 
     constructor(private $scope: ICardPreviewScope) {
     }
@@ -46,7 +47,8 @@ function directive() {
         scope: {
             display: '=',
             card: '=',
-            showComments: '='
+            showComments: '=',
+            boardOwner: '='
         },
         controllerAs: 'vm',
         bindToController: true,

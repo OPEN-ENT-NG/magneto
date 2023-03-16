@@ -6,7 +6,7 @@
                ng-model="vm.section.title"/>
         <i class="magneto-card-settings" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
         <card-list-item-options
-                ng-show="vm.isDisplayedOptions"
+                ng-show="vm.isDisplayedOptions && vm.board.myRights.manager !== undefined"
                 options="vm.section"
                 has-delete="true"
                 on-delete="vm.openDeleteSection"
@@ -39,7 +39,8 @@
             on-lock="vm.openLock"
             on-loaded="vm.onLoaded"
             card-update-eventer="vm.cardUpdateEventer"
-            has-comments="vm.board.canComment">
+            has-comments="vm.board.canComment"
+            board-owner="vm.board.owner">
     </card-list>
 
     <infinite-scroll scrolled="vm.onScroll()"

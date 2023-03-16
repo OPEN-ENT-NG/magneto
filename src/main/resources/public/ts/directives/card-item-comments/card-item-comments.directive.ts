@@ -18,6 +18,7 @@ interface ICardItemCommentsProps {
     card: Card;
     cardUpdateEventer: Subject<void>;
     boardOwner: IBoardOwner;
+    selectorResize: string;
 }
 
 interface ICardItemCommentsScope extends IScope, ICardItemCommentsProps {
@@ -29,6 +30,7 @@ class Controller implements IViewModel {
     card: Card;
     cardUpdateEventer: Subject<void>;
     boardOwner: IBoardOwner;
+    selectorResize: string;
 
     constructor(private $scope: ICardItemCommentsScope,
                 private $location: ILocationService,
@@ -69,7 +71,8 @@ function directive($parse: IParseService) {
         scope: {
             card: '=',
             cardUpdateEventer: '=',
-            boardOwner: '='
+            boardOwner: '=',
+            selectorResize: '='
         },
         controllerAs: 'vm',
         bindToController: true,

@@ -8,13 +8,13 @@
     <div class="section-container">
         <nav ng-if="!vm.board.isLayoutFree()" class="nav-container">
             <ul>
-                <li class="li-container">
+                <li class="li-container" ng-click="vm.openSection()">
                     <span>[[vm.section.title]] </span>
                     <div>
-                        <i ng-if="!vm.filter.showSection" class="magneto-chevron-down show-section"
-                           ng-click="vm.openSection()"></i>
-                        <i  ng-if="vm.filter.showSection" class="magneto-chevron-up show-section"
-                           ng-click="vm.openSection()"></i>
+                        <i ng-if="!vm.filter.showSection"
+                           class="magneto-chevron-down show-section"></i>
+                        <i  ng-if="vm.filter.showSection"
+                            class="magneto-chevron-up show-section"></i>
                     </div>
                 <li ng-show="vm.filter.showSection">
                     <ul>

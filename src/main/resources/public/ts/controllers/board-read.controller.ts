@@ -113,6 +113,10 @@ class Controller implements ng.IController, IViewModel {
         safeApply(this.$scope);
     }
 
+    /**
+     * Reading mode : change page with directional arrows keyboard
+     * @param $event
+     */
     async changePage($event: JQueryEventObject): Promise<void> {
         if($event.keyCode === KEYCODE.ARROW_LEFT && this.filter.page > 0) {
             await this.previousPage();

@@ -6,6 +6,7 @@ import {safeApply} from "../utils/safe-apply.utils";
 import {AxiosError} from "axios";
 import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
 import {Subject} from "rxjs";
+import {KEYCODE} from "../core/constants/keycode.const";
 
 interface IViewModel {
 
@@ -85,6 +86,9 @@ class Controller implements ng.IController, IViewModel {
     }
 
     async $onInit(): Promise<void> {
+        $(document).on('keydown', (event: JQueryEventObject) => {
+            this.changePage(event);
+        });
     }
 
     /**
@@ -105,6 +109,18 @@ class Controller implements ng.IController, IViewModel {
         await this.getCard();
         this.changePageSubject.next(this.card.id);
         safeApply(this.$scope);
+    }
+
+    /**
+     * Reading mode : change page with directional arrows keyboard
+     * @param $event
+     */
+    async changePage($event: JQueryEventObject): Promise<void> {
+        if($event.keyCode === KEYCODE.ARROW_LEFT && this.filter.page > 0) {
+            await this.previousPage();
+        } else if($event.keyCode === KEYCODE.ARROW_RIGHT && !this.isLastPage()) {
+            await this.nextPage();
+        }
     }
 
     /**

@@ -87,9 +87,7 @@ class Controller implements ng.IController, IViewModel {
 
     async $onInit(): Promise<void> {
         $(document).on('keydown', (event: JQueryEventObject) => {
-            if(event.keyCode === KEYCODE.ARROW_LEFT || event.keyCode === KEYCODE.ARROW_RIGHT) {
-                this.changePage(event);
-            }
+            this.changePage(event);
         });
     }
 

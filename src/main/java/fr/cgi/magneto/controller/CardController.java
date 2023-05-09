@@ -276,7 +276,7 @@ public class CardController extends ControllerHelper {
                 UserUtils.getUserInfos(eb, request, user -> {
                             List<String> cardIds = cards.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
                             String boardId = request.getParam(Field.BOARDID);
-                            Future<JsonObject> deleteCardsFuture = cardService.deleteCards(user.getUserId(), cardIds);
+                            Future<JsonObject> deleteCardsFuture = cardService.deleteCards(cardIds)
                             Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(boardId));
                             Future<List<Section>> getSectionFuture = sectionService.getSectionsByBoardId(boardId);
                             CompositeFuture.all(deleteCardsFuture, getBoardFuture, getSectionFuture)

@@ -17,9 +17,7 @@
                 <board-date date="vm.board.modificationDate"></board-date>
             </div>
         </div>
-        <div ng-if="!!vm.board.description" class="board-container-header-description">
-            [[vm.board.description]]
-        </div>
+        <div ng-if="!!vm.board.description" class="board-container-header-description" ng-bind="vm.board.description"></div>
     </div>
 
     <!-- Header mobile -->
@@ -41,9 +39,7 @@
             </button>
 
         </div>
-        <div ng-if="!!vm.board.description" class="board-container-header-description">
-            [[vm.board.description]]
-        </div>
+        <div ng-if="!!vm.board.description" class="board-container-header-description" ng-bind="vm.board.description"></div>
     </div>
 
     <div class="twelve cell board-container-body"

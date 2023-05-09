@@ -89,6 +89,7 @@ class Controller implements ng.IController, IViewModel {
         $(document).on('keydown', (event: JQueryEventObject) => {
             this.changePage(event);
         });
+        safeApply(this.$scope);
     }
 
     /**

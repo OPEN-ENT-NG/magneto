@@ -126,7 +126,7 @@ class Controller implements ng.IController, IViewModel {
     async changePage($event: JQueryEventObject): Promise<void> {
         if($event.keyCode === KEYCODE.ARROW_LEFT && this.filter.page > 0) {
             await this.previousPage();
-        } else if($event.keyCode === KEYCODE.ARROW_RIGHT && !this.isLastPage()) {
+        } else if($event.keyCode === KEYCODE.ARROW_RIGHT && !this.isLastPage() && !this.isLoading) {
             await this.nextPage();
         }
     }

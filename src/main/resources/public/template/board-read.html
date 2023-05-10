@@ -47,6 +47,6 @@
         <i class="magneto-chevron-left nav-left" ng-if="vm.filter.page > 0" ng-click="vm.previousPage()"></i>
     </div>
     <div class="button-next">
-        <i class="magneto-chevron-right nav-right" ng-if="!vm.isLastPage()" ng-click="vm.nextPage()"></i>
+        <i class="magneto-chevron-right nav-right" ng-if="!vm.isLastPage() && !vm.isLoading" ng-click="vm.nextPage()"></i>
     </div>
 </div>

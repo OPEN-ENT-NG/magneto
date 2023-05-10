@@ -50,6 +50,7 @@ class Controller implements ng.IController, IViewModel {
     card: Card;
     section: Section;
     board: Board;
+    isLoading: boolean;
 
     changePageSubject: Subject<string>;
 
@@ -76,6 +77,7 @@ class Controller implements ng.IController, IViewModel {
             boardId: (this.$route.current && this.$route.current.params) ? this.$route.current.params.boardId : null,
             showSection: false
         };
+        this.isLoading = true;
 
         this.board = new Board();
         this.changePageSubject = new Subject<string>();
@@ -90,6 +92,7 @@ class Controller implements ng.IController, IViewModel {
             .then(() => this.getCard())
             .then(() => {
                 this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length;
+                this.isLoading = false;
                 safeApply(this.$scope);
             });
 

@@ -1,4 +1,4 @@
-import {ng, notify, angular} from "entcore";
+import {ng, notify} from "entcore";
 import {IScope} from "angular";
 import {IBoardsService, ICardsService, ISectionsService} from "../services";
 import {Board, Boards, Card, Section, Sections} from "../models";
@@ -88,7 +88,10 @@ class Controller implements ng.IController, IViewModel {
 
         this.getBoard()
             .then(() => this.getCard())
-            .then(() => this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length);
+            .then(() => {
+                this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length;
+                safeApply(this.$scope);
+            });
 
         safeApply(this.$scope);
     }

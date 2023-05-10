@@ -1,4 +1,4 @@
-import {ng, notify} from "entcore";
+import {ng, notify, angular} from "entcore";
 import {IScope} from "angular";
 import {IBoardsService, ICardsService, ISectionsService} from "../services";
 import {Board, Boards, Card, Section, Sections} from "../models";
@@ -78,10 +78,6 @@ class Controller implements ng.IController, IViewModel {
         };
 
         this.board = new Board();
-        this.getBoard()
-            .then(() => this.getCard())
-            .then(() => this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length);
-
         this.changePageSubject = new Subject<string>();
     }
 
@@ -89,6 +85,11 @@ class Controller implements ng.IController, IViewModel {
         $(document).on('keydown', (event: JQueryEventObject) => {
             this.changePage(event);
         });
+
+        this.getBoard()
+            .then(() => this.getCard())
+            .then(() => this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length);
+
         safeApply(this.$scope);
     }
 

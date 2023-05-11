@@ -50,6 +50,7 @@ class Controller implements ng.IController, IViewModel {
     card: Card;
     section: Section;
     board: Board;
+    isLoading: boolean;
 
     changePageSubject: Subject<string>;
 
@@ -76,12 +77,9 @@ class Controller implements ng.IController, IViewModel {
             boardId: (this.$route.current && this.$route.current.params) ? this.$route.current.params.boardId : null,
             showSection: false
         };
+        this.isLoading = true;
 
         this.board = new Board();
-        this.getBoard()
-            .then(() => this.getCard())
-            .then(() => this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length);
-
         this.changePageSubject = new Subject<string>();
     }
 
@@ -89,6 +87,16 @@ class Controller implements ng.IController, IViewModel {
         $(document).on('keydown', (event: JQueryEventObject) => {
             this.changePage(event);
         });
+
+        this.getBoard()
+            .then(() => this.getCard())
+            .then(() => {
+                this.filter.count = this.board.isLayoutFree() ? this.board.cardIds.length : this.board.cardIdsSection().length;
+                this.isLoading = false;
+                safeApply(this.$scope);
+            });
+
+        safeApply(this.$scope);
     }
 
     /**
@@ -118,7 +126,7 @@ class Controller implements ng.IController, IViewModel {
     async changePage($event: JQueryEventObject): Promise<void> {
         if($event.keyCode === KEYCODE.ARROW_LEFT && this.filter.page > 0) {
             await this.previousPage();
-        } else if($event.keyCode === KEYCODE.ARROW_RIGHT && !this.isLastPage()) {
+        } else if($event.keyCode === KEYCODE.ARROW_RIGHT && !this.isLastPage() && !this.isLoading) {
             await this.nextPage();
         }
     }

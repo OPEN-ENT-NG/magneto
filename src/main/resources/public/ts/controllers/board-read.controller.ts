@@ -220,6 +220,7 @@ class Controller implements ng.IController, IViewModel {
     }
 
     $onDestroy() {
+        $(document).off('keydown');
     }
 
 }

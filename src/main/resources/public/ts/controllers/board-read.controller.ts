@@ -61,6 +61,8 @@ class Controller implements ng.IController, IViewModel {
         showSection: boolean;
     };
 
+    handlerChangePage: (eventObject: JQueryEventObject, ...args: any[]) => any
+
 
     constructor(private $scope: ICardsScope,
                 private $route: any,
@@ -81,12 +83,13 @@ class Controller implements ng.IController, IViewModel {
 
         this.board = new Board();
         this.changePageSubject = new Subject<string>();
+        this.handlerChangePage = (event: JQueryEventObject) => {
+            this.changePage(event).then();
+        };
     }
 
     async $onInit(): Promise<void> {
-        $(document).on('keydown', (event: JQueryEventObject) => {
-            this.changePage(event);
-        });
+        $(document).on('keydown', this.handlerChangePage);
 
         this.getBoard()
             .then(() => this.getCard())
@@ -220,6 +223,7 @@ class Controller implements ng.IController, IViewModel {
     }
 
     $onDestroy() {
+        $(document).off('keydown', this.handlerChangePage);
     }
 
 }

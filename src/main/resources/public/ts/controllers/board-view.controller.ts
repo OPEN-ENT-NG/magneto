@@ -508,7 +508,7 @@ class Controller implements IViewModel {
             .then((res: Cards) => {
                 if (res.all && res.all.length > 0) {
                     res.all.forEach((card: Card) => {
-                        const isDuplicate = this.cards.some((existingCard: Card) => existingCard.id === card.id);
+                        const isDuplicate : boolean = this.cards.some((existingCard: Card) : boolean => existingCard.id === card.id);
                         if (!isDuplicate) {
                             this.cards.push(card);
                         }

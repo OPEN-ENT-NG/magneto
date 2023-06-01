@@ -507,7 +507,12 @@ class Controller implements IViewModel {
         this.cardsService.getAllCardsByBoard(params)
             .then((res: Cards) => {
                 if (res.all && res.all.length > 0) {
-                    this.cards.push(...res.all);
+                    res.all.forEach((card: Card) => {
+                        const isDuplicate : boolean = this.cards.some((existingCard: Card) : boolean => existingCard.id === card.id);
+                        if (!isDuplicate) {
+                            this.cards.push(card);
+                        }
+                    });
                     this.cardUpdateSubject.next();
                 }
                 this.isLoading = false;

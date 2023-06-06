@@ -1,5 +1,6 @@
 package fr.cgi.magneto.service.impl;
 
+import com.mongodb.QueryBuilder;
 import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
@@ -12,8 +13,10 @@ import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.mongodb.MongoQueryBuilder;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -25,6 +28,7 @@ import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DefaultBoardService implements BoardService {
@@ -559,5 +563,21 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1));
         return query.getAggregate();
+    }
+
+    public Future<List<Board>> getAllBoardsByCreationDate(StatisticsPayload statisticsPayload) {
+        Promise<List<Board>> promise = Promise.promise();
+        Pattern datePattern = Pattern.compile("^" + statisticsPayload.getDate());
+        QueryBuilder matcher = QueryBuilder.start(Field.CREATIONDATE).regex(datePattern);
+        mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validResultsHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::get] Failed to get boards by creation date", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+            promise.complete(ModelHelper.toList(results.right().getValue(), Board.class));
+        }));
+        return promise.future();
     }
 }

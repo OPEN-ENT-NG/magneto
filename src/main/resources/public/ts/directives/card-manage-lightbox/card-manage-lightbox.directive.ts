@@ -5,6 +5,7 @@ import {Board, CardForm, Section} from "../../models";
 import {cardsService} from "../../services";
 import {EXTENSION_FORMAT} from "../../core/constants/extension-format.const";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
+import {safeApply} from "../../utils/safe-apply.utils";
 
 interface IViewModel extends ng.IController, ICardManageProps {
     submitCard?(): Promise<void>;
@@ -18,6 +19,12 @@ interface IViewModel extends ng.IController, ICardManageProps {
     closeForm(): void;
 
     getFileExtension(): string;
+
+    formatVideoUrl(url: string) : string;
+
+    displayEmbedder(): void
+
+    changeUrl(): void
 }
 
 interface ICardManageProps {
@@ -26,6 +33,7 @@ interface ICardManageProps {
     form: CardForm;
     board: Board;
     onSubmit?;
+    displayChangeVideoLightbox: boolean;
 }
 
 interface ICardManageScope extends IScope, ICardManageProps {
@@ -40,19 +48,52 @@ class Controller implements IViewModel {
     board: Board;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
     selectedSection: Section;
+    displayChangeVideoLightbox: boolean;
+    videoUrl: string;
 
     constructor(private $scope: ICardManageScope,
                 private $location: ILocationService,
+                private $sce: ng.ISCEService,
                 private $window: IWindowService) {
         this.RESOURCE_TYPES = RESOURCE_TYPE;
     }
 
     $onInit() {
+        this.displayChangeVideoLightbox = false;
+        this.videoUrl = this.form.resourceUrl;
         this.selectedSection = this.board.sections && this.board.sections.length > 0 ? this.board.sections[0] : null;
     }
 
     isFormValid = (): boolean => {
         return this.form.isValid();
+    }
+
+    formatVideoUrl = (url: string) : string | undefined | null => {
+        if(typeof url === 'string') {
+            return this.$sce.trustAsResourceUrl(url);
+        }
+        return url;
+    }
+
+    displayEmbedder = (): void => {
+        this.displayChangeVideoLightbox = true;
+    }
+
+    changeUrl = (): void => {
+        this.displayChangeVideoLightbox = false;
+
+        // Video from workspace
+        if (this.videoUrl.includes("workspace")) {
+            const regex: RegExp= /\/workspace\/document\/[a-f0-9-]+/;
+            const match: RegExpExecArray = regex.exec(this.videoUrl);
+            this.form.resourceUrl = match[0];
+        }
+        // Video from URL
+        else {
+            this.form.resourceUrl = this.$sce.trustAsResourceUrl(
+                this.videoUrl.split("src=\"")[1].split('"')[0]);
+        }
+        safeApply(this.$scope);
     }
 
     hasSection = (): boolean => {
@@ -110,7 +151,7 @@ function directive($parse: IParseService) {
         },
         controllerAs: 'vm',
         bindToController: true,
-        controller: ['$scope', '$location', '$window', '$parse', Controller],
+        controller: ['$scope', '$location', '$sce', '$window', '$parse', Controller],
         /* interaction DOM/element */
         link: function ($scope: ICardManageScope,
                         element: ng.IAugmentedJQuery,

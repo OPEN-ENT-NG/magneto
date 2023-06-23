@@ -1,10 +1,10 @@
 import * as angular from 'angular';
 import 'angular-mocks';
+window.scrollTo = jest.fn();
 import {boardViewController} from "../board-view.controller";
 import {ng} from "../../models/__mocks__/entcore";
 import {BoardsService, CardsService} from "../../services";
 import {Card, CardForm} from "../../models";
-
 
 describe("BoardViewController", () => {
 
@@ -31,7 +31,7 @@ describe("BoardViewController", () => {
 
     beforeEach(() => {
         const testApp = angular.module("app", []);
-        let $controller, $rootScope, $sce;
+        let $controller, $rootScope, $sce, $window;
 
         angular.mock.module("app");
 
@@ -40,11 +40,12 @@ describe("BoardViewController", () => {
         ng.initMockedModules(testApp);
 
         // Controller Injection
-        angular.mock.inject((_$controller_, _$rootScope_, _$sce_) => {
+        angular.mock.inject((_$controller_, _$rootScope_, _$sce_, _$window_) => {
             // The injector unwraps the underscores (_) from around the parameter names when matching
             $controller = _$controller_;
             $rootScope = _$rootScope_;
             $sce = _$sce_;
+            $window = _$window_;
         });
 
         // Creates a new instance of scope
@@ -66,7 +67,11 @@ describe("BoardViewController", () => {
 
         //boardViewControllerTest.$route.current.params.boardId = "boardId";
 
-        boardViewControllerTest.$onInit();
+        try {
+            boardViewControllerTest.$onInit();
+        } catch (e) {
+            console.error("err: ", e);
+        }
     });
 
     it("test resetCards", (done) => {

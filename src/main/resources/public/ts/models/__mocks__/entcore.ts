@@ -1,3 +1,4 @@
+window.scrollTo = jest.fn();
 
 declare let require: any;
 

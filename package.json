@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.0.96",
-    "@types/angular": "1.7.4",
+    "@types/angular": "^1.6.55",
     "@types/angular-mocks": "^1.7.1",
     "@types/core-js": "0.9.42",
     "@types/jest": "^27.5.2",

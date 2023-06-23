@@ -28,4 +28,6 @@ magneto/src/main/resources/public/font
 /src/main/resources/public/template/entcore/*
 /src/main/resources/public/template/entcore/
 /src/main/resources/public/js/
-/src/main/resources/view/
+/package-lock.json
+/src/main/resources/public/css/
+/yarn.lock

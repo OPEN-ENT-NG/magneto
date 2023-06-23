@@ -1,6 +1,7 @@
 .card-list-item {
 
-  height: 250px;
+  height: fit-content;
+
   width: 230px;
   border-radius: 10px;
   padding: 5px 5px 0px 5px;
@@ -27,24 +28,28 @@
 
   @include mobile {
     width: 170px;
-    height: 200px;
+    height: fit-content;
   }
 
   &-header {
     height: 15%;
-    gap: 5px;
     align-items: center;
     display: flex;
+
     &.reduced-format {
       height: 20% !important;
     }
+
     &-creation {
-      margin-right: 20px;
+      width: 80%;
+      margin-left: 8px;
       display: flex;
       flex-direction: column;
+
       &-user {
         @include noTextOverflow(1);
       }
+
       &-date {
         color: $magneto-light-grey;
         font-size: 12px;
@@ -59,7 +64,7 @@
     text-align: center;
 
     .type-icon {
-      height: 80%;
+      height: 13vh;
       margin: auto;
       object-fit: contain;
     }
@@ -67,14 +72,13 @@
 
   &-preview {
     position: relative;
-    height: 55%;
+    height: 18vh;
 
     img {
-      width: 100%;
-      height: 100%;
       margin-left: auto;
       margin-right: auto;
       object-fit: cover;
+      min-height: 64%;
     }
 
     &-image, &-file {
@@ -97,22 +101,21 @@
       @include noTextOverflow(999);
       margin-left: auto;
       margin-right: auto;
-      height: 100%;
     }
   }
 
   &-type {
-    background-color: $magneto-white;
-    border: 5px solid $magneto-white;
+    background-color: $magneto-lighter-light-grey;
+    border: 5px solid $magneto-lighter-light-grey;
     border-top-right-radius: 10px;
-    border-bottom-left-radius: 5px;
+    border-bottom-left-radius: 10px;
     position: absolute;
     bottom: 0;
     left: 0;
     z-index: 1;
 
     i {
-      font-size : $spacing-M;
+      font-size: $spacing-M;
     }
   }
 
@@ -127,27 +130,42 @@
   }
 
   &-infos {
-    flex-direction: column;
-    height: 20%;
 
     &-title {
       font-size: 16px;
-      height: 10% !important;
       font-weight: bold;
+      margin-bottom: 5px;
+      height: 3vh;
+
       &-ellipsis {
         @include noTextOverflow(1);
       }
+
       &.reduced-format {
         height: 20% !important;
       }
     }
-  }
 
-  &-caption {
-    color: $magneto-black;
-    font-style: italic;
-    font-size: 0.9em;
-    @include noTextOverflow(2);
+    &-footer {
+
+      height: 3vh;
+
+      &-caption {
+        color: $magneto-black;
+        font-style: italic;
+        font-size: 0.9em;
+        width: 90%;
+        @include noTextOverflow(1);
+      }
+
+      &-locked {
+        position: relative;
+        font-size: 20px;
+        display: flex;
+        justify-content: flex-end;
+        height: 3vh;
+      }
+    }
   }
 
   &-description {
@@ -163,7 +181,6 @@
 
   i.magneto-card-settings {
     font-size: 25px;
-    position: absolute;
     right: 5px;
   }
 }

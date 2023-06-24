@@ -2,7 +2,7 @@ import * as angular from 'angular';
 import 'angular-mocks';
 import {boardsController} from "../boards.controller";
 import {ng} from "../../models/__mocks__/entcore";
-import {BoardsService} from "../../services";
+import {boardsService, foldersService} from "../../services";
 import {BoardsFilter} from "../../models/boards-filter.model";
 import {FOLDER_TYPE} from "../../core/enums/folder-type.enum";
 import {Folder} from "../../models";
@@ -40,8 +40,25 @@ describe('BoardsController', () => {
         boardsControllerTest = $controller('BoardsController', {
             $scope: $scope,
             $location: $rootScope.location,
-            boardsService: BoardsService
+            boardsService: boardsService,
+            foldersService: foldersService
         });
+
+        // intercept operation "this.deletedFolders = await this.getDeletedFolders();" $onInit()
+        boardsControllerTest.foldersService.getFolders = jest.fn()
+            .mockImplementation(() => {
+                return Promise.resolve([]);
+            });
+
+        // intercept operation "await this.getBoards();" $onInit()
+        boardsControllerTest.boardsService.getAllBoards = jest.fn()
+            .mockImplementation(() => {
+                return Promise.resolve({
+                    all: [],
+                    page: 0,
+                    pageCount: 0
+                });
+            });
 
         boardsControllerTest.$onInit();
     });

@@ -70,3 +70,11 @@ export const Behaviours = {
 export const idiom = {
     translate: jest.fn((key: string) => key)
 };
+
+export const notify = {
+    message: (type: any, message: any, timeout?: any) => jest.fn(),
+    error: (message: any, timeout?: any) => jest.fn(),
+    info: (message: any, timeout?: any) => jest.fn(),
+    success: (message: any, timeout?: any) => jest.fn(),
+    close: () => jest.fn()
+};

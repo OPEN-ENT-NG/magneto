@@ -1,7 +1,29 @@
 .card-list {
-  background: $magneto-lighter-grey;
-  gap: 16px;
-  justify-content: center;
+  &.no-background-image {
+    background: $magneto-lighter-light-grey;
+  }
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(230px,1fr));
+  grid-auto-rows: 0;
+
+  &-free {
+    justify-content: center;
+  }
+
+  &-vertical {
+    justify-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 85vh;
+  }
+
+  &-horizontal {
+    min-height: 75px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 20px;
+  }
   padding-top: 15px;
 
   @include mobile {

@@ -2,30 +2,45 @@ import * as angular from 'angular';
 import 'angular-mocks';
 import {boardReadController} from "../board-read.controller";
 import {ng} from "../../models/__mocks__/entcore";
-import {BoardsService, CardsService} from "../../services";
-import {Card, CardForm} from "../../models";
+import {boardsService, cardsService} from "../../services";
+import {Board, Card, Section} from "../../models";
+import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
+import * as jquery from "jquery";
+
+window.$ = jquery
+window.$().on = jest.fn();
 
 describe("BoardReadController", () => {
 
     let boardReadControllerTest: any;
-    let card: Card = new Card().build({
-        id: "id",
-        title: "title",
-        description: "description",
-        modificationDate: "modificationDate",
-        caption: "caption",
-        resourceId: "resourceId",
-        resourceType: "resourceType",
-        resourceUrl: "resourceUrl",
-        ownerId: "ownerId",
-        ownerName: "ownerName",
-        creationDate: "creationDate",
-        lastModifierId: "lastModifierId",
-        lastModifierName: "lastModifierName",
-        boardId: "boardId",
-        parentId: "parentId",
-        locked: false,
-        metadata: null
+    let section: Section = new Section().build({
+        _id: "id",
+        boardId: "",
+        cardIds: [],
+        title: ""
+    });
+
+    let board: Board = new Board().build({
+        _id: "id",
+        backgroundUrl: "",
+        canComment: false,
+        cardIds: ["1", "2"],
+        creationDate: "",
+        deleted: false,
+        description: "",
+        folderId: "",
+        imageUrl: "",
+        layoutType: LAYOUT_TYPE.FREE,
+        modificationDate: "",
+        nbCards: 0,
+        nbCardsSections: 0,
+        ownerId: "",
+        ownerName: "",
+        public: false,
+        sections: [section],
+        shared: [],
+        tags: undefined,
+        title: ""
     });
 
     beforeEach(() => {
@@ -59,11 +74,48 @@ describe("BoardReadController", () => {
             $route: $rootScope,
             $location: $rootScope.location,
             $sce: $sce,
-            boardsService: BoardsService,
-            cardsService: CardsService
+            boardsService: boardsService,
+            cardsService: cardsService,
+            board: new Board()
         });
 
         //boardReadControllerTest.$route.current.params.boardId = "boardId";
+
+        // intercept operation "await this.getBoards();" $onInit()
+        boardReadControllerTest.boardsService.getBoardsByIds = jest.fn()
+            .mockImplementation(() => {
+                return Promise.resolve({
+                    all: [board],
+                    page: 0,
+                    pageCount: 0
+                });
+                // return Promise.resolve(undefined);
+            });
+
+        // intercept operation "this.deletedFolders = await this.getDeletedFolders();" $onInit()
+        boardReadControllerTest.cardsService.getCardById = jest.fn()
+            .mockImplementation(() => {
+                return Promise.resolve( new Card().build({
+                    boardId: "",
+                    caption: "",
+                    creationDate: "",
+                    description: "",
+                    lastModifierId: "",
+                    lastModifierName: "",
+                    locked: false,
+                    metadata: undefined,
+                    modificationDate: "",
+                    ownerId: "",
+                    ownerName: "",
+                    parentId: "",
+                    resourceId: "",
+                    resourceType: "",
+                    resourceUrl: "",
+                    title: ""
+                }));
+            });
+
+        boardReadControllerTest.handlerChangePage = jest.fn()
 
         boardReadControllerTest.$onInit();
     });

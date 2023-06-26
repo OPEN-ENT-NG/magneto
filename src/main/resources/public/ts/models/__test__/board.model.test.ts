@@ -72,13 +72,17 @@ describe('BoardModel', () => {
             page: 1,
             pageCount: 1
         }
+        let boards;
+        try {
+            boards = new Boards(boardsResponse);
+            expect(boards.all.length).toEqual(1);
+            expect(boards.page).toEqual(1);
+            expect(boards.pageCount).toEqual(1);
+            done();
+        } catch (e) {
+            console.error("err: ", e);
+        }
 
-        const boards = new Boards(boardsResponse);
-
-        expect(boards.all.length).toEqual(1);
-        expect(boards.page).toEqual(1);
-        expect(boards.pageCount).toEqual(1);
-        done();
     });
 
     it('test BordForm initialization', done => {

@@ -1,10 +1,10 @@
 import * as angular from 'angular';
 import 'angular-mocks';
+window.scrollTo = jest.fn();
 import {boardViewController} from "../board-view.controller";
 import {ng} from "../../models/__mocks__/entcore";
-import {BoardsService, CardsService} from "../../services";
+import {boardsService, cardsService, CardsService} from "../../services";
 import {Card, CardForm} from "../../models";
-
 
 describe("BoardViewController", () => {
 
@@ -31,7 +31,7 @@ describe("BoardViewController", () => {
 
     beforeEach(() => {
         const testApp = angular.module("app", []);
-        let $controller, $rootScope, $sce;
+        let $controller, $rootScope, $sce, $window;
 
         angular.mock.module("app");
 
@@ -40,11 +40,12 @@ describe("BoardViewController", () => {
         ng.initMockedModules(testApp);
 
         // Controller Injection
-        angular.mock.inject((_$controller_, _$rootScope_, _$sce_) => {
+        angular.mock.inject((_$controller_, _$rootScope_, _$sce_, _$window_) => {
             // The injector unwraps the underscores (_) from around the parameter names when matching
             $controller = _$controller_;
             $rootScope = _$rootScope_;
             $sce = _$sce_;
+            $window = _$window_;
         });
 
         // Creates a new instance of scope
@@ -60,11 +61,33 @@ describe("BoardViewController", () => {
             $route: $rootScope,
             $location: $rootScope.location,
             $sce: $sce,
-            boardsService: BoardsService,
-            cardsService: CardsService
+            boardsService: boardsService,
+            cardsService: cardsService
         });
 
         //boardViewControllerTest.$route.current.params.boardId = "boardId";
+
+
+        // intercept operation "this.deletedFolders = await this.getDeletedFolders();" $onInit()
+        boardViewControllerTest.boardsService.getBoardsByIds = jest.fn()
+            .mockImplementation(() => {
+                return Promise.resolve({
+                    all: [],
+                    page: 0,
+                    pageCount: 0
+                });
+            });
+
+        // intercept operation "await this.getBoards();" $onInit()
+        boardViewControllerTest.cardsService.getAllCardsByBoard = jest.fn()
+            .mockImplementation(() => {
+                return Promise.resolve({
+                    all: [],
+                    page: 0,
+                    pageCount: 0
+                });
+            });
+
 
         boardViewControllerTest.$onInit();
     });

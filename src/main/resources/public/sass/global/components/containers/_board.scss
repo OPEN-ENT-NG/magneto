@@ -4,7 +4,6 @@
     background: $magneto-white;
     padding: $spacing-M;
     padding-left: $spacing-XM;
-    z-index: 2;
     @include noTextOverflow(1);
     h1 {
       font-family: $magneto-font-secondary;
@@ -24,14 +23,14 @@
 
     &-description {
       height: 64px;
-      overflow-y: scroll;
+      overflow-y: auto;
+      white-space: pre-line;
     }
   }
 
   &-header-mobile {
     background: $magneto-white;
-    padding: $spacing-LXS;
-    z-index: 2;
+    padding: $spacing-LXS $spacing-LXS $spacing-LXS 73px;
     top: -12px;
     @include noTextOverflow(1);
 
@@ -54,7 +53,7 @@
 
     &-description {
       height: 64px;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
 
     .create-button {
@@ -66,7 +65,11 @@
     display: flex;
     border-top: solid 1px $magneto-white-blue;
     border-bottom: solid 1px $magneto-white-blue;
-    background: $magneto-lighter-grey;
+    background-size: cover;
+    min-height: 84vh;
+    &.no-background-image {
+      background: $magneto-lighter-light-grey;
+    }
     position: absolute;
 
     @include mobile {
@@ -80,6 +83,7 @@
     &-list {
       min-height: 650px;
       width: 100%;
+      overflow-x: auto;
 
       .empty-state {
         display: flex;

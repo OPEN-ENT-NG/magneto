@@ -69,6 +69,11 @@ i {
     content: '\F0140'
   }
 
+  &.magneto-chevron-up::before {
+    font-family: 'magneto-mdi';
+    content: '\F0143'
+  }
+
   &.magneto-magnify::before {
     font-family: 'magneto-mdi';
     content: '\F0349';
@@ -127,7 +132,7 @@ i {
 
   &.magneto-edit::before {
     font-family: 'magneto-mdi';
-      content: '\F03EB'
+    content: '\F03EB'
   }
 
   &.magneto-duplicate::before {
@@ -180,8 +185,49 @@ i {
     content: '\F1682';
   }
 
+  &.magneto-display-free::before {
+    font-family: 'magneto-mdi';
+    content: '\F148E';
+  }
+
+  &.magneto-display-vertical::before {
+    font-family: 'magneto-mdi';
+    content: '\F1491';
+  }
+
+  &.magneto-display-horizontal::before {
+    font-family: 'magneto-mdi';
+    content: '\F1490';
+  }
+
   &.magneto-play::before {
     font-family: 'magneto-mdi';
     content: '\F040A';
   }
+
+  &.magneto-lock::before {
+    font-family: 'magneto-mdi';
+    content: '\F033E';
+  }
+
+  &.magneto-unlock::before {
+    font-family: 'magneto-mdi';
+    content: '\F033F';
+  }
+
+  &.magneto-user::before {
+    font-family: 'magneto-mdi';
+    content: '\F0009';
+  }
+
+  &.magneto-comment-outline::before {
+    font-family: 'magneto-mdi';
+    content: '\F0182';
+  }
+
+  &.magneto-close::before {
+    font-family: 'magneto-mdi';
+    content: '\F0156';
+  }
+
 }

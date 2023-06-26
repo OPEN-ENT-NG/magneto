@@ -19,7 +19,6 @@
 
   @include mobile {
     width: 170px;
-    height: 183px;
   }
 
   &-image {
@@ -32,13 +31,13 @@
       height: 100%;
       width: 100%;
       object-fit: cover;
-      margin: 5px;
+      border-radius: 10px 10px 0 0;
     }
   }
 
   &-infos {
-    height: 40%;
-    margin: 4%;
+    height: 25%;
+    margin: 2% 4% 6% 4%;
     flex-direction: column;
 
     &-title {

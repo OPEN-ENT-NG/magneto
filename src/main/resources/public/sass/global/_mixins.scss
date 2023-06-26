@@ -1,6 +1,7 @@
 $magneto-yellow: #ffb600;
 $magneto-yellow-ochre: #ecbe30;
 $magneto-white: #ffffff;
+$magneto-lighter-light-grey: #f8f9fa;
 $magneto-lighter-grey: #ebebeb;
 $magneto-light-grey: #d6d6d6;
 $magneto-grey-blue: #f4fAfd;
@@ -20,6 +21,10 @@ $magneto-red: #e61610;
 $magneto-font-secondary: 'Comfortaa', cursive;
 
 $magneto-screen-mobile: 768px;
+$magneto-screen-tablet: 1024px;
+$magneto-screen-small-desktop: 1224px;
+$magneto-screen-medium-desktop: 1536px;
+
 
 
 
@@ -29,11 +34,36 @@ $magneto-screen-mobile: 768px;
   }
 }
 
-@mixin desktop {
-  @media (min-width: 769px) {
+@mixin tablet {
+  @media (min-width: 769px) and (max-width: $magneto-screen-tablet) {
     @content;
   }
 }
+
+@mixin desktop {
+  @media (min-width: 1025px) {
+    @content;
+  }
+}
+
+@mixin small-desktop {
+  @media (min-width: 1025px) and (max-width: $magneto-screen-small-desktop) {
+    @content;
+  }
+}
+
+@mixin medium-desktop {
+  @media (min-width: 1225px) and (max-width: $magneto-screen-medium-desktop) {
+    @content;
+  }
+}
+
+@mixin large-desktop {
+  @media (min-width: 1441px) {
+    @content;
+  }
+}
+
 
 @mixin paddingX($size) {
   padding-left: $size;

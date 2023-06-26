@@ -7,16 +7,6 @@ import {Board, Card, Section} from "../../models";
 import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
 import * as jquery from "jquery";
 
-jest.mock(
-    'jquery',
-    () => {
-        const m$ = { on: jest.fn(), ready: jest.fn(), addClass: jest.fn() };
-        return jest.fn(() => m$);
-    },
-    // remove this option if you have installed jquery module
-    { virtual: true },
-);
-
 window.$ = jquery
 window.$().on = jest.fn();
 

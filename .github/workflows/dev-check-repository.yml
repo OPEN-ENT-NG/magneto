@@ -16,6 +16,8 @@ jobs:
         run: yarn install
       - name: Run build node with Gulp
         run: node_modules/gulp/bin/gulp.js build
+      - name: Run build node sass
+        run: yarn run build:sass
       - name: Run test
         run: yarn test
 

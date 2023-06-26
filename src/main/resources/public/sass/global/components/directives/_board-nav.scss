@@ -43,8 +43,11 @@
         margin-top: 180px;
         height: 72%;
         transition: margin-top 0.2s ease-in-out;
-        @media screen and (max-height: $magneto-screen-mobile) {
+        @media screen and (max-height: 680px) {
           margin-top: 60px;
+        }
+        @media (max-width: $magneto-screen-mobile) and (min-height: 680px) {
+          margin-top: 100px !important;
         }
 
         .item {

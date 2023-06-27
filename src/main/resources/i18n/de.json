@@ -65,6 +65,7 @@
   "magneto.board.unpublish.title": "Delete share of board from the platform",
   "magneto.board.publish.description": "When sharing this board to the platform, it will be visible in read-only to all users of the platform. The board magnets can be reused.",
   "magneto.board.unpublish.description": "Do you want to remove the sharing of the board from the platform ?",
+  "magneto.board.description": "Description",
   "magneto.duplicate": "Duplicate",
   "magneto.restore": "Restore",
   "magneto.move": "Move",

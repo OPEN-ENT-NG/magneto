@@ -18,6 +18,10 @@
             </div>
         </div>
         <div ng-if="!!vm.board.description" class="board-container-header-description" ng-bind="vm.board.description"></div>
+        <board-description-lightbox
+                                board="vm.board"
+        >
+        </board-description-lightbox>
     </div>
 
     <!-- Header mobile -->

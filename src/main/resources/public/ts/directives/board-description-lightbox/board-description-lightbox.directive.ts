@@ -71,7 +71,7 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
                         element: ng.IAugmentedJQuery,
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
-            const descriptionHeightLimit : number = 64;
+            const descriptionHeightLimit : number = 66;
             const descriptionHeightLimitMobile : number = 28;
 
             $(document).ready(() => {

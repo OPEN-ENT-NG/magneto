@@ -24,8 +24,8 @@
             </button>
         </div>-->
     </lightbox>
-    <button ng-click="vm.display()">
-        Lire plus
-    </button>
+    <strong class="read-more-link" ng-if="vm.showReadMoreLink">
+        <a ng-click="vm.display()">Lire plus</a>
+    </strong>
 </div>
 

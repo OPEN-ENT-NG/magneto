@@ -43,7 +43,13 @@
             </button>
 
         </div>
-        <div ng-if="!!vm.board.description" class="board-container-header-description" ng-bind="vm.board.description"></div>
+        <div ng-if="!!vm.board.description" class="board-container-header-description">
+            <p class="board-container-header-description-text" ng-bind="vm.board.description"></p>
+        </div>
+        <board-description-lightbox
+                board="vm.board"
+        >
+        </board-description-lightbox>
     </div>
 
     <div class="twelve cell board-container-body"

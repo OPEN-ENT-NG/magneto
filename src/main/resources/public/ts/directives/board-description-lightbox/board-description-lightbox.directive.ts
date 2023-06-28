@@ -1,4 +1,4 @@
-import {ng} from "entcore";
+import {angular, ng} from "entcore";
 import {ILocationService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board, Boards, Card, IBoardOwner, IBoardPayload, IBoardsParamsRequest} from "../../models";
@@ -14,12 +14,14 @@ interface IBoardDescriptionProps {
 }
 
 interface IBoardDescriptionScope extends IScope, IBoardDescriptionProps {
+    checkDescriptionSize: () => void;
     vm: IViewModel;
 }
 
 class Controller implements IViewModel {
 
     displayDescription : boolean = false;
+    showReadMoreLink: boolean = false;
     boards: Array<Board>;
 
 
@@ -58,6 +60,14 @@ function directive() {
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
 
+            $scope.checkDescriptionSize = (): void => {
+                let descriptionElement = angular.element('.board-container-header-description-text');
+                let descriptionHeight = descriptionElement[0].offsetHeight;
+                this.showReadMoreLink = descriptionHeight > 64;
+            }
+            $scope.$watch('vm.board.description', () => {
+                $scope.checkDescriptionSize();
+            });
         }
     }
 }

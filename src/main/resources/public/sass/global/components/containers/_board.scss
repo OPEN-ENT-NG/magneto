@@ -23,8 +23,8 @@
     }
 
     &-description {
-      height: 64px;
-      overflow-y: auto;
+      max-height: 64px;
+      overflow: hidden;
       white-space: pre-line;
     }
   }

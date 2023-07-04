@@ -76,13 +76,14 @@ function directive() {
 
             $(document).ready($scope.vm.checkDescriptionSize);
             $scope.vm.checkDescriptionSize = (): void => {
-                if ($("#description-mobile").length > 0) {
+                let windowElement : JQuery = $(window);
+                if (windowElement.width() < 768) {
                     let descriptionElement : HTMLElement = angular.element('.board-container-header-mobile-description');
                     let spanElement = descriptionElement[0].querySelector('span');
                     let spanHeight = spanElement.offsetHeight;
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimitMobile);
                 }
-                if ($("#description").length > 0){
+                if (windowElement.width() > 768){
                     let descriptionElement : HTMLElement = angular.element('.board-container-header-description');
                     let spanElement = descriptionElement[0].querySelector('span');
                     let spanHeight = spanElement.offsetHeight;

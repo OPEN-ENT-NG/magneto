@@ -1,31 +1,23 @@
-<div>
+<div class="board-description-lightbox scrollbar">
     <lightbox
             show="vm.displayDescription"
             on-close="vm.displayDescription = false"
-            class="board-description-lightbox">
-        <section class="head board-description-lightbox-head">
+            class="board-description-lightbox-content no-scroll">
+        <section class="head board-description-lightbox-content-head">
             <h3>
                 <i18n>magneto.title</i18n>
                 / [[vm.board.title]]
             </h3>
         </section>
-
-        <section class="body board-description-lightbox-body">
-            <h4>
-                <i18n>magneto.board.description</i18n>
-            </h4>
-            <div class="row vertical-spacing board-description-lightbox-body-inputs" ng-bind="vm.board.description">
-                <!-- Description du tableau -->
-            </div>
+        <section class="body board-description-lightbox-content-body">
+            <h4><i18n>magneto.board.description</i18n></h4>
+            <div class="board-description-lightbox-content-body-inputs scrollbar-lightbox" ng-bind="vm.board.description"></div>
         </section>
-        <!--<div class="twelve cell">
-            <button class="right-magnet cancel" ng-click="vm.closeForm()">
-                <i18n>magneto.cancel</i18n>
-            </button>
-        </div>-->
     </lightbox>
-    <strong class="read-more-link" ng-if="vm.showReadMoreLink">
-        <a ng-click="vm.display()">Lire plus</a>
+    <strong class="board-description-lightbox-read-more-link" ng-if="vm.showReadMoreLink">
+        <a ng-click="vm.display()">
+            <i18n>magneto.board.description.readmore</i18n>
+        </a>
     </strong>
 </div>
 

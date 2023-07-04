@@ -17,9 +17,13 @@
                 <board-date date="vm.board.modificationDate"></board-date>
             </div>
         </div>
-        <div ng-if="!!vm.board.description" class="board-container-header-description" ng-bind="vm.board.description"></div>
+        <div class="board-container-header-desc">
+            <div ng-if="!!vm.board.description" class="board-container-header-description twelve cell"><span id="description">[[vm.board.description]]</span></div>
+            <div class="board-container-header-degrade twelve" ng-if="vm.showReadMoreLink"></div>
+        </div>
         <board-description-lightbox
-                                board="vm.board"
+                board="vm.board"
+                show-read-more-link="vm.showReadMoreLink"
         >
         </board-description-lightbox>
     </div>
@@ -43,9 +47,7 @@
             </button>
 
         </div>
-        <div ng-if="!!vm.board.description" class="board-container-header-description">
-            <p class="board-container-header-description-text" ng-bind="vm.board.description"></p>
-        </div>
+        <div ng-if="!!vm.board.description" class="board-container-header-mobile-description"><span id="description-mobile">[[vm.board.description]]</span></div>
         <board-description-lightbox
                 board="vm.board"
         >

@@ -1,27 +1,28 @@
 import {angular, ng} from "entcore";
-import {ILocationService, IScope, IWindowService} from "angular";
+import {IScope} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Board, Boards, Card, IBoardOwner, IBoardPayload, IBoardsParamsRequest} from "../../models";
-import {IBoardsService} from "../../services";
+import {Board} from "../../models";
+import {safeApply} from "../../utils/safe-apply.utils";
 
 interface IViewModel extends ng.IController, IBoardDescriptionProps {
+    updateSetVisible(value: boolean): void;
     display(): void;
     closeForm(): void;
+    checkDescriptionSize(): void;
 }
 
 interface IBoardDescriptionProps {
-
+    showReadMoreLink: boolean;
 }
 
 interface IBoardDescriptionScope extends IScope, IBoardDescriptionProps {
-    checkDescriptionSize: () => void;
     vm: IViewModel;
 }
 
 class Controller implements IViewModel {
 
-    displayDescription : boolean = false;
-    showReadMoreLink: boolean = false;
+    displayDescription : boolean;
+    showReadMoreLink: boolean;
     boards: Array<Board>;
 
 
@@ -29,6 +30,13 @@ class Controller implements IViewModel {
     }
 
     $onInit() {
+        this.displayDescription = false;
+        safeApply(this.$scope);
+    }
+
+    updateSetVisible = (value: boolean): void => {
+        this.showReadMoreLink = value;
+        safeApply(this.$scope);
     }
 
     display = (): void => {
@@ -37,6 +45,9 @@ class Controller implements IViewModel {
 
     closeForm = (): void => {
         this.displayDescription = false;
+    }
+
+    checkDescriptionSize = (): void => {
     }
 
     $onDestroy() {
@@ -50,6 +61,7 @@ function directive() {
         templateUrl: `${RootsConst.directive}board-description-lightbox/board-description-lightbox.html`,
         scope: {
             board: '=',
+            showReadMoreLink: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -59,14 +71,27 @@ function directive() {
                         element: ng.IAugmentedJQuery,
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
+            const descriptionHeightLimit : number = 64;
+            const descriptionHeightLimitMobile : number = 28;
 
-            $scope.checkDescriptionSize = (): void => {
-                let descriptionElement = angular.element('.board-container-header-description-text');
-                let descriptionHeight = descriptionElement[0].offsetHeight;
-                this.showReadMoreLink = descriptionHeight > 64;
+            $(document).ready($scope.vm.checkDescriptionSize);
+            $scope.vm.checkDescriptionSize = (): void => {
+                if ($("#description-mobile").length > 0) {
+                    let descriptionElement : HTMLElement = angular.element('.board-container-header-mobile-description');
+                    let spanElement = descriptionElement[0].querySelector('span');
+                    let spanHeight = spanElement.offsetHeight;
+                    vm.updateSetVisible(spanHeight >= descriptionHeightLimitMobile);
+                }
+                if ($("#description").length > 0){
+                    let descriptionElement : HTMLElement = angular.element('.board-container-header-description');
+                    let spanElement = descriptionElement[0].querySelector('span');
+                    let spanHeight = spanElement.offsetHeight;
+                    vm.updateSetVisible(spanHeight >= descriptionHeightLimit);
+                }
             }
+
             $scope.$watch('vm.board.description', () => {
-                $scope.checkDescriptionSize();
+                $scope.vm.checkDescriptionSize();
             });
         }
     }

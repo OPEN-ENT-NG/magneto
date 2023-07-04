@@ -22,10 +22,17 @@
       margin-top: 5px;
     }
 
+    &-degrade {
+      background: linear-gradient(to top, #FFFFFF 15%,transparent);
+      position: absolute;
+      height: 80%;
+    }
+
     &-description {
-      max-height: 64px;
-      overflow: hidden;
-      white-space: pre-line;
+      max-height: 64px !important;
+      overflow: hidden !important;
+      white-space: pre-line !important;
+      margin-bottom: 5px !important;
     }
   }
 
@@ -54,8 +61,9 @@
     }
 
     &-description {
-      height: 64px;
-      overflow-y: auto;
+      overflow: hidden !important;
+      white-space: pre-line !important;
+      height: 28px !important;
     }
 
     .create-button {

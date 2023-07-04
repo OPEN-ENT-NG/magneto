@@ -18,16 +18,29 @@
                 </image-select>
             </div>
             <!-- Video preview -->
-            <div class="cell" ng-if="vm.form.resourceType == 'video'">
+            <div class="cell video-preview" ng-if="vm.form.resourceType == 'video'">
 
-                <!-- Preview for external video sources -->
-                <iframe ng-if="!vm.videoIsFromWorkspace()" id="video-preview"
-                        width="302" height="170" data-ng-src="[[vm.form.resourceUrl]]">
-                </iframe>
-                <!-- Preview for workspace video -->
-                <video controls ng-if="vm.videoIsFromWorkspace()"
-                       data-ng-src="[[vm.form.resourceUrl]]">
-                </video>
+                    <!-- Preview for external video sources -->
+                    <iframe ng-if="!vm.videoIsFromWorkspace()" id="video-preview"
+                            width="302" height="170" data-ng-src="[[vm.formatVideoUrl(vm.form.resourceUrl)]]">
+                    </iframe>
+                    <!-- Preview for workspace video -->
+                    <video controls ng-if="vm.videoIsFromWorkspace()"
+                           data-ng-src="[[vm.form.resourceUrl]]">
+                    </video>
+                <div class="edit-container">
+                    <i class="edit pick-file" data-ng-click="vm.displayEmbedder()"
+                       ng-if="vm.isUpdate"></i>
+                </div>
+                <!--Change Video URL-->
+
+                <embedder file-format="'video'"
+                          hidden-share-video-code="false"
+                          ng-model="vm.videoUrl"
+                          ng-change="vm.changeUrl()"
+                          ng-if="vm.displayChangeVideoLightbox"
+                          show="vm.displayChangeVideoLightbox">
+                </embedder>
             </div>
             <!-- Audio preview -->
             <div class="cell" ng-if="vm.form.resourceType == 'audio'">

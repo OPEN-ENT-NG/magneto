@@ -7,6 +7,7 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
+import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
@@ -91,6 +92,14 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
      */
     Future<JsonObject> getAllCardsByBoard(Board board, Integer page);
+
+    /**
+     * Get all cards by creation date
+     *
+     * @param statisticsPayload Statistics filter object
+     * @return Future {@link Future List<Card>} containing the cards corresponding to the creation date
+     */
+    Future<List<Card>> getAllCardsByCreationDate(StatisticsPayload statisticsPayload);
 
     /**
      * Get all cards by section

@@ -51,6 +51,10 @@ public class ServiceFactory {
         return this.boardService;
     }
 
+    public UserService userService() {
+        return new DefaultUserService();
+    }
+
     public CardService cardService() {
         return this.cardService;
     }
@@ -62,8 +66,6 @@ public class ServiceFactory {
     public FolderService folderService() {
         return this.folderService;
     }
-
-
     public WorkspaceService workSpaceService() {
         return new DefaultWorkspaceService(vertx);
     }

@@ -24,7 +24,7 @@ describe('BoardModel', () => {
             public: false,
             deleted: false,
             canComment: false,
-            displayNbOfFavorites: false
+            displayNbFavorites: false
         }
 
         const board = new Board().build(boardResponse);
@@ -68,7 +68,7 @@ describe('BoardModel', () => {
                     public: false,
                     deleted: false,
                     canComment: false,
-                    displayNbOfFavorites: false
+                    displayNbFavorites: false
                 }
             ],
             page: 1,
@@ -118,7 +118,7 @@ describe('BoardModel', () => {
             imageUrl: 'imageUrl',
             backgroundUrl: 'backgroundUrl',
             canComment: true,
-            displayNbOfFavorites: true
+            displayNbFavorites: true
         }
 
         const formJSON2 = {
@@ -129,7 +129,7 @@ describe('BoardModel', () => {
             imageUrl: 'imageUrl',
             backgroundUrl: 'backgroundUrl',
             canComment: true,
-            displayNbOfFavorites: true
+            displayNbFavorites: true
         }
 
         let form = new BoardForm();
@@ -138,7 +138,7 @@ describe('BoardModel', () => {
         form.imageUrl = 'imageUrl';
         form.backgroundUrl = 'backgroundUrl';
         form.canComment = true;
-        form.displayNbOfFavorites = true;
+        form.displayNbFavorites = true;
         expect(form.toJSON()).toEqual(formJSON1);
         form.id = 'id';
         expect(form.toJSON()).toEqual(formJSON2);

@@ -28,7 +28,7 @@ public class FakeRight extends ControllerHelper {
     }
 
     @Get("/rights/board/favorites")
-    @SecuredAction(Rights.DISPLAY_NB_OF_FAVORITES)
+    @SecuredAction(Rights.DISPLAY_NB_FAVORITES)
     public void boardFavorites(HttpServerRequest request) {
         notImplemented(request);
     }

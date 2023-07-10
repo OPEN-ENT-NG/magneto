@@ -33,7 +33,7 @@
     "canComment": {
         "type": "boolean"
     },
-    "displayNbOfFavorites": {
+    "displayNbFavorites": {
         "type": "boolean"
     },
     "cardIds": {

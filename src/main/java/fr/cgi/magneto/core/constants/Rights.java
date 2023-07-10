@@ -27,7 +27,7 @@ public class Rights {
      * - add/remove ability to display number of favorites from cards of a board
      */
 
-    public static final String DISPLAY_NB_OF_FAVORITES = "magneto.board.favorites";
+    public static final String DISPLAY_NB_FAVORITES = "magneto.board.favorites";
 
     /** === SHARING RIGHTS === */
 

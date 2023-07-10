@@ -24,7 +24,7 @@ export interface IBoardItemResponse {
     ownerId: string;
     ownerName: string;
     canComment: boolean;
-    displayNbOfFavorites: boolean;
+    displayNbFavorites: boolean;
 }
 
 export interface IBoardsResponse {
@@ -56,7 +56,7 @@ export interface IBoardPayload {
     public?: boolean;
     layoutType?: LAYOUT_TYPE;
     canComment?: boolean;
-    displayNbOfFavorites?: boolean;
+    displayNbFavorites?: boolean;
 }
 
 export interface ISection {
@@ -84,7 +84,7 @@ export class BoardForm {
     private _tagsTextInput: string;
     private _layoutType: LAYOUT_TYPE;
     private _canComment: boolean;
-    private _displayNbOfFavorites : boolean;
+    private _displayNbFavorites : boolean;
 
     constructor() {
         this._id = null;
@@ -100,7 +100,7 @@ export class BoardForm {
         this._layoutType = LAYOUT_TYPE.FREE;
         this._tagsTextInput = null;
         this._canComment = false;
-        this._displayNbOfFavorites = false;
+        this._displayNbFavorites = false;
     }
 
     build(board: Board): BoardForm {
@@ -115,7 +115,7 @@ export class BoardForm {
         this.public = board.public;
         this.layoutType = board.layoutType;
         this.canComment = board.canComment;
-        this.displayNbOfFavorites = board.displayNbOfFavorites;
+        this.displayNbFavorites = board.displayNbFavorites;
         return this;
     }
 
@@ -224,12 +224,12 @@ export class BoardForm {
         this._canComment = value;
     }
 
-    get displayNbOfFavorites(): boolean {
-        return this._displayNbOfFavorites;
+    get displayNbFavorites(): boolean {
+        return this._displayNbFavorites;
     }
 
-    set displayNbOfFavorites(value: boolean) {
-        this._displayNbOfFavorites = value;
+    set displayNbFavorites(value: boolean) {
+        this._displayNbFavorites = value;
     }
 
     isLayoutFree(): boolean {
@@ -292,8 +292,8 @@ export class BoardForm {
             payload.id = this.id;
         }
 
-        if(this.displayNbOfFavorites != null) {
-            payload.displayNbOfFavorites = this.displayNbOfFavorites;
+        if(this.displayNbFavorites != null) {
+            payload.displayNbFavorites = this.displayNbFavorites;
         }
 
         return payload;
@@ -319,7 +319,7 @@ export class Board implements Shareable {
     private _public: boolean;
     private _deleted: boolean;
     private _canComment: boolean;
-    private _displayNbOfFavorites: boolean;
+    private _displayNbFavorites: boolean;
 
 
     // Share resource properties
@@ -353,7 +353,7 @@ export class Board implements Shareable {
         this.shared = data.shared;
         this._deleted = data.deleted;
         this._canComment = data.canComment;
-        this._displayNbOfFavorites = data.displayNbOfFavorites;
+        this._displayNbFavorites = data.displayNbFavorites;
         return this;
     }
 
@@ -485,12 +485,12 @@ export class Board implements Shareable {
         this._canComment = value;
     }
 
-    get displayNbOfFavorites(): boolean {
-        return this._displayNbOfFavorites;
+    get displayNbFavorites(): boolean {
+        return this._displayNbFavorites;
     }
 
-    set displayNbOfFavorites(value: boolean) {
-        this._displayNbOfFavorites = value;
+    set displayNbFavorites(value: boolean) {
+        this._displayNbFavorites = value;
     }
 }
 

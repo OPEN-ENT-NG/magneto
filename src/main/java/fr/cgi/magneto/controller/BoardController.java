@@ -139,9 +139,9 @@ public class BoardController extends ControllerHelper {
                             if (!hasCommRight) {
                                 board.remove(Field.CANCOMMENT);
                             }
-                            boolean hasDisplayNbOfFavoritesRight = WorkflowHelper.hasRight(user, Rights.DISPLAY_NB_OF_FAVORITES);
-                            if (!hasDisplayNbOfFavoritesRight) {
-                                board.remove(Field.DISPLAY_NB_OF_FAVORITES);
+                            boolean hasDisplayNbFavoritesRight = WorkflowHelper.hasRight(user, Rights.DISPLAY_NB_FAVORITES);
+                            if (!hasDisplayNbFavoritesRight) {
+                                board.remove(Field.DISPLAY_NB_FAVORITES);
                             }
                             boardService.create(user, board, true, i18nHelper)
                                     .onFailure(err -> renderError(request))
@@ -186,9 +186,9 @@ public class BoardController extends ControllerHelper {
                                 if (!hasCommRight) {
                                     board.remove(Field.CANCOMMENT);
                                 }
-                                boolean hasDisplayNbOfFavoritesRight = WorkflowHelper.hasRight(user, Rights.DISPLAY_NB_OF_FAVORITES);
-                                if(!hasDisplayNbOfFavoritesRight) {
-                                    board.remove(Field.DISPLAY_NB_OF_FAVORITES);
+                                boolean hasDisplayNbFavoritesRight = WorkflowHelper.hasRight(user, Rights.DISPLAY_NB_FAVORITES);
+                                if(!hasDisplayNbFavoritesRight) {
+                                    board.remove(Field.DISPLAY_NB_FAVORITES);
                                 }
                                 BoardPayload updateBoard = new BoardPayload(board)
                                         .setId(boardId)

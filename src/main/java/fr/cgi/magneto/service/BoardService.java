@@ -3,6 +3,7 @@ package fr.cgi.magneto.service;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
+import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
@@ -85,6 +86,14 @@ public interface BoardService {
      * @return Future {@link Future <List<Board>} containing list of editable boards
      */
     Future<List<Board>> getAllBoardsEditable(UserInfos user);
+
+    /**
+     * Get all boards by creation date
+     *
+     * @param statisticsPayload Statistics filter object
+     * @return Future {@link Future List<Board>} containing the boards corresponding to the creation date
+     */
+    Future<List<Board>> getAllBoardsByCreationDate(StatisticsPayload statisticsPayload);
 
     /**
      * Pre delete boards

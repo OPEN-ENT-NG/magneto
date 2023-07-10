@@ -49,6 +49,7 @@ public class DefaultSectionService implements SectionService {
     public Future<List<Section>> get(List<String> sectionIds) {
         Promise<List<Section>> promise = Promise.promise();
         QueryBuilder matcher = QueryBuilder.start(Field._ID).in(sectionIds);
+
         mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validResultsHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::get] Failed to get sections", this.getClass().getSimpleName());

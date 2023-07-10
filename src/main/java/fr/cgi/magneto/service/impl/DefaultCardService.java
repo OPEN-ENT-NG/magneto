@@ -16,6 +16,7 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
+import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import fr.cgi.magneto.service.CardService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.WorkspaceService;
@@ -32,6 +33,7 @@ import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DefaultCardService implements CardService {
@@ -332,6 +334,23 @@ public class DefaultCardService implements CardService {
                 });
 
 
+        return promise.future();
+    }
+
+    public Future<List<Card>> getAllCardsByCreationDate(StatisticsPayload statisticsPayload) {
+        Promise<List<Card>> promise = Promise.promise();
+
+        Pattern datePattern = Pattern.compile("^" + statisticsPayload.getDate());
+        QueryBuilder matcher = QueryBuilder.start(Field.CREATIONDATE).regex(datePattern);
+        mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validResultsHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::get] Failed to get cards by creation date", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+            promise.complete(ModelHelper.toList(results.right().getValue(), Card.class));
+        }));
         return promise.future();
     }
 

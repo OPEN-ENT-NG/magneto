@@ -32,13 +32,13 @@
                 <textarea ng-model="vm.form.description" class="twelve cell"></textarea>
             </div>
 
-            <div class="boardDirective-manage-lightbox-body-inputs-options" ng-if="vm.hasRight('comment')">
+            <div class="boardDirective-manage-lightbox-body-inputs-options" ng-if="vm.hasRight('comment') || vm.hasRight('favorites')">
                 <h2><i18n>magneto.create.board.options</i18n></h2>
-                <label class="checkbox">
+                <label class="checkbox" ng-if="vm.hasRight('comment')">
                     <input type="checkbox" ng-model="vm.form.canComment">
                     <span><i18n><span>magneto.create.board.options.comment</span></i18n></span>
                 </label>
-                <label class="checkbox">
+                <label class="checkbox" ng-if="vm.hasRight('favorites')">
                     <input type="checkbox" ng-model="vm.form.displayNbOfFavorites">
                     <span><i18n><span>magneto.create.board.options.display.favorites</span></i18n></span>
                 </label>

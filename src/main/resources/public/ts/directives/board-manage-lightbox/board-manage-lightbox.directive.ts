@@ -89,6 +89,7 @@ function directive($parse: IParseService) {
                     form.public = vm.form.public;
                     form.layoutType = vm.form.layoutType;
                     form.canComment = vm.form.canComment;
+                    form.displayNbOfFavorites = vm.form.displayNbOfFavorites;
 
                     if (vm.isUpdate) {
                         await boardsService.updateBoard(vm.form.id, form);

@@ -65,6 +65,7 @@ public class Field {
     public static final String LAYOUTTYPE = "layoutType";
 
     public static final String CANCOMMENT = "canComment";
+    public static final String DISPLAY_NB_OF_FAVORITES = "displayNbOfFavorites";
 
     public static final String OWNER = "owner";
     public static final String USERID = "userId";

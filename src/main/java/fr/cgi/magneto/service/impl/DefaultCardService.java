@@ -360,6 +360,26 @@ public class DefaultCardService implements CardService {
         return this.serviceFactory.boardService().update(board);
     }
 
+    public Future<JsonObject> updateFavorite(String cardId, boolean favorite, String userId){
+        if(cardId == null || userId == null){
+            String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite",
+                    this.getClass().getSimpleName());
+            return Future.failedFuture(message);
+        }
+        JsonObject query = new JsonObject()
+                .put(Field.ID, cardId);
+
+        getCards(Collections.singletonList(cardId))
+                .compose(cards -> {
+                    if(!cards.isEmpty()){
+                        CardPayload cardPayload = new CardPayload( cards.get(0).toJson());
+                        return this.serviceFactory.cardService().update(cardPayload);
+                    }
+                    return Future.succeededFuture();
+                });
+        return Future.succeededFuture();
+    }
+
     private Future<JsonObject> duplicateCardsFuture(String boardId, List<Card> cards, SectionPayload section, Board boardResult, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
         List<Future> duplicateFutures = new ArrayList<>();

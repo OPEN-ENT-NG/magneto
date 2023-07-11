@@ -119,4 +119,13 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing status of update
      */
     Future<JsonObject> updateBoard(BoardPayload boardPayload);
+
+    /**
+     * Update the list of favorite for a card, adding or deleting the a user from it
+     * @param cardId The id of the card we want to update
+     * @param favorite The new favorite status
+     * @param userId The id of the user who want to update the favorite status
+     * @return Future {@link Future <JsonObject>} containing status of update
+     */
+    Future<JsonObject> updateFavorite(String cardId, boolean favorite, String userId);
 }

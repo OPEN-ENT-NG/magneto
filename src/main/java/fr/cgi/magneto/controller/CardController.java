@@ -185,6 +185,20 @@ public class CardController extends ControllerHelper {
             });
         });
     }
+    @Put("/card/favorite/:id")
+    @ApiDoc("Update the favorites of a card")
+    public void updateFavorite(HttpServerRequest request){
+        RequestUtils.bodyToJson(request, pathPrefix + "cardUpdateFavorite", body -> {
+            UserUtils.getUserInfos(eb, request, user -> {
+                String cardId = request.getParam(Field.ID);
+                boolean favorite = body.getBoolean(Field.IS_FAVORITE);
+                cardService.updateFavorite(cardId, favorite, user.getUserId())
+                        .onFailure(err -> renderError(request))
+                        .onSuccess(res -> renderJson(request, res));
+            });
+        });
+    }
+
 
     @SuppressWarnings("unchecked")
     @Post("/card/duplicate")
@@ -320,6 +334,7 @@ public class CardController extends ControllerHelper {
                         }
                 ));
     }
+
 
     private void removeCardsLayout(CardPayload updateCard, String oldBoardId, Future<List<Section>> getOldSectionFuture,
                                    List<Future> updateBoardsFutures, Board currentBoard) {

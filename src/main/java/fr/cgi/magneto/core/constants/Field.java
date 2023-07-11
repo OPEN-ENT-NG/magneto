@@ -163,4 +163,6 @@ public class Field {
     public static final String NBCARDSSECTIONS = "nbCardsSections";
 
     public static final String BOARDURL = "boardUrl";
+
+    public static final String IS_FAVORITE = "isFavorite";
 }

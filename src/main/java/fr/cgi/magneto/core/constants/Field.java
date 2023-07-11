@@ -18,6 +18,11 @@ public class Field {
 
     public static final String ID = "id";
     public static final String _ID = "_id";
+
+    public static final String BDD_PREFIX = "magneto.";
+
+    public static final String SHARED_USERID = "shared.userId";
+    public static final String SHARED_GROUPID = "shared.groupId";
     public static final String SEARCHTEXT = "searchText";
     public static final String FOLDERID = "folderId";
 
@@ -163,6 +168,25 @@ public class Field {
     public static final String NBCARDSSECTIONS = "nbCardsSections";
 
     public static final String BOARDURL = "boardUrl";
+
+    //Import Export
+    public static final String RAPPORT = "rapport";
+
+    public static final String RESSOURCE_NUMBER = "resourcesNumber";
+
+    public static final String DUPLICATES_NUMBER = "duplicatesNumber";
+
+    public static final String ERRORS_NUMBER = "errorsNumber";
+
+    public static final String RESSOURCE_IDS_MAP = "resourcesIdsMap";
+
+    public static final String DUPLICATES_NUMBER_MAP = "duplicatesNumberMap";
+
+    public static final String MAIN_RESSOURCE_NAME = "mainResourceName";
+
+    public static final String COLLECTION = "collection";
+
+    public static final String IDS_MAP = "idsMap";
     public static final String DATE = "date";
     public static final String USER = "user";
     public static final String USERIDS = "userIds";

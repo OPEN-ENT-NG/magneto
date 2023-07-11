@@ -5,6 +5,7 @@ import fr.cgi.magneto.controller.*;
 import fr.cgi.magneto.core.constants.*;
 import fr.cgi.magneto.realtime.RealTimeCollaboration;
 import fr.cgi.magneto.service.ServiceFactory;
+import fr.cgi.magneto.service.impl.MagnetoRepositoryEvents;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.eventbus.*;
 import org.entcore.common.http.BaseServer;
@@ -34,6 +35,9 @@ public class Magneto extends BaseServer {
 
 		// TODO see if needed
 		setDefaultResourceFilter(new ShareAndOwner());
+
+		// Set RepositoryEvents implementation used to process events published for transition
+		setRepositoryEvents(new MagnetoRepositoryEvents(vertx));
 
 		addController(new MagnetoController(serviceFactory));
 		addController(new BoardController(serviceFactory));

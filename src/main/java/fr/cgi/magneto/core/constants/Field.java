@@ -190,4 +190,9 @@ public class Field {
     public static final String COLLECTION = "collection";
 
     public static final String IDS_MAP = "idsMap";
+
+    //FAVORITE
+
+    public static final String FAVORITE_LIST = "favoriteList";
+    public static final String IS_FAVORITE = "isFavorite";
 }

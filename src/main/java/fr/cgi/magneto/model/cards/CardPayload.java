@@ -3,9 +3,11 @@ package fr.cgi.magneto.model.cards;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.Model;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Date;
+import java.util.List;
 
 public class CardPayload implements Model<CardPayload> {
 
@@ -26,6 +28,7 @@ public class CardPayload implements Model<CardPayload> {
     private String parentId;
     private String boardId;
     private String sectionId;
+    private List<String> favoriteList;
 
 
     public CardPayload(JsonObject card) {
@@ -44,6 +47,7 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = card.getString(Field.PARENTID);
         this.boardId = card.getString(Field.BOARDID);
         this.sectionId = card.getString(Field.SECTIONID);
+        this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -204,6 +208,15 @@ public class CardPayload implements Model<CardPayload> {
         return this;
     }
 
+    public CardPayload setFavoriteList(List<String> favoriteList) {
+        this.favoriteList = favoriteList;
+        return this;
+    }
+
+    public List<String> getFavoriteList() {
+        return favoriteList;
+    }
+
     @Override
     public JsonObject toJson() {
 
@@ -218,7 +231,8 @@ public class CardPayload implements Model<CardPayload> {
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.LASTMODIFIERID, this.getLastModifierId())
-                .put(Field.LASTMODIFIERNAME, this.getLastModifierName());
+                .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
+                .put(Field.FAVORITE_LIST, this.getFavoriteList());
 
         // If create
         if (this.getId() == null) {

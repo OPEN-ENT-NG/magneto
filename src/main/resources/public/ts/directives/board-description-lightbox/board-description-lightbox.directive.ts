@@ -55,7 +55,7 @@ class Controller implements IViewModel {
 
 }
 
-function directive() {
+function directive($timeout: ng.ITimeoutService): ng.IDirective {
     return {
         restrict: 'E',
         templateUrl: `${RootsConst.directive}board-description-lightbox/board-description-lightbox.html`,
@@ -65,7 +65,7 @@ function directive() {
         },
         controllerAs: 'vm',
         bindToController: true,
-        controller: ['$scope', Controller],
+        controller: ['$scope', '$timeout', Controller],
         /* interaction DOM/element */
         link: function ($scope: IBoardDescriptionScope,
                         element: ng.IAugmentedJQuery,
@@ -74,7 +74,12 @@ function directive() {
             const descriptionHeightLimit : number = 64;
             const descriptionHeightLimitMobile : number = 28;
 
-            $(document).ready($scope.vm.checkDescriptionSize);
+            $(document).ready(() => {
+                $timeout(() => {
+                    vm.checkDescriptionSize()
+                }, 100);
+            });
+
             $scope.vm.checkDescriptionSize = (): void => {
                 let windowElement : JQuery = $(window);
                 if (windowElement.width() < 768) {
@@ -90,7 +95,6 @@ function directive() {
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimit);
                 }
             }
-
             $scope.$watch('vm.board.description', () => {
                 $scope.vm.checkDescriptionSize();
             });

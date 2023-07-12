@@ -1,20 +1,20 @@
-<div class="board-description-lightbox scrollbar">
+<div class="boardDirective-description-lightbox scrollbar">
     <lightbox
             show="vm.displayDescription"
             on-close="vm.displayDescription = false"
-            class="board-description-lightbox-content no-scroll">
-        <section class="head board-description-lightbox-content-head">
+            class="boardDirective-description-lightbox-content no-scroll">
+        <section class="head boardDirective-description-lightbox-content-head">
             <h3>
                 <i18n>magneto.title</i18n>
                 / [[vm.board.title]]
             </h3>
         </section>
-        <section class="body board-description-lightbox-content-body">
+        <section class="body boardDirective-description-lightbox-content-body">
             <h4><i18n>magneto.board.description</i18n></h4>
-            <div class="board-description-lightbox-content-body-inputs scrollbar-lightbox" ng-bind="vm.board.description"></div>
+            <div class="boardDirective-description-lightbox-content-body-inputs scrollbar-lightbox" ng-bind="vm.board.description"></div>
         </section>
     </lightbox>
-    <strong class="board-description-lightbox-read-more-link" ng-if="vm.showReadMoreLink">
+    <strong class="boardDirective-description-lightbox-read-more-link" ng-if="vm.showReadMoreLink">
         <a ng-click="vm.display()">
             <i18n>magneto.board.description.readmore</i18n>
         </a>

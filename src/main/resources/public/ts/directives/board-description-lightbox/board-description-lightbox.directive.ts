@@ -84,14 +84,14 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
                 let windowElement : JQuery = $(window);
                 if (windowElement.width() < 768) {
                     let descriptionElement : HTMLElement = angular.element('.board-container-header-mobile-description');
-                    let spanElement = descriptionElement[0].querySelector('span');
-                    let spanHeight = spanElement.offsetHeight;
+                    let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
+                    let spanHeight : number = spanElement.offsetHeight;
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimitMobile);
                 }
                 if (windowElement.width() > 768){
                     let descriptionElement : HTMLElement = angular.element('.board-container-header-description');
-                    let spanElement = descriptionElement[0].querySelector('span');
-                    let spanHeight = spanElement.offsetHeight;
+                    let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
+                    let spanHeight : number = spanElement.offsetHeight;
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimit);
                 }
             }

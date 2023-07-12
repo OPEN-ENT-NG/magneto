@@ -1,4 +1,4 @@
-<div id="section-list" class="sections-list sections-list-[[vm.board.layoutType]] scrollbar">
+<div id="section-list" class="sections-listDirective sections-listDirective-[[vm.board.layoutType]] scrollbar">
     <section-list-item
             ng-repeat="section in vm.board.sections"
             board="vm.board"
@@ -12,18 +12,18 @@
             on-preview="vm.openPreview"
             on-transfer="vm.openTransfer"
             on-lock="vm.openLock"
-            class="scrollbar sections-list-content sections-list-content-[[vm.board.layoutType]]"
+            class="scrollbar sections-listDirective-content sections-listDirective-content-[[vm.board.layoutType]]"
             card-update-eventer="vm.cardUpdateEventer">
     </section-list-item>
     <div ng-if="vm.board.myRights.publish !== undefined"
-         class="sections-list-content sections-list-content-[[vm.board.layoutType]]">
-        <div class="sections-list-content-container" tabindex="0">
-            <input type="text" class="sections-list-content-title input"
+         class="sections-listDirective-content sections-listDirective-content-[[vm.board.layoutType]]">
+        <div class="sections-listDirective-content-container" tabindex="0">
+            <input type="text" class="sections-listDirective-content-title input"
                    ng-keyup="$event.keyCode == 13 ? vm.createSection(vm.newSection) : null"
                    ng-blur="vm.createSection(vm.newSection)"
                    ng-model="vm.newSection.title" i18n-placeholder="magneto.section.insert.title"/>
         </div>
-        <div class="card-list card-list-[[vm.board.layoutType]] flex-row">
+        <div class="cardDirective-list cardDirective-list-[[vm.board.layoutType]] flex-row">
         </div>
     </div>
 

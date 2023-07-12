@@ -375,7 +375,7 @@ class Controller implements IViewModel {
             }
             this.nestedSortables = [];
 
-            const cardList: NodeListOf<Element> = document.querySelectorAll(".card-list");
+            const cardList: NodeListOf<Element> = document.querySelectorAll(".cardDirective-list");
             for (let i = 0; i < cardList.length; i++) {
                 this.nestedSortables.push(create(cardList[i], {
                     group: 'nested',

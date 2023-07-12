@@ -148,7 +148,7 @@ function directive($parse: IParseService) {
                 let actionOptionsElem: JQuery =
                     $("#options-" + vm.comment.id);
 
-                if (vm.selectorResize === '.card-manage-lightbox') {
+                if (vm.selectorResize === '.cardDirective-manage-lightbox') {
                     actionOptionsElem = $(vm.selectorResize).find("#options-" + vm.comment.id);
                 }
 

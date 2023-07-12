@@ -1,7 +1,7 @@
-<lightbox class="board-manage-lightbox"
+<lightbox class="boardDirective-manage-lightbox"
           show="vm.display"
           on-close="vm.closeForm()">
-    <section class="head board-manage-lightbox-head">
+    <section class="head boardDirective-manage-lightbox-head">
         <h3 ng-if="!vm.isUpdate">
             <i18n>magneto.create.board</i18n>
         </h3>
@@ -9,19 +9,19 @@
             <i18n>magneto.board.properties</i18n>
         </h3>
     </section>
-    <section class="body board-manage-lightbox-body">
+    <section class="body boardDirective-manage-lightbox-body">
         <div class="flex-row f-column">
             <image-select ng-model="vm.form.imageUrl"
                           default="/img/illustrations/collaborativeeditor-default.png"
-                          class="cell board-manage-lightbox-body-image-select">
+                          class="cell boardDirective-manage-lightbox-body-image-select">
             </image-select>
             <span ng-if="!vm.form.imageUrl"
-                  class="board-manage-lightbox-body-image-select-choose">
+                  class="boardDirective-manage-lightbox-body-image-select-choose">
                 <i18n>magneto.board.manage.ask.image</i18n>
             </span>
         </div>
 
-        <div class="row vertical-spacing board-manage-lightbox-body-inputs">
+        <div class="row vertical-spacing boardDirective-manage-lightbox-body-inputs">
             <div>
                 <i18n>magneto.create.board.title</i18n>
                 *&nbsp;:
@@ -32,7 +32,7 @@
                 <textarea ng-model="vm.form.description" class="twelve cell"></textarea>
             </div>
 
-            <div class="board-manage-lightbox-body-inputs-options" ng-if="vm.hasRight('comment')">
+            <div class="boardDirective-manage-lightbox-body-inputs-options" ng-if="vm.hasRight('comment')">
                 <h2><i18n>magneto.create.board.options</i18n></h2>
                 <label class="checkbox">
                     <input type="checkbox" ng-model="vm.form.canComment">
@@ -53,7 +53,7 @@
 
                 <image-select ng-model="vm.form.backgroundUrl"
                               default="/img/illustrations/collaborativeeditor-default.png"
-                              class="cell board-manage-lightbox-body-image-select small">
+                              class="cell boardDirective-manage-lightbox-body-image-select small">
                 </image-select>
                 <span class="italic-text"><i18n>magneto.board.background.warning</i18n></span>
             </div>

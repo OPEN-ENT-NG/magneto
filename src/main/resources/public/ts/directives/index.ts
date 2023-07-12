@@ -46,3 +46,4 @@ export * from './card-comment/card-comment.directive';
 export * from './comments-panel/comments-panel.directive';
 export * from './comment-input/comment-input.directive';
 export * from './comment-delete-lightbox/comment-delete-lightbox.directive';
+export * from './board-description-lightbox/board-description-lightbox.directive';

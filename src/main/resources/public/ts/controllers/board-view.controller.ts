@@ -67,6 +67,8 @@ interface IViewModel extends ng.IController {
     infiniteScrollService: InfiniteScrollService;
     cardUpdateSubject: Subject<void>;
 
+    showReadMoreLink: boolean;
+
     goToBoards(): void;
 
     getCards(): Promise<void>;
@@ -151,6 +153,7 @@ class Controller implements IViewModel {
     infiniteScrollService: InfiniteScrollService;
 
     cardUpdateSubject: Subject<void>;
+    showReadMoreLink: boolean;
 
     constructor(private $scope: IBoardViewScope,
                 private $route: any,
@@ -195,6 +198,7 @@ class Controller implements IViewModel {
         this.isLoading = true;
         this.isDraggable = true;
         this.nestedSortables = [];
+        this.showReadMoreLink = false;
         this.initDraggable();
 
 

@@ -1,5 +1,5 @@
-<div class="board-list">
-    <div class="board-list-folders flex-row f-wrap">
+<div class="boardDirective-list">
+    <div class="boardDirective-list-folders flex-row f-wrap">
         <board-list-folder ng-repeat="folder in vm.folders"
                            ng-click="vm.selectFolder(folder._id)"
                            dragdrop="vm.drag.dragDropHandler($originalEvent)"
@@ -10,7 +10,7 @@
 
         </board-list-folder>
     </div>
-    <div class="board-list-boards flex-row f-wrap justify-center">
+    <div class="boardDirective-list-boards flex-row f-wrap justify-center">
         <board-list-item ng-repeat="board in vm.boards"
                          dragstart="vm.drag.dragStartHandler($originalEvent, board)"
                          dragcondition="vm.drag.dragConditionHandler($originalEvent, board)"

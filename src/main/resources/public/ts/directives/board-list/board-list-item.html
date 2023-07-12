@@ -1,23 +1,23 @@
-<div class="card board-list-item flex-row f-column"
+<div class="card boardDirective-list-item flex-row f-column"
      ng-class="{'active': vm.isSelected}">
     <!--Board image-->
-    <div class="board-list-item-image flex-row justify-center">
+    <div class="boardDirective-list-item-image flex-row justify-center">
         <img ng-src="[[vm.board.imageUrl]]">
     </div>
     <!--Board infos-->
-    <div class="board-list-item-infos flex-row">
+    <div class="boardDirective-list-item-infos flex-row">
         <!--Board title-->
         <div>
-            <span class="board-list-item-infos-title">[[vm.board.title]] </span>
+            <span class="boardDirective-list-item-infos-title">[[vm.board.title]] </span>
         </div>
 
         <!--Board nb of magnets-->
-        <div class="board-list-item-infos-nb-cards">
+        <div class="boardDirective-list-item-infos-nb-cards">
             <i class="magneto-magnet"></i>
             <span ng-if="vm.getNbCards() != 1"><b>[[vm.getNbCards()]]</b>&nbsp;<i18n>magneto.magnets</i18n></span>
             <span ng-if="vm.getNbCards() == 1"><b>[[vm.getNbCards()]]</b>&nbsp;<i18n>magneto.magnet</i18n></span>
         </div>
-        <div class="board-list-item-infos-date-icons">
+        <div class="boardDirective-list-item-infos-date-icons">
             <div class="infos-date">
                 <i class="magneto-calendar" tooltip="magneto.board.date.update"></i> [[vm.formatDate(vm.board.modificationDate)]]
             </div>

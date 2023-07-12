@@ -1,8 +1,8 @@
-<div ng-controller="BoardsController as vm" class="boards-container">
+<div ng-controller="BoardsController as vm" class="boardsContainer-container">
 <!--    <card-profile name="'test'" job="'test'"></card-profile>-->
 
     <!-- Header desktop -->
-    <div class="row boards-container-header zero-mobile">
+    <div class="row boardsContainer-container-header zero-mobile">
         <h1 class="cell paddingRight">
             <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                  alt="" src="/magneto/public/img/uni-magneto.png">
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Header mobile -->
-    <div class="boards-container-header-mobile zero-desktop">
+    <div class="boardsContainer-container-header-mobile zero-desktop">
         <!-- Open navigation mobile -->
         <i class="magneto-card-settings cell one" ng-click="vm.openSideNavFolders()"></i>
         <h1 class="cell eight">
@@ -28,17 +28,17 @@
     </div>
 
 
-    <div class="twelve cell boards-container-body">
+    <div class="twelve cell boardsContainer-container-body">
 
         <!-- Navigation desktop -->
-        <div class="three cell boards-container-body-nav zero-mobile">
+        <div class="three cell boardsContainer-container-body-nav zero-mobile">
             <folder-tree-nav
                     folder-trees="vm.folderNavTrees"
                     folder-tree-eventer="vm.folderNavTreeSubject"
                     on-select-folder="vm.switchFolder"
                     drag="vm.draggable">
             </folder-tree-nav>
-            <div class="boards-container-body-folder-button"
+            <div class="boardsContainer-container-body-folder-button"
                  ng-click="vm.displayFolderLightbox = true"
                 ng-if="vm.filter.isMyBoards">
                 <a class="classic-link">
@@ -49,7 +49,7 @@
         </div>
 
         <div class="nine cell">
-            <div class="row boards-container-body-search">
+            <div class="row boardsContainer-container-body-search">
                     <search-bar
                             search-text="vm.filter.searchText"
                             on-search="vm.onSearchBoard()">

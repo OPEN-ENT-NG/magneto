@@ -288,7 +288,7 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
 
 
             vm.resizeAllCardItems = (): void => {
-                let allItems:  HTMLCollectionOf<Element> = document.getElementsByClassName('card-list-content');
+                let allItems:  HTMLCollectionOf<Element> = document.getElementsByClassName('cardDirective-list-content');
                 for (let i = 0; i < allItems.length; i++) {
                     resizeCardItem(allItems[i]);
                 }
@@ -296,11 +296,11 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
 
             let resizeCardItem = (item: any): void => {
 
-                let grid: Element = document.getElementsByClassName('card-list')[0];
+                let grid: Element = document.getElementsByClassName('cardDirective-list')[0];
                 let rowGap: number = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
                 let rowHeight: number = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
 
-                let rowSpan: number = Math.ceil((item.querySelector('.card-list-item').getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
+                let rowSpan: number = Math.ceil((item.querySelector('.cardDirective-list-item').getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
 
                 item.style.gridRowEnd = 'span '+ rowSpan;
             }

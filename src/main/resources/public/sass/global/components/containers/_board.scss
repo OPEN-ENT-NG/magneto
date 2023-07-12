@@ -22,16 +22,23 @@
       margin-top: 5px;
     }
 
+    &-degrade {
+      background: linear-gradient(to top, #FFFFFF 0.9%,transparent);
+      position: absolute;
+      height: 43%;
+    }
+
     &-description {
-      height: 64px;
-      overflow-y: auto;
-      white-space: pre-line;
+      max-height: 66px !important;
+      overflow: hidden !important;
+      white-space: pre-line !important;
+      margin-bottom: 5px !important;
     }
   }
 
   &-header-mobile {
     background: $magneto-white;
-    padding: $spacing-LXS $spacing-LXS $spacing-LXS 73px;
+    padding: $spacing-LXS $spacing-LXS $spacing-LL 73px;
     top: -12px;
     z-index: unset;
     @include noTextOverflow(1);
@@ -54,8 +61,9 @@
     }
 
     &-description {
-      height: 64px;
-      overflow-y: auto;
+      overflow: hidden !important;
+      white-space: pre-line !important;
+      height: 28px !important;
     }
 
     .create-button {
@@ -75,7 +83,7 @@
     position: absolute;
 
     @include mobile {
-      top: 65px;
+      top: 88px;
     }
 
     &-nav {

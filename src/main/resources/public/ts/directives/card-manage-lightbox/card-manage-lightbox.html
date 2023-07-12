@@ -1,7 +1,7 @@
-<lightbox class="card-manage-lightbox"
+<lightbox class="cardDirective-manage-lightbox"
           show="vm.display"
           on-close="vm.closeForm()">
-    <section class="head card-manage-lightbox-head">
+    <section class="head cardDirective-manage-lightbox-content-head">
         <h3 ng-if="!vm.isUpdate">
             <i18n>magneto.new.card</i18n>
         </h3>
@@ -9,8 +9,8 @@
             <i18n>magneto.edit.card</i18n>
         </h3>
     </section>
-    <section class="body card-manage-lightbox-body">
-        <div class="vertical-spacing card-manage-lightbox-body-resource">
+    <section class="body cardDirective-manage-lightbox-content-body">
+        <div class="vertical-spacing cardDirective-manage-lightbox-content-body-resource">
             <!-- Image preview -->
             <div class="cell" ng-if="vm.form.resourceType == 'image'">
                 <image-select ng-model="vm.form.resourceUrl"
@@ -49,30 +49,30 @@
                 </audio>
             </div>
             <!-- File preview -->
-            <div class="cell card-manage-lightbox-body-resource-file"
+            <div class="cell cardDirective-manage-lightbox-content-body-resource-file"
                  ng-if="vm.form.resourceType == 'file'">
                 <img data-ng-src="/magneto/public/img/extension/[[vm.getFileExtension()]].svg">
                 <span>[[vm.form.resourceFileName]]</span>
             </div>
             <!-- Link preview -->
-            <div class="twelve cell card-manage-lightbox-body-caption vertical-spacing" ng-if="vm.form.resourceType == 'link'">
+            <div class="twelve cell cardDirective-manage-lightbox-content-body-caption vertical-spacing" ng-if="vm.form.resourceType == 'link'">
                 <span><i18n >magneto.link.address</i18n>&nbsp;:</span>
                 <input type="text" data-ng-model="vm.form.resourceUrl" class="eleven cell">
             </div>
         </div>
-        <div class="vertical-spacing card-manage-lightbox-body-title">
+        <div class="vertical-spacing cardDirective-manage-lightbox-content-body-title">
             <i18n>magneto.card.title</i18n>&nbsp;:
             <input type="text" data-ng-model="vm.form.title" class="twelve cell">
         </div>
-        <div ng-if="vm.form.resourceType !== 'text'" class="vertical-spacing card-manage-lightbox-body-caption">
+        <div ng-if="vm.form.resourceType !== 'text'" class="vertical-spacing cardDirective-manage-lightbox-content-body-caption">
             <i18n>magneto.card.caption</i18n>&nbsp;:
             <input type="text" data-ng-model="vm.form.caption" class="twelve cell">
         </div>
-        <div class="row vertical-spacing card-manage-lightbox-body-description">
+        <div class="row vertical-spacing cardDirective-manage-lightbox-content-body-description">
             <i18n>magneto.card.description</i18n>&nbsp;:
-            <editor ng-model="vm.form.description" class="card-manage-lightbox-body-description-padding"></editor>
+            <editor ng-model="vm.form.description" class="cardDirective-manage-lightbox-content-body-description-padding"></editor>
         </div>
-        <div ng-if="vm.hasSection()" class="row vertical-spacing card-manage-lightbox-body-description">
+        <div ng-if="vm.hasSection()" class="row vertical-spacing cardDirective-manage-content-lightbox-body-description">
             <i18n>magneto.card.section</i18n>&nbsp;:
             <select ng-model="vm.selectedSection"
                     ng-options="section.title for section in vm.board.sections">

@@ -1,14 +1,14 @@
-<lightbox class="card-collection-lightbox"
+<lightbox class="cardDirective-collection-lightbox"
           show="vm.display"
           id="collection"
           on-close="vm.closeForm()">
-    <section class="head card-collection-lightbox-head">
+    <section class="head cardDirective-collection-lightbox-head">
         <h3>
             <i18n>magneto.cards.collection</i18n>
         </h3>
     </section>
-    <section class="body card-collection-lightbox-body">
-        <div class="row card-collection-lightbox-body-search">
+    <section class="body cardDirective-collection-lightbox-body">
+        <div class="row cardDirective-collection-lightbox-body-search">
             <search-bar
                     search-text="vm.filter.searchText"
                     is-loading="vm.isLoading"
@@ -25,22 +25,22 @@
             </switch>
             <span><i18n>magneto.cards.collection.board.view</i18n></span>
         </div>
-        <div class="card-list-scrollable"
+        <div class="cardDirective-list-scrollable"
              ng-show="vm.cards.length > 0 && !vm.isLoading">
             <div ng-show="vm.displayBoard" ng-repeat="collection in vm.displayedCard">
-                <div class="card-collection-lightbox-board">
-                    <span class="card-collection-lightbox-board-title">[[collection.cards[0].boardTitle]]</span>
-                    <span class="card-collection-lightbox-board-cards"
+                <div class="cardDirective-collection-lightbox-board">
+                    <span class="cardDirective-collection-lightbox-board-title">[[collection.cards[0].boardTitle]]</span>
+                    <span class="cardDirective-collection-lightbox-board-cards"
                           ng-click="vm.submitDuplicateBoard(collection.boardId)"
                           ng-show="vm.displayBoard">
                         <i class="magneto-duplicate"></i>
                         <i18n>magneto.cards.collection.board.duplicate</i18n></span>
-                    <span class="card-collection-lightbox-board-cards"
+                    <span class="cardDirective-collection-lightbox-board-cards"
                           ng-click="vm.getCardsByBoardId(collection.boardId)"
                           ng-show="!!vm.filter.searchText && !collection.isLinkedCardsDisplay">
                           <i class="magneto-show"></i>
                         <i18n>magneto.cards.collection.board.cards.show</i18n></span>
-                    <span class="card-collection-lightbox-board-cards"
+                    <span class="cardDirective-collection-lightbox-board-cards"
                           ng-click="vm.hideCardsByBoardId(collection.boardId)"
                           ng-show="!!vm.filter.searchText && collection.isLinkedCardsDisplay">
                         <i class="magneto-hide"></i>
@@ -55,7 +55,7 @@
                         has-duplicate="vm.board.myRights.contrib !== undefined"
                         on-duplicate="vm.submitDuplicateCard"
                         has-preview="true"
-                        selector-resize="'.card-list-scrollable'"
+                        selector-resize="'.cardDirective-list-scrollable'"
                         on-preview="vm.openPreview">
                 </card-list>
             </div>
@@ -65,7 +65,7 @@
                        selected-card-ids="vm.selectedCardIds"
                        has-caption="false"
                        has-duplicate="true"
-                       selector-resize="'.card-list-scrollable'"
+                       selector-resize="'.cardDirective-list-scrollable'"
                        on-duplicate="vm.submitDuplicateCard"
                        has-preview="true"
                        on-preview="vm.openPreview"
@@ -93,7 +93,7 @@
     <infinite-scroll
             scrolled="vm.onScroll()"
             loading-mode="true"
-            query-selector="'.card-list-scrollable'"
+            query-selector="'.cardDirective-list-scrollable'"
             scroll-eventer="vm.infiniteScrollService">
     </infinite-scroll>
 

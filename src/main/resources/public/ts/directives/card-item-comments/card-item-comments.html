@@ -1,10 +1,10 @@
-<div class="card-item-comments">
+<div class="cardDirective-item-comments">
     <hr class="divider">
-    <div class="card-item-comments-counter" ng-if="vm.card.nbOfComments > 0">
+    <div class="cardDirective-item-comments-counter" ng-if="vm.card.nbOfComments > 0">
         <i class="magneto-comment-outline" aria-hidden="true"></i>
         <span>[[vm.card.nbOfComments]]</span>
     </div>
-    <div class="card-item-comments-last" ng-if="vm.card.lastComment">
+    <div class="cardDirective-item-comments-last" ng-if="vm.card.lastComment">
         <card-comment
                 ng-if="vm.boardOwner"
                 card-id="vm.card.id"
@@ -14,7 +14,7 @@
                 selector-resize="vm.selectorResize">
         </card-comment>
     </div>
-    <div class="card-item-comments-content">
+    <div class="cardDirective-item-comments-content">
         <comment-input
                 card-id="vm.card.id"
                 on-submit="vm.onCommentSubmit">

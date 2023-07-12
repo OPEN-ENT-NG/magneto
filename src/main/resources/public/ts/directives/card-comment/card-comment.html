@@ -1,12 +1,12 @@
-<div class="card-comment">
-    <div class="card-comment-infos">
+<div class="cardDirective-comment">
+    <div class="cardDirective-comment-infos">
 
-        <div class="card-comment-infos-header twelve cell">
-            <div class="card-comment-infos-header-user ten cell">
-                <img class="card-comment-infos-header-user-avatar" ng-src="/userbook/avatar/[[vm.comment.ownerId]]?thumbnail=48x48"/>
-                <div class="card-comment-infos-header-user-infos">
-                    <span class="card-comment-infos-header-user-infos-name" ng-bind="vm.comment.ownerName"></span>
-                    <span class="card-comment-infos-header-user-infos-date"
+        <div class="cardDirective-comment-infos-header twelve cell">
+            <div class="cardDirective-comment-infos-header-user ten cell">
+                <img class="cardDirective-comment-infos-header-user-avatar" ng-src="/userbook/avatar/[[vm.comment.ownerId]]?thumbnail=48x48"/>
+                <div class="cardDirective-comment-infos-header-user-infos">
+                    <span class="cardDirective-comment-infos-header-user-infos-name" ng-bind="vm.comment.ownerName"></span>
+                    <span class="cardDirective-comment-infos-header-user-infos-date"
                           tooltip="[[vm.formatDate(vm.comment.modificationDate)]]">
                     [[vm.formatDateModification(vm.comment.modificationDate)]]
                     </span>
@@ -28,10 +28,10 @@
             </card-list-item-options>
         </div>
     </div>
-    <div class="card-comment-content" ng-if="!vm.isUpdateComment">
+    <div class="cardDirective-comment-content" ng-if="!vm.isUpdateComment">
         [[vm.comment.content]]
     </div>
-    <div class="card-comment-content" ng-if="vm.isUpdateComment">
+    <div class="cardDirective-comment-content" ng-if="vm.isUpdateComment">
         <input type="text"
                ng-model="vm.updateCommentContent"
                ng-keyup="vm.updateComment($event)">

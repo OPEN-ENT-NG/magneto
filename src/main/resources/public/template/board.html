@@ -1,8 +1,8 @@
-<div ng-controller="BoardViewController as vm" class="board-container">
+<div ng-controller="BoardViewController as vm" class="boardContainer-container">
 
 
     <!-- Header desktop -->
-    <div class="row board-container-header zero-mobile">
+    <div class="row boardContainer-container-header zero-mobile">
         <div class="row">
             <h1 ng-click="vm.goToBoards()" class="cell paddingRight">
                 <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
@@ -13,12 +13,13 @@
             <button ng-if="vm.board.isLayoutFree() ? vm.cards.length > 0 : vm.board.hasCardsSection()" class="right-magnet create-button" ng-click="vm.openReading()">
                 <i18n>magneto.reading.board</i18n>
             </button>
-            <div class="cell right-magnet board-container-header-date">
+            <div class="cell right-magnet boardContainer-container-header-date">
                 <board-date date="vm.board.modificationDate"></board-date>
             </div>
         </div>
+        <div ng-if="!!vm.board.description" class="boardContainer-container-header-description" ng-bind="vm.board.description"></div>
         <div class="board-container-header-desc">
-            <div ng-if="!!vm.board.description" class="board-container-header-description twelve cell"><span id="description">[[vm.board.description]]</span></div>
+            <div ng-if="!!vm.board.description" class="boardContainer-container-header-description twelve cell"><span id="description">[[vm.board.description]]</span></div>
             <div class="board-container-header-degrade twelve" ng-if="vm.showReadMoreLink"></div>
         </div>
         <board-description-lightbox
@@ -29,9 +30,9 @@
     </div>
 
     <!-- Header mobile -->
-    <div class="row board-container-header-mobile zero-desktop">
+    <div class="row boardContainer-container-header-mobile zero-desktop">
         <div class="row">
-            <div class="cell board-container-header-mobile-title">
+            <div class="cell boardContainer-container-header-mobile-title">
                 <h1 ng-click="vm.goToBoards()" class="cell paddingRight">
                     <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                          alt="" src="/magneto/public/img/uni-magneto.png">
@@ -47,7 +48,8 @@
             </button>
 
         </div>
-        <div ng-if="!!vm.board.description" class="board-container-header-mobile-description"><span id="description-mobile">[[vm.board.description]]</span></div>
+        <div ng-if="!!vm.board.description" class="boardContainer-container-header-description" ng-bind="vm.board.description"></div>
+        <div ng-if="!!vm.board.description" class="boardContainer-container-header-mobile-description"><span id="description-mobile">[[vm.board.description]]</span></div>
         <board-description-lightbox
                 board="vm.board"
                 show-read-more-link="vm.showReadMoreLink"
@@ -55,10 +57,10 @@
         </board-description-lightbox>
     </div>
 
-    <div class="twelve cell board-container-body"
+    <div class="twelve cell boardContainer-container-body"
          ng-class="{'no-background-image': !vm.board.backgroundUrl }"
          ng-style="{'background-image': vm.board.backgroundUrl ? 'url(' + vm.board.backgroundUrl + ')' : 'none'}">
-        <div class="cell board-container-body-nav">
+        <div class="cell boardContainer-container-body-nav">
             <board-nav
                     ng-if="vm.board.myRights.publish"
                     on-create="vm.openAddResourceLightbox"
@@ -67,7 +69,7 @@
             </board-nav>
         </div>
 
-        <div class="cell board-container-body-list scrollbar">
+        <div class="cell boardContainer-container-body-list scrollbar">
             <dropzone-overlay on-import="vm.draggable.dragDropFilesHandler($event)" can-drop="vm.board.myRights.publish !== undefined"
                               ng-if="vm.isDraggable">
             </dropzone-overlay>

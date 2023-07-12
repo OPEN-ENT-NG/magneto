@@ -1,18 +1,18 @@
-.card-manage-lightbox {
+.cardDirective-manage-lightbox {
 
   @include lightboxWidth(80%);
 
-  .content > :first-child {
+  &-content > :first-child {
     min-height: 60vh;
   }
 
-  .content {
+  &-content {
 
-    .card-manage-lightbox-head {
+    &-head {
 
     }
 
-    .card-manage-lightbox-body {
+    &-body {
       &-resource {
         display: flex;
         justify-content: center;

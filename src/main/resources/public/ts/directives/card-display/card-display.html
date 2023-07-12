@@ -1,11 +1,11 @@
-<div class="card-display">
+<div class="cardDirective-display">
     <div class="flex-row f-column">
         <div>
-            <span ng-if="!!vm.card.title" class="card-display-title"> [[vm.card.title]] </span>
+            <span ng-if="!!vm.card.title" class="cardDirective-display-title"> [[vm.card.title]] </span>
         </div>
-        <div class="flex-row card-display-info">
+        <div class="flex-row cardDirective-display-info">
             <span>[[vm.getOwnerText()]]</span>
-            <span class="card-display-date">[[vm.formatDateModification(vm.card.modificationDate)]]</span>
+            <span class="cardDirective-display-date">[[vm.formatDateModification(vm.card.modificationDate)]]</span>
         </div>
     </div>
     <!--Card title-->
@@ -14,7 +14,7 @@
     </card-preview-image>
     <div class="flex-row f-column">
         <!-- Card info -->
-        <span ng-if="!!vm.card.caption" class="card-display-info">[[vm.card.caption]]</span>
+        <span ng-if="!!vm.card.caption" class="cardDirective-display-info">[[vm.card.caption]]</span>
         <span ng-if="!!vm.card.description" data-ng-bind-html="vm.getDescriptionHTML(vm.card.description)"> </span>
     </div>
 </div>

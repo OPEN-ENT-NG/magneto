@@ -1,4 +1,4 @@
-<div id="[[vm.selectorIdentifier]]" class="card-list card-list-[[vm.layout]] scrollbar">
+<div id="[[vm.selectorIdentifier]]" class="cardDirective-list cardDirective-list-[[vm.layout]] scrollbar">
     <card-list-item ng-repeat="card in vm.cards"
                     ng-click="vm.selectCard(card._id)"
                     ng-dblclick="vm.canEdit(card) ? vm.openEdit(card) : vm.hasPreview ? vm.openPreview(card) : null"

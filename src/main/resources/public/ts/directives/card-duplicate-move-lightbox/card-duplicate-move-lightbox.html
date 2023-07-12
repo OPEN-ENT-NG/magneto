@@ -1,12 +1,12 @@
-<lightbox class="card-duplicate-move-lightbox"
+<lightbox class="cardDirective-duplicate-move-lightbox"
           show="vm.display"
           on-close="vm.display = false">
-    <section class="head card-duplicate-move-lightbox-head">
+    <section class="head cardDirective-duplicate-move-lightbox-head">
         <h3>
             <i18n>magneto.duplicate.move.cards</i18n>
         </h3>
     </section>
-    <section class="body card-duplicate-move-lightbox-body">
+    <section class="body cardDirective-duplicate-move-lightbox-body">
         <span><i18n>magneto.board.duplicate.move.text</i18n></span>
         <multi-combo title="[[vm.lang.translate('magneto.boards')]]"
                      labels="vm.comboLabels"
@@ -22,7 +22,7 @@
     <section>
         <div class="row horizontal-spacing">
             <div class="twelve cell">
-                <button class="right-magnet card-duplicate-move-lightbox-button"
+                <button class="right-magnet cardDirective-duplicate-move-lightbox-button"
                         data-ng-click="vm.submitDuplicateMove()"
                         data-ng-disabled="!vm.isFormValid()">
                     <i18n>magneto.duplicate</i18n>

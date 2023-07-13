@@ -83,13 +83,13 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
             $scope.vm.checkDescriptionSize = (): void => {
                 let windowElement : JQuery = $(window);
                 if (windowElement.width() < 768) {
-                    let descriptionElement : HTMLElement = angular.element('.board-container-header-mobile-description');
+                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-mobile-description');
                     let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
                     let spanHeight : number = spanElement.offsetHeight;
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimitMobile);
                 }
                 if (windowElement.width() > 768){
-                    let descriptionElement : HTMLElement = angular.element('.board-container-header-description');
+                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-description');
                     let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
                     let spanHeight : number = spanElement.offsetHeight;
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimit);

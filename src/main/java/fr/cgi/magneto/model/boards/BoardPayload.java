@@ -23,6 +23,8 @@ public class BoardPayload implements Model<BoardPayload> {
     private String folderId;
     private String layoutType;
     private Boolean canComment;
+
+    private Boolean displayNbFavorites;
     private List<String> cardIds;
     private List<String> sectionIds;
 
@@ -46,6 +48,9 @@ public class BoardPayload implements Model<BoardPayload> {
         this.layoutType = board.getString(Field.LAYOUTTYPE);
         if (board.getBoolean(Field.CANCOMMENT) != null) {
             this.canComment = board.getBoolean(Field.CANCOMMENT, false);
+        }
+        if(board.getBoolean(Field.DISPLAY_NB_FAVORITES) != null) {
+            this.displayNbFavorites = board.getBoolean(Field.DISPLAY_NB_FAVORITES, false);
         }
         this.cardIds = !board.getJsonArray(Field.CARDIDS, new JsonArray()).isEmpty() ?
                 board.getJsonArray(Field.CARDIDS, new JsonArray()).getList() : null;
@@ -156,6 +161,15 @@ public class BoardPayload implements Model<BoardPayload> {
 
     public BoardPayload setCanComment(Boolean canComment) {
         this.canComment = canComment;
+        return this;
+    }
+
+    public Boolean displayNbFavorites() {
+        return displayNbFavorites;
+    }
+
+    public BoardPayload setDisplayNbFavorites(Boolean displayNbFavorites) {
+        this.displayNbFavorites = displayNbFavorites;
         return this;
     }
 
@@ -294,6 +308,10 @@ public class BoardPayload implements Model<BoardPayload> {
 
         if (this.canComment() != null) {
             json.put(Field.CANCOMMENT, this.canComment());
+        }
+
+        if (this.displayNbFavorites() != null) {
+            json.put(Field.DISPLAY_NB_FAVORITES, this.displayNbFavorites());
         }
 
         json.put(Field.PUBLIC, this.isPublic());

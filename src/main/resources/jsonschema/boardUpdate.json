@@ -36,6 +36,9 @@
     "canComment": {
       "type": "boolean"
     },
+    "displayNbFavorites": {
+      "type": "boolean"
+    },
     "cardIds": {
       "type": "array",
       "items": {

@@ -184,5 +184,6 @@
   "magneto.dropzone.overlay.warning": "Il est impossible d'importer un dossier",
   "magneto.dropzone.overlay.solution": "Veuillez importer un <b>fichier</b>",
   "magneto.dropzone.overlay.action": "J'ai compris",
-  "magneto.shared.push.notif.body": "shared a board with you"
+  "magneto.shared.push.notif.body": "shared a board with you",
+  "magneto.create.board.options.display.favorites": "Afficher le nombre de likes sur un écran pour les destinataires du tableau"
 }

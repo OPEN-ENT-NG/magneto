@@ -24,6 +24,7 @@ describe("BoardReadController", () => {
         _id: "id",
         backgroundUrl: "",
         canComment: false,
+        displayNbFavorites: false,
         cardIds: ["1", "2"],
         creationDate: "",
         deleted: false,

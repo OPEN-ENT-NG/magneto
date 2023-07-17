@@ -37,10 +37,12 @@
       &-options {
         display: flex;
         flex-direction: column;
-        margin-bottom: 32px;
-
+        margin-bottom: 0 !important;
         h2 {
           color: $magneto-black;
+        }
+        .checkbox{
+            margin-bottom: 10px;
         }
       }
 

@@ -37,6 +37,7 @@
   "magneto.create.board.display.horizontal": "Section horizontale",
   "magneto.create.board.options": "Options du tableau",
   "magneto.create.board.options.comment": "Permettre aux utilisateurs de commenter les aimants",
+  "magneto.create.board.options.display.favorites": "Afficher le nombre de likes sur un écran pour les destinataires du tableau",
   "magneto.delete.section": "Supprimer la section",
   "magneto.delete.section.message": "Voulez-vous également supprimer les aimants contenus dans la section ? Si non, ils seront déplacés dans la première section.",
   "magneto.search.placeholder": "Rechercher ...",

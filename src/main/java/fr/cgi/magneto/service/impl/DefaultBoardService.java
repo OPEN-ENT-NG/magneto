@@ -148,7 +148,7 @@ public class DefaultBoardService implements BoardService {
                         }
 
                         // Get all cards from the board
-                        getCardsFuture = cardService.getAllCardsByBoard(duplicateBoard, null);
+                        getCardsFuture = cardService.getAllCardsByBoard(duplicateBoard, null, user);
                         futures.put(Field.CARDS, getCardsFuture);
 
                         // Reset new board
@@ -214,7 +214,7 @@ public class DefaultBoardService implements BoardService {
         return promise.future();
     }
 
-    public Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n) {
+    public Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
         List<Future> updateBoardFutures = new ArrayList<>();
 
@@ -231,7 +231,7 @@ public class DefaultBoardService implements BoardService {
 
             // Check if we are changing the layout from section to free
         } else if (!currentBoard.isLayoutFree() && updateBoard.isLayoutFree()) {
-            cardService.getAllCardsByBoard(currentBoard, null)
+            cardService.getAllCardsByBoard(currentBoard, null, user)
                     .compose(cards -> {
                         List<Card> cardsList = cards.getJsonArray(Field.ALL).getList();
                         List<String> cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());

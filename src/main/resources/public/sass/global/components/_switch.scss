@@ -7,7 +7,7 @@ switch {
       height: 12px;
       display: block;
       border-radius: 10px;
-      background: $grey;
+      background: $magneto-dark-light-grey;
       position: relative;
       overflow: visible;
       margin: 5px;
@@ -18,11 +18,11 @@ switch {
         height: 20px !important;
         left: 0;
         display: block;
-        background: $white;
+        background: $magneto-white;
         border-radius: 50%;
         position: absolute;
         top: -4px;
-        box-shadow: 0 1px 1px $shadow;
+        box-shadow: 0 1px 1px $magneto-shadow;
         margin-right: 0;
         margin-top: 0 !important;
         border: none !important;
@@ -30,27 +30,27 @@ switch {
     }
 
     input[type=checkbox]:checked + .tick {
-      background: $primary-light;
+      background: $magneto-primary-light;
 
       &:before {
         left: 20px;
-        background: $primary-dark;
+        background: $magneto-primary-dark;
       }
     }
 
     input[type=checkbox]:disabled + .tick {
-      background: $disabled-color;
+      background: $magneto-disabled-color;
 
       &:before {
-        background: $disabled-color;
+        background: $magneto-disabled-color;
       }
     }
 
     input[type=checkbox]:disabled:checked + .tick {
-      background: $primary-lighter;
+      background: $magneto-primary-lighter;
 
       &:before {
-        background: $primary-lighter;
+        background: $magneto-primary-lighter;
       }
     }
 

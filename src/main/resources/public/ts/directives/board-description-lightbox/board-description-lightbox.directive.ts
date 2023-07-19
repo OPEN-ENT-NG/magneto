@@ -71,7 +71,7 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
                         element: ng.IAugmentedJQuery,
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
-            const descriptionHeightLimit : number = 64;
+            const descriptionHeightLimit : number = 66;
             const descriptionHeightLimitMobile : number = 28;
 
             $(document).ready(() => {
@@ -83,13 +83,13 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
             $scope.vm.checkDescriptionSize = (): void => {
                 let windowElement : JQuery = $(window);
                 if (windowElement.width() < 768) {
-                    let descriptionElement : HTMLElement = angular.element('.board-container-header-mobile-description');
+                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-mobile-description');
                     let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
                     let spanHeight : number = spanElement.offsetHeight;
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimitMobile);
                 }
                 if (windowElement.width() > 768){
-                    let descriptionElement : HTMLElement = angular.element('.board-container-header-description');
+                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-description');
                     let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
                     let spanHeight : number = spanElement.offsetHeight;
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimit);

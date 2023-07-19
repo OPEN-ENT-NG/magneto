@@ -37,41 +37,41 @@
     }
 
     &.confirm {
-      color: darken($green, 35%);
-      background-color: lighten($green, 30%);
+      color: darken($magneto-green, 35%);
+      background-color: lighten($magneto-green, 30%);
 
       .content:before {
         content: "\e871";
       }
 
       .timer {
-        background-color: darken($green, 15%);
+        background-color: darken($magneto-green, 15%);
       }
     }
 
     &.info {
-      color: darken($cyan, 35%);
-      background-color: lighten($cyan, 30%);
+      color: darken($magneto-primary, 35%);
+      background-color: lighten($magneto-primary, 30%);
 
       .content:before {
         content: "\e84b";
       }
 
       .timer {
-        background-color: darken($cyan, 15%);
+        background-color: darken($magneto-primary, 15%);
       }
     }
 
     &.warning {
-      color: darken($warning-color, 35%);
-      background-color: lighten($warning-color, 30%);
+      color: darken($magneto-warning-color, 35%);
+      background-color: lighten($magneto-warning-color, 30%);
 
       .content:before {
         content: "\e903";
       }
 
       .timer {
-        background-color: darken($warning-color, 15%);
+        background-color: darken($magneto-warning-color, 15%);
       }
     }
 

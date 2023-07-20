@@ -7,6 +7,7 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
+import fr.cgi.magneto.model.user.User;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -71,9 +72,10 @@ public interface CardService {
      * Get cards by ids
      *
      * @param cardIds Identifier list of the searching card
+     * @param user  {@link UserInfos} User info
      * @return Future {@link Future <JsonArray>} containing the card list corresponding to the ids
      */
-    Future<List<Card>> getCards(List<String> cardIds);
+    Future<List<Card>> getCards(List<String> cardIds, UserInfos user);
 
 
     /**
@@ -89,9 +91,10 @@ public interface CardService {
      *
      * @param board Board object
      * @param page  Page number
+     * @param user    {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
      */
-    Future<JsonObject> getAllCardsByBoard(Board board, Integer page);
+    Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user);
 
     /**
      * Get all cards by creation date
@@ -106,9 +109,10 @@ public interface CardService {
      *
      * @param section Section object
      * @param page    Page number
+     * @param user    {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
      */
-    Future<JsonObject> getAllCardsBySection(Section section, Integer page);
+    Future<JsonObject> getAllCardsBySection(Section section, Integer page, UserInfos user);
 
     /**
      * Duplicate cards

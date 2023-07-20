@@ -88,7 +88,7 @@ public class CardController extends ControllerHelper {
             String boardId = request.getParam(Field.BOARDID);
             Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
             boardService.getBoards(Collections.singletonList(boardId))
-                    .compose(board -> cardService.getAllCardsByBoard(board.get(0), page))
+                    .compose(board -> cardService.getAllCardsByBoard(board.get(0), page, user))
                     .onSuccess(result -> renderJson(request, result))
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::getAllCardsByBoardId] Failed to get all cards : %s",
@@ -108,7 +108,7 @@ public class CardController extends ControllerHelper {
             String sectionId = request.getParam(Field.SECTIONID);
             Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
             sectionService.get(Collections.singletonList(sectionId))
-                    .compose(sections -> cardService.getAllCardsBySection(sections.get(0), page))
+                    .compose(sections -> cardService.getAllCardsBySection(sections.get(0), page, user))
                     .onSuccess(result -> renderJson(request, result))
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::getAllCardsBySectionId] Failed to get all cards : %s",
@@ -125,16 +125,18 @@ public class CardController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getCard(HttpServerRequest request) {
         String cardId = request.getParam(Field.ID);
-        cardService.getCards(Collections.singletonList(cardId))
-                .onSuccess(result -> {
-                    renderJson(request, !result.isEmpty() ? result.get(0).toJson() : new JsonObject());
-                })
-                .onFailure(fail -> {
-                    String message = String.format("[Magneto@%s::getCard] Failed to get card by id : %s",
-                            this.getClass().getSimpleName(), fail.getMessage());
-                    log.error(message);
-                    renderError(request);
-                });
+        UserUtils.getUserInfos(eb, request, user -> {
+            cardService.getCards(Collections.singletonList(cardId), user)
+                    .onSuccess(result -> {
+                        renderJson(request, !result.isEmpty() ? result.get(0).toJson() : new JsonObject());
+                    })
+                    .onFailure(fail -> {
+                        String message = String.format("[Magneto@%s::getCard] Failed to get card by id : %s",
+                                this.getClass().getSimpleName(), fail.getMessage());
+                        log.error(message);
+                        renderError(request);
+                    });
+        });
     }
 
     @Post("/card")
@@ -197,7 +199,7 @@ public class CardController extends ControllerHelper {
             UserUtils.getUserInfos(eb, request, user -> {
                 List<String> cardIds = duplicateCard.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
                 String boardId = duplicateCard.getString(Field.BOARDID);
-                cardService.getCards(cardIds)
+                cardService.getCards(cardIds, user)
                         .compose(cards -> cardService.duplicateCards(boardId, cards, null, user))
                         .onSuccess(res -> {
                             eventStore.createAndStoreEvent(CREATE_MAGNET.name(), request);

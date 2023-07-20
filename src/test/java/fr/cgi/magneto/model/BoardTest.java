@@ -28,7 +28,8 @@ public class BoardTest {
             .put("ownerId", "ownerId")
             .put("ownerName", "ownerName")
             .put("shared", new JsonArray())
-            .put("tags", new JsonArray());
+            .put("tags", new JsonArray())
+            .put("displayNbFavorites", false);
 
     @Test
     public void testBoardHasBeenInstantiated(TestContext ctx) {

@@ -38,9 +38,10 @@ public interface BoardService {
      * @param updateBoard  {@link BoardPayload} Board to update
      * @param currentBoard {@link Board} Board infos
      * @param i18n         I18nHelper Helper for I18n keys
+     * @param user    {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing updated board
      */
-    Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n);
+    Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n, UserInfos user);
 
     /**
      * Duplicate a board

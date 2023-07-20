@@ -29,6 +29,8 @@ public class Card implements Model<Card> {
     private Metadata metadata;
     private JsonObject lastComment;
     private Integer nbOfComments;
+    private Integer nbOfFavorites;
+    private boolean hasLiked;
 
 
     public Card(JsonObject card) {
@@ -50,6 +52,8 @@ public class Card implements Model<Card> {
         this.metadata = null;
         this.lastComment = card.getJsonObject(Field.LASTCOMMENT, new JsonObject());
         this.nbOfComments = card.getInteger(Field.NBOFCOMMENTS, 0);
+        this.nbOfFavorites = card.getInteger(Field.NBOFFAVORITES, 0);
+        this.hasLiked = card.getBoolean(Field.HASLIKED, false);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -69,6 +73,8 @@ public class Card implements Model<Card> {
     public String getTitle() {
         return title;
     }
+
+
 
     public Card setTitle(String title) {
         this.title = title;
@@ -238,6 +244,22 @@ public class Card implements Model<Card> {
         return this;
     }
 
+    public void setNbOfFavorites(Integer nbOfFavorites) {
+        this.nbOfFavorites = nbOfFavorites;
+    }
+
+    public void setHasLiked(boolean hasLiked) {
+        this.hasLiked = hasLiked;
+    }
+
+    public Integer getNbOfFavorites() {
+        return nbOfFavorites;
+    }
+
+    public boolean hasLiked() {
+        return hasLiked;
+    }
+
     @Override
     public JsonObject toJson() {
 
@@ -260,7 +282,9 @@ public class Card implements Model<Card> {
                 .put(Field.METADATA, this.getMetadata() != null ? this.getMetadata().toJson() : null)
                 .put(Field.OWNERNAME, this.getOwnerName())
                 .put(Field.BOARDID, this.getBoardId())
-                .put(Field.PARENTID, this.getParentId());
+                .put(Field.PARENTID, this.getParentId())
+                .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
+                .put(Field.HASLIKED, this.hasLiked());
     }
 
     @Override

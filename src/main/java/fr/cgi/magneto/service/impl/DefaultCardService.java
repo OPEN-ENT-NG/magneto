@@ -16,6 +16,7 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
+import fr.cgi.magneto.model.user.User;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import fr.cgi.magneto.service.CardService;
 import fr.cgi.magneto.service.ServiceFactory;
@@ -220,9 +221,9 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<List<Card>> getCards(List<String> cardIds) {
+    public Future<List<Card>> getCards(List<String> cardIds, UserInfos user) {
         Promise<List<Card>> promise = Promise.promise();
-        getCardsRequest(cardIds)
+        getCardsRequest(cardIds, user)
                 .compose(cards -> {
                     List<Card> cardList = ModelHelper.toList(cards.getJsonObject(Field.CURSOR, new JsonObject())
                             .getJsonArray(Field.FIRSTBATCH, new JsonArray()), Card.class);
@@ -239,8 +240,10 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<JsonObject> getCardsRequest(List<String> cardIds) {
+    private Future<JsonObject> getCardsRequest(List<String> cardIds, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
+
+        String userId = user.getUserId();
 
         JsonObject query = new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, cardIds)))
@@ -269,7 +272,21 @@ public class DefaultCardService implements CardService {
                                             .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
                                     .put(Mongo.THEN, new JsonObject()
                                             .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
-                                    .put(Mongo.ELSE, 0))))
+                                    .put(Mongo.ELSE, 0)))
+                    .put(Field.NBOFFAVORITES, new JsonObject()
+                                .put(Mongo.$COND, new JsonObject()
+                                        .put(Mongo.IF, new JsonObject()
+                                                .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                        .put(Mongo.THEN, new JsonObject()
+                                                .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
+                                        .put(Mongo.ELSE, 0)))
+                    .put(Field.HASLIKED, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
+                                    .put(Mongo.ELSE, false))))
                 .getAggregate();
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
@@ -278,12 +295,12 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<JsonObject> getAllCardsByBoard(Board board, Integer page) {
+    public Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
 
-        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsByBoardCount(board, page);
+        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsByBoardCount(board, page, user);
 
-        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page);
+        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page, user);
 
 
         CompositeFuture.all(fetchAllCardsFuture, fetchAllCardsCountFuture)
@@ -308,12 +325,12 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<JsonObject> getAllCardsBySection(Section section, Integer page) {
+    public Future<JsonObject> getAllCardsBySection(Section section, Integer page, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
 
-        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsBySectionCount(section, page);
+        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsBySectionCount(section, page, user);
 
-        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsBySection(section, page);
+        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsBySection(section, page, user);
 
 
         CompositeFuture.all(fetchAllCardsFuture, fetchAllCardsCountFuture)
@@ -490,9 +507,9 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<List<Card>> fetchAllCardsByBoard(Board board, Integer page) {
+    private Future<List<Card>> fetchAllCardsByBoard(Board board, Integer page, UserInfos user) {
         Promise<List<Card>> promise = Promise.promise();
-        JsonObject query = this.getAllCardsByBoardQuery(board, page, false);
+        JsonObject query = this.getAllCardsByBoardQuery(board, page, false, user);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error(String.format("[Magneto@%s::fetchAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName()),
@@ -508,9 +525,9 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<JsonArray> fetchAllCardsByBoardCount(Board board, Integer page) {
+    private Future<JsonArray> fetchAllCardsByBoardCount(Board board, Integer page, UserInfos user) {
         Promise<JsonArray> promise = Promise.promise();
-        JsonObject query = this.getAllCardsByBoardQuery(board, page, true);
+        JsonObject query = this.getAllCardsByBoardQuery(board, page, true, user);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error("[Magneto@%s::fetchAllCardsByBoardCount] Failed to get cards", this.getClass().getSimpleName(),
@@ -526,9 +543,9 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<List<Card>> fetchAllCardsBySection(Section section, Integer page) {
+    private Future<List<Card>> fetchAllCardsBySection(Section section, Integer page, UserInfos user) {
         Promise<List<Card>> promise = Promise.promise();
-        JsonObject query = this.getAllCardsBySectionQuery(section, page, false);
+        JsonObject query = this.getAllCardsBySectionQuery(section, page, false, user);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error(String.format("[Magneto@%s::fetchAllCardsBySection] Failed to get cards", this.getClass().getSimpleName()),
@@ -544,9 +561,9 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<JsonArray> fetchAllCardsBySectionCount(Section section, Integer page) {
+    private Future<JsonArray> fetchAllCardsBySectionCount(Section section, Integer page, UserInfos user) {
         Promise<JsonArray> promise = Promise.promise();
-        JsonObject query = this.getAllCardsBySectionQuery(section, page, true);
+        JsonObject query = this.getAllCardsBySectionQuery(section, page, true, user);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error("[Magneto@%s::fetchAllCardsBySectionCount] Failed to get cards", this.getClass().getSimpleName(),
@@ -636,7 +653,7 @@ public class DefaultCardService implements CardService {
         }
         List<String> groupField = Arrays.asList(Field.TITLE, Field.DESCRIPTION, Field.CAPTION, Field.RESOURCEID, Field.RESOURCETYPE, Field.RESOURCEURL);
         List<String> externalGroupField = Arrays.asList(Field.PARENTID, Field._ID, Field.CREATIONDATE, Field.BOARDID,
-                Field.MODIFICATIONDATE, Field.OWNERID, Field.OWNERNAME, Field.LASTMODIFIERID, Field.LASTMODIFIERNAME, Field.RESULT);
+                Field.MODIFICATIONDATE, Field.OWNERID, Field.OWNERNAME, Field.LASTMODIFIERID, Field.LASTMODIFIERNAME, Field.RESULT, Field.FAVORITELIST);
         query
                 .match(new JsonObject().put(String.format("%s.%s", Field.RESULT, Field.DELETED), false))
                 .sort(Field.PARENTID, 1)
@@ -646,6 +663,7 @@ public class DefaultCardService implements CardService {
         if (getCount) {
             query = query.count();
         } else {
+            String userId = user.getUserId();
             query
                     .page(page)
                     .project(new JsonObject()
@@ -663,12 +681,27 @@ public class DefaultCardService implements CardService {
                             .put(Field.LASTMODIFIERID, 1)
                             .put(Field.LASTMODIFIERNAME, 1)
                             .put(Field.BOARDTITLE, query.arrayElemAt(String.format("%s.%s", Field.RESULT, Field.TITLE), 0))
-                            .put(Field.BOARDID, 1));
+                            .put(Field.BOARDID, 1)
+                            .put(Field.NBOFFAVORITES, new JsonObject()
+                                    .put(Mongo.$COND, new JsonObject()
+                                            .put(Mongo.IF, new JsonObject()
+                                                    .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                            .put(Mongo.THEN, new JsonObject()
+                                                    .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
+                                            .put(Mongo.ELSE, 0)))
+                            .put(Field.HASLIKED, new JsonObject()
+                                    .put(Mongo.$COND, new JsonObject()
+                                            .put(Mongo.IF, new JsonObject()
+                                                    .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                            .put(Mongo.THEN, new JsonObject()
+                                                    .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
+                                            .put(Mongo.ELSE, false)))
+                    );
         }
         return query.getAggregate();
     }
 
-    private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount) {
+    private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user) {
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field.BOARDID, board.getId()));
         if (page != null) {
@@ -687,11 +720,14 @@ public class DefaultCardService implements CardService {
         } else {
             if (page != null)
                 query.page(page);
+
+            String userId = user.getUserId();
             query.project(new JsonObject()
                     .put(Field._ID, 1)
                     .put(Field.TITLE, 1)
                     .put(Field.CAPTION, 1)
                     .put(Field.DESCRIPTION, 1)
+                    .put(Field.ISLOCKED, 1)
                     .put(Field.OWNERID, 1)
                     .put(Field.OWNERNAME, 1)
                     .put(Field.RESOURCETYPE, 1)
@@ -701,7 +737,6 @@ public class DefaultCardService implements CardService {
                     .put(Field.MODIFICATIONDATE, 1)
                     .put(Field.BOARDID, 1)
                     .put(Field.PARENTID, 1)
-                    .put(Field.ISLOCKED, 1)
                     .put(Field.LASTMODIFIERID, 1)
                     .put(Field.LASTMODIFIERNAME, 1)
                     .put(Field.LASTCOMMENT, new JsonObject()
@@ -712,13 +747,28 @@ public class DefaultCardService implements CardService {
                                             .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
                                     .put(Mongo.THEN, new JsonObject()
                                             .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
-                                    .put(Mongo.ELSE, 0))));
+                                    .put(Mongo.ELSE, 0)))
+                    .put(Field.NBOFFAVORITES, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
+                                    .put(Mongo.ELSE, 0)))
+                    .put(Field.HASLIKED, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
+                                    .put(Mongo.ELSE, false)))
+            );
         }
 
         return query.getAggregate();
     }
 
-    private JsonObject getAllCardsBySectionQuery(Section section, Integer page, boolean getCount) {
+    private JsonObject getAllCardsBySectionQuery(Section section, Integer page, boolean getCount, UserInfos user) {
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field.BOARDID, section.getBoardId()))
                 .match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, section.getCardIds())))
@@ -734,6 +784,7 @@ public class DefaultCardService implements CardService {
         } else {
             if (page != null)
                 query.page(page);
+            String userId = user.getUserId();
             query.project(new JsonObject()
                     .put(Field._ID, 1)
                     .put(Field.TITLE, 1)
@@ -759,7 +810,22 @@ public class DefaultCardService implements CardService {
                                             .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
                                     .put(Mongo.THEN, new JsonObject()
                                             .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
-                                    .put(Mongo.ELSE, 0))));
+                                    .put(Mongo.ELSE, 0)))
+                    .put(Field.NBOFFAVORITES, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
+                                    .put(Mongo.ELSE, 0)))
+                    .put(Field.HASLIKED, new JsonObject()
+                            .put(Mongo.$COND, new JsonObject()
+                                    .put(Mongo.IF, new JsonObject()
+                                            .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                    .put(Mongo.THEN, new JsonObject()
+                                            .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
+                                    .put(Mongo.ELSE, false)))
+                    );
         }
 
         return query.getAggregate();

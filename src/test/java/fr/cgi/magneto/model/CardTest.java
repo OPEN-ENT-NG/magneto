@@ -30,7 +30,9 @@ public class CardTest {
             .put("lastComment", new JsonObject())
             .putNull("metadata")
             .putNull("parentId")
-            .put("caption", "caption");
+            .put("caption", "caption")
+            .put("nbOfFavorites",0)
+            .put("hasLiked",false);
 
     @Test
     public void testCardHasBeenInstantiated(TestContext ctx) {

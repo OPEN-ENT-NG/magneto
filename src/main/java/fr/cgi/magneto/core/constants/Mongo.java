@@ -59,5 +59,5 @@ public class Mongo {
     public static final String IN_MAP = "in";
     public static final String GTE = "$gte";
     public static final String LT = "$lt";
-
+    public static final String $SET_ISSUBSET = "$setIsSubset";
 }

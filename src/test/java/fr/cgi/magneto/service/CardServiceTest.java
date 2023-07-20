@@ -127,6 +127,8 @@ public class CardServiceTest {
                 "                \"$first\":\"$lastModifierName\"\n" +
                 "            },\"result\":{\n" +
                 "                \"$first\":\"$result\"\n" +
+                "            },\"favoriteList\":{\n" +
+                "                \"$first\":\"$favoriteList\"\n" +
                 "            }\n" +
                 "         }\n" +
                 "      },\n" +

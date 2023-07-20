@@ -95,8 +95,10 @@ public class Field {
     public static final String CAPTION = "caption";
     public static final String ISLOCKED = "isLocked";
     public static final String LOCKED = "locked";
+    public static final String NBOFFAVORITES = "nbOfFavorites";
+    public static final String HASLIKED = "hasLiked";
 
-
+    public static final String FAVORITELIST = "favoriteList";
 
     // FUTURE FIELD
     public static final String RESULT = "result";

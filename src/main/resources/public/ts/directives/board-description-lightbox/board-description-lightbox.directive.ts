@@ -3,6 +3,7 @@ import {IScope} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board} from "../../models";
 import {safeApply} from "../../utils/safe-apply.utils";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, IBoardDescriptionProps {
     updateSetVisible(value: boolean): void;
@@ -13,6 +14,7 @@ interface IViewModel extends ng.IController, IBoardDescriptionProps {
 
 interface IBoardDescriptionProps {
     showReadMoreLink: boolean;
+    boardDescriptionEventer: Subject<void>;
 }
 
 interface IBoardDescriptionScope extends IScope, IBoardDescriptionProps {
@@ -24,6 +26,8 @@ class Controller implements IViewModel {
     displayDescription : boolean;
     showReadMoreLink: boolean;
     boards: Array<Board>;
+    boardDescriptionEventer: Subject<void>;
+
 
 
     constructor(private $scope: IBoardDescriptionScope) {
@@ -61,7 +65,8 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
         templateUrl: `${RootsConst.directive}board-description-lightbox/board-description-lightbox.html`,
         scope: {
             board: '=',
-            showReadMoreLink: '='
+            showReadMoreLink: '=',
+            boardDescriptionEventer: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -75,12 +80,16 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
             const descriptionHeightLimitMobile : number = 28;
 
             $(document).ready(() => {
-                $timeout(() => {
-                    vm.checkDescriptionSize()
-                }, 100);
+                if (vm.boardDescriptionEventer) {
+                    vm.boardDescriptionEventer.subscribe(() => {
+                        $timeout(() => {
+                            vm.checkDescriptionSize()
+                        }, 100);
+                    });
+                }
             });
 
-            $scope.vm.checkDescriptionSize = (): void => {
+            vm.checkDescriptionSize = (): void => {
                 let windowElement : JQuery = $(window);
                 if (windowElement.width() < 768) {
                     let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-mobile-description');
@@ -96,7 +105,7 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
                 }
             }
             $scope.$watch('vm.board.description', () => {
-                $scope.vm.checkDescriptionSize();
+                vm.checkDescriptionSize();
             });
         }
     }

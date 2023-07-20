@@ -69,6 +69,8 @@ interface IViewModel extends ng.IController {
 
     showReadMoreLink: boolean;
 
+    boardDescriptionEventer: Subject<void>;
+
     goToBoards(): void;
 
     getCards(): Promise<void>;
@@ -154,6 +156,7 @@ class Controller implements IViewModel {
 
     cardUpdateSubject: Subject<void>;
     showReadMoreLink: boolean;
+    boardDescriptionEventer: Subject<void>;
 
     constructor(private $scope: IBoardViewScope,
                 private $route: any,
@@ -167,6 +170,7 @@ class Controller implements IViewModel {
         this.$scope.vm = this;
         this.infiniteScrollService = new InfiniteScrollService;
         this.cardUpdateSubject = new Subject<void>();
+        this.boardDescriptionEventer = new Subject<void>();
     }
 
     async $onInit(): Promise<void> {
@@ -316,6 +320,7 @@ class Controller implements IViewModel {
     onFormSubmit = async (): Promise<void> => {
         this.displayMediaLibraryLightbox = false;
         await this.resetBoardView()
+        this.boardDescriptionEventer.next()
     }
 
     /**

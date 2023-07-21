@@ -23,6 +23,8 @@ export interface ICardItemResponse {
     metadata: IMetadata;
     lastComment?: ICardItemCommentResponse;
     nbOfComments?: number;
+    nbOfFavorites?: number;
+    hasLiked?: boolean;
 }
 
 export interface ICardsResponse {
@@ -255,6 +257,8 @@ export class Card {
     private _metadata: IMetadata;
     private _nbOfComments: number;
     private _lastComment: CardComment;
+    private _nbOfFavorites: number;
+    private _hasLiked: boolean;
 
     build(data: ICardItemResponse): Card {
         this._id = data._id ? data._id : data.id;
@@ -278,6 +282,8 @@ export class Card {
         this._nbOfComments = data.nbOfComments;
         this._lastComment = (data.nbOfComments != null && data.nbOfComments > 0) ?
                             new CardComment().build(data.lastComment) : null;
+        this._nbOfFavorites = data.nbOfFavorites;
+        this._hasLiked = data.hasLiked;
         return this;
     }
 
@@ -403,6 +409,22 @@ export class Card {
 
     set lastComment(value: CardComment) {
         this._lastComment = value;
+    }
+
+    get nbOfFavorites(): number {
+        return this._nbOfFavorites;
+    }
+
+    set nbOfFavorites(value: number) {
+        this._nbOfFavorites = value;
+    }
+
+    get hasLiked(): boolean {
+        return this._hasLiked;
+    }
+
+    set hasLiked(value: boolean) {
+        this._hasLiked = value;
     }
 
     isType = (resourceType: string): boolean => {

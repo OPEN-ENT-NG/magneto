@@ -5,6 +5,8 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.excpetion.BadRequestException;
+import fr.cgi.magneto.excpetion.RessourceNotFoundException;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.helper.PromiseHelper;
@@ -22,7 +24,6 @@ import fr.cgi.magneto.service.CardService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.WorkspaceService;
 import fr.wseduc.mongodb.MongoDb;
-import fr.wseduc.mongodb.MongoQueryBuilder;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -286,7 +287,8 @@ public class DefaultCardService implements CardService {
                                             .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
                                     .put(Mongo.THEN, new JsonObject()
                                             .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
-                                    .put(Mongo.ELSE, false))))
+                                    .put(Mongo.ELSE, false)))
+                    .put(Field.FAVORITE_LIST, 1))
                 .getAggregate();
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
@@ -395,6 +397,47 @@ public class DefaultCardService implements CardService {
         }
         return this.serviceFactory.boardService().update(board);
     }
+
+    public Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user) {
+        Promise<JsonObject> promise = Promise.promise();
+        String userId = user.getUserId();
+        if (cardId == null || userId == null) {
+            promise.fail(new RessourceNotFoundException("User or card does not exist"));
+            return promise.future();
+        }
+
+        getCards(Collections.singletonList(cardId), user)
+                .compose(cards -> {
+                    if (!cards.isEmpty()) {
+                        Card card = cards.get(0);
+                        List<String> favoriteList = card.getFavoriteList();
+                        if (!favorite) {
+                            if (!favoriteList.contains(userId)) {
+                                favoriteList.add(userId);
+                            } else {
+                                return Future.failedFuture(new BadRequestException("User already in favorite list, you can't add it"));
+                            }
+                        } else {
+                            if (favoriteList.contains(userId)) {
+                                favoriteList.remove(userId);
+                            } else {
+                                return Future.failedFuture(new BadRequestException("User not in favorite list, you can't remove it"));
+                            }
+                        }
+                        card.setFavoriteList(favoriteList);
+                        // Update card in database
+                        CardPayload cardPayload = new CardPayload(card.toJson());
+                        cardPayload.setId(cardId);
+                        return update(cardPayload);
+                    } else {
+                        return Future.failedFuture("No card found with id " + cardId);
+                    }
+                })
+                .onSuccess(promise::complete)
+                .onFailure(promise::fail);
+        return promise.future();
+    }
+
 
     private Future<JsonObject> duplicateCardsFuture(String boardId, List<Card> cards, SectionPayload section, Board boardResult, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
@@ -727,7 +770,6 @@ public class DefaultCardService implements CardService {
                     .put(Field.TITLE, 1)
                     .put(Field.CAPTION, 1)
                     .put(Field.DESCRIPTION, 1)
-                    .put(Field.ISLOCKED, 1)
                     .put(Field.OWNERID, 1)
                     .put(Field.OWNERNAME, 1)
                     .put(Field.RESOURCETYPE, 1)
@@ -737,6 +779,7 @@ public class DefaultCardService implements CardService {
                     .put(Field.MODIFICATIONDATE, 1)
                     .put(Field.BOARDID, 1)
                     .put(Field.PARENTID, 1)
+                    .put(Field.ISLOCKED, 1)
                     .put(Field.LASTMODIFIERID, 1)
                     .put(Field.LASTMODIFIERNAME, 1)
                     .put(Field.LASTCOMMENT, new JsonObject()

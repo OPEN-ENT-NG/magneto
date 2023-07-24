@@ -23,4 +23,6 @@ public class Actions {
     public static final String CARD_DELETION = "CARD_DELETION";
 
     public static final String SECTION_CREATION = "SECTION_CREATION";
+
+    public static final String FAVORITE_UPDATE = "FAVORITE_UPDATE";
 }

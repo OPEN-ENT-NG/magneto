@@ -39,4 +39,7 @@ public class Rights {
 
     // Reutilization right
     public static final String PUBLISH = "magneto.publish";
+
+
+    public static final String SHAREBOARDCONTROLLER_INITREADRIGHT = "magneto-controller-ShareBoardController|initReadRight";
 }

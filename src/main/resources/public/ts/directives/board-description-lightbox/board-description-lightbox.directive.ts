@@ -76,37 +76,43 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
                         element: ng.IAugmentedJQuery,
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
-            const descriptionHeightLimit : number = 66;
-            const descriptionHeightLimitMobile : number = 28;
+            const descriptionHeightLimit: number = 66;
+            const descriptionHeightLimitMobile: number = 28;
 
-            $(document).ready(() => {
-                if (vm.boardDescriptionEventer) {
-                    vm.boardDescriptionEventer.subscribe(() => {
-                        $timeout(() => {
-                            vm.checkDescriptionSize()
-                        }, 100);
-                    });
-                }
+            $(document).ready((): void => {
+                $timeout((): void => {
+                    if (vm.boardDescriptionEventer) {
+                        vm.boardDescriptionEventer.asObservable().subscribe((): void => {
+                            $timeout((): void => {
+                                vm.checkDescriptionSize();
+                            });
+                        });
+                    }
+                    vm.checkDescriptionSize();
+                });
             });
 
             vm.checkDescriptionSize = (): void => {
-                let windowElement : JQuery = $(window);
+                let windowElement: JQuery = $(window);
                 if (windowElement.width() < 768) {
-                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-mobile-description');
-                    let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
-                    let spanHeight : number = spanElement.offsetHeight;
+                    let descriptionElement: HTMLElement = angular.element('.boardContainer-container-header-mobile-description');
+                    let spanHeight: number = 0;
+                    if (descriptionElement && descriptionElement[0]) {
+                        let spanElement: HTMLElement = descriptionElement[0].querySelector('span');
+                        spanHeight = spanElement.offsetHeight;
+                    }
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimitMobile);
                 }
                 if (windowElement.width() > 768){
-                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-description');
-                    let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
-                    let spanHeight : number = spanElement.offsetHeight;
+                    let descriptionElement: HTMLElement = angular.element('.boardContainer-container-header-description');
+                    let spanHeight: number = 0;
+                    if (descriptionElement && descriptionElement[0]) {
+                        let spanElement: HTMLElement = descriptionElement[0].querySelector('span');
+                        spanHeight = spanElement.offsetHeight;
+                    }
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimit);
                 }
             }
-            $scope.$watch('vm.board.description', () => {
-                vm.checkDescriptionSize();
-            });
         }
     }
 }

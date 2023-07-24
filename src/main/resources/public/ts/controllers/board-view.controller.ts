@@ -320,7 +320,6 @@ class Controller implements IViewModel {
     onFormSubmit = async (): Promise<void> => {
         this.displayMediaLibraryLightbox = false;
         await this.resetBoardView()
-        this.boardDescriptionEventer.next()
     }
 
     /**
@@ -570,6 +569,7 @@ class Controller implements IViewModel {
             if (this.board.layoutType == LAYOUT_TYPE.FREE) {
                 await this.getCards();
             }
+            this.boardDescriptionEventer.next();
         });
         safeApply(this.$scope);
     }

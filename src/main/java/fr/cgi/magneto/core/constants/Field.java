@@ -193,4 +193,9 @@ public class Field {
     public static final String DATE = "date";
     public static final String USER = "user";
     public static final String USERIDS = "userIds";
+
+    //FAVORITE
+
+    public static final String FAVORITE_LIST = "favoriteList";
+    public static final String IS_FAVORITE = "isFavorite";
 }

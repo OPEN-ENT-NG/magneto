@@ -3,7 +3,9 @@ package fr.cgi.magneto.controller;
 import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.helper.HttpRequestHelper;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
@@ -12,6 +14,7 @@ import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.security.DuplicateCardRight;
+import fr.cgi.magneto.security.ReadBoardRight;
 import fr.cgi.magneto.security.ViewRight;
 import fr.cgi.magneto.security.WriteBoardRight;
 import fr.cgi.magneto.service.BoardService;
@@ -187,6 +190,35 @@ public class CardController extends ControllerHelper {
             });
         });
     }
+    @Put("/card/:id/favorite")
+    @ApiDoc("Update the favorites of a card")
+    @ResourceFilter(ReadBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(Actions.FAVORITE_UPDATE)
+    public void updateFavorite(HttpServerRequest request){
+        RequestUtils.bodyToJson(request, pathPrefix + "cardUpdateFavorite", body -> {
+            UserUtils.getUserInfos(eb, request, user -> {
+                String cardId = request.getParam(Field.ID);
+                boolean favorite = body.getBoolean(Field.IS_FAVORITE);
+                if(user == null){
+                    BadRequestException noUser = new BadRequestException("User not found");
+                    String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
+                            this.getClass().getSimpleName(), noUser.getMessage());
+                    log.error(message);
+                    HttpRequestHelper.sendError(request, new BadRequestException("User not found"));
+                }
+                cardService.updateFavorite(cardId, favorite, user)
+                        .onSuccess(res -> renderJson(request, res))
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                            HttpRequestHelper.sendError(request, err);
+                        });
+            });
+        });
+    }
+
 
     @SuppressWarnings("unchecked")
     @Post("/card/duplicate")

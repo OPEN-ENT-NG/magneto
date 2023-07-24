@@ -32,7 +32,8 @@ public class CardTest {
             .putNull("parentId")
             .put("caption", "caption")
             .put("nbOfFavorites",0)
-            .put("hasLiked",false);
+            .put("hasLiked",false)
+            .put("favoriteList", new JsonArray().getList());
 
     @Test
     public void testCardHasBeenInstantiated(TestContext ctx) {

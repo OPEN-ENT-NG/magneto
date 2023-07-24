@@ -5,9 +5,11 @@ import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.Metadata;
 import fr.cgi.magneto.model.Model;
 import fr.cgi.magneto.model.user.User;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Date;
+import java.util.List;
 
 public class Card implements Model<Card> {
 
@@ -32,6 +34,7 @@ public class Card implements Model<Card> {
     private Integer nbOfFavorites;
     private boolean hasLiked;
 
+    private List<String> favoriteList;
 
     public Card(JsonObject card) {
         this._id = card.getString(Field._ID, null);
@@ -52,6 +55,7 @@ public class Card implements Model<Card> {
         this.metadata = null;
         this.lastComment = card.getJsonObject(Field.LASTCOMMENT, new JsonObject());
         this.nbOfComments = card.getInteger(Field.NBOFCOMMENTS, 0);
+        this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
         this.nbOfFavorites = card.getInteger(Field.NBOFFAVORITES, 0);
         this.hasLiked = card.getBoolean(Field.HASLIKED, false);
 
@@ -73,8 +77,6 @@ public class Card implements Model<Card> {
     public String getTitle() {
         return title;
     }
-
-
 
     public Card setTitle(String title) {
         this.title = title;
@@ -260,6 +262,13 @@ public class Card implements Model<Card> {
         return hasLiked;
     }
 
+    public List<String> getFavoriteList() { return favoriteList; }
+
+    public Card setFavoriteList(List<String> favoriteList) {
+    	this.favoriteList = favoriteList;
+    	return this;
+    }
+
     @Override
     public JsonObject toJson() {
 
@@ -284,7 +293,8 @@ public class Card implements Model<Card> {
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
-                .put(Field.HASLIKED, this.hasLiked());
+                .put(Field.HASLIKED, this.hasLiked())
+                .put(Field.FAVORITE_LIST, this.getFavoriteList());
     }
 
     @Override

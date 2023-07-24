@@ -1,6 +1,7 @@
 package fr.cgi.magneto.model;
 
 import fr.cgi.magneto.model.cards.CardPayload;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -27,7 +28,8 @@ public class CardPayloadTest {
             .put("modificationDate", "modificationDate")
             .put("isLocked", false)
             .put("parentId", "parentId")
-            .put("boardId", "boardId");
+            .put("boardId", "boardId")
+            .put("favoriteList", new JsonArray());
 
     JsonObject cardUpdateJsonObject_1 = new JsonObject()
             .put("title", "title")
@@ -40,7 +42,8 @@ public class CardPayloadTest {
             .put("description", "description")
             .put("lastModifierId", "lastModifierId")
             .put("lastModifierName", "lastModifierName")
-            .put("modificationDate", "modificationDate");
+            .put("modificationDate", "modificationDate")
+            .put("favoriteList", new JsonArray().getList());
 
     @Test
     public void testCardPayloadHasBeenInstantiated(TestContext ctx) {

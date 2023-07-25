@@ -170,7 +170,7 @@ public class SectionController extends ControllerHelper {
             UserUtils.getUserInfos(eb, request, user -> {
                 List<String> sectionIds = sectionDuplicate.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList();
                 String boardId = sectionDuplicate.getString(Field.BOARDID);
-                Future<JsonObject> getCardsFuture = cardService.getAllCardsByBoard(new Board(new JsonObject()).setId(boardId), null, user);
+                Future<JsonObject> getCardsFuture = cardService.getAllCardsByBoard(new Board(new JsonObject()).setId(boardId), null, user, false);
                 Future<List<Section>> getSectionsFuture = sectionService.get(sectionIds);
                 CompositeFuture.all(getCardsFuture, getSectionsFuture)
                         .compose(sections -> {

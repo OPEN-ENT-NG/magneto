@@ -297,12 +297,12 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user) {
+    public Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage) {
         Promise<JsonObject> promise = Promise.promise();
 
         Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsByBoardCount(board, page, user);
 
-        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page, user);
+        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page, user, fromStartPage);
 
 
         CompositeFuture.all(fetchAllCardsFuture, fetchAllCardsCountFuture)
@@ -550,9 +550,9 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<List<Card>> fetchAllCardsByBoard(Board board, Integer page, UserInfos user) {
+    private Future<List<Card>> fetchAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage) {
         Promise<List<Card>> promise = Promise.promise();
-        JsonObject query = this.getAllCardsByBoardQuery(board, page, false, user);
+        JsonObject query = this.getAllCardsByBoardQuery(board, page, false, user, fromStartPage);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error(String.format("[Magneto@%s::fetchAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName()),
@@ -570,7 +570,7 @@ public class DefaultCardService implements CardService {
 
     private Future<JsonArray> fetchAllCardsByBoardCount(Board board, Integer page, UserInfos user) {
         Promise<JsonArray> promise = Promise.promise();
-        JsonObject query = this.getAllCardsByBoardQuery(board, page, true, user);
+        JsonObject query = this.getAllCardsByBoardQuery(board, page, true, user, false);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error("[Magneto@%s::fetchAllCardsByBoardCount] Failed to get cards", this.getClass().getSimpleName(),
@@ -775,7 +775,7 @@ public class DefaultCardService implements CardService {
         return query.getAggregate();
     }
 
-    private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user) {
+    private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user, boolean fromStartPage) {
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field.BOARDID, board.getId()));
         if (page != null) {
@@ -792,8 +792,13 @@ public class DefaultCardService implements CardService {
         if (getCount) {
             query.count();
         } else {
-            if (page != null)
-                query.page(page);
+            if (page != null) {
+                if (fromStartPage){
+                    query.pageFromStart(page);
+                }else {
+                    query.page(page);
+                }
+            }
 
             String userId = user.getUserId();
             query.project(new JsonObject()

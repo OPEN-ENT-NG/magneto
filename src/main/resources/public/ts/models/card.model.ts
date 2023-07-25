@@ -40,6 +40,7 @@ export interface ICardsParamsRequest {
     sortBy?: string;
     isPublic?: boolean;
     isShared?: boolean;
+    fromStartPage?: boolean;
     isFavorite?: boolean;
 }
 

@@ -34,6 +34,7 @@ public class Field {
     public static final String ISSHARED = "isShared";
     public static final String SORTBY = "sortBy";
     public static final String PAGE = "page";
+    public static final String FROMSTARTPAGE = "fromStartPage";
 
     public static final String DELETED = "deleted";
     public static final String ISDELETED = "isDeleted";
@@ -198,4 +199,6 @@ public class Field {
     public static final String FAVORITE = "favorite";
     public static final String FAVORITE_LIST = "favoriteList";
     public static final String ISFAVORITE = "isFavorite";
+
+    public static final String MAGNETO_UPDATE_FREQUENCY = "magnetoUpdateFrequency";
 }

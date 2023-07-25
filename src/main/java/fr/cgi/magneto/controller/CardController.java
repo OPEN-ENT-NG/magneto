@@ -91,8 +91,9 @@ public class CardController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, user -> {
             String boardId = request.getParam(Field.BOARDID);
             Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
+            boolean fromStartPage = request.getParam(Field.FROMSTARTPAGE) != null ? Boolean.parseBoolean(request.getParam(Field.FROMSTARTPAGE)) : false;
             boardService.getBoards(Collections.singletonList(boardId))
-                    .compose(board -> cardService.getAllCardsByBoard(board.get(0), page, user))
+                    .compose(board -> cardService.getAllCardsByBoard(board.get(0), page, user, fromStartPage))
                     .onSuccess(result -> renderJson(request, result))
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::getAllCardsByBoardId] Failed to get all cards : %s",

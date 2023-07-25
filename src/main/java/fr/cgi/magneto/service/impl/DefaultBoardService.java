@@ -152,7 +152,7 @@ public class DefaultBoardService implements BoardService {
                         }
 
                         // Get all cards from the board
-                        getCardsFuture = cardService.getAllCardsByBoard(duplicateBoard, null, user);
+                        getCardsFuture = cardService.getAllCardsByBoard(duplicateBoard, null, user, false);
                         futures.put(Field.CARDS, getCardsFuture);
 
                         // Reset new board
@@ -235,7 +235,7 @@ public class DefaultBoardService implements BoardService {
 
             // Check if we are changing the layout from section to free
         } else if (!currentBoard.isLayoutFree() && updateBoard.isLayoutFree()) {
-            cardService.getAllCardsByBoard(currentBoard, null, user)
+            cardService.getAllCardsByBoard(currentBoard, null, user, false)
                     .compose(cards -> {
                         List<Card> cardsList = cards.getJsonArray(Field.ALL).getList();
                         List<String> cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());

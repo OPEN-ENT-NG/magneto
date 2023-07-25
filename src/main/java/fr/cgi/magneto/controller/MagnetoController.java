@@ -32,8 +32,11 @@ public class MagnetoController extends ControllerHelper {
         String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode()) ?
                 String.format(":%s%s", this.magnetoConfig.websocketConfig().port(), this.magnetoConfig.websocketConfig().endpointProxy()) :
                 this.magnetoConfig.websocketConfig().endpointProxy();
+
+        Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
         JsonObject param = new JsonObject()
-                .put(Field.WEBSOCKETENDPOINT, websocketEndpoint);
+                .put(Field.WEBSOCKETENDPOINT, websocketEndpoint)
+                .put(Field.MAGNETO_UPDATE_FREQUENCY, updateFrequency);
         renderView(request, param);
         eventStore.createAndStoreEvent(ACCESS.name(), request);
     }

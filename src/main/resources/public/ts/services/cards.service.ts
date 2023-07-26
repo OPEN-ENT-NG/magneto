@@ -30,6 +30,7 @@ export interface ICardsService {
 
     moveCard(params: CardForm, boardId: string): Promise<AxiosResponse>
 
+    favoriteCard(cardId : String, isFavorite: boolean): Promise<boolean>
 }
 
 export const cardsService: ICardsService = {
@@ -75,8 +76,12 @@ export const cardsService: ICardsService = {
 
     moveCard: async (params: CardForm, boardId: string): Promise<AxiosResponse> => {
         return http.post(`/magneto/card/move`, {card: params.toJSON(), boardId: boardId});
-    }
+    },
 
+    favoriteCard: async (cardId: String, isFavorite: boolean): Promise<boolean> => {
+        return http.put(`/magneto/card/${cardId}/favorite`, {isFavorite: isFavorite})
+            .then((res: AxiosResponse) => res.status == 200);
+    }
 };
 
 export const CardsService = ng.service('CardsService', (): ICardsService => cardsService);

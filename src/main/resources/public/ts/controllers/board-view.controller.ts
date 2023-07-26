@@ -106,7 +106,6 @@ interface IViewModel extends ng.IController {
     onEndDragAndDrop(evt: any): Promise<void>;
 
     initDraggable(): void;
-
 }
 
 interface IBoardViewScope extends IScope {

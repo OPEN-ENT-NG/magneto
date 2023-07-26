@@ -78,6 +78,8 @@ public class ReadBoardRight  implements ResourcesProvider {
                                 .add(new JsonObject()
                                         .put(Field.OWNERID, user.getUserId()))
                                 .add(new JsonObject()
+                                        .put(Field.PUBLIC, true))
+                                .add(new JsonObject()
                                         .put(String.format("%s.%s", Field.SHARED, Field.USERID),
                                                 new JsonObject().put(Mongo.IN, new JsonArray().add(user.getUserId())))
                                         .put(String.format("%s.%s", Field.SHARED, Rights.SHAREBOARDCONTROLLER_INITREADRIGHT), true))

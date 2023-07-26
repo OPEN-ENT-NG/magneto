@@ -6,6 +6,7 @@ import {DateUtils} from "../../utils/date.utils";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {Subject} from "rxjs";
+import {cardsService} from "../../services";
 
 interface IViewModel extends ng.IController, ICardListItemProps {
     formatDate(date: string): string;
@@ -32,10 +33,10 @@ interface IViewModel extends ng.IController, ICardListItemProps {
 
     openCardOptions?(): Promise<void>;
 
+    onCardFavorite?(card_id: string, isFavorite: boolean): void;
+
     isDisplayedOptions: boolean;
     isSelected: boolean;
-
-
 }
 
 interface ICardListItemProps {
@@ -59,9 +60,11 @@ interface ICardListItemProps {
     onTransfer?;
     hasLock: boolean;
     onLock?;
+    hasFavorite: boolean;
     cardUpdateEventer: Subject<void>;
     hasComments: boolean;
     boardOwner: IBoardOwner;
+    hasDisplayFavNumber: boolean;
 }
 
 interface ICardListItemScope extends IScope, ICardListItemProps {
@@ -83,6 +86,7 @@ class Controller implements IViewModel {
     hasPreview: boolean;
     hasTransfer: boolean;
     hasLock: boolean;
+    hasFavorite: boolean;
     hasComments: boolean;
 
     selectorResize: string;
@@ -90,6 +94,7 @@ class Controller implements IViewModel {
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
     cardUpdateEventer: Subject<void>;
     boardOwner: IBoardOwner;
+    hasDisplayFavNumber: boolean;
 
     constructor(private $scope: ICardListItemScope,
                 private $location: ILocationService,
@@ -156,10 +161,12 @@ function directive($parse: IParseService) {
             onTransfer: '&',
             hasLock: '=',
             onLock: '&',
+            hasFavorite: '=',
             selectorResize: '=',
             cardUpdateEventer: '=',
             hasComments: '=',
-            boardOwner: '='
+            boardOwner: '=',
+            hasDisplayFavNumber: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -232,6 +239,11 @@ function directive($parse: IParseService) {
 
             vm.openLock = (card: Card): void => {
                 $parse($scope.vm.onLock())(card);
+            }
+
+            vm.onCardFavorite = async (card_id: string, isFavorite: boolean): Promise<boolean> => {
+                let res = await cardsService.favoriteCard(card_id, isFavorite);
+                return res;
             }
         }
     }

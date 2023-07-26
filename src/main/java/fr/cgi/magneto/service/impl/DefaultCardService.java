@@ -316,7 +316,7 @@ public class DefaultCardService implements CardService {
                     int cardsCount = (fetchAllCardsCountFuture.result().isEmpty()) ? 0 :
                             fetchAllCardsCountFuture.result().getJsonObject(0).getInteger(Field.COUNT);
                     promise.complete(new JsonObject()
-                            .put(Field.ALL, cards)
+                            .put(Field.ALL, cards.stream().map(card -> card.toJson()).collect(Collectors.toList()))
                             .put(Field.PAGE, cardsCount)
                             .put(Field.PAGECOUNT, cardsCount <= Magneto.PAGE_SIZE ?
                                     0 : (long) Math.ceil(cardsCount / (double) Magneto.PAGE_SIZE)));
@@ -761,6 +761,7 @@ public class DefaultCardService implements CardService {
                             .put(Field.LASTMODIFIERNAME, 1)
                             .put(Field.BOARDTITLE, query.arrayElemAt(String.format("%s.%s", Field.RESULT, Field.TITLE), 0))
                             .put(Field.BOARDID, 1)
+                            .put(Field.FAVORITE_LIST, 1)
                             .put(Field.NBOFFAVORITES, new JsonObject()
                                     .put(Mongo.$COND, new JsonObject()
                                             .put(Mongo.IF, new JsonObject()
@@ -812,6 +813,7 @@ public class DefaultCardService implements CardService {
                     .put(Field.ISLOCKED, 1)
                     .put(Field.LASTMODIFIERID, 1)
                     .put(Field.LASTMODIFIERNAME, 1)
+                    .put(Field.FAVORITE_LIST, 1)
                     .put(Field.LASTCOMMENT, new JsonObject()
                             .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
                     .put(Field.NBOFCOMMENTS, new JsonObject()
@@ -875,6 +877,7 @@ public class DefaultCardService implements CardService {
                     .put(Field.PARENTID, 1)
                     .put(Field.LASTMODIFIERID, 1)
                     .put(Field.LASTMODIFIERNAME, 1)
+                    .put(Field.FAVORITE_LIST, 1)
                     .put(Field.LASTCOMMENT, new JsonObject()
                             .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
                     .put(Field.NBOFCOMMENTS, new JsonObject()

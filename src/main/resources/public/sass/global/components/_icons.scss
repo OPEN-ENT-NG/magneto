@@ -230,4 +230,13 @@ i {
     content: '\F0156';
   }
 
+  &.magneto-favorite-outline::before {
+    font-family: 'magneto-mdi';
+    content: '\F04D2';
+  }
+
+  &.magneto-favorite-active::before {
+    font-family: 'magneto-mdi';
+    content: '\F04CE';
+  }
 }

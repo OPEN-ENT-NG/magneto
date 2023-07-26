@@ -163,6 +163,7 @@
   "magneto.cards.collection.shared": "Dans les tableaux partagés",
   "magneto.cards.collection.public": "Dans les tableaux de la plateforme",
   "magneto.cards.collection.board.view": "Ranger par tableau",
+  "magneto.cards.collection.favorite.view": "Trier par like",
   "magneto.cards.collection.board.cards.show": "Voir tous les aimants du tableau",
   "magneto.cards.collection.board.cards.hide": "Cacher les aimants liés",
   "magneto.cards.collection.board.duplicate": "Dupliquer le tableau",

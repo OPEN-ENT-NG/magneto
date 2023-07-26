@@ -40,8 +40,10 @@ public class CardServiceTest {
                 "   \"pipeline\":[\n" +
                 "      {\n" +
                 "         \"$match\":{\n" +
-                "            \"boardId\": {\"$ne\":\"boardId\"}\n" +
-                "           }\n" +
+                "            \"boardId\":{\n" +
+                "               \"$ne\":\"boardId\"\n" +
+                "            }\n" +
+                "         }\n" +
                 "      },\n" +
                 "      {\n" +
                 "         \"$lookup\":{\n" +
@@ -105,30 +107,65 @@ public class CardServiceTest {
                 "      {\n" +
                 "         \"$group\":{\n" +
                 "            \"_id\":{\n" +
-                "                \"title\":\"$title\", \"description\":\"$description\", \"caption\":\"$caption\", \"resourceId\":\n" +
-                "                \"$resourceId\", \"resourceType\":\"$resourceType\", \"resourceUrl\":\"$resourceUrl\"\n" +
-                "            },\"parentId\":{\n" +
-                "                \"$first\":\"$parentId\"\n" +
-                "            },\"boardId\":{\n" +
-                "                \"$first\":\"$boardId\"\n" +
-                "            },\"id\":{\n" +
-                "                \"$first\":\"$_id\"\n" +
-                "            },\"creationDate\":{\n" +
-                "                \"$first\":\"$creationDate\"\n" +
-                "            },\"modificationDate\":{\n" +
-                "                \"$first\":\"$modificationDate\"\n" +
-                "            },\"ownerId\":{\n" +
-                "                \"$first\":\"$ownerId\"\n" +
-                "            },\"ownerName\":{\n" +
-                "                \"$first\":\"$ownerName\"\n" +
-                "            },\"lastModifierId\":{\n" +
-                "                \"$first\":\"$lastModifierId\"\n" +
-                "            },\"lastModifierName\":{\n" +
-                "                \"$first\":\"$lastModifierName\"\n" +
-                "            },\"result\":{\n" +
-                "                \"$first\":\"$result\"\n" +
-                "            },\"favoriteList\":{\n" +
-                "                \"$first\":\"$favoriteList\"\n" +
+                "               \"title\":\"$title\",\n" +
+                "               \"description\":\"$description\",\n" +
+                "               \"caption\":\"$caption\",\n" +
+                "               \"resourceId\":\"$resourceId\",\n" +
+                "               \"resourceType\":\"$resourceType\",\n" +
+                "               \"resourceUrl\":\"$resourceUrl\"\n" +
+                "            },\n" +
+                "            \"parentId\":{\n" +
+                "               \"$first\":\"$parentId\"\n" +
+                "            },\n" +
+                "            \"id\":{\n" +
+                "               \"$first\":\"$_id\"\n" +
+                "            },\n" +
+                "            \"creationDate\":{\n" +
+                "               \"$first\":\"$creationDate\"\n" +
+                "            },\n" +
+                "            \"boardId\":{\n" +
+                "               \"$first\":\"$boardId\"\n" +
+                "            },\n" +
+                "            \"modificationDate\":{\n" +
+                "               \"$first\":\"$modificationDate\"\n" +
+                "            },\n" +
+                "            \"ownerId\":{\n" +
+                "               \"$first\":\"$ownerId\"\n" +
+                "            },\n" +
+                "            \"ownerName\":{\n" +
+                "               \"$first\":\"$ownerName\"\n" +
+                "            },\n" +
+                "            \"lastModifierId\":{\n" +
+                "               \"$first\":\"$lastModifierId\"\n" +
+                "            },\n" +
+                "            \"lastModifierName\":{\n" +
+                "               \"$first\":\"$lastModifierName\"\n" +
+                "            },\n" +
+                "            \"result\":{\n" +
+                "               \"$first\":\"$result\"\n" +
+                "            },\n" +
+                "            \"favoriteList\":{\n" +
+                "               \"$first\":\"$favoriteList\"\n" +
+                "            }\n" +
+                "         }\n" +
+                "      },\n" +
+                "      {\n" +
+                "         \"$addFields\":{\n" +
+                "            \"hasLiked\":{\n" +
+                "               \"$cond\":{\n" +
+                "                  \"if\":{\n" +
+                "                     \"$isArray\":\"$favoriteList\"\n" +
+                "                  },\n" +
+                "                  \"then\":{\n" +
+                "                     \"$setIsSubset\":[\n" +
+                "                        [\n" +
+                "                           \"ownerId\"\n" +
+                "                        ],\n" +
+                "                        \"$favoriteList\"\n" +
+                "                     ]\n" +
+                "                  },\n" +
+                "                  \"else\":false\n" +
+                "               }\n" +
                 "            }\n" +
                 "         }\n" +
                 "      },\n" +

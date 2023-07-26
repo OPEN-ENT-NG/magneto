@@ -1,5 +1,6 @@
   .cardDirective-list-item-options {
     transform: translateX(5px) translateY(-26px);
+    z-index: 2;
     nav {
       .nav, .sub-nav {
         position: absolute;

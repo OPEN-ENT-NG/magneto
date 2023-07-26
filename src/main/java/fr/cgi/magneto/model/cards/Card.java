@@ -55,7 +55,8 @@ public class Card implements Model<Card> {
         this.metadata = null;
         this.lastComment = card.getJsonObject(Field.LASTCOMMENT, new JsonObject());
         this.nbOfComments = card.getInteger(Field.NBOFCOMMENTS, 0);
-        this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
+        JsonArray favoriteListOrNull = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray());
+        this.favoriteList = (favoriteListOrNull != null) ? favoriteListOrNull.getList() : new JsonArray().getList();
         this.nbOfFavorites = card.getInteger(Field.NBOFFAVORITES, 0);
         this.hasLiked = card.getBoolean(Field.HASLIKED, false);
 

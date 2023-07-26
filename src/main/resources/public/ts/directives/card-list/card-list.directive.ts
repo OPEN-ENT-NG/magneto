@@ -60,6 +60,7 @@ interface ICardListProps {
     hasLock: boolean;
     onLock?;
     onMove?;
+    hasFavorite?: boolean;
 
     onLoaded?;
 
@@ -95,6 +96,7 @@ class Controller implements IViewModel {
     hasPreview: boolean;
     hasTransfer: boolean;
     hasLock: boolean;
+    hasFavorite: boolean;
     hasComments: boolean;
     simpleView: boolean;
     boardOwner: IBoardOwner;
@@ -175,6 +177,7 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
             onTransfer: '&',
             hasLock: '=',
             onLock: '&',
+            hasFavorite: '=',
             onMove: '&',
             onLoaded: '&',
             selectorResize: '=',
@@ -270,8 +273,8 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
                 $parse($scope.vm.onLock())(card);
             }
 
-
             if (!vm.simpleView) {
+
                 $timeout(() => {
                     vm.resizeAllCardItems();
                 }, 800);

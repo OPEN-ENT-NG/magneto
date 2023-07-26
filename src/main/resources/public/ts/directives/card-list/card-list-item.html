@@ -9,6 +9,9 @@
                     [[vm.formatDateModification(vm.card.modificationDate)]]
                 </span>
             </div>
+            <div class="cardDirective-list-item-header-locked">
+                <i ng-if="vm.card.locked" class="magneto-lock" aria-hidden="true" tooltip="magneto.card.locked.tooltip"></i>
+            </div>
             <i ng-if="vm.hasOptions()" class="magneto-card-settings" data-ng-click="vm.openCardOptions(); $event.stopPropagation();"></i>
             <card-list-item-options
                     ng-show="vm.isDisplayedOptions"
@@ -42,14 +45,24 @@
                     card="vm.card">
             </card-list-item-preview>
             <!--Card infos-->
-            <div class="cardDirective-list-item-infos-footer flex-row" ng-if="vm.hasCaption">
+            <div class="cardDirective-list-item-infos-footer flex-row" ng-if="vm.hasCaption || vm.hasFavorite">
+
+                <!-- Favorite-->
+                <favorite-button
+                        element_id="vm.card.id"
+                        element-fav-nb="vm.card.nbOfFavorites"
+                        display-fav-nb="vm.hasDisplayFavNumber"
+                        has-liked="vm.card.hasLiked"
+                        on-favorite-handler="vm.onCardFavorite"
+                        ng-if="vm.hasFavorite">
+                </favorite-button>
+
                 <!-- Card caption -->
-                <span tooltip="[[vm.card.caption]]" class="cardDirective-list-item-infos-footer-caption">
+                <span tooltip="[[vm.card.caption]]" class="cardDirective-list-item-infos-footer-caption" ng-if="vm.hasCaption">
                     [[vm.card.caption]]
                 </span>
-                <div class="cardDirective-list-item-infos-footer-locked">
-                    <i ng-if="vm.card.locked" class="magneto-lock" aria-hidden="true" tooltip="magneto.card.locked.tooltip"></i>
-                </div>
+
+
             </div>
         </div>
         <card-item-comments

@@ -41,5 +41,5 @@ public class Rights {
     public static final String PUBLISH = "magneto.publish";
 
 
-    public static final String SHAREBOARDCONTROLLER_INITREADRIGHT = "magneto-controller-ShareBoardController|initReadRight";
+    public static final String SHAREBOARDCONTROLLER_INITREADRIGHT = "fr-cgi-magneto-controller-ShareBoardController|initReadRight";
 }

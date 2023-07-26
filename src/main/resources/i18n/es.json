@@ -161,6 +161,7 @@
   "magneto.cards.collection.mine": "My Boards",
   "magneto.cards.collection.shared": "My shared boards",
   "magneto.cards.collection.public": "My platform boards",
+  "magneto.cards.collection.favorite": "My favorite",
   "magneto.cards.collection.board.view": "Order by board",
   "magneto.cards.collection.favorite.view": "Order by favorite",
   "magneto.cards.collection.board.cards.show": "See all magnets of the board",

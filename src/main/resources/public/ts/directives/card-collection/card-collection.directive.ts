@@ -227,6 +227,7 @@ class Controller implements IViewModel {
         this.navbarViewSelected = navbarView;
         this.filter.isShared = this.isCurrentViewNav(COLLECTION_NAVBAR_VIEWS.SHARED_CARDS);
         this.filter.isPublic = this.isCurrentViewNav(COLLECTION_NAVBAR_VIEWS.PUBLIC_CARDS);
+        this.filter.isFavorite = this.isCurrentViewNav(COLLECTION_NAVBAR_VIEWS.FAVORITES);
         await this.resetCards();
         safeApply(this.$scope);
     }
@@ -239,7 +240,8 @@ class Controller implements IViewModel {
             searchText: this.filter.searchText,
             boardId: this.board.id,
             isShared: this.filter.isShared,
-            isPublic: this.filter.isPublic
+            isPublic: this.filter.isPublic,
+            isFavorite: this.filter.isFavorite
         };
         cardsService.getAllCardsCollection(params)
             .then((res: Cards) => {

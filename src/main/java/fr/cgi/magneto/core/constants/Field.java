@@ -197,5 +197,5 @@ public class Field {
     //FAVORITE
     public static final String FAVORITE = "favorite";
     public static final String FAVORITE_LIST = "favoriteList";
-    public static final String IS_FAVORITE = "isFavorite";
+    public static final String ISFAVORITE = "isFavorite";
 }

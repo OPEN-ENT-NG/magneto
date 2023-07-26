@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import java.util.Map;
 
 import static fr.cgi.magneto.Magneto.PAGE_SIZE;
 
@@ -78,22 +79,23 @@ public class MongoQuery {
         return this;
     }
 
-    public MongoQuery group(List<String> fields, List<String> externalFields) {
+    public MongoQuery group(List<String> fields, Map<String, String> externalFieldAccumulators) {
         JsonObject group = new JsonObject().put(Mongo._ID, new JsonObject());
         fields.forEach(field -> group.getJsonObject(Mongo._ID).put(field, String.format("$%s", field)));
-        if (!externalFields.isEmpty()) {
-            externalFields.forEach(field -> {
-                if(field.equals(Field._ID)) {
-                    group.put(Field.ID, new JsonObject().put(Mongo.FIRST, String.format("$%s", field)));
-                } else {
-                    group.put(field, new JsonObject().put(Mongo.FIRST, String.format("$%s", field)));
-                }
-            });
-        }
+        externalFieldAccumulators.forEach((field, accumulator) -> {
+            if (field.equals(Field._ID)) {
+                group.put(Field.ID, new JsonObject().put(accumulator, String.format("$%s", field)));
+            } else {
+                group.put(field, new JsonObject().put(accumulator, String.format("$%s", field)));
+            }
+        });
+
         this.pipeline.add(new JsonObject()
                 .put(Mongo.GROUP, group));
         return this;
     }
+
+
 
     public MongoQuery project(JsonObject parameters) {
         this.pipeline.add(new JsonObject()

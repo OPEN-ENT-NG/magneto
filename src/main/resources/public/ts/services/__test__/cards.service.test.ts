@@ -18,7 +18,7 @@ describe('CardsService', () => {
             all: []
         }
 
-        let urlParams: string = `?boardId=${params.boardId}&searchText=${params.searchText}&sortBy=${params.sortBy}&isPublic=${params.isPublic}&isShared=${params.isShared}&page=${params.page}`;
+        let urlParams: string = `?boardId=${params.boardId}&searchText=${params.searchText}&sortBy=${params.sortBy}&isPublic=${params.isPublic}&isFavorite=${params.isFavorite}&isShared=${params.isShared}&page=${params.page}`;
         mock.onGet(`/magneto/cards/collection${urlParams}`)
             .reply(200, data);
 

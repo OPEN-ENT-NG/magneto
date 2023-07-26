@@ -70,8 +70,9 @@ public class CardController extends ControllerHelper {
             String boardId = request.getParam(Field.BOARDID);
             boolean isPublic = Boolean.parseBoolean(request.getParam(Field.ISPUBLIC));
             boolean isShared = Boolean.parseBoolean(request.getParam(Field.ISSHARED));
+            boolean isFavorite = Boolean.parseBoolean(request.getParam(Field.ISFAVORITE));
             Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
-            cardService.getAllCards(user, boardId, page, isPublic, isShared, searchText, sortBy)
+            cardService.getAllCards(user, boardId, page, isPublic, isShared, isFavorite, searchText, sortBy)
                     .onSuccess(result -> renderJson(request, result))
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::getAllCards] Failed to get all cards : %s",
@@ -199,7 +200,7 @@ public class CardController extends ControllerHelper {
         RequestUtils.bodyToJson(request, pathPrefix + "cardUpdateFavorite", body -> {
             UserUtils.getUserInfos(eb, request, user -> {
                 String cardId = request.getParam(Field.ID);
-                boolean favorite = body.getBoolean(Field.IS_FAVORITE);
+                boolean favorite = body.getBoolean(Field.ISFAVORITE);
                 if(user == null){
                     BadRequestException noUser = new BadRequestException("User not found");
                     String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",

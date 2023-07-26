@@ -4,12 +4,14 @@ export class CardsFilter {
     private _sortBy: string;
     private _isShared: boolean;
     private _isPublic: boolean;
+    private _isFavorite: boolean;
     private _searchText: string;
 
     constructor() {
         this._page = 0;
         this._isShared = false;
         this._isPublic = false;
+        this._isFavorite = false;
         this._sortBy = '';
         this._searchText = '';
     }
@@ -48,6 +50,14 @@ export class CardsFilter {
 
     set isPublic(value: boolean) {
         this._isPublic = value;
+    }
+
+    get isFavorite(): boolean {
+        return this._isFavorite;
+    }
+
+    set isFavorite(value: boolean) {
+        this._isFavorite = value;
     }
 
     get isShared(): boolean {

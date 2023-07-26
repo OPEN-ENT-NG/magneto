@@ -90,6 +90,26 @@ public class CardServiceTest {
                 "         }\n" +
                 "      },\n" +
                 "      {\n" +
+                "         \"$addFields\":{\n" +
+                "            \"hasLiked\":{\n" +
+                "               \"$cond\":{\n" +
+                "                  \"if\":{\n" +
+                "                     \"$isArray\":\"$favoriteList\"\n" +
+                "                  },\n" +
+                "                  \"then\":{\n" +
+                "                     \"$setIsSubset\":[\n" +
+                "                        [\n" +
+                "                           \"ownerId\"\n" +
+                "                        ],\n" +
+                "                        \"$favoriteList\"\n" +
+                "                     ]\n" +
+                "                  },\n" +
+                "                  \"else\":false\n" +
+                "               }\n" +
+                "            }\n" +
+                "         }\n" +
+                "      },\n" +
+                "      {\n" +
                 "         \"$match\":{\n" +
                 "            \"result.ownerId\":\"ownerId\"\n" +
                 "         }\n" +
@@ -114,26 +134,23 @@ public class CardServiceTest {
                 "               \"resourceType\":\"$resourceType\",\n" +
                 "               \"resourceUrl\":\"$resourceUrl\"\n" +
                 "            },\n" +
-                "            \"parentId\":{\n" +
-                "               \"$first\":\"$parentId\"\n" +
-                "            },\n" +
-                "            \"id\":{\n" +
-                "               \"$first\":\"$_id\"\n" +
-                "            },\n" +
-                "            \"creationDate\":{\n" +
-                "               \"$first\":\"$creationDate\"\n" +
-                "            },\n" +
-                "            \"boardId\":{\n" +
-                "               \"$first\":\"$boardId\"\n" +
+                "            \"result\":{\n" +
+                "               \"$first\":\"$result\"\n" +
                 "            },\n" +
                 "            \"modificationDate\":{\n" +
                 "               \"$first\":\"$modificationDate\"\n" +
                 "            },\n" +
-                "            \"ownerId\":{\n" +
-                "               \"$first\":\"$ownerId\"\n" +
-                "            },\n" +
                 "            \"ownerName\":{\n" +
                 "               \"$first\":\"$ownerName\"\n" +
+                "            },\n" +
+                "            \"favoriteList\":{\n" +
+                "               \"$first\":\"$favoriteList\"\n" +
+                "            },\n" +
+                "            \"hasLiked\":{\n" +
+                "               \"$max\":\"$hasLiked\"\n" +
+                "            },\n" +
+                "            \"boardId\":{\n" +
+                "               \"$first\":\"$boardId\"\n" +
                 "            },\n" +
                 "            \"lastModifierId\":{\n" +
                 "               \"$first\":\"$lastModifierId\"\n" +
@@ -141,31 +158,17 @@ public class CardServiceTest {
                 "            \"lastModifierName\":{\n" +
                 "               \"$first\":\"$lastModifierName\"\n" +
                 "            },\n" +
-                "            \"result\":{\n" +
-                "               \"$first\":\"$result\"\n" +
+                "            \"id\":{\n" +
+                "               \"$first\":\"$_id\"\n" +
                 "            },\n" +
-                "            \"favoriteList\":{\n" +
-                "               \"$first\":\"$favoriteList\"\n" +
-                "            }\n" +
-                "         }\n" +
-                "      },\n" +
-                "      {\n" +
-                "         \"$addFields\":{\n" +
-                "            \"hasLiked\":{\n" +
-                "               \"$cond\":{\n" +
-                "                  \"if\":{\n" +
-                "                     \"$isArray\":\"$favoriteList\"\n" +
-                "                  },\n" +
-                "                  \"then\":{\n" +
-                "                     \"$setIsSubset\":[\n" +
-                "                        [\n" +
-                "                           \"ownerId\"\n" +
-                "                        ],\n" +
-                "                        \"$favoriteList\"\n" +
-                "                     ]\n" +
-                "                  },\n" +
-                "                  \"else\":false\n" +
-                "               }\n" +
+                "            \"creationDate\":{\n" +
+                "               \"$first\":\"$creationDate\"\n" +
+                "            },\n" +
+                "            \"ownerId\":{\n" +
+                "               \"$first\":\"$ownerId\"\n" +
+                "            },\n" +
+                "            \"parentId\":{\n" +
+                "               \"$first\":\"$parentId\"\n" +
                 "            }\n" +
                 "         }\n" +
                 "      },\n" +
@@ -184,7 +187,7 @@ public class CardServiceTest {
         testUser.setUserId("ownerId");
 
         JsonObject query = Whitebox.invokeMethod(this.cardService, "getAllCardsQuery", testUser,
-                "boardId", 0, false, false, "test", null, true);
+                "boardId", 0, false, false, false, "test", null, true);
 
         ctx.assertEquals(expected, query);
 

@@ -7,7 +7,6 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
-import fr.cgi.magneto.model.user.User;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -61,12 +60,13 @@ public interface CardService {
      * @param page       Page number
      * @param isPublic   fetch public boards if true
      * @param isShared   fetch shared boards if true
+     * @param isFavorite fetch favorite board if true
      * @param searchText Search text
      * @param sortBy     Sort by parameter
      * @return Future {@link Future <JsonObject>} containing all cards created by the user
      */
 
-    Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, String searchText, String sortBy);
+    Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText, String sortBy);
 
     /**
      * Get cards by ids

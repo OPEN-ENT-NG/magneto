@@ -162,6 +162,7 @@
   "magneto.cards.collection.mine": "Dans mes tableaux",
   "magneto.cards.collection.shared": "Dans les tableaux partagés",
   "magneto.cards.collection.public": "Dans les tableaux de la plateforme",
+  "magneto.cards.collection.favorite": "Aimant mis en favoris",
   "magneto.cards.collection.board.view": "Ranger par tableau",
   "magneto.cards.collection.favorite.view": "Trier par like",
   "magneto.cards.collection.board.cards.show": "Voir tous les aimants du tableau",

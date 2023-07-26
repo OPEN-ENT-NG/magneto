@@ -19,11 +19,19 @@
                 navbar-view-selected="vm.navbarViewSelected"
                 on-nav-click="vm.changeNav">
         </card-navbar>
-        <div>
-            <switch ng-change="vm.changeView()" ng-model="vm.displayBoard">
-                <label class="switch"></label>
-            </switch>
-            <span><i18n>magneto.cards.collection.board.view</i18n></span>
+        <div class="flex">
+            <div>
+                <switch ng-change="vm.changeView()" ng-model="vm.displayBoard">
+                    <label class="switch"></label>
+                </switch>
+                <span><i18n>magneto.cards.collection.board.view</i18n></span>
+            </div>
+            <div>
+                <switch ng-change="vm.changeOrder(vm.RESOURCE_ORDERS.FAVORITE)" ng-model="vm.orderFavorite">
+                    <label class="switch"></label>
+                </switch>
+                <span><i18n>magneto.cards.collection.favorite.view</i18n></span>
+            </div>
         </div>
         <div class="cardDirective-list-scrollable"
              ng-show="vm.cards.length > 0 && !vm.isLoading">

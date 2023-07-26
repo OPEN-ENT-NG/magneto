@@ -18,12 +18,12 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
-import fr.cgi.magneto.model.user.User;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import fr.cgi.magneto.service.CardService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.WorkspaceService;
 import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.mongodb.MongoQueryBuilder;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -249,46 +249,46 @@ public class DefaultCardService implements CardService {
         JsonObject query = new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, cardIds)))
                 .project(new JsonObject()
-                    .put(Field._ID, 1)
-                    .put(Field.TITLE, 1)
-                    .put(Field.CAPTION, 1)
-                    .put(Field.DESCRIPTION, 1)
-                    .put(Field.ISLOCKED, 1)
-                    .put(Field.OWNERID, 1)
-                    .put(Field.OWNERNAME, 1)
-                    .put(Field.RESOURCETYPE, 1)
-                    .put(Field.RESOURCEID, 1)
-                    .put(Field.RESOURCEURL, 1)
-                    .put(Field.CREATIONDATE, 1)
-                    .put(Field.MODIFICATIONDATE, 1)
-                    .put(Field.BOARDID, 1)
-                    .put(Field.PARENTID, 1)
-                    .put(Field.LASTMODIFIERID, 1)
-                    .put(Field.LASTMODIFIERNAME, 1)
-                    .put(Field.LASTCOMMENT, new JsonObject()
-                            .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
-                    .put(Field.NBOFCOMMENTS, new JsonObject()
-                            .put(Mongo.$COND, new JsonObject()
-                                    .put(Mongo.IF, new JsonObject()
-                                            .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
-                                    .put(Mongo.THEN, new JsonObject()
-                                            .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
-                                    .put(Mongo.ELSE, 0)))
-                    .put(Field.NBOFFAVORITES, new JsonObject()
+                        .put(Field._ID, 1)
+                        .put(Field.TITLE, 1)
+                        .put(Field.CAPTION, 1)
+                        .put(Field.DESCRIPTION, 1)
+                        .put(Field.ISLOCKED, 1)
+                        .put(Field.OWNERID, 1)
+                        .put(Field.OWNERNAME, 1)
+                        .put(Field.RESOURCETYPE, 1)
+                        .put(Field.RESOURCEID, 1)
+                        .put(Field.RESOURCEURL, 1)
+                        .put(Field.CREATIONDATE, 1)
+                        .put(Field.MODIFICATIONDATE, 1)
+                        .put(Field.BOARDID, 1)
+                        .put(Field.PARENTID, 1)
+                        .put(Field.LASTMODIFIERID, 1)
+                        .put(Field.LASTMODIFIERNAME, 1)
+                        .put(Field.LASTCOMMENT, new JsonObject()
+                                .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
+                        .put(Field.NBOFCOMMENTS, new JsonObject()
+                                .put(Mongo.$COND, new JsonObject()
+                                        .put(Mongo.IF, new JsonObject()
+                                                .put(Mongo.ISARRAY, String.format("$%s", Field.COMMENTS)))
+                                        .put(Mongo.THEN, new JsonObject()
+                                                .put(Mongo.SIZE, String.format("$%s", Field.COMMENTS)))
+                                        .put(Mongo.ELSE, 0)))
+                        .put(Field.NBOFFAVORITES, new JsonObject()
                                 .put(Mongo.$COND, new JsonObject()
                                         .put(Mongo.IF, new JsonObject()
                                                 .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
                                         .put(Mongo.THEN, new JsonObject()
                                                 .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
                                         .put(Mongo.ELSE, 0)))
-                    .put(Field.HASLIKED, new JsonObject()
-                            .put(Mongo.$COND, new JsonObject()
-                                    .put(Mongo.IF, new JsonObject()
-                                            .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
-                                    .put(Mongo.THEN, new JsonObject()
-                                            .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
-                                    .put(Mongo.ELSE, false)))
-                    .put(Field.FAVORITE_LIST, 1))
+                        .put(Field.HASLIKED, new JsonObject()
+                                .put(Mongo.$COND, new JsonObject()
+                                        .put(Mongo.IF, new JsonObject()
+                                                .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                        .put(Mongo.THEN, new JsonObject()
+                                                .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
+                                        .put(Mongo.ELSE, false)))
+                        .put(Field.FAVORITE_LIST, 1))
                 .getAggregate();
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
@@ -700,13 +700,31 @@ public class DefaultCardService implements CardService {
         query
                 .match(new JsonObject().put(String.format("%s.%s", Field.RESULT, Field.DELETED), false))
                 .sort(Field.PARENTID, 1)
-                .group(groupField, externalGroupField)
-                .sort(String.format("%s.%s", Field.RESULT, Field.MODIFICATIONDATE), -1);
+                .group(groupField, externalGroupField);
+        query.addFields(Field.HASLIKED, new JsonObject()
+                .put(Mongo.$COND, new JsonObject()
+                        .put(Mongo.IF, new JsonObject()
+                                .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                        .put(Mongo.THEN, new JsonObject()
+                                .put(Mongo.$SET_ISSUBSET, new JsonArray()
+                                        .add(new JsonArray().add(user.getUserId()))
+                                        .add(String.format("$%s", Field.FAVORITELIST))))
+                        .put(Mongo.ELSE, false)));
+        if (sortBy != null && !sortBy.isEmpty()) {
+            switch(sortBy){
+                case Field.FAVORITE:
+                    query.sort(Field.HASLIKED, -1);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            query.sort(String.format("%s.%s", Field.RESULT, Field.MODIFICATIONDATE), -1);
+        }
 
         if (getCount) {
             query = query.count();
         } else {
-            String userId = user.getUserId();
             query
                     .page(page)
                     .project(new JsonObject()
@@ -732,13 +750,7 @@ public class DefaultCardService implements CardService {
                                             .put(Mongo.THEN, new JsonObject()
                                                     .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
                                             .put(Mongo.ELSE, 0)))
-                            .put(Field.HASLIKED, new JsonObject()
-                                    .put(Mongo.$COND, new JsonObject()
-                                            .put(Mongo.IF, new JsonObject()
-                                                    .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
-                                            .put(Mongo.THEN, new JsonObject()
-                                                    .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
-                                            .put(Mongo.ELSE, false)))
+                            .put(Field.HASLIKED, 1)
                     );
         }
         return query.getAggregate();
@@ -868,7 +880,7 @@ public class DefaultCardService implements CardService {
                                     .put(Mongo.THEN, new JsonObject()
                                             .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
                                     .put(Mongo.ELSE, false)))
-                    );
+            );
         }
 
         return query.getAggregate();

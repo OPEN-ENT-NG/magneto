@@ -9,6 +9,7 @@ import {CardsFilter} from "../../models/cards-filter.model";
 import {Object} from "core-js";
 import {InfiniteScrollService} from "../../shared/services";
 import {COLLECTION_NAVBAR_VIEWS} from "../../core/enums/collection-navbar.enum";
+import {RESOURCE_ORDER} from "../../core/enums/resource-order.enum";
 
 interface IViewModel extends ng.IController, ICardCollectionProps {
     closeForm(): void;
@@ -34,6 +35,7 @@ interface IViewModel extends ng.IController, ICardCollectionProps {
     openPreview(card: Card): void;
 
     changeView(): void;
+    changeOrder(field: string): Promise<void>;
 
     changeNav(navbarView: COLLECTION_NAVBAR_VIEWS): Promise<void>;
 
@@ -45,6 +47,7 @@ interface IViewModel extends ng.IController, ICardCollectionProps {
     displayedCard: Array<CardCollection>;
 
     displayBoard: boolean;
+    orderFavorite: boolean;
     displayPreview: boolean;
     displayScroll: boolean;
 
@@ -82,12 +85,14 @@ class Controller implements IViewModel {
 
     display: boolean;
     displayBoard: boolean;
+    orderFavorite: boolean;
     displayPreview: boolean;
     displayScroll: boolean;
 
     filter: CardsFilter;
 
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
+    RESOURCE_ORDERS: typeof RESOURCE_ORDER;
     isLoading: boolean;
 
     infiniteScrollService: InfiniteScrollService;
@@ -99,11 +104,13 @@ class Controller implements IViewModel {
         this.selectedCardIds = [];
         this.selectedCard = new Card();
         this.displayBoard = false;
+        this.orderFavorite = false;
         this.displayPreview = false;
         this.isLoading = true;
         this.filter = new CardsFilter();
         this.infiniteScrollService = new InfiniteScrollService;
         this.navbarViewSelected = COLLECTION_NAVBAR_VIEWS.MY_CARDS;
+        this.RESOURCE_ORDERS = RESOURCE_ORDER;
     }
 
     async $onInit() {
@@ -137,6 +144,23 @@ class Controller implements IViewModel {
             this.getDisplayedCollectionCards();
         } else {
             this.displayedCard = [];
+        }
+        safeApply(this.$scope);
+    }
+
+    changeOrder = async (field: string): Promise<void> => {
+        switch (field) {
+            case this.RESOURCE_ORDERS.FAVORITE:
+                if(this.orderFavorite) {
+                    this.filter.sortBy = field;
+                    await this.resetCards();
+                } else {
+                    this.filter.sortBy = "";
+                    await this.resetCards();
+                }
+                break;
+            default:
+                break;
         }
         safeApply(this.$scope);
     }

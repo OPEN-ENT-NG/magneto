@@ -35,7 +35,7 @@ export interface ICardsService {
 export const cardsService: ICardsService = {
 
     getAllCardsCollection: async (params: ICardsParamsRequest): Promise<Cards> => {
-        let urlParams: string = `?boardId=${params.boardId}&searchText=${params.searchText}&sortBy=${params.sortBy}&isPublic=${params.isPublic}&isShared=${params.isShared}&page=${params.page}`;
+        let urlParams: string = `?boardId=${params.boardId}&searchText=${params.searchText}&sortBy=${params.sortBy}&isPublic=${params.isPublic}&isFavorite=${params.isFavorite}&isShared=${params.isShared}&page=${params.page}`;
         return http.get(`/magneto/cards/collection${urlParams}`)
             .then((res: AxiosResponse) => new Cards(res.data));
     },

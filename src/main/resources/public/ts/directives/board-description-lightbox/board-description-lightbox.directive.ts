@@ -3,6 +3,7 @@ import {IScope} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board} from "../../models";
 import {safeApply} from "../../utils/safe-apply.utils";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, IBoardDescriptionProps {
     updateSetVisible(value: boolean): void;
@@ -13,6 +14,7 @@ interface IViewModel extends ng.IController, IBoardDescriptionProps {
 
 interface IBoardDescriptionProps {
     showReadMoreLink: boolean;
+    boardDescriptionEventer: Subject<void>;
 }
 
 interface IBoardDescriptionScope extends IScope, IBoardDescriptionProps {
@@ -24,6 +26,8 @@ class Controller implements IViewModel {
     displayDescription : boolean;
     showReadMoreLink: boolean;
     boards: Array<Board>;
+    boardDescriptionEventer: Subject<void>;
+
 
 
     constructor(private $scope: IBoardDescriptionScope) {
@@ -61,7 +65,8 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
         templateUrl: `${RootsConst.directive}board-description-lightbox/board-description-lightbox.html`,
         scope: {
             board: '=',
-            showReadMoreLink: '='
+            showReadMoreLink: '=',
+            boardDescriptionEventer: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -71,33 +76,43 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
                         element: ng.IAugmentedJQuery,
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
-            const descriptionHeightLimit : number = 66;
-            const descriptionHeightLimitMobile : number = 28;
+            const descriptionHeightLimit: number = 66;
+            const descriptionHeightLimitMobile: number = 28;
 
-            $(document).ready(() => {
-                $timeout(() => {
-                    vm.checkDescriptionSize()
-                }, 100);
+            $(document).ready((): void => {
+                $timeout((): void => {
+                    if (vm.boardDescriptionEventer) {
+                        vm.boardDescriptionEventer.asObservable().subscribe((): void => {
+                            $timeout((): void => {
+                                vm.checkDescriptionSize();
+                            });
+                        });
+                    }
+                    vm.checkDescriptionSize();
+                });
             });
 
-            $scope.vm.checkDescriptionSize = (): void => {
-                let windowElement : JQuery = $(window);
+            vm.checkDescriptionSize = (): void => {
+                let windowElement: JQuery = $(window);
                 if (windowElement.width() < 768) {
-                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-mobile-description');
-                    let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
-                    let spanHeight : number = spanElement.offsetHeight;
+                    let descriptionElement: HTMLElement = angular.element('.boardContainer-container-header-mobile-description');
+                    let spanHeight: number = 0;
+                    if (descriptionElement && descriptionElement[0]) {
+                        let spanElement: HTMLElement = descriptionElement[0].querySelector('span');
+                        spanHeight = spanElement.offsetHeight;
+                    }
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimitMobile);
                 }
                 if (windowElement.width() > 768){
-                    let descriptionElement : HTMLElement = angular.element('.boardContainer-container-header-description');
-                    let spanElement : HTMLElement = descriptionElement[0].querySelector('span');
-                    let spanHeight : number = spanElement.offsetHeight;
+                    let descriptionElement: HTMLElement = angular.element('.boardContainer-container-header-description');
+                    let spanHeight: number = 0;
+                    if (descriptionElement && descriptionElement[0]) {
+                        let spanElement: HTMLElement = descriptionElement[0].querySelector('span');
+                        spanHeight = spanElement.offsetHeight;
+                    }
                     vm.updateSetVisible(spanHeight >= descriptionHeightLimit);
                 }
             }
-            $scope.$watch('vm.board.description', () => {
-                $scope.vm.checkDescriptionSize();
-            });
         }
     }
 }

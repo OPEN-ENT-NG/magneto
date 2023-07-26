@@ -55,6 +55,7 @@
     &-nav {
       min-height: 550px;
       border-right: solid 1px $magneto-white-blue;
+      gap: 16px;
     }
 
     &-search {
@@ -72,10 +73,21 @@
       }
     }
 
+    &-favorite-button {
+      text-align: center;
+      text-decoration: underline;
+      padding: $spacing-M;
+      margin-top: $spacing-LXS;
+      background: #F1F1F1;
+      &:hover {
+        background: $magneto-orange;
+        color: $magneto-white;
+      }
+    }
+
     &-folder-button {
-      width: 66%;
-      margin: 14px auto auto;
       display: flex;
+      align-self: center;
 
       a {
         border: solid $magneto-primary 1px;

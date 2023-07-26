@@ -19,6 +19,7 @@ import {FOLDER_TYPE} from "../core/enums/folder-type.enum";
 import {BoardsFilter} from "../models/boards-filter.model";
 import {hasRight} from "../utils/rights.utils";
 import {Draggable} from "../models/draggable.model";
+import {COLLECTION_NAVBAR_VIEWS} from "../core/enums/collection-navbar.enum";
 
 interface IViewModel {
     openedFolder: Folder;
@@ -38,6 +39,7 @@ interface IViewModel {
     displayUpdateFolderLightbox: boolean;
     displayFolderLightbox: boolean;
     displayMoveBoardLightbox: boolean;
+    displayCollectionLightbox: boolean;
 
     boards: Array<Board>;
     folders: Array<Folder>;
@@ -57,6 +59,8 @@ interface IViewModel {
     infiniteScrollService: InfiniteScrollService;
     draggable: Draggable;
     draggedItem: any;
+
+    COLLECTION_NAVBAR_VIEWS: typeof COLLECTION_NAVBAR_VIEWS;
 
     getBoards(): Promise<void>;
 
@@ -102,6 +106,8 @@ interface IViewModel {
 
     moveBoards(): Promise<void>;
 
+    openCardCollection(): void;
+
     duplicateBoard(): Promise<void>;
 
     closeSideNavFolders(): void;
@@ -145,6 +151,7 @@ class Controller implements ng.IController, IViewModel {
     displayUpdateFolderLightbox: boolean;
     displayFolderLightbox: boolean;
     displayMoveBoardLightbox: boolean;
+    displayCollectionLightbox: boolean
 
     folderNavTreeSubject: Subject<FolderTreeNavItem>;
 
@@ -152,6 +159,7 @@ class Controller implements ng.IController, IViewModel {
     infiniteScrollService: InfiniteScrollService;
     hasRight: typeof hasRight = hasRight;
     draggable: Draggable;
+    COLLECTION_NAVBAR_VIEWS: typeof COLLECTION_NAVBAR_VIEWS;
     draggedItem: any;
 
     constructor(private $scope: IBoardsScope,
@@ -160,6 +168,7 @@ class Controller implements ng.IController, IViewModel {
                 private boardsService: IBoardsService,
                 private foldersService: IFoldersService) {
         this.$scope.vm = this;
+        this.COLLECTION_NAVBAR_VIEWS = COLLECTION_NAVBAR_VIEWS;
         this.infiniteScrollService = new InfiniteScrollService;
         this.folderNavTreeSubject = new Subject<FolderTreeNavItem>();
     }
@@ -171,6 +180,7 @@ class Controller implements ng.IController, IViewModel {
         this.displayDeleteBoardLightbox = false;
         this.displayFolderLightbox = false;
         this.displayMoveBoardLightbox = false;
+        this.displayCollectionLightbox = false;
         this.displayShareBoardLightbox = false;
         this.displayPublicShareBoardLightbox = false;
 
@@ -477,6 +487,13 @@ class Controller implements ng.IController, IViewModel {
      */
     moveBoards = async (): Promise<void> => {
         this.displayMoveBoardLightbox = true;
+    }
+
+    /**
+     * Open card collection.
+     */
+    openCardCollection = (): void => {
+        this.displayCollectionLightbox = true;
     }
 
     /**

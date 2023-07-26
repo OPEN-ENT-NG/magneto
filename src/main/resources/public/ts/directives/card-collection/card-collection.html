@@ -17,6 +17,7 @@
         </div>
         <card-navbar
                 navbar-view-selected="vm.navbarViewSelected"
+                navbar-items="vm.navbar"
                 on-nav-click="vm.changeNav">
         </card-navbar>
         <div class="flex">
@@ -60,7 +61,7 @@
                         selected-card-ids="vm.selectedCardIds"
                         selector-identifier="'card-list'"
                         has-caption="false"
-                        has-duplicate="vm.board.myRights.contrib !== undefined"
+                        has-duplicate="!vm.isHome && vm.board.myRights.contrib !== undefined"
                         on-duplicate="vm.submitDuplicateCard"
                         has-preview="true"
                         selector-resize="'.cardDirective-list-scrollable'"
@@ -72,9 +73,11 @@
                        selector-identifier="card-list"
                        selected-card-ids="vm.selectedCardIds"
                        has-caption="false"
-                       has-duplicate="true"
+                       has-duplicate="!vm.isHome"
                        selector-resize="'.cardDirective-list-scrollable'"
                        on-duplicate="vm.submitDuplicateCard"
+                       on-board-view="vm.goToBoard"
+                       has-board-view="vm.isHome"
                        has-preview="true"
                        on-preview="vm.openPreview"
                        has-comments="false"

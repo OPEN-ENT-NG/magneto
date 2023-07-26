@@ -195,11 +195,11 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, String searchText, String sortBy) {
+    public Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText, String sortBy) {
         Promise<JsonObject> promise = Promise.promise();
 
-        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsCount(user, boardId, page, isPublic, isShared, searchText, sortBy, true);
-        Future<List<Card>> fetchAllCardsFuture = fetchAllCards(user, boardId, page, isPublic, isShared, searchText, sortBy);
+        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsCount(user, boardId, page, isPublic, isShared, isFavorite, searchText, sortBy, true);
+        Future<List<Card>> fetchAllCardsFuture = fetchAllCards(user, boardId, page, isPublic, isShared, isFavorite, searchText, sortBy);
 
 
         CompositeFuture.all(fetchAllCardsFuture, fetchAllCardsCountFuture)
@@ -622,12 +622,12 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<List<Card>> fetchAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, String searchText,
+    private Future<List<Card>> fetchAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText,
                                              String sortBy) {
 
         Promise<List<Card>> promise = Promise.promise();
 
-        JsonObject query = this.getAllCardsQuery(user, boardId, page, isPublic, isShared, searchText, sortBy, false);
+        JsonObject query = this.getAllCardsQuery(user, boardId, page, isPublic, isShared, isFavorite, searchText, sortBy, false);
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
@@ -645,12 +645,12 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<JsonArray> fetchAllCardsCount(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, String searchText,
+    private Future<JsonArray> fetchAllCardsCount(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText,
                                                  String sortBy, boolean getCount) {
 
         Promise<JsonArray> promise = Promise.promise();
 
-        JsonObject query = this.getAllCardsQuery(user, boardId, page, isPublic, isShared, searchText, sortBy, getCount);
+        JsonObject query = this.getAllCardsQuery(user, boardId, page, isPublic, isShared, isFavorite, searchText, sortBy, getCount);
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
@@ -669,7 +669,7 @@ public class DefaultCardService implements CardService {
     }
 
     private JsonObject getAllCardsQuery(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared,
-                                        String searchText, String sortBy, boolean getCount) {
+                                        boolean isFavorite, String searchText, String sortBy, boolean getCount) {
 
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject()
@@ -677,7 +677,16 @@ public class DefaultCardService implements CardService {
                                 .put(Mongo.NE, boardId)))
                 .lookUp(CollectionsConstant.BOARD_COLLECTION, Field.BOARDID, Field._ID, Field.RESULT)
                 .matchRegex(searchText, Arrays.asList(Field.TITLE, Field.DESCRIPTION, Field.CAPTION,
-                        String.format("%s.%s", Field.RESULT, Field.TAGS), String.format("%s.%s", Field.RESULT, Field.TITLE)));
+                        String.format("%s.%s", Field.RESULT, Field.TAGS), String.format("%s.%s", Field.RESULT, Field.TITLE)))
+                .addFields(Field.HASLIKED, new JsonObject()
+                        .put(Mongo.$COND, new JsonObject()
+                                .put(Mongo.IF, new JsonObject()
+                                        .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                .put(Mongo.THEN, new JsonObject()
+                                        .put(Mongo.$SET_ISSUBSET, new JsonArray()
+                                                .add(new JsonArray().add(user.getUserId()))
+                                                .add(String.format("$%s", Field.FAVORITELIST))))
+                                .put(Mongo.ELSE, false)));
         if (isShared) {
             query.matchOr(new JsonArray()
                     .add(new JsonObject()
@@ -691,27 +700,36 @@ public class DefaultCardService implements CardService {
             );
         } else if (isPublic) {
             query.match(new JsonObject().put(String.format("%s.%s", Field.RESULT, Field.PUBLIC), true));
+        } else if (isFavorite) {
+            query.matchOr(new JsonArray()
+                    .add(new JsonObject()
+                            .put(String.format("%s.%s.%s", Field.RESULT, Field.SHARED, Field.USERID),
+                                    new JsonObject().put(Mongo.IN, new JsonArray().add(user.getUserId())))
+                            .put(String.format("%s.%s.%s", Field.RESULT, Field.SHARED, "fr-cgi-magneto-controller-ShareBoardController|initContribRight"), true))
+                    .add(new JsonObject()
+                            .put(String.format("%s.%s.%s", Field.RESULT, Field.SHARED, Field.GROUPID),
+                                    new JsonObject().put(Mongo.IN, user.getGroupsIds()))
+                            .put(String.format("%s.%s.%s", Field.RESULT, Field.SHARED, "fr-cgi-magneto-controller-ShareBoardController|initContribRight"), true))
+                    .add(new JsonObject().put(String.format("%s.%s", Field.RESULT, Field.PUBLIC), true))
+                    .add(new JsonObject().put(String.format("%s.%s", Field.RESULT, Field.OWNERID), user.getUserId()))
+            );
+            query.match(new JsonObject().put(Field.HASLIKED, true));
         } else {
             query.match(new JsonObject().put(String.format("%s.%s", Field.RESULT, Field.OWNERID), user.getUserId()));
         }
         List<String> groupField = Arrays.asList(Field.TITLE, Field.DESCRIPTION, Field.CAPTION, Field.RESOURCEID, Field.RESOURCETYPE, Field.RESOURCEURL);
         List<String> externalGroupField = Arrays.asList(Field.PARENTID, Field._ID, Field.CREATIONDATE, Field.BOARDID,
-                Field.MODIFICATIONDATE, Field.OWNERID, Field.OWNERNAME, Field.LASTMODIFIERID, Field.LASTMODIFIERNAME, Field.RESULT, Field.FAVORITELIST);
+                Field.MODIFICATIONDATE, Field.OWNERID, Field.OWNERNAME, Field.LASTMODIFIERID, Field.LASTMODIFIERNAME, Field.RESULT, Field.FAVORITELIST, Field.HASLIKED);
+        Map<String, String> fieldAccumulators = new HashMap<>();
+        for (String field : externalGroupField) {
+            fieldAccumulators.put(field, field.equals(Field.HASLIKED) ? Mongo.MAX : Mongo.FIRST);
+        }
         query
                 .match(new JsonObject().put(String.format("%s.%s", Field.RESULT, Field.DELETED), false))
                 .sort(Field.PARENTID, 1)
-                .group(groupField, externalGroupField);
-        query.addFields(Field.HASLIKED, new JsonObject()
-                .put(Mongo.$COND, new JsonObject()
-                        .put(Mongo.IF, new JsonObject()
-                                .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
-                        .put(Mongo.THEN, new JsonObject()
-                                .put(Mongo.$SET_ISSUBSET, new JsonArray()
-                                        .add(new JsonArray().add(user.getUserId()))
-                                        .add(String.format("$%s", Field.FAVORITELIST))))
-                        .put(Mongo.ELSE, false)));
+                .group(groupField, fieldAccumulators);
         if (sortBy != null && !sortBy.isEmpty()) {
-            switch(sortBy){
+            switch (sortBy) {
                 case Field.FAVORITE:
                     query.sort(Field.HASLIKED, -1);
                     break;

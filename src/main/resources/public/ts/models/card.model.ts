@@ -38,6 +38,7 @@ export interface ICardsParamsRequest {
     sortBy?: string;
     isPublic?: boolean;
     isShared?: boolean;
+    isFavorite?: boolean;
 }
 
 export interface ICardsSectionParamsRequest {

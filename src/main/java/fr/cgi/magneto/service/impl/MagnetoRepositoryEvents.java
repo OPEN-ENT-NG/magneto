@@ -101,17 +101,12 @@ public class MagnetoRepositoryEvents extends MongoDbRepositoryEvents {
     @Override
     public void exportResources(JsonArray resourcesIds, final boolean exportDocuments, boolean exportSharedResources, String exportId, String userId, JsonArray groups, final String exportPath, final String locale, String host, final Handler<Boolean> handler) {
         QueryBuilder findByAuthor = QueryBuilder.start(Field.OWNERID).is(userId);
-        QueryBuilder findByShared = QueryBuilder.start().or(
-                QueryBuilder.start(Field.SHARED_USERID).is(userId).get(),
-                QueryBuilder.start(Field.SHARED_GROUPID).in(groups).get()
-        );
-        QueryBuilder findByAuthorOrShared = !exportSharedResources ? findByAuthor : QueryBuilder.start().or(findByAuthor.get(), findByShared.get());
         JsonObject query;
 
         if (resourcesIds == null)
-            query = MongoQueryBuilder.build(findByAuthorOrShared);
+            query = MongoQueryBuilder.build(findByAuthor);
         else {
-            QueryBuilder limitToResources = findByAuthorOrShared.and(
+            QueryBuilder limitToResources = findByAuthor.and(
                     QueryBuilder.start(Field._ID).in(resourcesIds).get()
             );
             query = MongoQueryBuilder.build(limitToResources);

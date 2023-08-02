@@ -24,7 +24,7 @@ export interface ICardItemResponse {
     lastComment?: ICardItemCommentResponse;
     nbOfComments?: number;
     nbOfFavorites?: number;
-    hasLiked?: boolean;
+    liked?: boolean;
 }
 
 export interface ICardsResponse {
@@ -40,6 +40,7 @@ export interface ICardsParamsRequest {
     sortBy?: string;
     isPublic?: boolean;
     isShared?: boolean;
+    fromStartPage?: boolean;
     isFavorite?: boolean;
 }
 
@@ -258,7 +259,7 @@ export class Card {
     private _nbOfComments: number;
     private _lastComment: CardComment;
     private _nbOfFavorites: number;
-    private _hasLiked: boolean;
+    private _liked: boolean;
 
     build(data: ICardItemResponse): Card {
         this._id = data._id ? data._id : data.id;
@@ -283,7 +284,7 @@ export class Card {
         this._lastComment = (data.nbOfComments != null && data.nbOfComments > 0) ?
                             new CardComment().build(data.lastComment) : null;
         this._nbOfFavorites = data.nbOfFavorites;
-        this._hasLiked = data.hasLiked;
+        this._liked = data.liked;
         return this;
     }
 
@@ -419,12 +420,12 @@ export class Card {
         this._nbOfFavorites = value;
     }
 
-    get hasLiked(): boolean {
-        return this._hasLiked;
+    get liked(): boolean {
+        return this._liked;
     }
 
-    set hasLiked(value: boolean) {
-        this._hasLiked = value;
+    set liked(value: boolean) {
+        this._liked = value;
     }
 
     isType = (resourceType: string): boolean => {

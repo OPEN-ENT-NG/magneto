@@ -17,6 +17,7 @@
         "websocket-config": {
             "wsPort": 4404,
             "endpoint-proxy": "/magneto/eventbus"
-        }
+        },
+        "magnetoUpdateFrequency": ${magnetoUpdateFrequency}
       }
     }

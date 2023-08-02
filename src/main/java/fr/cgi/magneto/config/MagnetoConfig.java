@@ -8,11 +8,16 @@ public class MagnetoConfig {
     private final String host;
     private final String mode;
     private final WebsocketConfig websocketConfig;
+    private final Integer magnetoUpdateFrequency;
+
+    private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; //refresh every 10 seconds by default
 
     public MagnetoConfig(JsonObject config) {
         this.host = config.getString(Field.HOST);
         this.mode = config.getString(Field.MODE);
         this.websocketConfig = new WebsocketConfig(config.getJsonObject(Field.WEBSOCKET_CONFIG_HYPHENS));
+        final int tempFrequency = config.getInteger(Field.MAGNETO_UPDATE_FREQUENCY, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
+        this.magnetoUpdateFrequency = Math.max(tempFrequency, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
     }
 
     public String host() {
@@ -25,6 +30,10 @@ public class MagnetoConfig {
 
     public WebsocketConfig websocketConfig() {
         return this.websocketConfig;
+    }
+
+    public Integer magnetoUpdateFrequency() {
+        return this.magnetoUpdateFrequency;
     }
 
     public static class WebsocketConfig {

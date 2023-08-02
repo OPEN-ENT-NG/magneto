@@ -91,7 +91,7 @@ public class CardServiceTest {
                 "      },\n" +
                 "      {\n" +
                 "         \"$addFields\":{\n" +
-                "            \"hasLiked\":{\n" +
+                "            \"isLiked\":{\n" +
                 "               \"$cond\":{\n" +
                 "                  \"if\":{\n" +
                 "                     \"$isArray\":\"$favoriteList\"\n" +
@@ -146,8 +146,8 @@ public class CardServiceTest {
                 "            \"favoriteList\":{\n" +
                 "               \"$first\":\"$favoriteList\"\n" +
                 "            },\n" +
-                "            \"hasLiked\":{\n" +
-                "               \"$max\":\"$hasLiked\"\n" +
+                "            \"isLiked\":{\n" +
+                "               \"$max\":\"$isLiked\"\n" +
                 "            },\n" +
                 "            \"boardId\":{\n" +
                 "               \"$first\":\"$boardId\"\n" +

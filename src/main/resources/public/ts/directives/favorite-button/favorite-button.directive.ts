@@ -13,7 +13,7 @@ interface IFavoriteButtonProps {
     elementFavNb: number;
     displayFavNb: boolean;
     onFavoriteHandler?;
-    hasLiked: boolean;
+    liked: boolean;
 }
 
 interface IFavoriteButtonScope extends IScope, IFavoriteButtonProps {
@@ -26,7 +26,7 @@ class Controller implements IViewModel {
     element_id: string;
     elementFavNb: number;
     displayFavNb: boolean;
-    hasLiked: boolean;
+    liked: boolean;
 
     constructor(private $scope: IFavoriteButtonScope){
     }
@@ -50,7 +50,7 @@ function directive($parse: IParseService) {
             elementFavNb: '=',
             displayFavNb: '=',
             onFavoriteHandler: '&',
-            hasLiked: '='
+            liked: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -62,11 +62,10 @@ function directive($parse: IParseService) {
                         vm: IViewModel) {
 
             vm.onFavorite = async (): Promise<void> => {
-                let res = await $parse($scope.vm.onFavoriteHandler())(vm.elementId, vm.hasLiked);
+                let res = await $parse($scope.vm.onFavoriteHandler())(vm.elementId, vm.liked);
                 if (res) {
-                    vm.hasLiked = !vm.hasLiked;
-
-                    if (vm.hasLiked) {
+                    vm.liked = !vm.liked;
+                    if (vm.liked) {
                         vm.elementFavNb++;
                     } else {
                         vm.elementFavNb--;

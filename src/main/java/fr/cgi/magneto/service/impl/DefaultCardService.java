@@ -316,7 +316,7 @@ public class DefaultCardService implements CardService {
                     int cardsCount = (fetchAllCardsCountFuture.result().isEmpty()) ? 0 :
                             fetchAllCardsCountFuture.result().getJsonObject(0).getInteger(Field.COUNT);
                     promise.complete(new JsonObject()
-                            .put(Field.ALL, cards.stream().map(card -> card.toJson()).collect(Collectors.toList()))
+                            .put(Field.ALL, cards)
                             .put(Field.PAGE, cardsCount)
                             .put(Field.PAGECOUNT, cardsCount <= Magneto.PAGE_SIZE ?
                                     0 : (long) Math.ceil(cardsCount / (double) Magneto.PAGE_SIZE)));
@@ -504,6 +504,7 @@ public class DefaultCardService implements CardService {
         cardPayload.setOwnerName(user.getUsername());
         cardPayload.setBoardId(boardId);
         cardPayload.setParentId(card.getId());
+        cardPayload.setFavoriteList(new ArrayList<>());
         this.create(cardPayload, newId)
                 .compose(createCardResult -> {
                     promise.complete(newId);

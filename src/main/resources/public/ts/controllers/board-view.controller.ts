@@ -165,6 +165,8 @@ class Controller implements IViewModel {
 
     updateFrequency: number;
 
+    updateIntervalPromise: angular.IPromise<any>;
+
     constructor(private $scope: IBoardViewScope,
                 private $route: any,
                 private $location: ng.ILocationService,
@@ -221,8 +223,8 @@ class Controller implements IViewModel {
         });
 
         this.updateFrequency = parseInt(`${window.magnetoUpdateFrequency}`);
-        if(Number.isSafeInteger(this.updateFrequency)) {
-            this.$interval(async (): Promise<void> => {
+        if (Number.isSafeInteger(this.updateFrequency)) {
+            this.updateIntervalPromise = this.$interval(async (): Promise<void> => {
                 await this.refreshCardsFavoriteNb();
             }, this.updateFrequency, 0, false);
         }
@@ -698,6 +700,7 @@ class Controller implements IViewModel {
     }
 
     $onDestroy() {
+        this.$interval.cancel(this.updateIntervalPromise);
     }
 
     /**

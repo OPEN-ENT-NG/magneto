@@ -1,5 +1,5 @@
 import {_, ng, notify, toasts} from "entcore";
-import {IParseService, IScope} from "angular";
+import {ILocationService, IParseService, IScope} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board, Card, CardCollection, Cards, ICardsBoardParamsRequest, ICardsParamsRequest} from "../../models";
 import {safeApply} from "../../utils/safe-apply.utils";
@@ -34,12 +34,16 @@ interface IViewModel extends ng.IController, ICardCollectionProps {
 
     openPreview(card: Card): void;
 
+    goToBoard(card: Card): void;
+
+
     changeView(): void;
+
     changeOrder(field: string): Promise<void>;
 
     changeNav(navbarView: COLLECTION_NAVBAR_VIEWS): Promise<void>;
 
-    isFormValid (): boolean;
+    isFormValid(): boolean;
 
     onScroll(): Promise<void>;
 
@@ -55,7 +59,6 @@ interface IViewModel extends ng.IController, ICardCollectionProps {
     selectedCard: Card;
 
     filter: CardsFilter;
-
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
     isLoading: boolean;
 
@@ -66,7 +69,10 @@ interface IViewModel extends ng.IController, ICardCollectionProps {
 
 interface ICardCollectionProps {
     display: boolean;
+    isHome: boolean;
     board: Board;
+    navbarFirstSelected: COLLECTION_NAVBAR_VIEWS;
+    navbar: Array<COLLECTION_NAVBAR_VIEWS>
     onSubmit?;
 
 }
@@ -79,10 +85,12 @@ class Controller implements IViewModel {
 
     board: Board;
     cards: Array<Card>;
+    navbar: Array<COLLECTION_NAVBAR_VIEWS>;
     displayedCard: Array<CardCollection>;
     selectedCardIds: Array<string>;
     selectedCard: Card;
 
+    isHome: boolean;
     display: boolean;
     displayBoard: boolean;
     orderFavorite: boolean;
@@ -92,6 +100,7 @@ class Controller implements IViewModel {
     filter: CardsFilter;
 
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
+    navbarFirstSelected: COLLECTION_NAVBAR_VIEWS;
     RESOURCE_ORDERS: typeof RESOURCE_ORDER;
     isLoading: boolean;
 
@@ -109,11 +118,12 @@ class Controller implements IViewModel {
         this.isLoading = true;
         this.filter = new CardsFilter();
         this.infiniteScrollService = new InfiniteScrollService;
-        this.navbarViewSelected = COLLECTION_NAVBAR_VIEWS.MY_CARDS;
         this.RESOURCE_ORDERS = RESOURCE_ORDER;
     }
 
     async $onInit() {
+        this.navbarViewSelected = this.navbarFirstSelected as COLLECTION_NAVBAR_VIEWS;
+        this.getFilters();
         await this.getCards();
     }
 
@@ -151,7 +161,7 @@ class Controller implements IViewModel {
     changeOrder = async (field: string): Promise<void> => {
         switch (field) {
             case this.RESOURCE_ORDERS.FAVORITE:
-                if(this.orderFavorite) {
+                if (this.orderFavorite) {
                     this.filter.sortBy = field;
                     await this.resetCards();
                 } else {
@@ -225,11 +235,15 @@ class Controller implements IViewModel {
 
     changeNav = async (navbarView: COLLECTION_NAVBAR_VIEWS): Promise<void> => {
         this.navbarViewSelected = navbarView;
+        this.getFilters();
+        await this.resetCards();
+        safeApply(this.$scope);
+    }
+
+    private getFilters = (): void => {
         this.filter.isShared = this.isCurrentViewNav(COLLECTION_NAVBAR_VIEWS.SHARED_CARDS);
         this.filter.isPublic = this.isCurrentViewNav(COLLECTION_NAVBAR_VIEWS.PUBLIC_CARDS);
         this.filter.isFavorite = this.isCurrentViewNav(COLLECTION_NAVBAR_VIEWS.FAVORITES);
-        await this.resetCards();
-        safeApply(this.$scope);
     }
 
     getCards = async (): Promise<void> => {
@@ -238,7 +252,7 @@ class Controller implements IViewModel {
             page: this.filter.page,
             sortBy: this.filter.sortBy,
             searchText: this.filter.searchText,
-            boardId: this.board.id,
+            boardId: !!this.board ? this.board.id : null,
             isShared: this.filter.isShared,
             isPublic: this.filter.isPublic,
             isFavorite: this.filter.isFavorite
@@ -285,6 +299,11 @@ class Controller implements IViewModel {
         this.selectedCard = card;
         this.displayPreview = true;
     }
+
+    goToBoard = (card: Card): void => {
+        window.location.href = `/magneto#/board/view/${card.boardId}`;
+        window.location.reload()
+    }
 }
 
 function directive($parse: IParseService) {
@@ -293,7 +312,10 @@ function directive($parse: IParseService) {
         templateUrl: `${RootsConst.directive}card-collection/card-collection.html`,
         scope: {
             display: '=',
-            board: '=',
+            board: '=?',
+            navbar: '=',
+            navbarFirstSelected: '=',
+            isHome: '=',
             onSubmit: '&'
         },
         controllerAs: 'vm',

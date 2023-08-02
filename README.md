@@ -27,6 +27,7 @@ Dans le fichier 'ent-core.json.template' du projet OPEN ENT :
         "app-registry.port" : 8012,
         "mode" : "${mode}",
         "entcore.port" : 8009,
+        "magnetoUpdateFrequency": "${magnetoUpdateFrequency}",
         "websocket-config": {
             "wsPort": 4404,
             "endpoint-proxy": "/magneto/eventbus"
@@ -34,6 +35,12 @@ Dans le fichier 'ent-core.json.template' du projet OPEN ENT :
       }
     }
 </pre>
+
+Dans votre springboard, vous devez inclure des variables d'environnement :
+
+| **conf.properties**             | **Utilisation**                                            | **Exemple** |
+|---------------------------------|------------------------------------------------------------|-------------|
+| "${magnetoUpdateFrequency}"     | Temps de fréquence de rafraichissement des favoris (en ms) | 10000       |
 
 Associer une route d'entrée à la configuration du module proxy intégré (`"name": "com.wse~http-proxy~1.0.0"`) :
 <pre>

@@ -18,7 +18,7 @@
                     options="vm.card"
                     has-edit="vm.hasEdit"
                     on-edit="vm.openEdit"
-                    has-delete="vm.hasDelete || vm.isMyCard(vm.card)"
+                    has-delete="vm.hasDelete"
                     on-delete="vm.openDelete"
                     has-hide="vm.hasHide"
                     on-hide="vm.openHide"
@@ -31,7 +31,9 @@
                     has-transfer="vm.hasTransfer"
                     on-transfer="vm.openTransfer"
                     has-lock="vm.hasLock"
-                    on-lock="vm.openLock">
+                    on-lock="vm.openLock"
+                    has-board-view="vm.hasBoardView"
+                    on-board-view="vm.openBoardView">
             </card-list-item-options>
         </div>
 

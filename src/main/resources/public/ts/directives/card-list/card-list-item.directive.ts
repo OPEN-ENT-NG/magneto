@@ -15,8 +15,6 @@ interface IViewModel extends ng.IController, ICardListItemProps {
 
     hasOptions(): boolean;
 
-    isMyCard(card: Card): boolean;
-
     openEdit?(card: Card): void;
 
     openDuplicate?(card: Card): void;
@@ -30,6 +28,8 @@ interface IViewModel extends ng.IController, ICardListItemProps {
     openTransfer?(card: Card): void;
 
     openLock?(card: Card): void;
+
+    openBoardView?(card: Card): void;
 
     openCardOptions?(): Promise<void>;
 
@@ -60,6 +60,8 @@ interface ICardListItemProps {
     onTransfer?;
     hasLock: boolean;
     onLock?;
+    hasBoardView: boolean;
+    onBoardView?;
     hasFavorite: boolean;
     cardUpdateEventer: Subject<void>;
     hasComments: boolean;
@@ -86,6 +88,7 @@ class Controller implements IViewModel {
     hasPreview: boolean;
     hasTransfer: boolean;
     hasLock: boolean;
+    hasBoardView: boolean;
     hasFavorite: boolean;
     hasComments: boolean;
 
@@ -127,10 +130,6 @@ class Controller implements IViewModel {
         return !!card.lastModifierName ? card.lastModifierName : card.ownerName;
     }
 
-    isMyCard = (card: Card): boolean => {
-        return card.ownerId === model.me.userId;
-    }
-
     hasOptions = (): boolean => {
         return this.hasDelete || this.hasPreview || this.hasEdit || this.hasHide || this.hasDuplicate;
     }
@@ -161,6 +160,8 @@ function directive($parse: IParseService) {
             onTransfer: '&',
             hasLock: '=',
             onLock: '&',
+            hasBoardView: '=',
+            onBoardView: '&',
             hasFavorite: '=',
             selectorResize: '=',
             cardUpdateEventer: '=',
@@ -239,6 +240,10 @@ function directive($parse: IParseService) {
 
             vm.openLock = (card: Card): void => {
                 $parse($scope.vm.onLock())(card);
+            }
+
+            vm.openBoardView = (card: Card): void => {
+                $parse($scope.vm.onBoardView())(card);
             }
 
             vm.onCardFavorite = async (card_id: string, isFavorite: boolean): Promise<boolean> => {

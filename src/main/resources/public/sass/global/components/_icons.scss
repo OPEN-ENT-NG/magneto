@@ -239,4 +239,9 @@ i {
     font-family: 'magneto-mdi';
     content: '\F04CE';
   }
+
+  &.magneto-board::before {
+    font-family: 'magneto-mdi';
+    content: '\F04EB';
+  }
 }

@@ -1,12 +1,14 @@
 <div ng-controller="BoardsController as vm" class="boardsContainer-container">
-<!--    <card-profile name="'test'" job="'test'"></card-profile>-->
+    <!--    <card-profile name="'test'" job="'test'"></card-profile>-->
 
     <!-- Header desktop -->
     <div class="row boardsContainer-container-header zero-mobile">
         <h1 class="cell paddingRight">
             <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                  alt="" src="/magneto/public/img/uni-magneto.png">
-            <i18n>magneto.title</i18n> / <i18n>magneto.my.boards</i18n>
+            <i18n>magneto.title</i18n>
+            /
+            <i18n>magneto.my.boards</i18n>
         </h1>
         <button ng-if="vm.filter.isMyBoards && vm.hasRight('manage')"
                 class="right-magnet create-button" ng-click="vm.openCreateForm()">
@@ -19,7 +21,9 @@
         <!-- Open navigation mobile -->
         <i class="magneto-card-settings cell one" ng-click="vm.openSideNavFolders()"></i>
         <h1 class="cell eight">
-            <i18n>magneto.title</i18n> / <i18n>magneto.my.boards</i18n>
+            <i18n>magneto.title</i18n>
+            /
+            <i18n>magneto.my.boards</i18n>
         </h1>
         <button ng-if="vm.filter.isMyBoards && vm.hasRight('manage')"
                 class="right-magnet create-button cell three" ng-click="vm.openCreateForm()">
@@ -31,7 +35,7 @@
     <div class="twelve cell boardsContainer-container-body">
 
         <!-- Navigation desktop -->
-        <div class="three cell boardsContainer-container-body-nav zero-mobile">
+        <div class="three cell boardsContainer-container-body-nav zero-mobile flex-row f-column">
             <folder-tree-nav
                     folder-trees="vm.folderNavTrees"
                     folder-tree-eventer="vm.folderNavTreeSubject"
@@ -40,20 +44,26 @@
             </folder-tree-nav>
             <div class="boardsContainer-container-body-folder-button"
                  ng-click="vm.displayFolderLightbox = true"
-                ng-if="vm.filter.isMyBoards">
+                 ng-if="vm.filter.isMyBoards">
                 <a class="classic-link">
                     <i class="magneto-folder-plus"></i>
                     <i18n>magneto.create.folder</i18n>
                 </a>
             </div>
+            <div ng-click="vm.openCardCollection()" class="boardsContainer-container-body-favorite-button">
+                <span>
+                    <i class="magneto-favorite-active"></i>
+                    <i18n>magneto.show.favorites</i18n>
+                </span>
+            </div>
         </div>
 
         <div class="nine cell">
             <div class="row boardsContainer-container-body-search">
-                    <search-bar
-                            search-text="vm.filter.searchText"
-                            on-search="vm.onSearchBoard()">
-                    </search-bar>
+                <search-bar
+                        search-text="vm.filter.searchText"
+                        on-search="vm.onSearchBoard()">
+                </search-bar>
             </div>
 
 
@@ -162,10 +172,19 @@
     </share-panel-lightbox>
 
     <board-publish-lightbox
-        display="vm.displayPublicShareBoardLightbox"
-        board="vm.selectedBoards[0]"
-        on-submit="vm.onFormSubmit">
+            display="vm.displayPublicShareBoardLightbox"
+            board="vm.selectedBoards[0]"
+            on-submit="vm.onFormSubmit">
     </board-publish-lightbox>
+
+    <card-collection
+            ng-if="vm.displayCollectionLightbox"
+            display="vm.displayCollectionLightbox"
+            navbar-first-selected="vm.COLLECTION_NAVBAR_VIEWS.FAVORITES"
+            navbar="[vm.COLLECTION_NAVBAR_VIEWS.FAVORITES]"
+            is-home="true"
+            on-submit="vm.onCollectionSubmit">
+    </card-collection>
 
     <infinite-scroll scrolled="vm.onScroll()"
                      loading-mode="false"

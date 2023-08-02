@@ -5,12 +5,15 @@ import {COLLECTION_NAVBAR_VIEWS} from "../../core/enums/collection-navbar.enum";
 
 interface IViewModel {
     isSelected(navbarView: COLLECTION_NAVBAR_VIEWS): boolean;
+    isAvailable(navbarView: COLLECTION_NAVBAR_VIEWS): boolean;
     changeNav?(nav: COLLECTION_NAVBAR_VIEWS): void;
+
     onNavClick?
 
     lang: typeof lang;
     NAVBAR_VIEWS: typeof COLLECTION_NAVBAR_VIEWS;
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
+    navbarItems: Array<COLLECTION_NAVBAR_VIEWS>;
 }
 
 interface ICardNavbarScope extends IScope {
@@ -19,6 +22,7 @@ interface ICardNavbarScope extends IScope {
 
 class Controller implements ng.IController, IViewModel {
     lang: typeof lang;
+    navbarItems: Array<COLLECTION_NAVBAR_VIEWS>;
     NAVBAR_VIEWS: typeof COLLECTION_NAVBAR_VIEWS;
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
 
@@ -35,6 +39,8 @@ class Controller implements ng.IController, IViewModel {
     $onDestroy() {
     }
 
+    isAvailable = (navbarView: COLLECTION_NAVBAR_VIEWS) => this.navbarItems.some(navbar => navbar == navbarView);
+
     isSelected = (navbarView: COLLECTION_NAVBAR_VIEWS): boolean => navbarView === this.navbarViewSelected;
 
 
@@ -46,6 +52,7 @@ function directive($parse: IParseService) {
         templateUrl: `${RootsConst.directive}/card-navbar/card-navbar.html`,
         scope: {
             navbarViewSelected: '=',
+            navbarItems: '=',
             onNavClick: '&'
         },
         controllerAs: 'vm',

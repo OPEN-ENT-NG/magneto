@@ -25,6 +25,10 @@ interface IViewModel extends ng.IController, ICardListProps {
 
     openLock?(card: Card): void;
 
+    openBoardView?(card: Card): void;
+
+    isMyCard(card: Card): boolean;
+
 }
 
 interface ICardListProps {
@@ -59,6 +63,8 @@ interface ICardListProps {
     onTransfer?;
     hasLock: boolean;
     onLock?;
+    hasBoardView: boolean;
+    onBoardView?;
     onMove?;
     hasFavorite?: boolean;
 
@@ -98,6 +104,7 @@ class Controller implements IViewModel {
     hasLock: boolean;
     hasFavorite: boolean;
     hasComments: boolean;
+    hasBoardView: boolean;
     simpleView: boolean;
     boardOwner: IBoardOwner;
 
@@ -148,6 +155,10 @@ class Controller implements IViewModel {
             || (this.boardRight.contrib && !card.locked);
     }
 
+    isMyCard = (card: Card): boolean => {
+        return card.ownerId === model.me.userId;
+    }
+
 }
 
 function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDirective {
@@ -177,6 +188,8 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
             onTransfer: '&',
             hasLock: '=',
             onLock: '&',
+            hasBoardView: '=',
+            onBoardView: '&',
             hasFavorite: '=',
             onMove: '&',
             onLoaded: '&',
@@ -271,6 +284,10 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
 
             vm.openLock = (card: Card): void => {
                 $parse($scope.vm.onLock())(card);
+            }
+
+            vm.openBoardView = (card: Card): void => {
+                $parse($scope.vm.onBoardView())(card);
             }
 
             if (!vm.simpleView) {

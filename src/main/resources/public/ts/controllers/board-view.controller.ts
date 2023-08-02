@@ -27,6 +27,7 @@ import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
 import {Draggable} from "../models/draggable.model";
 import {WorkspaceUtils} from "../utils/workspace.utils";
 import {Subject} from "rxjs";
+import {COLLECTION_NAVBAR_VIEWS} from "../core/enums/collection-navbar.enum";
 
 interface IViewModel extends ng.IController {
 
@@ -66,6 +67,8 @@ interface IViewModel extends ng.IController {
 
     infiniteScrollService: InfiniteScrollService;
     cardUpdateSubject: Subject<void>;
+    COLLECTION_NAVBAR_VIEWS: typeof COLLECTION_NAVBAR_VIEWS;
+    navbarCollection: Array<COLLECTION_NAVBAR_VIEWS>;
 
     showReadMoreLink: boolean;
 
@@ -152,7 +155,8 @@ class Controller implements IViewModel {
     };
 
     infiniteScrollService: InfiniteScrollService;
-
+    COLLECTION_NAVBAR_VIEWS: typeof COLLECTION_NAVBAR_VIEWS;
+    navbarCollection: Array<COLLECTION_NAVBAR_VIEWS>;
     cardUpdateSubject: Subject<void>;
     showReadMoreLink: boolean;
     boardDescriptionEventer: Subject<void>;
@@ -169,6 +173,8 @@ class Controller implements IViewModel {
         this.$scope.vm = this;
         this.infiniteScrollService = new InfiniteScrollService;
         this.cardUpdateSubject = new Subject<void>();
+        this.navbarCollection = [];
+        this.COLLECTION_NAVBAR_VIEWS = COLLECTION_NAVBAR_VIEWS;
         this.boardDescriptionEventer = new Subject<void>();
     }
 
@@ -197,6 +203,10 @@ class Controller implements IViewModel {
             page: 0,
             boardId: (this.$route.current && this.$route.current.params) ? this.$route.current.params.boardId : null
         };
+
+        for (const value in COLLECTION_NAVBAR_VIEWS) {
+            this.navbarCollection.push(COLLECTION_NAVBAR_VIEWS[value] as COLLECTION_NAVBAR_VIEWS);
+        }
 
         this.isLoading = true;
         this.isDraggable = true;
@@ -515,7 +525,7 @@ class Controller implements IViewModel {
             .then((res: Cards) => {
                 if (res.all && res.all.length > 0) {
                     res.all.forEach((card: Card) => {
-                        const isDuplicate : boolean = this.cards.some((existingCard: Card) : boolean => existingCard.id === card.id);
+                        const isDuplicate: boolean = this.cards.some((existingCard: Card): boolean => existingCard.id === card.id);
                         if (!isDuplicate) {
                             this.cards.push(card);
                         }

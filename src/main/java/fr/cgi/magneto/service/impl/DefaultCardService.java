@@ -316,7 +316,7 @@ public class DefaultCardService implements CardService {
                     int cardsCount = (fetchAllCardsCountFuture.result().isEmpty()) ? 0 :
                             fetchAllCardsCountFuture.result().getJsonObject(0).getInteger(Field.COUNT);
                     promise.complete(new JsonObject()
-                            .put(Field.ALL, cards.stream().map(card -> card.toJson()).collect(Collectors.toList()))
+                            .put(Field.ALL, cards)
                             .put(Field.PAGE, cardsCount)
                             .put(Field.PAGECOUNT, cardsCount <= Magneto.PAGE_SIZE ?
                                     0 : (long) Math.ceil(cardsCount / (double) Magneto.PAGE_SIZE)));
@@ -671,11 +671,13 @@ public class DefaultCardService implements CardService {
     private JsonObject getAllCardsQuery(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared,
                                         boolean isFavorite, String searchText, String sortBy, boolean getCount) {
 
-        MongoQuery query = new MongoQuery(this.collection)
-                .match(new JsonObject()
-                        .put(Field.BOARDID, new JsonObject()
-                                .put(Mongo.NE, boardId)))
-                .lookUp(CollectionsConstant.BOARD_COLLECTION, Field.BOARDID, Field._ID, Field.RESULT)
+        MongoQuery query = new MongoQuery(this.collection);
+        if (boardId != null && !boardId.isEmpty()) {
+            query.match(new JsonObject()
+                    .put(Field.BOARDID, new JsonObject()
+                            .put(Mongo.NE, boardId)));
+        }
+        query.lookUp(CollectionsConstant.BOARD_COLLECTION, Field.BOARDID, Field._ID, Field.RESULT)
                 .matchRegex(searchText, Arrays.asList(Field.TITLE, Field.DESCRIPTION, Field.CAPTION,
                         String.format("%s.%s", Field.RESULT, Field.TAGS), String.format("%s.%s", Field.RESULT, Field.TITLE)))
                 .addFields(Field.HASLIKED, new JsonObject()

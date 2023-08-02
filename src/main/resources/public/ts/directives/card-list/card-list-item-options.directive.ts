@@ -31,6 +31,8 @@ interface ICardListItemOptionsProps {
     onTransfer?;
     hasLock: boolean;
     onLock?;
+    hasBoardView: boolean;
+    onBoardView?;
 }
 
 interface ICardListItemOptionsScope extends IScope, ICardListItemOptionsProps {
@@ -48,6 +50,7 @@ class Controller implements IViewModel {
     hasPreview: boolean;
     hasTransfer: boolean;
     hasLock: boolean;
+    hasBoardView: boolean;
 
     constructor(private $scope: ICardListItemOptionsScope,
                 private $location: ILocationService,
@@ -83,7 +86,9 @@ function directive($parse: IParseService) {
             hasPreview: '=',
             onPreview: '&',
             hasTransfer: '=',
-            onTransfer: '&'
+            onTransfer: '&',
+            hasBoardView: '=',
+            onBoardView: '&'
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -142,6 +147,13 @@ function directive($parse: IParseService) {
                     event.stopPropagation();
                 });
                 $parse($scope.vm.onLock())(vm.options);
+            }
+
+            vm.openBoardView = (): void => {
+                element.click(function (event) {
+                    event.stopPropagation();
+                });
+                $parse($scope.vm.onBoardView())(vm.options);
             }
         }
     }

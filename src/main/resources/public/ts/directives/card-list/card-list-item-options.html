@@ -37,6 +37,13 @@
                         <i18n>magneto.card.options.hide</i18n>
                     </span>
                 </a>
+                <!-- Go to board button -->
+                <a class="item" ng-if="vm.hasBoardView" ng-click="vm.openBoardView()">
+                    <i class="magneto-board" aria-hidden="true"></i>
+                    <span>
+                        <i18n>magneto.card.options.board</i18n>
+                    </span>
+                </a>
                 <!-- Lock button -->
                 <a class="item" ng-if="vm.hasLock && !vm.options.locked" ng-click="vm.openLock()">
                     <i class="magneto-lock" aria-hidden="true"></i>

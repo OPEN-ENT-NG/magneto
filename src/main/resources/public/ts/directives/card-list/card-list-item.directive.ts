@@ -242,8 +242,7 @@ function directive($parse: IParseService) {
             }
 
             vm.onCardFavorite = async (card_id: string, isFavorite: boolean): Promise<boolean> => {
-                let res = await cardsService.favoriteCard(card_id, isFavorite);
-                return res;
+                return await cardsService.favoriteCard(card_id, isFavorite);
             }
         }
     }

@@ -32,7 +32,7 @@ public class CardTest {
             .putNull("parentId")
             .put("caption", "caption")
             .put("nbOfFavorites",0)
-            .put("hasLiked",false)
+            .put("isLiked",false)
             .put("favoriteList", new JsonArray().getList());
 
     @Test

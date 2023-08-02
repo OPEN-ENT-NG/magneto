@@ -44,23 +44,19 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
 
-    .card-list {
+  .cardDirective-list {
+    grid-gap: 11px;
+    grid-auto-rows: auto !important;
 
-      grid-gap: 11px;
-      grid-auto-rows: auto !important;
-
-      &-item-infos {
-        height: 10vh;
-      }
-
-
-      &-item-preview {
-        height: 14vh;
-      }
+    &-item-infos {
+      height: 22vh;
     }
 
 
-
+    &-item-preview {
+      height: 14vh;
+    }
   }
 }

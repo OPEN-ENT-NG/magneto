@@ -42,8 +42,9 @@ export const cardsService: ICardsService = {
     },
 
     getAllCardsByBoard: async (params: ICardsParamsRequest): Promise<Cards> => {
-        let urlParams: string = params.page !== null && params.page !== undefined ? `?page=${params.page}` : '';
-        return http.get(`/magneto/cards/${params.boardId}${urlParams}`)
+        let pageParams: string = params.page !== null && params.page !== undefined ? `?page=${params.page}` : '';
+        let fromStartPage: string = params.fromStartPage !== null && params.fromStartPage !== undefined ? `&fromStartPage=${params.fromStartPage}` : '';
+        return http.get(`/magneto/cards/${params.boardId}${pageParams}${fromStartPage}`)
             .then((res: AxiosResponse) => new Cards(res.data));
     },
 

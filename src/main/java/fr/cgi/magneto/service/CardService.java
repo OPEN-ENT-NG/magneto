@@ -92,9 +92,10 @@ public interface CardService {
      * @param board Board object
      * @param page  Page number
      * @param user    {@link UserInfos} User info
+     * @param fromStartPage if true the request will retrieve cards from the page 0 to @param page
      * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
      */
-    Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user);
+    Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage);
 
     /**
      * Get all cards by creation date

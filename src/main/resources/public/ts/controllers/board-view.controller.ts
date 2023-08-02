@@ -29,6 +29,8 @@ import {WorkspaceUtils} from "../utils/workspace.utils";
 import {Subject} from "rxjs";
 import {COLLECTION_NAVBAR_VIEWS} from "../core/enums/collection-navbar.enum";
 
+
+declare const window: any;
 interface IViewModel extends ng.IController {
 
     displayCardLightbox: boolean;
@@ -74,9 +76,13 @@ interface IViewModel extends ng.IController {
 
     boardDescriptionEventer: Subject<void>;
 
+    updateFrequency: number;
+
     goToBoards(): void;
 
     getCards(): Promise<void>;
+
+    refreshCardsFavoriteNb(): Promise<void>;
 
     openAddResourceLightbox(resourceType: RESOURCE_TYPE): void;
 
@@ -161,12 +167,17 @@ class Controller implements IViewModel {
     showReadMoreLink: boolean;
     boardDescriptionEventer: Subject<void>;
 
+    updateFrequency: number;
+
+    updateIntervalPromise: angular.IPromise<any>;
+
     constructor(private $scope: IBoardViewScope,
                 private $route: any,
                 private $location: ng.ILocationService,
                 private $sce: ng.ISCEService,
                 private $timeout: ng.ITimeoutService,
                 private $window: IWindowService,
+                private $interval: ng.IIntervalService,
                 private sectionsServices: ISectionsService,
                 private boardsService: IBoardsService,
                 private cardsService: ICardsService) {
@@ -220,6 +231,13 @@ class Controller implements IViewModel {
                 await this.getCards();
             }
         });
+
+        this.updateFrequency = parseInt(`${window.magnetoUpdateFrequency}`);
+        if (Number.isSafeInteger(this.updateFrequency)) {
+            this.updateIntervalPromise = this.$interval(async (): Promise<void> => {
+                await this.refreshCardsFavoriteNb();
+            }, this.updateFrequency, 0, false);
+        }
     }
 
     /**
@@ -541,6 +559,33 @@ class Controller implements IViewModel {
             });
     }
 
+    refreshCardsFavoriteNb = async (): Promise<void> => {
+        const params: ICardsParamsRequest = {
+            page: 0,
+            boardId: this.filter.boardId,
+            fromStartPage: true
+        };
+
+        this.cardsService.getAllCardsByBoard(params)
+            .then((res: Cards) => {
+                if (res.all && res.all.length > 0) {
+                    res.all.forEach((card: Card) => {
+                        const existingCardIndex: number = this.cards.findIndex((existingCard: Card): boolean => existingCard.id === card.id);
+                        if (existingCardIndex !== -1) {
+                            // Mettre à jour le champ nbOfFavorites de la carte existante
+                            this.cards[existingCardIndex].nbOfFavorites = card.nbOfFavorites;
+                        }
+                    });
+                    this.cardUpdateSubject.next();
+                }
+                safeApply(this.$scope);
+            })
+            .catch((err: AxiosError) => {
+                this.isLoading = false;
+                notify.error(err.message)
+            });
+    }
+
     /**
      * Fetch board cards for all sections.
      */
@@ -665,6 +710,7 @@ class Controller implements IViewModel {
     }
 
     $onDestroy() {
+        this.$interval.cancel(this.updateIntervalPromise);
     }
 
     /**
@@ -679,4 +725,4 @@ class Controller implements IViewModel {
 }
 
 export const boardViewController = ng.controller('BoardViewController',
-    ['$scope', '$route', '$location', '$sce', '$timeout', '$window', 'SectionsService', 'BoardsService', 'CardsService', Controller]);
+    ['$scope', '$route', '$location', '$sce', '$timeout', '$window', '$interval', 'SectionsService', 'BoardsService', 'CardsService', Controller]);

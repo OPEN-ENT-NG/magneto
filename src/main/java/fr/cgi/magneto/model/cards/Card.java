@@ -32,7 +32,7 @@ public class Card implements Model<Card> {
     private JsonObject lastComment;
     private Integer nbOfComments;
     private Integer nbOfFavorites;
-    private boolean hasLiked;
+    private boolean isLiked;
 
     private List<String> favoriteList;
 
@@ -58,7 +58,7 @@ public class Card implements Model<Card> {
         JsonArray favoriteListOrNull = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray());
         this.favoriteList = (favoriteListOrNull != null) ? favoriteListOrNull.getList() : new JsonArray().getList();
         this.nbOfFavorites = card.getInteger(Field.NBOFFAVORITES, 0);
-        this.hasLiked = card.getBoolean(Field.HASLIKED, false);
+        this.isLiked = card.getBoolean(Field.ISLIKED, false);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -251,16 +251,16 @@ public class Card implements Model<Card> {
         this.nbOfFavorites = nbOfFavorites;
     }
 
-    public void setHasLiked(boolean hasLiked) {
-        this.hasLiked = hasLiked;
+    public void setIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
     }
 
     public Integer getNbOfFavorites() {
         return nbOfFavorites;
     }
 
-    public boolean hasLiked() {
-        return hasLiked;
+    public boolean isLiked() {
+        return isLiked;
     }
 
     public List<String> getFavoriteList() { return favoriteList; }
@@ -294,7 +294,7 @@ public class Card implements Model<Card> {
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
-                .put(Field.HASLIKED, this.hasLiked())
+                .put(Field.ISLIKED, this.isLiked())
                 .put(Field.FAVORITE_LIST, this.getFavoriteList());
     }
 

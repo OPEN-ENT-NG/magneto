@@ -117,6 +117,11 @@ public class MongoQuery {
         return this;
     }
 
+    public MongoQuery pageFromStart(Integer pageNumber) {
+        this.pipeline.add(new JsonObject().put(Mongo.LIMIT, (pageNumber + 1) * PAGE_SIZE));
+        return this;
+    }
+
     public MongoQuery lookUp(String from, String localField, String foreignField, String output) {
         this.pipeline.add(new JsonObject()
                 .put(Mongo.LOOKUP, new JsonObject()

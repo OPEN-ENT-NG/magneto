@@ -1,5 +1,13 @@
-.boardContainer-container {
+.header.no-1d {
+  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9000;
+  width: 100%;
+}
 
+.boardContainer-container {
   &-header {
     background: $magneto-white;
     padding: $spacing-M;

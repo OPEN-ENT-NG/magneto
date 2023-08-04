@@ -40,8 +40,8 @@
         align-items: center;
         justify-content: space-between;
         flex-direction: column;
-        margin-top: 180px;
-        height: 72%;
+        margin-top: 225px;
+        height: 65%;
         transition: margin-top 0.2s ease-in-out;
         @media screen and (max-height: $magneto-height-navbar) {
           margin-top: 60px;

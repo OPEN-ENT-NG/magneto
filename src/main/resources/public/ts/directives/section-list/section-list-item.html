@@ -41,7 +41,9 @@
             card-update-eventer="vm.cardUpdateEventer"
             has-comments="vm.board.canComment"
             board-owner="vm.board.owner"
-            has-favorite="true">
+            has-favorite="true"
+            display-favorite="vm.board.displayNbFavorites"
+    >
     </card-list>
 
     <infinite-scroll scrolled="vm.onScroll()"

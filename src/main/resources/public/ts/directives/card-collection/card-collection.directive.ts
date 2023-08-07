@@ -1,5 +1,5 @@
 import {_, ng, notify, toasts} from "entcore";
-import {ILocationService, IParseService, IScope} from "angular";
+import {IParseService, IScope} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board, Card, CardCollection, Cards, ICardsBoardParamsRequest, ICardsParamsRequest} from "../../models";
 import {safeApply} from "../../utils/safe-apply.utils";
@@ -102,6 +102,7 @@ class Controller implements IViewModel {
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
     navbarFirstSelected: COLLECTION_NAVBAR_VIEWS;
     RESOURCE_ORDERS: typeof RESOURCE_ORDER;
+    COLLECTION_NAVBAR_VIEWS: typeof COLLECTION_NAVBAR_VIEWS;
     isLoading: boolean;
 
     infiniteScrollService: InfiniteScrollService;
@@ -119,6 +120,7 @@ class Controller implements IViewModel {
         this.filter = new CardsFilter();
         this.infiniteScrollService = new InfiniteScrollService;
         this.RESOURCE_ORDERS = RESOURCE_ORDER;
+        this.COLLECTION_NAVBAR_VIEWS = COLLECTION_NAVBAR_VIEWS;
     }
 
     async $onInit() {

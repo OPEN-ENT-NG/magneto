@@ -9,15 +9,15 @@ public class Metadata implements Model {
     private final String contentType;
     private final String contentTransferEncoding;
     private final String charset;
-    private final int size;
+    private final Integer size;
 
     public Metadata(JsonObject metadata) {
-        this.name = metadata.getString(Field.NAME);
-        this.filename = metadata.getString(Field.FILENAME);
-        this.contentType = metadata.getString(Field.CONTENT_TYPE);
-        this.contentTransferEncoding = metadata.getString(Field.CONTENT_TRANSFER_ENCODING);
-        this.charset = metadata.getString(Field.CHARSET);
-        this.size = metadata.getInteger(Field.SIZE);
+        this.name = metadata.getString(Field.NAME, null);
+        this.filename = metadata.getString(Field.FILENAME, null);
+        this.contentType = metadata.getString(Field.CONTENT_TYPE, null);
+        this.contentTransferEncoding = metadata.getString(Field.CONTENT_TRANSFER_ENCODING, null);
+        this.charset = metadata.getString(Field.CHARSET, null);
+        this.size = metadata.getInteger(Field.SIZE, null);
     }
 
     public String getName() {
@@ -41,7 +41,7 @@ public class Metadata implements Model {
     }
 
 
-    public int getSize() {
+    public Integer getSize() {
         return size;
     }
 

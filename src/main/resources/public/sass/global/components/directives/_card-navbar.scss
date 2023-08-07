@@ -9,7 +9,7 @@
   &-item {
     height: 100%;
     align-items: center;
-
+    text-align: center;
 
     &.selected {
       @include desktop {

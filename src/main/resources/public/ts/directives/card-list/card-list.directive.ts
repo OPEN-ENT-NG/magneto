@@ -67,7 +67,7 @@ interface ICardListProps {
     onBoardView?;
     onMove?;
     hasFavorite?: boolean;
-
+    displayFavorite?: boolean;
     onLoaded?;
 
     hasComments: boolean;
@@ -106,6 +106,7 @@ class Controller implements IViewModel {
     hasComments: boolean;
     hasBoardView: boolean;
     simpleView: boolean;
+    displayFavorite: boolean;
     boardOwner: IBoardOwner;
 
 
@@ -191,6 +192,7 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
             hasBoardView: '=',
             onBoardView: '&',
             hasFavorite: '=',
+            displayFavorite: '=',
             onMove: '&',
             onLoaded: '&',
             selectorResize: '=',

@@ -166,6 +166,17 @@ function directive($parse: IParseService) {
                     if(!vm.board.isLayoutFree() && vm.board.sections.length > 0 && !vm.isUpdate) {
                         vm.form.sectionId = vm.selectedSection.id;
                     }
+
+                    // Allows to retrieve values in JQuery when there is a link or text
+                    if (vm.form.description || vm.form.description == '') {
+                        let linkHref: string = $("div[role='textbox'] span").find("a").attr("href");
+                        let linkText: string = $("div[role='textbox'] span").find("a").text();
+
+                        if (linkHref && linkText) {
+                            vm.form.description = "<a href='" + linkHref + "'>" + linkText + "</a>";
+                        }
+                    }
+
                     vm.isUpdate ? await cardsService.updateCard(vm.form) : await cardsService.createCard(vm.form);
 
                 } catch (e) {

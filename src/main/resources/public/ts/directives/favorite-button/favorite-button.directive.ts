@@ -62,6 +62,9 @@ function directive($parse: IParseService) {
                         vm: IViewModel) {
 
             vm.onFavorite = async (): Promise<void> => {
+                element.click(function (event) {
+                    event.stopPropagation();
+                });
                 let res = await $parse($scope.vm.onFavoriteHandler())(vm.elementId, vm.liked);
                 if (res) {
                     vm.liked = !vm.liked;

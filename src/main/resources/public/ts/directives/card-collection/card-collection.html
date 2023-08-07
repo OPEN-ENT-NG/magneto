@@ -20,14 +20,14 @@
                 navbar-items="vm.navbar"
                 on-nav-click="vm.changeNav">
         </card-navbar>
-        <div class="flex">
+        <div class="cardDirective-collection-lightbox-body-options">
             <div>
                 <switch ng-change="vm.changeView()" ng-model="vm.displayBoard">
                     <label class="switch"></label>
                 </switch>
                 <span><i18n>magneto.cards.collection.board.view</i18n></span>
             </div>
-            <div>
+            <div ng-if="vm.navbarViewSelected != vm.COLLECTION_NAVBAR_VIEWS.FAVORITES">
                 <switch ng-change="vm.changeOrder(vm.RESOURCE_ORDERS.FAVORITE)" ng-model="vm.orderFavorite">
                     <label class="switch"></label>
                 </switch>
@@ -65,7 +65,8 @@
                         on-duplicate="vm.submitDuplicateCard"
                         has-preview="true"
                         selector-resize="'.cardDirective-list-scrollable'"
-                        on-preview="vm.openPreview">
+                        on-preview="vm.openPreview"
+                        has-favorite="true">
                 </card-list>
             </div>
             <card-list ng-hide="vm.displayBoard"
@@ -109,7 +110,8 @@
             scroll-eventer="vm.infiniteScrollService">
     </infinite-scroll>
 
-    <button class="right-magnet create-button"
+    <button ng-if="!vm.isHome"
+            class="right-magnet create-button"
             data-ng-disabled="!vm.isFormValid()"
             ng-click="vm.submitDuplicateCard()">
         <i18n>magneto.duplicate</i18n>

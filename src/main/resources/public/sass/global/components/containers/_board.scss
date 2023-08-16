@@ -13,11 +13,31 @@
     padding: $spacing-M;
     padding-left: $spacing-XM;
     z-index: unset;
+
+    .test1 {
+      gap: 30px;
+    }
+
+    .test2 {
+      gap: 30px;
+      @media (max-width: 1025px) {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+    }
+
+
     @include noTextOverflow(1);
     h1 {
       font-family: $magneto-font-secondary;
       color: $magneto-yellow-ochre;
       margin-bottom: 0;
+      @include noTextOverflow(1);
+
+      @media (max-width: 1025px) {
+        @include noTextOverflow(2);
+      }
 
       .application-logo {
         width: 36px;
@@ -26,14 +46,17 @@
     }
 
     &-date {
-      margin-right: $spacing-XM;
-      margin-top: 5px;
+      //margin-right: $spacing-XM;
+      //margin-top: 5px;
     }
 
     &-degrade {
       background: linear-gradient(to top, #FFFFFF 0.9%,transparent);
       position: absolute;
       height: 43%;
+      @media (max-width: 1025px) {
+        height: 33%;
+      }
     }
 
     &-description {
@@ -41,6 +64,14 @@
       overflow: hidden !important;
       white-space: pre-line !important;
       margin-bottom: 5px !important;
+    }
+
+    &-title {
+      flex: 3;
+    }
+
+    @media (max-width: 832px) {
+      display: none !important;
     }
   }
 
@@ -71,11 +102,15 @@
     &-description {
       overflow: hidden !important;
       white-space: pre-line !important;
-      height: 19px !important;
+      height: 20px !important;
     }
 
     .create-button {
       float: right;
+    }
+
+    @media (min-width: 833px) {
+      display: none !important;
     }
   }
 

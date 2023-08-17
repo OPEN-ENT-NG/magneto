@@ -40,7 +40,7 @@
         align-items: center;
         justify-content: space-between;
         flex-direction: column;
-        margin-top: 29vh;
+        margin-top: 27vh;
         height: 65%;
         transition: margin-top 0.2s ease-in-out;
         @media screen and (max-height: $magneto-height-navbar) {
@@ -48,6 +48,9 @@
         }
         @media (max-width: $magneto-screen-mobile) and (min-height: $magneto-height-navbar) {
           margin-top: 100px !important;
+        }
+        @media (max-width: $magneto-screen-tablet) and (min-width: $magneto-screen-mobile){
+          margin-top: 13vh !important;
         }
 
         .item {

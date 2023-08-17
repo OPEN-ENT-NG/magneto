@@ -2,19 +2,23 @@
 
 
     <!-- Header desktop -->
-    <div class="row boardContainer-container-header zero-mobile">
-        <div class="row">
-            <h1 ng-click="vm.goToBoards()" class="cell paddingRight">
-                <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
-                     alt="" src="/magneto/public/img/uni-magneto.png">
-                <i18n>magneto.title</i18n>
-                / [[vm.board.title]]
-            </h1>
-            <button ng-if="vm.board.isLayoutFree() ? vm.cards.length > 0 : vm.board.hasCardsSection()" class="right-magnet create-button" ng-click="vm.openReading()">
-                <i18n>magneto.reading.board</i18n>
-            </button>
-            <div class="cell right-magnet boardContainer-container-header-date">
-                <board-date date="vm.board.modificationDate"></board-date>
+    <div class="row boardContainer-container-header">
+        <div class="flex boardContainer-container-header-content">
+            <div class="cell boardContainer-container-header-title">
+                <h1 ng-click="vm.goToBoards()" class="cell paddingRight" tooltip="[[vm.board.title]]">
+                    <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
+                         alt="" src="/magneto/public/img/uni-magneto.png">
+                    <i18n>magneto.title</i18n>
+                    / [[vm.board.title]]
+                </h1>
+            </div>
+            <div class="flex boardContainer-container-header-content-options">
+                <div class="cell right-magnet boardContainer-container-header-date">
+                    <board-date date="vm.board.modificationDate"></board-date>
+                </div>
+                <button ng-if="vm.board.isLayoutFree() ? vm.cards.length > 0 : vm.board.hasCardsSection()" class="right-magnet create-button" ng-click="vm.openReading()">
+                    <i18n>magneto.reading.board</i18n>
+                </button>
             </div>
         </div>
         <div class="boardContainer-container-header-desc">
@@ -30,23 +34,21 @@
     </div>
 
     <!-- Header mobile -->
-    <div class="row boardContainer-container-header-mobile zero-desktop">
+    <div class="row boardContainer-container-header-mobile">
         <div class="row">
             <div class="cell boardContainer-container-header-mobile-title">
-                <h1 ng-click="vm.goToBoards()" class="cell paddingRight">
+                <h1 ng-click="vm.goToBoards()" class="cell paddingRight" tooltip="[[vm.board.title]]">
                     <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                          alt="" src="/magneto/public/img/uni-magneto.png">
                     <i18n>magneto.title</i18n>
                     / [[vm.board.title]]
                 </h1>
-
             </div>
-            <button ng-if="vm.cards.length > 0"
+            <button ng-if="vm.board.isLayoutFree() ? vm.cards.length > 0 : vm.board.hasCardsSection()"
                     class="cell create-button"
                     ng-click="vm.openReading()">
                 <i18n>magneto.reading.board</i18n>
             </button>
-
         </div>
         <div ng-if="!!vm.board.description" class="boardContainer-container-header-mobile-description"><span id="description-mobile">[[vm.board.description]]</span></div>
         <board-description-lightbox

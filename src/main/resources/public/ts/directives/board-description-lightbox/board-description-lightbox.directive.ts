@@ -92,6 +92,12 @@ function directive($timeout: ng.ITimeoutService): ng.IDirective {
                 });
             });
 
+            $(window).on('resize', (): void => {
+                $scope.$apply((): void => {
+                    vm.checkDescriptionSize();
+                });
+            });
+
             vm.checkDescriptionSize = (): void => {
                 let windowElement: JQuery = $(window);
                 if (windowElement.width() < 768) {

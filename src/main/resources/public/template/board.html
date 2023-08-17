@@ -3,7 +3,7 @@
 
     <!-- Header desktop -->
     <div class="row boardContainer-container-header">
-        <div class="flex test1">
+        <div class="flex boardContainer-container-header-content">
             <div class="cell boardContainer-container-header-title">
                 <h1 ng-click="vm.goToBoards()" class="cell paddingRight" tooltip="[[vm.board.title]]">
                     <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
@@ -12,7 +12,7 @@
                     / [[vm.board.title]]
                 </h1>
             </div>
-            <div class="flex test2">
+            <div class="flex boardContainer-container-header-content-options">
                 <div class="cell right-magnet boardContainer-container-header-date">
                     <board-date date="vm.board.modificationDate"></board-date>
                 </div>
@@ -43,14 +43,12 @@
                     <i18n>magneto.title</i18n>
                     / [[vm.board.title]]
                 </h1>
-
             </div>
             <button ng-if="vm.board.isLayoutFree() ? vm.cards.length > 0 : vm.board.hasCardsSection()"
                     class="cell create-button"
                     ng-click="vm.openReading()">
                 <i18n>magneto.reading.board</i18n>
             </button>
-
         </div>
         <div ng-if="!!vm.board.description" class="boardContainer-container-header-mobile-description"><span id="description-mobile">[[vm.board.description]]</span></div>
         <board-description-lightbox

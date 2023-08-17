@@ -14,19 +14,23 @@
     padding-left: $spacing-XM;
     z-index: unset;
 
-    .test1 {
+    &-content {
       gap: 30px;
-    }
 
-    .test2 {
-      gap: 30px;
-      @media (max-width: 1025px) {
-        flex-direction: column;
-        gap: 15px;
+      &-options {
+        gap: 30px;
+        @media (max-width: $magneto-screen-tablet) {
+          flex-direction: column;
+          gap: 15px;
+        }
+        @media (max-width: $magneto-screen-tablet) and (min-width: $magneto-screen-mobile){
+          button {
+            width: 36%;
+            margin-left: auto;
+          }
+        }
       }
-
     }
-
 
     @include noTextOverflow(1);
     h1 {
@@ -35,7 +39,7 @@
       margin-bottom: 0;
       @include noTextOverflow(1);
 
-      @media (max-width: 1025px) {
+      @media (max-width: $magneto-screen-tablet) {
         @include noTextOverflow(2);
       }
 
@@ -54,7 +58,7 @@
       background: linear-gradient(to top, #FFFFFF 0.9%,transparent);
       position: absolute;
       height: 43%;
-      @media (max-width: 1025px) {
+      @media (max-width: $magneto-screen-tablet) {
         height: 33%;
       }
     }
@@ -70,14 +74,14 @@
       flex: 3;
     }
 
-    @media (max-width: 832px) {
+    @media (max-width: $magneto-screen-mobile) {
       display: none !important;
     }
   }
 
   &-header-mobile {
     background: $magneto-white;
-    padding: $spacing-LXS $spacing-LXS $spacing-LL 73px;
+    padding: $spacing-LXS $spacing-LXS $spacing-XM 73px;
     top: -12px;
     z-index: unset;
     @include noTextOverflow(1);
@@ -109,7 +113,7 @@
       float: right;
     }
 
-    @media (min-width: 833px) {
+    @media (min-width: 801px) {
       display: none !important;
     }
   }

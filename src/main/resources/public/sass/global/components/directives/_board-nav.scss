@@ -13,7 +13,9 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
       overflow-y: auto;
       overflow-x: hidden;
-
+      @media (max-width: $magneto-screen-mobile) and (min-height: $magneto-height-navbar) {
+        top: 50px !important;
+      }
       a {
         color: $magneto-black !important;
         position: relative;

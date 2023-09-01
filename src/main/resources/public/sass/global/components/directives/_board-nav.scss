@@ -3,8 +3,8 @@
     .nav, .sub-nav {
       position: fixed;
       left: 0;
-      top: 24px;
-      height: calc(100% - 24px);
+      top: 64px;
+      height:100%;
       background-color: $magneto-white;
       width: 60px;
       display: flex;

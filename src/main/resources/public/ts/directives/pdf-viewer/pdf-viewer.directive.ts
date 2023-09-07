@@ -16,12 +16,8 @@ interface IViewModel extends ng.IController {
     loadPdfJs(): Promise<void> ;
     pageIndex: number | any;
     numPages: number;
-    $parent: {
-        render: any
-    }
     loading: boolean;
     reloadPdf: Subject<number>;
-    pdf:any;
     element: any;
 }
 
@@ -40,9 +36,6 @@ let _loadedPdfJs = false;
 class Controller implements IViewModel {
     pageIndex: number | any;
     numPages: number;
-    $parent: {
-        render: any
-    }
     loading: boolean;
     reloadPdf: Subject<number>;
     pdf:any;
@@ -130,24 +123,21 @@ function directive() {
             var canvas = document.createElement('canvas');
             $(canvas).addClass('render');
             this.element.append(canvas);
-            console.log(attrs.ngSrc)
-            console.log( $scope.vm.loadPdfJs())
             $scope.vm.loadPdfJs().then(() => {
                 (window as any).PDFJS
                     .getDocument(attrs.ngSrc)
                     .then(function (file) {
                         vm.pdf = file;
+                        console.log(vm.pdf)
                         vm.numPages = vm.pdf.pdfInfo.numPages;
                         $scope.$apply('numPages');
                         vm.openPage();
                         vm.loading = false;
                         $scope.$apply('loading');
-                        console.log(vm.pdf)
                     }).catch(function(e){
                      console.log(e)
                     vm.loading = false;
                     $scope.$apply('loading');
-                    //faire un retour d'erreur
                 })
             });
 

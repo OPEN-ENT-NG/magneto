@@ -18,7 +18,6 @@ interface IViewModel extends ng.IController {
     numPages: number;
     loading: boolean;
     reloadPdf: Subject<number>;
-    element: any;
 }
 
 interface IPdfViewerProps {
@@ -38,8 +37,6 @@ class Controller implements IViewModel {
     numPages: number;
     loading: boolean;
     reloadPdf: Subject<number>;
-    pdf:any;
-    element: any;
     constructor(private $scope: IPdfViewerScope, element: ng.IAugmentedJQuery) {
         this.loading = true;
         this.pageIndex = 1;

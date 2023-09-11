@@ -75,10 +75,11 @@ public interface BoardService {
      * @param isShared   fetch shared boards if true
      * @param isDeleted  fetch deleted boards if true
      * @param sortBy     Sort by parameter
+     * @param allFolders fetch all folders if true
      * @return Future {@link Future <JsonObject>} containing list of boards
      */
     Future<JsonObject> getAllBoards(UserInfos user, Integer page, String searchText, String folderId,
-                                    boolean isPublic, boolean isShared, boolean isDeleted, String sortBy);
+                                    boolean isPublic, boolean isShared, boolean isDeleted, String sortBy, boolean allFolders);
 
     /**
      * Get all boards with publish right

@@ -328,15 +328,15 @@ public class DefaultBoardService implements BoardService {
     public Future<JsonObject> getAllBoards(UserInfos user, Integer page,
                                            String searchText, String folderId,
                                            boolean isPublic,
-                                           boolean isShared, boolean isDeleted, String sortBy) {
+                                           boolean isShared, boolean isDeleted, String sortBy, boolean allFolders) {
 
         Promise<JsonObject> promise = Promise.promise();
 
         Future<JsonArray> fetchAllBoardsFuture = fetchAllBoards(user, page, searchText, folderId, isPublic, isShared,
-                isDeleted, sortBy, false);
+                isDeleted, sortBy, false, allFolders);
 
         Future<JsonArray> fetchAllBoardsCountFuture = fetchAllBoards(user, page, searchText, folderId,
-                isPublic, isShared, isDeleted, sortBy, true);
+                isPublic, isShared, isDeleted, sortBy, true, allFolders);
 
         CompositeFuture.all(fetchAllBoardsFuture, fetchAllBoardsCountFuture)
                 .onFailure(fail -> {
@@ -360,12 +360,12 @@ public class DefaultBoardService implements BoardService {
     private Future<JsonArray> fetchAllBoards(UserInfos user, Integer page,
                                              String searchText, String folderId,
                                              boolean isPublic, boolean isShared, boolean isDeleted,
-                                             String sortBy, boolean getCount) {
+                                             String sortBy, boolean getCount, boolean allFolders) {
 
         Promise<JsonArray> promise = Promise.promise();
 
         JsonObject query = this.getAllBoardsQuery(user, page, searchText, folderId, isPublic, isShared,
-                isDeleted, sortBy, getCount);
+                isDeleted, sortBy, getCount, allFolders);
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
@@ -409,7 +409,7 @@ public class DefaultBoardService implements BoardService {
     private JsonObject getAllBoardsQuery(UserInfos user, Integer page,
                                          String searchText, String folderId,
                                          boolean isPublic, boolean isShared, boolean isDeleted,
-                                         String sortBy, boolean getCount) {
+                                         String sortBy, boolean getCount, boolean allFolders) {
 
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject()
@@ -485,7 +485,7 @@ public class DefaultBoardService implements BoardService {
         }
 
         // If user searches a term, remove folder filter
-        if (searchText == null || searchText.isEmpty()) {
+        if ((searchText == null || searchText.isEmpty()) && !allFolders) {
             if (folderId != null || isDeleted) {
                 query.match(new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field._ID), folderId));
             } else {

@@ -68,6 +68,8 @@ public class Field {
     public static final String CANCOMMENT = "canComment";
     public static final String DISPLAY_NB_FAVORITES = "displayNbFavorites";
 
+    public static final String ALLFOLDERS = "allFolders";
+
     public static final String OWNER = "owner";
     public static final String USERID = "userId";
     public static final String GROUPID = "groupId";

@@ -97,6 +97,7 @@ class Controller implements IViewModel {
     }
 
     updateSection = async (section: Section): Promise<void> => {
+
         let updateSection: SectionForm = new SectionForm().build(section);
         await sectionsService.update(updateSection).then(response => {
             if (response.status === 200 || response.status === 201) {

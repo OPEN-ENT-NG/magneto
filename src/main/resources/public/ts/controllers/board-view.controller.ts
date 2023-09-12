@@ -429,40 +429,41 @@ class Controller implements IViewModel {
                 }));
             }
 
-            const sectionList: Element = document.getElementById("section-list");
-            this.nestedSortables.push(create(sectionList, {
-                animation: 300,
-                easing: "cubic-bezier(1, 0, 0, 1)",
-                delay: 150,
-                draggable: ".scrollbar",
-                forceAutoScrollFallback: true,
-                scroll: true, // or HTMLElement
-                scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
-                scrollSpeed: 30, // px*/
-                delayOnTouchOnly: true,
-                onUpdate: async (evt) => {
-                    let form: BoardForm = new BoardForm().build(this.board);
-                    let sectionIds: Array<string> = this.board.sections.map((section: Section) => section.id);
-                    let oldSectionId: string = sectionIds[evt.oldIndex];
-                    let newSectionIndex: number = evt.newIndex;
-                    sectionIds.splice(evt.oldIndex, 1);
-                    sectionIds.splice(newSectionIndex, 0, oldSectionId);
-                    form.sectionsIds = sectionIds;
-                    this.boardsService.updateBoard(this.board.id, form)
-                        .then(async res => {
-                            if (res.status == 200 || res.status == 201) {
-                                this.board.sections = this.board.sortSections(sectionIds);
-                                this.isDraggable = true;
-                                safeApply(this.$scope);
-                            }
-                        });
-                },
-                onStart: () => {
-                    this.isDraggable = false;
-                    safeApply(this.$scope);
-                }
-            }));
-            safeApply(this.$scope);
+            const sectionList: NodeListOf<Element> = document.querySelectorAll(".sections-listDirective-container");
+            for (let i = 0; i < cardList.length; i++) {
+                this.nestedSortables.push(create(sectionList[i], {
+                    animation: 300,
+                    easing: "cubic-bezier(1, 0, 0, 1)",
+                    delay: 150,
+                    forceAutoScrollFallback: true,
+                    scroll: true, // or HTMLElement
+                    scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
+                    scrollSpeed: 30, // px*/
+                    delayOnTouchOnly: true,
+                    onUpdate: async (evt) => {
+                        let form: BoardForm = new BoardForm().build(this.board);
+                        let sectionIds: Array<string> = this.board.sections.map((section: Section) => section.id);
+                        let oldSectionId: string = sectionIds[evt.oldIndex];
+                        let newSectionIndex: number = evt.newIndex;
+                        sectionIds.splice(evt.oldIndex, 1);
+                        sectionIds.splice(newSectionIndex, 0, oldSectionId);
+                        form.sectionsIds = sectionIds;
+                        this.boardsService.updateBoard(this.board.id, form)
+                            .then(async res => {
+                                if (res.status == 200 || res.status == 201) {
+                                    this.board.sections = this.board.sortSections(sectionIds);
+                                    this.isDraggable = true;
+                                    safeApply(this.$scope);
+                                }
+                            });
+                    },
+                    onStart: () => {
+                        this.isDraggable = false;
+                        safeApply(this.$scope);
+                    }
+                }));
+                safeApply(this.$scope);
+            }
         }
     }
 

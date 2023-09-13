@@ -1,12 +1,19 @@
 .sections-listDirective {
+  overflow-x: auto;
+  display: flex;
+
   i.magneto-card-settings {
     font-size: 25px;
     right: 5px;
   }
-
-  display: flex;
   justify-content: space-between;
   overflow-y: hidden;
+
+  &-container {
+    flex-shrink: 0;
+    display: flex;
+    overflow: hidden;
+  }
 
   &-horizontal {
     flex-direction: column;
@@ -21,26 +28,6 @@
     }
 
     display: flex;
-
-    @include mobile {
-      min-width: 100%;
-    }
-
-    @include tablet {
-      min-width: 50%;
-    }
-
-    @include small-desktop {
-      min-width: 33%;
-    }
-
-    @include medium-desktop {
-      min-width: 25%;
-    }
-
-    @include large-desktop {
-      min-width: 20%;
-    }
 
     flex-direction: column;
 

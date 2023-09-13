@@ -48,3 +48,4 @@ export * from './comment-input/comment-input.directive';
 export * from './comment-delete-lightbox/comment-delete-lightbox.directive';
 export * from './board-description-lightbox/board-description-lightbox.directive';
 export * from './favorite-button/favorite-button.directive';
+export * from './pdf-viewer/pdf-viewer.directive'

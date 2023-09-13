@@ -1,0 +1,23 @@
+.pdf-viewer{
+  &-pagination-area{
+    &-pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &-numPage {
+        font-size: 14px;
+      }
+
+      &-input {
+        font-size: 14px;
+        margin: 0;
+        flex: 1;
+        width: 3em;
+      }
+    }
+    &-file-controls{
+        padding: 0 1em;
+      }
+  }
+}

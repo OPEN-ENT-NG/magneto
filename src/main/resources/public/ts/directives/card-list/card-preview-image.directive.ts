@@ -13,6 +13,8 @@ interface IViewModel extends ng.IController, ICardPreviewProps {
     formatVideoUrl(url: string) : string;
 
     downloadFile(): void;
+
+    getWorkspaceUrl(): string;
 }
 
 interface ICardPreviewProps {
@@ -84,6 +86,10 @@ class Controller implements IViewModel {
             result = this.RESOURCE_TYPES.DEFAULT;
         }
         return result;
+    }
+
+    getWorkspaceUrl(): string {
+        return `/workspace/document/${this.card.resourceId}`;
     }
 
 }

@@ -1,0 +1,12 @@
+<div class="pdf-viewer" id="pdf-viewer" >
+    <div class="pdf-viewer-pagination-area pagination__area  flex-row align-center justify-center">
+        <div class="pdf-viewer-pagination-area-file-control-left file-controls left" ng-click="vm.previousPage()"><i class="left"></i></div>
+        <div class="pdf-viewer-pagination-area-pagination">
+            <input class="pdf-viewer-pagination-area-pagination-input" type="text" ng-model="vm.pageIndex" ng-change="vm.openPage()"/>
+            <span class="pdf-viewer-pagination-area-pagination-numPage">/ [[vm.numPages]]</span>
+        </div>
+        <div class="pdf-viewer-pagination-area-file-controls right" ng-click="vm.nextPage()"><i class="right"></i></div>
+    </div>
+    <p ng-if="vm.loading" class="pdf-viewer-loading-area top-spacing-four flex-row align-start justify-center centered-text">
+        <i18n>magneto.loading</i18n>&nbsp;<i class="loading"></i></p>
+</div>

@@ -9,11 +9,17 @@
   justify-content: space-between;
   overflow-y: hidden;
 
-  &-container {
+  &-container-horizontal,
+  &-container-vertical {
     flex-shrink: 0;
     display: flex;
     overflow: hidden;
   }
+
+  &-container-horizontal {
+    flex-direction: column;
+  }
+
 
   &-horizontal {
     flex-direction: column;

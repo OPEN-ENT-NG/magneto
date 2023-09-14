@@ -1,4 +1,4 @@
-import {Document, idiom as lang, ng, notify, toasts, workspace} from "entcore";
+import {Document, idiom as lang, ng, notify, toasts, workspace, angular} from "entcore";
 import {IScope, IWindowService} from "angular";
 import {IBoardsService, ICardsService, ISectionsService, sectionsService} from "../services";
 import {create} from 'sortablejs';
@@ -190,6 +190,7 @@ class Controller implements IViewModel {
     }
 
     async $onInit(): Promise<void> {
+        this.initResizeScroll();
         this.displayCardLightbox = false;
         this.displayDeleteCardLightbox = false;
         this.displayTransferCardLightbox = false;
@@ -238,6 +239,7 @@ class Controller implements IViewModel {
                 await this.refreshCardsFavoriteNb();
             }, this.updateFrequency, 0, false);
         }
+
     }
 
     /**
@@ -429,7 +431,7 @@ class Controller implements IViewModel {
                 }));
             }
 
-            const sectionList: NodeListOf<Element> = document.querySelectorAll(".sections-listDirective-container");
+            const sectionList: NodeListOf<Element> = document.querySelectorAll("#section-list");
             for (let i = 0; i < cardList.length; i++) {
                 this.nestedSortables.push(create(sectionList[i], {
                     animation: 300,
@@ -506,6 +508,29 @@ class Controller implements IViewModel {
     };
 
     /**
+     * Init resize listener for adapting height from screen size
+     */
+    initResizeScroll = (): void => {
+        angular.element(window).bind('resize', this.calcHeightSections);
+    }
+
+    /**
+     * Adapt height from screen size computing
+     */
+    calcHeightSections = (): void => {
+        // Obtenir la largeur actuelle de l'écran
+        let screenWidth: number = $(window).width();
+        // Calculer la hauteur du header en fonction de la taille d'écran
+        let headerHeight: number = screenWidth > 801 ? $('.boardContainer-container-header').outerHeight() : $('.boardContainer-container-header-mobile').height();
+        // Calculer la hauteur de la fenêtre moins la hauteur des autres éléments
+        let maxHeightContainer: number = $('.navbar.row').outerHeight() + headerHeight + 2;
+        let maxHeightSections: number = maxHeightContainer + $('.sections-listDirective-content-container').outerHeight() - 2;
+        // Appliquer la nouvelle max-height à votre élément
+        $('.sections-listDirective-vertical').css('max-height', 'calc(100vh - ' + maxHeightContainer + 'px)');
+        $('.cardDirective-list-vertical').css('height', 'calc(100vh - ' + (maxHeightSections + 35) + 'px)');
+    }
+
+    /**
      * Fetch board infos.
      */
     getBoard = async (): Promise<void> => {
@@ -519,6 +544,7 @@ class Controller implements IViewModel {
                             this.board.sections = sections.all;
                             await this.getCardsBySectionBoard();
                             setTimeout(this.initDrag, 500);
+                            setTimeout(this.calcHeightSections, 500);
                         });
                     }
                 }

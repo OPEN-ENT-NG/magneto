@@ -15,7 +15,6 @@
     justify-items: center;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 85vh;
   }
 
   &-horizontal {
@@ -25,10 +24,6 @@
     padding-bottom: 20px;
   }
   padding-top: 15px;
-
-  @include mobile {
-    padding-top: 60px;
-  }
 
   @include paddingX(15px);
   &-scrollable {

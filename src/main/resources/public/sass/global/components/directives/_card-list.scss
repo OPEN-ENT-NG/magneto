@@ -4,6 +4,7 @@
   }
 
   &-free {
+    min-height: 60vh;
     justify-content: center;
     display: grid;
     grid-gap: 10px;
@@ -22,7 +23,7 @@
   }
 
   &-horizontal {
-    min-height: 75px;
+    min-height: 20vh;
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 20px;

@@ -93,8 +93,6 @@ class Controller implements IViewModel {
             this.url = await new Dailymotion(url).getThumbnail();
         } else if (url.includes("youtube.com") || url.includes("youtu.be")) {
             this.url = new Youtube(url).getThumbnail();
-        } else {
-            this.url = "toto"
         }
         this.url = this.$sce.trustAsResourceUrl(this.url).toString();
 

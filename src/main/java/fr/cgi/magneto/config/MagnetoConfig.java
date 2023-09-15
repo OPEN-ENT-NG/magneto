@@ -10,7 +10,7 @@ public class MagnetoConfig {
     private final WebsocketConfig websocketConfig;
     private final Integer magnetoUpdateFrequency;
 
-    private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000000; //refresh every 10 seconds by default
+    private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; //refresh every 10 seconds by default
 
     public MagnetoConfig(JsonObject config) {
         this.host = config.getString(Field.HOST);

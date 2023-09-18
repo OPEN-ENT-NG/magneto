@@ -108,6 +108,7 @@
                     board-owner="vm.board.owner"
                     has-favorite="true"
                     display-favorite="vm.board.displayNbFavorites"
+                    ng-style="{'zoom': vm.zoomLevel + '%'}"
             >
             </card-list>
             <section-list
@@ -218,5 +219,8 @@
                          loading-mode="true"
                          scroll-eventer="vm.infiniteScrollService">
         </infinite-scroll>
+        <zoom
+                zoom-level="vm.zoomLevel"
+        ></zoom>
     </div>
 </div>

@@ -1,5 +1,6 @@
 {
   "push.notif.magneto.share": "Magneto: Share board",
   "timeline.magneto.shared": "has given you access to a new board",
-  "timeline.magneto.shared.link.board": "board link"
+  "timeline.magneto.shared.link.board": "board link",
+  "magneto.share_board": "Sharing a board"
 }

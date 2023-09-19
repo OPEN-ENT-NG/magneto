@@ -13,6 +13,7 @@
   &-plus{
     font-size: 32px;
     padding-left: 1em;
+    margin-top: 3px;
     &-disabled{
       color: $magneto-light-grey;
     }
@@ -20,6 +21,7 @@
   &-minus{
     padding-right: 1em;
     font-size: 32px;
+    margin-top: 3px;
     &-disabled{
       color: $magneto-light-grey;
     }

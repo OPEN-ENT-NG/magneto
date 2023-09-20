@@ -302,7 +302,7 @@ export class BoardForm {
 
 export class Board implements Shareable {
     private _id: string;
-    private _title: string;
+    public _title: string = " ";
     private _imageUrl: string;
     private _backgroundUrl: string;
     private _description: string;

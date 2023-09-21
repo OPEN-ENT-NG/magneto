@@ -19,9 +19,6 @@
         <video controls ng-if="vm.card.isType(vm.RESOURCE_TYPES.VIDEO) && vm.videoIsFromWorkspace()" class="cardDirective-list-item-preview-[[vm.card.resourceType]]"
                data-ng-src="[[vm.card.resourceUrl]]">
         </video>
-        <iframe ng-if="vm.card.isType(vm.RESOURCE_TYPES.VIDEO) && !vm.videoIsFromWorkspace()" class="cardDirective-list-item-preview-[[vm.card.resourceType]]"
-                data-ng-src="[[vm.formatVideoUrl(vm.card.resourceUrl)]]">
-        </iframe>
-
+        <img ng-if="vm.card.isType(vm.RESOURCE_TYPES.VIDEO) && !vm.videoIsFromWorkspace()" class="cardDirective-list-item-preview-[[vm.card.resourceType]]" ng-src="[[vm.url]]">
     </div>
 </div>

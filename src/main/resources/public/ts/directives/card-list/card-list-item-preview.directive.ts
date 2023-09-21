@@ -4,6 +4,7 @@ import {RootsConst} from "../../core/constants/roots.const";
 import {Card} from "../../models";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {EXTENSION_FORMAT} from "../../core/constants/extension-format.const";
+import {Dailymotion, PeerTube, Vimeo, Youtube} from "../../models/video-platform.model";
 
 interface IViewModel extends ng.IController, ICardListItemProps {
     getExtension(fileName: string): string;
@@ -12,7 +13,7 @@ interface IViewModel extends ng.IController, ICardListItemProps {
 
     videoIsFromWorkspace(): boolean;
 
-    formatVideoUrl(url: string): string;
+    formatVideoUrl(url: string): Promise<void>;
 
     getDescriptionHTML(description: string): string;
 
@@ -31,6 +32,7 @@ class Controller implements IViewModel {
 
     card: Card;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
+    url: string;
 
 
     constructor(private $scope: ICardListItemScope,
@@ -41,7 +43,9 @@ class Controller implements IViewModel {
     }
 
 
-    $onInit() {
+    async $onInit() {
+        await this.formatVideoUrl(this.card.resourceUrl);
+        this.$scope.$apply();
     }
 
     $onDestroy() {
@@ -80,9 +84,22 @@ class Controller implements IViewModel {
         }
     }
 
-    formatVideoUrl = (url: string): string => {
-        return !!url ? this.$sce.trustAsResourceUrl(url) : null;
+    formatVideoUrl = async (url: string): Promise<void> => {
+        if (url.includes("peertube")) {
+            this.url = await new PeerTube(url).getThumbnail();
+        } else if (url.includes("vimeo")) {
+            this.url = await new Vimeo(url).getThumbnail();
+        } else if (url.includes("dailymotion")) {
+            this.url = await new Dailymotion(url).getThumbnail();
+        } else if (url.includes("youtube.com") || url.includes("youtu.be")) {
+            this.url = new Youtube(url).getThumbnail();
+        } else {
+            this.url = "toto"
+        }
+        this.url = this.$sce.trustAsResourceUrl(this.url).toString();
+
     }
+
 
     private getExtensionType = (extension: string): string => {
         let result: string = "";

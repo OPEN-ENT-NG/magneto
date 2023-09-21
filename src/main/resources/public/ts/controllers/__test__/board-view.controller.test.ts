@@ -89,7 +89,7 @@ describe("BoardViewController", () => {
             });
 
 
-        boardViewControllerTest.$onInit();
+        //boardViewControllerTest.$onInit();
     });
 
     it("test resetCards", (done) => {

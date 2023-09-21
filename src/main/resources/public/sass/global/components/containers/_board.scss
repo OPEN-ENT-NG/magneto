@@ -79,7 +79,7 @@
 
   &-header-mobile {
     background: $magneto-white;
-    padding: $spacing-LXS $spacing-LXS $spacing-XM 73px;
+    padding: $spacing-LXS $spacing-LXS $spacing-L 73px;
     top: -12px;
     z-index: unset;
     @include noTextOverflow(1);
@@ -121,7 +121,6 @@
     border-top: solid 1px $magneto-white-blue;
     border-bottom: solid 1px $magneto-white-blue;
     background-size: cover;
-    min-height: 84vh;
     &.no-background-image {
       background: $magneto-lighter-light-grey;
     }
@@ -136,7 +135,6 @@
     }
 
     &-list {
-      min-height: 650px;
       width: 100%;
       overflow-x: auto;
 

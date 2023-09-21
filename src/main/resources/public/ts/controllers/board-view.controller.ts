@@ -524,7 +524,7 @@ class Controller implements IViewModel {
             // Calculer la hauteur du header en fonction de la taille d'écran
         let headerHeight: number = screenWidth > 801 ? $('.boardContainer-container-header').outerHeight() : $('.boardContainer-container-header-mobile').height();
             // Calculer la hauteur de la fenêtre moins la hauteur des autres éléments
-        let maxHeightContainer: number = $('.navbar.row').outerHeight() + headerHeight + 2;
+        let maxHeightContainer: number = $('.navbar').outerHeight() + headerHeight + 2;
         let maxHeightSections: number = maxHeightContainer + $('.sections-listDirective-content-container').outerHeight() - 2;
             // Appliquer la nouvelle max-height à votre élément
             $('.sections-listDirective-vertical').css('max-height', 'calc(100vh - ' + maxHeightContainer + 'px)');

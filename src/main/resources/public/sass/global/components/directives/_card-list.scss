@@ -4,6 +4,7 @@
   }
 
   &-free {
+    min-height: 70vh;
     justify-content: center;
     display: grid;
     grid-gap: 10px;
@@ -22,7 +23,7 @@
   }
 
   &-horizontal {
-    min-height: 75px;
+    min-height: 20vh;
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 20px;
@@ -30,8 +31,7 @@
     gap: 10px;
 
   }
-  padding-top: 15px;
-
+  @include paddingY(15px);
   @include paddingX(15px);
   &-scrollable {
     overflow-y: scroll;

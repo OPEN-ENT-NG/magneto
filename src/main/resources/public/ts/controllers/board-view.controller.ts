@@ -1,4 +1,4 @@
-import {Document, idiom as lang, ng, notify, toasts, workspace, angular} from "entcore";
+import {angular, Document, idiom as lang, ng, notify, toasts, workspace} from "entcore";
 import {IScope, IWindowService} from "angular";
 import {IBoardsService, ICardsService, ISectionsService, sectionsService} from "../services";
 import {create} from 'sortablejs';
@@ -518,16 +518,21 @@ class Controller implements IViewModel {
      * Adapt height from screen size computing
      */
     calcHeightSections = (): void => {
-        // Obtenir la largeur actuelle de l'écran
+        if(this.board.layoutType == LAYOUT_TYPE.VERTICAL) {
+            // Obtenir la largeur actuelle de l'écran
         let screenWidth: number = $(window).width();
-        // Calculer la hauteur du header en fonction de la taille d'écran
+            // Calculer la hauteur du header en fonction de la taille d'écran
         let headerHeight: number = screenWidth > 801 ? $('.boardContainer-container-header').outerHeight() : $('.boardContainer-container-header-mobile').height();
-        // Calculer la hauteur de la fenêtre moins la hauteur des autres éléments
+            // Calculer la hauteur de la fenêtre moins la hauteur des autres éléments
         let maxHeightContainer: number = $('.navbar.row').outerHeight() + headerHeight + 2;
         let maxHeightSections: number = maxHeightContainer + $('.sections-listDirective-content-container').outerHeight() - 2;
-        // Appliquer la nouvelle max-height à votre élément
-        $('.sections-listDirective-vertical').css('max-height', 'calc(100vh - ' + maxHeightContainer + 'px)');
-        $('.cardDirective-list-vertical').css('height', 'calc(100vh - ' + (maxHeightSections + 35) + 'px)');
+            // Appliquer la nouvelle max-height à votre élément
+            $('.sections-listDirective-vertical').css('max-height', 'calc(100vh - ' + maxHeightContainer + 'px)');
+            $('.cardDirective-list-vertical').css('height', 'calc(100vh - ' + (maxHeightSections + 35) + 'px)');
+        } else {
+            $('.sections-listDirective-horizontal').removeAttr('style');
+            $('.cardDirective-list-horizontal').removeAttr('style');
+        }
     }
 
     /**

@@ -31,6 +31,11 @@
                 board-description-eventer="vm.boardDescriptionEventer"
         >
         </board-description-lightbox>
+        <zoom
+                zoom-level="vm.zoomLevel"
+                preferences="zoomPreferences"
+                zoom-eventer="vm.zoomEventer"
+        ></zoom>
     </div>
 
     <!-- Header mobile -->
@@ -108,7 +113,8 @@
                     board-owner="vm.board.owner"
                     has-favorite="true"
                     display-favorite="vm.board.displayNbFavorites"
-                    ng-style="{'zoom': vm.zoomLevel + '%'}"
+                    zoom="vm.zoomLevel"
+                    zoom-eventer="vm.zoomEventer"
             >
             </card-list>
             <section-list
@@ -123,7 +129,9 @@
                     on-transfer="vm.openTransferResourceLightbox"
                     on-submit="vm.onFormSubmit"
                     on-lock="vm.openLockResource"
-                    card-update-eventer="vm.cardUpdateSubject">
+                    card-update-eventer="vm.cardUpdateSubject"
+                    zoom="vm.zoomLevel"
+                    zoom-eventer="vm.zoomEventer">
             </section-list>
             <div ng-show="vm.isLoading" class="centered-text">
                 <loader min-height="'250px'"></loader>
@@ -219,9 +227,5 @@
                          loading-mode="true"
                          scroll-eventer="vm.infiniteScrollService">
         </infinite-scroll>
-        <zoom
-                zoom-level="vm.zoomLevel"
-                preferences="zoomPreferences"
-        ></zoom>
     </div>
 </div>

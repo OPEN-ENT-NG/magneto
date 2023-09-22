@@ -1,14 +1,17 @@
 import {RootsConst} from "../../core/constants/roots.const";
 import {ng, Me} from "entcore";
-
+import {Observable, Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ICardProfileProps {
     zoomIn(): void;
-    zoomOut(): void;
-    savePreferences(): Promise<void>
-    resetZoom():void;
 
-    zoomReset:number;
+    zoomOut(): void;
+
+    savePreferences(): Promise<void>
+
+    resetZoom(): void;
+
+    zoomReset: number;
 }
 
 interface ICardProfileProps {
@@ -17,7 +20,7 @@ interface ICardProfileProps {
     zoomMin: number;
     zoomIncrement: number;
     preferences: string;
-
+    zoomEventer: Subject<void>;
 }
 
 interface IZoomScope extends ICardProfileProps, IViewModel {
@@ -29,20 +32,20 @@ class Controller implements IViewModel {
     zoomMax: number;
     zoomMin: number;
     zoomIncrement: number
-    zoomReset:number
+    zoomReset: number
     preferences: string;
+    zoomEventer: Subject<void>;
 
     constructor() {
         if (this.zoomMax === undefined)
-            this.zoomMax = 150
+            this.zoomMax = 130
         if (this.zoomMin === undefined)
-            this.zoomMin = 50
-        if (this.zoomIncrement === undefined) {
-            this.zoomIncrement = 25
-        }
+            this.zoomMin = 55
+        if (this.zoomIncrement === undefined)
+            this.zoomIncrement = 15
     }
 
-    async $onInit() : Promise<void>{
+    async $onInit(): Promise<void> {
         await Me.preference('magneto')
         if (!Me.preferences['magneto']) {
             await Me.savePreference('magneto');
@@ -52,7 +55,7 @@ class Controller implements IViewModel {
             Me.preferences['magneto'][this.preferences] = this.zoomLevel;
             await Me.savePreference('magneto');
             await Me.preference('magneto')
-        }else{
+        } else {
             this.zoomLevel = Me.preferences['magneto'][this.preferences];
         }
         this.zoomReset = this.zoomLevel;
@@ -61,10 +64,11 @@ class Controller implements IViewModel {
     async zoomIn(): Promise<void> {
         if (this.zoomLevel < this.zoomMax)
             this.zoomLevel += this.zoomIncrement;
+        this.zoomEventer.next();
         await this.savePreferences();
     }
 
-    async savePreferences():Promise<void> {
+    async savePreferences(): Promise<void> {
         Me.preferences['magneto'][this.preferences] = this.zoomLevel;
         await Me.savePreference('magneto');
     }
@@ -72,13 +76,15 @@ class Controller implements IViewModel {
     async zoomOut(): Promise<void> {
         if (this.zoomLevel > this.zoomMin)
             this.zoomLevel -= this.zoomIncrement;
-       Me.preferences['magneto'][this.preferences] = this.zoomLevel;
-       await Me.savePreference('magneto');
-   }
+        Me.preferences['magneto'][this.preferences] = this.zoomLevel;
+        this.zoomEventer.next();
+        await Me.savePreference('magneto');
+    }
 
-   resetZoom():void {
+    resetZoom(): void {
         this.zoomLevel = this.zoomReset;
-   }
+        this.zoomEventer.next();
+    }
 
 }
 
@@ -91,7 +97,8 @@ function directive() {
             zoomMax: '=?',
             zoomMin: '=?',
             zoomIncrement: '=?',
-            preferences: '@'
+            preferences: '@',
+            zoomEventer: '='
         },
         controllerAs: 'vm',
         bindToController: true,

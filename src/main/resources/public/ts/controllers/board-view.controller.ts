@@ -79,6 +79,7 @@ interface IViewModel extends ng.IController {
     updateFrequency: number;
 
     zoomLevel:  number;
+    zoomEventer :Subject<void>;
 
     goToBoards(): void;
 
@@ -126,6 +127,7 @@ interface IBoardViewScope extends IScope {
 class Controller implements IViewModel {
 
     private eventBusService: EventBusService;
+    zoomEventer :Subject<void> = new Subject<void>();
 
     displayCardLightbox: boolean;
     displayUpdateCardLightbox: boolean;

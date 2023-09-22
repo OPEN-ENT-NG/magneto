@@ -54,6 +54,9 @@ interface ISectionListItemProps {
     onMove?;
     onLock?;
     cardUpdateEventer: Subject<void>;
+    zoom: number;
+    zoomEventer: Subject<void>;
+
 }
 
 interface ISectionListItemScope extends IScope, ISectionListItemProps {
@@ -72,7 +75,8 @@ class Controller implements IViewModel {
     isDisplayedOptions: boolean;
     isDomLoaded: boolean;
     cardUpdateEventer: Subject<void>;
-
+    zoom: number;
+    zoomEventer: Subject<void>;
 
     constructor(private $scope: ISectionListItemScope) {
         this.isDisplayedOptions = false;
@@ -168,7 +172,9 @@ function directive($parse: IParseService) {
             onTransfer: '&',
             onMove: '&',
             onLock: '&',
-            cardUpdateEventer: '='
+            cardUpdateEventer: '=',
+            zoom:"=?",
+            zoomEventer:"=?"
         },
         controllerAs: 'vm',
         bindToController: true,

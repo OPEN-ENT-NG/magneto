@@ -1,19 +1,25 @@
 .sections-listDirective {
-  overflow-x: auto;
   display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  overflow-y: hidden;
+  min-width: min-content;
+
 
   i.magneto-card-settings {
     font-size: 25px;
     right: 5px;
   }
-  justify-content: space-between;
-  overflow-y: hidden;
 
   &-container-horizontal,
   &-container-vertical {
-    flex-shrink: 0;
     display: flex;
     overflow: hidden;
+  }
+
+  &-container-vertical {
+    flex-shrink: 1;
+    flex-basis: 0;
   }
 
   &-container-horizontal {
@@ -34,8 +40,28 @@
     }
 
     display: flex;
-
     flex-direction: column;
+
+    @include mobile {
+      min-width: 80vw;
+    }
+
+    @include tablet {
+      min-width: 50vw;
+    }
+
+    @include small-desktop {
+      min-width: 33vw;
+    }
+
+    @include medium-desktop {
+      min-width: 25vw;
+    }
+
+    @include large-desktop {
+      min-width: 20vw;
+    }
+
 
     &-container {
       padding: 10px;
@@ -62,6 +88,7 @@
       margin-left: auto;
       margin-right: auto;
       font-size: 20px;
+
       &.input {
         outline: none;
         box-shadow: none;

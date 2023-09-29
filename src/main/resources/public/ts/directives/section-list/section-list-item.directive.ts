@@ -133,6 +133,7 @@ class Controller implements IViewModel {
                 if (res.all && res.all.length > 0) {
                     this.section.cards.push(...res.all);
                     this.infiniteScrollService.updateScroll();
+                    this.cardUpdateEventer.next();
                 }
                 this.isLoading = false;
                 safeApply(this.$scope);

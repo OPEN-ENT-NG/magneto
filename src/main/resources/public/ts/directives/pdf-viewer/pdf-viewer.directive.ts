@@ -22,6 +22,7 @@ interface IViewModel extends ng.IController {
 
 interface IPdfViewerProps {
     ngSrc: string ;
+    title?: string;
 }
 
 interface IPdfViewerScope extends IViewModel, IPdfViewerProps {
@@ -58,7 +59,7 @@ class Controller implements IViewModel {
     }
 
     openPage = (): void => {
-        var pageNumber = parseInt(this.pageIndex);
+        let pageNumber: number = parseInt(this.pageIndex);
         if (!pageNumber) {
             return;
         }
@@ -77,8 +78,7 @@ class Controller implements IViewModel {
             this.openPage();
         }
     }
-    keyNav = function(e)
-    {
+    keyNav = (e: JQueryKeyEventObject): void => {
         switch(e.keyCode)
         {
             case 37: this.previousPage(); break;
@@ -104,7 +104,8 @@ function directive() {
         restrict: 'E',
         templateUrl: `${RootsConst.directive}pdf-viewer/pdf-viewer.html`,
         scope: {
-                ngSrc: '='
+                ngSrc: '=',
+                title: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -117,7 +118,7 @@ function directive() {
             this.element = angular.element(element);
             document.addEventListener("keydown", this.keyNav);
 
-            var canvas = document.createElement('canvas');
+            let canvas: HTMLCanvasElement = document.createElement('canvas');
             $(canvas).addClass('render');
             this.element.append(canvas);
             $scope.vm.loadPdfJs().then(() => {
@@ -140,21 +141,21 @@ function directive() {
 
             (vm.reloadPdf as Observable<number>).debounceTime(100).subscribe(pageNumber=>{
                 vm.pdf.getPage(pageNumber).then(function (page) {
-                    var viewport;
+                    let viewport;
                     if (!$(canvas).hasClass('fullscreen')) {
                         viewport = page.getViewport(1);
-                        var scale = element.width() / viewport.width;
+                        let scale: number = element.width() / viewport.width;
                         viewport = page.getViewport(scale);
                     }
                     else {
                         viewport = page.getViewport(2);
                     }
 
-                    var context = canvas.getContext('2d');
+                    let context: CanvasRenderingContext2D = canvas.getContext('2d');
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
 
-                    var renderContext = {
+                    let renderContext = {
                         canvasContext: context,
                         viewport: viewport
                     };

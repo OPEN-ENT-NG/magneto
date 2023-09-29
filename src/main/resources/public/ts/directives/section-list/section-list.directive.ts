@@ -58,7 +58,6 @@ class Controller implements IViewModel {
     displayDeleteSectionLightbox: boolean;
     cardUpdateEventer: Subject<void>;
 
-
     constructor(private $scope: ISectionListScope,
                 private $location: ILocationService,
                 private $window: IWindowService) {
@@ -68,10 +67,22 @@ class Controller implements IViewModel {
         this.selectedSection = new Section();
         this.displayDeleteSectionLightbox = false;
         this.newSection = new SectionForm().buildNew(this.board.id);
+        this.$scope.$watch(
+            function () {
+                return $("section-list-item").length;
+            },
+            function (newValue, oldValue) {
+                if (newValue !== oldValue && newValue > 0) {
+                        $('#section-list').css('flex-grow', newValue);
+                    }
+            }
+        );
     }
 
     $onDestroy() {
     }
+
+
 
     /**
      * Create new section

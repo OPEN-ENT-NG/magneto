@@ -522,13 +522,11 @@ class Controller implements IViewModel {
             // Obtenir la largeur actuelle de l'écran
         let screenWidth: number = $(window).width();
             // Calculer la hauteur du header en fonction de la taille d'écran
-        let headerHeight: number = screenWidth > 801 ? $('.boardContainer-container-header').outerHeight() : $('.boardContainer-container-header-mobile').height();
-            // Calculer la hauteur de la fenêtre moins la hauteur des autres éléments
-        let maxHeightContainer: number = $('.navbar').outerHeight() + headerHeight + 2;
-        let maxHeightSections: number = maxHeightContainer + $('.sections-listDirective-content-container').outerHeight() - 2;
+        let headerHeight: number = screenWidth > 801 ? $('.boardContainer-container-header').outerHeight() : $('.boardContainer-container-header-mobile').outerHeight();
+        // Calculer la hauteur de la fenêtre moins la hauteur des autres éléments + 54 correspond au 30 du padding section + 24 du padding header
+        let maxHeightContainer: number = $('.navbar').outerHeight() + headerHeight + $('.sections-listDirective-content-container').outerHeight() + 54;
             // Appliquer la nouvelle max-height à votre élément
-            $('.sections-listDirective-vertical').css('max-height', 'calc(100vh - ' + maxHeightContainer + 'px)');
-            $('.cardDirective-list-vertical').css('height', 'calc(100vh - ' + (maxHeightSections + 35) + 'px)');
+            $('.cardDirective-list-vertical').css('height', 'calc(100vh - ' + (maxHeightContainer) + 'px)');
         } else {
             $('.sections-listDirective-horizontal').removeAttr('style');
             $('.cardDirective-list-horizontal').removeAttr('style');
@@ -548,8 +546,8 @@ class Controller implements IViewModel {
                         this.sectionsServices.getSectionsByBoard(this.filter.boardId).then(async (sections: Sections) => {
                             this.board.sections = sections.all;
                             await this.getCardsBySectionBoard();
-                            setTimeout(this.initDrag, 500);
-                            setTimeout(this.calcHeightSections, 500);
+                            setTimeout(this.initDrag, 1000);
+                            setTimeout(this.calcHeightSections, 1000);
                         });
                     }
                 }

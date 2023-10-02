@@ -109,7 +109,7 @@
     </div>
 
     <!-- Navigation mobile -->
-    <div id="sideNavMobile" class="side-nav-mobile zero-desktop ellipsis">
+    <div id="sideNavMobile" class="side-nav-mobile zero-desktop">
         <div class="vertical-spacing row">
             <a class="closebtn" ng-click="vm.closeSideNavFolders()">&times;</a>
         </div>
@@ -125,6 +125,12 @@
             <a class="classic-link">
                 <i class="magneto-folder-plus"></i>
                 <i18n>magneto.create.folder</i18n>
+            </a>
+        </div>
+        <div ng-click="vm.openCardCollection()" class="side-nav-mobile-folder-button">
+            <a class="classic-link">
+                <i class="magneto-favorite-active"></i>
+                <i18n>magneto.show.favorites</i18n>
             </a>
         </div>
     </div>

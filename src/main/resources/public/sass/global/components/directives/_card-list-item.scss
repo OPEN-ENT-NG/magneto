@@ -18,6 +18,18 @@
     }
   }
 
+  $start: 0;
+  $end: 5;
+  @for $i from $start through $end {
+    &-zoom-#{$i} {
+      $width-value: 120 + $i * 48px;
+      width: #{$width-value};
+      @if $i < 2 {
+        height: #{$width-value};
+      }
+    }
+  }
+
   &.draggable {
     cursor: move;
   }
@@ -31,17 +43,25 @@
     height: 15%;
     align-items: center;
     display: flex;
+    justify-content: space-between;
 
     &.reduced-format {
       height: 20% !important;
     }
+    &.dezoom{
+      height: 25% !important;
+      margin-bottom: 0.5em;
+    }
 
     &-creation {
-      width: 80%;
       margin-left: 8px;
       display: flex;
       flex-direction: column;
 
+      &.dezoom{
+        width: 49%;
+        margin-left: 0;
+      }
       &-user {
         @include noTextOverflow(1);
       }
@@ -73,10 +93,27 @@
     }
   }
 
+  &-flex-row {
+    display: flex;
+    position: relative;
+    align-items: end;
+    bottom: 0;
+  }
   &-preview {
     position: relative;
     height: 18vh;
 
+
+    $start: 0;
+    $end: 5;
+    @for $i from $start through $end {
+      &-zoom-#{$i} {
+        $width-value: 3 + $i * 3em;
+        height: #{$width-value};
+        display: flex;
+        flex: 1;
+      }
+    }
     img {
       margin-left: auto;
       margin-right: auto;
@@ -120,7 +157,14 @@
     bottom: 0;
     left: 0;
     z-index: 1;
-
+    &-zoom-0{
+      margin-left: -5px;
+      height: 1.5em;
+    }
+    &-zoom-1{
+      margin-left: -5px;
+      height: 1.5em;
+    }
     i {
       font-size: $spacing-M;
     }
@@ -137,15 +181,37 @@
   }
 
   &-infos {
+    &-0 ,&-1{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      align-content: stretch;
+      align-items: stretch;
+      height: 70%;
+    }
 
     &-title {
       font-size: 16px;
       font-weight: bold;
       margin-bottom: 5px;
       height: 3vh;
-
+      white-space: initial;
       &-ellipsis {
         @include noTextOverflow(1);
+        height: 1.5em;
+        &.dezoom-0{
+          @include noTextOverflow(3);
+          width: 100%;
+          line-height: 18px;
+          height: auto;
+        }
+        &.dezoom-1{
+          @include noTextOverflow(4);
+          line-height: 130%;
+          width: 100%;
+          height: auto;
+        }
       }
 
       &.reduced-format {

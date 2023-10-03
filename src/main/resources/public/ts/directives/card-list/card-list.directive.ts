@@ -29,6 +29,7 @@ interface IViewModel extends ng.IController, ICardListProps {
 
     isMyCard(card: Card): boolean;
 
+    getZoomLevel(): number;
 }
 
 interface ICardListProps {
@@ -73,6 +74,8 @@ interface ICardListProps {
     hasComments: boolean;
     simpleView: boolean;
     boardOwner: IBoardOwner;
+    zoom: number;
+    zoomEventer: Subject<void>;
 }
 
 interface ICardListScope extends IScope, ICardListProps {
@@ -109,6 +112,8 @@ class Controller implements IViewModel {
     displayFavorite: boolean;
     boardOwner: IBoardOwner;
 
+    zoom: number = 100; //default no zoom
+    zoomEventer: Subject<void>;
 
     constructor(private $scope: ICardListScope,
                 private $location: ILocationService,
@@ -160,6 +165,16 @@ class Controller implements IViewModel {
         return card.ownerId === model.me.userId;
     }
 
+    //cetnralise
+    getZoomLevel(): number {
+        if(this.zoom >= 100){
+            return (this.zoom - 100 )/15 + 3;
+        }
+        else {
+            return (this.zoom - 55 ) / 15
+        }
+    }
+
 }
 
 function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDirective {
@@ -200,7 +215,9 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
             cardUpdateEventer: '=',
             hasComments: '=',
             simpleView: '=',
-            boardOwner: '='
+            boardOwner: '=',
+            zoom:"=?",
+            zoomEventer:"=?"
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -215,6 +232,13 @@ function directive($parse: IParseService, $timeout: ng.ITimeoutService): ng.IDir
 
                 if (vm.cardUpdateEventer) {
                     vm.cardUpdateEventer.asObservable().subscribe(() => {
+                        $timeout(() => {
+                            vm.resizeAllCardItems();
+                        }, 200);
+                    });
+                }
+                if (vm.zoomEventer) {
+                    vm.zoomEventer.asObservable().subscribe(() => {
                         $timeout(() => {
                             vm.resizeAllCardItems();
                         }, 200);

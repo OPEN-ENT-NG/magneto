@@ -47,7 +47,7 @@ class Controller implements IViewModel {
 
     getExtension = (): string => {
         let result: string = this.RESOURCE_TYPES.DEFAULT;
-        if (!!this.card.metadata && !!this.card.metadata.filename) {
+        if (this.card.metadata && !!this.card.metadata && !!this.card.metadata.filename) {
             let extension: string;
             extension = this.card.metadata.filename.split('.').pop();
             result = this.getExtensionType(extension);

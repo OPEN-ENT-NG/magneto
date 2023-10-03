@@ -5,10 +5,10 @@ export * from './board-manage-lightbox/board-layout-type/board-layout-type.direc
 export * from './card-display/card-display.directive';
 export * from './card-preview-lightbox/card-preview-lightbox.directive';
 export * from './card-list/card-list.directive';
-export * from './card-list/card-list-item.directive';
-export * from './card-list/card-list-item-preview.directive';
+export * from './card-list/card-list-item/card-list-item.directive';
+export * from './card-list/card-list-item/card-list-item-preview/card-list-item-preview.directive';
 export * from './card-list/card-preview-image.directive';
-export * from './card-list/card-list-item-options.directive';
+export * from './card-list/card-list-item/card-list-item-options/card-list-item-options.directive';
 export * from './card-collection/card-collection.directive';
 export * from './card-move-lightbox/card-move-lightbox.directive';
 export * from './card-duplicate-move-lightbox/card-duplicate-move-lightbox.directive';
@@ -48,4 +48,5 @@ export * from './comment-input/comment-input.directive';
 export * from './comment-delete-lightbox/comment-delete-lightbox.directive';
 export * from './board-description-lightbox/board-description-lightbox.directive';
 export * from './favorite-button/favorite-button.directive';
-export * from './pdf-viewer/pdf-viewer.directive'
+export * from './pdf-viewer/pdf-viewer.directive';
+export * from './zoom/zoom.directive';

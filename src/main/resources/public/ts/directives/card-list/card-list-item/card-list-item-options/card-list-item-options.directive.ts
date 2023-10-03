@@ -1,8 +1,8 @@
 import {ng} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
-import {RootsConst} from "../../core/constants/roots.const";
-import {Card, Section} from "../../models";
-import {CardComment} from "../../models/card-comment.model";
+import {RootsConst} from "../../../../core/constants/roots.const";
+import {Card, Section} from "../../../../models";
+import {CardComment} from "../../../../models/card-comment.model";
 
 interface IViewModel extends ng.IController, ICardListItemOptionsProps {
     openEdit?(): void;
@@ -69,7 +69,7 @@ function directive($parse: IParseService) {
     return {
         replace: true,
         restrict: 'E',
-        templateUrl: `${RootsConst.directive}card-list/card-list-item-options.html`,
+        templateUrl: `${RootsConst.directive}card-list/card-list-item/card-list-item-options/card-list-item-options.html`,
         scope: {
             options: '=',
             isDisplayed: '=',

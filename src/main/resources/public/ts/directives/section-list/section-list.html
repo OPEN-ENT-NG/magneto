@@ -1,4 +1,4 @@
-<div class="sections-listDirective sections-listDirective-[[vm.board.layoutType]] scrollbar">
+<div class="sections-listDirective sections-listDirective-[[vm.board.layoutType]] sections-listDirective-zoom-[[vm.getZoomLevel()]] scrollbar">
     <div id="section-list" class="sections-listDirective-container-[[vm.board.layoutType]]">
         <section-list-item
                 ng-repeat="section in vm.board.sections"
@@ -14,7 +14,9 @@
                 on-transfer="vm.openTransfer"
                 on-lock="vm.openLock"
                 class="scrollbar sections-listDirective-content sections-listDirective-content-[[vm.board.layoutType]]"
-                card-update-eventer="vm.cardUpdateEventer">
+                card-update-eventer="vm.cardUpdateEventer"
+                zoom-eventer="vm.zoomEventer"
+                zoom="vm.zoom">
         </section-list-item>
     </div>
     <div ng-if="vm.board.myRights.publish !== undefined"

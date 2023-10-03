@@ -88,12 +88,14 @@
     &-folder-button {
       display: flex;
       align-self: center;
+      width: 80%;
 
       a {
         border: solid $magneto-primary 1px;
         border-radius: 5px;
         background: none !important;
         padding: $spacing-LXS $spacing-L;
+        text-align: center;
       }
     }
 
@@ -126,9 +128,12 @@
     top: 52px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.26);
     border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-M;
+    align-items: center;
 
     .vertical-spacing {
-      display: flex;
       height: 24px;
 
       .closebtn {
@@ -151,15 +156,15 @@
 
     &-folder-button {
       justify-content: center;
-      width: 66%;
-      margin: 14px auto auto;
       display: flex;
+      width: 85%;
 
       a {
         border: solid $magneto-primary 1px;
         border-radius: 5px;
         background: none !important;
         padding: $spacing-LXS $spacing-L;
+        text-align: center;
       }
     }
 

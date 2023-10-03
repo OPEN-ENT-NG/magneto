@@ -29,7 +29,7 @@ interface IViewModel extends ng.IController, ISectionListProps {
     openDeleteSectionLightbox(section: Section): void;
 
     refresh?(): void;
-
+    getZoomLevel(): number;
 }
 
 interface ISectionListProps {
@@ -43,6 +43,8 @@ interface ISectionListProps {
     onSubmit?;
     onLock?;
     cardUpdateEventer: Subject<void>;
+    zoom: number;
+    zoomEventer: Subject<void>;
 }
 
 interface ISectionListScope extends IScope, ISectionListProps {
@@ -57,7 +59,8 @@ class Controller implements IViewModel {
     selectedSection: Section;
     displayDeleteSectionLightbox: boolean;
     cardUpdateEventer: Subject<void>;
-
+    zoom: number;
+    zoomEventer: Subject<void>;
     constructor(private $scope: ISectionListScope,
                 private $location: ILocationService,
                 private $window: IWindowService) {
@@ -112,6 +115,15 @@ class Controller implements IViewModel {
         this.selectedSection = section;
         this.displayDeleteSectionLightbox = true;
     }
+
+    getZoomLevel(): number {
+        if(this.zoom >= 100){
+            return (this.zoom - 100 )/15 + 3;
+        }
+        else {
+            return (this.zoom - 55 ) / 15
+        }
+    }
 }
 
 function directive($parse: IParseService) {
@@ -129,7 +141,9 @@ function directive($parse: IParseService) {
             onMove: '&',
             onSubmit: '&',
             onLock: '&',
-            cardUpdateEventer: '='
+            cardUpdateEventer: '=',
+            zoom:"=?",
+            zoomEventer:"=?"
         },
         controllerAs: 'vm',
         bindToController: true,

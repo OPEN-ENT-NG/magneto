@@ -1,10 +1,10 @@
 import {idiom, ng} from "entcore";
 import {ILocationService, IScope, IWindowService} from "angular";
-import {RootsConst} from "../../core/constants/roots.const";
-import {Card} from "../../models";
-import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
-import {EXTENSION_FORMAT} from "../../core/constants/extension-format.const";
-import {Dailymotion, PeerTube, Vimeo, Youtube} from "../../models/video-platform.model";
+import {RootsConst} from "../../../../core/constants/roots.const";
+import {Card} from "../../../../models";
+import {RESOURCE_TYPE} from "../../../../core/enums/resource-type.enum";
+import {EXTENSION_FORMAT} from "../../../../core/constants/extension-format.const";
+import {Dailymotion, PeerTube, Vimeo, Youtube} from "../../../../models/video-platform.model";
 
 interface IViewModel extends ng.IController, ICardListItemProps {
     getExtension(fileName: string): string;
@@ -22,6 +22,7 @@ interface IViewModel extends ng.IController, ICardListItemProps {
 
 interface ICardListItemProps {
     card: Card;
+    zoom:number;
 }
 
 interface ICardListItemScope extends IScope, ICardListItemProps {
@@ -34,6 +35,7 @@ class Controller implements IViewModel {
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
     url: string;
 
+    zoom:number;
 
     constructor(private $scope: ICardListItemScope,
                 private $location: ILocationService,
@@ -124,16 +126,26 @@ class Controller implements IViewModel {
         return idiom.translate('magneto.card.type.' + this.card.resourceType);
     }
 
+    getZoomLevel(): number {
+        if(this.zoom >= 100){
+            return (this.zoom - 100 )/15 + 3;
+        }
+        else {
+            return (this.zoom - 55   ) / 15
+        }
+    }
+
 }
 
 function directive() {
     return {
         replace: true,
         restrict: 'E',
-        templateUrl: `${RootsConst.directive}card-list/card-list-item-preview.html`,
+        templateUrl: `${RootsConst.directive}card-list/card-list-item/card-list-item-preview/card-list-item-preview.html`,
         scope: {
             card: '=',
-            resourceType: '='
+            resourceType: '=',
+            zoom: '='
         },
         controllerAs: 'vm',
         bindToController: true,

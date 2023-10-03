@@ -244,4 +244,12 @@ i {
     font-family: 'magneto-mdi';
     content: '\F04EB';
   }
+  &.magneto-plus::before{
+      font-family: 'magneto-mdi';
+      content: '\F0415';
+  }
+  &.magneto-minus::before{
+    font-family: 'magneto-mdi';
+    content: '\F0374';
+  }
 }

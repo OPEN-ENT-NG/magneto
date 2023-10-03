@@ -1,12 +1,12 @@
 import {angular, model, ng} from "entcore";
 import {IAugmentedJQuery, ILocationService, IParseService, IScope, IWindowService} from "angular";
-import {RootsConst} from "../../core/constants/roots.const";
-import {Card, IBoardOwner} from "../../models";
-import {DateUtils} from "../../utils/date.utils";
-import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
-import {safeApply} from "../../utils/safe-apply.utils";
+import {RootsConst} from "../../../core/constants/roots.const";
+import {Card, IBoardOwner} from "../../../models";
+import {DateUtils} from "../../../utils/date.utils";
+import {RESOURCE_TYPE} from "../../../core/enums/resource-type.enum";
+import {safeApply} from "../../../utils/safe-apply.utils";
 import {Subject} from "rxjs";
-import {cardsService} from "../../services";
+import {cardsService} from "../../../services";
 
 interface IViewModel extends ng.IController, ICardListItemProps {
     formatDate(date: string): string;
@@ -34,6 +34,8 @@ interface IViewModel extends ng.IController, ICardListItemProps {
     openCardOptions?(): Promise<void>;
 
     onCardFavorite?(card_id: string, isFavorite: boolean): void;
+
+    getZoomLevel(): number;
 
     isDisplayedOptions: boolean;
     isSelected: boolean;
@@ -67,6 +69,7 @@ interface ICardListItemProps {
     hasComments: boolean;
     boardOwner: IBoardOwner;
     hasDisplayFavNumber: boolean;
+    zoom:number;
 }
 
 interface ICardListItemScope extends IScope, ICardListItemProps {
@@ -98,6 +101,7 @@ class Controller implements IViewModel {
     cardUpdateEventer: Subject<void>;
     boardOwner: IBoardOwner;
     hasDisplayFavNumber: boolean;
+    zoom:number;
 
     constructor(private $scope: ICardListItemScope,
                 private $location: ILocationService,
@@ -134,13 +138,26 @@ class Controller implements IViewModel {
         return this.hasDelete || this.hasPreview || this.hasEdit || this.hasHide || this.hasDuplicate;
     }
 
+    getZoomLevel(): number {
+        if(this.zoom >= 100){
+            return (this.zoom - 100 )/15 + 3;
+        }
+        else {
+            return (this.zoom - 55   ) / 15
+        }
+
+    }
+    hasImgDisplay(): boolean{
+        return this.zoom >= 85;
+    }
+
 }
 
 function directive($parse: IParseService) {
     return {
         replace: true,
         restrict: 'E',
-        templateUrl: `${RootsConst.directive}card-list/card-list-item.html`,
+        templateUrl: `${RootsConst.directive}card-list/card-list-item/card-list-item.html`,
         scope: {
             card: '=',
             isSelected: '=',
@@ -167,7 +184,8 @@ function directive($parse: IParseService) {
             cardUpdateEventer: '=',
             hasComments: '=',
             boardOwner: '=',
-            hasDisplayFavNumber: '='
+            hasDisplayFavNumber: '=',
+            zoom: '='
         },
         controllerAs: 'vm',
         bindToController: true,

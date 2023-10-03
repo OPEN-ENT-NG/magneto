@@ -2,14 +2,25 @@
   &.no-background-image {
     background: $magneto-lighter-light-grey;
   }
+  $start: 0;
+  $end: 5;
+  @for $i from $start through $end {
+    &-zoom-#{$i} {
+      $width-value: 120 + $i * 48px;
+      grid-template-columns: repeat(auto-fill, minmax(#{$width-value}, 1fr));
+    }
+  }
+
+  transform-origin: 0 0;
+  display: grid;
+  grid-gap: 10px;
+  column-gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(230px,1fr));
+  grid-auto-rows: 0;
 
   &-free {
     min-height: 70vh;
     justify-content: center;
-    display: grid;
-    grid-gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(230px,1fr));
-    grid-auto-rows: 0;
   }
 
   &-collection {
@@ -22,7 +33,6 @@
     overflow-x: hidden;
     display: grid;
     grid-gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(230px,1fr));
     grid-auto-rows: 0;
   }
 
@@ -31,7 +41,6 @@
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: 20px;
-    display: flex;
     gap: 10px;
 
   }

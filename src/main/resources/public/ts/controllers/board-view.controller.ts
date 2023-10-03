@@ -78,6 +78,9 @@ interface IViewModel extends ng.IController {
 
     updateFrequency: number;
 
+    zoomLevel:  number;
+    zoomEventer :Subject<void>;
+
     goToBoards(): void;
 
     getCards(): Promise<void>;
@@ -124,6 +127,7 @@ interface IBoardViewScope extends IScope {
 class Controller implements IViewModel {
 
     private eventBusService: EventBusService;
+    zoomEventer :Subject<void> = new Subject<void>();
 
     displayCardLightbox: boolean;
     displayUpdateCardLightbox: boolean;
@@ -171,6 +175,7 @@ class Controller implements IViewModel {
 
     updateIntervalPromise: angular.IPromise<any>;
 
+    zoomLevel:number;
     constructor(private $scope: IBoardViewScope,
                 private $route: any,
                 private $location: ng.ILocationService,
@@ -187,6 +192,7 @@ class Controller implements IViewModel {
         this.navbarCollection = [];
         this.COLLECTION_NAVBAR_VIEWS = COLLECTION_NAVBAR_VIEWS;
         this.boardDescriptionEventer = new Subject<void>();
+        this.zoomLevel = 100;
     }
 
     async $onInit(): Promise<void> {

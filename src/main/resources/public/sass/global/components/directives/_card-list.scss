@@ -12,6 +12,10 @@
     grid-auto-rows: 0;
   }
 
+  &-collection {
+    justify-content: center;
+  }
+
   &-vertical {
     justify-items: center;
     overflow-y: auto;

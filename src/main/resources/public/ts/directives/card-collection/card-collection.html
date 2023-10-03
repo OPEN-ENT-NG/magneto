@@ -57,6 +57,7 @@
                 </div>
                 <card-list
                         cards="collection.cards"
+                        layout="vm.layoutType"
                         selector-identifier="card-list"
                         selected-card-ids="vm.selectedCardIds"
                         selector-identifier="'card-list'"
@@ -71,6 +72,7 @@
             </div>
             <card-list ng-hide="vm.displayBoard"
                        cards="vm.cards"
+                       layout="collection"
                        selector-identifier="card-list"
                        selected-card-ids="vm.selectedCardIds"
                        has-caption="false"

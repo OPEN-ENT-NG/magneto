@@ -10,6 +10,7 @@ import {Object} from "core-js";
 import {InfiniteScrollService} from "../../shared/services";
 import {COLLECTION_NAVBAR_VIEWS} from "../../core/enums/collection-navbar.enum";
 import {RESOURCE_ORDER} from "../../core/enums/resource-order.enum";
+import {LAYOUT_TYPE} from "../../core/enums/layout-type.enum";
 
 interface IViewModel extends ng.IController, ICardCollectionProps {
     closeForm(): void;

@@ -199,7 +199,6 @@ function directive($parse: IParseService) {
                 if(!element.find(event.target).length && vm.isDisplayedOptions) {
                     vm.isDisplayedOptions = false;
                 }
-                safeApply($scope);
             });
 
             let repositionActionOptions = (): void => {

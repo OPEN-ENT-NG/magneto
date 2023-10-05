@@ -1,5 +1,5 @@
     {
-      "name": "fr.cgi~magneto~1.5-SNAPSHOT",
+      "name": "fr.cgi~magneto~1.6.0",
       "config": {
         "main" : "fr.cgi.magneto.Magneto",
         "port" : 8205,

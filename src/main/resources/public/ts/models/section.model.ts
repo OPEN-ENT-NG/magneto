@@ -36,7 +36,6 @@ export class SectionForm {
     private _title: string;
     private _cardIds: Array<string>;
     private _boardId: string;
-
     constructor() {
         this._id = null;
         this._title = null;
@@ -124,6 +123,7 @@ export class Section {
     private _boardId: string;
     private _page: number;
     private _cards: Card[];
+    private _displayed: boolean = true;
 
 
     build(data: ISectionItemResponse): Section {
@@ -168,6 +168,14 @@ export class Section {
         return this._cards;
     }
 
+
+    get displayed(): boolean {
+        return this._displayed;
+    }
+
+    set displayed(value: boolean) {
+        this._displayed = value;
+    }
 }
 
 export class Sections {

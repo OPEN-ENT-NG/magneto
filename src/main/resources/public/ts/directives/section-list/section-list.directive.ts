@@ -163,6 +163,7 @@ function directive($parse: IParseService) {
             }
 
             vm.openHide = (card: Card): void => {
+                console.log("celui là? ")
                 $parse($scope.vm.onHide())(card);
             }
 
@@ -204,6 +205,7 @@ function directive($parse: IParseService) {
                 }
             }
 
+            vm.h
             vm.onFormSubmit = (): void => {
                 $parse($scope.vm.onSubmit())({});
             }

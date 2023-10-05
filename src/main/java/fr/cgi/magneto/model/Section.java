@@ -12,6 +12,7 @@ public class Section implements Model {
     private String title;
     private List<String> cardIds;
     private String boardId;
+    private boolean displayed;
 
     @SuppressWarnings("unchecked")
     public Section(JsonObject section) {
@@ -19,6 +20,7 @@ public class Section implements Model {
         this.title = section.getString(Field.TITLE);
         this.cardIds = section.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
         this.boardId = section.getString(Field.BOARDID);
+        this.displayed = section.getBoolean(Field.DISPLAYED);
     }
     public Section() {
 
@@ -72,7 +74,13 @@ public class Section implements Model {
         this.cardIds = cardIds;
         return this;
     }
+    public boolean getDisplayed() {
+        return displayed;
+    }
 
+    public void setDisplayed(boolean displayed) {
+        this.displayed = displayed;
+    }
 
     @Override
     public JsonObject toJson() {
@@ -80,7 +88,8 @@ public class Section implements Model {
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.CARDIDS, this.getCardIds())
-                .put(Field.BOARDID, this.getBoardId());
+                .put(Field.BOARDID, this.getBoardId())
+                .put(Field.DISPLAYED, this.getDisplayed());
         return json;
     }
 
@@ -88,6 +97,7 @@ public class Section implements Model {
     public Section model(JsonObject section) {
         return new Section(section);
     }
+
 
 
 }

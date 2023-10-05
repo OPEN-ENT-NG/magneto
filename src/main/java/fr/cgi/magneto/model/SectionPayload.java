@@ -13,6 +13,7 @@ public class SectionPayload implements Model {
     private String title;
     private List<String> cardIds;
     private String boardId;
+    private boolean hided;
 
     @SuppressWarnings("unchecked")
     public SectionPayload(JsonObject section) {
@@ -20,6 +21,7 @@ public class SectionPayload implements Model {
         this.title = section.getString(Field.TITLE);
         this.cardIds = section.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
         this.boardId = section.getString(Field.BOARDID);
+        this.hided = section.getBoolean(Field.HIDED);
     }
 
     public SectionPayload(String boardId) {

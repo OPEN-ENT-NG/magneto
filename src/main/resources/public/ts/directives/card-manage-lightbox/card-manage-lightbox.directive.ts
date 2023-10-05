@@ -62,6 +62,7 @@ class Controller implements IViewModel {
         this.displayChangeVideoLightbox = false;
         this.videoUrl = this.form.resourceUrl;
         this.selectedSection = this.board.sections && this.board.sections.length > 0 ? this.board.sections[0] : null;
+        this.form.title = this.form.resourceFileName.replace(/\.[^/.]+$/, "");
     }
 
     isFormValid = (): boolean => {

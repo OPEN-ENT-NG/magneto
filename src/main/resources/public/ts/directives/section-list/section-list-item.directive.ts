@@ -154,9 +154,9 @@ class Controller implements IViewModel {
     }
 
     openHide = (): void =>{
-        console.log(this.section.displayed);
         this.section.displayed = !this.section.displayed;
         this.isDisplayedOptions = false;
+        sectionsService.update(new SectionForm().build(this.section));
         safeApply(this.$scope)
     }
 }

@@ -140,6 +140,7 @@ public class DefaultSectionService implements SectionService {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject sectionUpdate = new JsonObject()
                 .put(Field._ID, section.getId());
+        log.info(section.toJson());
         JsonObject update = new JsonObject().put(Mongo.SET, section.toJson());
         mongoDb.update(this.collection, sectionUpdate, update, MongoDbResult.validResultHandler(results -> {
             if (results.isLeft()) {

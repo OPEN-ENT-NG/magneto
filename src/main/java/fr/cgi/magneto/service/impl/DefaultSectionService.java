@@ -12,8 +12,6 @@ import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
-import fr.cgi.magneto.service.BoardService;
-import fr.cgi.magneto.service.CardService;
 import fr.cgi.magneto.service.SectionService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
@@ -80,7 +78,7 @@ public class DefaultSectionService implements SectionService {
     }
 
     @Override
-    public Future<List<Section>> getSectionsByBoard(Board board) {
+    public Future<List<Section>> getSectionsByBoard(Board board, boolean isReadOnly) {
         Promise<List<Section>> promise = Promise.promise();
         JsonObject query = this.getAllSectionsByBoardQuery(board);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
@@ -92,7 +90,12 @@ public class DefaultSectionService implements SectionService {
                 JsonArray result = either.right().getValue()
                         .getJsonObject(Field.CURSOR, new JsonObject())
                         .getJsonArray(Field.FIRSTBATCH, new JsonArray());
-                promise.complete(ModelHelper.toList(result, Section.class));
+                if (isReadOnly) {
+                    promise.complete(((List<Section>)ModelHelper.toList(result, Section.class)).stream()
+                            .filter(Section::getDisplayed).collect(Collectors.toList()));
+                }
+                else
+                    promise.complete(ModelHelper.toList(result, Section.class));
             }
         }));
 
@@ -115,7 +118,9 @@ public class DefaultSectionService implements SectionService {
                         .put(Field._ID, 1)
                         .put(Field.TITLE, 1)
                         .put(Field.BOARDID, 1)
-                        .put(Field.CARDIDS, 1));
+                        .put(Field.CARDIDS, 1)
+                        .put(Field.DISPLAYED, 1))
+                ;
         return query.getAggregate();
     }
 
@@ -140,7 +145,6 @@ public class DefaultSectionService implements SectionService {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject sectionUpdate = new JsonObject()
                 .put(Field._ID, section.getId());
-        log.info(section.toJson());
         JsonObject update = new JsonObject().put(Mongo.SET, section.toJson());
         mongoDb.update(this.collection, sectionUpdate, update, MongoDbResult.validResultHandler(results -> {
             if (results.isLeft()) {

@@ -13,7 +13,7 @@ public class SectionPayload implements Model {
     private String title;
     private List<String> cardIds;
     private String boardId;
-    private boolean displayed;
+    private Boolean displayed;
 
     @SuppressWarnings("unchecked")
     public SectionPayload(JsonObject section) {
@@ -115,7 +115,7 @@ public class SectionPayload implements Model {
             json.put(Field.CARDIDS, new JsonArray());
         }
         if (this.displayed() != null ) {
-            json.put(Field.DISPLAYED, new JsonArray());
+            json.put(Field.DISPLAYED, this.displayed());
         }
 
         return json;

@@ -236,10 +236,6 @@ function directive($parse: IParseService) {
                 $parse($scope.vm.onDuplicate())(card);
             }
 
-            // vm.openHide = (card: Card): void => {
-            //     $parse($scope.vm.onHide())(card);
-            // }
-
             vm.openDelete = (card: Card): void => {
                 $parse($scope.vm.onDelete())(card);
             }

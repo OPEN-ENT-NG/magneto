@@ -61,7 +61,6 @@ interface IViewModel extends ng.IController, ICardCollectionProps {
 
     filter: CardsFilter;
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
-    layoutType: LAYOUT_TYPE;
     isLoading: boolean;
 
     infiniteScrollService: InfiniteScrollService;

@@ -1,5 +1,7 @@
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
 import {CardComment, ICardItemCommentResponse} from "./card-comment.model";
+import {workspace} from "entcore";
+import {Element} from "entcore/types/src/ts/workspace/model";
 
 export interface ICardItemResponse {
     id?: string;
@@ -88,6 +90,7 @@ export class CardForm {
     private _resourceType: string;
     private _resourceUrl: string;
     private _resourceFileName: string;
+    private _resource: workspace.v2.models.Element;
     private _boardId: string;
     private _sectionId: string;
 
@@ -210,6 +213,15 @@ export class CardForm {
 
     set resourceFileName(value: string) {
         this._resourceFileName = value;
+    }
+
+
+    getResource(): Element {
+        return this._resource;
+    }
+
+    setResource(value: Element) {
+        this._resource = value;
     }
 
     isValid(): boolean {

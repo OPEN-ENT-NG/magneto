@@ -3,10 +3,8 @@ import { CsvDelegate, CsvFile } from './csv-viewer/csv-viewer.directive';
 import { TxtDelegate } from './txt-viewer/txt-viewer-directive';
 import {RootsConst} from "../../core/constants/roots.const";
 import {ILocationService, IScope, IWindowService} from "angular";
+import {FileViewerModel} from "./FileViewerModel";
 
-declare var ENABLE_LOOL: boolean;
-declare var ENABLE_SCRATCH: boolean;
-declare var ENABLE_GGB: boolean;
 
 const workspaceService = workspace.v2.service;
 
@@ -22,7 +20,7 @@ interface IViewModel extends ng.IController , IFileViewerProps{
     isOfficeExcelOrCsv(): boolean;
     getCsvContent(): CsvDelegate;
     render?: () => void;
-    previewUrl(): string;
+    // previewUrl(): string;
     canEditInLool(): boolean;
     canEditInScratch(): boolean;
     openOnLool(): void;
@@ -40,7 +38,7 @@ interface IViewModel extends ng.IController , IFileViewerProps{
 }
 
 interface IFileViewerProps {
-    file: workspace.v2.models.Element;
+    file: FileViewerModel;
 }
 
 interface IFileViewerScope extends IScope, IFileViewerProps {
@@ -49,24 +47,24 @@ interface IFileViewerScope extends IScope, IFileViewerProps {
 
 class Controller implements IViewModel {
     contentType: string;
-    file: workspace.v2.models.Element;
-    ENABLE_SCRATCH:boolean = true;
+    file: FileViewerModel;
     constructor(private $scope: IFileViewerScope,
                 private $location: ILocationService,
                 private $sce: ng.ISCEService,
                 private $window: IWindowService){
     }
     $onInit() {
-        this.contentType = this.file.metadata.extension;
+        this.contentType = this.file[0].metadata.extension;
     }
 
     isFullscreen = false;
 
     download = function () {
-        workspaceService.downloadFiles([this.file]);
+        workspaceService.downloadFiles([this.file[0]]);
     };
     canDownload = () => {
-        return workspaceService.isActionAvailable("download", [this.file])
+        // return workspaceService.isActionAvailable("download", [this.file])
+        return false
     }
 
     isOfficePdf = () => {
@@ -88,38 +86,41 @@ class Controller implements IViewModel {
 
     isStreamable = () => {
         return this.contentType==='video'
-            && this.file
-            && this.file.metadata
-            && typeof this.file.metadata.captation === "boolean";
+            && this.file[0]
+            && this.file[0].metadata
+            && typeof this.file[0].metadata.captation === "boolean";
     }
-    previewUrl = () => {
-        return this.$scope.vm.file.previewUrl;
-    }
+    // previewUrl = () => {
+    //     return this.$scope.vm.file.previewUrl;
+    // }
 
 
 
     openOnLool = () => {
-        ENABLE_LOOL && Behaviours.applicationsBehaviours.lool.openOnLool(this.file);
+        // ENABLE_LOOL && Behaviours.applicationsBehaviours.lool.openOnLool(this.file);
     }
 
     openOnScratch = () => {
-        ENABLE_SCRATCH && window.open(`/scratch/open?ent_id=${this.file._id}`);
+        // ENABLE_SCRATCH && window.open(`/scratch/open?ent_id=${this.file._id}`);
     }
 
     openOnGeogebra = () => {
-        ENABLE_GGB && window.open(`/geogebra#/${this.file._id}?fileName=${this.file.name}.ggb`);
+        // ENABLE_GGB && window.open(`/geogebra#/${this.file._id}?fileName=${this.file.name}.ggb`);
     }
 
     canEditInLool = () => {
         const ext = ['doc', 'ppt', "xls"];
         const isoffice = ext.includes(this.contentType);
-        return isoffice && ENABLE_LOOL && Behaviours.applicationsBehaviours.lool.canBeOpenOnLool(this.file);
+        // return isoffice && ENABLE_LOOL && Behaviours.applicationsBehaviours.lool.canBeOpenOnLool(this.file);
+        return false
     }
 
     canEditInScratch = () => {
-        return ENABLE_SCRATCH &&
-            ["sb","sb2","sb3"].includes(this.file.metadata.extension) &&
-            this.file.metadata["content-type"] === "application/octet-stream";
+        // return ENABLE_SCRATCH &&
+        //     ["sb","sb2","sb3"].includes(this.file.metadata.extension) &&
+        //     this.file.metadata["content-type"] === "application/octet-stream";
+        return false
+
     }
     $parent: { display: { editedImage: any; editImage: boolean } };
     csvDelegate: CsvDelegate;

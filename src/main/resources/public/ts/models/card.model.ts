@@ -1,7 +1,7 @@
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
 import {CardComment, ICardItemCommentResponse} from "./card-comment.model";
-import {workspace} from "entcore";
 import {Element} from "entcore/types/src/ts/workspace/model";
+import {FileViewerModel} from "../directives/file-viewer/FileViewerModel";
 
 export interface ICardItemResponse {
     id?: string;
@@ -90,7 +90,7 @@ export class CardForm {
     private _resourceType: string;
     private _resourceUrl: string;
     private _resourceFileName: string;
-    private _resource: workspace.v2.models.Element;
+    private _resource: FileViewerModel;
     private _boardId: string;
     private _sectionId: string;
 
@@ -216,12 +216,17 @@ export class CardForm {
     }
 
 
-    getResource(): Element {
+    getResource(): FileViewerModel {
         return this._resource;
     }
 
     setResource(value: Element) {
-        this._resource = value;
+
+        this._resource = new FileViewerModel();
+        this._resource._id = value._id
+        this._resource.metadata = value.metadata
+        this._resource.file = value.file
+        this._resource.title = value.title
     }
 
     isValid(): boolean {

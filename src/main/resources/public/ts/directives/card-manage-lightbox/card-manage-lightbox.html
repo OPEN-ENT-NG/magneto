@@ -53,7 +53,7 @@
                  ng-if="vm.form.resourceType == 'file'">
 <!--                <img data-ng-src="/magneto/public/img/extension/[[vm.getFileExtension()]].svg">-->
 <!--                <file-viewer file="[[vm.form.getResource().file]]" ></file-viewer>-->
-                <file-viewer file="vm.form.resource" content-type="vm.card.resource.previewRole()"></file-viewer>
+                <file-viewer file="vm.form.resource" content-type="vm.form.resource.previewRole()"></file-viewer>
 <!--            <file-viewer ng-model="[[vm.getWorkspaceUrl()]]"></file-viewer>-->
 <!--                <span>[[vm.form.resourceFileName]]</span>-->
             </div>

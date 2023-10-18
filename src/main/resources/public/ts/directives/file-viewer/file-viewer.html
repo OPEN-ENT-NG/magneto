@@ -1,23 +1,13 @@
-<div class="embedded-viewer" ng-class="{'height-minus200 height-minus270-1d': true}" id="embeded-viewer">
+<div class="embedded-viewer file-viewer"  id="embeded-viewer"  >
     <div class="controls__navbar flex-row align-center justify-between" ng-if="!isFullscreen">
         <div class="flex-row align-center justify-between">
-            <div class="flex-row f-column left-spacing-twice">
+            <div class="flex-row f-column ">
                 <h2 class="no-margin">[[vm.file.name]]</h2>
                 <small><span class="no-1d"><i18n>owner</i18n>:&nbsp;</span><strong>[[vm.file.ownerName]]</strong></small>
             </div>
         </div>
-        <div class="flex-row align-center justify-between">
-            <button class="cancel" ng-click="fullscreen(true)"><i18n>preview</i18n></button>
-            <button class="cancel" ng-click="download()"><i18n>download</i18n></button>
-            <resource-right resource="vm.file" name="contrib">
-                <button ng-click="editImage()" ng-if="vm.file.isEditableImage"><i18n>editImage</i18n></button>
-            </resource-right>
-            <button ng-if="vm.canEditInLool()" workflow="lool.openFile" ng-click="openOnLool()">
-                <i18n>workspace.external.open</i18n>
-            </button>
-            <button ng-if="vm.canEditInScratch()" ng-click="openOnScratch()">
-                <i18n>workspace.external.open</i18n>
-            </button>
+        <div class="flex-row align-center justify-between" ng-show="vm.canDownload()">
+            <button class="cancel" ng-click="vm.download()"><i18n>download</i18n></button>
         </div>
     </div>
     <div class="file">
@@ -29,7 +19,7 @@
         <video ng-if="vm.contentType==='video' && vm.isStreamable()" controls class="render" ng-src="[[vm.file.link]]" data-document-id="[[vm.file._id]]" data-document-is-captation="[[vm.file.metadata.captation]]"></video>
         <video ng-if="vm.contentType==='video' && !vm.isStreamable()" controls class="render" ng-src="[[vm.file.link]]" data-document-id="[[vm.file._id]]"></video>
         <pdf-viewer ng-if="vm.contentType === 'pdf'" ng-src="[[vm.file.link]]"></pdf-viewer>
-<!--        <pdf-viewer ng-if="vm.isOfficePdf()" ng-src="[[previewUrl()]]" scroller="'#embeded-viewer'"></pdf-viewer>-->
+        <pdf-viewer ng-if="vm.isOfficePdf()" ng-src="[[previewUrl()]]" scroller="'#embeded-viewer'"></pdf-viewer>
         <csv-viewer ng-if="vm.isOfficeExcelOrCsv()" csv-delegate="csvDelegate"></csv-viewer>
         <txt-viewer ng-if="vm.isTxt()" txt-delegate="txtDelegate"></txt-viewer>
         <div ng-if="contentType === 'unknown' || contentType === 'zip'" class="default-viewer">

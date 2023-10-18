@@ -1,15 +1,16 @@
 import { ng, Behaviours ,workspace} from 'entcore';
-import { CsvDelegate, CsvFile } from './csv-viewer/csv-viewer.directive';
-import { TxtDelegate } from './txt-viewer/txt-viewer-directive';
+import {CsvController, CsvDelegate, CsvFile} from './csv-viewer/csv-viewer.directive';
+import {TxtController, TxtDelegate, TxtFile} from './txt-viewer/txt-viewer-directive';
 import {RootsConst} from "../../core/constants/roots.const";
 import {ILocationService, IScope, IWindowService} from "angular";
-import {FileViewerModel} from "./FileViewerModel";
+import * as util from "util";
+import {safeApply} from "../../utils/safe-apply.utils";
+import {FileViewModel} from "./FileViewerModel";
 
 
 const workspaceService = workspace.v2.service;
 
 interface IViewModel extends ng.IController , IFileViewerProps{
-    contentType: string;
     isFullscreen: boolean;
     csvDelegate: CsvDelegate;
     txtDelegate: TxtDelegate
@@ -20,12 +21,7 @@ interface IViewModel extends ng.IController , IFileViewerProps{
     isOfficeExcelOrCsv(): boolean;
     getCsvContent(): CsvDelegate;
     render?: () => void;
-    // previewUrl(): string;
-    canEditInLool(): boolean;
-    canEditInScratch(): boolean;
-    openOnLool(): void;
-    openOnScratch(): void;
-    openOnGeogebra():void;
+    previewUrl(): string;
     $parent: {
         display: {
             editedImage: any;
@@ -38,7 +34,8 @@ interface IViewModel extends ng.IController , IFileViewerProps{
 }
 
 interface IFileViewerProps {
-    file: FileViewerModel;
+    file: FileViewModel;
+    contentType: string;
 }
 
 interface IFileViewerScope extends IScope, IFileViewerProps {
@@ -47,28 +44,26 @@ interface IFileViewerScope extends IScope, IFileViewerProps {
 
 class Controller implements IViewModel {
     contentType: string;
-    file: FileViewerModel;
+    file: FileViewModel;
     constructor(private $scope: IFileViewerScope,
                 private $location: ILocationService,
                 private $sce: ng.ISCEService,
                 private $window: IWindowService){
+        this.$scope = $scope;
     }
     $onInit() {
-        this.contentType = this.file[0].metadata.extension;
     }
 
     isFullscreen = false;
 
     download = function () {
-        workspaceService.downloadFiles([this.file[0]]);
+        workspaceService.downloadFiles([this.file]);
     };
     canDownload = () => {
-        // return workspaceService.isActionAvailable("download", [this.file])
-        return false
+        return workspaceService.isActionAvailable("download", [this.file])
     }
 
     isOfficePdf = () => {
-        console.log("isOfficePdf")
         const ext = ['doc', 'ppt'];
         return ext.includes(this.contentType);
     }
@@ -90,38 +85,14 @@ class Controller implements IViewModel {
             && this.file[0].metadata
             && typeof this.file[0].metadata.captation === "boolean";
     }
-    // previewUrl = () => {
-    //     return this.$scope.vm.file.previewUrl;
-    // }
-
-
-
-    openOnLool = () => {
-        // ENABLE_LOOL && Behaviours.applicationsBehaviours.lool.openOnLool(this.file);
+    previewUrl = () => {
+        return this.file.previewUrl;
     }
 
-    openOnScratch = () => {
-        // ENABLE_SCRATCH && window.open(`/scratch/open?ent_id=${this.file._id}`);
-    }
 
-    openOnGeogebra = () => {
-        // ENABLE_GGB && window.open(`/geogebra#/${this.file._id}?fileName=${this.file.name}.ggb`);
-    }
 
-    canEditInLool = () => {
-        const ext = ['doc', 'ppt', "xls"];
-        const isoffice = ext.includes(this.contentType);
-        // return isoffice && ENABLE_LOOL && Behaviours.applicationsBehaviours.lool.canBeOpenOnLool(this.file);
-        return false
-    }
 
-    canEditInScratch = () => {
-        // return ENABLE_SCRATCH &&
-        //     ["sb","sb2","sb3"].includes(this.file.metadata.extension) &&
-        //     this.file.metadata["content-type"] === "application/octet-stream";
-        return false
 
-    }
     $parent: { display: { editedImage: any; editImage: boolean } };
     csvDelegate: CsvDelegate;
     htmlContent: string;
@@ -131,109 +102,105 @@ class Controller implements IViewModel {
         return undefined;
     }
 }
-// class CsvProviderFromText implements CsvFile {
-//     private _cache: Promise<string>;
-//     constructor(private model: workspace.v2.models.Element) { }
-//     get id() { return this.model._id; }
-//     get content() {
-//         if (this._cache) return this._cache;
-//         this._cache = new Promise<string>(async (resolve, reject) => {
-//             const a = await workspaceService.getDocumentBlob(this.model._id);
-//             const reader = new FileReader();
-//             reader.onload = () => {
-//                 const res = (reader.result) as string;
-//                 resolve(res);
-//             }
-//             reader.onerror = (e) => reject(e);
-//             reader.readAsText(a);
-//         })
-//         return this._cache;
-//     }
-// }
-// class CsvProviderFromExcel implements CsvFile {
-//     private _cache: Promise<string>;
-//     constructor(private model: workspace.v2.models.Element) { }
-//     get id() { return this.model._id; }
-//     get content() {
-//         if (this._cache) return this._cache;
-//         this._cache = new Promise<string>(async (resolve, reject) => {
-//             const a = await workspaceService.getPreviewBlob(this.model._id);
-//             const reader = new FileReader();
-//             reader.onload = () => {
-//                 const res = (reader.result) as string;
-//                 resolve(res);
-//             }
-//             reader.onerror = (e) => reject(e);
-//             reader.readAsText(a);
-//         })
-//         return this._cache;
-//     }
-// }
+class CsvProviderFromText implements CsvFile {
+    private _cache: Promise<string>;
+    constructor(private model: FileViewModel) { }
+    get id() { return this.model._id; }
+    get content() {
+        if (this._cache) return this._cache;
+        this._cache = new Promise<string>(async (resolve, reject) => {
+            const a = await workspaceService.getDocumentBlob(this.model._id);
+            const reader = new FileReader();
+            reader.onload = () => {
+                const res = (reader.result) as string;
+                resolve(res);
+            }
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(a);
+        })
+        return this._cache;
+    }
+}
+class CsvProviderFromExcel implements CsvFile {
+    private _cache: Promise<string>;
+    constructor(private model: workspace.v2.models.Element) { }
+    get id() { return this.model._id; }
+    get content() {
+        if (this._cache) return this._cache;
+        this._cache = new Promise<string>(async (resolve, reject) => {
+            const a = await workspaceService.getDocumentBlob(this.model._id);
+            const reader = new FileReader();
+            reader.onload = () => {
+                const res = (reader.result) as string;
+                resolve(res);
+            }
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(a);
+        })
+        return this._cache;
+    }
+}
 function directive(){
     return {
         restrict: 'E',
         scope: {
-            file: '='
+            file: '=',
+            contentType: '='
         },
         templateUrl: `${RootsConst.directive}/file-viewer/file-viewer.html`,
         controllerAs: 'vm',
         bindToController: true,
         controller: ['$scope', '$location', '$sce', '$window', Controller],
         /* interaction DOM/element */
-        link: function ($scope: IFileViewerScope,
-                        element: ng.IAugmentedJQuery,
-                        attrs: ng.IAttributes,
-                        vm: IViewModel) {}
+        link: function (scope: IViewModel, element, attributes) {
+            const _csvCache: { [key: string]: CsvFile } = {}
+            const _txtCache: { [key: string]: TxtFile } = {}
+            let _csvController: CsvController = null;
+            let _txtDelegate: TxtController = null;
+            scope.csvDelegate = {
+                onInit(ctrl) {
+                    _csvController = ctrl;
+                    _csvController.setContent(getCsvContent());
+                }
+            }
+            scope.txtDelegate = {
+                onInit(ctrl) {
+                    _txtDelegate = ctrl;
+                    _txtDelegate.setContent(getTxtContent())
+                }
+            }
+            const getCsvContent = () => {
+                if (_csvCache[scope.vm.file._id]) {
+                    return _csvCache[scope.vm.file._id];
+                }
+                if (scope.contentType == "csv") {
+                    _csvCache[scope.vm.file._id] = new CsvProviderFromText(scope.vm.file);
+                } else {
+                    _csvCache[scope.vm.file._id] = new CsvProviderFromExcel(scope.vm.file);
+                }
+                return _csvCache[scope.vm.file._id];
+            }
+            const getTxtContent = () => {
+                if (_txtCache[scope.vm.file._id]) {
+                    return _txtCache[scope.vm.file._id];
+                }
+                _txtCache[scope.vm.file._id] = new CsvProviderFromText(scope.vm.file);
+                return _txtCache[scope.vm.file._id];
+            }
 
-        // link: function (scope: IViewModel, element, attributes) {
-        //     // const _csvCache: { [key: string]: CsvFile } = {}
-        //     // const _txtCache: { [key: string]: TxtFile } = {}
-        //     // let _csvController: CsvController = null;
-        //     // let _txtDelegate: TxtController = null;
-        //     // scope.csvDelegate = {
-        //     //     onInit(ctrl) {
-        //     //         _csvController = ctrl;
-        //     //         _csvController.setContent(getCsvContent());
-        //     //     }
-        //     // }
-        //     // scope.txtDelegate = {
-        //     //     onInit(ctrl) {
-        //     //         _txtDelegate = ctrl;
-        //     //         _txtDelegate.setContent(getTxtContent())
-        //     //     }
-        //     // }
-        //     // const getCsvContent = () => {
-        //     //     if (_csvCache[scope.file._id]) {
-        //     //         return _csvCache[scope.file._id];
-        //     //     }
-        //     //     if (scope.contentType == "csv") {
-        //     //         _csvCache[scope.file._id] = new CsvProviderFromText(scope.file);
-        //     //     } else {
-        //     //         _csvCache[scope.file._id] = new CsvProviderFromExcel(scope.file);
-        //     //     }
-        //     //     return _csvCache[scope.file._id];
-        //     // }
-        //     // const getTxtContent = () => {
-        //     //     if (_txtCache[scope.file._id]) {
-        //     //         return _txtCache[scope.file._id];
-        //     //     }
-        //     //     _txtCache[scope.file._id] = new CsvProviderFromText(scope.file);
-        //     //     return _txtCache[scope.file._id];
-        //     // }
-        //     //
-        //     // if (scope.contentType == 'html') {
-        //     //     const call = async () => {
-        //     //         const a = await workspaceService.getDocumentBlob(scope.file._id);
-        //     //         const reader = new FileReader();
-        //     //         reader.onload = function () {
-        //     //             scope.htmlContent = $sce.trustAsHtml(reader.result) as string;
-        //     //             safeApply(scope);
-        //     //         }
-        //     //         reader.readAsText(a);
-        //     //     }
-        //     //     call();
-        //     // }
-        // }
+            if (scope.contentType == 'html') {
+                const call = async () => {
+                    const a = await workspaceService.getDocumentBlob(scope.vm.file._id);
+                    const reader = new FileReader();
+                    reader.onload = function () {
+                        // scope.htmlContent = $sce.trustAsHtml(reader.result) as string;
+                        safeApply(scope);
+                    }
+                    reader.readAsText(a);
+                }
+                call();
+            }
+        }
     }
 }
 

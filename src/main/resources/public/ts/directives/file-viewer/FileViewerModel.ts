@@ -1,18 +1,4 @@
-export class FileViewerModel {
-    _id?: string;
-    metadata:{
+import {workspace} from "entcore";
 
-    'content-type'?: string;
-    role?: string;
-    extension?: string;
-    filename?: string;
-    size?: number;
-    captation?: boolean;
-    duration?: number;
-    width?: number;
-    height?: number;
-};
-    title:string;
-    file:string;
-
+export class FileViewModel extends workspace.v2.models.Element{
 }

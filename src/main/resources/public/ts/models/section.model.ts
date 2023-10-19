@@ -5,6 +5,7 @@ export interface ISectionItemResponse {
     title: string;
     cardIds: Array<string>;
     boardId: string;
+    displayed?: boolean;
 }
 
 export interface ISectionDeleteParams {
@@ -27,6 +28,7 @@ export interface ISectionPayload {
     title?: string;
     cardIds?: Array<string>;
     boardId?: string;
+    displayed?: boolean;
 }
 
 
@@ -36,7 +38,7 @@ export class SectionForm {
     private _title: string;
     private _cardIds: Array<string>;
     private _boardId: string;
-
+    private _displayed?: boolean;
     constructor() {
         this._id = null;
         this._title = null;
@@ -49,6 +51,8 @@ export class SectionForm {
         this.title = section.title;
         this.cardIds = section.cardIds;
         this.boardId = section.boardId;
+        if (section.displayed !== undefined)
+            this.displayed = section.displayed;
         return this;
     }
 
@@ -95,6 +99,13 @@ export class SectionForm {
         this._cardIds.push(value);
     }
 
+    get displayed(): boolean {
+        return this._displayed;
+    }
+
+    set displayed(value: boolean) {
+        this._displayed = value;
+    }
     isValid(): boolean {
         return this.title !== null && this.title !== '';
     }
@@ -113,6 +124,10 @@ export class SectionForm {
             payload.id = this.id;
         }
         payload.cardIds = this.cardIds;
+
+        if(this.displayed !== undefined && this.displayed !== null){
+            payload.displayed = this.displayed;
+        }
         return payload;
     }
 }
@@ -124,6 +139,7 @@ export class Section {
     private _boardId: string;
     private _page: number;
     private _cards: Card[];
+    private _displayed?: boolean;
 
 
     build(data: ISectionItemResponse): Section {
@@ -133,6 +149,7 @@ export class Section {
         this._cardIds = data.cardIds;
         this._cards = [];
         this._page = 0;
+        this._displayed = data.displayed !== false;
         return this;
     }
 
@@ -168,6 +185,14 @@ export class Section {
         return this._cards;
     }
 
+
+    get displayed(): boolean {
+        return this._displayed;
+    }
+
+    set displayed(value: boolean) {
+        this._displayed = value;
+    }
 }
 
 export class Sections {

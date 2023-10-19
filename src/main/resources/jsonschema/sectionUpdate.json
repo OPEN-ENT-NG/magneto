@@ -12,6 +12,9 @@
     "boardId": {
       "type": ["string", "null"]
     },
+    "displayed": {
+      "type": "boolean"
+    },
     "cardIds": {
       "type": "array",
       "items": {

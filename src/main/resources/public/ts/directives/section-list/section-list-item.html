@@ -1,5 +1,6 @@
-<div id="section-[[vm.section.id]]">
+<div id="section-[[vm.section.id]]" >
     <div class="sections-listDirective-content-container" tabindex="0">
+        <i class="magneto-hide" aria-hidden="true" ng-show="!vm.section.displayed"></i>
         <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input"
                ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null"
                ng-blur="vm.updateSection(vm.section)"
@@ -11,7 +12,9 @@
                 has-delete="true"
                 on-delete="vm.openDeleteSection"
                 has-duplicate="true"
-                on-duplicate="vm.openDuplicateSection">
+                on-duplicate="vm.openDuplicateSection"
+                has-hide="true"
+                on-hide="vm.openHide">
         </card-list-item-options>
     </div>
     <card-list

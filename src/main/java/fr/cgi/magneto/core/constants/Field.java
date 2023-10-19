@@ -203,4 +203,5 @@ public class Field {
 
     public static final String MAGNETO_UPDATE_FREQUENCY = "magnetoUpdateFrequency";
     public static final String ISLIKED = "isLiked";
+    public static final String DISPLAYED = "displayed";
 }

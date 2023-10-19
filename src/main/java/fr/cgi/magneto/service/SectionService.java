@@ -28,7 +28,13 @@ public interface SectionService {
      */
     Future<List<Section>> getSectionsByBoardId(String boardId);
 
-    Future<List<Section>> getSectionsByBoard(Board board);
+    /**
+     *
+     * @param board board of the sections
+     * @param isReadOnly
+     * @return
+     */
+    Future<List<Section>> getSectionsByBoard(Board board, boolean isReadOnly);
 
     /**
      * Create a section

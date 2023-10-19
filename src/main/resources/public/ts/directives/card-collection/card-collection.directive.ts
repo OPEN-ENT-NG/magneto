@@ -100,6 +100,7 @@ class Controller implements IViewModel {
 
     filter: CardsFilter;
 
+    layoutType: LAYOUT_TYPE;
     navbarViewSelected: COLLECTION_NAVBAR_VIEWS;
     navbarFirstSelected: COLLECTION_NAVBAR_VIEWS;
     RESOURCE_ORDERS: typeof RESOURCE_ORDER;
@@ -122,6 +123,7 @@ class Controller implements IViewModel {
         this.infiniteScrollService = new InfiniteScrollService;
         this.RESOURCE_ORDERS = RESOURCE_ORDER;
         this.COLLECTION_NAVBAR_VIEWS = COLLECTION_NAVBAR_VIEWS;
+        this.layoutType = LAYOUT_TYPE.FREE;
     }
 
     async $onInit() {

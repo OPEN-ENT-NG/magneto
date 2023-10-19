@@ -40,6 +40,7 @@ interface IViewModel extends ng.IController, ISectionListItemProps {
     onLoaded(): void;
 
     isDisplayedOptions: boolean;
+    displayed:boolean;
 }
 
 interface ISectionListItemProps {
@@ -56,7 +57,6 @@ interface ISectionListItemProps {
     cardUpdateEventer: Subject<void>;
     zoom: number;
     zoomEventer: Subject<void>;
-
 }
 
 interface ISectionListItemScope extends IScope, ISectionListItemProps {
@@ -77,7 +77,7 @@ class Controller implements IViewModel {
     cardUpdateEventer: Subject<void>;
     zoom: number;
     zoomEventer: Subject<void>;
-
+    displayed: boolean;
     constructor(private $scope: ISectionListItemScope) {
         this.isDisplayedOptions = false;
         this.isLoading = false;
@@ -153,6 +153,12 @@ class Controller implements IViewModel {
         safeApply(this.$scope);
     }
 
+    openHide = (): void =>{
+        this.section.displayed = !this.section.displayed;
+        this.isDisplayedOptions = false;
+        sectionsService.update(new SectionForm().build(this.section));
+        safeApply(this.$scope)
+    }
 }
 
 function directive($parse: IParseService) {
@@ -228,10 +234,6 @@ function directive($parse: IParseService) {
 
             vm.openDuplicate = (card: Card): void => {
                 $parse($scope.vm.onDuplicate())(card);
-            }
-
-            vm.openHide = (card: Card): void => {
-                $parse($scope.vm.onHide())(card);
             }
 
             vm.openDelete = (card: Card): void => {

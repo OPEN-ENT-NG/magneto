@@ -4,14 +4,6 @@
   overflow-y: hidden;
   min-width: min-content;
 
-  $start: 3;
-  $end: 5;
-  @for $i from $start through $end {
-    &-zoom-#{$i} {
-      $width-value: 100 + ($i - 3) * 20%;
-      width: $width-value
-    }
-  }
 
   i.magneto-card-settings {
     font-size: 25px;
@@ -43,6 +35,7 @@
 
     &-horizontal {
       overflow-y: unset;
+      overflow-x: scroll;
       height: 100% !important;
     }
 

@@ -38,8 +38,7 @@
 
   &-horizontal {
     min-height: 20vh;
-    max-height: 40vh;
-    width: 200vh;
+    width: 90vw;
     overflow-y: hidden;
     overflow-x: scroll;
     flex-wrap: nowrap;
@@ -47,6 +46,9 @@
     gap: 10px;
     grid-template-columns: unset;
     display:flex;
+    @include tablet {
+      width: 80vw;
+    }
   }
   @include paddingY(15px);
   @include paddingX(15px);

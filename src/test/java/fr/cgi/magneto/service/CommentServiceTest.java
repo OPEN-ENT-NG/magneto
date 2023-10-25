@@ -54,7 +54,7 @@ public class CommentServiceTest {
                         "   \"modificationDate\":\"$comments.modificationDate\"\n" +
                         "}\n" +
                 "},\n" +
-                        "{\"$skip\":400},\n" +
+                        "{\"$skip\":900},\n" +
                         "{\"$limit\":30}]}");
 
 

@@ -3,7 +3,6 @@ package fr.cgi.magneto;
 import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.controller.*;
 import fr.cgi.magneto.core.constants.*;
-import fr.cgi.magneto.realtime.RealTimeCollaboration;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.impl.MagnetoRepositoryEvents;
 import fr.wseduc.mongodb.MongoDb;
@@ -47,6 +46,7 @@ public class Magneto extends BaseServer {
 		addController(new StatisticController(serviceFactory));
 		addController(new AuthController(serviceFactory));
 		addController(new CommentController(serviceFactory));
+		addController(new BoardAccessController(serviceFactory));
 
 		final EventBus eb = getEventBus(vertx);
 

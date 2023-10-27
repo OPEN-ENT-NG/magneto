@@ -37,6 +37,7 @@ public class BoardController extends ControllerHelper {
 
     private final EventStore eventStore;
     private final BoardService boardService;
+    private final BoardAccessService boardAccessService;
 
     private final SectionService sectionService;
     private final CardService cardService;
@@ -45,6 +46,7 @@ public class BoardController extends ControllerHelper {
 
     public BoardController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
+        this.boardAccessService = serviceFactory.boardViewService();
         this.sectionService = serviceFactory.sectionService();
         this.cardService = serviceFactory.cardService();
         this.folderService = serviceFactory.folderService();
@@ -108,26 +110,30 @@ public class BoardController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @SuppressWarnings("unchecked")
     public void getBoardsByIds(HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "boardList", boards -> {
-            List<String> boardIds = boards.getJsonArray(Field.BOARDIDS).getList();
-            boardService.getBoards(boardIds)
-                    .onSuccess(result -> {
-                        JsonArray boardsResult = new JsonArray(result
-                                .stream()
-                                .map(Board::toJson)
-                                .collect(Collectors.toList()));
-                        renderJson(request, new JsonObject()
-                                .put(Field.ALL, boardsResult));
-                    })
-                    .onFailure(fail -> {
-                        String message = String.format("[Magneto@%s::getAllBoardsByIds] Failed to get all boards by ids : %s",
-                                this.getClass().getSimpleName(), fail.getMessage());
-                        log.error(message);
-                        renderError(request);
-                    });
-        });
-    }
 
+        RequestUtils.bodyToJson(request, pathPrefix + "boardList", boards -> {
+            UserUtils.getUserInfos(eb, request, user -> {
+                List<String> boardIds = boards.getJsonArray(Field.BOARDIDS).getList();
+                boardAccessService.insertAccess(boardIds, user.getUserId());
+                boardService.getBoards(boardIds)
+                        .onSuccess(result -> {
+                            JsonArray boardsResult = new JsonArray(result
+                                    .stream()
+                                    .map(Board::toJson)
+                                    .collect(Collectors.toList()));
+                            renderJson(request, new JsonObject()
+                                    .put(Field.ALL, boardsResult));
+                        })
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::getAllBoardsByIds] Failed to get all boards by ids : %s",
+                                    this.getClass().getSimpleName(), fail.getMessage());
+                            log.error(message);
+                            renderError(request);
+                        });
+            });
+        });
+
+    }
     @Post("/board")
     @ApiDoc("Create a board")
     @SecuredAction(Rights.MANAGE_BOARD)

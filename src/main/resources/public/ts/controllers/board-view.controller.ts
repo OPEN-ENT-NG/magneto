@@ -438,7 +438,7 @@ class Controller implements IViewModel {
             }
 
             const sectionList: NodeListOf<Element> = document.querySelectorAll("#section-list");
-            for (let i = 0; i < cardList.length; i++) {
+            for (let i = 0; i < sectionList.length; i++) {
                 this.nestedSortables.push(create(sectionList[i], {
                     animation: 300,
                     easing: "cubic-bezier(1, 0, 0, 1)",
@@ -448,6 +448,8 @@ class Controller implements IViewModel {
                     scrollSensitivity: 100, // px, how near the mouse must be to an edge to start scrolling.
                     scrollSpeed: 30, // px*/
                     delayOnTouchOnly: true,
+                    filter: ".notDraggable",
+                    preventOnFilter: false,
                     onUpdate: async (evt) => {
                         let form: BoardForm = new BoardForm().build(this.board);
                         let sectionIds: Array<string> = this.board.sections.map((section: Section) => section.id);

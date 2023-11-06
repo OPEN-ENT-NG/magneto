@@ -39,7 +39,7 @@ public class DefaultBoardAccessService implements BoardAccessService {
         boardAccess.setUserId(userId);
         mongoDb.insert(this.collection, boardAccess.toJson(), MongoDbResult.validResultHandler(results -> {
             if (results.isLeft()) {
-                String message = String.format("[Magneto@%s::insertView] Failed to create board", this.getClass().getSimpleName());
+                String message = String.format("[Magneto@%s::insertAccess] Failed to insert view ", this.getClass().getSimpleName());
                 log.error(String.format("%s. %s", message, results.left().getValue()));
                 promise.fail(message);
             }
@@ -52,11 +52,11 @@ public class DefaultBoardAccessService implements BoardAccessService {
     public Future<List<String>> getLastAccess(String userId) {
         Promise<List<String>> promise = Promise.promise();
 
-        MongoQuery query = getBoardAccessQuery(userId);
+        JsonObject query = getBoardAccessQuery(userId);
 
-        mongoDb.command(query.getAggregate().toString(), MongoDbResult.validResultHandler(either -> {
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
-                log.error("[Magneto@%s::fetchAllCardsByBoardCount] Failed to get cards", this.getClass().getSimpleName(),
+                log.error("[Magneto@%s::fetchAllCardsByBoardCount] Failed to last accesses", this.getClass().getSimpleName(),
                         either.left().getValue());
                 promise.fail(either.left().getValue());
             } else {
@@ -70,20 +70,16 @@ public class DefaultBoardAccessService implements BoardAccessService {
         return promise.future();
     }
 
-    private MongoQuery getBoardAccessQuery(String userId) {
+    private JsonObject getBoardAccessQuery(String userId) {
         List<String> filter= new ArrayList<>();
-        filter.add("boardId");
+        filter.add(Field.BOARDID);
         Map<String,String> externalFieldAccumulators = new HashMap<>();
-        //get date -1 month
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.MONTH, -1);
-        Date limitDate = calendar.getTime();
+
 
         return new MongoQuery(this.collection)
-                .match(new JsonObject().put(Field.USERID, userId).put(Field.CREATIONDATE, new JsonObject().put(Mongo.GTE, DateHelper.getDateString(limitDate, DateHelper.MONGO_FORMAT))))
+                .match(new JsonObject().put(Field.USERID, userId))
                 .group(filter, externalFieldAccumulators)
                 .sort(Field.CREATIONDATE, -1)
-                .limit(5);
+                .limit(5).getAggregate();
     }
 }

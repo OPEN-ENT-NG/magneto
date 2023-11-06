@@ -684,7 +684,6 @@ class Controller implements IViewModel {
         this.cardForm.resourceId = file._id;
         this.cardForm.resourceFileName = file.metadata.filename;
         this.cardForm.resource = file;
-        console.log("onFileSelected")
         this.$timeout(() => {
             this.displayCardLightbox = true;
         }, 100);

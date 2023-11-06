@@ -193,7 +193,6 @@ function directive(){
                     const a = await workspaceService.getDocumentBlob(scope.vm.file._id);
                     const reader = new FileReader();
                     reader.onload = function () {
-                        // scope.htmlContent = $sce.trustAsHtml(reader.result) as string;
                         safeApply(scope);
                     }
                     reader.readAsText(a);

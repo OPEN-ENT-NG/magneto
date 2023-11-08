@@ -86,7 +86,7 @@ class Controller implements IViewModel {
             && typeof this.file[0].metadata.captation === "boolean";
     }
     previewUrl = () => {
-        return this.file.previewUrl;
+        return `/workspace/document/preview/${this.file._id}`;
     }
 
 

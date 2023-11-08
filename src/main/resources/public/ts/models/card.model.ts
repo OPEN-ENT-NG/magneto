@@ -1,6 +1,5 @@
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
 import {CardComment, ICardItemCommentResponse} from "./card-comment.model";
-import {Element} from "entcore/types/src/ts/workspace/model";
 import {FileViewModel} from "../directives/file-viewer/FileViewerModel";
 
 export interface ICardItemResponse {

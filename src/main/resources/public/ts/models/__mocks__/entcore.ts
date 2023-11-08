@@ -21,6 +21,18 @@ const controllers: Array<IController> = []
 const directives: Array<IDirective> = []
 const services: Array<IService> = [];
 
+export const workspace = {
+    v2: {
+        models: {
+            Element: jest.fn().mockImplementation(() => {
+                return {
+                    setData: () => jest.fn(),
+                    disableCache: () => jest.fn(),
+                };
+            })
+        }
+    }
+};
 export const ng = {
     service: jest.fn((name:string, contents: any) => {
         if (ng && ng.services && typeof ng.services.length === 'number')

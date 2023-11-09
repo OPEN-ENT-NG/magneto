@@ -1,9 +1,7 @@
-import { angular, ng, http, $ } from 'entcore';
-import { Subject, Observable } from "rxjs";
-import moment = require('moment');
-import {RootsConst} from "../../core/constants/roots.const";
-import { IOnChangesObject } from 'angular';
-import {safeApply} from "../../utils/safe-apply.utils";
+import {angular, ng, http, $} from 'entcore';
+import {Subject, Observable} from "rxjs";
+import {RootsConst} from "../../../core/constants/roots.const";
+import {safeApply} from "../../../utils/safe-apply.utils";
 
 interface IViewModel extends ng.IController {
     nextPage(): void;
@@ -13,7 +11,9 @@ interface IViewModel extends ng.IController {
     previousPage(): void;
 
     keyNav(e: JQueryKeyEventObject): void;
-    loadPdfJs(): Promise<void> ;
+
+    loadPdfJs(): Promise<void>;
+
     pageIndex: number | any;
     numPages: number;
     loading: boolean;
@@ -21,7 +21,7 @@ interface IViewModel extends ng.IController {
 }
 
 interface IPdfViewerProps {
-    ngSrc: string ;
+    ngSrc: string;
     title?: string;
 }
 
@@ -32,12 +32,12 @@ interface IPdfViewerScope extends IViewModel, IPdfViewerProps {
 let _loadedPdfJs = false;
 
 
-
 class Controller implements IViewModel {
     pageIndex: number | any;
     numPages: number;
     loading: boolean;
     reloadPdf: Subject<number>;
+
     constructor(private $scope: IPdfViewerScope, element: ng.IAugmentedJQuery) {
         this.loading = true;
         this.pageIndex = 1;
@@ -79,10 +79,13 @@ class Controller implements IViewModel {
         }
     }
     keyNav = (e: JQueryKeyEventObject): void => {
-        switch(e.keyCode)
-        {
-            case 37: this.previousPage(); break;
-            case 39: this.nextPage(); break;
+        switch (e.keyCode) {
+            case 37:
+                this.previousPage();
+                break;
+            case 39:
+                this.nextPage();
+                break;
         }
         safeApply(this);
     };
@@ -102,10 +105,10 @@ function directive() {
     return {
         replace: true,
         restrict: 'E',
-        templateUrl: `${RootsConst.directive}pdf-viewer/pdf-viewer.html`,
+        templateUrl: `${RootsConst.directive}/file-viewer/pdf-viewer/pdf-viewer.html`,
         scope: {
-                ngSrc: '=',
-                title: '='
+            ngSrc: '=',
+            title: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -132,22 +135,21 @@ function directive() {
                         vm.openPage();
                         vm.loading = false;
                         $scope.$apply('loading');
-                    }).catch(function(e){
-                     console.log(e)
+                    }).catch(function (e) {
+                    console.log(e)
                     vm.loading = false;
                     $scope.$apply('loading');
                 })
             });
 
-            (vm.reloadPdf as Observable<number>).debounceTime(100).subscribe(pageNumber=>{
+            (vm.reloadPdf as Observable<number>).debounceTime(100).subscribe(pageNumber => {
                 vm.pdf.getPage(pageNumber).then(function (page) {
                     let viewport;
                     if (!$(canvas).hasClass('fullscreen')) {
                         viewport = page.getViewport(1);
                         let scale: number = element.width() / viewport.width;
                         viewport = page.getViewport(scale);
-                    }
-                    else {
+                    } else {
                         viewport = page.getViewport(2);
                     }
 

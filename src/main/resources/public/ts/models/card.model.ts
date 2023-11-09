@@ -1,5 +1,6 @@
 import {RESOURCE_TYPE} from "../core/enums/resource-type.enum";
 import {CardComment, ICardItemCommentResponse} from "./card-comment.model";
+import {FileViewModel} from "../directives/file-viewer/FileViewerModel";
 
 export interface ICardItemResponse {
     id?: string;
@@ -88,6 +89,7 @@ export class CardForm {
     private _resourceType: string;
     private _resourceUrl: string;
     private _resourceFileName: string;
+    private _resource: FileViewModel;
     private _boardId: string;
     private _sectionId: string;
 
@@ -114,6 +116,7 @@ export class CardForm {
         this._resourceId = card.resourceId;
         this._resourceUrl = card.resourceUrl;
         this._resourceType = card.resourceType;
+        this.resource = card.resource;
         this._boardId = card.boardId;
         this._locked = card.locked;
         this._sectionId = null;
@@ -212,6 +215,15 @@ export class CardForm {
         this._resourceFileName = value;
     }
 
+
+    get resource(): FileViewModel {
+        return this._resource;
+    }
+
+    set resource(value: FileViewModel) {
+        this._resource = value;
+    }
+
     isValid(): boolean {
         return this.resourceType != null && this.resourceType !== '';
     }
@@ -260,6 +272,7 @@ export class Card {
     private _lastComment: CardComment;
     private _nbOfFavorites: number;
     private _liked: boolean;
+    private _resource?: FileViewModel;
 
     build(data: ICardItemResponse): Card {
         this._id = data._id ? data._id : data.id;
@@ -285,7 +298,21 @@ export class Card {
                             new CardComment().build(data.lastComment) : null;
         this._nbOfFavorites = data.nbOfFavorites;
         this._liked = data.liked;
+        if(this._resourceType === "file")
+        this._resource = this.initResource();
         return this;
+    }
+
+    initResource(): FileViewModel {
+        this._resource = new FileViewModel();
+        this._resource._id = this._resourceId;
+        this._resource.metadata = this.metadata;
+        if(!this._resource.metadata["content-type"])
+            this._resource.metadata["content-type"] = this.metadata.contentType
+        this._resource.name = this.title;
+        this._resource.ownerName = this.ownerName
+        this._resource.link =  `/workspace/document/${this.resourceId}`
+        return this._resource
     }
 
     get id(): string {
@@ -430,6 +457,13 @@ export class Card {
 
     isType = (resourceType: string): boolean => {
         return this.resourceType == resourceType;
+    }
+    get resource(): FileViewModel {
+        return this._resource;
+    }
+
+    set resource(value: FileViewModel) {
+        this._resource = value;
     }
 
 }

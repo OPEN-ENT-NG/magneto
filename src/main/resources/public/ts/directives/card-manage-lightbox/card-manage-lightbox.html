@@ -51,8 +51,7 @@
             <!-- File preview -->
             <div class="cell cardDirective-manage-lightbox-content-body-resource-file"
                  ng-if="vm.form.resourceType == 'file'">
-                <img data-ng-src="/magneto/public/img/extension/[[vm.getFileExtension()]].svg">
-                <span>[[vm.form.resourceFileName]]</span>
+                <file-viewer file="vm.form.resource" content-type="vm.form.resource.previewRole()"></file-viewer>
             </div>
             <!-- Link preview -->
             <div class="twelve cell cardDirective-manage-lightbox-content-body-caption vertical-spacing" ng-if="vm.form.resourceType == 'link'">

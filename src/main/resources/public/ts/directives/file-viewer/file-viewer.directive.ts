@@ -71,12 +71,12 @@ class Controller implements IViewModel {
         return workspaceService.isActionAvailable("download", [this.file])
     }
 
-    edit = function () {
+    edit = (): void => {
         Behaviours.applicationsBehaviours['lool'].openOnLool(this.file);
     };
-    canEdit = function () {
-        const ext = ['doc', 'ppt', "xls"];
-        const isoffice = ext.includes(this.contentType);
+    canEdit = (): boolean => {
+        const ext: string[] = ['doc', 'ppt', "xls"];
+        const isoffice: boolean = ext.includes(this.contentType);
         return isoffice && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
     }
 

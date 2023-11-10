@@ -9,6 +9,9 @@
         <div class="flex-row align-center justify-between" ng-show="vm.canDownload()">
             <button class="cancel" ng-click="vm.download()"><i18n>download</i18n></button>
         </div>
+        <div class="flex-row align-center justify-between" ng-show="vm.canEdit() && vm.hasRight('manage')">
+            <button ng-click="vm.edit()"><i18n>edit</i18n></button>
+        </div>
     </div>
     <div class="file">
         <div ng-if="contentType === 'html'">

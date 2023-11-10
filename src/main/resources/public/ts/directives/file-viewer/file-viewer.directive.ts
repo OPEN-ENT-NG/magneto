@@ -6,6 +6,7 @@ import {ILocationService, IScope, IWindowService} from "angular";
 import * as util from "util";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {FileViewModel} from "./FileViewerModel";
+import {hasRight} from "../../utils/rights.utils";
 
 
 const workspaceService = workspace.v2.service;
@@ -30,7 +31,10 @@ interface IViewModel extends ng.IController , IFileViewerProps{
     }
     htmlContent: string;
     download(): void;
-    canDownload(): boolean
+    canDownload(): boolean;
+    edit(): void;
+    canEdit(): boolean;
+    hasRight: typeof hasRight;
 }
 
 interface IFileViewerProps {
@@ -45,6 +49,7 @@ interface IFileViewerScope extends IScope, IFileViewerProps {
 class Controller implements IViewModel {
     contentType: string;
     file: FileViewModel;
+    hasRight: typeof hasRight = hasRight;
     constructor(private $scope: IFileViewerScope,
                 private $location: ILocationService,
                 private $sce: ng.ISCEService,
@@ -52,6 +57,9 @@ class Controller implements IViewModel {
         this.$scope = $scope;
     }
     $onInit() {
+        Behaviours.load('lool').then(() => {
+            Behaviours.applicationsBehaviours.lool.init(() => console.debug("Lool behaviours loaded"));
+        });
     }
 
     isFullscreen = false;
@@ -61,6 +69,15 @@ class Controller implements IViewModel {
     };
     canDownload = () => {
         return workspaceService.isActionAvailable("download", [this.file])
+    }
+
+    edit = function () {
+        Behaviours.applicationsBehaviours['lool'].openOnLool(this.file);
+    };
+    canEdit = function () {
+        const ext = ['doc', 'ppt', "xls"];
+        const isoffice = ext.includes(this.contentType);
+        return isoffice && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
     }
 
     isOfficePdf = () => {

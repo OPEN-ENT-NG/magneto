@@ -34,7 +34,7 @@ public class BoardAccessController extends ControllerHelper {
                     .compose(result -> boardService.getBoards(result))
                     .onSuccess(result -> renderJson(request, new JsonObject().put(Field.ALL, result)))
                     .onFailure(fail -> {
-                        String message = String.format("[Magneto@%s::getAllBoardsByIds] Failed to get all boards by ids : %s",
+                        String message = String.format("[Magneto@%s::getLastBoardsAccessed] Failed to get all boards by ids : %s",
                                 this.getClass().getSimpleName(), fail.getMessage());
                         log.error(message);
                         renderError(request);

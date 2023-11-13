@@ -125,7 +125,7 @@ public class BoardController extends ControllerHelper {
                                     .put(Field.ALL, boardsResult));
                         })
                         .onFailure(fail -> {
-                            String message = String.format("[Magneto@%s::getAllBoardsByIds] Failed to get all boards by ids : %s",
+                            String message = String.format("[Magneto@%s::getBoardsByIds] Failed to get all boards by ids : %s",
                                     this.getClass().getSimpleName(), fail.getMessage());
                             log.error(message);
                             renderError(request);

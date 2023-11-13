@@ -145,7 +145,7 @@ class CsvProviderFromExcel implements CsvFile {
     get content() {
         if (this._cache) return this._cache;
         this._cache = new Promise<string>(async (resolve, reject) => {
-            const a = await workspaceService.getDocumentBlob(this.model._id);
+            const a = await workspaceService.getPreviewBlob(this.model._id);
             const reader = new FileReader();
             reader.onload = () => {
                 const res = (reader.result) as string;
@@ -193,6 +193,7 @@ function directive(){
                 if (scope.contentType == "csv") {
                     _csvCache[scope.vm.file._id] = new CsvProviderFromText(scope.vm.file);
                 } else {
+                    console.log("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                     _csvCache[scope.vm.file._id] = new CsvProviderFromExcel(scope.vm.file);
                 }
                 return _csvCache[scope.vm.file._id];

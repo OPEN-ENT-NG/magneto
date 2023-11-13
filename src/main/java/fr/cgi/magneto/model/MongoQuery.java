@@ -122,6 +122,12 @@ public class MongoQuery {
         return this;
     }
 
+    public MongoQuery limit(Integer limit) {
+        this.pipeline.add(new JsonObject().put(Mongo.LIMIT, limit ));
+        return this;
+    }
+
+
     public MongoQuery lookUp(String from, String localField, String foreignField, String output) {
         this.pipeline.add(new JsonObject()
                 .put(Mongo.LOOKUP, new JsonObject()

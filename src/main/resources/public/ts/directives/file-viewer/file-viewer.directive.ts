@@ -193,7 +193,6 @@ function directive(){
                 if (scope.contentType == "csv") {
                     _csvCache[scope.vm.file._id] = new CsvProviderFromText(scope.vm.file);
                 } else {
-                    console.log("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                     _csvCache[scope.vm.file._id] = new CsvProviderFromExcel(scope.vm.file);
                 }
                 return _csvCache[scope.vm.file._id];

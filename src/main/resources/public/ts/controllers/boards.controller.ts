@@ -151,7 +151,8 @@ class Controller implements ng.IController, IViewModel {
     displayUpdateFolderLightbox: boolean;
     displayFolderLightbox: boolean;
     displayMoveBoardLightbox: boolean;
-    displayCollectionLightbox: boolean
+    displayCollectionLightbox: boolean;
+    magnetoStandalone: boolean;
 
     folderNavTreeSubject: Subject<FolderTreeNavItem>;
 
@@ -165,6 +166,7 @@ class Controller implements ng.IController, IViewModel {
     constructor(private $scope: IBoardsScope,
                 private $location: ng.ILocationService,
                 private $timeout: ng.ITimeoutService,
+                private $window: ng.IWindowService,
                 private boardsService: IBoardsService,
                 private foldersService: IFoldersService) {
         this.$scope.vm = this;
@@ -183,6 +185,7 @@ class Controller implements ng.IController, IViewModel {
         this.displayCollectionLightbox = false;
         this.displayShareBoardLightbox = false;
         this.displayPublicShareBoardLightbox = false;
+        this.magnetoStandalone = this.$window.magnetoStandalone == "true";
 
         this.filter = new BoardsFilter();
         this.boards = [];
@@ -656,4 +659,4 @@ class Controller implements ng.IController, IViewModel {
 }
 
 export const boardsController = ng.controller('BoardsController',
-    ['$scope', '$location', '$timeout', 'BoardsService', 'FoldersService', Controller]);
+    ['$scope', '$location', '$timeout', '$window', 'BoardsService', 'FoldersService', Controller]);

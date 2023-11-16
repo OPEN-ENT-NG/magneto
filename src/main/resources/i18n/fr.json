@@ -192,5 +192,8 @@
   "magneto.dropzone.overlay.action": "J'ai compris",
   "magneto.shared.push.notif.body": "a partagé avec vous un nouveau tableau",
   "magneto.loading": "Chargement",
-  "magneto.zoom": "Zoom"
+  "magneto.zoom": "Zoom",
+  "magneto.navbar.home": "Accueil",
+  "magneto.navbar.documents": "Documents",
+  "magneto.navbar.archive": "Archiver"
 }

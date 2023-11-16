@@ -28,6 +28,7 @@ Dans le fichier 'ent-core.json.template' du projet OPEN ENT :
         "mode" : "${mode}",
         "entcore.port" : 8009,
         "magnetoUpdateFrequency": "${magnetoUpdateFrequency}",
+        "magnetoIsStandalone": "${magnetoIsStandalone}",
         "websocket-config": {
             "wsPort": 4404,
             "endpoint-proxy": "/magneto/eventbus"
@@ -38,9 +39,10 @@ Dans le fichier 'ent-core.json.template' du projet OPEN ENT :
 
 Dans votre springboard, vous devez inclure des variables d'environnement :
 
-| **conf.properties**             | **Utilisation**                                            | **Exemple** |
-|---------------------------------|------------------------------------------------------------|-------------|
-| "${magnetoUpdateFrequency}"     | Temps de fréquence de rafraichissement des favoris (en ms) | 10000       |
+| **conf.properties**          | **Utilisation**                                            | **Exemple** |
+|------------------------------|------------------------------------------------------------|-------------|
+| "${magnetoUpdateFrequency}"  | Temps de fréquence de rafraichissement des favoris (en ms) | 10000       |
+| "${magnetoIsStandalone}"     | Informe de si Magneto est standalone ou pas                | false       |
 
 Associer une route d'entrée à la configuration du module proxy intégré (`"name": "com.wse~http-proxy~1.0.0"`) :
 <pre>

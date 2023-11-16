@@ -190,7 +190,7 @@ function directive(){
                 if (_csvCache[scope.vm.file._id]) {
                     return _csvCache[scope.vm.file._id];
                 }
-                if (scope.contentType == "csv") {
+                if (scope.vm.contentType == "csv") {
                     _csvCache[scope.vm.file._id] = new CsvProviderFromText(scope.vm.file);
                 } else {
                     _csvCache[scope.vm.file._id] = new CsvProviderFromExcel(scope.vm.file);

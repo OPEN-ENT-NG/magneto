@@ -7,6 +7,7 @@ import * as util from "util";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {FileViewModel} from "./FileViewerModel";
 import {hasRight} from "../../utils/rights.utils";
+import {Board} from "../../models";
 
 
 const workspaceService = workspace.v2.service;
@@ -40,6 +41,9 @@ interface IViewModel extends ng.IController , IFileViewerProps{
 interface IFileViewerProps {
     file: FileViewModel;
     contentType: string;
+
+    hasDownload: boolean;
+    hasEdit: boolean;
 }
 
 interface IFileViewerScope extends IScope, IFileViewerProps {
@@ -48,6 +52,9 @@ interface IFileViewerScope extends IScope, IFileViewerProps {
 
 class Controller implements IViewModel {
     contentType: string;
+
+    hasDownload: boolean;
+    hasEdit: boolean;
     file: FileViewModel;
     hasRight: typeof hasRight = hasRight;
     constructor(private $scope: IFileViewerScope,
@@ -68,7 +75,7 @@ class Controller implements IViewModel {
         workspaceService.downloadFiles([this.file]);
     };
     canDownload = () => {
-        return workspaceService.isActionAvailable("download", [this.file])
+        return this.hasDownload && workspaceService.isActionAvailable("download", [this.file])
     }
 
     edit = (): void => {
@@ -77,7 +84,9 @@ class Controller implements IViewModel {
     canEdit = (): boolean => {
         const ext: string[] = ['doc', 'ppt', "xls"];
         const isoffice: boolean = ext.includes(this.contentType);
-        return isoffice && !Behaviours.applicationsBehaviours['lool'].failed && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
+
+        return this.hasEdit && isoffice && !Behaviours.applicationsBehaviours['lool'].failed && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
+
     }
 
     isOfficePdf = () => {
@@ -162,7 +171,9 @@ function directive(){
         restrict: 'E',
         scope: {
             file: '=',
-            contentType: '='
+            contentType: '=',
+            hasDownload: '=',
+            hasEdit: '='
         },
         templateUrl: `${RootsConst.directive}/file-viewer/file-viewer.html`,
         controllerAs: 'vm',

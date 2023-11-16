@@ -51,7 +51,10 @@
             <!-- File preview -->
             <div class="cell cardDirective-manage-lightbox-content-body-resource-file"
                  ng-if="vm.form.resourceType == 'file' && vm.form._id">
-                    <file-viewer file="vm.form.resource" content-type="vm.form.resource.previewRole()"></file-viewer>
+                    <file-viewer file="vm.form.resource"
+                                 content-type="vm.form.resource.previewRole()"
+                                 has-download="vm.board.myRights.contrib !== undefined"
+                                 has-edit="vm.board.myRights.publish !== undefined"></file-viewer>
             </div>
             <div class="cell cardDirective-manage-lightbox-content-body-resource-file"
                  ng-if="vm.form.resourceType == 'file' && !vm.form._id">

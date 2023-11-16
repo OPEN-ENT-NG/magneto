@@ -1,7 +1,7 @@
 import {ng, workspace} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Card} from "../../models";
+import {Card, Board} from "../../models";
 import {DateUtils} from "../../utils/date.utils";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {I18nUtils} from "../../utils/i18n.utils";
@@ -23,6 +23,7 @@ interface IViewModel extends ng.IController, ICardDisplayProps {
 
 interface ICardDisplayProps {
     card: Card;
+    board: Board;
 }
 
 interface ICardListItemScope extends IScope, ICardDisplayProps {
@@ -32,6 +33,7 @@ interface ICardListItemScope extends IScope, ICardDisplayProps {
 class Controller implements IViewModel {
 
     card: Card;
+    board: Board;
 
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
 
@@ -82,6 +84,7 @@ function directive() {
         templateUrl: `${RootsConst.directive}card-display/card-display.html`,
         scope: {
             card: '=',
+            board: '='
         },
         controllerAs: 'vm',
         bindToController: true,

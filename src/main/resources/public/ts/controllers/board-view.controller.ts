@@ -387,6 +387,7 @@ class Controller implements IViewModel {
                                     break;
                                 case RESOURCE_TYPE.VIDEO:
                                     that.videoUrl = result.link;
+                                    that.cardForm.resourceFileName = result.metadata.filename;
                                     that.onVideoSelected();
                                     break;
                                 case RESOURCE_TYPE.AUDIO:

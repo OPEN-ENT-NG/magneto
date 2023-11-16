@@ -7,10 +7,7 @@ import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
-import fr.cgi.magneto.security.DuplicateCardRight;
-import fr.cgi.magneto.security.ManageBoardRight;
-import fr.cgi.magneto.security.ViewRight;
-import fr.cgi.magneto.security.WriteBoardRight;
+import fr.cgi.magneto.security.*;
 import fr.cgi.magneto.service.BoardService;
 import fr.cgi.magneto.service.CardService;
 import fr.cgi.magneto.service.SectionService;
@@ -18,11 +15,9 @@ import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
-import fr.wseduc.webutils.http.Binding;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -30,7 +25,6 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
-import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
 import java.util.Collections;
@@ -60,7 +54,7 @@ public class SectionController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getSectionsByBoardId(HttpServerRequest request) {
         String boardId = request.getParam(Field.ID);
-        UserUtils.getUserInfos(eb, request, user -> new ManageBoardRight().authorize(request, null, user, readOnly ->
+        UserUtils.getUserInfos(eb, request, user -> new ContribBoardRight().authorize(request, null, user, readOnly ->
                 boardService.getBoards(Collections.singletonList(boardId))
                 .compose(boards -> {
                     if (boards.isEmpty()) {

@@ -34,10 +34,10 @@ public class Rights {
     public static final String MANAGER = "magneto.manager";
     public static final String READ = "magneto.read";
 
-    // Write right
+    // Reutilization right
     public static final String CONTRIB = "magneto.contrib";
 
-    // Reutilization right
+    // Write
     public static final String PUBLISH = "magneto.publish";
 
 

@@ -84,7 +84,9 @@ class Controller implements IViewModel {
     canEdit = (): boolean => {
         const ext: string[] = ['doc', 'ppt', "xls"];
         const isoffice: boolean = ext.includes(this.contentType);
-        return this.hasEdit && isoffice && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
+
+        return this.hasEdit && isoffice && !Behaviours.applicationsBehaviours['lool'].failed && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
+
     }
 
     isOfficePdf = () => {
@@ -199,7 +201,7 @@ function directive(){
                 if (_csvCache[scope.vm.file._id]) {
                     return _csvCache[scope.vm.file._id];
                 }
-                if (scope.contentType == "csv") {
+                if (scope.vm.contentType == "csv") {
                     _csvCache[scope.vm.file._id] = new CsvProviderFromText(scope.vm.file);
                 } else {
                     _csvCache[scope.vm.file._id] = new CsvProviderFromExcel(scope.vm.file);

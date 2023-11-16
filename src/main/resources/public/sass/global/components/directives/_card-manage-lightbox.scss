@@ -34,6 +34,10 @@
           display: flex;
           flex-direction: column;
           align-items: center;
+
+          .embedded-viewer {
+            max-width: 60vw;
+          }
         }
 
         &-link {

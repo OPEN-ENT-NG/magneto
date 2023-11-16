@@ -1,4 +1,13 @@
 .file-viewer{
   max-height: 50vh;
+  min-width: 60vw;
   overflow-y: auto;
+
+  button {
+    border: none;
+    box-shadow: none;
+    color: $magneto-orange !important;
+    background: $magneto-lighter-grey !important;
+  }
+
 }

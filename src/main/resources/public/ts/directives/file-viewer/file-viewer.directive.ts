@@ -77,7 +77,7 @@ class Controller implements IViewModel {
     canEdit = (): boolean => {
         const ext: string[] = ['doc', 'ppt', "xls"];
         const isoffice: boolean = ext.includes(this.contentType);
-        return isoffice && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
+        return isoffice && !Behaviours.applicationsBehaviours['lool'].failed && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
     }
 
     isOfficePdf = () => {

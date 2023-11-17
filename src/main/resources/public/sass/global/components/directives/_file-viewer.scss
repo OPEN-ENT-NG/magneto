@@ -1,8 +1,10 @@
 .file-viewer{
   max-height: 50vh;
-  min-width: 60vw;
+  //min-width: 30vw;
   overflow-y: auto;
-
+  & .controls__navbar{
+    gap: 1vw;
+  }
   button {
     border: none;
     box-shadow: none;

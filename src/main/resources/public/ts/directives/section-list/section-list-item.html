@@ -1,10 +1,12 @@
 <div id="section-[[vm.section.id]]" >
     <div class="sections-listDirective-content-container" tabindex="0">
         <i class="magneto-hide" aria-hidden="true" ng-show="!vm.section.displayed"></i>
-        <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input"
-               ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null"
-               ng-blur="vm.updateSection(vm.section)"
-               ng-model="vm.section.title"/>
+        <div class="text-area sections-listDirective-content-title">
+            <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input"
+                   ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null"
+                   ng-blur="vm.updateSection(vm.section)"
+                   ng-model="vm.section.title" ng-style="vm.getTextWidth()"/>
+        </div>
         <i class="magneto-card-settings" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
         <card-list-item-options
                 ng-show="vm.isDisplayedOptions && vm.board.myRights.manager !== undefined"

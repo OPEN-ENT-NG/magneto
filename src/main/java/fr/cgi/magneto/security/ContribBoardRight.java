@@ -15,21 +15,22 @@ public class ContribBoardRight implements ResourcesProvider {
                           Handler<Boolean> handler) {
 
         String boardId = request.getParam(Field.ID);
+        JsonObject sharedUserCondition = new JsonObject()
+                .put(Field.USERID, user.getUserId())
+                .put("fr-cgi-magneto-controller-ShareBoardController|initContribRight", true);
+
+        JsonObject sharedGroupCondition = new JsonObject()
+                .put(Field.GROUPID, new JsonObject().put(Mongo.IN, user.getGroupsIds()))
+                .put("fr-cgi-magneto-controller-ShareBoardController|initContribRight", true);
+
         JsonObject query = new JsonObject()
                 .put(Field._ID, boardId)
                 .put(Field.DELETED, false)
-                .put(Mongo.OR,
-                        new JsonArray()
-                                .add(new JsonObject()
-                                        .put(Field.OWNERID, user.getUserId()))
-                                .add(new JsonObject()
-                                        .put(String.format("%s.%s", Field.SHARED, Field.USERID),
-                                                new JsonObject().put(Mongo.IN, new JsonArray().add(user.getUserId())))
-                                        .put(String.format("%s.%s", Field.SHARED, "fr-cgi-magneto-controller-ShareBoardController|initContribRight"), true))
-                                .add(new JsonObject()
-                                        .put(String.format("%s.%s", Field.SHARED, Field.GROUPID),
-                                                new JsonObject().put(Mongo.IN, user.getGroupsIds()))
-                                        .put(String.format("%s.%s", Field.SHARED, "fr-cgi-magneto-controller-ShareBoardController|initContribRight"), true))
+                .put(Mongo.OR, new JsonArray()
+                        .add(new JsonObject().put(Field.OWNERID, user.getUserId()))
+                        .add(new JsonObject().put(Field.SHARED, new JsonObject().put(Mongo.ELEMMATCH, sharedUserCondition)))
+                        .add(new JsonObject().put(Field.SHARED, new JsonObject().put(Mongo.ELEMMATCH, sharedGroupCondition))
+                        )
                 );
 
        MongoAppFilter.executeCountQuery(request, CollectionsConstant.BOARD_COLLECTION, query, 1, res -> {

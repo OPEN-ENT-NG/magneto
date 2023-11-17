@@ -5,6 +5,7 @@ import {Card, Board} from "../../models";
 import {DateUtils} from "../../utils/date.utils";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {I18nUtils} from "../../utils/i18n.utils";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ICardDisplayProps {
     formatDate(date: string): string;
@@ -24,6 +25,7 @@ interface IViewModel extends ng.IController, ICardDisplayProps {
 interface ICardDisplayProps {
     card: Card;
     board: Board;
+    changePageEventer: Subject<string>;
 }
 
 interface ICardListItemScope extends IScope, ICardDisplayProps {
@@ -34,7 +36,7 @@ class Controller implements IViewModel {
 
     card: Card;
     board: Board;
-
+    changePageEventer: Subject<string>;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
 
     constructor(private $scope: ICardListItemScope,
@@ -84,7 +86,9 @@ function directive() {
         templateUrl: `${RootsConst.directive}card-display/card-display.html`,
         scope: {
             card: '=',
-            board: '='
+            board: '=',
+            changePageEventer: '=',
+
         },
         controllerAs: 'vm',
         bindToController: true,

@@ -8,6 +8,7 @@ import {safeApply} from "../../utils/safe-apply.utils";
 import {FileViewModel} from "./FileViewerModel";
 import {hasRight} from "../../utils/rights.utils";
 import {Board} from "../../models";
+import {Subject} from "rxjs";
 
 
 const workspaceService = workspace.v2.service;
@@ -41,7 +42,7 @@ interface IViewModel extends ng.IController , IFileViewerProps{
 interface IFileViewerProps {
     file: FileViewModel;
     contentType: string;
-
+    changePageEventer: Subject<string>;
     hasDownload: boolean;
     hasEdit: boolean;
 }
@@ -56,6 +57,8 @@ class Controller implements IViewModel {
     hasDownload: boolean;
     hasEdit: boolean;
     file: FileViewModel;
+    changePageEventer: Subject<string>;
+
     hasRight: typeof hasRight = hasRight;
     constructor(private $scope: IFileViewerScope,
                 private $location: ILocationService,
@@ -67,6 +70,12 @@ class Controller implements IViewModel {
         Behaviours.load('lool').then(() => {
             Behaviours.applicationsBehaviours.lool.init(() => console.debug("Lool behaviours loaded"));
         });
+        if(this.$scope.changePageEventer){
+            this.$scope.changePageEventer.subscribe(async (cardId: string) => {
+                //TODO refresh CSVDELEAGate? pdf viewer? Il y a déjà un truc qui refresh le canvas => creuser?
+                safeApply(this.$scope);
+            });
+        }
     }
 
     isFullscreen = false;
@@ -173,7 +182,9 @@ function directive(){
             file: '=',
             contentType: '=',
             hasDownload: '=',
-            hasEdit: '='
+            hasEdit: '=',
+            changePageEventer: '='
+
         },
         templateUrl: `${RootsConst.directive}/file-viewer/file-viewer.html`,
         controllerAs: 'vm',

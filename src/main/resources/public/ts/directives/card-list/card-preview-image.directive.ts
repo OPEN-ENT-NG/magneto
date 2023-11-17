@@ -4,6 +4,7 @@ import {RootsConst} from "../../core/constants/roots.const";
 import {Card, Board} from "../../models";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {EXTENSION_FORMAT} from "../../core/constants/extension-format.const";
+import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ICardPreviewProps {
     getExtension(fileName: string): string;
@@ -20,6 +21,8 @@ interface IViewModel extends ng.IController, ICardPreviewProps {
 interface ICardPreviewProps {
     card: Card;
     board: Board;
+    changePageEventer: Subject<string>;
+
 }
 
 interface ICardListItemScope extends IScope, ICardPreviewProps {
@@ -31,6 +34,7 @@ class Controller implements IViewModel {
     card: Card;
     board: Board;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
+    changePageEventer: Subject<string>;
 
 
     constructor(private $scope: ICardListItemScope,
@@ -103,7 +107,9 @@ function directive() {
         templateUrl: `${RootsConst.directive}card-list/card-preview-image.html`,
         scope: {
             card: '=',
-            board: '='
+            board: '=',
+            changePageEventer: '='
+
         },
         controllerAs: 'vm',
         bindToController: true,

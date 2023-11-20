@@ -25,7 +25,6 @@ interface IViewModel extends ng.IController, ICardDisplayProps {
 interface ICardDisplayProps {
     card: Card;
     board: Board;
-    changePageEventer: Subject<string>;
 }
 
 interface ICardListItemScope extends IScope, ICardDisplayProps {
@@ -36,7 +35,6 @@ class Controller implements IViewModel {
 
     card: Card;
     board: Board;
-    changePageEventer: Subject<string>;
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
 
     constructor(private $scope: ICardListItemScope,
@@ -87,7 +85,6 @@ function directive() {
         scope: {
             card: '=',
             board: '=',
-            changePageEventer: '=',
 
         },
         controllerAs: 'vm',

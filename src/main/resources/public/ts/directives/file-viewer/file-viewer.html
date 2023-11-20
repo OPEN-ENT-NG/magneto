@@ -13,7 +13,7 @@
                 </button>
             </div>
             <div  >
-                <button ng-click="vm.edit()">
+                <button ng-show="vm.canEdit() && vm.hasRight('manage')" ng-click="vm.edit()">
                     <i18n>edit</i18n>
                 </button>
             </div>

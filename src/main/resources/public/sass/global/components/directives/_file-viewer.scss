@@ -1,8 +1,9 @@
 .file-viewer{
   max-height: 50vh;
-  min-width: 60vw;
-  overflow-y: auto;
-
+  height: 100%;
+  & .controls__navbar{
+    gap: 1vw;
+  }
   button {
     border: none;
     box-shadow: none;
@@ -10,4 +11,8 @@
     background: $magneto-lighter-grey !important;
   }
 
+  & .file{
+    overflow: auto;
+    max-height: 83%;
+  }
 }

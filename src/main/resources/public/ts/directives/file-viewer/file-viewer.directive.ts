@@ -3,11 +3,9 @@ import {CsvController, CsvDelegate, CsvFile} from './csv-viewer/csv-viewer.direc
 import {TxtController, TxtDelegate, TxtFile} from './txt-viewer/txt-viewer-directive';
 import {RootsConst} from "../../core/constants/roots.const";
 import {ILocationService, IScope, IWindowService} from "angular";
-import * as util from "util";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {FileViewModel} from "./FileViewerModel";
 import {hasRight} from "../../utils/rights.utils";
-import {Board} from "../../models";
 
 
 const workspaceService = workspace.v2.service;
@@ -41,7 +39,6 @@ interface IViewModel extends ng.IController , IFileViewerProps{
 interface IFileViewerProps {
     file: FileViewModel;
     contentType: string;
-
     hasDownload: boolean;
     hasEdit: boolean;
 }
@@ -56,18 +53,25 @@ class Controller implements IViewModel {
     hasDownload: boolean;
     hasEdit: boolean;
     file: FileViewModel;
+
     hasRight: typeof hasRight = hasRight;
     constructor(private $scope: IFileViewerScope,
                 private $location: ILocationService,
                 private $sce: ng.ISCEService,
                 private $window: IWindowService){
         this.$scope = $scope;
+        //Necessaire pour refresh la directive en cas de même type de fichier
+        $scope.$watch('vm.file', (newVal, oldVal) => {
+            this.contentType = "refresh"
+            safeApply($scope)
+        });
     }
     $onInit() {
         Behaviours.load('lool').then(() => {
             Behaviours.applicationsBehaviours.lool.init(() => console.debug("Lool behaviours loaded"));
         });
     }
+
 
     isFullscreen = false;
 

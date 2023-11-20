@@ -30,14 +30,14 @@
         <!-- Card display -->
         <card-display
                 card="vm.card"
-                board="vm.board">
+                board="vm.board"
+               >
         </card-display>
 
         <!-- Comments panel -->
         <comments-panel
                 ng-if="vm.card.id !== undefined && vm.changePageSubject !== undefined && vm.board.canComment"
                 card-id="vm.card.id"
-                change-page-eventer="vm.changePageSubject"
                 board-owner="vm.board.owner">
         </comments-panel>
     </div>

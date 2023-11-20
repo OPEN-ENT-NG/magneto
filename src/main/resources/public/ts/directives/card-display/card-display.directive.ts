@@ -34,7 +34,6 @@ class Controller implements IViewModel {
 
     card: Card;
     board: Board;
-
     RESOURCE_TYPES: typeof RESOURCE_TYPE;
 
     constructor(private $scope: ICardListItemScope,

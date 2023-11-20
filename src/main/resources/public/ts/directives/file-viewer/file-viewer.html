@@ -6,11 +6,17 @@
                 <small><span class="no-1d"><i18n>owner</i18n>:&nbsp;</span><strong>[[vm.file.ownerName]]</strong></small>
             </div>
         </div>
-        <div class="flex-row align-center justify-between" ng-show="vm.canDownload()">
-            <button class="cancel" ng-click="vm.download()"><i18n>download</i18n></button>
-        </div>
-        <div class="flex-row align-center justify-between" ng-show="vm.canEdit() && vm.hasRight('manage')">
-            <button ng-click="vm.edit()"><i18n>edit</i18n></button>
+        <div class="flex-row align-center justify-between">
+            <div  ng-show="vm.canDownload()">
+                <button class="cancel" ng-click="vm.download()">
+                    <i18n>download</i18n>
+                </button>
+            </div>
+            <div  >
+                <button ng-show="vm.canEdit() && vm.hasRight('manage')" ng-click="vm.edit()">
+                    <i18n>edit</i18n>
+                </button>
+            </div>
         </div>
     </div>
     <div class="file">
@@ -21,8 +27,8 @@
         <audio ng-if="vm.contentType === 'audio'" controls class="render" ng-src="[[vm.file.link]]"></audio>
         <video ng-if="vm.contentType==='video' && vm.isStreamable()" controls class="render" ng-src="[[vm.file.link]]" data-document-id="[[vm.file._id]]" data-document-is-captation="[[vm.file.metadata.captation]]"></video>
         <video ng-if="vm.contentType==='video' && !vm.isStreamable()" controls class="render" ng-src="[[vm.file.link]]" data-document-id="[[vm.file._id]]"></video>
-        <pdf-viewer ng-if="vm.contentType === 'pdf'" ng-src="[[vm.file.link]]"></pdf-viewer>
-        <pdf-viewer ng-if="vm.isOfficePdf()" ng-src="[[vm.previewUrl()]]" scroller="'#embeded-viewer'"></pdf-viewer>
+        <pdf-viewer ng-if="vm.contentType === 'pdf'" ng-src="[[vm.file.link]]" ></pdf-viewer>
+        <pdf-viewer ng-if="vm.isOfficePdf()" ng-src="[[vm.previewUrl()]]" scroller="'#embeded-viewer'" ></pdf-viewer>
         <csv-viewer ng-if="vm.isOfficeExcelOrCsv()" csv-delegate="csvDelegate"></csv-viewer>
         <txt-viewer ng-if="vm.isTxt()" txt-delegate="txtDelegate"></txt-viewer>
         <div ng-if="contentType === 'unknown' || contentType === 'zip'" class="default-viewer">

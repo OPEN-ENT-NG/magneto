@@ -20,6 +20,7 @@ interface IViewModel extends ng.IController, ICardPreviewProps {
 interface ICardPreviewProps {
     card: Card;
     board: Board;
+
 }
 
 interface ICardListItemScope extends IScope, ICardPreviewProps {

@@ -64,6 +64,7 @@ class Controller implements IViewModel {
                 private $sce: ng.ISCEService,
                 private $window: IWindowService){
         this.$scope = $scope;
+        //Necessaire pour refresh la directive en cas de même type de fichier
         $scope.$watch('vm.file', (newVal, oldVal) => {
             this.contentType = "refresh"
             safeApply($scope)

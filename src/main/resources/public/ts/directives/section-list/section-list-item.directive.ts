@@ -25,8 +25,6 @@ interface IViewModel extends ng.IController, ISectionListItemProps {
 
     openTransfer?(card: Card): void;
 
-    getTextWidth?(): void;
-
     openLock?(card: Card): void;
 
     updateSection(section: Section): Promise<void>;
@@ -265,11 +263,6 @@ function directive($parse: IParseService) {
             vm.refresh = (): void => {
                 $parse($scope.vm.onMove())({});
             }
-
-            vm.getTextWidth = () => {
-                const textLength = vm.section.title.length;
-                return { width: textLength + 'ch' }; // Taille de l'input en fonction de la longueur du texte
-            };
         }
     }
 }

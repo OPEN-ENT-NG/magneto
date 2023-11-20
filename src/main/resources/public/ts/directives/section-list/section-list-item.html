@@ -2,12 +2,12 @@
     <div class="sections-listDirective-content-container" tabindex="0">
         <i class="magneto-hide" aria-hidden="true" ng-show="!vm.section.displayed"></i>
         <div class="text-area sections-listDirective-content-title">
-            <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input"
+            <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input notDraggable"
                    ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null"
                    ng-blur="vm.updateSection(vm.section)"
-                   ng-model="vm.section.title" ng-style="vm.getTextWidth()"/>
+                   ng-model="vm.section.title"/>
         </div>
-        <i class="magneto-card-settings" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
+        <i class="magneto-card-settings notDraggable" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
         <card-list-item-options
                 ng-show="vm.isDisplayedOptions && vm.board.myRights.manager !== undefined"
                 options="vm.section"
@@ -50,7 +50,7 @@
             display-favorite="vm.board.displayNbFavorites"
             zoom="vm.zoom"
             zoom-eventer="vm.zoomEventer"
-            class="notDraggable"
+            class="notDraggable-item"
     >
     </card-list>
 

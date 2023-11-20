@@ -8,7 +8,6 @@
                  content-type="vm.card.resource.previewRole()"
                  has-download="vm.board.myRights.contrib !== undefined"
                  has-edit="vm.board.myRights.publish !== undefined"
-                 change-page-eventer="vm.changePageEventer"
     ></file-viewer>
     <a ng-href="[[vm.card.resourceUrl]]" target="_blank" ng-if="vm.card.isType(vm.RESOURCE_TYPES.LINK)">
         <img class="cardDirective-preview-image-icons" data-ng-src="/magneto/public/img/extension/link.svg">

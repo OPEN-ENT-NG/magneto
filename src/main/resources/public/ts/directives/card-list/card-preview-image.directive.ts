@@ -4,7 +4,6 @@ import {RootsConst} from "../../core/constants/roots.const";
 import {Card, Board} from "../../models";
 import {RESOURCE_TYPE} from "../../core/enums/resource-type.enum";
 import {EXTENSION_FORMAT} from "../../core/constants/extension-format.const";
-import {Subject} from "rxjs";
 
 interface IViewModel extends ng.IController, ICardPreviewProps {
     getExtension(fileName: string): string;
@@ -105,8 +104,7 @@ function directive() {
         templateUrl: `${RootsConst.directive}card-list/card-preview-image.html`,
         scope: {
             card: '=',
-            board: '=',
-
+            board: '='
         },
         controllerAs: 'vm',
         bindToController: true,

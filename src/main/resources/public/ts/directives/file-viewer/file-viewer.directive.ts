@@ -3,13 +3,9 @@ import {CsvController, CsvDelegate, CsvFile} from './csv-viewer/csv-viewer.direc
 import {TxtController, TxtDelegate, TxtFile} from './txt-viewer/txt-viewer-directive';
 import {RootsConst} from "../../core/constants/roots.const";
 import {ILocationService, IScope, IWindowService} from "angular";
-import * as util from "util";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {FileViewModel} from "./FileViewerModel";
 import {hasRight} from "../../utils/rights.utils";
-import {Board} from "../../models";
-import {Subject} from "rxjs";
-import {WorkspaceUtils} from "../../utils/workspace.utils";
 
 
 const workspaceService = workspace.v2.service;
@@ -181,8 +177,7 @@ function directive(){
             file: '=',
             contentType: '=',
             hasDownload: '=',
-            hasEdit: '=',
-
+            hasEdit: '='
         },
         templateUrl: `${RootsConst.directive}/file-viewer/file-viewer.html`,
         controllerAs: 'vm',

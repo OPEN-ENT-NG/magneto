@@ -1,11 +1,13 @@
-<div id="section-[[vm.section.id]]" >
+<div id="section-[[vm.section.id]]" class="move" >
     <div class="sections-listDirective-content-container" tabindex="0">
         <i class="magneto-hide" aria-hidden="true" ng-show="!vm.section.displayed"></i>
-        <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input"
-               ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null"
-               ng-blur="vm.updateSection(vm.section)"
-               ng-model="vm.section.title"/>
-        <i class="magneto-card-settings" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
+        <div class="text-area sections-listDirective-content-title">
+            <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input notDraggable"
+                   ng-keyup="$event.keyCode == 13 ? vm.updateSection(vm.section) : null"
+                   ng-blur="vm.updateSection(vm.section)"
+                   ng-model="vm.section.title"/>
+        </div>
+        <i class="magneto-card-settings notDraggable" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
         <card-list-item-options
                 ng-show="vm.isDisplayedOptions && vm.board.myRights.manager !== undefined"
                 options="vm.section"
@@ -48,7 +50,7 @@
             display-favorite="vm.board.displayNbFavorites"
             zoom="vm.zoom"
             zoom-eventer="vm.zoomEventer"
-            class="notDraggable"
+            class="notDraggable notDraggable-item"
     >
     </card-list>
 

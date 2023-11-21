@@ -11,8 +11,25 @@
     background: $magneto-lighter-grey !important;
   }
 
-  & .file{
-    overflow: auto;
+  & .file {
     max-height: 83%;
+    overflow: auto;
+    padding-bottom: 0%;
+  }
+
+}
+
+.csv-viewer {
+  & .pagination__area{
+    position: sticky;
+    right: 0;
+    margin-top: 0;
+  }
+  & .render {
+    @media screen and (max-width: $magneto-screen-mobile) {
+      max-height: 25vh !important
+    }
+    max-height: 28vh;
+    overflow: auto;
   }
 }

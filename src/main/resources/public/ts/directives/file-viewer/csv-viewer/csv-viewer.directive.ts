@@ -41,6 +41,7 @@ export const csvViewer = ng.directive('csvViewer', ['$sce', ($sce) => {
             csvDelegate: '='
         },
         template: `
+ <div class="csv-viewer">
             <div ng-if="showTabs()" class="pagination__area flex-row align-center justify-center">
                 <div class="file-controls left" ng-click="previousPage(e)"><i class="left"></i></div>
                 <div class="pagination">
@@ -49,7 +50,7 @@ export const csvViewer = ng.directive('csvViewer', ['$sce', ($sce) => {
                 <div class="file-controls right" ng-click="nextPage(e)"><i class="right"></i></div>
             </div>
             <div class="render">
-			    <p ng-if="loading" class="top-spacing-four flex-row align-start justify-center centered-text"><i18n>workspace.preview.loading</i18n>&nbsp;<i class="loading"></i></p>
+			    <p ng-if="loading" class="top-spacing-four flex-row align-start justify-center centered-text"><i18n>magneto.loading</i18n>&nbsp;<i class="loading"></i></p>
                 <table ng-if="showContent()">
                     <tbody>
                         <tr ng-repeat="row in currentTab.rows">
@@ -58,6 +59,7 @@ export const csvViewer = ng.directive('csvViewer', ['$sce', ($sce) => {
                     </tbody>
                 </table>
             </div>
+          </div>
         `,
         link: function (scope: CsvViewerScope, element, attributes, ctrl) {
             let _ngmodel = "";

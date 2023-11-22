@@ -76,7 +76,7 @@ class Controller implements IViewModel {
     isFullscreen = false;
 
     download = function () {
-        workspaceService.downloadFiles([this.file]);
+        window.open(`/workspace/document/${this.file._id}`);
     };
     canDownload = () => {
         return this.hasDownload && workspaceService.isActionAvailable("download", [this.file])

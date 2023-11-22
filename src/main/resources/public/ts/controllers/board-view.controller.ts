@@ -374,7 +374,8 @@ class Controller implements IViewModel {
                 event.preventDefault();
             },
             async dragDropFilesHandler(files: FileList): Promise<void> {
-                workspace.v2.service.createDocument(files[0], new Document(), null)
+                workspace.v2.service.createDocument(files[0], new Document(), null,
+                    {visibility: "protected", application: "media-library"})
                     .then(async result => {
                         if (!!result) {
                             that.cardForm = new CardForm();

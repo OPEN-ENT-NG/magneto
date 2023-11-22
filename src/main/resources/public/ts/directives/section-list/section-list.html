@@ -21,7 +21,7 @@
     </div>
     <div ng-if="vm.board.myRights.publish !== undefined"
          class="sections-listDirective-content sections-listDirective-content-[[vm.board.layoutType]]">
-        <div class="sections-listDirective-content-container" tabindex="0">
+        <div class="sections-listDirective-content-container" ng-class="{'move': vm.board.myRights.publish !== undefined}" tabindex="0">
             <input type="text" class="sections-listDirective-content-title input"
                    ng-keyup="$event.keyCode == 13 ? vm.createSection(vm.newSection) : null"
                    ng-blur="vm.createSection(vm.newSection)"

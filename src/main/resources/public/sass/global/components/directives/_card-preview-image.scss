@@ -22,4 +22,21 @@
     margin: auto;
   }
 
+  .file-viewer {
+    max-height: 65vh;
+    height: 100%;
+
+    .file {
+      max-height: 50vh;
+    }
+
+    .csv-viewer > .render {
+      max-height: 48vh;
+    }
+
+    .render {
+      max-height: 75%;
+    }
+  }
+
 }

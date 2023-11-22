@@ -19,7 +19,7 @@
             </div>
         </div>
     </div>
-    <div class="file">
+    <div class="file" ng-class="{'file-csv' : vm.isOfficeExcelOrCsv()}">
         <div ng-if="contentType === 'html'">
             <div ng-bind-html="htmlContent"></div>
         </div>

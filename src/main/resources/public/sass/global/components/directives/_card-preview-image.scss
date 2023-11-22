@@ -32,7 +32,9 @@
 
     .pdf-viewer {
       max-height: 50vh;
+      padding: 0;
       .render{
+        max-width: 97%;
         max-height: 90%;
       }
     }

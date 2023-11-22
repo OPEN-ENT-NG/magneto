@@ -14,15 +14,34 @@
     background: $magneto-lighter-grey !important;
   }
 
-  & .file {
-    max-height: 30vh;
-    @media screen and (max-width: $magneto-screen-mobile) {
-      max-height: 25vh !important
-    }
-    overflow: auto;
-    padding-bottom: 0%;
+  //& .file {
+  //  max-height: 30vh;
+  //  @media screen and (max-width: $magneto-screen-mobile) {
+  //    max-height: 25vh !important
+  //  }
+  //  overflow: auto;
+  //  padding-bottom: 0%;
+  //}
+  .file {
+    max-height: fit-content;
   }
 
+  .pdf-viewer {
+    max-height: 32vh;
+    max-width: 97%;
+    padding: 1%;
+    overflow: auto;
+    .render{
+      max-height: 90%;
+    }
+  }
+  .csv-viewer > .render {
+    max-height: 30vh;
+  }
+
+  .render {
+    max-height: 30vh;
+  }
 }
 
 .csv-viewer {

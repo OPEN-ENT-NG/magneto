@@ -14,14 +14,6 @@
     background: $magneto-lighter-grey !important;
   }
 
-  //& .file {
-  //  max-height: 30vh;
-  //  @media screen and (max-width: $magneto-screen-mobile) {
-  //    max-height: 25vh !important
-  //  }
-  //  overflow: auto;
-  //  padding-bottom: 0%;
-  //}
   .file {
     max-height: fit-content;
   }

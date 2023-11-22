@@ -179,6 +179,7 @@ function directive(){
             hasDownload: '=',
             hasEdit: '='
         },
+        replace:true,
         templateUrl: `${RootsConst.directive}/file-viewer/file-viewer.html`,
         controllerAs: 'vm',
         bindToController: true,

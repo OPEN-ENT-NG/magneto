@@ -40,6 +40,7 @@ export const csvViewer = ng.directive('csvViewer', ['$sce', ($sce) => {
         scope: {
             csvDelegate: '='
         },
+        replace:true,
         template: `
  <div class="csv-viewer">
             <div ng-if="showTabs()" class="pagination__area flex-row align-center justify-center">

@@ -101,6 +101,8 @@
   "magneto.card.options.move": "Move",
   "magneto.card.options.hide": "Hide",
   "magneto.card.options.board": "Associated board",
+  "magneto.card.options.hide.section.off": "Hide for readers",
+  "magneto.card.options.hide.section.on": "Show for readers",
   "magneto.card.options.lock": "Lock",
   "magneto.card.options.unlock": "Unlock",
   "magneto.card.options.delete": "Delete",

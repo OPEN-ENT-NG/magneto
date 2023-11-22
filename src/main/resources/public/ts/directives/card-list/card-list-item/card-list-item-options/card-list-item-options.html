@@ -34,7 +34,8 @@
                 <a class="item" ng-if="vm.hasHide" ng-click="vm.openHide()">
                     <i class="magneto-hide" aria-hidden="true"></i>
                     <span>
-                        <i18n>magneto.card.options.hide</i18n>
+                        <i18n ng-if="vm.options.displayed">magneto.card.options.hide.section.off</i18n>
+                        <i18n ng-if="!vm.options.displayed">magneto.card.options.hide.section.on</i18n>
                     </span>
                 </a>
                 <!-- Go to board button -->

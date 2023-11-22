@@ -27,15 +27,21 @@
     height: 100%;
 
     .file {
-      max-height: 50vh;
+      max-height: fit-content;
     }
 
+    .pdf-viewer {
+      max-height: 50vh;
+      .render{
+        max-height: 90%;
+      }
+    }
     .csv-viewer > .render {
-      max-height: 48vh;
+      max-height: 46vh;
     }
 
     .render {
-      max-height: 75%;
+      max-height: 50vh;
     }
   }
 

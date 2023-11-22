@@ -119,6 +119,49 @@ class Controller implements IViewModel {
         return `/workspace/document/preview/${this.file._id}`;
     }
 
+    /*fullscreen = (allow:boolean) => {
+        //is an external renderer managing the fullscreen? if so return
+        if (workspaceService.renderFullScreen(scope.ngModel) != false) {
+            return;
+        }
+        this.isFullscreen = allow;
+        if (allow) {
+            let container = $('<div class="fullscreen-viewer"></div>');
+            container.hide();
+            container.on('click', function (e) {
+                if (!$(e.target).hasClass('render')) {
+                    this.fullscreen(false);
+                    safeApply(this.$scope);
+                }
+            });
+            element.children('.embedded-viewer').addClass('fullscreen');
+            renderElement = element
+                .find('.render');
+            renderParent = renderElement.parent();
+
+            renderElement
+                .addClass('fullscreen')
+                .appendTo(container);
+            container.appendTo('body');
+            container.fadeIn();
+            if (typeof scope.render === 'function') {
+                scope.render();
+            }
+        }
+        else {
+            renderElement.removeClass('fullscreen').appendTo(renderParent);
+            element.children('.embedded-viewer').removeClass('fullscreen');
+            var fullscreenViewer = $('body').find('.fullscreen-viewer');
+            fullscreenViewer.fadeOut(400, function () {
+                fullscreenViewer.remove();
+            });
+
+            if (typeof scope.render === 'function') {
+                scope.render();
+            }
+        }
+    }*/
+
 
 
 
@@ -189,6 +232,8 @@ function directive(){
             const _txtCache: { [key: string]: TxtFile } = {}
             let _csvController: CsvController = null;
             let _txtDelegate: TxtController = null;
+            let renderElement;
+            let renderParent;
             scope.csvDelegate = {
                 onInit(ctrl) {
                     _csvController = ctrl;
@@ -230,6 +275,49 @@ function directive(){
                     reader.readAsText(a);
                 }
                 call();
+            }
+
+            scope.fullscreen = (allow) => {
+                //is an external renderer managing the fullscreen? if so return
+                if (workspaceService.renderFullScreen(scope.vm.file) != false) {
+                    return;
+                }
+                scope.isFullscreen = allow;
+                if (allow) {
+                    let container = $('<div class="fullscreen-viewer"></div>');
+                    container.hide();
+                    container.on('click', function (e) {
+                        if (!$(e.target).hasClass('render')) {
+                            scope.fullscreen(false);
+                            scope.$apply('isFullscreen');
+                        }
+                    });
+                    element.children('.embedded-viewer').addClass('fullscreen');
+                    renderElement = element
+                        .find('.render');
+                    renderParent = renderElement.parent();
+
+                    renderElement
+                        .addClass('fullscreen')
+                        .appendTo(container);
+                    container.appendTo('body');
+                    container.fadeIn();
+                    if (typeof scope.render === 'function') {
+                        scope.render();
+                    }
+                }
+                else {
+                    renderElement.removeClass('fullscreen').appendTo(renderParent);
+                    element.children('.embedded-viewer').removeClass('fullscreen');
+                    var fullscreenViewer = $('body').find('.fullscreen-viewer');
+                    fullscreenViewer.fadeOut(400, function () {
+                        fullscreenViewer.remove();
+                    });
+
+                    if (typeof scope.render === 'function') {
+                        scope.render();
+                    }
+                }
             }
         }
     }

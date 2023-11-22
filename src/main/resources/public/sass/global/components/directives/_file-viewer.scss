@@ -33,3 +33,34 @@
     overflow: auto;
   }
 }
+.embedded-viewer.fullscreen{
+  position: fixed;
+  z-index: 100101;
+  left: 0;
+  top: 0;
+  height: 40px;
+  padding: 0;
+  .controls{
+    line-height: 38px;
+    padding-right: 10px;
+  }
+}
+
+.fullscreen-viewer{
+  position: absolute;
+  z-index: 100001;
+  width: 100%;
+  background: rgba(0,0,0,0.7);
+  top: 40px;
+  left: 0;
+  min-height: calc(100% - 40px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .render{
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    max-width: 100%;
+  }
+}

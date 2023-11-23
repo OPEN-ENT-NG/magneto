@@ -1,5 +1,5 @@
-<div id="section-[[vm.section.id]]" class="move" >
-    <div class="sections-listDirective-content-container" tabindex="0">
+<div id="section-[[vm.section.id]]" ng-class="{'move': vm.board.myRights.publish !== undefined}" >
+    <div class="sections-listDirective-content-container" ng-class="{'imove': vm.board.myRights.publish !== undefined}" tabindex="0">
         <i class="magneto-hide" aria-hidden="true" ng-show="!vm.section.displayed"></i>
         <div class="text-area sections-listDirective-content-title">
             <input ng-readonly="vm.board.myRights.publish === undefined" type="text" class="sections-listDirective-content-title input notDraggable"
@@ -51,6 +51,7 @@
             zoom="vm.zoom"
             zoom-eventer="vm.zoomEventer"
             class="notDraggable notDraggable-item"
+            ng-class="{'move': vm.board.myRights.publish !== undefined}"
     >
     </card-list>
 

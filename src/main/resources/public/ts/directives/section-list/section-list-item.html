@@ -9,13 +9,13 @@
         </div>
         <i class="magneto-card-settings notDraggable" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"></i>
         <card-list-item-options
-                ng-show="vm.isDisplayedOptions && vm.board.myRights.manager !== undefined"
+                ng-show="vm.isDisplayedOptions && vm.board.myRights.publish !== undefined"
                 options="vm.section"
-                has-delete="true"
+                has-delete="vm.board.myRights.manager !== undefined"
                 on-delete="vm.openDeleteSection"
                 has-duplicate="true"
                 on-duplicate="vm.openDuplicateSection"
-                has-hide="true"
+                has-hide="vm.board.myRights.manager !== undefined"
                 on-hide="vm.openHide">
         </card-list-item-options>
     </div>

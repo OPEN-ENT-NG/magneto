@@ -16,7 +16,8 @@
                 class="scrollbar sections-listDirective-content sections-listDirective-content-[[vm.board.layoutType]]"
                 card-update-eventer="vm.cardUpdateEventer"
                 zoom-eventer="vm.zoomEventer"
-                zoom="vm.zoom">
+                zoom="vm.zoom"
+                has-longer-reposition="vm.board.myRights.manager !== undefined">
         </section-list-item>
     </div>
     <div ng-if="vm.board.myRights.publish !== undefined"

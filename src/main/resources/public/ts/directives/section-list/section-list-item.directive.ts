@@ -180,7 +180,8 @@ function directive($parse: IParseService) {
             onLock: '&',
             cardUpdateEventer: '=',
             zoom:"=?",
-            zoomEventer:"=?"
+            zoomEventer:"=?",
+            hasLongerReposition: '='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -198,11 +199,15 @@ function directive($parse: IParseService) {
                 safeApply($scope);
             });
 
+            let selectReposition = (): string => {
+                return (vm.hasLongerReposition != null && vm.hasLongerReposition ? 'longer-reposition' : 'reposition');
+            }
+
             let repositionActionOptions = (): void => {
                 let windowElem: JQuery = $(vm.formatSectionSelector(vm.section));
                 let actionOptionsElem: JQuery =
                     $("#options-" + vm.section.id);
-                let repositionClass: string = 'reposition';
+                let repositionClass: string = selectReposition();
                 // if element position element is left sided, we want to check right sided position to see if it goes
                 // out of the screen, so we add 2 times the element width.
                 if(actionOptionsElem.length > 0) {

@@ -1,16 +1,41 @@
 .file-viewer {
   max-height: 50vh;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   & .controls__navbar {
-    gap: 1vw;
-    //override ode theme
-      flex-direction: unset;
-      align-items: unset;
+
+    @media screen and (max-width: $magneto-screen-mobile) {
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    display: flex;
+    width: 100%;
+    padding: 0;
+  }
+
+  &-navbar-buttons {
+    padding-right: 15px;
+    @media screen and (max-width: $magneto-screen-mobile) {
+      padding-bottom: 5px;
+    }
+  }
+
+  &-navbar-header {
+    padding: 15px;
   }
 
   &-file-name-ellipsis {
     @include noTextOverflow(1);
+    @media screen and (max-width: $magneto-screen-mobile) {
+      max-width: 20vh;
+    }
+    @media (max-width: $magneto-screen-tablet) and (min-width: $magneto-screen-mobile) {
+      max-width: 30vh;
+    }
+    padding-right: 1vw;
   }
 
   button {

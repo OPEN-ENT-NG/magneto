@@ -1,19 +1,19 @@
 <div class="embedded-viewer file-viewer"  id="embeded-viewer"  >
     <div class="controls__navbar flex-row align-center justify-between" ng-if="!isFullscreen">
-        <div class="flex-row align-center justify-between">
+        <div class="flex-row file-viewer-navbar-header align-center justify-between">
             <div class="flex-row f-column ">
                 <h2 class="file-viewer-file-name-ellipsis no-margin" tooltip="[[vm.file.name]]">[[vm.file.name]]</h2>
                 <small><span class="no-1d"><i18n>owner</i18n>:&nbsp;</span><strong>[[vm.file.ownerName]]</strong></small>
             </div>
         </div>
-        <div class="flex-row align-center justify-between">
+        <div class="flex-row file-viewer-navbar-buttons align-center justify-between">
             <div  ng-show="vm.canDownload()">
                 <button class="cancel" ng-click="vm.download()">
                     <i18n>download</i18n>
                 </button>
             </div>
-            <div  >
-                <button ng-show="vm.canEdit() && vm.hasRight('manage')" ng-click="vm.edit()">
+            <div ng-show="vm.canEdit() && vm.hasRight('manage')" >
+                <button  ng-click="vm.edit()">
                     <i18n>edit</i18n>
                 </button>
             </div>

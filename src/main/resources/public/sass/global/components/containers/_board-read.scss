@@ -4,6 +4,7 @@
   display: flex;
   background: $magneto-white;
   min-height: calc(100vh - 124px);
+  max-height: 82vh;
   width: 70%;
   @include mobile {
     width: 100% ! important;
@@ -68,6 +69,15 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+
+    .file-viewer {
+      margin: 0;
+      max-height: calc(80vh - 150px);
+
+      .pdf-viewer {
+        max-height: calc(58vh - 145px);
+      }
+    }
   }
 
   .li-container {

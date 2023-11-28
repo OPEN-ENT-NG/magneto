@@ -61,6 +61,10 @@
 
   .csv-viewer > .render {
     max-height: 30vh;
+
+    table {
+      width: 100%;
+    }
   }
 
   .render {

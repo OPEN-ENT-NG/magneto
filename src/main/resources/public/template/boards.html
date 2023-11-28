@@ -2,19 +2,12 @@
     <!--    <card-profile name="'test'" job="'test'"></card-profile>-->
 
     <!-- Header desktop -->
-    <div class="row boardsContainer-container-header zero-mobile">
-        <h1 class="cell paddingRight">
-            <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
-                 alt="" src="/magneto/public/img/uni-magneto.png">
-            <i18n>magneto.title</i18n>
-            /
-            <i18n>magneto.my.boards</i18n>
-        </h1>
-        <button ng-if="vm.filter.isMyBoards && vm.hasRight('manage')"
-                class="right-magnet create-button" ng-click="vm.openCreateForm()">
-            <i18n>magneto.create.board</i18n>
-        </button>
-    </div>
+    <board-container-header
+            filter="vm.filter"
+            magneto-standalone="vm.magnetoStandalone"
+            on-has-right="vm.hasRight"
+            on-open-create-form="vm.openCreateForm()">
+    </board-container-header>
 
     <!-- Header mobile -->
     <div class="boardsContainer-container-header-mobile zero-desktop">

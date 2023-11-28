@@ -50,3 +50,5 @@ export * from './board-description-lightbox/board-description-lightbox.directive
 export * from './favorite-button/favorite-button.directive';
 export * from './zoom/zoom.directive';
 export * from './file-viewer/index'
+export * from './board-container-header/board-container-header.directive';
+export * from './board-container-header-title/board-container-header-title.directive';

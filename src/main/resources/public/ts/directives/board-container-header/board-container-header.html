@@ -1,0 +1,9 @@
+<div class="row boardsContainer-container-header zero-mobile">
+    <board-container-header-title
+            magneto-standalone="vm.magnetoStandalone">
+    </board-container-header-title>
+    <button ng-if="vm.filter.isMyBoards && vm.hasRight('manage')"
+            class="right-magnet create-button" ng-click="vm.openCreateForm()">
+        <i18n>magneto.create.board</i18n>
+    </button>
+</div>

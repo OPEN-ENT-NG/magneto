@@ -191,5 +191,8 @@
   "magneto.dropzone.overlay.solution": "Veuillez importer un <b>fichier</b>",
   "magneto.dropzone.overlay.action": "J'ai compris",
   "magneto.shared.push.notif.body": "shared a board with you",
-  "magneto.create.board.options.display.favorites": "Afficher le nombre de favoris sur les aimants"
+  "magneto.create.board.options.display.favorites": "Afficher le nombre de favoris sur les aimants",
+  "magneto.navbar.home": "Accueil",
+  "magneto.navbar.documents": "Documents",
+  "magneto.navbar.archive": "Archiver"
 }

@@ -24,7 +24,7 @@ import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.Trace;
-import org.entcore.common.user.UserUtils;
+import org.entcore.common.user.*;
 
 import java.util.Collections;
 import java.util.Date;
@@ -283,6 +283,23 @@ public class BoardController extends ControllerHelper {
                             .onFailure(err -> renderError(request))
                             .onSuccess(result -> renderJson(request, result));
                 }));
+    }
+
+
+    @Get("/boards/:boardId/resources")
+    @ApiDoc("Get board resource ids")
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void getBoardResourceIds(HttpServerRequest request) {
+        String boardId = request.getParam(Field.BOARDID);
+
+        UserUtils.getUserInfos(eb, request, user -> {
+
+            boardService.getAllDocumentIds(boardId, user)
+                    .onFailure(err -> renderError(request))
+                    .onSuccess(result -> renderJson(request, new JsonObject().put("documents",
+                            result)));
+        });
     }
 
 

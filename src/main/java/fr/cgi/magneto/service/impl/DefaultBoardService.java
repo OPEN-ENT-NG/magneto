@@ -569,6 +569,7 @@ public class DefaultBoardService implements BoardService {
         return query.getAggregate();
     }
 
+    @Override
     public Future<List<Board>> getAllBoardsByCreationDate(StatisticsPayload statisticsPayload) {
         Promise<List<Board>> promise = Promise.promise();
         Pattern datePattern = Pattern.compile("^" + statisticsPayload.getDate());
@@ -582,6 +583,22 @@ public class DefaultBoardService implements BoardService {
             }
             promise.complete(ModelHelper.toList(results.right().getValue(), Board.class));
         }));
+        return promise.future();
+    }
+
+    @Override
+    public Future<List<String>> getAllDocumentIds(String boardId, UserInfos user) {
+        Promise<List<String>> promise = Promise.promise();
+
+
+        this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user)
+                .onFailure(promise::fail)
+                .onSuccess(cards -> {
+                    List<String> cardIds = cards.stream().map(Card::getResourceId)
+                            .collect(Collectors.toList());
+                    promise.complete(cardIds);
+                });
+
         return promise.future();
     }
 }

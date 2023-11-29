@@ -22,6 +22,12 @@ export interface IBoardsService {
     duplicateBoard(boardId: string): Promise<AxiosResponse>;
 
     moveBoardsToFolder(boardIds: Array<string>, folderId: string): Promise<AxiosResponse>;
+
+    getAllDocumentIds(boardId: string): Promise<any>;
+
+    syncDocumentSharing(documentIds: string[], shared: {users: {[userId: string]: string[]},
+        groups: {[groupId: string]: string[]},
+        bookmarks: {[bookmarkId: string]: string[]}}): Promise<any>;
 }
 
 export const boardsService: IBoardsService = {
@@ -80,6 +86,52 @@ export const boardsService: IBoardsService = {
 
     moveBoardsToFolder: async (boardIds: Array<string>, folderId: string): Promise<AxiosResponse> => {
         return http.put(`/magneto/boards/folder/${folderId}`, {boardIds: boardIds});
+    },
+    getAllDocumentIds: async (boardId: string): Promise<any> => {
+         return http.get(`/magneto/boards/${boardId}/resources`)
+            .then((res: AxiosResponse) => res.data);
+    },
+    syncDocumentSharing: async (documentIds: string[],
+                                shared: {users: {[userId: string]: string[]},
+                                    groups: {[groupId: string]: string[]},
+                                    bookmarks: {[bookmarkId: string]: string[]}}): Promise<any> => {
+
+
+        let shareBody = {users: {}, groups: {}, bookmarks: {}};
+        let defaultWorkspaceRights: string[] = [
+            "org-entcore-workspace-controllers-WorkspaceController|getDocument",
+            "org-entcore-workspace-controllers-WorkspaceController|copyDocuments",
+            "org-entcore-workspace-controllers-WorkspaceController|getDocumentProperties",
+            "org-entcore-workspace-controllers-WorkspaceController|getRevision",
+            "org-entcore-workspace-controllers-WorkspaceController|copyFolder",
+            "org-entcore-workspace-controllers-WorkspaceController|getPreview",
+            "org-entcore-workspace-controllers-WorkspaceController|copyDocument",
+            "org-entcore-workspace-controllers-WorkspaceController|getDocumentBase64",
+            "org-entcore-workspace-controllers-WorkspaceController|listRevisions"
+        ];
+
+        for (let userId in shared.users) {
+            shareBody.users[userId] = defaultWorkspaceRights;
+            if (shared.users[userId].includes("fr-cgi-magneto-controller-ShareBoardController|initPublishRight")) {
+                shareBody.users[userId].push("org-entcore-workspace-controllers-WorkspaceController|updateDocument");
+            }
+        }
+
+        for (let userId in shared.groups) {
+            shareBody.groups[userId] = defaultWorkspaceRights;
+            if (shared.groups[userId].includes("fr-cgi-magneto-controller-ShareBoardController|initPublishRight")) {
+                shareBody.groups[userId].push("org-entcore-workspace-controllers-WorkspaceController|updateDocument");
+            }
+        }
+
+        let sharePromises = [];
+
+        for (let docId of documentIds) {
+            if (docId !== '') {
+                sharePromises.push(http.put('/workspace/share/resource/' + docId, shareBody));
+            }
+            await Promise.all(sharePromises);
+        }
     }
 };
 

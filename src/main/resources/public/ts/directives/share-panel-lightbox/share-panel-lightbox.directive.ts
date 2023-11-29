@@ -1,8 +1,14 @@
 import {ng, ShareAction, SharePayload} from "entcore";
 import {ILocationService, IScope, IWindowService, IParseService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
+import {boardsService} from "../../services";
+import http from "axios";
 
 interface IViewModel extends ng.IController, ISharePanelProps {
+
+    onShare(shared: {users: {[userId: string]: string[]},
+        groups: {[groupId: string]: string[]},
+        bookmarks: {[bookmarkId: string]: string[]}}): void;
 }
 
 interface ISharePanelProps {
@@ -32,13 +38,22 @@ class Controller implements IViewModel {
         this.display = false;
     }
 
-    closeForm = (): void => {
+    closeForm = async (): Promise<void> => {
+        let ids = await boardsService.getAllDocumentIds(this.resources[0]['_id'])
+        console.log(ids);
         this.display = false;
     }
 
     $onDestroy() {
     }
 
+    onShare = async (shared: {users: {[userId: string]: string[]},
+        groups: {[groupId: string]: string[]}, bookmarks: {[bookmarkId: string]: string[]}}) => {
+        boardsService.getAllDocumentIds(this.resources[0]['_id']).then(async (ids) => {
+            let documentIds: string[] = ids['documents'];
+            await boardsService.syncDocumentSharing(documentIds, shared);
+        })
+    }
 }
 
 class ShareableWithId {
@@ -75,7 +90,6 @@ function directive($parse: IParseService) {
                 $actions: ShareAction[]}): void => {
                 $parse($scope.vm.onValidate)(args);
             }
-
         }
     }
 }

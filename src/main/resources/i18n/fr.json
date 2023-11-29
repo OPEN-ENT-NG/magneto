@@ -195,5 +195,6 @@
   "magneto.zoom": "Zoom",
   "magneto.navbar.home": "Accueil",
   "magneto.navbar.documents": "Documents",
-  "magneto.navbar.archive": "Archiver"
+  "magneto.navbar.archive": "Archiver",
+  "magneto.board.share.warning" : "Attention : les documents de ce tableau seront partagés avec les utilisateurs de ce tableau."
 }

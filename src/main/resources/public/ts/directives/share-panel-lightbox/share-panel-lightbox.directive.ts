@@ -1,8 +1,12 @@
 import {ng, ShareAction, SharePayload} from "entcore";
 import {ILocationService, IScope, IWindowService, IParseService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
+import {boardsService} from "../../services";
+import http from "axios";
 
 interface IViewModel extends ng.IController, ISharePanelProps {
+
+    onShare(shared: { bookmarks: any, groups: any, users: any }): void;
 }
 
 interface ISharePanelProps {
@@ -32,13 +36,55 @@ class Controller implements IViewModel {
         this.display = false;
     }
 
-    closeForm = (): void => {
+    closeForm = async (): Promise<void> => {
+        let ids = await boardsService.getAllDocumentIds(this.resources[0]['_id'])
+        console.log(ids);
         this.display = false;
     }
 
     $onDestroy() {
     }
 
+    onShare = async (shared: { bookmarks: any, groups: any, users: any }) => {
+        console.log(shared);
+        let ids = await boardsService.getAllDocumentIds(this.resources[0]['_id']);
+            let docids = ids['documents'];
+        console.log(ids);
+
+        let shareBody = {
+            users: {},
+            groups: {},
+            bookmarks: {}
+        };
+
+        for (let userId in shared.users) {
+            console.log("UserId:", userId);
+
+
+            shareBody.users[userId] = [
+                "org-entcore-workspace-controllers-WorkspaceController|getDocument",
+                "org-entcore-workspace-controllers-WorkspaceController|copyDocuments",
+                "org-entcore-workspace-controllers-WorkspaceController|getDocumentProperties",
+                "org-entcore-workspace-controllers-WorkspaceController|getRevision",
+                "org-entcore-workspace-controllers-WorkspaceController|copyFolder",
+                "org-entcore-workspace-controllers-WorkspaceController|getPreview",
+                "org-entcore-workspace-controllers-WorkspaceController|copyDocument",
+                "org-entcore-workspace-controllers-WorkspaceController|getDocumentBase64",
+                "org-entcore-workspace-controllers-WorkspaceController|listRevisions"
+            ];
+
+            //TODO ajouter org-entcore-workspace-controllers-WorkspaceController|updateDocument si droit modif magneto
+
+        }
+
+        console.log(shareBody);
+
+        for (let docId of docids) {
+            if (docId !== '')
+                await http.put('/workspace/share/resource/' + docId, shareBody);
+        }
+
+    }
 }
 
 class ShareableWithId {
@@ -75,7 +121,6 @@ function directive($parse: IParseService) {
                 $actions: ShareAction[]}): void => {
                 $parse($scope.vm.onValidate)(args);
             }
-
         }
     }
 }

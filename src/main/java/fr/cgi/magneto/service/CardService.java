@@ -96,6 +96,7 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
      */
     Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage);
+    Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user);
 
     /**
      * Get all cards by creation date

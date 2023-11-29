@@ -22,6 +22,8 @@ export interface IBoardsService {
     duplicateBoard(boardId: string): Promise<AxiosResponse>;
 
     moveBoardsToFolder(boardIds: Array<string>, folderId: string): Promise<AxiosResponse>;
+
+    getAllDocumentIds(boardId: string): Promise<any>;
 }
 
 export const boardsService: IBoardsService = {
@@ -80,6 +82,10 @@ export const boardsService: IBoardsService = {
 
     moveBoardsToFolder: async (boardIds: Array<string>, folderId: string): Promise<AxiosResponse> => {
         return http.put(`/magneto/boards/folder/${folderId}`, {boardIds: boardIds});
+    },
+    getAllDocumentIds: async (boardId: string): Promise<any> => {
+         return http.get(`/magneto/boards/${boardId}/resources`)
+            .then((res: AxiosResponse) => res.data);
     }
 };
 

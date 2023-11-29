@@ -327,6 +327,22 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
+    public Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user) {
+        Promise<List<Card>> promise = Promise.promise();
+
+        fetchAllCardsByBoard(board, null, user, true)
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
+                })
+                .onSuccess(promise::complete);
+
+
+        return promise.future();
+    }
+
+    @Override
     public Future<JsonObject> getAllCardsBySection(Section section, Integer page, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
 
@@ -914,5 +930,4 @@ public class DefaultCardService implements CardService {
 
         return query.getAggregate();
     }
-
 }

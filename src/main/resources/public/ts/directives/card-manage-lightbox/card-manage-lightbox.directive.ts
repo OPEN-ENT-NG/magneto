@@ -180,7 +180,9 @@ function directive($parse: IParseService) {
                     }
 
                     vm.isUpdate ? await cardsService.updateCard(vm.form) : await cardsService.createCard(vm.form);
-                    await shareDocument();
+
+                    if (!vm.isUpdate)
+                        await shareDocument();
                 } catch (e) {
                     console.error(e);
                 }
@@ -227,7 +229,7 @@ function directive($parse: IParseService) {
                     }
                 }
 
-                await boardsService.syncDocumentSharing(vm.board.id, formattedShare);
+                await boardsService.syncDocumentSharing([vm.form.resourceId], formattedShare);
             }
         }
     }

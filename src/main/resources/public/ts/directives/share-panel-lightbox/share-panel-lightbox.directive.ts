@@ -46,7 +46,10 @@ class Controller implements IViewModel {
     }
 
     onShare = async (shared: { bookmarks: any, groups: any, users: any }) => {
-        await boardsService.syncDocumentSharing(this.resources[0]['_id'], shared);
+        boardsService.getAllDocumentIds(this.resources[0]['_id']).then(async (ids) => {
+            let documentIds: string[] = ids['documents'];
+            await boardsService.syncDocumentSharing(documentIds, shared);
+        })
     }
 }
 

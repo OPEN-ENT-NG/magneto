@@ -3,7 +3,14 @@
     <img ng-if="vm.card.isType(vm.RESOURCE_TYPES.IMAGE)"
          ng-src="/workspace/document/[[vm.card.resourceId]]"
          ng-class="cardDirective-preview-image-img">
-    <file-viewer ng-if="vm.card.isType(vm.RESOURCE_TYPES.FILE)"
+    <div ng-if="vm.card.isType(vm.RESOURCE_TYPES.FILE) && vm.card.isCompressed()" class="cardDirective-preview-image-archive">
+        <img class="card-preview-image-icons"
+             ng-click="vm.downloadFile()"
+             data-ng-src="/magneto/public/img/extension/[[vm.getExtension()]].svg">
+        <span>[[vm.card.metadata.filename]]</span>
+    </div>
+
+    <file-viewer ng-if="vm.card.isType(vm.RESOURCE_TYPES.FILE) && !vm.card.isCompressed()"
                  file="vm.card.resource"
                  content-type="vm.card.resource.previewRole()"
                  has-download="vm.board.myRights.contrib !== undefined"

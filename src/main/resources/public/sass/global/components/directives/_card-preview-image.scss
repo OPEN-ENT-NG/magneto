@@ -1,4 +1,15 @@
 .cardDirective-preview-image {
+
+  &-archive {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    span {
+      padding: 15px;
+    }
+  }
+
   &-icons {
     height: 30vh;
     width: 100%;

@@ -458,6 +458,13 @@ export class Card {
     isType = (resourceType: string): boolean => {
         return this.resourceType == resourceType;
     }
+
+    isCompressed = (): boolean => {
+        return this.metadata && this.metadata["content-type"] && (
+            this.metadata["content-type"].includes("zip") ||
+            this.metadata["content-type"].includes("octet-stream"));
+    }
+
     get resource(): FileViewModel {
         return this._resource;
     }

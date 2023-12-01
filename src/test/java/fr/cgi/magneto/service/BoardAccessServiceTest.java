@@ -40,7 +40,7 @@ public class BoardAccessServiceTest {
                         "         \"$match\":{\n" +
                         "           \"userId\":\"userId\"}\n" +
                         "},\n" +
-                        "{\"_id\":\"$boardId\",\"creationDate\":{\"$max\":\"$creationDate\"}},\n" +
+                        "{\"$group\":{\"_id\":\"$boardId\",\"creationDate\":{\"$max\":\"$creationDate\"}}},\n" +
                         "{\"$sort\":{\"creationDate\":-1}},\n" +
                         "{\"$limit\":5}]}");
 

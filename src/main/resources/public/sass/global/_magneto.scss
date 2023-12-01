@@ -18,6 +18,9 @@ body.magneto,.sniplet.magneto {
 
   section.main {
     top: 56px !important;
+    @media screen and (max-height: $magneto-screen-tablet) {
+      padding-bottom: 0 !important;
+    }
 
     #directory + div.cell {
       box-shadow: 0 5px 5px rgba(0, 0, 0, 0.21);

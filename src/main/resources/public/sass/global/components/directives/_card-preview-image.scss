@@ -53,11 +53,17 @@
       }
     }
     .csv-viewer > .render {
-      max-height: 46vh;
+      max-height: calc(64vh - 170px);
+      @media screen and (max-height: $magneto-screen-tablet) {
+        max-height: calc(60vh - 170px);
+      }
+      @media screen and (max-height: $magneto-height-navbar) {
+        max-height: calc(56vh - 170px);
+      }
     }
 
     .render {
-      max-height: 50vh;
+      max-height: calc(60vh - 170px);
     }
   }
 

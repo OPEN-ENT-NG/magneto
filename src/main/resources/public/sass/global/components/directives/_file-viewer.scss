@@ -25,6 +25,9 @@
 
   &-navbar-header {
     padding: 15px;
+    @media (min-width: 800px) and (max-width: 875px){
+      width: 50% !important;
+    }
   }
 
   &-file-name-ellipsis {

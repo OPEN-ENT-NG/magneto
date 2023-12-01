@@ -95,6 +95,19 @@ public class MongoQuery {
         return this;
     }
 
+    /**
+     * Generate group pipeline for group by one field
+     * @param mainField main field you want to group by
+     * @param externalFieldAccumulators externals fields
+     * @return group pipeline ex : $group{ _id : mainField , externalFieldAccumulators}
+     */
+    public MongoQuery group(String mainField, Map<String, JsonObject> externalFieldAccumulators) {
+        JsonObject group = new JsonObject().put(Mongo._ID, String.format("$%s", mainField));
+        externalFieldAccumulators.forEach(group::put);
+        this.pipeline.add(new JsonObject().put(Mongo.GROUP, group));
+        return this;
+    }
+
 
 
     public MongoQuery project(JsonObject parameters) {

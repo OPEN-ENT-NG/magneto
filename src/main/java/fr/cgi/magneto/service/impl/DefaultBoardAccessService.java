@@ -63,7 +63,7 @@ public class DefaultBoardAccessService implements BoardAccessService {
                 JsonArray result = either.right().getValue()
                         .getJsonObject(Field.CURSOR, new JsonObject())
                         .getJsonArray(Field.FIRSTBATCH, new JsonArray());
-                promise.complete(result.stream().map(elem ->((JsonObject) elem).getJsonObject(Field._ID,new JsonObject()).getString(Field.BOARDID,""))
+                promise.complete(result.stream().map(elem -> ((JsonObject) elem).getString(Field._ID, ""))
                         .collect(Collectors.toList()));
             }
         }));
@@ -71,14 +71,13 @@ public class DefaultBoardAccessService implements BoardAccessService {
     }
 
     private JsonObject getBoardAccessQuery(String userId) {
-        List<String> filter= new ArrayList<>();
-        filter.add(Field.BOARDID);
-        Map<String,String> externalFieldAccumulators = new HashMap<>();
+        Map<String, JsonObject> externalFieldAccumulators = new HashMap<>();
 
+        externalFieldAccumulators.put(Field.CREATIONDATE, new JsonObject().put(Mongo.MAX, String.format("$%s", Field.CREATIONDATE)));
 
         return new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field.USERID, userId))
-                .group(filter, externalFieldAccumulators)
+                .group(Field.BOARDID, externalFieldAccumulators)
                 .sort(Field.CREATIONDATE, -1)
                 .limit(5).getAggregate();
     }

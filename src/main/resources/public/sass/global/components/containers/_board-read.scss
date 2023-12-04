@@ -4,10 +4,15 @@
   display: flex;
   background: $magneto-white;
   min-height: calc(100vh - 124px);
-  max-height: 82vh;
   width: 70%;
+  @media screen and (max-width: 1075px) {
+    width: 85% !important;
+  }
   @include mobile {
     width: 100% ! important;
+  }
+  @media screen and (max-width: 950px) {
+    width: 100% !important;
   }
 
   margin-left: auto;

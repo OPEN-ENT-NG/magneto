@@ -28,17 +28,13 @@
     @media (min-width: 800px) and (max-width: 875px){
       width: 50% !important;
     }
+    min-width: 0;
   }
 
   &-file-name-ellipsis {
     @include noTextOverflow(1);
-    @media screen and (max-width: $magneto-screen-mobile) {
-      max-width: 20vh;
-    }
-    @media (max-width: $magneto-screen-tablet) and (min-width: $magneto-screen-mobile) {
-      max-width: 30vh;
-    }
     padding-right: 1vw;
+    word-break: break-all;
   }
 
   button {
@@ -89,4 +85,8 @@
     max-height: 28vh;
     overflow: auto;
   }
+}
+
+.width100 {
+  max-width: 100%;
 }

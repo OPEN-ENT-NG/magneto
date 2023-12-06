@@ -68,6 +68,10 @@
 
   .render {
     max-height: 30vh;
+    pre{
+      overflow: auto;
+      max-height: inherit;
+    }
   }
 }
 

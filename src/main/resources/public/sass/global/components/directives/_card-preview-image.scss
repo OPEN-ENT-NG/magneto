@@ -1,5 +1,8 @@
 .cardDirective-preview-image {
 
+  flex: 1;
+  display: flex;
+
   &-archive {
     display: flex;
     flex-direction: column;
@@ -21,7 +24,13 @@
     height: 400px;
   }
 
+  img{
+    max-width: 57vw;
+    max-height: 65vh;
+  }
+
   &-img {
+    max-height: 69vh;
     width: 100%;
     height: 100%;
     margin-left: auto;
@@ -34,15 +43,18 @@
   }
 
   .file-viewer {
-    max-height: 65vh;
     height: 100%;
 
     .file {
+      flex: 1;
       max-height: fit-content;
     }
 
     .file-csv{
       padding: 1px;
+    }
+    .file-txt{
+      padding-bottom: 1px;
     }
     .pdf-viewer {
       max-height: 50vh;
@@ -52,14 +64,21 @@
         max-height: 90%;
       }
     }
+
+    .txt-viewer{
+      max-height: calc(80vh - 255px) !important;
+    }
+
+    .txt{
+      padding-right: 50px;
+    }
+
     .csv-viewer > .render {
-      max-height: calc(64vh - 170px);
-      @media screen and (max-height: $magneto-screen-tablet) {
-        max-height: calc(60vh - 170px);
-      }
-      @media screen and (max-height: $magneto-height-navbar) {
-        max-height: calc(56vh - 170px);
-      }
+      max-height: calc(80vh - 170px);
+    }
+
+    .txt-viewer > .render {
+      max-height: calc(80vh - 255px);
     }
 
     .render {

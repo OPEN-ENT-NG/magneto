@@ -77,10 +77,10 @@
 
     .file-viewer {
       margin: 0;
-      max-height: calc(80vh - 150px);
+      flex: 1;
 
       .pdf-viewer {
-        max-height: calc(58vh - 145px);
+        max-height: calc(80vh - 238px);
       }
     }
   }

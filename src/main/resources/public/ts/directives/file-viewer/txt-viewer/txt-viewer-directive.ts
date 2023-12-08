@@ -24,9 +24,9 @@ export const txtViewer = ng.directive('txtViewer', ['$sce', ($sce) => {
             txtDelegate: '='
         },
         template: `
-            <div class="render">
+            <div class="render txt-viewer">
 			    <p ng-if="loading" class="top-spacing-four flex-row align-start justify-center centered-text"><i18n>workspace.preview.loading</i18n>&nbsp;<i class="loading"></i></p>
-                <pre>[[content]]</pre>
+                <pre class="txt">[[content]]</pre>
             </div>
         `,
         link: function (scope: TxtViewerScope, element, attributes, ctrl) {

@@ -1,4 +1,4 @@
-import {ng} from 'entcore'
+import {ng, model} from 'entcore'
 import http, {AxiosResponse} from 'axios';
 import {BoardForm, Boards, IBoardsParamsRequest} from "../models";
 
@@ -109,6 +109,9 @@ export const boardsService: IBoardsService = {
             "org-entcore-workspace-controllers-WorkspaceController|getDocumentBase64",
             "org-entcore-workspace-controllers-WorkspaceController|listRevisions"
         ];
+
+        shareBody.users[model.me.userId] = defaultWorkspaceRights;
+        shareBody.users[model.me.userId].push("org-entcore-workspace-controllers-WorkspaceController|updateDocument");
 
         for (let userId in shared.users) {
             shareBody.users[userId] = defaultWorkspaceRights;

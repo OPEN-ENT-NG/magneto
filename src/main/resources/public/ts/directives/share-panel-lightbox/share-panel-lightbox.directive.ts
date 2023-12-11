@@ -39,8 +39,6 @@ class Controller implements IViewModel {
     }
 
     closeForm = async (): Promise<void> => {
-        let ids = await boardsService.getAllDocumentIds(this.resources[0]['_id'])
-        console.log(ids);
         this.display = false;
     }
 

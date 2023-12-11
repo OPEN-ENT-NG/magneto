@@ -229,6 +229,8 @@ function directive($parse: IParseService) {
                     }
                 }
 
+                formattedShare.users[vm.board.owner.userId] = rights;
+
                 await boardsService.syncDocumentSharing([vm.form.resourceId], formattedShare);
             }
         }

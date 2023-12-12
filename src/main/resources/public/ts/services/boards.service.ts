@@ -128,10 +128,12 @@ export const boardsService: IBoardsService = {
         }
 
         let sharePromises = [];
+        let uniqueDocumentIds = new Set(documentIds);
 
-        for (let docId of documentIds) {
+        for (let docId of Array.from(uniqueDocumentIds)) {
             if (docId !== '') {
-                sharePromises.push(http.put('/workspace/share/resource/' + docId, shareBody));
+                sharePromises.push(http.put('/workspace/share/resource/' + docId, shareBody)
+                    .catch(err => console.error('Erreur lors du partage du document ' + docId, err)));
             }
             await Promise.all(sharePromises);
         }

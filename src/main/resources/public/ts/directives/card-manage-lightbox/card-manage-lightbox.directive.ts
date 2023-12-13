@@ -181,7 +181,7 @@ function directive($parse: IParseService) {
 
                     vm.isUpdate ? await cardsService.updateCard(vm.form) : await cardsService.createCard(vm.form);
 
-                    if (!vm.isUpdate)
+                    if (!vm.isUpdate && vm.board.isMyBoard())
                         await shareDocument();
                 } catch (e) {
                     console.error(e);

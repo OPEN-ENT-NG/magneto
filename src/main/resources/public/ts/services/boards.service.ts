@@ -110,9 +110,6 @@ export const boardsService: IBoardsService = {
             "org-entcore-workspace-controllers-WorkspaceController|listRevisions"
         ];
 
-        shareBody.users[model.me.userId] = defaultWorkspaceRights;
-        shareBody.users[model.me.userId].push("org-entcore-workspace-controllers-WorkspaceController|updateDocument");
-
         for (let userId in shared.users) {
             shareBody.users[userId] = defaultWorkspaceRights;
             if (shared.users[userId].includes("fr-cgi-magneto-controller-ShareBoardController|initPublishRight")) {

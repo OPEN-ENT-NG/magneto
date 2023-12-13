@@ -66,6 +66,7 @@ public class Field {
     public static final String LAYOUTTYPE = "layoutType";
 
     public static final String CANCOMMENT = "canComment";
+    public static final String CANEDIT = "canEdit";
     public static final String DISPLAY_NB_FAVORITES = "displayNbFavorites";
 
     public static final String ALLFOLDERS = "allFolders";
@@ -139,6 +140,8 @@ public class Field {
     public static final String BOARD = "board";
 
     public static final String COMMENTID = "commentId";
+
+    public static final String DOCUMENTID = "documentId";
 
     // AUTH
     public static final String CODE = "code";

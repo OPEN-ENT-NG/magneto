@@ -12,4 +12,6 @@ public interface WorkspaceService {
      * @return Future {@link Future <JsonObject>} containing metadata of the document
      */
     Future<JsonObject> getDocument(String documentId);
+
+    Future<Boolean> canEditDocument(String userId, String documentId);
 }

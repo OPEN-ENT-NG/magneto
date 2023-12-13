@@ -67,7 +67,7 @@ public class ServiceFactory {
         return this.folderService;
     }
     public WorkspaceService workSpaceService() {
-        return new DefaultWorkspaceService(vertx);
+        return new DefaultWorkspaceService(vertx, mongoDb);
     }
 
     public CommentService commentService() {

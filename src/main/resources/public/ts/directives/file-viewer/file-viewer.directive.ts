@@ -6,9 +6,9 @@ import {ILocationService, IScope, IWindowService} from "angular";
 import {safeApply} from "../../utils/safe-apply.utils";
 import {FileViewModel} from "./FileViewerModel";
 import {hasRight} from "../../utils/rights.utils";
+import {workspaceService} from "../../services";
 
-
-const workspaceService = workspace.v2.service;
+const workspaceServiceV2 = workspace.v2.service;
 
 interface IViewModel extends ng.IController , IFileViewerProps{
     isFullscreen: boolean;
@@ -52,6 +52,8 @@ class Controller implements IViewModel {
 
     hasDownload: boolean;
     hasEdit: boolean;
+
+    hasEditRight: boolean = false;
     file: FileViewModel;
 
     hasRight: typeof hasRight = hasRight;
@@ -70,6 +72,14 @@ class Controller implements IViewModel {
         Behaviours.load('lool').then(() => {
             Behaviours.applicationsBehaviours.lool.init(() => console.debug("Lool behaviours loaded"));
         });
+
+        workspaceService.canEditDocument(this.file._id).then((canEditRight: boolean) => {
+            this.hasEditRight = canEditRight;
+            safeApply(this.$scope);
+        }).catch(() => {
+            this.hasEditRight = false;
+        });
+
     }
 
 
@@ -79,7 +89,7 @@ class Controller implements IViewModel {
         window.open(`/workspace/document/${this.file._id}`);
     };
     canDownload = () => {
-        return this.hasDownload && workspaceService.isActionAvailable("download", [this.file])
+        return this.hasDownload && workspaceServiceV2.isActionAvailable("download", [this.file])
     }
 
     edit = (): void => {
@@ -88,9 +98,9 @@ class Controller implements IViewModel {
     canEdit = (): boolean => {
         const ext: string[] = ['doc', 'ppt', "xls"];
         const isoffice: boolean = ext.includes(this.contentType);
+        const canBeOpenOnLool: boolean = !Behaviours.applicationsBehaviours['lool'].failed && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
 
-        return this.hasEdit && isoffice && !Behaviours.applicationsBehaviours['lool'].failed && Behaviours.applicationsBehaviours['lool'].canBeOpenOnLool(this.file);
-
+        return this.hasEditRight && this.hasEdit && isoffice && canBeOpenOnLool;
     }
 
     isOfficePdf = () => {
@@ -120,9 +130,6 @@ class Controller implements IViewModel {
     }
 
 
-
-
-
     $parent: { display: { editedImage: any; editImage: boolean } };
     csvDelegate: CsvDelegate;
     htmlContent: string;
@@ -139,7 +146,7 @@ class CsvProviderFromText implements CsvFile {
     get content() {
         if (this._cache) return this._cache;
         this._cache = new Promise<string>(async (resolve, reject) => {
-            const a = await workspaceService.getDocumentBlob(this.model._id);
+            const a = await workspaceServiceV2.getDocumentBlob(this.model._id);
             const reader = new FileReader();
             reader.onload = () => {
                 const res = (reader.result) as string;
@@ -158,7 +165,7 @@ class CsvProviderFromExcel implements CsvFile {
     get content() {
         if (this._cache) return this._cache;
         this._cache = new Promise<string>(async (resolve, reject) => {
-            const a = await workspaceService.getPreviewBlob(this.model._id);
+            const a = await workspaceServiceV2.getPreviewBlob(this.model._id);
             const reader = new FileReader();
             reader.onload = () => {
                 const res = (reader.result) as string;
@@ -223,7 +230,7 @@ function directive(){
 
             if (scope.contentType == 'html') {
                 const call = async () => {
-                    const a = await workspaceService.getDocumentBlob(scope.vm.file._id);
+                    const a = await workspaceServiceV2.getDocumentBlob(scope.vm.file._id);
                     const reader = new FileReader();
                     reader.onload = function () {
                         safeApply(scope);

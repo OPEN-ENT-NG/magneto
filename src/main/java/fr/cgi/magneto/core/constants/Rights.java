@@ -42,4 +42,5 @@ public class Rights {
 
 
     public static final String SHAREBOARDCONTROLLER_INITREADRIGHT = "fr-cgi-magneto-controller-ShareBoardController|initReadRight";
+    public static final String WORKSPACECONTROLLER_UPDATEDOCUMENT = "org-entcore-workspace-controllers-WorkspaceController|updateDocument";
 }

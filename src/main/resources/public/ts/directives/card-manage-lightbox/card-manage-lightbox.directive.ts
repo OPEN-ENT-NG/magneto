@@ -181,8 +181,8 @@ function directive($parse: IParseService) {
 
                     vm.isUpdate ? await cardsService.updateCard(vm.form) : await cardsService.createCard(vm.form);
 
-                    if (!vm.isUpdate && vm.board.isMyBoard())
-                        await shareDocument();
+                    if (!vm.isUpdate)
+                        await shareDocument(!vm.board.isMyBoard());
                 } catch (e) {
                     console.error(e);
                 }
@@ -190,7 +190,7 @@ function directive($parse: IParseService) {
                 $parse($scope.vm.onSubmit())({});
             };
 
-            let shareDocument = async () => {
+            let shareDocument = async (isReadOnly: boolean): Promise<void> => {
                 // We need to format the shared object for sharing the associated document
                 let formattedShare = {
                     users: {},
@@ -198,12 +198,13 @@ function directive($parse: IParseService) {
                     bookmarks: {}
                 };
 
-                const rights: string[] = [
+                const readRight: string = 'fr-cgi-magneto-controller-ShareBoardController|initReadRight';
+                const higherRights: string[] = [
                     'fr-cgi-magneto-controller-ShareBoardController|initContribRight',
                     'fr-cgi-magneto-controller-ShareBoardController|initManagerRight',
-                    'fr-cgi-magneto-controller-ShareBoardController|initPublishRight',
-                    'fr-cgi-magneto-controller-ShareBoardController|initReadRight'
+                    'fr-cgi-magneto-controller-ShareBoardController|initPublishRight'
                 ];
+                const rights: string[] = isReadOnly ? [readRight]: [readRight, ...higherRights];
 
                 for (let u in vm.board.shared) {
                     let userOrGroup = vm.board.shared[u];

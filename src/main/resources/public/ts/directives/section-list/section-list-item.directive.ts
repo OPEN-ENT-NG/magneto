@@ -237,6 +237,7 @@ function directive($parse: IParseService) {
                 $parse($scope.vm.onEdit())(card);
             }
 
+
             vm.openDuplicate = (card: Card): void => {
                 $parse($scope.vm.onDuplicate())(card);
             }

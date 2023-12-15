@@ -180,60 +180,12 @@ function directive($parse: IParseService) {
                     }
 
                     vm.isUpdate ? await cardsService.updateCard(vm.form) : await cardsService.createCard(vm.form);
-
-                    if (!vm.isUpdate)
-                        await shareDocument(!vm.board.isMyBoard());
                 } catch (e) {
                     console.error(e);
                 }
 
                 $parse($scope.vm.onSubmit())({});
             };
-
-            let shareDocument = async (isReadOnly: boolean): Promise<void> => {
-                // We need to format the shared object for sharing the associated document
-                let formattedShare = {
-                    users: {},
-                    groups: {},
-                    bookmarks: {}
-                };
-
-                const readRight: string = 'fr-cgi-magneto-controller-ShareBoardController|initReadRight';
-                const higherRights: string[] = [
-                    'fr-cgi-magneto-controller-ShareBoardController|initContribRight',
-                    'fr-cgi-magneto-controller-ShareBoardController|initManagerRight',
-                    'fr-cgi-magneto-controller-ShareBoardController|initPublishRight'
-                ];
-                const rights: string[] = isReadOnly ? [readRight]: [readRight, ...higherRights];
-
-                for (let u in vm.board.shared) {
-                    let userOrGroup = vm.board.shared[u];
-
-                    if (userOrGroup['userId'] !== undefined) {
-                        let userId = userOrGroup['userId'];
-                        formattedShare.users[userId] = [];
-
-                        for (let right of rights) {
-                            if (userOrGroup[right] === true) {
-                                formattedShare.users[userId].push(right);
-                            }
-                        }
-                    } else if (userOrGroup['groupId'] !== undefined) {
-                        let groupId = userOrGroup['groupId'];
-                        formattedShare.groups[groupId] = [];
-
-                        for (let right of rights) {
-                            if (userOrGroup[right] === true) {
-                                formattedShare.groups[groupId].push(right);
-                            }
-                        }
-                    }
-                }
-
-                formattedShare.users[vm.board.owner.userId] = rights;
-
-                await boardsService.syncDocumentSharing([vm.form.resourceId], formattedShare);
-            }
         }
     }
 }

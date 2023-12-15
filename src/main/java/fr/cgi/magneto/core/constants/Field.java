@@ -31,6 +31,7 @@ public class Field {
     public static final String ISPUBLIC = "isPublic";
 
     public static final String SHARED = "shared";
+    public static final String INHERITEDSHARES = "inheritedShares";
     public static final String ISSHARED = "isShared";
     public static final String SORTBY = "sortBy";
     public static final String PAGE = "page";
@@ -209,4 +210,8 @@ public class Field {
     public static final String MAGNETO_STANDALONE = "magnetoStandalone";
     public static final String ISLIKED = "isLiked";
     public static final String DISPLAYED = "displayed";
+    public static final String USERS = "users";
+    public static final String GROUPS = "groups";
+    public static final String BOOKMARKS = "bookmarks";
+    public static final String BOOKMARKID = "bookmarkId";
 }

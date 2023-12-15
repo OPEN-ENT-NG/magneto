@@ -5,10 +5,6 @@ import {boardsService} from "../../services";
 import http from "axios";
 
 interface IViewModel extends ng.IController, ISharePanelProps {
-
-    onShare(shared: {users: {[userId: string]: string[]},
-        groups: {[groupId: string]: string[]},
-        bookmarks: {[bookmarkId: string]: string[]}}): void;
 }
 
 interface ISharePanelProps {
@@ -43,14 +39,6 @@ class Controller implements IViewModel {
     }
 
     $onDestroy() {
-    }
-
-    onShare = async (shared: {users: {[userId: string]: string[]},
-        groups: {[groupId: string]: string[]}, bookmarks: {[bookmarkId: string]: string[]}}) => {
-        boardsService.getAllDocumentIds(this.resources[0]['_id']).then(async (ids) => {
-            let documentIds: string[] = ids['documents'];
-            await boardsService.syncDocumentSharing(documentIds, shared);
-        })
     }
 }
 

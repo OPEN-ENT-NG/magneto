@@ -51,7 +51,7 @@ public class Magneto extends BaseServer {
 
 		final EventBus eb = getEventBus(vertx);
 
-		ShareBoardController shareBoardController = new ShareBoardController();
+		ShareBoardController shareBoardController = new ShareBoardController(serviceFactory);
 		addController(shareBoardController);
 		shareBoardController.setShareService(new MongoDbShareService(eb, MongoDb.getInstance(),
 				CollectionsConstant.BOARD_COLLECTION, securedActions, null));

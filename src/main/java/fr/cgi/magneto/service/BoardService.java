@@ -98,7 +98,7 @@ public interface BoardService {
     Future<List<Board>> getAllBoardsByCreationDate(StatisticsPayload statisticsPayload);
 
     /**
-     * Get all document ids from a board
+     * Get all document ids of a user from a board
      * @param boardId Board identifier
      * @param user User who get documents
      * @return Future {@link Future <List<String>>} containing list of document ids

@@ -97,6 +97,7 @@ public interface CardService {
      */
     Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage);
     Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user);
+    Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user, UserInfos userToFetch);
 
     /**
      * Get all cards by creation date

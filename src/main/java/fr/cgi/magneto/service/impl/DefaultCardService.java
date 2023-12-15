@@ -7,9 +7,7 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.excpetion.RessourceNotFoundException;
-import fr.cgi.magneto.helper.I18nHelper;
-import fr.cgi.magneto.helper.ModelHelper;
-import fr.cgi.magneto.helper.PromiseHelper;
+import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.Metadata;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.Section;
@@ -80,9 +78,11 @@ public class DefaultCardService implements CardService {
         Future<JsonObject> createCardFuture = this.create(cardPayload, newId);
         Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(cardPayload.getBoardId()));
         Future<List<Section>> getSectionsFuture = this.serviceFactory.sectionService().getSectionsByBoardId(cardPayload.getBoardId());
+        Future<JsonObject> syncDocumentRightsFuture = this.syncDocumentRights(cardPayload.getBoardId(),
+                cardPayload.getResourceId(), cardPayload.getOwnerId());
 
         List<Future> createCardFutures = new ArrayList<>();
-        CompositeFuture.all(createCardFuture, getBoardFuture, getSectionsFuture)
+        CompositeFuture.all(createCardFuture, getBoardFuture, getSectionsFuture, syncDocumentRightsFuture)
                 .compose(result -> {
                     if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
                         BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
@@ -129,6 +129,28 @@ public class DefaultCardService implements CardService {
                 .onFailure(promise::fail)
                 .onSuccess(success -> promise.complete(new JsonObject().put(Field.ID, newId)));
 
+        return promise.future();
+    }
+
+    private Future<JsonObject> syncDocumentRights(String boardId, String documentId, String cardOwnerId) {
+        Promise<JsonObject> promise = Promise.promise();
+        this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
+                .onFailure(promise::fail)
+                .onSuccess(boards -> {
+                    if (!boards.isEmpty()) {
+                        Board board = boards.get(0);
+                        String boardOwnerId = board.getOwnerId();
+                        JsonObject shared = WorkspaceHelper.toAPIShareFormat(board.getShared(), cardOwnerId.equals(boardOwnerId), boardOwnerId);
+                        JsonArray workspaceShare = WorkspaceHelper.toMongoWorkspaceShareFormat(shared);
+                        this.workspaceService.setShareRights(Collections.singletonList(documentId), workspaceShare)
+                                .onFailure(promise::fail)
+                                .onSuccess(success -> promise.complete(shared));
+                    } else {
+                        String message = String.format("[Magneto@%s::syncDocumentRights] " +
+                                "No board found with id %s", this.getClass().getSimpleName(), boardId);
+                        promise.fail(message);
+                    }
+                });
         return promise.future();
     }
 
@@ -302,7 +324,7 @@ public class DefaultCardService implements CardService {
 
         Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsByBoardCount(board, page, user);
 
-        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page, user, fromStartPage);
+        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page, user, fromStartPage, null);
 
 
         CompositeFuture.all(fetchAllCardsFuture, fetchAllCardsCountFuture)
@@ -328,9 +350,14 @@ public class DefaultCardService implements CardService {
 
     @Override
     public Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user) {
+        return this.getAllCardsByBoard(board, user, null);
+    }
+
+    @Override
+    public Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user, UserInfos userToFetch) {
         Promise<List<Card>> promise = Promise.promise();
 
-        fetchAllCardsByBoard(board, null, user, true)
+        fetchAllCardsByBoard(board, null, user, true, userToFetch)
                 .onFailure(fail -> {
                     log.error("[Magneto@%s::getAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName(),
                             fail.getMessage());
@@ -567,9 +594,19 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<List<Card>> fetchAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage) {
+    /**
+     * Fetch all cards by board
+     * @param board the board
+     * @param page the page
+     * @param user the user who fetches the cards
+     * @param fromStartPage if true, we fetch the first page of cards
+     * @param userToFetch if defined, we fetch cards of this user
+     * @return the list of cards
+     */
+    private Future<List<Card>> fetchAllCardsByBoard(Board board, Integer page, UserInfos user,
+                                                    boolean fromStartPage, UserInfos userToFetch) {
         Promise<List<Card>> promise = Promise.promise();
-        JsonObject query = this.getAllCardsByBoardQuery(board, page, false, user, fromStartPage);
+        JsonObject query = this.getAllCardsByBoardQuery(board, page, false, user, fromStartPage, userToFetch);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error(String.format("[Magneto@%s::fetchAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName()),
@@ -794,9 +831,27 @@ public class DefaultCardService implements CardService {
         return query.getAggregate();
     }
 
-    private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user, boolean fromStartPage) {
+    /**
+     * Get all cards by board
+     * @param board the board
+     * @param page the page
+     * @param getCount if true, return the count of cards
+     * @param user the user who requests the cards
+     * @param fromStartPage if true, return the cards from the start page
+     * @param userToFetch if defined, only return the cards of the user
+     * @return the query to get all cards by board
+     */
+    private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user,
+                                               boolean fromStartPage, UserInfos userToFetch) {
         MongoQuery query = new MongoQuery(this.collection)
-                .match(new JsonObject().put(Field.BOARDID, board.getId()));
+                .match(new JsonObject()
+                        .put(Field.BOARDID, board.getId()));
+
+        if (userToFetch != null) {
+            query.match(new JsonObject()
+                    .put(Field.OWNERID, userToFetch.getUserId()));
+        }
+
         if (page != null) {
             JsonArray cardIds = new JsonArray(board.cards().stream().map(Card::getId).collect(Collectors.toList()));
             query.match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, cardIds)))
@@ -865,6 +920,11 @@ public class DefaultCardService implements CardService {
         }
 
         return query.getAggregate();
+    }
+
+    private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user,
+                                               boolean fromStartPage) {
+        return getAllCardsByBoardQuery(board, page, getCount, user, fromStartPage, null);
     }
 
     private JsonObject getAllCardsBySectionQuery(Section section, Integer page, boolean getCount, UserInfos user) {

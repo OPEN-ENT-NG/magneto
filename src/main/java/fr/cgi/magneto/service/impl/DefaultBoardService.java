@@ -590,8 +590,7 @@ public class DefaultBoardService implements BoardService {
     public Future<List<String>> getAllDocumentIds(String boardId, UserInfos user) {
         Promise<List<String>> promise = Promise.promise();
 
-
-        this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user)
+        this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
                 .onFailure(promise::fail)
                 .onSuccess(cards -> {
                     List<String> cardIds = cards.stream().map(Card::getResourceId)

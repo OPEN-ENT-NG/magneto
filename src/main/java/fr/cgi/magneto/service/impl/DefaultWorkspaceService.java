@@ -14,6 +14,8 @@ import io.vertx.core.json.*;
 import io.vertx.core.logging.*;
 import org.entcore.common.mongodb.*;
 
+import java.util.*;
+
 public class DefaultWorkspaceService implements WorkspaceService {
 
     private final EventBus eb;
@@ -62,9 +64,10 @@ public class DefaultWorkspaceService implements WorkspaceService {
                 );
 
 
-        mongoDb.find("documents", query, MongoDbResult.validResultsHandler(results -> {
+        mongoDb.find(CollectionsConstant.WORKSPACE_DOCUMENTS, query, MongoDbResult.validResultsHandler(results -> {
             if (results.isLeft()) {
-                String message = String.format("[Magneto@%s::canEditDocument] Failed to access document info", this.getClass().getSimpleName());
+                String message = String.format("[Magneto@%s::canEditDocument] Failed to access document info",
+                        this.getClass().getSimpleName());
                 log.error(String.format("%s : %s", message, results.left().getValue()));
                 promise.fail(message);
                 return;
@@ -75,5 +78,31 @@ public class DefaultWorkspaceService implements WorkspaceService {
     }
 
 
+    @Override
+    public Future<JsonObject> setShareRights(List<String> documentIds, JsonArray shareRights) {
+        Promise<JsonObject> promise = Promise.promise();
 
+        JsonObject query = new JsonObject()
+                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(documentIds)));
+
+        JsonObject update = new JsonObject()
+                .put(Mongo.SET, new JsonObject()
+                        .put(Field.SHARED, shareRights)
+                        .put(Field.INHERITEDSHARES, shareRights)
+                        .put(Field.ISSHARED, true));
+
+        mongoDb.update(CollectionsConstant.WORKSPACE_DOCUMENTS, query, update, false, true,
+                MongoDbResult.validActionResultHandler(results -> {
+                    if (results.isLeft()) {
+                        String message = String.format("[Magneto@%s::setShareRights] Failed to set share rights",
+                                this.getClass().getSimpleName());
+                        log.error(String.format("%s : %s", message, results.left().getValue()));
+                        promise.fail(message);
+                        return;
+                    }
+                    promise.complete(results.right().getValue());
+                }));
+
+        return promise.future();
+    }
 }

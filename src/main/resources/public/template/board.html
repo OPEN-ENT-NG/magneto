@@ -5,10 +5,12 @@
     <div class="row boardContainer-container-header">
         <div class="flex boardContainer-container-header-content">
             <div class="cell boardContainer-container-header-title">
-                <h1 ng-click="vm.goToBoards()" class="cell paddingRight" tooltip="[[vm.board.title]]">
+                <h1  class="cell paddingRight" tooltip="[[vm.board.title]]">
+                    <span ng-click="vm.goToBoards()">
                     <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                          alt="" src="/magneto/public/img/uni-magneto.png">
                     <i18n>magneto.title</i18n>
+                    </span>
                     / [[vm.board.title]]
                 </h1>
             </div>
@@ -42,10 +44,12 @@
     <div class="row boardContainer-container-header-mobile">
         <div class="row">
             <div class="cell boardContainer-container-header-mobile-title">
-                <h1 ng-click="vm.goToBoards()" class="cell paddingRight" tooltip="[[vm.board.title]]">
+                <h1 class="cell paddingRight"  tooltip="[[vm.board.title]]">
+               <span  ng-click="vm.goToBoards()">
                     <img class="application-logo" ng-src="/magneto/public/img/uni-magneto.png"
                          alt="" src="/magneto/public/img/uni-magneto.png">
                     <i18n>magneto.title</i18n>
+               </span>
                     / [[vm.board.title]]
                 </h1>
             </div>

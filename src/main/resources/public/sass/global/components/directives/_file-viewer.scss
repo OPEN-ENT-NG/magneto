@@ -1,5 +1,5 @@
 .file-viewer {
-  height: 100%;
+  height: 90%;
   display: flex;
   flex-direction: column;
 
@@ -16,6 +16,7 @@
   }
 
   &-navbar-buttons {
+    height: 100%;
     padding-right: 15px;
     @media screen and (max-width: $magneto-screen-mobile) {
       padding-bottom: 5px;
@@ -45,6 +46,7 @@
 
   .file {
     max-height: fit-content;
+    overflow: auto;
   }
 
   .pdf-viewer {
@@ -68,7 +70,6 @@
   .render {
     max-height: 30vh;
     pre{
-      overflow: auto;
       max-height: inherit;
     }
   }

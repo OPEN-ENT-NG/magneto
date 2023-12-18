@@ -46,8 +46,12 @@
 
   .file {
     max-height: fit-content;
-    overflow: auto;
+    overflow: hidden;
+    &-txt{
+      overflow: auto;
+    }
   }
+
 
   .pdf-viewer {
     max-height: 32vh;

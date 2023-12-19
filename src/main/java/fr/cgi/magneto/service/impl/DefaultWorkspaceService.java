@@ -1,11 +1,11 @@
 package fr.cgi.magneto.service.impl;
 
 
-import com.mongodb.*;
 import fr.cgi.magneto.core.constants.*;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.enums.EventBusActions;
 import fr.cgi.magneto.helper.EventBusHelper;
+import fr.cgi.magneto.helper.WorkspaceHelper;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.mongodb.*;
 import io.vertx.core.*;
@@ -79,16 +79,16 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
 
     @Override
-    public Future<JsonObject> setShareRights(List<String> documentIds, JsonArray shareRights) {
+    public Future<JsonObject> setShareRights(List<String> documentIds, JsonObject share) {
         Promise<JsonObject> promise = Promise.promise();
-
+        JsonArray shareArray = WorkspaceHelper.toMongoWorkspaceShareFormat(share);
         JsonObject query = new JsonObject()
                 .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(documentIds)));
 
         JsonObject update = new JsonObject()
                 .put(Mongo.SET, new JsonObject()
-                        .put(Field.SHARED, shareRights)
-                        .put(Field.INHERITEDSHARES, shareRights)
+                        .put(Field.SHARED, shareArray)
+                        .put(Field.INHERITEDSHARES, shareArray)
                         .put(Field.ISSHARED, true));
 
         mongoDb.update(CollectionsConstant.WORKSPACE_DOCUMENTS, query, update, false, true,

@@ -50,6 +50,9 @@
     &-txt{
       overflow: auto;
     }
+    &-csv{
+      overflow: auto;
+    }
   }
 
 
@@ -91,7 +94,6 @@
       max-height: 25vh !important
     }
     max-height: 28vh;
-    overflow: auto;
   }
 }
 

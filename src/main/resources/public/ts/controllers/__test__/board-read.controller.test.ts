@@ -1,5 +1,6 @@
 import * as angular from 'angular';
 import 'angular-mocks';
+import * as angularMock from 'angular-mocks/angular-mocks';
 import {boardReadController} from "../board-read.controller";
 import {ng} from "../../models/__mocks__/entcore";
 import {boardsService, cardsService} from "../../services";
@@ -48,14 +49,14 @@ describe("BoardReadController", () => {
         const testApp = angular.module("app", []);
         let $controller, $rootScope, $sce;
 
-        angular.mock.module("app");
+        angularMock.module("app");
 
         boardReadController;
 
         ng.initMockedModules(testApp);
 
         // Controller Injection
-        angular.mock.inject((_$controller_, _$rootScope_, _$sce_) => {
+        angularMock.inject((_$controller_, _$rootScope_, _$sce_) => {
             // The injector unwraps the underscores (_) from around the parameter names when matching
             $controller = _$controller_;
             $rootScope = _$rootScope_;

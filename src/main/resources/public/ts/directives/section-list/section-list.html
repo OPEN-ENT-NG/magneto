@@ -28,7 +28,8 @@
                    ng-blur="vm.createSection(vm.newSection)"
                    ng-model="vm.newSection.title" i18n-placeholder="magneto.section.insert.title"/>
         </div>
-        <div class="cardDirective-list cardDirective-list-[[vm.board.layoutType]] flex-row">
+        <div class="cardDirective-list cardDirective-list-[[vm.board.layoutType]] flex-row"
+             ng-if="vm.board.layoutType != 'horizontal'">
         </div>
     </div>
 

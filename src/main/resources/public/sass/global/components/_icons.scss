@@ -252,4 +252,8 @@ i {
     font-family: 'magneto-mdi';
     content: '\F0374';
   }
+  &.magneto-folder-share::before{
+    font-family: 'magneto-mdi';
+    content: '\F024C';
+  }
 }

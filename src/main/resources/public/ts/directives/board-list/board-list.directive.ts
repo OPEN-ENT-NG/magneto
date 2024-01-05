@@ -26,6 +26,7 @@ interface IBoardListProps {
     selectedBoardIds: Array<string>;
     selectedBoardsForSharing: Array<Board>;
     selectedFolderIds: Array<string>;
+    selectedFoldersForSharing: Array<Folder>;
     drag: Draggable;
     onOpen?;
 }
@@ -41,6 +42,7 @@ class Controller implements IViewModel {
     selectedBoardIds: Array<string>;
     selectedBoardsForSharing: Array<Board>;
     selectedFolderIds: Array<string>;
+    selectedFoldersForSharing: Array<Folder>;
     drag: Draggable;
 
 
@@ -70,9 +72,12 @@ class Controller implements IViewModel {
         // select folder
         if (!this.isFolderSelected(folderId)) {
             this.selectedFolderIds.push(folderId);
+            this.selectedFoldersForSharing.push(this.folders.find((folder: Folder) => folder.id === folderId));
         } else {
             // deselect folder
             this.selectedFolderIds = this.selectedFolderIds.filter((id: string) => id !== folderId);
+            this.selectedFoldersForSharing = this.folders.filter((folder: Folder) =>
+                this.selectedFolderIds.some((id: string) => id == folder.id));
         }
     }
 
@@ -100,6 +105,7 @@ function directive($parse: IParseService) {
             selectedBoardIds: '=',
             selectedBoardsForSharing: '=',
             selectedFolderIds: '=',
+            selectedFoldersForSharing: '=',
             onOpen: '&',
             drag: '='
         },

@@ -1,12 +1,15 @@
 package fr.cgi.magneto.service.impl;
 
+import com.mongodb.QueryBuilder;
 import fr.cgi.magneto.core.constants.Field;
-import com.mongodb.*;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.PromiseHelper;
+import fr.cgi.magneto.helper.WorkspaceHelper;
 import fr.cgi.magneto.model.FolderPayload;
 import fr.cgi.magneto.model.MongoQuery;
-import fr.cgi.magneto.service.*;
+import fr.cgi.magneto.service.FolderService;
+import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -371,5 +374,119 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
+    @Override
+    public Future<List<String>> getChildrenBoardsIds(String id) {
+        Promise<List<String>> promise = Promise.promise();
 
+        List<String> ids = new ArrayList<>();
+        ids.add(id);
+        getFolderChildrenIds(ids)
+                .compose(this::getBoardIdsInFolders)
+                .onSuccess(promise::complete)
+                .onFailure(error -> {
+                    String message = String.format("[Magneto@%s::getAllBoardsIds] Failed to recovers boards and folders ids",
+                            this.getClass().getSimpleName());
+                    log.error(String.format("%s : %s", message, error));
+                    promise.fail(message);
+                });
+        return promise.future();
+    }
+
+    @Override
+    public Future<Void> shareFolder(String id, JsonObject share) {
+        List<String> ids = new ArrayList<>();
+        ids.add(id);
+        Promise<Void> promise = Promise.promise();
+        List<Future<Void>> futures = new ArrayList<>();
+        //opti en récupérant les childs qu une fois
+        getFolderChildrenIds(ids).onSuccess(foldersIds -> foldersIds.forEach(folderId -> futures.add(upsertSharedArray(folderId,share))));
+        FutureHelper.all(futures)
+                .onSuccess(success -> promise.complete())
+                .onFailure(error -> promise.fail(error.getMessage()));
+
+        return promise.future();
+    }
+
+    private Future<Void> upsertSharedArray(String folderId, JsonObject share) {
+        Promise<Void> promise = Promise.promise();
+        getOldDataToUpdate(folderId).onSuccess(oldData -> {
+                    JsonArray newShare = toMongoBasicShareFormat(share);
+                    JsonObject query = new JsonObject().put(Field._ID, folderId);
+                    JsonObject update = new JsonObject()
+                            .put(Mongo.SET, new JsonObject()
+                                    .put(Field.SHARED, newShare));
+                    mongoDb.update(this.collection, query, update, MongoDbResult.validActionResultHandler(results -> {
+                        if (results.isLeft()) {
+                            String message = String.format("[Magneto@%s::update] Failed to update board", this.getClass().getSimpleName());
+                            log.error(String.format("%s : %s", message, results.left().getValue()));
+                            promise.fail(results.left().getValue());
+                        }
+                        promise.complete();
+                    }));
+                }
+        ).onFailure(error -> promise.fail(error.getMessage()));
+        return promise.future();
+    }
+
+    private static JsonArray toMongoBasicShareFormat(JsonObject shareJson) {
+        JsonArray resultJsonArray = new JsonArray();
+        processShareJsonField(shareJson, Field.USERS, Field.USERID, resultJsonArray);
+        processShareJsonField(shareJson, Field.GROUPS, Field.GROUPID, resultJsonArray);
+        processShareJsonField(shareJson, Field.BOOKMARKS, Field.BOOKMARKID, resultJsonArray);
+        return resultJsonArray;
+
+    }
+
+    private static void processShareJsonField(JsonObject shareJson, String fieldKey, String idKey, JsonArray resultJsonArray) {
+        if (shareJson.containsKey(fieldKey)) {
+            shareJson.getJsonObject(fieldKey, new JsonObject()).forEach(entry -> {
+                String id = entry.getKey();
+                JsonArray rights = (JsonArray) entry.getValue();
+                JsonObject object = new JsonObject().put(idKey, id);
+                processRights(rights, object);
+                resultJsonArray.add(object);
+            });
+        }
+    }
+
+    private static void processRights(JsonArray rights, JsonObject targetObject) {
+        rights.forEach(right -> targetObject.put(right.toString(), true));
+    }
+    private Future<JsonObject> getOldDataToUpdate(String folderId) {
+        Promise<JsonObject> promise = Promise.promise();
+        MongoQuery query= new MongoQuery(this.collection);
+        query.match(new JsonObject().put( Field._ID, folderId));
+        mongoDb.command(query.getAggregate().toString(), MongoDbResult.validResultHandler(resultMongo -> {
+            if(resultMongo.isRight()) {
+                JsonObject result = resultMongo.right().getValue()
+                        .getJsonObject(Mongo.CURSOR, new JsonObject())
+                        .getJsonArray(Mongo.FIRSTBATCH, new JsonArray())
+                        .getJsonObject(0);
+                promise.complete(result);
+            }else {
+                String message = String.format("[Magneto@%s::updateOldFolder] Failed to update old folder",
+                        this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, resultMongo.left().getValue()));
+                promise.fail(message);
+            }
+        }));
+        return promise.future();
+    }
 }
+
+
+/*  JsonObject query = (new JsonObject()).put("_id", resourceId);
+ JsonObject update = (new JsonObject()).put("$set", (new JsonObject()).put("shared", ((JsonObject)res.right().getValue()).getJsonArray("shared")));
+ JsonObject keys = (new JsonObject()).put("shared", 1);
+ this.mongo.findAndModify(this.collection, query, update, (JsonObject)null, keys, (mongoRes) -> {
+ if ("ok".equals(((JsonObject)mongoRes.body()).getString("status"))) {
+ JsonArray oldShared = ((JsonObject)Utils.getOrElse(((JsonObject)mongoRes.body()).getJsonObject("result"), new JsonObject())).getJsonArray("shared");
+ JsonArray members = ((JsonObject)res.right().getValue()).getJsonArray("notify-members");
+ this.getNotifyMembers(handler, oldShared, members, (m) -> {
+ return (String)Utils.getOrElse(((JsonObject)m).getString("groupId"), ((JsonObject)m).getString("userId"));
+ });
+ } else {
+ handler.handle(new Either.Left(((JsonObject)mongoRes.body()).getString("message")));
+ }
+
+ });*/

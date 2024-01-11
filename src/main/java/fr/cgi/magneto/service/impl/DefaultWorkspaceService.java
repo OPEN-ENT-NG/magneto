@@ -80,6 +80,8 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
     @Override
     public Future<JsonObject> setShareRights(List<String> documentIds, JsonObject share) {
+        JsonArray shareRights = WorkspaceHelper.toMongoWorkspaceShareFormat(share);
+
         Promise<JsonObject> promise = Promise.promise();
         JsonArray shareArray = WorkspaceHelper.toMongoWorkspaceShareFormat(share);
 

@@ -67,4 +67,8 @@ public interface FolderService {
          * @return           Future {@link Future <JsonObject>} containing folder
          */
         Future<JsonObject> updateOldFolder(List<String> boardIds);
+
+         Future<List<String>> getChildrenBoardsIds(String id);
+
+        Future<Void> shareFolder(String id, JsonObject share);
 }

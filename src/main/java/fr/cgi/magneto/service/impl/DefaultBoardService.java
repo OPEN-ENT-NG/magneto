@@ -600,4 +600,12 @@ public class DefaultBoardService implements BoardService {
 
         return promise.future();
     }
+
+    @Override
+    public Future<List<String>> shareBoard(List<String> ids, JsonObject share) {
+        Promise<List<String>> promise= Promise.promise();
+
+
+        return promise.future();
+    }
 }

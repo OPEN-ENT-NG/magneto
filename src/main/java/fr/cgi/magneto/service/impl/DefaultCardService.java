@@ -142,7 +142,6 @@ public class DefaultCardService implements CardService {
                         String boardOwnerId = board.getOwnerId();
                         JsonObject shared = WorkspaceHelper.toAPIShareFormat(board.getShared(), cardOwnerId.equals(boardOwnerId), boardOwnerId);
 //                        JsonArray workspaceShare = WorkspaceHelper.toMongoWorkspaceShareFormat(shared);
-                        //TODO BIEN CHECK SI CA MARCHE une fois MAG-286 implentée
                         this.workspaceService.setShareRights(Collections.singletonList(documentId), shared)
                                 .onFailure(promise::fail)
                                 .onSuccess(success -> promise.complete(shared));

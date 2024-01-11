@@ -224,8 +224,8 @@
                             && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].myRights.manager"
             on-properties="vm.openPropertiesForm"
             has-delete="!vm.filter.isPublic
-                        && (vm.selectedFolderIds.length > 0 || vm.selectedBoardIds.length > 0)
-                        && vm.areSelectedBoardsMine()"
+                        && ((vm.selectedFolderIds.length > 0  && vm.areSelectedFoldersMine())
+                        || (vm.selectedBoardIds.length > 0 && vm.areSelectedBoardsMine()))"
             on-delete="vm.openDeleteForm"
             has-share="!vm.openedFolder.shared && ((vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
                         && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard())

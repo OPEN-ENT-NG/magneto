@@ -3,8 +3,10 @@ import {ILocationService, IScope, IWindowService, IParseService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {boardsService} from "../../services";
 import http from "axios";
+import {I18nUtils} from "../../utils/i18n.utils";
 
 interface IViewModel extends ng.IController, ISharePanelProps {
+    translate?(key: string, param: string): string;
 }
 
 interface ISharePanelProps {
@@ -32,6 +34,10 @@ class Controller implements IViewModel {
 
     $onInit() {
         this.display = false;
+    }
+
+    translate(key: string, param: string): string {
+        return I18nUtils.getWithParams(key, [param]);
     }
 
     closeForm = async (): Promise<void> => {

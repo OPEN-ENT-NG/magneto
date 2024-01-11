@@ -1,0 +1,22 @@
+<lightbox class="board-share-panel"
+          show="vm.display"
+          on-close="vm.cancel()">
+
+    <div class="vertical-spacing-six">
+        <div>[[vm.translate(vm.key, vm.params)]]</div>
+    </div>
+
+    <div class="row horizontal-spacing">
+        <div class="twelve cell">
+            <button class="right-magnet"
+                    data-ng-click="vm.confirm()">
+                <i18n>magneto.confirm</i18n>
+            </button>
+            <button class="right-magnet cancel"
+                    data-ng-click="vm.cancel()">
+                <i18n>magneto.cancel</i18n>
+            </button>
+        </div>
+    </div>
+
+</lightbox>

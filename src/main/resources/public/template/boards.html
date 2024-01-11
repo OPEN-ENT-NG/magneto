@@ -85,6 +85,7 @@
                     selected-board-ids="vm.selectedBoardIds"
                     selected-boards-for-sharing="vm.selectedBoards"
                     selected-folder-ids="vm.selectedFolderIds"
+                    selected-folders-for-sharing="vm.selectedFolders"
                     on-open="vm.openBoardOrFolder"
                     drag="vm.draggable">
             </board-list>
@@ -167,7 +168,14 @@
     <share-panel-lightbox
             display="vm.displayShareBoardLightbox"
             resources="vm.selectedBoards"
-            app-prefix="'magneto'">
+            app-prefix="'magneto/board'">
+    </share-panel-lightbox>
+
+    <!-- Folder share modal -->
+    <share-panel-lightbox
+            display="vm.displayShareFolderLightbox"
+            resources="vm.selectedFolders"
+            app-prefix="'magneto/folder'">
     </share-panel-lightbox>
 
     <board-publish-lightbox
@@ -175,6 +183,24 @@
             board="vm.selectedBoards[0]"
             on-submit="vm.onFormSubmit">
     </board-publish-lightbox>
+
+    <!-- Drag n drop in shared folder warning -->
+    <message-lightbox
+            display="vm.displayEnterSharedFolderWarningLightbox"
+            key="'magneto.folder.share.drag.in.warning'",
+            params="[vm.dragAndDropTarget.title]",
+            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget)",
+            on-close="vm.resetDragAndDrop()">
+    </message-lightbox>
+
+    <!-- Drag n drop out of shared folder warning -->
+    <message-lightbox
+            display="vm.displayExitSharedFolderWarningLightbox"
+            key="'magneto.folder.share.drag.out.warning'",
+            params="[vm.dragAndDropInitialFolder.title]",
+            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget)",
+            on-close="vm.resetDragAndDrop()">
+    </message-lightbox>
 
     <card-collection
             ng-if="vm.displayCollectionLightbox"
@@ -201,10 +227,11 @@
                         && (vm.selectedFolderIds.length > 0 || vm.selectedBoardIds.length > 0)
                         && vm.areSelectedBoardsMine()"
             on-delete="vm.openDeleteForm"
-            has-share="vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
-                        && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard()"
-            has-public-share="vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
-                        && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard() && !vm.selectedBoards[0].public && vm.hasRight('publish')"
+            has-share="!vm.openedFolder.shared && ((vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
+                        && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard())
+                        || (vm.selectedFolderIds.length == 1 && vm.selectedBoardIds.length == 0 && vm.hasFolderShareRights(vm.selectedFolderIds[0])))"
+            has-public-share="!vm.openedFolder.shared && (vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
+                        && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard() && !vm.selectedBoards[0].public && vm.hasRight('publish'))"
             has-public-unshare="vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
                         && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard() && vm.selectedBoards[0].public && vm.hasRight('publish')"
             on-public-share="vm.openPublicShareForm"

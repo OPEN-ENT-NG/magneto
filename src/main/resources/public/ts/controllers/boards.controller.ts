@@ -1,4 +1,4 @@
-import {angular, idiom as lang, ng, notify, toasts} from "entcore";
+import {angular, idiom as lang, model, ng, notify, toasts} from "entcore";
 import {IScope} from "angular";
 import {BoardsService, IBoardsService, IFoldersService} from "../services";
 import {
@@ -26,6 +26,7 @@ interface IViewModel {
     selectedBoardIds: Array<string>;
     selectedBoards: Array<Board>;
     selectedFolderIds: Array<string>;
+    selectedFolders: Array<Folder>;
     selectedUpdateBoardForm: BoardForm;
     selectedUpdateFolderForm: IFolderForm;
 
@@ -35,6 +36,7 @@ interface IViewModel {
     displayBoardLightbox: boolean;
     displayDeleteBoardLightbox: boolean;
     displayShareBoardLightbox: boolean;
+    displayShareFolderLightbox : boolean;
     displayUpdateBoardLightbox: boolean;
     displayUpdateFolderLightbox: boolean;
     displayFolderLightbox: boolean;
@@ -92,6 +94,10 @@ interface IViewModel {
 
     setFolderParentIds(): void;
 
+    proceedOnDragAndDrop(originalBoard: Board, targetItem: Folder): Promise<void>;
+
+    resetDragAndDrop(): void;
+
     switchFolder(folder: FolderTreeNavItem): Promise<void>;
 
     submitFolderForm(): Promise<void>;
@@ -101,6 +107,8 @@ interface IViewModel {
     onScroll(): void;
 
     resetBoards(): void;
+
+    hasFolderShareRights(folderId: string): boolean;
 
     restoreBoardsOrFolders(): Promise<void>;
 
@@ -132,6 +140,7 @@ class Controller implements ng.IController, IViewModel {
     selectedBoardIds: Array<string>;
     selectedBoards: Array<Board>;
     selectedFolderIds: Array<string>;
+    selectedFolders: Array<Folder>;
     selectedUpdateBoardForm: BoardForm;
     selectedUpdateFolderForm: IFolderForm;
 
@@ -146,13 +155,19 @@ class Controller implements ng.IController, IViewModel {
     folderMoveNavTrees: Array<FolderTreeNavItem>;
     displayDeleteBoardLightbox: boolean;
     displayShareBoardLightbox: boolean;
+    displayShareFolderLightbox: boolean;
     displayPublicShareBoardLightbox: boolean;
     displayUpdateBoardLightbox: boolean;
     displayUpdateFolderLightbox: boolean;
     displayFolderLightbox: boolean;
     displayMoveBoardLightbox: boolean;
     displayCollectionLightbox: boolean;
+    displayEnterSharedFolderWarningLightbox: boolean;
+    displayExitSharedFolderWarningLightbox: boolean;
     magnetoStandalone: boolean;
+    dragAndDropBoard: Board;
+    dragAndDropTarget: Folder;
+    dragAndDropInitialFolder: Folder;
 
     folderNavTreeSubject: Subject<FolderTreeNavItem>;
 
@@ -184,7 +199,10 @@ class Controller implements ng.IController, IViewModel {
         this.displayMoveBoardLightbox = false;
         this.displayCollectionLightbox = false;
         this.displayShareBoardLightbox = false;
+        this.displayShareFolderLightbox = false;
         this.displayPublicShareBoardLightbox = false;
+        this.displayEnterSharedFolderWarningLightbox = false;
+        this.displayExitSharedFolderWarningLightbox = false;
         this.magnetoStandalone = this.$window.magnetoStandalone == "true";
 
         this.filter = new BoardsFilter();
@@ -194,6 +212,7 @@ class Controller implements ng.IController, IViewModel {
         this.selectedBoardIds = [];
         this.selectedBoards = [];
         this.selectedFolderIds = [];
+        this.selectedFolders = [];
         this.folderNavTrees = [];
         this.folderMoveNavTrees = [];
         this.selectedUpdateBoardForm = new BoardForm();
@@ -250,32 +269,61 @@ class Controller implements ng.IController, IViewModel {
                 let originalBoard: Board = new Board().build(JSON.parse(event.dataTransfer.getData("application/json")));
                 let targetItem: Folder = angular.element(event.srcElement).scope().vm.folder || angular.element(event.srcElement).scope().vm.folderTree;
 
-                let idOriginalItem: string = originalBoard.id;
-                let idTargetItem: string = targetItem.id;
-
-                if (that.selectedBoardIds.length > 0) {
-                    if (targetItem.id == FOLDER_TYPE.DELETED_BOARDS) {
-                        that.openDeleteForm();
-                    } else {
-                        await that.boardsService.moveBoardsToFolder(that.selectedBoardIds, idTargetItem);
-                        await that.onFormSubmit();
-                    }
-                    // Move several boards
+                let originalBoardData: Board = that.boards.find((board: Board) => board.id == originalBoard.id);
+                that.dragAndDropInitialFolder = !!originalBoardData.folderId ? that.folders.find((folder: Folder) => folder.id == originalBoardData.folderId)
+                    : new Folder();
+                if (!!targetItem.shared) {
+                    that.dragAndDropBoard = originalBoard;
+                    that.dragAndDropTarget = targetItem;
+                    that.displayEnterSharedFolderWarningLightbox = true;
+                    safeApply(that.$scope);
+                } else if (!!that.dragAndDropInitialFolder.shared) {
+                    that.dragAndDropBoard = originalBoard;
+                    that.dragAndDropTarget = targetItem;
+                    that.displayExitSharedFolderWarningLightbox = true;
+                    safeApply(that.$scope);
                 } else {
-                    // Move one board
-                    let draggedItemIds: string[] = that.boards.filter(board => board.id === idOriginalItem).map(board => board.id);
-                    if (targetItem.id == FOLDER_TYPE.DELETED_BOARDS) {
-                        that.selectedBoardIds = draggedItemIds;
-                        that.openDeleteForm();
-                    } else {
-                        await that.boardsService.moveBoardsToFolder(draggedItemIds, idTargetItem);
-                        await that.onFormSubmit();
-                    }
+                    await that.proceedOnDragAndDrop(originalBoard, targetItem);
                 }
-                safeApply(that.$scope);
             }
         };
+    }
 
+    proceedOnDragAndDrop = async (originalBoard: Board, targetItem: Folder): Promise<void> => {
+        this.resetDragAndDrop();
+        let idOriginalItem: string = originalBoard.id;
+        let idTargetItem: string = targetItem.id;
+
+        if (this.selectedBoardIds.length > 0) {
+            if (targetItem.id == FOLDER_TYPE.DELETED_BOARDS) {
+                this.openDeleteForm();
+            } else {
+                await this.boardsService.moveBoardsToFolder(this.selectedBoardIds, idTargetItem);
+                await this.onFormSubmit();
+            }
+            // Move several boards
+        } else {
+            // Move one board
+            let draggedItemIds: string[] = this.boards.filter(board => board.id === idOriginalItem).map(board => board.id);
+            if (targetItem.id == FOLDER_TYPE.DELETED_BOARDS) {
+                this.selectedBoardIds = draggedItemIds;
+                this.openDeleteForm();
+            } else {
+                await this.boardsService.moveBoardsToFolder(draggedItemIds, idTargetItem);
+                await this.onFormSubmit();
+            }
+        }
+        safeApply(this.$scope);
+    }
+
+    resetDragAndDrop = (): void => {
+        this.displayEnterSharedFolderWarningLightbox = false;
+        this.displayExitSharedFolderWarningLightbox = false;
+        this.dragAndDropBoard = undefined;
+        this.dragAndDropTarget = undefined;
+        this.dragAndDropInitialFolder = undefined;
+
+        safeApply(this.$scope);
     }
 
     /**
@@ -328,7 +376,13 @@ class Controller implements ng.IController, IViewModel {
      * Open share board form.
      */
     openShareForm = (): void => {
-        this.displayShareBoardLightbox = true;
+        if (this.filter.isMyBoards && this.selectedBoardIds.length == 1
+            && this.selectedFolderIds.length == 0 && this.selectedBoards[0].isMyBoard()) {
+            this.displayShareBoardLightbox = true;
+        } else if (this.selectedFolderIds.length == 1 && this.selectedBoardIds.length == 0
+            && this.hasFolderShareRights(this.selectedFolderIds[0])) {
+            this.displayShareFolderLightbox = true;
+        }
     }
 
     /**
@@ -638,6 +692,32 @@ class Controller implements ng.IController, IViewModel {
         this.selectedFolderIds = [];
         this.selectedUpdateBoardForm = new BoardForm();
         this.selectedUpdateFolderForm = {id: null, title: ''};
+    }
+
+    /**
+     * Return true if user can share folder
+     */
+    hasFolderShareRights = (folderId: string): boolean => {
+        let selectedFolder: Folder = this.folders.find((folder: Folder) => folder.id == folderId);
+        let isOwner: boolean = selectedFolder.ownerId == model.me.userId;
+        //todo check right level (need lower right with share right)
+        let hasIndividualShareRight: boolean = selectedFolder.shared && !!selectedFolder.shared.find(share => share.userId == model.me.userId
+            && share['fr-cgi-magneto-controller-ShareBoardController|initContribRight'] == true);
+        let hasGroupShareRight: boolean = selectedFolder.shared && model.me.groupsIds
+            && !!model.me.groupsIds.map((groupId: string) => {
+                if (selectedFolder.shared.find(share => share.groupId == groupId
+                    && share['fr-cgi-magneto-controller-ShareBoardController|initContribRight'] == true)) return true;
+            });
+        return (isOwner && !!selectedFolder.shared) || (isOwner || hasIndividualShareRight || hasGroupShareRight);
+    }
+
+    /**
+     * Return true board has no parent folder
+     */
+    noSharedParentFolder = (folderId: string): boolean => {
+        let parentFolder: Folder = this.folders.find((folder: Folder) => folder.id == folderId);
+
+        return !!parentFolder.shared;
     }
 
     /**

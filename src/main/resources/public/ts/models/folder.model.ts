@@ -3,6 +3,7 @@ export interface IFolderResponse {
     title: string;
     parentId: string;
     ownerId: string;
+    shared?: any[];
 }
 
 export interface IFolderForm {
@@ -11,16 +12,19 @@ export interface IFolderForm {
 }
 
 export class Folder {
+
     private _id: string;
     private _title: string;
     private _parentId: string;
     private _ownerId: string;
+    private _shared: any[];
 
     build(data: IFolderResponse): Folder {
         this._id = data._id;
         this._title = data.title;
         this._parentId = data.parentId;
         this._ownerId = data.ownerId;
+        this._shared = data.shared;
         return this;
     }
 
@@ -54,5 +58,13 @@ export class Folder {
 
     set ownerId(value: string) {
         this._ownerId = value;
+    }
+
+    get shared(): any[] {
+        return this._shared;
+    }
+
+    set shared(value: any[]) {
+        this._shared = value;
     }
 }

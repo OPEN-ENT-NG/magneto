@@ -52,3 +52,4 @@ export * from './zoom/zoom.directive';
 export * from './file-viewer/index'
 export * from './board-container-header/board-container-header.directive';
 export * from './board-container-header-title/board-container-header-title.directive';
+export * from './message-lightbox/message-lightbox.directive';

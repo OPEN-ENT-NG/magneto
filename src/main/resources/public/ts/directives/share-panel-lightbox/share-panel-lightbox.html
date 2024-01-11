@@ -7,7 +7,11 @@
                  resources="vm.resources">
     </share-panel>
 
-    <div class="sharePanel-warning">
+    <div class="sharePanel-warning" ng-if="vm.appPrefix == 'magneto/board'">
         <i18n>magneto.board.share.warning</i18n>
+    </div>
+
+    <div class="sharePanel-warning" ng-if="vm.appPrefix == 'magneto/folder'">
+        <div>[[vm.translate('magneto.folder.share.warning', vm.resources[0].title)]]</div>
     </div>
 </lightbox>

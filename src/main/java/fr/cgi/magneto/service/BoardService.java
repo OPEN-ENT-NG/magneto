@@ -124,5 +124,5 @@ public interface BoardService {
      */
     Future<JsonObject> delete(String userId, List<String> boardIds);
 
-    Future<List<String>> shareBoard(List<String> ids, JsonObject share);
+    Future<List<String> > shareBoard(List<String> ids, JsonObject share);
 }

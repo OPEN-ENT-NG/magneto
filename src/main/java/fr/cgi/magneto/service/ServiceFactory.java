@@ -76,6 +76,9 @@ public class ServiceFactory {
     public BoardAccessService boardViewService(){
         return new DefaultBoardAccessService(CollectionsConstant.BOARD_VIEW_COLLECTION,mongoDb);
     }
+    public ShareService shareService(){
+        return new DefaultShareService( mongoDb);
+    }
     // Helpers
     public EventBus eventBus() {
         return this.vertx.eventBus();

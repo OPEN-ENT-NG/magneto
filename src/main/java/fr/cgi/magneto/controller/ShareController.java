@@ -18,11 +18,14 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserUtils;
 
+import java.util.ArrayList;
+
 public class ShareController extends ControllerHelper {
 
     private final BoardService boardService;
     private final WorkspaceService workspaceService;
     private final FolderService folderService;
+
     public ShareController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
         this.folderService = serviceFactory.folderService();
@@ -70,7 +73,7 @@ public class ShareController extends ControllerHelper {
                 }
 
                 RequestUtils.bodyToJson(request, share -> {
-                    if(type.equals(Field.BOARD)) {
+                    if (type.equals(Field.BOARD)) {
                         this.boardService.getAllDocumentIds(id, user)
                                 .compose(documentIds -> this.workspaceService.setShareRights(documentIds, share)
                                         .onFailure(fail -> {
@@ -92,17 +95,28 @@ public class ShareController extends ControllerHelper {
                                             //TODO arreter d utiliser ça
                                             shareResource(request, "magneto.share_board", false, params, Field.TITLE);
                                         }));
-                    }else if(type.equals(Field.FOLDER)){
-                        this.folderService.shareFolder(id, share).onSuccess(success ->{
-                            this.folderService.getChildrenBoardsIds(id).onSuccess(boardsIds ->{
-                                this.boardService.shareBoard(boardsIds,share);
-                                this.workspaceService.setShareRights(boardsIds , share);
+                    } else if (type.equals(Field.FOLDER)) {
+                        this.folderService.shareFolder(id, share)
+                                .compose(success -> this.folderService.getChildrenBoardsIds(id))
+                                .compose(boardsIds -> this.boardService.shareBoard(boardsIds, share))
+                                .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
+                                .onSuccess(success ->{
+                                    JsonObject params = new JsonObject();
+                                    params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                                    params.put(Field.USERNAME, user.getUsername());
+                                    params.put(Field.BOARDURL, "/magneto#/board/view/" + id);
 
-                            });
+                                    JsonObject pushNotif = new JsonObject()
+                                            .put(Field.TITLE, "push.notif.magneto.share")
+                                            .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
+                                    params.put(Field.PUSHNOTIF, pushNotif);
 
-                        });
-                            //Faire notification
-                            request.response().setStatusCode(200).end();
+                                    notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
+                                            params, true);
+                                    request.response().setStatusMessage(id).setStatusCode(200).end();
+                                })
+                                .onFailure(error -> badRequest(request,error.getMessage()));
+                        //Faire notification
                     }
                 });
             }

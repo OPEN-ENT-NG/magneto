@@ -19,6 +19,7 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ShareController extends ControllerHelper {
 
@@ -93,7 +94,14 @@ public class ShareController extends ControllerHelper {
                                             params.put(Field.PUSHNOTIF, pushNotif);
 
                                             //TODO arreter d utiliser ça
-                                            shareResource(request, "magneto.share_board", false, params, Field.TITLE);
+//                                            shareResource(request, "magneto.share_board", false, params, Field.TITLE);
+                                            List<String> ids = new ArrayList<>();
+                                            ids.add(id);
+                                            this.boardService.shareBoard(ids, share).onSuccess(success ->{
+                                                notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
+                                                        params, true);
+                                                request.response().setStatusMessage(id).setStatusCode(200).end();
+                                            });
                                         }));
                     } else if (type.equals(Field.FOLDER)) {
                         this.folderService.shareFolder(id, share)
@@ -104,7 +112,7 @@ public class ShareController extends ControllerHelper {
                                     JsonObject params = new JsonObject();
                                     params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                                     params.put(Field.USERNAME, user.getUsername());
-                                    params.put(Field.BOARDURL, "/magneto#/board/view/" + id);
+                                    params.put(Field.BOARDURL, "/magneto#/");
 
                                     JsonObject pushNotif = new JsonObject()
                                             .put(Field.TITLE, "push.notif.magneto.share")
@@ -116,7 +124,6 @@ public class ShareController extends ControllerHelper {
                                     request.response().setStatusMessage(id).setStatusCode(200).end();
                                 })
                                 .onFailure(error -> badRequest(request,error.getMessage()));
-                        //Faire notification
                     }
                 });
             }

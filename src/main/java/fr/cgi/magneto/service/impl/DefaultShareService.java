@@ -27,35 +27,47 @@ public class DefaultShareService implements ShareService {
     }
 
     @Override
-    public Future<JsonObject> upsertSharedArray(String id, JsonObject share, String collection) {
+    public Future<JsonObject> upsertSharedArray(String id, JsonObject share, String collection, boolean checkOldRights) {
         Promise<JsonObject> promise = Promise.promise();
         JsonArray newShare = toMongoBasicShareFormat(share);
         JsonObject query = new JsonObject().put(Field._ID, id);
-        JsonObject update = new JsonObject()
-                .put(Mongo.SET, new JsonObject()
-                        .put(Field.SHARED, newShare));
-        getOldDataToUpdate(id, collection).onSuccess(success -> {
-           List<SharedElem> sharedElems = getOldRights(success, newShare);
-           sharedElems.forEach(sharedElem ->{
-               newShare.add(sharedElem.toJson());
-           });
-            mongoDb.update(collection, query, update, MongoDbResult.validActionResultHandler(results -> {
-                if (results.isLeft()) {
-                    String message = String.format("[Magneto@%s::upsertSharedArray] Failed to upsertSharedArray", this.getClass().getSimpleName());
-                    log.error(String.format("%s : %s", message, results.left().getValue()));
-                    promise.fail(results.left().getValue());
-                }
-                promise.complete(results.right().getValue());
-            }));
-        });
+
+        if (checkOldRights) {
+            getOldDataToUpdate(id, collection).onSuccess(success -> {
+                List<SharedElem> sharedElems = getOldRights( success.getJsonArray("shared", new JsonArray()), newShare);
+                sharedElems.forEach(sharedElem -> {
+                    newShare.add(sharedElem.toJson());
+                });
+
+                updateMongo(collection, promise, query, newShare);
+            });
+        }  else{
+            updateMongo(collection, promise, query, newShare);
+        }
 
         return promise.future();
     }
 
-    private static List<SharedElem> getOldRights(JsonObject success, JsonArray newShare) {
+    private void updateMongo(String collection, Promise<JsonObject> promise, JsonObject query, JsonArray newShare) {
+        JsonObject update = new JsonObject()
+                .put(Mongo.SET, new JsonObject()
+                        .put(Field.SHARED, newShare));
+        mongoDb.update(collection, query, update, MongoDbResult.validActionResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::updateMongo] Failed to updateMongo", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(results.left().getValue());
+            }
+            promise.complete(results.right().getValue());
+        }));
+    }
+
+
+    @Override
+    public  List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare) {
         List<SharedElem> oldSharedElems = new ArrayList<>();
         List<SharedElem> newSharedElems = new ArrayList<>();
-        success.getJsonArray("shared").forEach(elem -> {
+        oldShared.forEach(elem -> {
             JsonObject elemJO = (JsonObject) elem;
             SharedElem sharedElem = new SharedElem();
             sharedElem.set(elemJO);
@@ -76,6 +88,11 @@ public class DefaultShareService implements ShareService {
             }
         });
         return elementsToAdd;
+    }
+
+    @Override
+    public List<SharedElem> getOldRights(JsonArray oldShared, JsonObject newShare) {
+       return getOldRights(oldShared, toMongoBasicShareFormat(newShare));
     }
 
     private static JsonArray toMongoBasicShareFormat(JsonObject shareJson) {
@@ -103,7 +120,8 @@ public class DefaultShareService implements ShareService {
         rights.forEach(right -> targetObject.put(right.toString(), true));
     }
 
-    private Future<JsonObject> getOldDataToUpdate(String folderId, String collection) {
+    @Override
+    public Future<JsonObject> getOldDataToUpdate(String folderId, String collection) {
         Promise<JsonObject> promise = Promise.promise();
         MongoQuery query = new MongoQuery(collection);
         query.match(new JsonObject().put(Field._ID, folderId));

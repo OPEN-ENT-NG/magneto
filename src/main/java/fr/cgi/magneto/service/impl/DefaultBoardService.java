@@ -257,7 +257,7 @@ public class DefaultBoardService implements BoardService {
         JsonObject query = new JsonObject()
                 .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds)))
                 .put(Field.OWNERID, userId);
-        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore));
+        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
         mongoDb.update(this.collection, query, update, false, true, MongoDbResult.validActionResultHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::preDeleteBoards] Failed to pre delete boards",

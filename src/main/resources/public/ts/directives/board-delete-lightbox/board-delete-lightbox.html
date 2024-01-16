@@ -12,6 +12,9 @@
             <div ng-if="vm.isPredelete">
                 <i18n>magneto.predelete.elements.message</i18n>
             </div>
+            <div ng-if="vm.isPredelete && vm.hasSharedElement()">
+                <i18n>magneto.folder.share.predelete.warning</i18n>
+            </div>
             <div ng-if="!vm.isPredelete">
                 <i18n>magneto.delete.elements.message</i18n>
             </div>

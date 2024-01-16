@@ -1,6 +1,7 @@
 package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.model.*;
+import fr.cgi.magneto.model.share.SharedElem;
 import io.vertx.core.*;
 import io.vertx.core.json.*;
 import org.entcore.common.user.*;
@@ -70,5 +71,5 @@ public interface FolderService {
 
          Future<List<String>> getChildrenBoardsIds(String id);
 
-        Future<Void> shareFolder(String id, JsonObject share);
+        Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares);
 }

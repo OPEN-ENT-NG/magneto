@@ -48,6 +48,32 @@ public class DefaultShareService implements ShareService {
         return promise.future();
     }
 
+    @Override
+    public Future<JsonObject> upsertSharedArray(String id, List<SharedElem> newShare, List<SharedElem> deletedShares, String collection, boolean checkOldRights) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        JsonObject query = new JsonObject().put(Field._ID, id);
+        JsonArray shares = new JsonArray();
+
+        if (checkOldRights) {
+            getOldDataToUpdate(id, collection).onSuccess(success -> {
+                List<SharedElem> sharedElems = getOldRights( success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
+                sharedElems.addAll(newShare);
+                sharedElems.forEach(sharedElem ->{
+                   if(deletedShares.stream().noneMatch(sharedElem::hasSameId)){
+                       shares.add(sharedElem.toJson());
+                   }
+                });
+                updateMongo(collection, promise, query, shares);
+            });
+        }  else{
+            newShare.forEach(elem -> shares.add(elem.toJson()));
+            updateMongo(collection, promise, query, shares);
+        }
+
+        return promise.future();
+    }
+
     private void updateMongo(String collection, Promise<JsonObject> promise, JsonObject query, JsonArray newShare) {
         JsonObject update = new JsonObject()
                 .put(Mongo.SET, new JsonObject()
@@ -65,22 +91,20 @@ public class DefaultShareService implements ShareService {
 
     @Override
     public  List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare) {
-        List<SharedElem> oldSharedElems = new ArrayList<>();
-        List<SharedElem> newSharedElems = new ArrayList<>();
-        oldShared.forEach(elem -> {
-            JsonObject elemJO = (JsonObject) elem;
-            SharedElem sharedElem = new SharedElem();
-            sharedElem.set(elemJO);
-            oldSharedElems.add(sharedElem);
+        List<SharedElem>  oldSharedElems= getSharedElemList(oldShared);
+        List<SharedElem> newSharedElems = getSharedElemList(newShare);
 
-        });
-        newShare.forEach(newShareElem -> {
-            JsonObject newShareElemJO = (JsonObject) newShareElem;
-            SharedElem sharedElem = new SharedElem();
-            sharedElem.set(newShareElemJO);
-            newSharedElems.add(sharedElem);
-        });
+        return getOldRights(oldSharedElems, newSharedElems);
+    }
 
+    @Override
+    public  List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare) {
+        List<SharedElem>  oldSharedElems= getSharedElemList(oldShared);
+
+        return getOldRights(oldSharedElems, newShare);
+    }
+    @Override
+    public  List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems) {
         List<SharedElem> elementsToAdd = new ArrayList<>();
         oldSharedElems.forEach(oldElem -> {
             if ( newSharedElems.stream().noneMatch(oldElem::hasSameId)) {
@@ -88,6 +112,23 @@ public class DefaultShareService implements ShareService {
             }
         });
         return elementsToAdd;
+    }
+
+    @Override
+    public List<SharedElem> getSharedElemList(JsonArray shares) {
+        List<SharedElem> sharedElems = new ArrayList<>();
+        shares.forEach(share -> {
+            JsonObject newShareElemJO = (JsonObject) share;
+            SharedElem sharedElem = new SharedElem();
+            sharedElem.set(newShareElemJO);
+            sharedElems.add(sharedElem);
+        });
+        return sharedElems;
+    }
+
+    @Override
+    public List<SharedElem> getSharedElemList(JsonObject shares) {
+        return getSharedElemList(toMongoBasicShareFormat(shares));
     }
 
     @Override
@@ -139,6 +180,15 @@ public class DefaultShareService implements ShareService {
                 promise.fail(message);
             }
         }));
+        return promise.future();
+    }
+
+    @Override
+    public Future<List<SharedElem>> getDeletedRights(String id, List<SharedElem> newSharedElem, String boardCollection) {
+        Promise<List<SharedElem>> promise = Promise.promise();
+        getOldDataToUpdate(id, boardCollection).onSuccess(success ->{
+            promise.complete(getOldRights(success.getJsonArray(Field.SHARED),newSharedElem));
+        });
         return promise.future();
     }
 }

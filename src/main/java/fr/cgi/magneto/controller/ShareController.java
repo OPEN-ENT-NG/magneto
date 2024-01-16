@@ -1,8 +1,10 @@
 package fr.cgi.magneto.controller;
 
+import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.*;
+import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.security.GetSharesRight;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.rs.ApiDoc;
@@ -12,6 +14,7 @@ import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.*;
+import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.*;
 import org.entcore.common.controller.ControllerHelper;
@@ -27,10 +30,14 @@ public class ShareController extends ControllerHelper {
     private final WorkspaceService workspaceService;
     private final FolderService folderService;
 
+    private final ShareService magnetoShareService;
+
     public ShareController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
         this.folderService = serviceFactory.folderService();
         this.workspaceService = serviceFactory.workSpaceService();
+        this.magnetoShareService = serviceFactory.shareService();
+
     }
 
     // Init sharing rights
@@ -50,7 +57,7 @@ public class ShareController extends ControllerHelper {
     public void initPublishRight(final HttpServerRequest request) {
     }
 
-    @Get("/share/json/:id")
+    @Get("/:type/share/json/:id")
     @ApiDoc("Share board by id")
     @ResourceFilter(GetSharesRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
@@ -97,16 +104,21 @@ public class ShareController extends ControllerHelper {
 //                                            shareResource(request, "magneto.share_board", false, params, Field.TITLE);
                                             List<String> ids = new ArrayList<>();
                                             ids.add(id);
-                                            this.boardService.shareBoard(ids, share).onSuccess(success ->{
+                                            this.boardService.shareBoard(ids, share, false).onSuccess(success ->{
                                                 notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
                                                         params, true);
                                                 request.response().setStatusMessage(id).setStatusCode(200).end();
                                             });
                                         }));
                     } else if (type.equals(Field.FOLDER)) {
-                        this.folderService.shareFolder(id, share)
+                        log.info(share);
+                        List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(share);
+
+                        Future<List<SharedElem>> deletedRightFuture =  this.magnetoShareService.getDeletedRights(id, newSharedElem , CollectionsConstant.FOLDER_COLLECTION);
+                        deletedRightFuture
+                                .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem ,deleteRights ))
                                 .compose(success -> this.folderService.getChildrenBoardsIds(id))
-                                .compose(boardsIds -> this.boardService.shareBoard(boardsIds, share))
+                                .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem ,deletedRightFuture.result(), true))
                                 .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
                                 .onSuccess(success ->{
                                     JsonObject params = new JsonObject();

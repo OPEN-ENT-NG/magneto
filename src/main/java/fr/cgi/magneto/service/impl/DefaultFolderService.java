@@ -5,11 +5,12 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.PromiseHelper;
-import fr.cgi.magneto.helper.WorkspaceHelper;
 import fr.cgi.magneto.model.FolderPayload;
 import fr.cgi.magneto.model.MongoQuery;
+import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.service.FolderService;
 import fr.cgi.magneto.service.ServiceFactory;
+import fr.cgi.magneto.service.ShareService;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -392,15 +393,18 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
+
+
     @Override
-    public Future<Void> shareFolder(String id, JsonObject share) {
+    public Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares) {
         List<String> ids = new ArrayList<>();
         ids.add(id);
         Promise<Void> promise = Promise.promise();
         List<Future<JsonObject>> futures = new ArrayList<>();
+
         getFolderChildrenIds(ids).onSuccess(foldersIds ->
                 foldersIds.forEach(folderId ->
-                        futures.add(serviceFactory.shareService().upsertSharedArray(folderId, share, this.collection))));
+                        futures.add(serviceFactory.shareService().upsertSharedArray(folderId, newShares, deletedShares, this.collection, true))));
 
         FutureHelper.all(futures)
                 .onSuccess(success -> promise.complete())
@@ -416,19 +420,3 @@ public class DefaultFolderService implements FolderService {
 
 }
 
-
-/*  JsonObject query = (new JsonObject()).put("_id", resourceId);
- JsonObject update = (new JsonObject()).put("$set", (new JsonObject()).put("shared", ((JsonObject)res.right().getValue()).getJsonArray("shared")));
- JsonObject keys = (new JsonObject()).put("shared", 1);
- this.mongo.findAndModify(this.collection, query, update, (JsonObject)null, keys, (mongoRes) -> {
- if ("ok".equals(((JsonObject)mongoRes.body()).getString("status"))) {
- JsonArray oldShared = ((JsonObject)Utils.getOrElse(((JsonObject)mongoRes.body()).getJsonObject("result"), new JsonObject())).getJsonArray("shared");
- JsonArray members = ((JsonObject)res.right().getValue()).getJsonArray("notify-members");
- this.getNotifyMembers(handler, oldShared, members, (m) -> {
- return (String)Utils.getOrElse(((JsonObject)m).getString("groupId"), ((JsonObject)m).getString("userId"));
- });
- } else {
- handler.handle(new Either.Left(((JsonObject)mongoRes.body()).getString("message")));
- }
-
- });*/

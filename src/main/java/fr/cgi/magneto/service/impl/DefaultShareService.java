@@ -131,11 +131,6 @@ public class DefaultShareService implements ShareService {
         return getSharedElemList(toMongoBasicShareFormat(shares));
     }
 
-    @Override
-    public List<SharedElem> getOldRights(JsonArray oldShared, JsonObject newShare) {
-       return getOldRights(oldShared, toMongoBasicShareFormat(newShare));
-    }
-
     private static JsonArray toMongoBasicShareFormat(JsonObject shareJson) {
         JsonArray resultJsonArray = new JsonArray();
         processShareJsonField(shareJson, Field.USERS, Field.USERID, resultJsonArray);

@@ -20,6 +20,16 @@ public interface ShareService {
      */
     Future<JsonObject> upsertSharedArray(String id, JsonObject share, String collection, boolean checkOldRights);
 
+    /**
+     * Update or insert a shared array of rights in the element
+     *
+     * @param id
+     * @param newShare
+     * @param deletedShares
+     * @param collection
+     * @param checkOldRights
+     * @return
+     */
     Future<JsonObject> upsertSharedArray(String id, List<SharedElem> newShare, List<SharedElem> deletedShares, String collection, boolean checkOldRights);
 
     /**
@@ -31,22 +41,38 @@ public interface ShareService {
      */
     List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare);
 
-    List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare);
-
-    List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems);
-
-    List<SharedElem> getSharedElemList(JsonArray shares);
-
-    List<SharedElem> getSharedElemList(JsonObject shares);
-
     /**
      * Return a list of SharedElem wich were present in the object and are not update in new Share
-     *
-     * @param oldShared
-     * @param newShare  new rights but not parsed
+     * *
+     * @param oldShared old rights of the object
+     * @param newShare new rights to apply
      * @return
      */
-    List<SharedElem> getOldRights(JsonArray oldShared, JsonObject newShare);
+    List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare);
+
+    /**
+     *
+     * Return a list of SharedElem wich were present in the object and are not update in new Share
+     * @param oldSharedElems old rights of the object
+     * @param newSharedElems new rights to apply
+     * @return
+     */
+    List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems);
+
+    /**
+     *
+     * @param shares
+     * @return
+     */
+    List<SharedElem> getSharedElemList(JsonArray shares);
+
+    /**
+     *
+     * @param shares
+     * @return
+     */
+
+    List<SharedElem> getSharedElemList(JsonObject shares);
 
     /**
      * Get the old object to update
@@ -58,5 +84,13 @@ public interface ShareService {
     Future<JsonObject> getOldDataToUpdate(String id, String collection);
 
 
+    /**
+     * Get the rights to delete of the object
+     *
+     * @param id
+     * @param newSharedElem
+     * @param boardCollection
+     * @return
+     */
     Future<List<SharedElem>> getDeletedRights(String id, List<SharedElem> newSharedElem, String boardCollection);
 }

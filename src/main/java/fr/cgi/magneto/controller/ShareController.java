@@ -100,27 +100,24 @@ public class ShareController extends ControllerHelper {
                                                     .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
                                             params.put(Field.PUSHNOTIF, pushNotif);
 
-                                            //TODO arreter d utiliser ça
-//                                            shareResource(request, "magneto.share_board", false, params, Field.TITLE);
                                             List<String> ids = new ArrayList<>();
                                             ids.add(id);
-                                            this.boardService.shareBoard(ids, share, false).onSuccess(success ->{
+                                            this.boardService.shareBoard(ids, share, false).onSuccess(success -> {
                                                 notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
                                                         params, true);
                                                 request.response().setStatusMessage(id).setStatusCode(200).end();
                                             });
                                         }));
                     } else if (type.equals(Field.FOLDER)) {
-                        log.info(share);
                         List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(share);
 
-                        Future<List<SharedElem>> deletedRightFuture =  this.magnetoShareService.getDeletedRights(id, newSharedElem , CollectionsConstant.FOLDER_COLLECTION);
+                        Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
                         deletedRightFuture
-                                .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem ,deleteRights ))
+                                .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem, deleteRights))
                                 .compose(success -> this.folderService.getChildrenBoardsIds(id))
-                                .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem ,deletedRightFuture.result(), true))
+                                .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem, deletedRightFuture.result(), true))
                                 .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
-                                .onSuccess(success ->{
+                                .onSuccess(success -> {
                                     JsonObject params = new JsonObject();
                                     params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                                     params.put(Field.USERNAME, user.getUsername());
@@ -135,7 +132,7 @@ public class ShareController extends ControllerHelper {
                                             params, true);
                                     request.response().setStatusMessage(id).setStatusCode(200).end();
                                 })
-                                .onFailure(error -> badRequest(request,error.getMessage()));
+                                .onFailure(error -> badRequest(request, error.getMessage()));
                     }
                 });
             }

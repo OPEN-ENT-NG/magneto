@@ -22,6 +22,7 @@ public class Mongo {
     public static final String PROJECT = "$project";
     public static final String REGEX = "$regex";
     public static final String SET = "$set";
+    public static final String UNSET = "$unset";
     public static final String PUSH = "$push";
     public static final String PULL = "$pull";
     public static final String EACH = "$each";

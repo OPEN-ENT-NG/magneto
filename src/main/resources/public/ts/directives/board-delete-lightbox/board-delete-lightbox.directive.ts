@@ -3,11 +3,16 @@ import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {boardsService, foldersService} from "../../services";
 import {AxiosResponse} from "axios";
+import {Board, Folder} from "../../models";
 
 interface IViewModel extends ng.IController, IBoardDeleteProps {
+    boardsData: Board[];
+
     submitDelete?(): Promise<void>;
 
     closeForm(): void;
+    getElementsData(): void;
+    hasSharedElement(): boolean;
 }
 
 interface IBoardDeleteProps {
@@ -29,6 +34,8 @@ class Controller implements IViewModel {
     boardIds: Array<string>;
     folderIds: Array<string>;
 
+    boardsData: Board[];
+
     constructor(private $scope: IBoardDeleteScope,
                 private $location: ILocationService,
                 private $window: IWindowService) {
@@ -40,6 +47,16 @@ class Controller implements IViewModel {
 
     closeForm = (): void => {
         this.display = false;
+    }
+
+    getElementsData = (): void => {
+        this.boardsData = !!this.$scope.$parent['vm'].boards ? this.$scope.$parent['vm'].boards.filter((board: Board) =>
+            this.boardIds.find((boardId: string) => boardId == board.id)) :  [];
+    }
+
+    hasSharedElement = (): boolean => {
+        this.getElementsData();
+        return (this.folderIds.length > 0) || (!!this.boardsData.find((board: Board) => !!board.shared));
     }
 
     $onDestroy() {

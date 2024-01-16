@@ -8,7 +8,6 @@ import fr.cgi.magneto.model.FolderPayload;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.mongodb.MongoDb;
-import fr.wseduc.mongodb.MongoQueryBuilder;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
@@ -18,6 +17,7 @@ import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,14 +38,23 @@ public class DefaultFolderService implements FolderService {
     @Override
     public Future<JsonArray> getFolders(UserInfos user, boolean isDeleted) {
         Promise<JsonArray> promise = Promise.promise();
-        QueryBuilder matcher = QueryBuilder.start(Field.OWNERID).is(user.getUserId());
+
+        JsonObject query = new JsonObject().put(Mongo.OR,
+                new JsonArray()
+                        .add(new JsonObject().put(Field.OWNERID, user.getUserId()))
+                        .add(new JsonObject().put(String.format("%s.%s", Field.SHARED, Field.USERID),
+                                new JsonObject().put(Mongo.IN, new JsonArray().add(user.getUserId()))))
+                        .add(new JsonObject().put(String.format("%s.%s", Field.SHARED, Field.GROUPID),
+                                new JsonObject().put(Mongo.IN, user.getGroupsIds()))));
+
+
         if (isDeleted) {
-            matcher = matcher.and(Field.DELETED).is(true);
+            query.put(Field.DELETED, true);
         } else {
-            matcher = matcher.and(Field.DELETED).notEquals(true);
+            query.put(Field.DELETED, new JsonObject().put(Mongo.NE, true));
         }
 
-        mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validResultsHandler(results -> {
+        mongoDb.find(this.collection, query, MongoDbResult.validResultsHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::getFolders] Failed to get folders", this.getClass().getSimpleName());
                 log.error(String.format("%s : %s", message, results.left().getValue()));
@@ -171,13 +180,50 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
+    /**
+     * Returns list of folder ids that are only my folders
+     * @param folderIds {@link List<String>} the initial list of folder ids
+     * @return {@link Future<List<String>>} the initial list minus the ids of the folders that are not mine
+     */
+    private Future<List<String>> filterMyFolderIds(List<String> folderIds, String userId) {
+        Promise<List<String>> promise = Promise.promise();
+
+        JsonObject query = new JsonObject().put(Mongo.AND,
+                new JsonArray()
+                        .add(new JsonObject().put(Field.OWNERID, userId))
+                        .add(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(folderIds)))));
+
+        mongoDb.find(this.collection, query, MongoDbResult.validResultsHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::filterMyFolders] Failed to get folders", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+
+            List<JsonObject> filteredFolders = (List<JsonObject>) results.right().getValue().getList();
+            List<String> filteredFoldersIds = filteredFolders.stream()
+                    .map(folder -> folder.getString(Field._ID, ""))
+                    .collect(Collectors.toList());
+            promise.complete(filteredFoldersIds);
+        }));
+
+
+        return promise.future();
+    }
+
 
     @Override
     public Future<JsonObject> preDeleteFoldersAndBoards(UserInfos user, List<String> folderIds, boolean restore) {
         Promise<JsonObject> promise = Promise.promise();
+        List<String> myFolderIds = new ArrayList<>();
 
-        this.preDeleteBoardsInFolderWithChildren(folderIds, restore, user.getUserId())
-                .compose(v -> this.preDeleteFoldersWithChildren(folderIds, restore, user.getUserId()))
+        filterMyFolderIds(folderIds, user.getUserId())
+                .compose(filteredFolderIds -> {
+                    myFolderIds.addAll(filteredFolderIds);
+                    return this.preDeleteBoardsInFolderWithChildren(myFolderIds, restore, user.getUserId());
+                })
+                .compose(v -> this.preDeleteFoldersWithChildren(myFolderIds, restore, user.getUserId()))
                 .onFailure(promise::fail)
                 .onSuccess(promise::complete);
 
@@ -215,7 +261,7 @@ public class DefaultFolderService implements FolderService {
         JsonObject query = new JsonObject()
                 .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(folderIds)))
                 .put(Field.OWNERID, ownerId);
-        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore));
+        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
         mongoDb.update(this.collection, query, update, false, true,
                 MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
                         String.format("[Magneto@%s::preDeleteFolders] Failed to pre-delete folders",

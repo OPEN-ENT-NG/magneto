@@ -197,5 +197,6 @@
   "magneto.folder.share.warning" : "Vous ne pouvez par retirer l'accès à ces utilisateurs puisqu'ils ont accès à tout le dossier partagé \"{0}\".",
   "magneto.folder.share.drag.in.warning": "Cet élément sera visible par toutes les personnes ayant accès au dossier {0}.",
   "magneto.folder.share.drag.out.warning": "Toutes les personnes ayant accès au dossier {0} ne pourront plus accéder à cet élément, sauf s'il est partagé directement avec elles.",
-  "magneto.confirm": "Confirmer"
+  "magneto.confirm": "Confirmer",
+  "magneto.folder.share.predelete.warning": "Les utilisateurs à qui vous avez partagé les éléments n'y auront plus accès."
 }

@@ -126,6 +126,8 @@ interface IViewModel {
 
     areSelectedBoardsMine(): boolean;
 
+    areSelectedFoldersMine(): boolean;
+
     hasRight: typeof hasRight;
 
 }
@@ -572,6 +574,10 @@ class Controller implements ng.IController, IViewModel {
 
     areSelectedBoardsMine = (): boolean => {
         return this.selectedBoards.every((board: Board) => board.isMyBoard());
+    }
+
+    areSelectedFoldersMine = (): boolean => {
+        return this.selectedFolders.every((folder: Folder) => folder.isMyFolder());
     }
 
     /**

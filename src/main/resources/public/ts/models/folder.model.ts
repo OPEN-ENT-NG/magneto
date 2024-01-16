@@ -1,3 +1,5 @@
+import {model} from "entcore";
+
 export interface IFolderResponse {
     _id: string;
     title: string;
@@ -66,5 +68,9 @@ export class Folder {
 
     set shared(value: any[]) {
         this._shared = value;
+    }
+
+    isMyFolder(): boolean {
+        return this.ownerId === model.me.userId;
     }
 }

@@ -2,6 +2,7 @@ package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.model.share.SharedElem;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -101,5 +102,7 @@ public interface ShareService {
      * @param collection
      * @return
      */
-    Future<Boolean> checkRights(String id, List<SharedElem> newSharedElem, String collection);
+    Future<Boolean> checkParentRights(String id, List<SharedElem> newSharedElem, String collection);
+
+    boolean checkRights(List<SharedElem> newSharedElem, JsonObject parent);
 }

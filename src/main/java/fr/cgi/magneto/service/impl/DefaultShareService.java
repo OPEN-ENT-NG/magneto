@@ -188,7 +188,7 @@ public class DefaultShareService implements ShareService {
     }
 
     @Override
-    public Future<Boolean> checkRights(String id, List<SharedElem> newSharedElem, String collection) {
+    public Future<Boolean> checkParentRights(String id, List<SharedElem> newSharedElem, String collection) {
         Promise<Boolean> promise = Promise.promise();
         this.getOldDataToUpdate(id, collection).onSuccess(folder -> {
             if (folder.getValue(Field.PARENTID) == null) {
@@ -196,15 +196,19 @@ public class DefaultShareService implements ShareService {
             } else {
                 this.getOldDataToUpdate(folder.getString(Field.PARENTID, ""), collection)
                         .onSuccess(parent -> {
-                            List<SharedElem> parentRights = getSharedElemList(parent.getJsonArray(Field.SHARED, new JsonArray()));
-
-                           promise.complete(parentRights.stream().allMatch(parentRight ->
-                                   newSharedElem.stream().noneMatch(elem -> parentRight.hasSameId(elem) && parentRight.getRights().size() > elem.getRights().size())));
-
+                            promise.complete(checkRights(newSharedElem, parent));
                         }).onFailure(error -> promise.fail(error.getMessage()));
             }
         });
 
         return promise.future();
+    }
+
+    @Override
+    public boolean checkRights(List<SharedElem> newSharedElem, JsonObject parent) {
+        List<SharedElem> parentRights = getSharedElemList(parent.getJsonArray(Field.SHARED, new JsonArray()));
+
+       return parentRights.stream().allMatch(parentRight ->
+                newSharedElem.stream().noneMatch(elem -> parentRight.hasSameId(elem) && parentRight.getRights().size() > elem.getRights().size()));
     }
 }

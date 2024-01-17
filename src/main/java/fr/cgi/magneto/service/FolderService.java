@@ -69,7 +69,22 @@ public interface FolderService {
          */
         Future<JsonObject> updateOldFolder(List<String> boardIds);
 
+        Future<JsonObject> getFolderByBoardId(String boardId);
+
+        /**
+         * Get boards Ids in a folder ( even boards from others folders inside the asked folder)
+         *
+         * @param id
+         * @return
+         */
          Future<List<String>> getChildrenBoardsIds(String id);
 
+        /**
+         * Share folders
+         * @param id
+         * @param newShares
+         * @param deletedShares
+         * @return
+         */
         Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares);
 }

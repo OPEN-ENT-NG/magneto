@@ -1,6 +1,5 @@
 package fr.cgi.magneto.service.impl;
 
-import com.mongodb.QueryBuilder;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.FutureHelper;
@@ -10,7 +9,6 @@ import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.service.FolderService;
 import fr.cgi.magneto.service.ServiceFactory;
-import fr.cgi.magneto.service.ShareService;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -375,6 +373,21 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
+    @Override
+    public  Future<JsonObject> getFolderByBoardId(String boardId){
+        Promise<JsonObject> promise = Promise.promise();
+        MongoQuery query = new MongoQuery(this.collection);
+        query.match(new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.IN,new JsonArray().add(boardId))));
+        mongoDb.command(query.getAggregate().toString(), MongoDbResult.validResultHandler(resultMongo -> {
+            if (resultMongo.isRight()) {
+                JsonObject result = resultMongo.right().getValue()
+                        .getJsonObject(Mongo.CURSOR, new JsonObject())
+                        .getJsonArray(Mongo.FIRSTBATCH, new JsonArray())
+                        .getJsonObject(0);
+                promise.complete(result);
+            }}));
+        return promise.future();
+    }
     @Override
     public Future<List<String>> getChildrenBoardsIds(String id) {
         Promise<List<String>> promise = Promise.promise();

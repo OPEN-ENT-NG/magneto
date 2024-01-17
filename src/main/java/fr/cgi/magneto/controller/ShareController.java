@@ -80,48 +80,59 @@ public class ShareController extends ControllerHelper {
                     badRequest(request, "invalid.id");
                     return;
                 }
-
                 RequestUtils.bodyToJson(request, share -> {
+                    List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(share);
                     if (type.equals(Field.BOARD)) {
-                        this.boardService.getAllDocumentIds(id, user)
-                                .compose(documentIds -> this.workspaceService.setShareRights(documentIds, share)
-                                        .onFailure(fail -> {
-                                            log.error(String.format("[Magneto@%s::shareResource] Failed to share board documents %s",
-                                                    user.getUserId(), id), fail);
-                                            badRequest(request, fail.getMessage());
-                                        })
-                                        .onSuccess(res -> {
-                                            JsonObject params = new JsonObject();
-                                            params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
-                                            params.put(Field.USERNAME, user.getUsername());
-                                            params.put(Field.BOARDURL, "/magneto#/board/view/" + id);
 
-                                            JsonObject pushNotif = new JsonObject()
-                                                    .put(Field.TITLE, "push.notif.magneto.share")
-                                                    .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
-                                            params.put(Field.PUSHNOTIF, pushNotif);
+                        handleShareBoard(request, user, share, id, newSharedElem, i18nHelper);
 
-                                            List<String> ids = new ArrayList<>();
-                                            ids.add(id);
-                                            this.boardService.shareBoard(ids, share, false).onSuccess(success -> {
-                                                notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
-                                                        params, true);
-                                                request.response().setStatusMessage(id).setStatusCode(200).end();
-                                            });
-                                        }));
                     } else if (type.equals(Field.FOLDER)) {
-                        handleShareFolder(request, user, share, id, i18nHelper);
+                        handleShareFolder(request, user, newSharedElem, id, i18nHelper, share);
                     }
                 });
             }
         });
     }
 
-    private void handleShareFolder(HttpServerRequest request, UserInfos user, JsonObject share, String id, I18nHelper i18nHelper) {
-        List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(share);
+    private void handleShareBoard(HttpServerRequest request, UserInfos user, JsonObject share, String id, List<SharedElem> newSharedElem, I18nHelper i18nHelper) {
+        this.folderService.getFolderByBoardId(id).onSuccess(s -> {
+            if (this.magnetoShareService.checkRights(newSharedElem, s)) {
+                this.boardService.getAllDocumentIds(id, user)
+                        .compose(documentIds -> this.workspaceService.setShareRights(documentIds, share)
+                                .onFailure(fail -> {
+                                    log.error(String.format("[Magneto@%s::shareResource] Failed to share board documents %s",
+                                            user.getUserId(), id), fail);
+                                    badRequest(request, fail.getMessage());
+                                })
+                                .onSuccess(res -> {
+                                    JsonObject params = new JsonObject();
+                                    params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                                    params.put(Field.USERNAME, user.getUsername());
+                                    params.put(Field.BOARDURL, "/magneto#/board/view/" + id);
+
+                                    JsonObject pushNotif = new JsonObject()
+                                            .put(Field.TITLE, "push.notif.magneto.share")
+                                            .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
+                                    params.put(Field.PUSHNOTIF, pushNotif);
+
+                                    List<String> ids = new ArrayList<>();
+                                    ids.add(id);
+                                    this.boardService.shareBoard(ids, share, false).onSuccess(success -> {
+                                        notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
+                                                params, true);
+                                        request.response().setStatusMessage(id).setStatusCode(200).end();
+                                    });
+                                }));
+            } else {
+                badRequest(request, "Can't apply this rights");
+            }
+        });
+    }
+
+    private void handleShareFolder(HttpServerRequest request, UserInfos user, List<SharedElem> newSharedElem, String id, I18nHelper i18nHelper, JsonObject share) {
 
         Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
-        this.magnetoShareService.checkRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION)
+        this.magnetoShareService.checkParentRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION)
                 .onSuccess(checkRight -> {
                             if (checkRight) {
                                 deletedRightFuture
@@ -146,7 +157,7 @@ public class ShareController extends ControllerHelper {
                                         })
                                         .onFailure(error -> badRequest(request, error.getMessage()));
                             } else {
-                                badRequest(request, "blablaba");
+                                badRequest(request, "Can't apply this rights");
                             }
                         }
                 );

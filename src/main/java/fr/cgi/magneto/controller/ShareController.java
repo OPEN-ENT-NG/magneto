@@ -18,11 +18,11 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserUtils;
 
-public class ShareBoardController extends ControllerHelper {
+public class ShareController extends ControllerHelper {
 
     private final BoardService boardService;
     private final WorkspaceService workspaceService;
-    public ShareBoardController(ServiceFactory serviceFactory) {
+    public ShareController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
         this.workspaceService = serviceFactory.workSpaceService();
     }
@@ -67,10 +67,8 @@ public class ShareBoardController extends ControllerHelper {
                 }
 
                 RequestUtils.bodyToJson(request, share -> {
-                    JsonArray shareArray = WorkspaceHelper.toMongoWorkspaceShareFormat(share);
-
                     this.boardService.getAllDocumentIds(id, user)
-                            .compose(documentIds -> this.workspaceService.setShareRights(documentIds, shareArray)
+                            .compose(documentIds -> this.workspaceService.setShareRights(documentIds, share)
                             .onFailure(fail -> {
                                 log.error(String.format("[Magneto@%s::shareResource] Failed to share board documents %s",
                                         user.getUserId(), id), fail);

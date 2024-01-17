@@ -1,11 +1,11 @@
 package fr.cgi.magneto.service.impl;
 
 
-import com.mongodb.*;
 import fr.cgi.magneto.core.constants.*;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.enums.EventBusActions;
 import fr.cgi.magneto.helper.EventBusHelper;
+import fr.cgi.magneto.helper.WorkspaceHelper;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.mongodb.*;
 import io.vertx.core.*;
@@ -79,30 +79,52 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
 
     @Override
-    public Future<JsonObject> setShareRights(List<String> documentIds, JsonArray shareRights) {
+    public Future<JsonObject> setShareRights(List<String> documentIds, JsonObject share) {
         Promise<JsonObject> promise = Promise.promise();
+        JsonArray shareArray = WorkspaceHelper.toMongoWorkspaceShareFormat(share);
 
-        JsonObject query = new JsonObject()
-                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(documentIds)));
+        if(checkOldRights(share,new JsonObject())) { //TODO remplacer new JsonObject() par les droits du parents dans la MAG-286
+            JsonObject query = new JsonObject()
+                    .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(documentIds)));
 
-        JsonObject update = new JsonObject()
-                .put(Mongo.SET, new JsonObject()
-                        .put(Field.SHARED, shareRights)
-                        .put(Field.INHERITEDSHARES, shareRights)
-                        .put(Field.ISSHARED, true));
+            JsonObject update = new JsonObject()
+                    .put(Mongo.SET, new JsonObject()
+                            .put(Field.SHARED, shareArray)
+                            .put(Field.INHERITEDSHARES, shareArray)
+                            .put(Field.ISSHARED, true));
 
-        mongoDb.update(CollectionsConstant.WORKSPACE_DOCUMENTS, query, update, false, true,
-                MongoDbResult.validActionResultHandler(results -> {
-                    if (results.isLeft()) {
-                        String message = String.format("[Magneto@%s::setShareRights] Failed to set share rights",
-                                this.getClass().getSimpleName());
-                        log.error(String.format("%s : %s", message, results.left().getValue()));
-                        promise.fail(message);
-                        return;
-                    }
-                    promise.complete(results.right().getValue());
-                }));
-
+            mongoDb.update(CollectionsConstant.WORKSPACE_DOCUMENTS, query, update, false, true,
+                    MongoDbResult.validActionResultHandler(results -> {
+                        if (results.isLeft()) {
+                            String message = String.format("[Magneto@%s::setShareRights] Failed to set share rights",
+                                    this.getClass().getSimpleName());
+                            log.error(String.format("%s : %s", message, results.left().getValue()));
+                            promise.fail(message);
+                            return;
+                        }
+                        promise.complete(results.right().getValue());
+                    }));
+        }else{
+            promise.fail(String.format("[Magneto@%s::setShareRights] Failed during checking rights",
+                    this.getClass().getSimpleName()));
+        }
         return promise.future();
     }
+
+    private boolean checkOldRights(JsonObject newRights, JsonObject previousRights) {
+        return checkRights(newRights.getJsonObject(Field.USERS, new JsonObject()), previousRights.getJsonObject(Field.USERS, new JsonObject()))
+                && checkRights(newRights.getJsonObject(Field.GROUPS, new JsonObject()), previousRights.getJsonObject(Field.GROUPS, new JsonObject())) &&
+                checkRights(newRights.getJsonObject(Field.BOOKMARKS, new JsonObject()), previousRights.getJsonObject(Field.BOOKMARKS, new JsonObject()));
+    }
+
+    private boolean checkRights(JsonObject newRights, JsonObject previousRights) {
+        return newRights.fieldNames().stream().noneMatch(newKey ->
+                previousRights.fieldNames().stream().anyMatch(oldKey ->
+                        oldKey.equals(newKey)
+                                && newRights.getJsonArray(newKey).size() < previousRights.getJsonArray(newKey).size()
+                )
+        );
+    }
+
+
 }

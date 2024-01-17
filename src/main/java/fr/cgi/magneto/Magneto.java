@@ -52,11 +52,11 @@ public class Magneto extends BaseServer {
 
 		final EventBus eb = getEventBus(vertx);
 
-		ShareBoardController shareBoardController = new ShareBoardController(serviceFactory);
-		addController(shareBoardController);
-		shareBoardController.setShareService(new MongoDbShareService(eb, MongoDb.getInstance(),
+		ShareController shareController = new ShareController(serviceFactory);
+		addController(shareController);
+		shareController.setShareService(new MongoDbShareService(eb, MongoDb.getInstance(),
 				CollectionsConstant.BOARD_COLLECTION, securedActions, null));
-		shareBoardController.setCrudService(new MongoDbCrudService(CollectionsConstant.BOARD_COLLECTION));
+		shareController.setCrudService(new MongoDbCrudService(CollectionsConstant.BOARD_COLLECTION));
 
 		// TODO Websocket
 		// new RealTimeCollaboration(vertx, magnetoConfig).initRealTime();

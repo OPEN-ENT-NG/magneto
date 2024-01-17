@@ -80,12 +80,9 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
     @Override
     public Future<JsonObject> setShareRights(List<String> documentIds, JsonObject share) {
-        JsonArray shareRights = WorkspaceHelper.toMongoWorkspaceShareFormat(share);
-
         Promise<JsonObject> promise = Promise.promise();
         JsonArray shareArray = WorkspaceHelper.toMongoWorkspaceShareFormat(share);
 
-        if(checkOldRights(share,new JsonObject())) { //TODO remplacer new JsonObject() par les droits du parents dans la MAG-286
             JsonObject query = new JsonObject()
                     .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(documentIds)));
 
@@ -106,27 +103,6 @@ public class DefaultWorkspaceService implements WorkspaceService {
                         }
                         promise.complete(results.right().getValue());
                     }));
-        }else{
-            promise.fail(String.format("[Magneto@%s::setShareRights] Failed during checking rights",
-                    this.getClass().getSimpleName()));
-        }
         return promise.future();
     }
-
-    private boolean checkOldRights(JsonObject newRights, JsonObject previousRights) {
-        return checkRights(newRights.getJsonObject(Field.USERS, new JsonObject()), previousRights.getJsonObject(Field.USERS, new JsonObject()))
-                && checkRights(newRights.getJsonObject(Field.GROUPS, new JsonObject()), previousRights.getJsonObject(Field.GROUPS, new JsonObject())) &&
-                checkRights(newRights.getJsonObject(Field.BOOKMARKS, new JsonObject()), previousRights.getJsonObject(Field.BOOKMARKS, new JsonObject()));
-    }
-
-    private boolean checkRights(JsonObject newRights, JsonObject previousRights) {
-        return newRights.fieldNames().stream().noneMatch(newKey ->
-                previousRights.fieldNames().stream().anyMatch(oldKey ->
-                        oldKey.equals(newKey)
-                                && newRights.getJsonArray(newKey).size() < previousRights.getJsonArray(newKey).size()
-                )
-        );
-    }
-
-
 }

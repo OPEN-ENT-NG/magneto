@@ -93,4 +93,13 @@ public interface ShareService {
      * @return
      */
     Future<List<SharedElem>> getDeletedRights(String id, List<SharedElem> newSharedElem, String boardCollection);
+
+    /**
+     *
+     * @param id
+     * @param newSharedElem
+     * @param collection
+     * @return
+     */
+    Future<Boolean> checkRights(String id, List<SharedElem> newSharedElem, String collection);
 }

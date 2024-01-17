@@ -186,4 +186,25 @@ public class DefaultShareService implements ShareService {
         });
         return promise.future();
     }
+
+    @Override
+    public Future<Boolean> checkRights(String id, List<SharedElem> newSharedElem, String collection) {
+        Promise<Boolean> promise = Promise.promise();
+        this.getOldDataToUpdate(id, collection).onSuccess(folder -> {
+            if (folder.getValue(Field.PARENTID) == null) {
+                promise.complete(true);
+            } else {
+                this.getOldDataToUpdate(folder.getString(Field.PARENTID, ""), collection)
+                        .onSuccess(parent -> {
+                            List<SharedElem> parentRights = getSharedElemList(parent.getJsonArray(Field.SHARED, new JsonArray()));
+
+                           promise.complete(parentRights.stream().allMatch(parentRight ->
+                                   newSharedElem.stream().noneMatch(elem -> parentRight.hasSameId(elem) && parentRight.getRights().size() > elem.getRights().size())));
+
+                        }).onFailure(error -> promise.fail(error.getMessage()));
+            }
+        });
+
+        return promise.future();
+    }
 }

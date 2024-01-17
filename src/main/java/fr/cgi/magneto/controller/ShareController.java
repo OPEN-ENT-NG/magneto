@@ -19,6 +19,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.*;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
 import java.util.ArrayList;
@@ -109,34 +110,46 @@ public class ShareController extends ControllerHelper {
                                             });
                                         }));
                     } else if (type.equals(Field.FOLDER)) {
-                        List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(share);
-
-                        Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
-                        deletedRightFuture
-                                .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem, deleteRights))
-                                .compose(success -> this.folderService.getChildrenBoardsIds(id))
-                                .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem, deletedRightFuture.result(), true))
-                                .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
-                                .onSuccess(success -> {
-                                    JsonObject params = new JsonObject();
-                                    params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
-                                    params.put(Field.USERNAME, user.getUsername());
-                                    params.put(Field.BOARDURL, "/magneto#/");
-
-                                    JsonObject pushNotif = new JsonObject()
-                                            .put(Field.TITLE, "push.notif.magneto.share")
-                                            .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
-                                    params.put(Field.PUSHNOTIF, pushNotif);
-
-                                    notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
-                                            params, true);
-                                    request.response().setStatusMessage(id).setStatusCode(200).end();
-                                })
-                                .onFailure(error -> badRequest(request, error.getMessage()));
+                        handleShareFolder(request, user, share, id, i18nHelper);
                     }
                 });
             }
         });
+    }
+
+    private void handleShareFolder(HttpServerRequest request, UserInfos user, JsonObject share, String id, I18nHelper i18nHelper) {
+        List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(share);
+
+        Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
+        this.magnetoShareService.checkRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION)
+                .onSuccess(checkRight -> {
+                            if (checkRight) {
+                                deletedRightFuture
+                                        .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem, deleteRights))
+                                        .compose(success -> this.folderService.getChildrenBoardsIds(id))
+                                        .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem, deletedRightFuture.result(), true))
+                                        .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
+                                        .onSuccess(success -> {
+                                            JsonObject params = new JsonObject();
+                                            params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                                            params.put(Field.USERNAME, user.getUsername());
+                                            params.put(Field.BOARDURL, "/magneto#/");
+
+                                            JsonObject pushNotif = new JsonObject()
+                                                    .put(Field.TITLE, "push.notif.magneto.share")
+                                                    .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
+                                            params.put(Field.PUSHNOTIF, pushNotif);
+
+                                            notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
+                                                    params, true);
+                                            request.response().setStatusMessage(id).setStatusCode(200).end();
+                                        })
+                                        .onFailure(error -> badRequest(request, error.getMessage()));
+                            } else {
+                                badRequest(request, "blablaba");
+                            }
+                        }
+                );
     }
 
 

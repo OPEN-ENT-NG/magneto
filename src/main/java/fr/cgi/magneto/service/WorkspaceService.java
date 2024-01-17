@@ -17,5 +17,5 @@ public interface WorkspaceService {
 
     Future<Boolean> canEditDocument(String userId, String documentId);
 
-    Future<JsonObject> setShareRights(List<String> documentIds, JsonArray shareRights);
+    Future<JsonObject> setShareRights(List<String> documentIds, JsonObject shareRights);
 }

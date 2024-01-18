@@ -3,6 +3,7 @@ package fr.cgi.magneto.service;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
+import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -124,4 +125,24 @@ public interface BoardService {
      */
     Future<JsonObject> delete(String userId, List<String> boardIds);
 
+    /**
+     * share Boards
+     *
+     * @param ids
+     * @param share
+     * @param checkOldRights
+     * @return
+     */
+    Future<List<String> > shareBoard(List<String> ids, JsonObject share, boolean checkOldRights);
+
+    /**
+     * share Boards
+     *
+     * @param boardsIds
+     * @param share
+     * @param deletedShared
+     * @param checkOldRights
+     * @return
+     */
+    Future<List<String>> shareBoard(List<String> boardsIds, List<SharedElem> share, List<SharedElem> deletedShared,boolean checkOldRights );
 }

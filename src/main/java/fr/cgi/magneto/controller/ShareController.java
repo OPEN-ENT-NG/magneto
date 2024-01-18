@@ -138,12 +138,12 @@ public class ShareController extends ControllerHelper {
                                         notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
                                                 params, true);
                                         request.response().setStatusMessage(id).setStatusCode(200).end();
-                                    });
+                                    }).onFailure(error -> badRequest(request, error.getMessage()));
                                 }));
             } else {
                 unauthorized(request, "Can't apply this rights");
             }
-        });
+        }).onFailure(error -> badRequest(request,error.getMessage()));
     }
 
     private void handleShareFolder(HttpServerRequest request, UserInfos user, List<SharedElem> newSharedElem, String id, I18nHelper i18nHelper, JsonObject share) {

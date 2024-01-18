@@ -141,7 +141,6 @@ public class DefaultCardService implements CardService {
                         Board board = boards.get(0);
                         String boardOwnerId = board.getOwnerId();
                         JsonObject shared = WorkspaceHelper.toAPIShareFormat(board.getShared(), cardOwnerId.equals(boardOwnerId), boardOwnerId);
-//                        JsonArray workspaceShare = WorkspaceHelper.toMongoWorkspaceShareFormat(shared);
                         this.workspaceService.setShareRights(Collections.singletonList(documentId), shared)
                                 .onFailure(promise::fail)
                                 .onSuccess(success -> promise.complete(shared));

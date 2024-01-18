@@ -34,14 +34,14 @@ public class DefaultShareService implements ShareService {
 
         if (checkOldRights) {
             getOldDataToUpdate(id, collection).onSuccess(success -> {
-                List<SharedElem> sharedElems = getOldRights( success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
+                List<SharedElem> sharedElems = getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
                 sharedElems.forEach(sharedElem -> {
                     newShare.add(sharedElem.toJson());
                 });
 
                 updateMongo(collection, promise, query, newShare);
             });
-        }  else{
+        } else {
             updateMongo(collection, promise, query, newShare);
         }
 
@@ -57,16 +57,16 @@ public class DefaultShareService implements ShareService {
 
         if (checkOldRights) {
             getOldDataToUpdate(id, collection).onSuccess(success -> {
-                List<SharedElem> sharedElems = getOldRights( success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
+                List<SharedElem> sharedElems = getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
                 sharedElems.addAll(newShare);
-                sharedElems.forEach(sharedElem ->{
-                   if(deletedShares.stream().noneMatch(sharedElem::hasSameId)){
-                       shares.add(sharedElem.toJson());
-                   }
+                sharedElems.forEach(sharedElem -> {
+                    if (deletedShares.stream().noneMatch(sharedElem::hasSameId)) {
+                        shares.add(sharedElem.toJson());
+                    }
                 });
                 updateMongo(collection, promise, query, shares);
             });
-        }  else{
+        } else {
             newShare.forEach(elem -> shares.add(elem.toJson()));
             updateMongo(collection, promise, query, shares);
         }
@@ -90,24 +90,25 @@ public class DefaultShareService implements ShareService {
 
 
     @Override
-    public  List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare) {
-        List<SharedElem>  oldSharedElems= getSharedElemList(oldShared);
+    public List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare) {
+        List<SharedElem> oldSharedElems = getSharedElemList(oldShared);
         List<SharedElem> newSharedElems = getSharedElemList(newShare);
 
         return getOldRights(oldSharedElems, newSharedElems);
     }
 
     @Override
-    public  List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare) {
-        List<SharedElem>  oldSharedElems= getSharedElemList(oldShared);
+    public List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare) {
+        List<SharedElem> oldSharedElems = getSharedElemList(oldShared);
 
         return getOldRights(oldSharedElems, newShare);
     }
+
     @Override
-    public  List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems) {
+    public List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems) {
         List<SharedElem> elementsToAdd = new ArrayList<>();
         oldSharedElems.forEach(oldElem -> {
-            if ( newSharedElems.stream().noneMatch(oldElem::hasSameId)) {
+            if (newSharedElems.stream().noneMatch(oldElem::hasSameId)) {
                 elementsToAdd.add(oldElem);
             }
         });
@@ -181,8 +182,8 @@ public class DefaultShareService implements ShareService {
     @Override
     public Future<List<SharedElem>> getDeletedRights(String id, List<SharedElem> newSharedElem, String boardCollection) {
         Promise<List<SharedElem>> promise = Promise.promise();
-        getOldDataToUpdate(id, boardCollection).onSuccess(success ->{
-            promise.complete(getOldRights(success.getJsonArray(Field.SHARED),newSharedElem));
+        getOldDataToUpdate(id, boardCollection).onSuccess(success -> {
+            promise.complete(getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newSharedElem));
         });
         return promise.future();
     }
@@ -199,7 +200,7 @@ public class DefaultShareService implements ShareService {
                             promise.complete(checkRights(newSharedElem, parent));
                         }).onFailure(error -> promise.fail(error.getMessage()));
             }
-        });
+        }).onFailure(error -> promise.fail(error.getMessage()));
 
         return promise.future();
     }
@@ -208,7 +209,7 @@ public class DefaultShareService implements ShareService {
     public boolean checkRights(List<SharedElem> newSharedElem, JsonObject parent) {
         List<SharedElem> parentRights = getSharedElemList(parent.getJsonArray(Field.SHARED, new JsonArray()));
 
-       return parentRights.stream().allMatch(parentRight ->
+        return parentRights.stream().allMatch(parentRight ->
                 newSharedElem.stream().noneMatch(elem -> parentRight.hasSameId(elem) && parentRight.getRights().size() > elem.getRights().size()));
     }
 }

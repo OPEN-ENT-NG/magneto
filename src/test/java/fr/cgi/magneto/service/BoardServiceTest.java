@@ -24,7 +24,7 @@ public class BoardServiceTest {
     public void setUp() {
         vertx = Vertx.vertx();
         MongoDb.getInstance().init(vertx.eventBus(), "fr.cgi.magneto");
-        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, mongoDb);
+        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, mongoDb, null);
         this.boardService = new DefaultBoardService("board", mongoDb, serviceFactory);
     }
 

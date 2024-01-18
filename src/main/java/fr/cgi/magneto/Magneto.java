@@ -26,7 +26,7 @@ public class Magneto extends BaseServer {
 
 		Storage storage = new StorageFactory(vertx, config).getStorage();
 		MagnetoConfig magnetoConfig = new MagnetoConfig(config);
-		ServiceFactory serviceFactory = new ServiceFactory(vertx, storage, magnetoConfig, Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance());
+		ServiceFactory serviceFactory = new ServiceFactory(vertx, storage, magnetoConfig, Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance() ,securedActions);
 
 		final MongoDbConf conf = MongoDbConf.getInstance();
 		conf.setCollection(CollectionsConstant.BOARD_COLLECTION);

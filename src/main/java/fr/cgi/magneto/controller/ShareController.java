@@ -2,6 +2,7 @@ package fr.cgi.magneto.controller;
 
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.share.SharedElem;
@@ -19,6 +20,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.*;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.share.impl.MongoDbShareService;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
@@ -33,11 +35,14 @@ public class ShareController extends ControllerHelper {
 
     private final ShareService magnetoShareService;
 
+    private final ServiceFactory serviceFactory;
+
     public ShareController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
         this.folderService = serviceFactory.folderService();
         this.workspaceService = serviceFactory.workSpaceService();
         this.magnetoShareService = serviceFactory.shareService();
+        this.serviceFactory = serviceFactory;
 
     }
 
@@ -62,7 +67,19 @@ public class ShareController extends ControllerHelper {
     @ApiDoc("Share board by id")
     @ResourceFilter(GetSharesRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    public void shareBoard(final HttpServerRequest request) {
+    public void getShareResource(final HttpServerRequest request) {
+        String type = request.params().get(Field.TYPE);
+        switch (type) {
+            case Field.BOARD:
+                this.setShareService(this.serviceFactory.mongoDbShareService(CollectionsConstant.BOARD_COLLECTION));
+                break;
+            case Field.FOLDER:
+                this.setShareService(this.serviceFactory.mongoDbShareService(CollectionsConstant.FOLDER_COLLECTION));
+                break;
+            default:
+                badRequest(request,"Wrong Field called");
+                return;
+        }
         shareJson(request, false);
     }
 

@@ -13,9 +13,12 @@ import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Put;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.*;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.*;
 import org.entcore.common.controller.ControllerHelper;
@@ -26,6 +29,7 @@ import org.entcore.common.user.UserUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ShareController extends ControllerHelper {
 
@@ -77,7 +81,7 @@ public class ShareController extends ControllerHelper {
                 this.setShareService(this.serviceFactory.mongoDbShareService(CollectionsConstant.FOLDER_COLLECTION));
                 break;
             default:
-                badRequest(request,"Wrong Field called");
+                badRequest(request, "Wrong Field called");
                 return;
         }
         shareJson(request, false);
@@ -134,16 +138,49 @@ public class ShareController extends ControllerHelper {
 
                                     List<String> ids = new ArrayList<>();
                                     ids.add(id);
-                                    this.boardService.shareBoard(ids, share, false).onSuccess(success -> {
-                                        notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
-                                                params, true);
-                                        request.response().setStatusMessage(id).setStatusCode(200).end();
-                                    }).onFailure(error -> badRequest(request, error.getMessage()));
+                                    this.boardService.shareBoard(ids, share, false)
+                                            .compose(success -> getUsersIdsToNotify(user, id, newSharedElem)
+                                                    .onSuccess(usersIdToShare -> {
+                                                        notification.notifyTimeline(request, "magneto.share_board", user, usersIdToShare, id, Field.TITLE,
+                                                                params, true);
+                                                        request.response().setStatusMessage(id).setStatusCode(200).end();
+                                                    }).onFailure(error -> badRequest(request, error.getMessage())));
                                 }));
             } else {
                 unauthorized(request, "Can't apply this rights");
             }
-        }).onFailure(error -> badRequest(request,error.getMessage()));
+        }).onFailure(error -> badRequest(request, error.getMessage()));
+    }
+
+    private Future<List<String>> getUsersIdsToNotify(UserInfos user, String id, List<SharedElem> newSharedElem) {
+        List<String> usersIdToShare = new ArrayList<>();
+        Promise<List<String>> promise = Promise.promise();
+        List<Future<List<String>>> futures = new ArrayList<>();
+        newSharedElem.forEach(elem -> {
+            if (elem.getTypeId().equals(Field.USERID)) {
+                usersIdToShare.add(elem.getId());
+            }
+            if (elem.getTypeId().equals(Field.GROUPID)) {
+                futures.add(getGroupUsers(user, id));
+            }
+            if (elem.getTypeId().equals(Field.BOOKMARKID)) {
+                //wip
+            }
+        });
+        FutureHelper.all(futures).onSuccess(s -> {
+            futures.forEach(future -> {
+                usersIdToShare.addAll(future.result());
+                promise.complete(usersIdToShare);
+            });
+        }).onFailure(error -> promise.fail(error.getMessage()));
+        return promise.future();
+    }
+
+    private Future<List<String>> getGroupUsers(UserInfos user, String id) {
+        Promise<List<String>> promise = Promise.promise();
+        UserUtils.findUsersInProfilsGroups(id, eb, user.getUserId(), false, event ->
+                promise.complete(event.stream().map(Object::toString).collect(Collectors.toList())));
+        return promise.future();
     }
 
     private void handleShareFolder(HttpServerRequest request, UserInfos user, List<SharedElem> newSharedElem, String id, I18nHelper i18nHelper, JsonObject share) {
@@ -168,7 +205,7 @@ public class ShareController extends ControllerHelper {
                                                     .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
                                             params.put(Field.PUSHNOTIF, pushNotif);
 
-                                            notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, "test",
+                                            notification.notifyTimeline(request, "magneto.share_folder", user, new ArrayList<>(), id, Field.TITLE,
                                                     params, true);
                                             request.response().setStatusMessage(id).setStatusCode(200).end();
                                         })

@@ -383,7 +383,7 @@ public class DefaultFolderService implements FolderService {
                 JsonArray resultJsonArray = resultMongo.right().getValue()
                         .getJsonObject(Mongo.CURSOR, new JsonObject())
                         .getJsonArray(Mongo.FIRSTBATCH, new JsonArray());
-                if(resultJsonArray.size() > 0) {
+                if(!resultJsonArray.isEmpty()) {
                     JsonObject result = resultJsonArray
                             .getJsonObject(0);
                     promise.complete(result);

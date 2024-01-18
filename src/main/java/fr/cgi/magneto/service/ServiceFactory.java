@@ -4,13 +4,17 @@ import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.service.impl.*;
 import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.webutils.security.SecuredAction;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.net.*;
 import io.vertx.ext.web.client.*;
 import org.entcore.common.neo4j.Neo4j;
+import org.entcore.common.share.impl.MongoDbShareService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.storage.Storage;
+
+import java.util.Map;
 
 public class ServiceFactory {
     private final Vertx vertx;
@@ -25,14 +29,16 @@ public class ServiceFactory {
     private final FolderService folderService;
     private final BoardService boardService;
     private final CardService cardService;
+    private final Map<String, SecuredAction> securedActions;
 
-    public ServiceFactory(Vertx vertx, Storage storage, MagnetoConfig magnetoConfig, Neo4j neo4j, Sql sql, MongoDb mongoDb) {
+    public ServiceFactory(Vertx vertx, Storage storage, MagnetoConfig magnetoConfig, Neo4j neo4j, Sql sql, MongoDb mongoDb, Map<String, SecuredAction> securedActions) {
         this.vertx = vertx;
         this.storage = storage;
         this.magnetoConfig = magnetoConfig;
         this.neo4j = neo4j;
         this.sql = sql;
         this.mongoDb = mongoDb;
+        this.securedActions = securedActions;
         this.webClient = initWebClient();
         this.folderService = new DefaultFolderService(CollectionsConstant.FOLDER_COLLECTION, mongoDb, this);
         this.cardService = new DefaultCardService(CollectionsConstant.CARD_COLLECTION, mongoDb, this);
@@ -76,6 +82,10 @@ public class ServiceFactory {
     public BoardAccessService boardViewService(){
         return new DefaultBoardAccessService(CollectionsConstant.BOARD_VIEW_COLLECTION,mongoDb);
     }
+
+    public ShareService shareService() {
+        return new DefaultShareService(mongoDb);
+    }
     // Helpers
     public EventBus eventBus() {
         return this.vertx.eventBus();
@@ -93,6 +103,10 @@ public class ServiceFactory {
         return this.webClient;
     }
 
+    public Map<String, SecuredAction> securedActions() {
+        return securedActions;
+    }
+
     private WebClient initWebClient() {
         WebClientOptions options = new WebClientOptions();
         options.setTrustAll(true);
@@ -106,6 +120,10 @@ public class ServiceFactory {
             options.setProxyOptions(proxyOptions);
         }
         return WebClient.create(this.vertx, options);
+    }
+    public MongoDbShareService mongoDbShareService(String collection){
+        return new MongoDbShareService(this.eventBus(), MongoDb.getInstance(),
+                collection, this.securedActions(), null);
     }
 
 }

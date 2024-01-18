@@ -1,6 +1,7 @@
 package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.model.*;
+import fr.cgi.magneto.model.share.SharedElem;
 import io.vertx.core.*;
 import io.vertx.core.json.*;
 import org.entcore.common.user.*;
@@ -67,4 +68,30 @@ public interface FolderService {
          * @return           Future {@link Future <JsonObject>} containing folder
          */
         Future<JsonObject> updateOldFolder(List<String> boardIds);
+
+        /**
+         * Return folder parent of a boardId
+         *
+         * @param boardId
+         * @return
+         */
+        Future<JsonObject> getFolderByBoardId(String boardId);
+
+        /**
+         * Get boards Ids in a folder ( even boards from others folders inside the asked folder)
+         *
+         * @param id
+         * @return
+         */
+         Future<List<String>> getChildrenBoardsIds(String id);
+
+        /**
+         * Share folders with new rights and delete the rights to remove
+         *
+         * @param id
+         * @param newShares new rights to apply
+         * @param deletedShares rights to remove
+         * @return
+         */
+        Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares);
 }

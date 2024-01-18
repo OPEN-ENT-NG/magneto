@@ -1,8 +1,6 @@
 import {ng, ShareAction, SharePayload} from "entcore";
-import {ILocationService, IScope, IWindowService, IParseService} from "angular";
+import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {boardsService} from "../../services";
-import http from "axios";
 import {I18nUtils} from "../../utils/i18n.utils";
 
 interface IViewModel extends ng.IController, ISharePanelProps {
@@ -42,6 +40,8 @@ class Controller implements IViewModel {
 
     closeForm = async (): Promise<void> => {
         this.display = false;
+        await this.$scope.$parent['vm'].onFormSubmit();
+
     }
 
     $onDestroy() {

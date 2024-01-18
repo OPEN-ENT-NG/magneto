@@ -1,15 +1,19 @@
 package fr.cgi.magneto.service.impl;
 
+import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.PromiseHelper;
+import fr.cgi.magneto.helper.ShareHelper;
 import fr.cgi.magneto.model.FolderPayload;
 import fr.cgi.magneto.model.MongoQuery;
+import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.service.FolderService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
@@ -320,10 +324,72 @@ public class DefaultFolderService implements FolderService {
     public Future<JsonObject> moveBoardsToFolder(String userId, List<String> boardIds, String folderId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        this.updateOldFolder(boardIds)
-                .compose(success -> this.updateNewFolder(userId, boardIds, folderId))
-                .onFailure(promise::fail)
-                .onSuccess(promise::complete);
+        Future<JsonObject> updateOldFolderFuture = this.updateOldFolder(boardIds);
+        Future<JsonObject> updateNewFolderFuture = this.updateNewFolder(userId, boardIds, folderId);
+        Future<Void> handleBoardSharedRightsFuture = this.handleBoardsSharedRights(boardIds, folderId);
+
+        CompositeFuture.all(updateOldFolderFuture, updateNewFolderFuture, handleBoardSharedRightsFuture)
+                .onFailure(error -> promise.fail(error.getMessage()))
+                .onSuccess(result -> promise.complete(updateNewFolderFuture.result()));
+
+        return promise.future();
+    }
+
+    private Future<Void> handleBoardsSharedRights(List<String> boardIds, String folderId) {
+        Promise<Void> promise = Promise.promise();
+        List<Future<Void>> handleBoardFutures = new ArrayList<Future<Void>>();
+
+        this.serviceFactory.boardService().getBoards(boardIds)
+                .compose(boards -> {
+                    boards.forEach(board -> handleBoardFutures.add(handleBoardSharedRights(board, folderId)));
+                    return FutureHelper.all(handleBoardFutures);
+                })
+                .onSuccess(result -> promise.complete())
+                .onFailure(error -> promise.fail(error.getMessage()));
+
+        return promise.future();
+    }
+
+    private Future<Void> handleBoardSharedRights(Board board, String folderId) {
+        Promise<Void> promise = Promise.promise();
+
+        Future<JsonArray> newFolderSharedRights = folderId.equals(Field.MY_BOARDS) ? Future.succeededFuture(new JsonArray())
+                : this.getFolderSharedRights(folderId);
+        Future<JsonArray> oldFolderSharedRights = (board.getFolderId() != null && board.getFolderId().equals(Field.MY_BOARDS)) ? Future.succeededFuture(new JsonArray())
+                : this.getFolderByBoardId(board.getId()).compose(folder -> this.getFolderSharedRights(folder.getString(Field._ID, "")));
+
+        CompositeFuture.all(newFolderSharedRights, oldFolderSharedRights)
+                .compose(rights -> {
+                    List<SharedElem> newFolderSharedRightsList = ShareHelper.getSharedElem(rights.resultAt(0));
+                    List<SharedElem> oldFolderSharedRightsList = ShareHelper.getSharedElem(rights.resultAt(1));
+
+                    return this.serviceFactory.shareService().upsertSharedArray(board.getId(), newFolderSharedRightsList,
+                            oldFolderSharedRightsList, CollectionsConstant.BOARD_COLLECTION, true);
+                })
+                .onFailure(error -> promise.fail(error.getMessage()))
+                .onSuccess(result -> promise.complete());
+
+        return promise.future();
+    }
+
+    private Future<JsonArray> getFolderSharedRights(String folderId) {
+        Promise<JsonArray> promise = Promise.promise();
+        JsonObject query = new JsonObject()
+                .put(Field._ID, folderId);
+
+        mongoDb.findOne(this.collection, query, MongoDbResult.validResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::getFolderSharedRights] Failed to get folder", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+
+            JsonObject folderData = results.right().getValue();
+            JsonArray folderSharedRights = folderData.getJsonArray(Field.SHARED, new JsonArray());
+
+            promise.complete(folderSharedRights);
+        }));
         return promise.future();
     }
 
@@ -411,8 +477,6 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
-
-
     @Override
     public Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares) {
         List<String> ids = new ArrayList<>();
@@ -430,11 +494,5 @@ public class DefaultFolderService implements FolderService {
 
         return promise.future();
     }
-
-
-    private static void processRights(JsonArray rights, JsonObject targetObject) {
-        rights.forEach(right -> targetObject.put(right.toString(), true));
-    }
-
 }
 

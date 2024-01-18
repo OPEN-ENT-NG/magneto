@@ -124,7 +124,7 @@ public class ShareController extends ControllerHelper {
                                     });
                                 }));
             } else {
-                badRequest(request, "Can't apply this rights");
+                unauthorized(request, "Can't apply this rights");
             }
         });
     }
@@ -157,7 +157,7 @@ public class ShareController extends ControllerHelper {
                                         })
                                         .onFailure(error -> badRequest(request, error.getMessage()));
                             } else {
-                                badRequest(request, "Can't apply this rights");
+                                unauthorized(request, "Can't apply this rights");
                             }
                         }
                 );

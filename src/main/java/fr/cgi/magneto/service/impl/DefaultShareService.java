@@ -34,7 +34,7 @@ public class DefaultShareService implements ShareService {
 
         if (checkOldRights) {
             getOldDataToUpdate(id, collection).onSuccess(success -> {
-                List<SharedElem> sharedElems = getOldRights( success.getJsonArray("shared", new JsonArray()), newShare);
+                List<SharedElem> sharedElems = getOldRights( success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
                 sharedElems.forEach(sharedElem -> {
                     newShare.add(sharedElem.toJson());
                 });
@@ -169,7 +169,7 @@ public class DefaultShareService implements ShareService {
                         .getJsonObject(0);
                 promise.complete(result);
             } else {
-                String message = String.format("[Magneto@%s::updateOldFolder] Failed to update old folder",
+                String message = String.format("[Magneto@%s::getOldDataToUpdate] Failed to update old folder",
                         this.getClass().getSimpleName());
                 log.error(String.format("%s : %s", message, resultMongo.left().getValue()));
                 promise.fail(message);

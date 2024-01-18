@@ -398,7 +398,7 @@ public class DefaultFolderService implements FolderService {
                 .compose(this::getBoardIdsInFolders)
                 .onSuccess(promise::complete)
                 .onFailure(error -> {
-                    String message = String.format("[Magneto@%s::getAllBoardsIds] Failed to recovers boards and folders ids",
+                    String message = String.format("[Magneto@%s::getChildrenBoardsIds] Failed to recovers boards and folders ids",
                             this.getClass().getSimpleName());
                     log.error(String.format("%s : %s", message, error));
                     promise.fail(message);

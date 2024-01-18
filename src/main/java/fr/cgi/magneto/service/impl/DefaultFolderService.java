@@ -374,7 +374,7 @@ public class DefaultFolderService implements FolderService {
     }
 
     @Override
-    public  Future<JsonObject> getFolderByBoardId(String boardId){
+    public Future<JsonObject> getFolderByBoardId(String boardId) {
         Promise<JsonObject> promise = Promise.promise();
         MongoQuery query = new MongoQuery(this.collection);
         query.match(new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.IN,new JsonArray().add(boardId))));

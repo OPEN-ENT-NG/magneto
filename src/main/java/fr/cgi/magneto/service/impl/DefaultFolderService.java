@@ -380,11 +380,16 @@ public class DefaultFolderService implements FolderService {
         query.match(new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.IN,new JsonArray().add(boardId))));
         mongoDb.command(query.getAggregate().toString(), MongoDbResult.validResultHandler(resultMongo -> {
             if (resultMongo.isRight()) {
-                JsonObject result = resultMongo.right().getValue()
+                JsonArray resultJsonArray = resultMongo.right().getValue()
                         .getJsonObject(Mongo.CURSOR, new JsonObject())
-                        .getJsonArray(Mongo.FIRSTBATCH, new JsonArray())
-                        .getJsonObject(0);
-                promise.complete(result);
+                        .getJsonArray(Mongo.FIRSTBATCH, new JsonArray());
+                if(resultJsonArray.size() > 0) {
+                    JsonObject result = resultJsonArray
+                            .getJsonObject(0);
+                    promise.complete(result);
+                }else {
+                    promise.complete(new JsonObject());
+                }
             }}));
         return promise.future();
     }

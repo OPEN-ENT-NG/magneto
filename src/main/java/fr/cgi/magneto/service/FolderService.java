@@ -69,6 +69,12 @@ public interface FolderService {
          */
         Future<JsonObject> updateOldFolder(List<String> boardIds);
 
+        /**
+         * Return folder parent of a boardId
+         *
+         * @param boardId
+         * @return
+         */
         Future<JsonObject> getFolderByBoardId(String boardId);
 
         /**
@@ -80,10 +86,11 @@ public interface FolderService {
          Future<List<String>> getChildrenBoardsIds(String id);
 
         /**
-         * Share folders
+         * Share folders with new rights and delete the rights to remove
+         *
          * @param id
-         * @param newShares
-         * @param deletedShares
+         * @param newShares new rights to apply
+         * @param deletedShares rights to remove
          * @return
          */
         Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares);

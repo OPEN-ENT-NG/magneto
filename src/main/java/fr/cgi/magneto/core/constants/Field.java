@@ -219,4 +219,5 @@ public class Field {
     public static final String GROUPS = "groups";
     public static final String BOOKMARKS = "bookmarks";
     public static final String BOOKMARKID = "bookmarkId";
+    public static final String TYPE = "type";
 }

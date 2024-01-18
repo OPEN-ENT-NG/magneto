@@ -1,12 +1,14 @@
 package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.constants.Field;
-import com.mongodb.*;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.PromiseHelper;
 import fr.cgi.magneto.model.FolderPayload;
 import fr.cgi.magneto.model.MongoQuery;
-import fr.cgi.magneto.service.*;
+import fr.cgi.magneto.model.share.SharedElem;
+import fr.cgi.magneto.service.FolderService;
+import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -371,5 +373,68 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
+    @Override
+    public Future<JsonObject> getFolderByBoardId(String boardId) {
+        Promise<JsonObject> promise = Promise.promise();
+        MongoQuery query = new MongoQuery(this.collection);
+        query.match(new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.IN,new JsonArray().add(boardId))));
+        mongoDb.command(query.getAggregate().toString(), MongoDbResult.validResultHandler(resultMongo -> {
+            if (resultMongo.isRight()) {
+                JsonArray resultJsonArray = resultMongo.right().getValue()
+                        .getJsonObject(Mongo.CURSOR, new JsonObject())
+                        .getJsonArray(Mongo.FIRSTBATCH, new JsonArray());
+                if(!resultJsonArray.isEmpty()) {
+                    JsonObject result = resultJsonArray
+                            .getJsonObject(0);
+                    promise.complete(result);
+                }else {
+                    promise.complete(new JsonObject());
+                }
+            }}));
+        return promise.future();
+    }
+    @Override
+    public Future<List<String>> getChildrenBoardsIds(String id) {
+        Promise<List<String>> promise = Promise.promise();
+
+        List<String> ids = new ArrayList<>();
+        ids.add(id);
+        getFolderChildrenIds(ids)
+                .compose(this::getBoardIdsInFolders)
+                .onSuccess(promise::complete)
+                .onFailure(error -> {
+                    String message = String.format("[Magneto@%s::getChildrenBoardsIds] Failed to recovers boards and folders ids",
+                            this.getClass().getSimpleName());
+                    log.error(String.format("%s : %s", message, error));
+                    promise.fail(message);
+                });
+        return promise.future();
+    }
+
+
+
+    @Override
+    public Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares) {
+        List<String> ids = new ArrayList<>();
+        ids.add(id);
+        Promise<Void> promise = Promise.promise();
+        List<Future<JsonObject>> futures = new ArrayList<>();
+
+        getFolderChildrenIds(ids).onSuccess(foldersIds ->
+                foldersIds.forEach(folderId ->
+                        futures.add(serviceFactory.shareService().upsertSharedArray(folderId, newShares, deletedShares, this.collection, true))));
+
+        FutureHelper.all(futures)
+                .onSuccess(success -> promise.complete())
+                .onFailure(error -> promise.fail(error.getMessage()));
+
+        return promise.future();
+    }
+
+
+    private static void processRights(JsonArray rights, JsonObject targetObject) {
+        rights.forEach(right -> targetObject.put(right.toString(), true));
+    }
 
 }
+

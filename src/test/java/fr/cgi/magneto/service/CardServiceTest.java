@@ -26,7 +26,7 @@ public class CardServiceTest {
     public void setUp() {
         vertx = Vertx.vertx();
         MongoDb.getInstance().init(vertx.eventBus(), "fr.cgi.magneto");
-        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, null);
+        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, null, null);
         this.cardService = new DefaultCardService("card", mongoDb, serviceFactory);
     }
     @Test

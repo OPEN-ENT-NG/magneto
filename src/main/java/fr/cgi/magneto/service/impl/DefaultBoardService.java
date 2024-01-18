@@ -5,6 +5,7 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.model.MongoQuery;
@@ -13,6 +14,7 @@ import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.mongodb.MongoDb;
@@ -39,6 +41,8 @@ public class DefaultBoardService implements BoardService {
     private final SectionService sectionService;
     private final CardService cardService;
 
+    private final ShareService shareService;
+
     protected static final Logger log = LoggerFactory.getLogger(DefaultBoardService.class);
 
 
@@ -48,6 +52,8 @@ public class DefaultBoardService implements BoardService {
         this.folderService = serviceFactory.folderService();
         this.cardService = serviceFactory.cardService();
         this.sectionService = serviceFactory.sectionService();
+        this.shareService = serviceFactory.shareService();
+
     }
 
     @Override
@@ -184,7 +190,7 @@ public class DefaultBoardService implements BoardService {
                                     .getJsonArray(Field.SECTIONIDS, new JsonArray())
                                     .getList();
 
-                            duplicateSection.sort(Comparator.comparing(section-> duplicateSectionIds.indexOf(section.getId())));
+                            duplicateSection.sort(Comparator.comparing(section -> duplicateSectionIds.indexOf(section.getId())));
 
                             // If no section in board, no duplicate
                             if (duplicateSection.isEmpty()) {
@@ -600,4 +606,25 @@ public class DefaultBoardService implements BoardService {
 
         return promise.future();
     }
+
+    @Override
+    public Future<List<String> > shareBoard(List<String> ids, JsonObject share, boolean checkOldRights) {
+        Promise<List<String> > promise = Promise.promise();
+        List<Future<JsonObject>> futures = new ArrayList<>();
+        ids.forEach(id -> futures.add(this.shareService.upsertSharedArray(id, share, this.collection, true)));
+        FutureHelper.all(futures)
+                .onSuccess(success -> promise.complete(ids))
+                .onFailure(error -> promise.fail(error.getMessage()));
+        return promise.future();
+    }
+
+    @Override
+    public Future<List<String>> shareBoard(List<String> ids, List<SharedElem> share, List<SharedElem> deletedShared, boolean b) {
+        Promise<List<String> > promise = Promise.promise();
+        List<Future<JsonObject>> futures = new ArrayList<>();
+        ids.forEach(id -> futures.add(this.shareService.upsertSharedArray(id, share, deletedShared,this.collection, true)));
+        FutureHelper.all(futures)
+                .onSuccess(success -> promise.complete(ids))
+                .onFailure(error -> promise.fail(error.getMessage()));
+        return promise.future();    }
 }

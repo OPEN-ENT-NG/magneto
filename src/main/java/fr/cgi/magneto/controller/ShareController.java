@@ -121,7 +121,7 @@ public class ShareController extends ControllerHelper {
                     this.boardService.getAllDocumentIds(id, user)
                             .compose(documentIds -> this.workspaceService.setShareRights(documentIds, share)
                                     .onFailure(fail -> {
-                                        log.error(String.format("[Magneto@%s::shareResource] Failed to share board documents %s",
+                                        log.error(String.format("[Magneto@%s::handleShareBoard] Failed to share board documents %s",
                                                 user.getUserId(), id), fail);
                                         badRequest(request, fail.getMessage());
                                     })

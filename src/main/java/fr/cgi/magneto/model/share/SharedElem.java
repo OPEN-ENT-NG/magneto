@@ -40,6 +40,9 @@ public class SharedElem {
     public void addRight(String right) {
         this.rights.add(right);
     }
+    public void addAllRight(List<String> rights) {
+        this.rights.addAll(rights);
+    }
 
     public boolean hasSameId(SharedElem elem) {
         return this.typeId.equals(elem.getTypeId()) && this.id.equals(elem.getId());

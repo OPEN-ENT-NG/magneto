@@ -198,6 +198,7 @@ public class Field {
     public static final String IDS_MAP = "idsMap";
     public static final String DATE = "date";
     public static final String USER = "user";
+    public static final String USER_2 = "User";
     public static final String USERIDS = "userIds";
 
     //FAVORITE
@@ -216,4 +217,7 @@ public class Field {
     public static final String BOOKMARKID = "bookmarkId";
     public static final String TYPE = "type";
     public static final String MY_BOARDS = "my-boards";
+    public static final String GROUP_TYPE = "groupType";
+    public static final String GROUP = "Group";
+    public static final String MEMBERS = "members";
 }

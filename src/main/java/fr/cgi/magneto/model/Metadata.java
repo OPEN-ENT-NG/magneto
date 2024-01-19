@@ -10,6 +10,7 @@ public class Metadata implements Model {
     private final String contentTransferEncoding;
     private final String charset;
     private final Integer size;
+    private final String extension;
 
     public Metadata(JsonObject metadata) {
         this.name = metadata.getString(Field.NAME, null);
@@ -18,6 +19,7 @@ public class Metadata implements Model {
         this.contentTransferEncoding = metadata.getString(Field.CONTENT_TRANSFER_ENCODING, null);
         this.charset = metadata.getString(Field.CHARSET, null);
         this.size = metadata.getInteger(Field.SIZE, null);
+        this.extension = filename.substring(filename.lastIndexOf('.') + 1);
     }
 
     public String getName() {
@@ -40,9 +42,12 @@ public class Metadata implements Model {
         return charset;
     }
 
-
     public Integer getSize() {
         return size;
+    }
+
+    public String getExtension() {
+        return extension;
     }
 
 
@@ -54,7 +59,8 @@ public class Metadata implements Model {
                 .put(Field.CONTENT_TYPE, this.getContentType())
                 .put(Field.CONTENT_TRANSFER_ENCODING, this.getContentTransferEncoding())
                 .put(Field.CHARSET, this.getCharset())
-                .put(Field.SIZE, this.getSize());
+                .put(Field.SIZE, this.getSize())
+                .put(Field.EXTENSION, this.getExtension());
     }
 
     @Override

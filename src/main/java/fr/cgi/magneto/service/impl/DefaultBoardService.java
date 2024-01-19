@@ -611,7 +611,7 @@ public class DefaultBoardService implements BoardService {
     public Future<List<String> > shareBoard(List<String> ids, JsonObject share, boolean checkOldRights) {
         Promise<List<String> > promise = Promise.promise();
         List<Future<JsonObject>> futures = new ArrayList<>();
-        ids.forEach(id -> futures.add(this.shareService.upsertSharedArray(id, share, this.collection, true)));
+        ids.forEach(id -> futures.add(this.shareService.upsertSharedArray(id, share, this.collection, checkOldRights)));
         FutureHelper.all(futures)
                 .onSuccess(success -> promise.complete(ids))
                 .onFailure(error -> promise.fail(error.getMessage()));

@@ -125,5 +125,7 @@ public class ServiceFactory {
         return new MongoDbShareService(this.eventBus(), MongoDb.getInstance(),
                 collection, this.securedActions(), null);
     }
-
+    public ShareBookMarkService shareBookMarkService(){
+        return new DefaultShareBookMarkService(neo4j);
+    }
 }

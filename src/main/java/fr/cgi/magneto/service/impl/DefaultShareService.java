@@ -128,6 +128,19 @@ public class DefaultShareService implements ShareService {
     }
 
     @Override
+    public JsonObject getSharedJsonFromList(List<SharedElem> elems) {
+        JsonObject result = new JsonObject();
+        elems.forEach(elem -> {
+            if(elem.getTypeId().equals(Field.USERID)) {
+                result.put(Field.USERS,result.getJsonObject(Field.USERS, new JsonObject()).put(elem.getId(),elem.getRights()));
+            }else if(elem.getTypeId().equals(Field.GROUPID)) {
+                result.put(Field.GROUPS,result.getJsonObject(Field.GROUPS, new JsonObject()).put(elem.getId(),elem.getRights()));
+            }
+        });
+        return result;
+    }
+
+    @Override
     public List<SharedElem> getSharedElemList(JsonObject shares) {
         return getSharedElemList(toMongoBasicShareFormat(shares));
     }

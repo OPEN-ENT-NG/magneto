@@ -70,6 +70,8 @@ public interface ShareService {
     List<SharedElem> getSharedElemList(JsonArray shares);
 
 
+    JsonObject getSharedJsonFromList(List<SharedElem> elems);
+
     /**
      * format shared array to SharedElemList
      *

@@ -428,7 +428,8 @@ class Controller implements ng.IController, IViewModel {
             this.folderNavTreeSubject.next(new FolderTreeNavItem(
                 {
                     id: this.openedFolder.id,
-                    title: this.openedFolder.title, parentId: this.openedFolder.parentId
+                    title: this.openedFolder.title,
+                    parentId: this.openedFolder.parentId
                 }));
         } else {
             this.$location.path(`/board/view/${this.selectedBoardIds[0]}`);

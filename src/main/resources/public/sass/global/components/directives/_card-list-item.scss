@@ -114,7 +114,7 @@
         flex: 1;
       }
     }
-    img {
+    &-img {
       margin-left: auto;
       margin-right: auto;
       object-fit: cover;
@@ -249,4 +249,8 @@
     font-size: 25px;
     right: 5px;
   }
+}
+
+.h100 {
+  height: 100%;
 }

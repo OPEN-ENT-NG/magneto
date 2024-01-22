@@ -72,12 +72,27 @@ public class DefaultBoardService implements BoardService {
         }
         createBoard.setOwnerId(user.getUserId());
         createBoard.setOwnerName(user.getUsername());
+        if (createBoard.getFolderId() != null) {
+            shareService.getOldDataToUpdate(createBoard.getFolderId(), CollectionsConstant.FOLDER_COLLECTION)
+                    .onSuccess(s -> {
+                        createBoard.setShared(s.getJsonArray(Field.SHARED, new JsonArray()));
+                        handleCreateComposite(user, createBoardFutures, createBoard, newId, promise);
+                    })
+                    .onFailure(error -> promise.fail(error.getMessage()));
+        } else {
+            handleCreateComposite(user, createBoardFutures, createBoard, newId, promise);
+        }
+
+        return promise.future();
+    }
+
+    private void handleCreateComposite(UserInfos user, List<Future> createBoardFutures, BoardPayload createBoard, String newId, Promise<JsonObject> promise) {
         createBoardFutures.add(this.createBoard(createBoard, newId));
+
         CompositeFuture.all(createBoardFutures)
                 .compose(success -> this.updateFolderOnBoardCreate(user.getUserId(), createBoard, newId))
                 .onFailure(promise::fail)
                 .onSuccess(res -> promise.complete(new JsonObject().put(Field.ID, newId)));
-        return promise.future();
     }
 
     private Future<JsonObject> createBoard(BoardPayload board, String id) {

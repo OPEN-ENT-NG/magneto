@@ -31,6 +31,8 @@ public class BoardPayload implements Model<BoardPayload> {
     private List<String> tags;
     private boolean isPublic;
 
+    private JsonArray shared;
+
     public BoardPayload() {
 
     }
@@ -269,6 +271,14 @@ public class BoardPayload implements Model<BoardPayload> {
         return this;
     }
 
+    public JsonArray getShared() {
+        return shared;
+    }
+
+    public void setShared(JsonArray shared) {
+        this.shared = shared;
+    }
+
     @Override
     public JsonObject toJson() {
 
@@ -314,6 +324,10 @@ public class BoardPayload implements Model<BoardPayload> {
             json.put(Field.DISPLAY_NB_FAVORITES, this.displayNbFavorites());
         }
 
+        if(this.shared.size() > 0){
+            json.put(Field.SHARED,shared);
+        }
+
         json.put(Field.PUBLIC, this.isPublic());
         json.put(Field.MODIFICATIONDATE, this.getModificationDate());
 
@@ -329,6 +343,7 @@ public class BoardPayload implements Model<BoardPayload> {
 
         return json;
     }
+
 
     @Override
     public BoardPayload model(JsonObject board) {

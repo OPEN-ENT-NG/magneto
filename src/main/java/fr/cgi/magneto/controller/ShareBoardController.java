@@ -27,7 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ShareController extends ControllerHelper {
+/**
+ *Handle folders too but can't rename without losing old shared Boards
+ */
+public class ShareBoardController extends ControllerHelper {
 
     private final BoardService boardService;
     private final WorkspaceService workspaceService;
@@ -38,7 +41,7 @@ public class ShareController extends ControllerHelper {
     private final ServiceFactory serviceFactory;
     private final ShareBookMarkService shareBookMarkService;
 
-    public ShareController(ServiceFactory serviceFactory) {
+    public ShareBoardController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
         this.folderService = serviceFactory.folderService();
         this.workspaceService = serviceFactory.workSpaceService();

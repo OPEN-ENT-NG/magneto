@@ -227,9 +227,9 @@
                         && ((vm.selectedFolderIds.length > 0  && vm.areSelectedFoldersMine())
                         || (vm.selectedBoardIds.length > 0 && vm.areSelectedBoardsMine()))"
             on-delete="vm.openDeleteForm"
-            has-share="!vm.openedFolder.shared && ((vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
+            has-share="((vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
                         && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard())
-                        || (vm.selectedFolderIds.length == 1 && vm.selectedBoardIds.length == 0 && vm.hasFolderShareRights(vm.selectedFolderIds[0])))"
+                        || (!vm.openedFolder.shared && vm.selectedFolderIds.length == 1 && vm.selectedBoardIds.length == 0 && vm.hasFolderShareRights(vm.selectedFolderIds[0])))"
             has-public-share="!vm.openedFolder.shared && (vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
                         && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard() && !vm.selectedBoards[0].public && vm.hasRight('publish'))"
             has-public-unshare="vm.filter.isMyBoards && vm.selectedBoardIds.length == 1

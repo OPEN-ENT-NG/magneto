@@ -75,6 +75,18 @@ public class DefaultFolderService implements FolderService {
     @Override
     public Future<JsonObject> createFolder(FolderPayload folder) {
         Promise<JsonObject> promise = Promise.promise();
+        if(folder.getParentId() != null){
+            this.getFolderSharedRights(folder.getParentId()).onSuccess(s ->{
+               folder.setShared(s);
+                mongoCreation(folder, promise);
+            }).onFailure(error -> promise.fail(error.getMessage()));
+        }else{
+            mongoCreation(folder, promise);
+        }
+        return promise.future();
+    }
+
+    private void mongoCreation(FolderPayload folder, Promise<JsonObject> promise) {
         mongoDb.insert(this.collection, folder.toJson(), MongoDbResult.validResultHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::createFolder] Failed to create folder", this.getClass().getSimpleName());
@@ -84,7 +96,6 @@ public class DefaultFolderService implements FolderService {
             }
             promise.complete();
         }));
-        return promise.future();
     }
 
     @Override

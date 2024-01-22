@@ -324,7 +324,7 @@ public class BoardPayload implements Model<BoardPayload> {
             json.put(Field.DISPLAY_NB_FAVORITES, this.displayNbFavorites());
         }
 
-        if(this.shared.size() > 0){
+        if(this.shared != null && !this.shared.isEmpty()){
             json.put(Field.SHARED,shared);
         }
 

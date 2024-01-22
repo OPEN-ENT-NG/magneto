@@ -75,8 +75,9 @@ class Controller implements IViewModel {
             });
 
             this.search.application = currentApp ? currentApp : this.apps[0];
-        }
+            this.loadApplicationResources();
 
+        }
     }
 
     resetLinker = (): void => {

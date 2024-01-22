@@ -11,11 +11,12 @@ public class MetadataTest {
 
     JsonObject metadataJsonObject = new JsonObject()
             .put("name", "name")
-            .put("filename", "filename")
+            .put("filename", "filename.test")
             .put("content-type", "contentType")
             .put("content-transfer-encoding", "contentTransferEncoding")
             .put("charset", "charset")
-            .put("size", 1);
+            .put("size", 1)
+            .put("extension", "test");
 
 
     @Test

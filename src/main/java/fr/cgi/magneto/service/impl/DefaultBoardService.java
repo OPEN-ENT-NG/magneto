@@ -73,10 +73,12 @@ public class DefaultBoardService implements BoardService {
         createBoard.setOwnerId(user.getUserId());
         createBoard.setOwnerName(user.getUsername());
         if (createBoard.getFolderId() != null) {
-            shareService.getOldDataToUpdate(createBoard.getFolderId(), CollectionsConstant.FOLDER_COLLECTION).onSuccess(s -> {
-                createBoard.setShared(s.getJsonArray(Field.SHARED, new JsonArray()));
-                handleCreateComposite(user, createBoardFutures, createBoard, newId, promise);
-            }).onFailure(error -> promise.fail(error.getMessage()));
+            shareService.getOldDataToUpdate(createBoard.getFolderId(), CollectionsConstant.FOLDER_COLLECTION)
+                    .onSuccess(s -> {
+                        createBoard.setShared(s.getJsonArray(Field.SHARED, new JsonArray()));
+                        handleCreateComposite(user, createBoardFutures, createBoard, newId, promise);
+                    })
+                    .onFailure(error -> promise.fail(error.getMessage()));
         } else {
             handleCreateComposite(user, createBoardFutures, createBoard, newId, promise);
         }

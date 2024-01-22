@@ -215,6 +215,7 @@ public class Field {
     public static final String GROUPS = "groups";
     public static final String BOOKMARKS = "bookmarks";
     public static final String BOOKMARKID = "bookmarkId";
+    public static final String EXTENSION = "extension";
     public static final String TYPE = "type";
     public static final String MY_BOARDS = "my-boards";
     public static final String GROUP_TYPE = "groupType";

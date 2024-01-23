@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static fr.cgi.magneto.core.enums.Events.CREATE_SECTION;
+import static fr.cgi.magneto.core.enums.Events.CREATE;
 
 public class SectionController extends ControllerHelper {
     private final EventStore eventStore;
@@ -88,32 +88,35 @@ public class SectionController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void createSection(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "section", section -> {
-            SectionPayload createSection = new SectionPayload(section);
-            String newId = UUID.randomUUID().toString();
+            UserUtils.getUserInfos(eb, request, user -> {
+                SectionPayload createSection = new SectionPayload(section);
+                String newId = UUID.randomUUID().toString();
 
-            Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(createSection.getBoardId()));
-            Future<JsonObject> createSectionFuture = sectionService.create(createSection, newId);
-            CompositeFuture.all(getBoardFuture, createSectionFuture)
-                    .compose(result -> {
-                        if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
-                            BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
-                            boardPayload.addSection(newId);
-                            return boardService.update(boardPayload);
-                        } else {
-                            return Future.failedFuture(String.format("[Magneto%s::createSection] " +
-                                    "No board found with id %s", this.getClass().getSimpleName(), createSection.getBoardId()));
-                        }
-                    })
-                    .onFailure(err -> {
-                        String message = String.format("[Magneto@%s::createSection] Failed to create section : %s",
-                                this.getClass().getSimpleName(), err.getMessage());
-                        log.error(message);
-                        renderError(request);
-                    })
-                    .onSuccess(result -> {
-                        eventStore.createAndStoreEvent(CREATE_SECTION.name(), request);
-                        renderJson(request, createSectionFuture.result());
-                    });
+                Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(createSection.getBoardId()));
+                Future<JsonObject> createSectionFuture = sectionService.create(createSection, newId);
+                CompositeFuture.all(getBoardFuture, createSectionFuture)
+                        .compose(result -> {
+                            if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
+                                BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
+                                boardPayload.addSection(newId);
+                                return boardService.update(boardPayload);
+                            } else {
+                                return Future.failedFuture(String.format("[Magneto%s::createSection] " +
+                                        "No board found with id %s", this.getClass().getSimpleName(), createSection.getBoardId()));
+                            }
+                        })
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::createSection] Failed to create section : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                            renderError(request);
+                        })
+                        .onSuccess(result -> {
+                            eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()
+                                    .put(Field.RESOURCE_DASH_TYPE, Field.RESOURCE_SECTION));
+                            renderJson(request, createSectionFuture.result());
+                        });
+            });
         });
     }
 
@@ -180,7 +183,8 @@ public class SectionController extends ControllerHelper {
                             return sectionService.duplicateSections(boardId, duplicateSections, duplicateCards, false, user);
                         })
                         .onSuccess(res -> {
-                            eventStore.createAndStoreEvent(CREATE_SECTION.name(), request);
+                            eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()
+                                    .put(Field.RESOURCE_DASH_TYPE, Field.RESOURCE_SECTION));
                             renderJson(request, res);
                         })
                         .onFailure(err -> {

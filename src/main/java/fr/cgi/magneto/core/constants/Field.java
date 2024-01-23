@@ -92,6 +92,11 @@ public class Field {
     public static final String BOARDTITLE = "boardTitle";
     public static final String RESOURCEID = "resourceId";
     public static final String RESOURCETYPE = "resourceType";
+    public static final String RESOURCE_DASH_TYPE = "resource-type";
+
+    public static final String RESOURCE_BOARD = "board";
+    public static final String RESOURCE_MAGNET = "magnet";
+    public static final String RESOURCE_SECTION = "section";
     public static final String RESOURCEURL = "resourceUrl";
     public static final String LASTMODIFIERID = "lastModifierId";
     public static final String LASTMODIFIERNAME = "lastModifierName";

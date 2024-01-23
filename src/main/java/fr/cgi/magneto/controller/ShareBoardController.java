@@ -260,9 +260,9 @@ public class ShareBoardController extends ControllerHelper {
     private void handleShareFolder(HttpServerRequest request, UserInfos user, List<SharedElem> newSharedElem, String id, I18nHelper i18nHelper, JsonObject share) {
 
         Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
-        this.getBookmarksToElems(user, newSharedElem).compose(bookmarkShared -> {
+        this.getBookmarksToElems(user, newSharedElem).onSuccess(bookmarkShared -> {
             newSharedElem.addAll(bookmarkShared);
-            return this.magnetoShareService.checkParentRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION)
+            this.magnetoShareService.checkParentRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION)
                     .onSuccess(checkRight -> {
                                 if (checkRight) {
                                     deletedRightFuture

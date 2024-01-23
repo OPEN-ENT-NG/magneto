@@ -153,7 +153,7 @@ public class ShareBoardController extends ControllerHelper {
                                     }));
 
                 } else {
-                    unauthorized(request, "Can't apply this rights");
+                    forbidden(request, "Can't apply this rights");
                 }
             });
         }).onFailure(error -> badRequest(request, error.getMessage()));
@@ -291,7 +291,7 @@ public class ShareBoardController extends ControllerHelper {
                                             })
                                             .onFailure(error -> badRequest(request, error.getMessage()));
                                 } else {
-                                    unauthorized(request, "Can't apply this rights");
+                                    forbidden(request, "Can't apply this rights");
                                 }
                             }
                     );

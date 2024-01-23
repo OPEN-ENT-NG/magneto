@@ -53,7 +53,6 @@ class Controller implements IViewModel {
     }
 
     $onInit = (): void => {
-        console.log("init")
     }
 
     selectBoard = (boardId: string): void => {

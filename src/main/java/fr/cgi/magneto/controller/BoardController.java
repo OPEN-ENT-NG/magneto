@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static fr.cgi.magneto.core.enums.Events.CREATE_BOARD;
+import static fr.cgi.magneto.core.enums.Events.CREATE;
 
 public class BoardController extends ControllerHelper {
 
@@ -153,7 +153,8 @@ public class BoardController extends ControllerHelper {
                             boardService.create(user, board, true, i18nHelper)
                                     .onFailure(err -> renderError(request))
                                     .onSuccess(result -> {
-                                        eventStore.createAndStoreEvent(CREATE_BOARD.name(), request);
+                                        eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()
+                                                .put(Field.RESOURCE_DASH_TYPE, Field.RESOURCE_BOARD));
                                         renderJson(request, result);
                                     });
                         }

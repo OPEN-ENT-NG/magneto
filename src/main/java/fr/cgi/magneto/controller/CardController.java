@@ -41,7 +41,7 @@ import org.entcore.common.user.UserUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static fr.cgi.magneto.core.enums.Events.CREATE_MAGNET;
+import static fr.cgi.magneto.core.enums.Events.CREATE;
 
 public class CardController extends ControllerHelper {
 
@@ -159,7 +159,8 @@ public class CardController extends ControllerHelper {
                     this.cardService.createCardLayout(cardPayload, i18nHelper)
                             .onFailure(err -> renderError(request))
                             .onSuccess(result -> {
-                                eventStore.createAndStoreEvent(CREATE_MAGNET.name(), request);
+                                eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()
+                                        .put(Field.RESOURCE_DASH_TYPE, Field.RESOURCE_MAGNET));
                                 renderJson(request, result);
                             });
                 }));
@@ -236,7 +237,8 @@ public class CardController extends ControllerHelper {
                 cardService.getCards(cardIds, user)
                         .compose(cards -> cardService.duplicateCards(boardId, cards, null, user))
                         .onSuccess(res -> {
-                            eventStore.createAndStoreEvent(CREATE_MAGNET.name(), request);
+                            eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()
+                                    .put(Field.RESOURCE_DASH_TYPE, Field.RESOURCE_MAGNET));
                             renderJson(request, res);
                         })
                         .onFailure(err -> renderError(request));

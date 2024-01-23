@@ -69,6 +69,8 @@ class Controller implements IViewModel {
     }
 
     selectFolder = (folderId: string): void => {
+        this.selectedFoldersForSharing = this.folders.filter((folder: Folder) =>
+            this.selectedFolderIds.some((id: string) => id == folder.id));
         // select folder
         if (!this.isFolderSelected(folderId)) {
             this.selectedFolderIds.push(folderId);
@@ -76,8 +78,6 @@ class Controller implements IViewModel {
         } else {
             // deselect folder
             this.selectedFolderIds = this.selectedFolderIds.filter((id: string) => id !== folderId);
-            this.selectedFoldersForSharing = this.folders.filter((folder: Folder) =>
-                this.selectedFolderIds.some((id: string) => id == folder.id));
         }
     }
 

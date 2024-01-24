@@ -25,4 +25,15 @@ public class ShareHelper {
         }).collect(Collectors.toList());
     }
 
+    /**
+     *Return elems without the same rights as elems 2
+     *
+     * @param elems
+     * @param elems2
+     * @return
+     */
+    public static List<SharedElem> removeCommonRights(List<SharedElem> elems, List<SharedElem> elems2){
+        return elems.stream().filter(elem -> elems2.stream().noneMatch(elem::hasSameId)).collect(Collectors.toList());
+    }
+
 }

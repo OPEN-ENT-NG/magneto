@@ -110,6 +110,14 @@ public class DefaultShareService implements ShareService {
         oldSharedElems.forEach(oldElem -> {
             if (newSharedElems.stream().noneMatch(oldElem::hasSameId)) {
                 elementsToAdd.add(oldElem);
+            } else {
+                // add elements common to old and new shared elements if old element has higher rights and remove lower right element
+                newSharedElems.stream().forEach(element -> {
+                    if (element.hasSameId(oldElem) && oldElem.getRights().size() > element.getRights().size()) {
+                        elementsToAdd.add(oldElem);
+                        elementsToAdd.remove(element);
+                    }
+                });
             }
         });
         return elementsToAdd;

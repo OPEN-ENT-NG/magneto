@@ -26,6 +26,7 @@ public class ShareHelper {
     }
 
     /**
+     *Return elems without the same rights as elems 2
      *
      * @param elems
      * @param elems2

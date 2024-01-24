@@ -417,13 +417,16 @@ public class DefaultFolderService implements FolderService {
         Promise<List<JsonObject>> promise = Promise.promise();
         List<Future<JsonObject>> updateBoardsSharedRightsFutures = new ArrayList<Future<JsonObject>>();
 
+
         oldFolderSharedRightsList
                 .stream()
                 .filter(JsonObject.class::isInstance)
                 .map(JsonObject.class::cast)
                 .forEach(oldRightAndBoardIdList -> updateBoardsSharedRightsFutures
-                        .add(this.serviceFactory.shareService().upsertSharedArray(oldRightAndBoardIdList.getString(Field.BOARDID, ""), newFolderSharedRightsList,
-                                ShareHelper.getSharedElem(oldRightAndBoardIdList.getJsonArray(Field.SHARED, new JsonArray())), CollectionsConstant.BOARD_COLLECTION, true)));
+                        .add(this.serviceFactory.shareService().upsertSharedArray(oldRightAndBoardIdList.getString(Field.BOARDID, ""),
+                                newFolderSharedRightsList,
+                                ShareHelper.removeCommonRights(ShareHelper.getSharedElem(oldRightAndBoardIdList.getJsonArray(Field.SHARED, new JsonArray())), newFolderSharedRightsList)
+                                , CollectionsConstant.BOARD_COLLECTION, true)));
 
         FutureHelper.all(updateBoardsSharedRightsFutures)
                 .onSuccess(result -> promise.complete(result.list()))

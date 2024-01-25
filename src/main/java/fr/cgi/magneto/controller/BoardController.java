@@ -134,9 +134,11 @@ public class BoardController extends ControllerHelper {
         });
 
     }
+
     @Post("/board")
     @ApiDoc("Create a board")
-    @SecuredAction(Rights.MANAGE_BOARD)
+    @ResourceFilter(CreateBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     @Trace(Actions.BOARD_CREATION)
     public void create(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "board", board ->

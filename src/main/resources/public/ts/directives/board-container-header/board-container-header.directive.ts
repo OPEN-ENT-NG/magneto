@@ -1,4 +1,4 @@
-import {angular, ng} from "entcore";
+import {model, ng} from "entcore";
 import {
     IAugmentedJQuery,
     ICompileService,
@@ -7,11 +7,12 @@ import {
 } from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {BoardsFilter} from "../../models/boards-filter.model";
+import {ShareUtils} from "../../utils/share.utils";
 
 interface IViewModel extends ng.IController, IBoardContainerHeaderProps {
     hasRight?(right: string): boolean;
     openCreateForm?(): void;
-    insert?(): void;
+    hasFolderShareRight?(): boolean;
 }
 
 interface IBoardContainerHeaderProps {
@@ -42,6 +43,16 @@ class Controller implements IViewModel {
     openCreateForm = (): void => {
         this.$scope.vm.onOpenCreateForm();
     };
+
+    hasFolderShareRight = (): boolean => { // main page || folder owner || has folder share rights
+        let currentFolder = this.$scope.$parent['vm'].openedFolder ?
+            this.$scope.$parent['vm'].openedFolder[0]
+            : null;
+
+        return currentFolder == null
+            || currentFolder.ownerId == model.me.userId
+            || ShareUtils.folderHasShareRights(currentFolder, "publish");
+    }
 
 
     $onDestroy() {

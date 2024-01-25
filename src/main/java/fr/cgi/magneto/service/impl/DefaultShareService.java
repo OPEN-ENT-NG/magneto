@@ -116,7 +116,6 @@ public class DefaultShareService implements ShareService {
                     if (element.hasSameId(oldElem) && oldElem.getRights().size() > element.getRights().size() && checkRightLength) {
                         elementsToAdd.add(oldElem);
                         elementsToAdd.remove(element);
-                        log.info("check regression");
                     }
                 });
             }

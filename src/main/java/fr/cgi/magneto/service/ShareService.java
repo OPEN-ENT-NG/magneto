@@ -2,7 +2,6 @@ package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.model.share.SharedElem;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -36,30 +35,33 @@ public interface ShareService {
     /**
      * Return a list of SharedElem which were present in the object and are not update in new Share
      *
-     * @param oldShared old rights of the object
-     * @param newShare  new rights to apply
+     * @param oldShared        old rights of the object
+     * @param newShare         new rights to apply
+     * @param checkRightLength
      * @return list of SharedElem for old rights to keep
      */
-    List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare);
+    List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare, boolean checkRightLength);
 
     /**
      * Return a list of SharedElem which were present in the object and are not update in new Share
      * *
-     * @param oldShared old rights of the object
-     * @param newShare new rights to apply
+     *
+     * @param oldShared        old rights of the object
+     * @param newShare         new rights to apply
+     * @param checkRightLength
      * @return
      */
-    List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare);
+    List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare, boolean checkRightLength);
 
     /**
-     *
      * Return a list of SharedElem which were present in the object and are not update in new Share
      *
-     * @param oldSharedElems old rights of the object
-     * @param newSharedElems new rights to apply
+     * @param oldSharedElems   old rights of the object
+     * @param newSharedElems   new rights to apply
+     * @param checkRightLength
      * @return
      */
-    List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems);
+    List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems, boolean checkRightLength);
 
     /**
      * format shared array to SharedElemList

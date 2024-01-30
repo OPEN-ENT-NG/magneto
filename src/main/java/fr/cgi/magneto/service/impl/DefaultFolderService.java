@@ -438,8 +438,7 @@ public class DefaultFolderService implements FolderService {
     private Future<JsonObject> updateNewFolder(String userId, List<String> boardIds, String folderId) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
-                .put(Field._ID, folderId)
-                .put(Field.OWNERID, userId);
+                .put(Field._ID, folderId);
         JsonObject update = new JsonObject().put(Mongo.PUSH,
                 new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.EACH, new JsonArray(boardIds))));
         mongoDb.update(this.collection, query, update, false, false,

@@ -294,15 +294,18 @@ public class DefaultBoardService implements BoardService {
     @Override
     public Future<JsonObject> delete(String userId, List<String> boardIds) {
         Promise<JsonObject> promise = Promise.promise();
-        this.deleteBoards(userId, boardIds)
-                .compose(success -> {
-                    Future<JsonObject> deleteSectionsFuture = this.sectionService.deleteByBoards(boardIds);
-                    Future<JsonObject> updateFolderFuture = this.folderService.updateOldFolder(boardIds);
-                    return CompositeFuture.all(deleteSectionsFuture, updateFolderFuture);
-                })
-                .onFailure(promise::fail)
-                .onSuccess(success -> promise.complete(new JsonObject().put(Field.STATUS, Field.OK)));
-
+        if (!boardIds.isEmpty()) {
+            this.deleteBoards(userId, boardIds)
+                    .compose(success -> {
+                        Future<JsonObject> deleteSectionsFuture = this.sectionService.deleteByBoards(boardIds);
+                        Future<JsonObject> updateFolderFuture = this.folderService.updateOldFolder(boardIds);
+                        return CompositeFuture.all(deleteSectionsFuture, updateFolderFuture);
+                    })
+                    .onFailure(promise::fail)
+                    .onSuccess(success -> promise.complete(new JsonObject().put(Field.STATUS, Field.OK)));
+        } else {
+            promise.complete(new JsonObject());
+        }
         return promise.future();
     }
 

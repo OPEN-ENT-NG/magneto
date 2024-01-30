@@ -230,7 +230,14 @@ public class DefaultShareService implements ShareService {
     public boolean checkRights(List<SharedElem> newSharedElem, JsonObject parent) {
         List<SharedElem> parentRights = getSharedElemList(parent.getJsonArray(Field.SHARED, new JsonArray()));
 
-        return parentRights.stream().allMatch(parentRight ->
-                newSharedElem.stream().noneMatch(elem -> parentRight.hasSameId(elem) && parentRight.getRights().size() > elem.getRights().size()));
+        return parentRights.stream()
+                .allMatch(parentRight -> newSharedElem.stream()
+                        .noneMatch(elem -> parentRight.hasSameId(elem) && parentRight.getRights().size() > elem.getRights().size()))
+                &&
+                //Check if all parentsIds are in the newShared Elem
+                parentRights.stream()
+                        .allMatch(parentRight -> newSharedElem.stream()
+                                .anyMatch(parentRight::hasSameId));
+
     }
 }

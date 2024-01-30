@@ -34,7 +34,7 @@ public class DefaultShareService implements ShareService {
 
         if (checkOldRights) {
             getOldDataToUpdate(id, collection).onSuccess(success -> {
-                List<SharedElem> sharedElems = getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
+                List<SharedElem> sharedElems = getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newShare, true);
                 sharedElems.forEach(sharedElem -> {
                     newShare.add(sharedElem.toJson());
                 });
@@ -57,7 +57,7 @@ public class DefaultShareService implements ShareService {
 
         if (checkOldRights) {
             getOldDataToUpdate(id, collection).onSuccess(success -> {
-                List<SharedElem> sharedElems = getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newShare);
+                List<SharedElem> sharedElems = getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newShare, true);
                 sharedElems.addAll(newShare);
                 sharedElems.forEach(sharedElem -> {
                     if (deletedShares.stream().noneMatch(sharedElem::hasSameId)) {
@@ -90,22 +90,22 @@ public class DefaultShareService implements ShareService {
 
 
     @Override
-    public List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare) {
+    public List<SharedElem> getOldRights(JsonArray oldShared, JsonArray newShare, boolean checkRightLength) {
         List<SharedElem> oldSharedElems = getSharedElemList(oldShared);
         List<SharedElem> newSharedElems = getSharedElemList(newShare);
 
-        return getOldRights(oldSharedElems, newSharedElems);
+        return getOldRights(oldSharedElems, newSharedElems, checkRightLength);
     }
 
     @Override
-    public List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare) {
+    public List<SharedElem> getOldRights(JsonArray oldShared, List<SharedElem> newShare, boolean checkRightLength) {
         List<SharedElem> oldSharedElems = getSharedElemList(oldShared);
 
-        return getOldRights(oldSharedElems, newShare);
+        return getOldRights(oldSharedElems, newShare, checkRightLength);
     }
 
     @Override
-    public List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems) {
+    public List<SharedElem> getOldRights(List<SharedElem> oldSharedElems, List<SharedElem> newSharedElems, boolean checkRightLength) {
         List<SharedElem> elementsToAdd = new ArrayList<>();
         oldSharedElems.forEach(oldElem -> {
             if (newSharedElems.stream().noneMatch(oldElem::hasSameId)) {
@@ -113,7 +113,7 @@ public class DefaultShareService implements ShareService {
             } else {
                 // add elements common to old and new shared elements if old element has higher rights and remove lower right element
                 newSharedElems.stream().forEach(element -> {
-                    if (element.hasSameId(oldElem) && oldElem.getRights().size() > element.getRights().size()) {
+                    if (element.hasSameId(oldElem) && oldElem.getRights().size() > element.getRights().size() && checkRightLength) {
                         elementsToAdd.add(oldElem);
                         elementsToAdd.remove(element);
                     }
@@ -204,7 +204,7 @@ public class DefaultShareService implements ShareService {
     public Future<List<SharedElem>> getDeletedRights(String id, List<SharedElem> newSharedElem, String boardCollection) {
         Promise<List<SharedElem>> promise = Promise.promise();
         getOldDataToUpdate(id, boardCollection).onSuccess(success -> {
-            promise.complete(getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newSharedElem));
+            promise.complete(getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newSharedElem, false));
         });
         return promise.future();
     }

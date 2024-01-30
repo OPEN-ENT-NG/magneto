@@ -114,8 +114,7 @@ public class DefaultBoardService implements BoardService {
 
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
-                .put(Field._ID, board.getFolderId())
-                .put(Field.OWNERID, ownerId);
+                .put(Field._ID, board.getFolderId());
         JsonObject update = new JsonObject()
                 .put(Mongo.PUSH, new JsonObject()
                         .put(Field.BOARDIDS, boardId));

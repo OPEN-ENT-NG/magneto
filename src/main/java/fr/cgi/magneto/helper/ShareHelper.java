@@ -1,5 +1,7 @@
 package fr.cgi.magneto.helper;
 
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.model.share.SharedElem;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -36,4 +38,19 @@ public class ShareHelper {
         return elems.stream().filter(elem -> elems2.stream().noneMatch(elem::hasSameId)).collect(Collectors.toList());
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     */
+    public static SharedElem getOwnerSharedElem(String userId) {
+        SharedElem sharedElem = new SharedElem();
+        sharedElem.setId(userId);
+        sharedElem.setTypeId(Field.USERID);
+        sharedElem.addRight(Rights.SHAREBOARDCONTROLLER_INITREADRIGHT);
+        sharedElem.addRight(Rights.SHAREBOARDCONTROLLER_INITCONTRIBRIGHT);
+        sharedElem.addRight(Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT);
+        sharedElem.addRight(Rights.SHAREBOARDCONTROLLER_INITMANAGERRIGHT);
+        return sharedElem;
+    }
 }

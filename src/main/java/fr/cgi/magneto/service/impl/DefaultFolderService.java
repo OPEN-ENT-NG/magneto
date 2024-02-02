@@ -145,7 +145,6 @@ public class DefaultFolderService implements FolderService {
 
     private Future<JsonObject> deleteFolders(List<String> folderIds, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
-
         JsonObject query = new JsonObject()
                 .put(Field.OWNERID, ownerId)
                 .put(Field._ID, new JsonObject().put(Mongo.IN, folderIds));
@@ -159,13 +158,15 @@ public class DefaultFolderService implements FolderService {
 
     private Future<JsonObject> deleteBoardsInFolderWithChildren(List<String> folderIds, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
-        this.getFolderChildrenIds(folderIds)
+        Future<List<String>> folderChildrenIds = this.getFolderChildrenIds(folderIds);
+        folderChildrenIds
                 .compose(this::getBoardIdsInFolders)
                 .compose(childrenIds -> this.serviceFactory.boardService().delete(ownerId, childrenIds))
                 .onFailure(promise::fail)
                 .onSuccess(res -> promise.complete());
         return promise.future();
     }
+
 
     @SuppressWarnings("unchecked")
     private Future<List<String>> getBoardIdsInFolders(List<String> folderIds) {
@@ -209,7 +210,6 @@ public class DefaultFolderService implements FolderService {
 
         JsonObject query = new JsonObject().put(Mongo.AND,
                 new JsonArray()
-                        .add(new JsonObject().put(Field.OWNERID, userId))
                         .add(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(folderIds)))));
 
         mongoDb.find(this.collection, query, MongoDbResult.validResultsHandler(results -> {
@@ -235,19 +235,15 @@ public class DefaultFolderService implements FolderService {
     @Override
     public Future<JsonObject> preDeleteFoldersAndBoards(UserInfos user, List<String> folderIds, boolean restore) {
         Promise<JsonObject> promise = Promise.promise();
-        List<String> myFolderIds = new ArrayList<>();
 
-        filterMyFolderIds(folderIds, user.getUserId())
-                .compose(filteredFolderIds -> {
-                    myFolderIds.addAll(filteredFolderIds);
-                    return this.preDeleteBoardsInFolderWithChildren(myFolderIds, restore, user.getUserId());
-                })
-                .compose(v -> this.preDeleteFoldersWithChildren(myFolderIds, restore, user.getUserId()))
+        this.preDeleteBoardsInFolderWithChildren(folderIds, restore, user.getUserId())
+                .compose(v -> this.preDeleteFoldersWithChildren(folderIds, restore, user.getUserId()))
                 .onFailure(promise::fail)
                 .onSuccess(promise::complete);
 
         return promise.future();
     }
+
 
     private Future<JsonObject> preDeleteBoardsInFolderWithChildren(List<String> folderIds, boolean restore, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
@@ -264,27 +260,112 @@ public class DefaultFolderService implements FolderService {
     private Future<JsonObject> preDeleteFoldersWithChildren(List<String> folderIds, boolean restore, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        this.getFolderChildrenIds(folderIds)
-                .compose(childrenIds -> {
-                    folderIds.addAll(childrenIds);
-                    return this.preDeleteFolders(folderIds, restore, ownerId);
-                })
-                .onFailure(promise::fail)
-                .onSuccess(promise::complete);
+        if(restore) {
+            Future<List<String>> getFolderChildrenIdsOwnerOnlyFuture = getFolderChildrenIdsOwnerOnly(folderIds,ownerId);
+            getFolderChildrenIdsOwnerOnlyFuture
+                    .compose(childrenIds -> this.preRestoreChildren(childrenIds, ownerId))
+                    .compose(r -> this.preDeleteFoldersParent(folderIds))
+                    .onFailure(promise::fail)
+                    .onSuccess(promise::complete);
+        }else {
+            this.getFolderChildrenIds(folderIds)
+                    .compose(childrenIds -> {
+                        folderIds.addAll(childrenIds);
+                        return this.preDeleteFolders(folderIds);
+                    })
+                    .compose(r ->this.getBoardIdsInFolders(folderIds))
+                    .compose(boardsIds -> this.updateBoardsFromFolder(folderIds,ownerId,boardsIds))
+                    .onFailure(promise::fail)
+                    .onSuccess(promise::complete);
+        }
+        return promise.future();
+    }
+    private Future<JsonObject> preDeleteFoldersParent(List<String> folderIds) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        JsonObject query = new JsonObject()
+                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(folderIds)));
+
+        JsonObject update = new JsonObject()
+                .put(Mongo.SET, new JsonObject().put(Field.DELETED, false))
+                .put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
+        mongoDb.update(this.collection, query, update, false, true,
+                MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
+                        String.format("[Magneto@%s::preDeleteFolders] Failed to pre-delete folders",
+                                this.getClass().getSimpleName()))));
         return promise.future();
     }
 
-    private Future<JsonObject> preDeleteFolders(List<String> folderIds, boolean restore, String ownerId) {
+    private Future<JsonObject> preRestoreChildren(List<String> folderIds, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
 
         JsonObject query = new JsonObject()
                 .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(folderIds)))
                 .put(Field.OWNERID, ownerId);
-        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
+
+        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject()
+                .put(Field.DELETED, false)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
         mongoDb.update(this.collection, query, update, false, true,
                 MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
                         String.format("[Magneto@%s::preDeleteFolders] Failed to pre-delete folders",
                                 this.getClass().getSimpleName()))));
+        return promise.future();
+    }
+
+    private Future<JsonObject> preDeleteFolders(List<String> folderIds) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        JsonObject query = new JsonObject()
+                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(folderIds)));
+
+        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject()
+                .put(Field.DELETED, true)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
+        mongoDb.update(this.collection, query, update, false, true,
+                MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
+                        String.format("[Magneto@%s::preDeleteFolders] Failed to pre-delete folders",
+                                this.getClass().getSimpleName()))));
+        return promise.future();
+    }
+
+    private Future<JsonObject> updateBoardsFromFolder(List<String> folderChildrenIds, String ownerId, List<String> boardsIds) {
+        Promise<JsonObject> promise = Promise.promise();
+        this.serviceFactory.boardService().getOwnedBoardsIds(boardsIds,ownerId)
+                .compose(myBoards -> this.getFolders(folderChildrenIds)
+                        .onSuccess(res ->{
+                    List<Future<JsonObject>> foldersUpdate = new ArrayList<>();
+                     res.forEach(folderO ->{
+                         JsonObject folder = (JsonObject) folderO;
+                         JsonArray folderBoards = folder.getJsonArray(Field.BOARDIDS, new JsonArray());
+                         List<String> newBoardsIds =  folderBoards.stream().filter(String.class::isInstance)
+                                 .map(String.class::cast)
+                                 .filter(bo -> !myBoards.contains(bo))
+                                 .collect(Collectors.toList());
+                         foldersUpdate.add(updateOldFolder(newBoardsIds));
+                     });
+                     FutureHelper.all(foldersUpdate)
+                             .onSuccess(s-> promise.complete(new JsonObject()))
+                             .onFailure(r->promise.fail(r.getMessage()));
+                 }).onFailure(r -> promise.fail(r.getMessage()))).onFailure(r -> promise.fail(r.getMessage()));
+
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<JsonArray> getFolders(List<String> folderChildrenIds) {
+        Promise<JsonArray> promise = Promise.promise();
+        JsonObject query = new JsonObject()
+                .put(Field._ID, new JsonObject().put(Mongo.IN, folderChildrenIds));
+
+        mongoDb.find(this.collection, query, MongoDbResult.validResultsHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::getFolders] Failed to get folders", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+            promise.complete(results.right().getValue());
+        }));
         return promise.future();
     }
 
@@ -299,6 +380,52 @@ public class DefaultFolderService implements FolderService {
                 .graphLookup(new JsonObject()
                         .put(Mongo.FROM, this.collection)
                         .put(Mongo.STARTWITH, String.format("$%s", Field._ID))
+                        .put(Mongo.CONNECTFROMFIELD, Field._ID)
+                        .put(Mongo.CONNECTTOFIELD, Field.PARENTID)
+                        .put(Mongo.AS, Field.CHILDREN))
+                .project(new JsonObject()
+                        .put(Field.CHILDRENIDS, String.format("$%s.%s", Field.CHILDREN, Field._ID)))
+                .getAggregate();
+
+
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::getFolderChildrenIds] Failed to get folder children ids",
+                        this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+
+            JsonArray result = results.right().getValue()
+                    .getJsonObject(Mongo.CURSOR, new JsonObject())
+                    .getJsonArray(Mongo.FIRSTBATCH, new JsonArray());
+
+            List<String> childrenFolderIds = ((List<JsonObject>) result.getList()).stream().flatMap(r -> {
+                List<String> childrenIds = (r.getJsonArray(Field.CHILDRENIDS, new JsonArray())).getList();
+                childrenIds.add(r.getString(Field._ID));
+                return childrenIds.stream();
+            }).collect(Collectors.toList());
+
+
+            promise.complete(childrenFolderIds);
+        }));
+
+        return promise.future();
+    }
+
+    private Future<List<String>> getFolderChildrenIdsOwnerOnly(List<String> folderIds, String ownerId) {
+
+        Promise<List<String>> promise = Promise.promise();
+
+        JsonObject query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, folderIds)))
+                .graphLookup(new JsonObject()
+                        .put(Mongo.FROM, this.collection)
+                        .put(Mongo.STARTWITH, new JsonObject()
+                                .put(Field._ID, new JsonObject().put(Mongo.IN, folderIds))
+                                .put(Field.OWNERID, ownerId))
                         .put(Mongo.CONNECTFROMFIELD, Field._ID)
                         .put(Mongo.CONNECTTOFIELD, Field.PARENTID)
                         .put(Mongo.AS, Field.CHILDREN))

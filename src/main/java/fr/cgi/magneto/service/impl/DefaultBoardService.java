@@ -275,8 +275,7 @@ public class DefaultBoardService implements BoardService {
     public Future<JsonObject> preDeleteBoards(String userId, List<String> boardIds, boolean restore) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
-                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds)))
-                .put(Field.OWNERID, userId);
+                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds)));
         JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
         mongoDb.update(this.collection, query, update, false, true, MongoDbResult.validActionResultHandler(results -> {
             if (results.isLeft()) {
@@ -312,8 +311,7 @@ public class DefaultBoardService implements BoardService {
     private Future<JsonObject> deleteBoards(String userId, List<String> boardIds) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
-                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds)))
-                .put(Field.OWNERID, userId);
+                .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds)));
         mongoDb.delete(this.collection, query, MongoDbResult.validActionResultHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::deleteBoards] Failed to delete boards",
@@ -664,5 +662,32 @@ public class DefaultBoardService implements BoardService {
         FutureHelper.all(futures)
                 .onSuccess(success -> promise.complete(ids))
                 .onFailure(error -> promise.fail(error.getMessage()));
-        return promise.future();    }
+        return promise.future();
+    }
+
+    @Override
+    public Future<List<String>> getOwnedBoardsIds(List<String> boardsIds, String ownerId) {
+        Promise<List<String>> promise = Promise.promise();
+        JsonObject query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, boardsIds)).put(Field.OWNERID,ownerId)).getAggregate()
+                ;
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
+            if (either.isLeft()) {
+                log.error("[Magneto@%s::getBoards] Failed to get boards", this.getClass().getSimpleName(),
+                        either.left().getValue());
+                promise.fail(either.left().getValue());
+            } else {
+                JsonArray result = either.right().getValue()
+                        .getJsonObject(Field.CURSOR, new JsonObject())
+                        .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+                promise.complete(result.stream().filter(JsonObject.class::isInstance)
+                        .map(JsonObject.class::cast)
+                        .map(board->board.getString(Field._ID))
+                        .collect(Collectors.toList()));
+            }
+        }));
+
+        return promise.future();
+    }
 }

@@ -13,6 +13,7 @@ interface IMessageProps {
     display: boolean;
     key: string;
     params: string[];
+    disableSubmit: boolean;
 
     onSubmit?;
     onClose?;
@@ -27,6 +28,7 @@ class Controller implements IViewModel {
     display: boolean;
     key: string;
     params: string[];
+    disableSubmit: boolean;
 
     constructor(private $scope: IMessageScope,
                 private $location: ILocationService,
@@ -38,7 +40,7 @@ class Controller implements IViewModel {
     }
 
     translate(key: string, param: string[]): string {
-        if (!!param) {
+        if (!!param.length) {
             return I18nUtils.getWithParams(key, param);
         }
         return I18nUtils.translate(key);
@@ -64,6 +66,7 @@ function directive($parse: IParseService) {
             display: '=',
             key: '=',
             params: '=',
+            disableSubmit: '=',
             onSubmit: '&',
             onClose: '&'
         },

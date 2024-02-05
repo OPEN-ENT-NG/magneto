@@ -261,8 +261,8 @@ public class DefaultFolderService implements FolderService {
         Promise<JsonObject> promise = Promise.promise();
 
         if (restore) {
-            Future<List<String>> getFolderChildrenIdsOwnerOnlyFuture = getFolderChildrenIdsOwnerOnly(folderIds, ownerId);
-            getFolderChildrenIdsOwnerOnlyFuture
+             getFolderChildrenIdsOwnerOnly(folderIds, ownerId)
+//            getFolderChildrenIds(folderIds)
                     .compose(childrenIds -> this.preRestoreChildren(childrenIds, ownerId))
                     .compose(r -> this.preDeleteFoldersParent(folderIds))
                     .onFailure(promise::fail)
@@ -415,24 +415,23 @@ public class DefaultFolderService implements FolderService {
     }
 
     private Future<List<String>> getFolderChildrenIdsOwnerOnly(List<String> folderIds, String ownerId) {
-
-        Promise<List<String>> promise = Promise.promise();
-
+//
         JsonObject query = new MongoQuery(this.collection)
                 .match(new JsonObject()
                         .put(Field._ID, new JsonObject().put(Mongo.IN, folderIds)))
                 .graphLookup(new JsonObject()
                         .put(Mongo.FROM, this.collection)
-                        .put(Mongo.STARTWITH, new JsonObject()
-                                .put(Field._ID, new JsonObject().put(Mongo.IN, folderIds))
-                                .put(Field.OWNERID, ownerId))
+                        .put(Mongo.STARTWITH, String.format("$%s", Field._ID))
                         .put(Mongo.CONNECTFROMFIELD, Field._ID)
                         .put(Mongo.CONNECTTOFIELD, Field.PARENTID)
-                        .put(Mongo.AS, Field.CHILDREN))
+                        .put(Mongo.AS, Field.CHILDREN)
+                        .put(Mongo.RESTRICT_SEARCH_WITH_MATCH, new JsonObject().put(Field.OWNERID, ownerId))
+                )
                 .project(new JsonObject()
                         .put(Field.CHILDRENIDS, String.format("$%s.%s", Field.CHILDREN, Field._ID)))
                 .getAggregate();
 
+        Promise<List<String>> promise = Promise.promise();
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(results -> {
             if (results.isLeft()) {
@@ -585,25 +584,29 @@ public class DefaultFolderService implements FolderService {
     @Override
     public Future<JsonObject> updateOldFolder(List<String> boardIds) {
         Promise<JsonObject> promise = Promise.promise();
-        JsonObject query = new JsonObject()
-                .put(Field.BOARDIDS, new JsonObject().put(Mongo.ELEMMATCH, new JsonObject().put(Mongo.IN,
-                        new JsonArray(java.util.Collections.singletonList(boardIds.get(0))))));
+        if (boardIds.isEmpty())
+            promise.complete(new JsonObject());
+        else {
+            JsonObject query = new JsonObject()
+                    .put(Field.BOARDIDS, new JsonObject().put(Mongo.ELEMMATCH, new JsonObject().put(Mongo.IN,
+                            new JsonArray(java.util.Collections.singletonList(boardIds.get(0))))));
 
-        JsonObject update = new JsonObject().put(Mongo.PULL, new JsonObject().put(Field.BOARDIDS,
-                new JsonObject().put(Mongo.IN, new JsonArray(boardIds))));
+            JsonObject update = new JsonObject().put(Mongo.PULL, new JsonObject().put(Field.BOARDIDS,
+                    new JsonObject().put(Mongo.IN, new JsonArray(boardIds))));
 
-        mongoDb.update(this.collection, query, update, false, false,
-                MongoDbResult.validActionResultHandler(results -> {
-                    if (results.isLeft()) {
-                        String message = String.format("[Magneto@%s::updateOldFolder] Failed to update old folder",
-                                this.getClass().getSimpleName());
-                        log.error(String.format("%s : %s", message, results.left().getValue()));
-                        promise.fail(message);
-                        return;
-                    }
-                    promise.complete(results.right().getValue());
-                }));
+            mongoDb.update(this.collection, query, update, false, false,
+                    MongoDbResult.validActionResultHandler(results -> {
+                        if (results.isLeft()) {
+                            String message = String.format("[Magneto@%s::updateOldFolder] Failed to update old folder",
+                                    this.getClass().getSimpleName());
+                            log.error(String.format("%s : %s", message, results.left().getValue()));
+                            promise.fail(message);
+                            return;
+                        }
+                        promise.complete(results.right().getValue());
+                    }));
 
+        }
         return promise.future();
     }
 

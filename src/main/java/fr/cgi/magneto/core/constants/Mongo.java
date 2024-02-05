@@ -64,4 +64,8 @@ public class Mongo {
     public static final String LT = "$lt";
     public static final String $SET_ISSUBSET = "$setIsSubset";
     public static final String EXPR = "$expr";
+
+    public static final String PIPELINE = "$pipeline";
+
+    public static final String RESTRICT_SEARCH_WITH_MATCH = "restrictSearchWithMatch";
 }

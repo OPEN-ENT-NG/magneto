@@ -21,7 +21,7 @@ public class CreateBoardRight implements ResourcesProvider {
             JsonObject bodyObject = new JsonObject(body);
             String folderId = bodyObject.getString(Field.FOLDERID, "");
 
-            if (!folderId.isEmpty()) { //is in folder
+            if (!folderId.isEmpty() && folderId != null && !folderId.equals(Field.MY_BOARDS)) { //is in folder
                 JsonObject query = new JsonObject();
 
                 ShareHelper.checkFolderShareRightsQuery(user, folderId, query, Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT);

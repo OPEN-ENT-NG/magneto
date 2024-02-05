@@ -15,19 +15,19 @@ import org.entcore.common.http.filter.MongoAppFilter;
 import org.entcore.common.http.filter.ResourcesProvider;
 import org.entcore.common.user.UserInfos;
 
-public class DeleteBoardRight implements ResourcesProvider {
+public class DeleteFolderRight implements ResourcesProvider {
     @Override
     public void authorize(HttpServerRequest request, Binding binding, UserInfos user,
                           Handler<Boolean> handler) {
 
         RequestUtils.bodyToJson(request, body -> {
-            JsonArray boardIds = body.getJsonArray(Field.BOARDIDS, new JsonArray());
+            JsonArray folderIds = body.getJsonArray(Field.FOLDERIDS, new JsonArray());
 
             JsonObject query = new JsonObject()
-                    .put(Field._ID, new JsonObject().put(Mongo.IN, boardIds))
+                    .put(Field._ID, new JsonObject().put(Mongo.IN, folderIds))
                     .put(Field.OWNERID, user.getUserId());
 
-            MongoAppFilter.executeCountQuery(request, CollectionsConstant.BOARD_COLLECTION, query, boardIds.size(), res -> {
+            MongoAppFilter.executeCountQuery(request, CollectionsConstant.FOLDER_COLLECTION, query, folderIds.size(), res -> {
                 handler.handle(Boolean.TRUE.equals(res) && WorkflowHelper.hasRight(user, Rights.MANAGE_BOARD));
             });
         });

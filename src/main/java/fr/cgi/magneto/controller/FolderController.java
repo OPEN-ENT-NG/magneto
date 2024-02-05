@@ -42,7 +42,7 @@ public class FolderController extends ControllerHelper {
 
     @Post("/folder")
     @ApiDoc("Create a folder")
-    @ResourceFilter(MoveBoardRight.class)
+    @ResourceFilter(CreateFolderRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void createFolder(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "folder", folder ->
@@ -57,7 +57,7 @@ public class FolderController extends ControllerHelper {
 
     @Put("/folder/:folderId")
     @ApiDoc("Update a folder")
-    @ResourceFilter(MoveBoardRight.class)
+    @ResourceFilter(ManageFolderRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void updateFolder(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "folder", folder ->
@@ -73,7 +73,7 @@ public class FolderController extends ControllerHelper {
 
     @Delete("/folders")
     @ApiDoc("Delete folders")
-    @ResourceFilter(MoveBoardRight.class)
+    @ResourceFilter(SetShareRights.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @SuppressWarnings("unchecked")
     public void deleteFolders(HttpServerRequest request) {
@@ -88,7 +88,7 @@ public class FolderController extends ControllerHelper {
 
     @Put("/folders/predelete")
     @ApiDoc("Pre-delete folders")
-    @ResourceFilter(MoveBoardRight.class)
+    @ResourceFilter(DeleteFolderRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @SuppressWarnings("unchecked")
     public void preDeleteFolders(HttpServerRequest request) {
@@ -103,7 +103,7 @@ public class FolderController extends ControllerHelper {
 
     @Put("/folders/restore")
     @ApiDoc("Restore pre-deleted folders")
-    @ResourceFilter(MoveBoardRight.class)
+    @ResourceFilter(SetShareRights.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @SuppressWarnings("unchecked")
     public void restoreFolders(HttpServerRequest request) {

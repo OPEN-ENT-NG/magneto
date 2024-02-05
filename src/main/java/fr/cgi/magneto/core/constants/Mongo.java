@@ -3,6 +3,7 @@ package fr.cgi.magneto.core.constants;
 public class Mongo {
     public static final String COUNT = "$count";
     public static final String IN = "$in";
+    public static final String NIN = "$nin";
     public static final String EQ = "$eq";
     public static final String AND = "$and";
     public static final String LIMIT = "$limit";
@@ -62,4 +63,5 @@ public class Mongo {
     public static final String GTE = "$gte";
     public static final String LT = "$lt";
     public static final String $SET_ISSUBSET = "$setIsSubset";
+    public static final String EXPR = "$expr";
 }

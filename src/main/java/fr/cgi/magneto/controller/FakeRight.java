@@ -15,6 +15,12 @@ public class FakeRight extends ControllerHelper {
         request.response().setStatusCode(501).end();
     }
 
+    @Get("/rights/board/manage")
+    @SecuredAction(Rights.MANAGE_BOARD)
+    public void boardManage(HttpServerRequest request) {
+        notImplemented(request);
+    }
+
     @Get("/rights/board/publish")
     @SecuredAction(Rights.PUBLISH_BOARD)
     public void boardPublish(HttpServerRequest request) {

@@ -6,6 +6,7 @@ import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.security.GetSharesRight;
+import fr.cgi.magneto.security.SetShareRights;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
@@ -90,7 +91,7 @@ public class ShareBoardController extends ControllerHelper {
 
     @Put("/:type/share/resource/:id")
     @ApiDoc("Share board by id")
-    @ResourceFilter(GetSharesRight.class)
+    @ResourceFilter(SetShareRights.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void shareResource(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {

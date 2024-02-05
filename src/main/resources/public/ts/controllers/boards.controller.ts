@@ -20,6 +20,7 @@ import {BoardsFilter} from "../models/boards-filter.model";
 import {hasRight} from "../utils/rights.utils";
 import {Draggable} from "../models/draggable.model";
 import {COLLECTION_NAVBAR_VIEWS} from "../core/enums/collection-navbar.enum";
+import {ShareUtils} from "../utils/share.utils";
 
 interface IViewModel {
     openedFolder: Folder;
@@ -108,7 +109,13 @@ interface IViewModel {
 
     resetBoards(): void;
 
-    hasFolderShareRights(folderId: string): boolean;
+    isOwner(folderId: string): boolean;
+
+    folderIdHasShareRight(folderId: string, right: string): boolean;
+
+    folderHasShareRight(folder: Folder, right: string): boolean;
+
+    folderIsShared(folderId: string): boolean;
 
     restoreBoardsOrFolders(): Promise<void>;
 
@@ -127,6 +134,12 @@ interface IViewModel {
     areSelectedBoardsMine(): boolean;
 
     areSelectedFoldersMine(): boolean;
+
+    hasDuplicationRight(): boolean;
+
+    hasRenameRight(): boolean;
+
+
 
     hasRight: typeof hasRight;
 
@@ -382,7 +395,7 @@ class Controller implements ng.IController, IViewModel {
             && this.selectedFolderIds.length == 0 && this.selectedBoards[0].isMyBoard()) {
             this.displayShareBoardLightbox = true;
         } else if (this.selectedFolderIds.length == 1 && this.selectedBoardIds.length == 0
-            && this.hasFolderShareRights(this.selectedFolderIds[0])) {
+            && this.isOwner(this.selectedFolderIds[0])) {
             this.displayShareFolderLightbox = true;
         }
     }
@@ -702,29 +715,35 @@ class Controller implements ng.IController, IViewModel {
     }
 
     /**
-     * Return true if user can share folder
+     * Return true if user can share folder = is folder owner
      */
-    hasFolderShareRights = (folderId: string): boolean => {
+    isOwner = (folderId: string): boolean => {
         let selectedFolder: Folder = this.folders.find((folder: Folder) => folder.id == folderId);
-        let isOwner: boolean = selectedFolder.ownerId == model.me.userId;
-        //todo check right level (need lower right with share right)
-        let hasIndividualShareRight: boolean = selectedFolder.shared && !!selectedFolder.shared.find(share => share.userId == model.me.userId
-            && share['fr-cgi-magneto-controller-ShareBoardController|initContribRight'] == true);
-        let hasGroupShareRight: boolean = selectedFolder.shared && model.me.groupsIds
-            && !!model.me.groupsIds.map((groupId: string) => {
-                if (selectedFolder.shared.find(share => share.groupId == groupId
-                    && share['fr-cgi-magneto-controller-ShareBoardController|initContribRight'] == true)) return true;
-            });
-        return (isOwner && !!selectedFolder.shared) || (isOwner || hasIndividualShareRight || hasGroupShareRight);
+        return  !!selectedFolder && selectedFolder.ownerId == model.me.userId;
     }
 
     /**
-     * Return true board has no parent folder
+     * Return true if user has certain share right
      */
-    noSharedParentFolder = (folderId: string): boolean => {
+    folderIdHasShareRight = (folderId: string, right: string): boolean => {
+        let selectedFolder: Folder = this.folders.find((folder: Folder) => folder.id == folderId);
+        return this.folderHasShareRight(selectedFolder, right);
+    }
+
+    /**
+     * Return true if user has certain share right
+     */
+    folderHasShareRight = (folder: Folder, right: string): boolean => {
+        return ShareUtils.folderHasShareRights(folder, right);
+    }
+
+    /**
+     * Return true if folder is not shared
+     */
+    folderIsShared = (folderId: string): boolean => {
         let parentFolder: Folder = this.folders.find((folder: Folder) => folder.id == folderId);
 
-        return !!parentFolder.shared;
+        return parentFolder.shared && parentFolder.shared.length > 0;
     }
 
     /**
@@ -739,6 +758,22 @@ class Controller implements ng.IController, IViewModel {
      */
     closeSideNavFolders = (): void => {
         document.getElementById("sideNavMobile").style.width = "0";
+    };
+
+    hasDuplicationRight = (): boolean => {
+        let oneBoardSelectedOnly: boolean = this.selectedBoardIds.length == 1 && this.selectedFolderIds.length == 0;
+        let isOwnerOrPublicOrShared: boolean =  !!this.selectedBoards.length && (this.selectedBoards[0].isMyBoard() || this.selectedBoards[0].public
+            || (!this.folderIsShared(this.selectedBoards[0].folderId) && this.selectedBoards[0].myRights.contrib)
+            || (this.folderIsShared(this.selectedBoards[0].folderId) && this.folderIdHasShareRight(this.selectedBoards[0].folderId, 'publish')));
+
+        return oneBoardSelectedOnly && isOwnerOrPublicOrShared;
+    };
+
+    hasRenameRight = (): boolean => {
+        let isMyBoardsAndOneBoardSelectedOnly: boolean = this.filter.isMyBoards && this.selectedFolderIds.length == 1 && this.selectedBoardIds.length == 0;
+        let isFolderOwnerOrSharedWithRights: boolean = (this.isOwner(this.selectedFolderIds[0]) || this.folderIdHasShareRight(this.selectedFolderIds[0], 'manager'));
+
+        return isMyBoardsAndOneBoardSelectedOnly && isFolderOwnerOrSharedWithRights;
     };
 
     $onDestroy() {

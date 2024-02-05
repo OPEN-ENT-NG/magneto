@@ -1,9 +1,10 @@
-import {ng} from "entcore";
+import {angular, model, ng} from "entcore";
 import {ILocationService, IScope, IWindowService, IParseService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
-import {Folder, FolderTreeNavItem} from "../../models";
+import {Board, Folder, FolderTreeNavItem} from "../../models";
 import {boardsService} from "../../services";
 import {FOLDER_TYPE} from "../../core/enums/folder-type.enum";
+import {safeApply} from "../../utils/safe-apply.utils";
 
 interface IViewModel extends ng.IController, IBoardMoveProps {
     folderId: string;
@@ -83,10 +84,52 @@ function directive($parse: IParseService) {
 
             vm.submit = async (): Promise<void> => {
                 try {
-                    if (vm.folderId == FOLDER_TYPE.MY_BOARDS)
-                        vm.folderId = null;
 
-                    await boardsService.moveBoardsToFolder(vm.boardIds, vm.folderId);
+                    let originalBoards: Board[] = [];
+                    vm.boardIds.filter((boardId: string) =>
+                        $scope.$parent['vm'].boards.map((board: Board) => {
+                            if (boardId == board.id && board.owner.userId == model.me.userId) originalBoards.push(board)}));
+                    let targetItem: Folder = $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == vm.folderId);
+
+                    $scope.$parent['vm'].dragAndDropInitialFolder = !!originalBoards[0].folderId ?
+                        $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == originalBoards[0].folderId)
+                        : new Folder();
+
+                    if (originalBoards.length != vm.boardIds.length) { //not board owner
+                        vm.display = false;
+                        $scope.$parent['vm'].displayMoveNoRightInFolderLightbox = true;
+                        safeApply($scope.$parent['vm'].$scope);
+                        return ;
+
+                    } else if (($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId
+                            || vm.$scope.$parent['vm'].dragAndDropInitialFolder.id == undefined
+                            || $scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropInitialFolder, "publish"))
+                        && $scope.$parent['vm'].folderHasShareRight(targetItem, "publish")) { //initial folder owner/has right, target folder has right
+                        if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
+                        vm.display = false;
+                        $scope.$parent['vm'].isFromMoveBoardLightbox = true;
+                        $scope.$parent['vm'].displayEnterSharedFolderWarningLightbox = true;
+                        safeApply($scope.$parent['vm'].$scope);
+
+                    } else if ($scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropInitialFolder, "publish")
+                        && (targetItem.ownerId == model.me.userId || vm.folderId == FOLDER_TYPE.MY_BOARDS)) { //initial folder has right, target folder owner
+                        if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
+                        vm.display = false;
+                        $scope.$parent['vm'].isFromMoveBoardLightbox = true;
+                        $scope.$parent['vm'].displayExitSharedFolderWarningLightbox = true;
+                        safeApply($scope.$parent['vm'].$scope);
+
+                    } else if (($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId
+                            || $scope.$parent['vm'].dragAndDropInitialFolder.id == undefined)
+                        && (targetItem.ownerId == model.me.userId || targetItem.ownerId == model.me.userId)) { //initial folder owner, target folder owner
+                        if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
+                        vm.display = false;
+                        await boardsService.moveBoardsToFolder(vm.boardIds, vm.folderId);
+
+                    } else {
+                        vm.display = false;
+                        $scope.$parent['vm'].displayMoveNoRightInFolderLightbox = true;
+                    }
                 } catch (e) {
                     throw e;
                 }

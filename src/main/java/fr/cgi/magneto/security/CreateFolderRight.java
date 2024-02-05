@@ -22,7 +22,7 @@ public class CreateFolderRight implements ResourcesProvider{
             FolderPayload bodyObject = new FolderPayload(body.toJsonObject());
             String folderId = bodyObject.getParentId();
 
-            if (folderId != null) { //is in folder
+            if (!folderId.isEmpty() && folderId != null && !folderId.equals(Field.MY_BOARDS)) { //is in folder
                 JsonObject query = new JsonObject();
 
                 ShareHelper.checkFolderShareRightsQuery(user, folderId, query, Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT);

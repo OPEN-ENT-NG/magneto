@@ -94,4 +94,6 @@ public interface FolderService {
          * @return
          */
         Future<Void> shareFolder(String id, List<SharedElem> newShares, List<SharedElem> deletedShares);
+
+        Future<JsonArray> getFolders(List<String> folderChildrenIds);
 }

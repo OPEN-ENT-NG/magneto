@@ -414,7 +414,6 @@ public class DefaultFolderService implements FolderService {
     }
 
     private Future<List<String>> getFolderChildrenIdsOwnerOnly(List<String> folderIds, String ownerId) {
-//
         JsonObject query = new MongoQuery(this.collection)
                 .match(new JsonObject()
                         .put(Field._ID, new JsonObject().put(Mongo.IN, folderIds)))

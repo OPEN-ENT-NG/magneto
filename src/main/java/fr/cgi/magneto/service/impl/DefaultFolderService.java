@@ -260,21 +260,21 @@ public class DefaultFolderService implements FolderService {
     private Future<JsonObject> preDeleteFoldersWithChildren(List<String> folderIds, boolean restore, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        if(restore) {
-            Future<List<String>> getFolderChildrenIdsOwnerOnlyFuture = getFolderChildrenIdsOwnerOnly(folderIds,ownerId);
+        if (restore) {
+            Future<List<String>> getFolderChildrenIdsOwnerOnlyFuture = getFolderChildrenIdsOwnerOnly(folderIds, ownerId);
             getFolderChildrenIdsOwnerOnlyFuture
                     .compose(childrenIds -> this.preRestoreChildren(childrenIds, ownerId))
                     .compose(r -> this.preDeleteFoldersParent(folderIds))
                     .onFailure(promise::fail)
                     .onSuccess(promise::complete);
-        }else {
+        } else {
             this.getFolderChildrenIds(folderIds)
                     .compose(childrenIds -> {
                         folderIds.addAll(childrenIds);
                         return this.preDeleteFolders(folderIds);
                     })
-                    .compose(r ->this.getBoardIdsInFolders(folderIds))
-                    .compose(boardsIds -> this.updateBoardsFromFolder(folderIds,ownerId,boardsIds))
+                    .compose(r -> this.getBoardIdsInFolders(folderIds))
+                    .compose(boardsIds -> this.updateBoardsFromFolder(folderIds, ownerId, boardsIds))
                     .onFailure(promise::fail)
                     .onSuccess(promise::complete);
         }

@@ -42,8 +42,10 @@ public class Rights {
 
 
     public static final String SHAREBOARDCONTROLLER_INITREADRIGHT = "fr-cgi-magneto-controller-ShareBoardController|initReadRight";
+    // Reutilization right
     public static final String SHAREBOARDCONTROLLER_INITCONTRIBRIGHT = "fr-cgi-magneto-controller-ShareBoardController|initContribRight";
     public static final String SHAREBOARDCONTROLLER_INITMANAGERRIGHT = "fr-cgi-magneto-controller-ShareBoardController|initManagerRight";
+    // Write
     public static final String SHAREBOARDCONTROLLER_INITPUBLISHRIGHT = "fr-cgi-magneto-controller-ShareBoardController|initPublishRight";
 
 

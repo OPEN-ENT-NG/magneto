@@ -187,18 +187,30 @@
     <!-- Drag n drop in shared folder warning -->
     <message-lightbox
             display="vm.displayEnterSharedFolderWarningLightbox"
-            key="'magneto.folder.share.drag.in.warning'",
-            params="[vm.dragAndDropTarget.title]",
-            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget)",
+            key="'magneto.folder.share.drag.in.warning'"
+            params="[vm.dragAndDropTarget.title]"
+            disable-submit="false"
+            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget, vm.isFromMoveBoardLightbox)"
             on-close="vm.resetDragAndDrop()">
     </message-lightbox>
 
     <!-- Drag n drop out of shared folder warning -->
     <message-lightbox
             display="vm.displayExitSharedFolderWarningLightbox"
-            key="'magneto.folder.share.drag.out.warning'",
-            params="[vm.dragAndDropInitialFolder.title]",
-            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget)",
+            key="'magneto.folder.share.drag.out.warning'"
+            params="[vm.dragAndDropInitialFolder.title]"
+            disable-submit="false"
+            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget, vm.isFromMoveBoardLightbox)"
+            on-close="vm.resetDragAndDrop()">
+    </message-lightbox>
+
+    <!-- Drag n drop in folder no rights error -->
+    <message-lightbox
+            display="vm.displayMoveNoRightInFolderLightbox"
+            key="'magneto.folder.drag.drop.right.error'"
+            params="[]"
+            disable-submit="true"
+            on-submit="vm.resetDragAndDrop()"
             on-close="vm.resetDragAndDrop()">
     </message-lightbox>
 

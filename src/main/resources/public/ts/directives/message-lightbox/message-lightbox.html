@@ -9,6 +9,7 @@
     <div class="row horizontal-spacing">
         <div class="twelve cell">
             <button class="right-magnet"
+                    data-ng-if="!vm.disableSubmit"
                     data-ng-click="vm.confirm()">
                 <i18n>magneto.confirm</i18n>
             </button>

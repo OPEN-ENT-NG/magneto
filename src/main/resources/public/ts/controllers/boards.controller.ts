@@ -179,6 +179,8 @@ class Controller implements ng.IController, IViewModel {
     displayCollectionLightbox: boolean;
     displayEnterSharedFolderWarningLightbox: boolean;
     displayExitSharedFolderWarningLightbox: boolean;
+    displayMoveNoRightInFolderLightbox: boolean;
+    isFromMoveBoardLightbox: boolean;
     magnetoStandalone: boolean;
     dragAndDropBoard: Board;
     dragAndDropTarget: Folder;
@@ -218,6 +220,8 @@ class Controller implements ng.IController, IViewModel {
         this.displayPublicShareBoardLightbox = false;
         this.displayEnterSharedFolderWarningLightbox = false;
         this.displayExitSharedFolderWarningLightbox = false;
+        this.displayMoveNoRightInFolderLightbox = false;
+        this.isFromMoveBoardLightbox = false;
         this.magnetoStandalone = this.$window.magnetoStandalone == "true";
 
         this.filter = new BoardsFilter();
@@ -287,27 +291,47 @@ class Controller implements ng.IController, IViewModel {
                 let originalBoardData: Board = that.boards.find((board: Board) => board.id == originalBoard.id);
                 that.dragAndDropInitialFolder = !!originalBoardData.folderId ? that.folders.find((folder: Folder) => folder.id == originalBoardData.folderId)
                     : new Folder();
-                if (!!targetItem.shared) {
+                if (originalBoardData.owner.userId != model.me.userId) { //not board owner
+                    that.handleNoRightsDragAndDrop(that, originalBoard, targetItem);
+                    return ;
+                } else if ((that.dragAndDropInitialFolder.ownerId == model.me.userId || that.dragAndDropInitialFolder.id == undefined
+                        || that.folderHasShareRight(that.dragAndDropInitialFolder, "publish"))
+                        && that.folderHasShareRight(targetItem, "publish")) { //initial folder owner/has right, target folder has right
                     that.dragAndDropBoard = originalBoard;
                     that.dragAndDropTarget = targetItem;
                     that.displayEnterSharedFolderWarningLightbox = true;
                     safeApply(that.$scope);
-                } else if (!!that.dragAndDropInitialFolder.shared) {
+                } else if (that.folderHasShareRight(that.dragAndDropInitialFolder, "publish")
+                    && (targetItem.ownerId == model.me.userId || targetItem.id == FOLDER_TYPE.MY_BOARDS)) { //initial folder has right, target folder owner
                     that.dragAndDropBoard = originalBoard;
                     that.dragAndDropTarget = targetItem;
                     that.displayExitSharedFolderWarningLightbox = true;
                     safeApply(that.$scope);
-                } else {
+                } else if ((that.dragAndDropInitialFolder.ownerId == model.me.userId || that.dragAndDropInitialFolder.id == undefined)
+                    && (targetItem.ownerId == model.me.userId || targetItem.id == FOLDER_TYPE.MY_BOARDS)) { //initial folder owner, target folder owner
                     await that.proceedOnDragAndDrop(originalBoard, targetItem);
+                } else {
+                    that.handleNoRightsDragAndDrop(that, originalBoard, targetItem);
                 }
             }
         };
     }
 
-    proceedOnDragAndDrop = async (originalBoard: Board, targetItem: Folder): Promise<void> => {
+    handleNoRightsDragAndDrop = (that: this, originalBoard: Board, targetItem: Folder) => {
+        that.dragAndDropBoard = originalBoard;
+        that.dragAndDropTarget = targetItem;
+        that.displayMoveNoRightInFolderLightbox = true;
+        safeApply(that.$scope);
+    }
+
+    proceedOnDragAndDrop = async (originalBoard: Board, targetItem: Folder, isFromMoveBoardLightbox?: boolean): Promise<void> => {
         this.resetDragAndDrop();
-        let idOriginalItem: string = originalBoard.id;
         let idTargetItem: string = targetItem.id;
+        if (isFromMoveBoardLightbox) {
+            await this.boardsService.moveBoardsToFolder(this.selectedBoardIds, idTargetItem);
+            return ;
+        }
+        let idOriginalItem: string = originalBoard.id;
 
         if (this.selectedBoardIds.length > 0) {
             if (targetItem.id == FOLDER_TYPE.DELETED_BOARDS) {
@@ -334,6 +358,8 @@ class Controller implements ng.IController, IViewModel {
     resetDragAndDrop = (): void => {
         this.displayEnterSharedFolderWarningLightbox = false;
         this.displayExitSharedFolderWarningLightbox = false;
+        this.displayMoveNoRightInFolderLightbox = false;
+        this.isFromMoveBoardLightbox = false;
         this.dragAndDropBoard = undefined;
         this.dragAndDropTarget = undefined;
         this.dragAndDropInitialFolder = undefined;

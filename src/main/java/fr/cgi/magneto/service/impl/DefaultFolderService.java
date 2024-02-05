@@ -262,7 +262,6 @@ public class DefaultFolderService implements FolderService {
 
         if (restore) {
              getFolderChildrenIdsOwnerOnly(folderIds, ownerId)
-//            getFolderChildrenIds(folderIds)
                     .compose(childrenIds -> this.preRestoreChildren(childrenIds, ownerId))
                     .compose(r -> this.preDeleteFoldersParent(folderIds))
                     .onFailure(promise::fail)

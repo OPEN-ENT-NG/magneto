@@ -471,11 +471,12 @@ public class DefaultFolderService implements FolderService {
                     JsonArray oldFolderSharedRightsList = rightsList.resultAt(0);
                     List<SharedElem> newFolderSharedRightsList = ShareHelper.getSharedElem(rightsList.resultAt(1));
 
+                    Future<JsonObject> workspaceShareRights = this.serviceFactory.workSpaceService().setShareRights(boardIds, this.serviceFactory.shareService().getSharedJsonFromList(newFolderSharedRightsList));
                     Future<JsonObject> updateOldFolderFuture = this.updateOldFolder(boardIds);
                     Future<JsonObject> updateNewFolderFuture = this.updateNewFolder(userId, boardIds, folderId);
                     Future<List<JsonObject>> handleBoardSharedRightsFuture = this.updateBoardsSharedRights(oldFolderSharedRightsList, newFolderSharedRightsList);
 
-                    return CompositeFuture.all(updateOldFolderFuture, updateNewFolderFuture, handleBoardSharedRightsFuture);
+                    return CompositeFuture.all(updateOldFolderFuture, updateNewFolderFuture, handleBoardSharedRightsFuture,workspaceShareRights);
                 })
                 .onFailure(error -> promise.fail(error.getMessage()))
                 .onSuccess(result -> promise.complete(result.resultAt(1)));

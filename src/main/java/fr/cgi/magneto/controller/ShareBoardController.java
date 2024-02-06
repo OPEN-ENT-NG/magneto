@@ -262,7 +262,8 @@ public class ShareBoardController extends ControllerHelper {
 
         Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
         SharedElem ownerRights = ShareHelper.getOwnerSharedElem(user.getUserId());
-        newSharedElem.add(ownerRights);
+        if (!newSharedElem.isEmpty())
+            newSharedElem.add(ownerRights);
         this.getBookmarksToElems(user, newSharedElem)
                 .compose(bookmarkShared -> {
                     newSharedElem.addAll(bookmarkShared);

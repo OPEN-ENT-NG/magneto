@@ -100,6 +100,7 @@ class Controller implements IViewModel {
 
     getApplications = async (): Promise<void> => {
         this.apps = await linkerService.getResourcesApplications();
+        this.apps.find((app: IApp) => {if (app.address == "/magneto") app.displayName = "Magnéto"});
     }
 
     loadApplicationResources = (): void => {

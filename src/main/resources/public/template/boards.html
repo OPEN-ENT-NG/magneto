@@ -38,7 +38,7 @@
             <div class="boardsContainer-container-body-folder-button"
                  ng-click="vm.displayFolderLightbox = true"
                  ng-if="vm.filter.isMyBoards">
-                <a class="classic-link">
+                <a class="classic-link" data-ng-if="vm.folderHasCreationRight()">
                     <i class="magneto-folder-plus"></i>
                     <i18n>magneto.create.folder</i18n>
                 </a>
@@ -116,7 +116,7 @@
         <div class="side-nav-mobile-folder-button"
              ng-click="vm.displayFolderLightbox = true"
              ng-if="vm.filter.isMyBoards">
-            <a class="classic-link">
+            <a class="classic-link" data-ng-if="vm.folderHasCreationRight()">
                 <i class="magneto-folder-plus"></i>
                 <i18n>magneto.create.folder</i18n>
             </a>

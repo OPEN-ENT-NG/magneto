@@ -89,30 +89,35 @@ function directive($parse: IParseService) {
                     vm.boardIds.filter((boardId: string) =>
                         $scope.$parent['vm'].boards.map((board: Board) => {
                             if (boardId == board.id && board.owner.userId == model.me.userId) originalBoards.push(board)}));
-                    let targetItem: Folder = $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == vm.folderId);
-
-                    $scope.$parent['vm'].dragAndDropInitialFolder = !!originalBoards[0].folderId ?
-                        $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == originalBoards[0].folderId)
-                        : new Folder();
+                    $scope.$parent['vm'].dragAndDropTarget = $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == vm.folderId);
 
                     if (originalBoards.length != vm.boardIds.length) { //not board owner
                         vm.display = false;
                         $scope.$parent['vm'].displayMoveNoRightInFolderLightbox = true;
                         safeApply($scope.$parent['vm'].$scope);
                         return ;
+                    }
 
-                    } else if (($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId
+                    $scope.$parent['vm'].dragAndDropInitialFolder = !!originalBoards[0].folderId ?
+                        $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == originalBoards[0].folderId)
+                        : new Folder();
+
+                    if (($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId
                             || vm.$scope.$parent['vm'].dragAndDropInitialFolder.id == undefined
                             || $scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropInitialFolder, "publish"))
-                        && $scope.$parent['vm'].folderHasShareRight(targetItem, "publish")) { //initial folder owner/has right, target folder has right
+                        && ($scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropTarget, "publish")
+                            || ($scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId && !!$scope.$parent['vm'].dragAndDropTarget.shared))) {
+                        //initial folder owner/has right, target folder has right OR is owner + shared
                         if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
                         vm.display = false;
                         $scope.$parent['vm'].isFromMoveBoardLightbox = true;
                         $scope.$parent['vm'].displayEnterSharedFolderWarningLightbox = true;
                         safeApply($scope.$parent['vm'].$scope);
 
-                    } else if ($scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropInitialFolder, "publish")
-                        && (targetItem.ownerId == model.me.userId || vm.folderId == FOLDER_TYPE.MY_BOARDS)) { //initial folder has right, target folder owner
+                    } else if (($scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropInitialFolder, "publish")
+                            || ($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId && !!$scope.$parent['vm'].dragAndDropInitialFolder.shared))
+                        && ($scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId || vm.folderId == FOLDER_TYPE.MY_BOARDS)) {
+                        //initial folder has right OR is owner + shared, target folder owner
                         if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
                         vm.display = false;
                         $scope.$parent['vm'].isFromMoveBoardLightbox = true;
@@ -121,7 +126,7 @@ function directive($parse: IParseService) {
 
                     } else if (($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId
                             || $scope.$parent['vm'].dragAndDropInitialFolder.id == undefined)
-                        && (targetItem.ownerId == model.me.userId || targetItem.ownerId == model.me.userId)) { //initial folder owner, target folder owner
+                        && ($scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId || $scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId)) { //initial folder owner, target folder owner
                         if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
                         vm.display = false;
                         await boardsService.moveBoardsToFolder(vm.boardIds, vm.folderId);

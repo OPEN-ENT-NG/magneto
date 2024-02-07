@@ -103,7 +103,7 @@ public class FolderController extends ControllerHelper {
 
     @Put("/folders/restore")
     @ApiDoc("Restore pre-deleted folders")
-    @ResourceFilter(SetShareRights.class)
+    @ResourceFilter(DeleteFolderRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @SuppressWarnings("unchecked")
     public void restoreFolders(HttpServerRequest request) {

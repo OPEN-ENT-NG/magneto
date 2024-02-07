@@ -139,7 +139,7 @@ interface IViewModel {
 
     hasRenameRight(): boolean;
 
-
+    folderHasCreationRight(): boolean;
 
     hasRight: typeof hasRight;
 
@@ -296,13 +296,13 @@ class Controller implements ng.IController, IViewModel {
                     return ;
                 } else if ((that.dragAndDropInitialFolder.ownerId == model.me.userId || that.dragAndDropInitialFolder.id == undefined
                         || that.folderHasShareRight(that.dragAndDropInitialFolder, "publish"))
-                        && that.folderHasShareRight(targetItem, "publish")) { //initial folder owner/has right, target folder has right
+                        && (that.folderHasShareRight(targetItem, "publish") || (targetItem.ownerId == model.me.userId && !!targetItem.shared))) { //initial folder owner/has right, target folder has right OR is owner + shared
                     that.dragAndDropBoard = originalBoard;
                     that.dragAndDropTarget = targetItem;
                     that.displayEnterSharedFolderWarningLightbox = true;
                     safeApply(that.$scope);
-                } else if (that.folderHasShareRight(that.dragAndDropInitialFolder, "publish")
-                    && (targetItem.ownerId == model.me.userId || targetItem.id == FOLDER_TYPE.MY_BOARDS)) { //initial folder has right, target folder owner
+                } else if ((that.folderHasShareRight(that.dragAndDropInitialFolder, "publish") || (that.dragAndDropInitialFolder.ownerId == model.me.userId && !!that.dragAndDropInitialFolder.shared))
+                    && (targetItem.ownerId == model.me.userId || targetItem.id == FOLDER_TYPE.MY_BOARDS)) { //initial folder has right OR is owner + shared, target folder owner
                     that.dragAndDropBoard = originalBoard;
                     that.dragAndDropTarget = targetItem;
                     that.displayExitSharedFolderWarningLightbox = true;
@@ -325,12 +325,12 @@ class Controller implements ng.IController, IViewModel {
     }
 
     proceedOnDragAndDrop = async (originalBoard: Board, targetItem: Folder, isFromMoveBoardLightbox?: boolean): Promise<void> => {
-        this.resetDragAndDrop();
         let idTargetItem: string = targetItem.id;
         if (isFromMoveBoardLightbox) {
             await this.boardsService.moveBoardsToFolder(this.selectedBoardIds, idTargetItem);
             return ;
         }
+        this.resetDragAndDrop();
         let idOriginalItem: string = originalBoard.id;
 
         if (this.selectedBoardIds.length > 0) {
@@ -801,6 +801,10 @@ class Controller implements ng.IController, IViewModel {
 
         return isMyBoardsAndOneBoardSelectedOnly && isFolderOwnerOrSharedWithRights;
     };
+
+    folderHasCreationRight = (): boolean => {
+        return ShareUtils.hasFolderCreationRight(this.openedFolder);
+    }
 
     $onDestroy() {
     }

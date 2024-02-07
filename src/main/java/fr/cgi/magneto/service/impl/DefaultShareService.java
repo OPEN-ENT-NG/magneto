@@ -59,6 +59,18 @@ public class DefaultShareService implements ShareService {
             getOldDataToUpdate(id, collection).onSuccess(success -> {
                 List<SharedElem> sharedElems = getOldRights(success.getJsonArray(Field.SHARED, new JsonArray()), newShare, true);
                 sharedElems.addAll(newShare);
+
+                //remove duplicate
+                List<SharedElem> elemsToRemove = new ArrayList<>();
+                sharedElems.forEach(sharedElem1 -> {
+                    sharedElems.forEach(sharedElem2 -> {
+                        if (sharedElem1 != sharedElem2 && sharedElem2.hasSameId(sharedElem1) && sharedElem1.getRights().size() > sharedElem2.getRights().size()) {
+                            elemsToRemove.add(sharedElem2);
+                        }
+                    });
+                });
+                sharedElems.removeAll(elemsToRemove);
+
                 sharedElems.forEach(sharedElem -> {
                     if (deletedShares.stream().noneMatch(sharedElem::hasSameId)) {
                         shares.add(sharedElem.toJson());

@@ -202,6 +202,7 @@ public class DefaultFolderService implements FolderService {
 
     /**
      * Returns list of folder ids that are only my folders
+     *
      * @param folderIds {@link List<String>} the initial list of folder ids
      * @return {@link Future<List<String>>} the initial list minus the ids of the folders that are not mine
      */
@@ -261,7 +262,7 @@ public class DefaultFolderService implements FolderService {
         Promise<JsonObject> promise = Promise.promise();
 
         if (restore) {
-             getFolderChildrenIdsOwnerOnly(folderIds, ownerId)
+            getFolderChildrenIdsOwnerOnly(folderIds, ownerId)
                     .compose(childrenIds -> this.preRestoreChildren(childrenIds, ownerId))
                     .compose(r -> this.preDeleteFoldersParent(folderIds))
                     .onFailure(promise::fail)
@@ -279,6 +280,7 @@ public class DefaultFolderService implements FolderService {
         }
         return promise.future();
     }
+
     private Future<JsonObject> preDeleteFoldersParent(List<String> folderIds) {
         Promise<JsonObject> promise = Promise.promise();
 
@@ -328,23 +330,23 @@ public class DefaultFolderService implements FolderService {
 
     private Future<JsonObject> updateBoardsFromFolder(List<String> folderChildrenIds, String ownerId, List<String> boardsIds) {
         Promise<JsonObject> promise = Promise.promise();
-        this.serviceFactory.boardService().getOwnedBoardsIds(boardsIds,ownerId)
+        this.serviceFactory.boardService().getOwnedBoardsIds(boardsIds, ownerId)
                 .compose(myBoards -> this.getFolders(folderChildrenIds)
-                        .onSuccess(res ->{
-                    List<Future<JsonObject>> foldersUpdate = new ArrayList<>();
-                     res.forEach(folderO ->{
-                         JsonObject folder = (JsonObject) folderO;
-                         JsonArray folderBoards = folder.getJsonArray(Field.BOARDIDS, new JsonArray());
-                         List<String> newBoardsIds =  folderBoards.stream().filter(String.class::isInstance)
-                                 .map(String.class::cast)
-                                 .filter(bo -> !myBoards.contains(bo))
-                                 .collect(Collectors.toList());
-                         foldersUpdate.add(updateOldFolder(newBoardsIds));
-                     });
-                     FutureHelper.all(foldersUpdate)
-                             .onSuccess(s-> promise.complete(new JsonObject()))
-                             .onFailure(r->promise.fail(r.getMessage()));
-                 }).onFailure(r -> promise.fail(r.getMessage()))).onFailure(r -> promise.fail(r.getMessage()));
+                        .onSuccess(res -> {
+                            List<Future<JsonObject>> foldersUpdate = new ArrayList<>();
+                            res.forEach(folderO -> {
+                                JsonObject folder = (JsonObject) folderO;
+                                JsonArray folderBoards = folder.getJsonArray(Field.BOARDIDS, new JsonArray());
+                                List<String> newBoardsIds = folderBoards.stream().filter(String.class::isInstance)
+                                        .map(String.class::cast)
+                                        .filter(bo -> !myBoards.contains(bo))
+                                        .collect(Collectors.toList());
+                                foldersUpdate.add(updateOldFolder(newBoardsIds));
+                            });
+                            FutureHelper.all(foldersUpdate)
+                                    .onSuccess(s -> promise.complete(new JsonObject()))
+                                    .onFailure(r -> promise.fail(r.getMessage()));
+                        }).onFailure(r -> promise.fail(r.getMessage()))).onFailure(r -> promise.fail(r.getMessage()));
 
 
         return promise.future();
@@ -476,7 +478,7 @@ public class DefaultFolderService implements FolderService {
                     Future<JsonObject> updateNewFolderFuture = this.updateNewFolder(userId, boardIds, folderId);
                     Future<List<JsonObject>> handleBoardSharedRightsFuture = this.updateBoardsSharedRights(oldFolderSharedRightsList, newFolderSharedRightsList);
 
-                    return CompositeFuture.all(updateOldFolderFuture, updateNewFolderFuture, handleBoardSharedRightsFuture,workspaceShareRights);
+                    return CompositeFuture.all(updateOldFolderFuture, updateNewFolderFuture, handleBoardSharedRightsFuture, workspaceShareRights);
                 })
                 .onFailure(error -> promise.fail(error.getMessage()))
                 .onSuccess(result -> promise.complete(result.resultAt(1)));
@@ -613,7 +615,7 @@ public class DefaultFolderService implements FolderService {
     public Future<JsonObject> getFolderByBoardId(String boardId) {
         Promise<JsonObject> promise = Promise.promise();
         MongoQuery query = new MongoQuery(this.collection);
-        query.match(new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.IN,new JsonArray().add(boardId))));
+        query.match(new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.IN, new JsonArray().add(boardId))));
         mongoDb.command(query.getAggregate().toString(), MongoDbResult.validResultHandler(resultMongo -> {
             if (resultMongo.isRight()) {
                 JsonArray resultJsonArray = resultMongo.right().getValue()
@@ -626,9 +628,11 @@ public class DefaultFolderService implements FolderService {
                 } else {
                     promise.complete(new JsonObject());
                 }
-            }}));
+            }
+        }));
         return promise.future();
     }
+
     @Override
     public Future<List<String>> getChildrenBoardsIds(String id) {
         Promise<List<String>> promise = Promise.promise();
@@ -654,9 +658,14 @@ public class DefaultFolderService implements FolderService {
         Promise<Void> promise = Promise.promise();
         List<Future<JsonObject>> futures = new ArrayList<>();
 
+        futures.add(serviceFactory.shareService().upsertSharedArray(id, newShares, deletedShares, this.collection, false));
+
         getFolderChildrenIds(ids).onSuccess(foldersIds ->
-                foldersIds.forEach(folderId ->
-                        futures.add(serviceFactory.shareService().upsertSharedArray(folderId, newShares, deletedShares, this.collection, true))));
+                foldersIds.forEach(folderId -> {
+                            if (!folderId.equals(id))
+                                futures.add(serviceFactory.shareService().upsertSharedArray(folderId, newShares, deletedShares, this.collection, true));
+                        }
+                ));
 
         FutureHelper.all(futures)
                 .onSuccess(success -> promise.complete())

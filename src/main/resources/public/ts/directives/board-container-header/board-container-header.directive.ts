@@ -8,11 +8,12 @@ import {
 import {RootsConst} from "../../core/constants/roots.const";
 import {BoardsFilter} from "../../models/boards-filter.model";
 import {ShareUtils} from "../../utils/share.utils";
+import {FOLDER_TYPE} from "../../core/enums/folder-type.enum";
 
 interface IViewModel extends ng.IController, IBoardContainerHeaderProps {
     hasRight?(right: string): boolean;
     openCreateForm?(): void;
-    hasFolderShareRight?(): boolean;
+    hasFolderCreationRight?(): boolean;
 }
 
 interface IBoardContainerHeaderProps {
@@ -44,14 +45,8 @@ class Controller implements IViewModel {
         this.$scope.vm.onOpenCreateForm();
     };
 
-    hasFolderShareRight = (): boolean => { // main page || folder owner || has folder share rights
-        let currentFolder = this.$scope.$parent['vm'].openedFolder ?
-            this.$scope.$parent['vm'].openedFolder[0]
-            : null;
-
-        return currentFolder == null
-            || currentFolder.ownerId == model.me.userId
-            || ShareUtils.folderHasShareRights(currentFolder, "publish");
+    hasFolderCreationRight = (): boolean => { // main page || folder owner || has folder share rights
+        return ShareUtils.hasFolderCreationRight(this.$scope.$parent['vm'].openedFolder);
     }
 
 

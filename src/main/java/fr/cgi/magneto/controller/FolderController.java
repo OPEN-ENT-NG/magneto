@@ -73,7 +73,7 @@ public class FolderController extends ControllerHelper {
 
     @Delete("/folders")
     @ApiDoc("Delete folders")
-    @ResourceFilter(SetShareRights.class)
+    @ResourceFilter(DeleteFolderRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @SuppressWarnings("unchecked")
     public void deleteFolders(HttpServerRequest request) {

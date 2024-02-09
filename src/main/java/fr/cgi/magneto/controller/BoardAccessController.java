@@ -38,12 +38,14 @@ public class BoardAccessController extends ControllerHelper {
     public void getLastBoardsAccessed(HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             Future<List<String>> getLastAccessFuture = boardAccessService.getLastAccess(user.getUserId());
-            getLastAccessFuture.compose(resultIds -> boardService.getBoards(resultIds))
+            getLastAccessFuture.compose(resultIds -> boardService.getBoardsWithNbCards(resultIds))
                     .onSuccess(boards -> {
                         List<Board> results = new ArrayList<>();
                         getLastAccessFuture.result().forEach(id -> boards.forEach(board -> {
-                                    if (board.getId().equals(id))
+                                    if (board.getId().equals(id)) {
+                                        board.setNbCards(board.cards().size());
                                         results.add(board);
+                                    }
                                 })
                         );
                         renderJson(request, new JsonObject().put(Field.ALL, results));

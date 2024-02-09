@@ -690,4 +690,58 @@ public class DefaultBoardService implements BoardService {
 
         return promise.future();
     }
+
+    private JsonObject getBoardWithCardsByIds(List<String> boardIds) {
+        MongoQuery query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds))))
+                .lookUp(CollectionsConstant.SECTION_COLLECTION, Field.SECTIONIDS, Field._ID, Field.SECTIONS)
+                .addFields(Field.NBCARDSSECTIONS, new JsonObject().put(Mongo.SUM, new JsonObject().put(
+                                        Mongo.MAP, new JsonObject()
+                                                .put(Mongo.INPUT, String.format("$%s", Field.SECTIONS))
+                                                .put(Mongo.AS, Field.SECTION)
+                                                .put(Mongo.IN_MAP, new JsonObject().put(Mongo.SIZE, String.format("$$%s.%s", Field.SECTION, Field.CARDIDS)))
+                                )
+                        )
+                )
+                .project(new JsonObject()
+                        .put(Field._ID, 1)
+                        .put(Field.TITLE, 1)
+                        .put(Field.IMAGEURL, 1)
+                        .put(Field.BACKGROUNDURL, 1)
+                        .put(Field.CREATIONDATE, 1)
+                        .put(Field.SECTIONIDS, 1)
+                        .put(Field.CARDIDS, 1)
+                        .put(Field.LAYOUTTYPE, 1)
+                        .put(Field.MODIFICATIONDATE, 1)
+                        .put(Field.NBCARDSSECTIONS, 1)
+                        .put(Field.DESCRIPTION, 1)
+                        .put(Field.OWNERID, 1)
+                        .put(Field.OWNERNAME, 1)
+                        .put(Field.SHARED, 1)
+                        .put(Field.TAGS, 1)
+                        .put(Field.PUBLIC, 1)
+                        .put(Field.CANCOMMENT, 1)
+                        .put(Field.DISPLAY_NB_FAVORITES, 1));
+        return query.getAggregate();
+    }
+    @Override
+    public Future<List<Board>> getBoardsWithNbCards(List<String> resultIds) {
+        Promise<List<Board>> promise = Promise.promise();
+        JsonObject query = this.getBoardWithCardsByIds(resultIds);
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
+            if (either.isLeft()) {
+                log.error("[Magneto@%s::getBoards] Failed to get boards", this.getClass().getSimpleName(),
+                        either.left().getValue());
+                promise.fail(either.left().getValue());
+            } else {
+                JsonArray result = either.right().getValue()
+                        .getJsonObject(Field.CURSOR, new JsonObject())
+                        .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+                promise.complete(ModelHelper.toList(result, Board.class));
+            }
+        }));
+
+        return promise.future();
+    }
 }

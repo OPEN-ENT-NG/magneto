@@ -147,4 +147,6 @@ public interface BoardService {
     Future<List<String>> shareBoard(List<String> boardsIds, List<SharedElem> share, List<SharedElem> deletedShared,boolean checkOldRights );
 
     Future<List<String>> getOwnedBoardsIds(List<String> boardsIds,String userId );
+
+    Future<List<Board>> getBoardsWithNbCards(List<String> resultIds);
 }

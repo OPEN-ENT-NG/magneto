@@ -34,6 +34,8 @@ public class Board implements Model<Board> {
     private String layoutType;
     private boolean canComment;
     private Boolean displayNbFavorites;
+    private int nbCards;
+    private int nbCardsSections;
 
 
     @SuppressWarnings("unchecked")
@@ -66,6 +68,8 @@ public class Board implements Model<Board> {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
             this.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
         }
+        if (board.containsKey(Field.NBCARDSSECTIONS))
+            this.nbCardsSections = board.getInteger(Field.NBCARDSSECTIONS);
 
     }
 
@@ -272,6 +276,22 @@ public class Board implements Model<Board> {
     public Board setTags(List<String> tags) {
         this.tags = tags;
         return this;
+    }
+
+    public int getNbCards() {
+        return nbCards;
+    }
+
+    public void setNbCards(int nbCards) {
+        this.nbCards = nbCards;
+    }
+
+    public int getNbCardsSections() {
+        return nbCardsSections;
+    }
+
+    public void setNbCardsSections(int nbCardsSections) {
+        this.nbCardsSections = nbCardsSections;
     }
 
     public Board reset() {

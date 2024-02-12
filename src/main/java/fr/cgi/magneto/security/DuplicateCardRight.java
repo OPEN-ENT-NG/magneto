@@ -32,6 +32,14 @@ public class DuplicateCardRight implements ResourcesProvider {
     }
 
     private static JsonObject getDuplicateRightQuery(UserInfos user, String boardId) {
+        JsonObject sharedUserCondition = new JsonObject()
+                .put(Field.USERID, user.getUserId())
+                .put(Rights.SHAREBOARDCONTROLLER_INITCONTRIBRIGHT, true);
+
+        JsonObject sharedGroupCondition = new JsonObject()
+                .put(Field.GROUPID, new JsonObject().put(Mongo.IN, user.getGroupsIds()))
+                .put(Rights.SHAREBOARDCONTROLLER_INITCONTRIBRIGHT, true);
+
         return new JsonObject()
                 .put(Field._ID, boardId)
                 .put(Field.DELETED, false)
@@ -41,13 +49,8 @@ public class DuplicateCardRight implements ResourcesProvider {
                                         .put(Field.OWNERID, user.getUserId()))
                                 .add(new JsonObject()
                                         .put(Field.PUBLIC, true))
-                                .add(new JsonObject()
-                                        .put(String.format("%s.%s", Field.SHARED, Field.USERID),
-                                                new JsonObject().put(Mongo.IN, new JsonArray().add(user.getUserId())))
-                                        .put(String.format("%s.%s", Field.SHARED, "fr-cgi-magneto-controller-ShareBoardController|initContribRight"), true))
-                                .add(new JsonObject()
-                                        .put(String.format("%s.%s", Field.SHARED, Field.GROUPID),
-                                                new JsonObject().put(Mongo.IN, user.getGroupsIds()))
-                                        .put(String.format("%s.%s", Field.SHARED, "fr-cgi-magneto-controller-ShareBoardController|initContribRight"), true)));
+                                .add(new JsonObject().put(Field.SHARED, new JsonObject().put(Mongo.ELEMMATCH, sharedUserCondition)))
+                                .add(new JsonObject().put(Field.SHARED, new JsonObject().put(Mongo.ELEMMATCH, sharedGroupCondition)))
+                );
     }
 }

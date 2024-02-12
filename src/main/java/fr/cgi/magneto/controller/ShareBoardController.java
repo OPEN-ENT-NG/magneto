@@ -166,8 +166,8 @@ public class ShareBoardController extends ControllerHelper {
         Promise<List<String>> promise = Promise.promise();
         List<Future<List<String>>> futures = new ArrayList<>();
         newSharedElem.forEach(elem -> {
-            if (elem.getTypeId().equals(Field.USERID) && !elem.getId().equals(user.getUserId())){
-                    usersIdToShare.add(elem.getId());
+            if (elem.getTypeId().equals(Field.USERID) && !elem.getId().equals(user.getUserId())) {
+                usersIdToShare.add(elem.getId());
             }
             if (elem.getTypeId().equals(Field.GROUPID)) {
                 futures.add(getGroupUsers(user, elem.getId()));

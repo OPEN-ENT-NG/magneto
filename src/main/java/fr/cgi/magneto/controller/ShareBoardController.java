@@ -25,6 +25,7 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -166,7 +167,7 @@ public class ShareBoardController extends ControllerHelper {
         Promise<List<String>> promise = Promise.promise();
         List<Future<List<String>>> futures = new ArrayList<>();
         newSharedElem.forEach(elem -> {
-            if (elem.getTypeId().equals(Field.USERID)) {
+            if (elem.getTypeId().equals(Field.USERID) && !elem.getId().equals(user.getUserId())) {
                 usersIdToShare.add(elem.getId());
             }
             if (elem.getTypeId().equals(Field.GROUPID)) {
@@ -261,6 +262,7 @@ public class ShareBoardController extends ControllerHelper {
     private void handleShareFolder(HttpServerRequest request, UserInfos user, List<SharedElem> newSharedElem, String id, I18nHelper i18nHelper, JsonObject share) {
 
         Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
+        Future<JsonArray> getFolderDataFuture = this.folderService.getFolders(Collections.singletonList(id));;
         SharedElem ownerRights = ShareHelper.getOwnerSharedElem(user.getUserId());
         if (!newSharedElem.isEmpty())
             newSharedElem.add(ownerRights);
@@ -279,6 +281,7 @@ public class ShareBoardController extends ControllerHelper {
                             if (Boolean.TRUE.equals(checkRight)) {
                                 deletedRightFuture
                                         .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem, deleteRights))
+                                        .compose(r -> getFolderDataFuture)
                                         .compose(success -> this.folderService.getChildrenBoardsIds(id))
                                         .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem, deletedRightFuture.result(), true))
                                         .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
@@ -287,16 +290,17 @@ public class ShareBoardController extends ControllerHelper {
                                             JsonObject params = new JsonObject();
                                             params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                                             params.put(Field.USERNAME, user.getUsername());
-                                            params.put(Field.BOARDURL, "/magneto#/");
+                                            params.put(Field.FOLDERURL, "/magneto#/");
+                                            if (!getFolderDataFuture.result().isEmpty())
+                                                params.put(Field.FOLDERTITLE, getFolderDataFuture.result().getJsonObject(0).getValue(Field.TITLE, ""));
 
                                             JsonObject pushNotif = new JsonObject()
                                                     .put(Field.TITLE, "push.notif.magneto.share")
                                                     .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
                                             params.put(Field.PUSHNOTIF, pushNotif);
-
                                             getUsersIdsToNotify(user, newSharedElem)
                                                     .onSuccess(usersIdToShare -> {
-                                                        notification.notifyTimeline(request, "magneto.share_board", user, usersIdToShare, id, Field.TITLE,
+                                                        notification.notifyTimeline(request, "magneto.share_folder", user, usersIdToShare, id, Field.TITLE,
                                                                 params, true);
                                                         request.response().setStatusMessage(id).setStatusCode(200).end();
                                                     }).onFailure(error -> badRequest(request, error.getMessage()));

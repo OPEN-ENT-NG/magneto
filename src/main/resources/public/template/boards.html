@@ -168,14 +168,16 @@
     <share-panel-lightbox
             display="vm.displayShareBoardLightbox"
             resources="vm.selectedBoards"
-            app-prefix="'magneto/board'">
+            app-prefix="'magneto/board'"
+            parent-folder="vm.openedFolder">
     </share-panel-lightbox>
 
     <!-- Folder share modal -->
     <share-panel-lightbox
             display="vm.displayShareFolderLightbox"
             resources="vm.selectedFolders"
-            app-prefix="'magneto/folder'">
+            app-prefix="'magneto/folder'"
+            parent-folder="vm.openedFolder">
     </share-panel-lightbox>
 
     <board-publish-lightbox

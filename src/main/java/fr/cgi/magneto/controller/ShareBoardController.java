@@ -25,6 +25,7 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -261,9 +262,7 @@ public class ShareBoardController extends ControllerHelper {
     private void handleShareFolder(HttpServerRequest request, UserInfos user, List<SharedElem> newSharedElem, String id, I18nHelper i18nHelper, JsonObject share) {
 
         Future<List<SharedElem>> deletedRightFuture = this.magnetoShareService.getDeletedRights(id, newSharedElem, CollectionsConstant.FOLDER_COLLECTION);
-        List<String> idArray = new ArrayList<>();
-        idArray.add(id);
-        Future<JsonArray> getFolderDataFuture = this.folderService.getFolders(idArray);
+        Future<JsonArray> getFolderDataFuture = this.folderService.getFolders(Collections.singletonList(id));;
         SharedElem ownerRights = ShareHelper.getOwnerSharedElem(user.getUserId());
         if (!newSharedElem.isEmpty())
             newSharedElem.add(ownerRights);

@@ -226,4 +226,7 @@ public class Field {
     public static final String GROUP_TYPE = "groupType";
     public static final String GROUP = "Group";
     public static final String MEMBERS = "members";
+    //notification Folder
+    public static final String FOLDERTITLE = "folderTitle";
+    public static final String FOLDERURL = "folderUrl";
 }

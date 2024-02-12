@@ -568,13 +568,17 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.DELETED, false));
         JsonObject userOrCondition = new JsonObject()
                 .put(Field.SHARED,
-                        new JsonObject().put(Mongo.ELEMMATCH, new JsonObject().put(Field.USERID,user.getUserId())
-                .put(Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT, true)));
+                        new JsonObject()
+                                .put(Mongo.ELEMMATCH, new JsonObject()
+                                        .put(Field.USERID, user.getUserId())
+                                        .put(Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT, true)));
 
-        JsonObject groupOrCondition = new JsonObject() .put(Field.SHARED,
-                new JsonObject().put(Mongo.ELEMMATCH, new JsonObject().put(Field.GROUPID,
-                        new JsonObject().put(Mongo.IN, user.getGroupsIds()))
-                .put(Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT, true)));
+        JsonObject groupOrCondition = new JsonObject()
+                .put(Field.SHARED,
+                        new JsonObject()
+                                .put(Mongo.ELEMMATCH, new JsonObject()
+                                        .put(Field.GROUPID, new JsonObject().put(Mongo.IN, user.getGroupsIds()))
+                                        .put(Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT, true)));
 
         query.matchOr(new JsonArray()
                 .add(new JsonObject().put(Field.OWNERID, user.getUserId()))

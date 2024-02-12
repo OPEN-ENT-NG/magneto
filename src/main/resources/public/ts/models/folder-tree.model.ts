@@ -3,6 +3,8 @@ export interface IFolderTreeNavItem {
     title: string;
     parentId: string;
     isOpened?: boolean;
+    ownerId?: string;
+    shared?: any[];
 }
 
 export class FolderTreeNavItem {
@@ -36,6 +38,16 @@ export class FolderTreeNavItem {
      */
     private _isOpened: boolean;
 
+    /**
+     * Id of folder owner
+     */
+    private _ownerId: string;
+
+    /**
+     * People with whom the folder is shared
+     */
+    private _shared: any[];
+
     constructor(folder: IFolderTreeNavItem, isOpened?: boolean, iconClass?: string) {
         this._id = folder.id;
         this._name = folder.title;
@@ -43,6 +55,8 @@ export class FolderTreeNavItem {
         this._children = [];
         this._iconClass = iconClass;
         this._isOpened = (isOpened !== null) ? isOpened : false;
+        this._ownerId = folder.ownerId ? folder.ownerId : "";
+        this._shared = folder.shared ? folder.shared : [];
     }
 
     get id(): string {
@@ -91,6 +105,22 @@ export class FolderTreeNavItem {
 
     set isOpened(value: boolean) {
         this._isOpened = value;
+    }
+
+    get ownerId(): string {
+        return this._ownerId;
+    }
+
+    set ownerId(value: string) {
+        this._ownerId = value;
+    }
+
+    get shared(): any[] {
+        return this._shared;
+    }
+
+    set shared(value: any[]) {
+        this._shared = value;
     }
 
     /**

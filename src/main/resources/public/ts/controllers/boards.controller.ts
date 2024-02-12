@@ -374,8 +374,11 @@ class Controller implements ng.IController, IViewModel {
     switchFolder = async (folder: FolderTreeNavItem): Promise<void> => {
         this.resetBoards();
         this.openedFolder = new Folder().build({
-            _id: folder.id, title: folder.name,
-            parentId: folder.parentId, ownerId: ''
+            _id: folder.id,
+            title: folder.name,
+            parentId: folder.parentId,
+            ownerId: folder.ownerId,
+            shared: folder.shared
         });
 
         // Update filter category
@@ -468,7 +471,9 @@ class Controller implements ng.IController, IViewModel {
                 {
                     id: this.openedFolder.id,
                     title: this.openedFolder.title,
-                    parentId: this.openedFolder.parentId
+                    parentId: this.openedFolder.parentId,
+                    ownerId: this.openedFolder.ownerId,
+                    shared: this.openedFolder.shared
                 }));
         } else {
             this.$location.path(`/board/view/${this.selectedBoardIds[0]}`);
@@ -796,10 +801,10 @@ class Controller implements ng.IController, IViewModel {
     };
 
     hasRenameRight = (): boolean => {
-        let isMyBoardsAndOneBoardSelectedOnly: boolean = this.filter.isMyBoards && this.selectedFolderIds.length == 1 && this.selectedBoardIds.length == 0;
+        let isMyBoardsAndOneFolderSelectedOnly: boolean = this.filter.isMyBoards && this.selectedFolderIds.length == 1 && this.selectedBoardIds.length == 0;
         let isFolderOwnerOrSharedWithRights: boolean = (this.isOwner(this.selectedFolderIds[0]) || this.folderIdHasShareRight(this.selectedFolderIds[0], 'manager'));
 
-        return isMyBoardsAndOneBoardSelectedOnly && isFolderOwnerOrSharedWithRights;
+        return isMyBoardsAndOneFolderSelectedOnly && isFolderOwnerOrSharedWithRights;
     };
 
     folderHasCreationRight = (): boolean => {

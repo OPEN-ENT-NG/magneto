@@ -370,8 +370,6 @@ public class DefaultBoardService implements BoardService {
                     JsonArray boards = fetchAllBoardsFuture.result();
                     int boardsCount = (fetchAllBoardsCountFuture.result().isEmpty()) ? 0 :
                             fetchAllBoardsCountFuture.result().getJsonObject(0).getInteger(Field.COUNT);
-                    log.info(boards);
-                    log.info(boardsCount);
                     promise.complete(new JsonObject()
                             .put(Field.ALL, boards)
                             .put(Field.PAGE, boardsCount)

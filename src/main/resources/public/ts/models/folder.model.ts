@@ -1,4 +1,5 @@
 import {model} from "entcore";
+import {FolderTreeNavItem} from "./folder-tree.model";
 
 export interface IFolderResponse {
     _id: string;
@@ -72,5 +73,16 @@ export class Folder {
 
     isMyFolder(): boolean {
         return this.ownerId === model.me.userId;
+    }
+
+    navItemToFolder(navItem: FolderTreeNavItem): Folder {
+        let finalFolder: Folder = new Folder();
+        finalFolder.id = navItem.id;
+        finalFolder.title = navItem.name;
+        finalFolder.parentId = navItem.parentId;
+        finalFolder.ownerId = navItem.ownerId;
+        finalFolder.shared = navItem.shared;
+
+        return finalFolder;
     }
 }

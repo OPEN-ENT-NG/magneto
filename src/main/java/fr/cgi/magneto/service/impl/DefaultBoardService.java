@@ -357,8 +357,8 @@ public class DefaultBoardService implements BoardService {
         Future<JsonArray> fetchAllBoardsFuture = fetchAllBoards(user, page, searchText, folderId, isPublic, isShared,
                 isDeleted, sortBy, false, allFolders);
 
-        Future<JsonArray> fetchAllBoardsCountFuture = fetchAllBoards(user, page, searchText, folderId,
-                isPublic, isShared, isDeleted, sortBy, true, allFolders);
+        Future<JsonArray> fetchAllBoardsCountFuture = fetchAllBoards(user, page, searchText, folderId, isPublic, isShared,
+                isDeleted, sortBy, true, allFolders);
 
         CompositeFuture.all(fetchAllBoardsFuture, fetchAllBoardsCountFuture)
                 .onFailure(fail -> {
@@ -529,11 +529,13 @@ public class DefaultBoardService implements BoardService {
 
         // If user searches a term, remove folder filter
         if ((searchText == null || searchText.isEmpty()) && !allFolders) {
+
             if (folderId != null || isDeleted) {
                 query.match(new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field._ID), folderId));
             } else {
-                query.match(new JsonObject().putNull(String.format("%s.%s", Field.FOLDERID, Field._ID)));
+                filterBoardWithoutFolder(user, query);
             }
+
         }
 
         query.project(new JsonObject()
@@ -559,6 +561,25 @@ public class DefaultBoardService implements BoardService {
         }
 
         return query.getAggregate();
+    }
+
+    private static void filterBoardWithoutFolder(UserInfos user, MongoQuery query) {
+        JsonObject folderIdMatch = new JsonObject().putNull(String.format("%s.%s", Field.FOLDERID, Field._ID));
+        JsonObject userRequest = new JsonObject()
+                .put(String.format("%s.%s", Field.FOLDERID, Field.SHARED), new JsonObject()
+                        .put(Mongo.NOT, new JsonObject()
+                                .put(Mongo.ELEMMATCH, new JsonObject()
+                                        .put(Field.USERID, user.getUserId()))));
+
+        JsonObject checkGroupRequest = new JsonObject()
+                .put(String.format("%s.%s.%s",Field.FOLDERID,Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.NIN, user.getGroupsIds()));
+
+        JsonObject emptySharedArray = new JsonObject()
+                .put(Mongo.AND, new JsonArray()
+                        .add(new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field.SHARED), new JsonObject().put(Mongo.SIZE, 0)))
+                        .add(new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field.OWNERID), user.getUserId())));
+        JsonObject andCondition = new JsonObject().put(Mongo.AND ,new JsonArray().add(userRequest).add(checkGroupRequest));
+        query.matchOr(new JsonArray().add(folderIdMatch).add(andCondition).add(emptySharedArray));
     }
 
     private JsonObject getAllBoardsEditableQuery(UserInfos user) {

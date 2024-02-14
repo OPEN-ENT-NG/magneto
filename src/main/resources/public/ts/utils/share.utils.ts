@@ -2,6 +2,7 @@ import {model} from "entcore";
 import {Folder} from "../models";
 import {rights} from "../magnetoBehaviours";
 import {FOLDER_TYPE} from "../core/enums/folder-type.enum";
+import {SHARE_RIGHTS} from "../core/enums/rights.enum";
 
 export class ShareUtils {
 
@@ -52,6 +53,21 @@ export class ShareUtils {
         return currentFolder == null
             || currentFolder.id == FOLDER_TYPE.MY_BOARDS
             || currentFolder.ownerId == model.me.userId
-            || this.folderHasShareRights(currentFolder, "publish");
+            || this.folderHasShareRights(currentFolder, SHARE_RIGHTS.PUBLISH);
+    }
+
+    static folderOwnerOrMainPage = (folder: Folder): boolean => {
+        let isFolderOwner: boolean = !!folder && folder.ownerId == model.me.userId;
+        let isMainPage: boolean = folder == null || folder.id == undefined || folder.id == FOLDER_TYPE.MY_BOARDS;
+
+        return isFolderOwner || isMainPage;
+    }
+
+    static folderOwnerNotShared = (folder: Folder): boolean => {
+        return this.folderOwnerOrMainPage(folder) && (!folder.shared || folder.shared.length == 0);
+    }
+
+    static folderOwnerAndSharedOrShareRights = (folder: Folder): boolean => {
+        return (this.folderOwnerOrMainPage(folder) && !!folder.shared && folder.shared.length > 0) || this.folderHasShareRights(folder, SHARE_RIGHTS.PUBLISH);
     }
 }

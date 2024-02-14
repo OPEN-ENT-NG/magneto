@@ -3,23 +3,26 @@ import {ILocationService, IScope, IWindowService, IParseService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {Board, Folder, FolderTreeNavItem} from "../../models";
 import {boardsService} from "../../services";
-import {FOLDER_TYPE} from "../../core/enums/folder-type.enum";
+import {FOLDER_TYPE, MAIN_PAGE_TITLE} from "../../core/enums/folder-type.enum";
 import {safeApply} from "../../utils/safe-apply.utils";
+import {ShareUtils} from "../../utils/share.utils";
 
 interface IViewModel extends ng.IController, IBoardMoveProps {
     folderId: string;
 
     selectFolder(folder: FolderTreeNavItem): void;
-    submit?(): Promise<void>;
     isFormValid(): boolean;
     closeForm(): void;
+    submit(): Promise<void>;
 }
 
 interface IBoardMoveProps {
     display: boolean;
     folderTrees: Array<FolderTreeNavItem>;
     boardIds: Array<string>;
-    onSubmit?;
+    initialFolder: Folder;
+    targetFolder: Folder;
+    fromMoveLightbox: boolean;
 }
 
 interface IBoardMoveScope extends IScope, IBoardMoveProps {
@@ -32,9 +35,10 @@ class Controller implements IViewModel {
     folders: Array<Folder>;
     folderTrees: Array<FolderTreeNavItem>;
     boardIds: Array<string>;
+    initialFolder: Folder;
+    targetFolder: Folder;
     folderId: string;
-    onSubmit: () => void;
-
+    fromMoveLightbox: boolean;
 
     constructor(private $scope: IBoardMoveScope,
                 private $location: ILocationService,
@@ -51,12 +55,68 @@ class Controller implements IViewModel {
     selectFolder = (folder: FolderTreeNavItem): void => {
         this.folderId = folder.id;
     }
-
-
-
+    
     closeForm = (): void => {
         this.display = false;
     }
+
+    submit = async (): Promise<void> => {
+        try {
+            this.$scope.$parent['vm'].selectedBoardIds = this.boardIds;
+            let originalBoards: Board[] = [];
+            this.boardIds.filter((boardId: string) =>
+                this.$scope.$parent['vm'].boards.map((board: Board) => {
+                    if (boardId == board.id && board.owner.userId == model.me.userId) originalBoards.push(board)}));
+            this.targetFolder = this.folderId == FOLDER_TYPE.MY_BOARDS ?
+                new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: model.me.userId, title: MAIN_PAGE_TITLE, parentId: undefined})
+                : this.$scope.$parent['vm'].folders.find((folder: Folder) => folder.id == this.folderId);
+
+            if (originalBoards.length != this.boardIds.length) { //not board owner
+                this.display = false;
+                this.$scope.$parent['vm'].displayMoveNoRightInFolderLightbox = true;
+                safeApply(this.$scope.$parent['vm'].$scope);
+                return ;
+            }
+
+            this.initialFolder = !!originalBoards[0].folderId ?
+                this.$scope.$parent['vm'].folders.find((folder: Folder) => folder.id == originalBoards[0].folderId)
+                : new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: model.me.userId, title: MAIN_PAGE_TITLE, parentId: undefined});
+
+            if ((ShareUtils.folderOwnerNotShared(this.initialFolder)
+                    || ShareUtils.folderOwnerAndSharedOrShareRights(this.initialFolder))
+                && ShareUtils.folderOwnerAndSharedOrShareRights(this.targetFolder)) {
+                //initial folder owner/has right, target folder has right OR is owner + shared
+                if (this.folderId == FOLDER_TYPE.MY_BOARDS) this.folderId = null;
+                this.display = false;
+                this.fromMoveLightbox = true;
+                this.$scope.$parent['vm'].displayEnterSharedFolderWarningLightbox = true;
+                safeApply(this.$scope.$parent['vm'].$scope);
+
+            } else if (ShareUtils.folderOwnerAndSharedOrShareRights(this.initialFolder)
+                && ShareUtils.folderOwnerNotShared(this.targetFolder)) {
+                //initial folder has right OR is owner + shared, target folder owner
+                if (this.folderId == FOLDER_TYPE.MY_BOARDS) this.folderId = null;
+                this.display = false;
+                this.fromMoveLightbox = true;
+                this.$scope.$parent['vm'].displayExitSharedFolderWarningLightbox = true;
+                safeApply(this.$scope.$parent['vm'].$scope);
+
+            } else if (ShareUtils.folderOwnerNotShared(this.initialFolder)
+                && ShareUtils.folderOwnerNotShared(this.targetFolder)) {
+                //initial folder owner, target folder owner
+                this.display = false;
+                await boardsService.moveBoardsToFolder(this.boardIds, this.folderId);
+                this.$scope.$parent['vm'].resetDragAndDrop();
+                this.$scope.$parent['vm'].onFormSubmit();
+            } else {
+                this.display = false;
+                this.$scope.$parent['vm'].displayMoveNoRightInFolderLightbox = true;
+            }
+        } catch (e) {
+            throw e;
+        }
+    }
+    
 
     $onDestroy() {
     }
@@ -69,9 +129,11 @@ function directive($parse: IParseService) {
         templateUrl: `${RootsConst.directive}board-move-lightbox/board-move-lightbox.html`,
         scope: {
             display: '=',
-            onSubmit: '&',
             folderTrees: '=',
-            boardIds: '='
+            boardIds: '=',
+            initialFolder:'=',
+            targetFolder:'=',
+            fromMoveLightbox:'='
         },
         controllerAs: 'vm',
         bindToController: true,
@@ -81,67 +143,6 @@ function directive($parse: IParseService) {
                         element: ng.IAugmentedJQuery,
                         attrs: ng.IAttributes,
                         vm: IViewModel) {
-
-            vm.submit = async (): Promise<void> => {
-                try {
-
-                    let originalBoards: Board[] = [];
-                    vm.boardIds.filter((boardId: string) =>
-                        $scope.$parent['vm'].boards.map((board: Board) => {
-                            if (boardId == board.id && board.owner.userId == model.me.userId) originalBoards.push(board)}));
-                    $scope.$parent['vm'].dragAndDropTarget = $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == vm.folderId);
-
-                    if (originalBoards.length != vm.boardIds.length) { //not board owner
-                        vm.display = false;
-                        $scope.$parent['vm'].displayMoveNoRightInFolderLightbox = true;
-                        safeApply($scope.$parent['vm'].$scope);
-                        return ;
-                    }
-
-                    $scope.$parent['vm'].dragAndDropInitialFolder = !!originalBoards[0].folderId ?
-                        $scope.$parent['vm'].folders.find((folder: Folder) => folder.id == originalBoards[0].folderId)
-                        : new Folder();
-
-                    if (($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId
-                            || vm.$scope.$parent['vm'].dragAndDropInitialFolder.id == undefined
-                            || $scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropInitialFolder, "publish"))
-                        && ($scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropTarget, "publish")
-                            || ($scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId && !!$scope.$parent['vm'].dragAndDropTarget.shared))) {
-                        //initial folder owner/has right, target folder has right OR is owner + shared
-                        if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
-                        vm.display = false;
-                        $scope.$parent['vm'].isFromMoveBoardLightbox = true;
-                        $scope.$parent['vm'].displayEnterSharedFolderWarningLightbox = true;
-                        safeApply($scope.$parent['vm'].$scope);
-
-                    } else if (($scope.$parent['vm'].folderHasShareRight($scope.$parent['vm'].dragAndDropInitialFolder, "publish")
-                            || ($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId && !!$scope.$parent['vm'].dragAndDropInitialFolder.shared))
-                        && ($scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId || vm.folderId == FOLDER_TYPE.MY_BOARDS)) {
-                        //initial folder has right OR is owner + shared, target folder owner
-                        if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
-                        vm.display = false;
-                        $scope.$parent['vm'].isFromMoveBoardLightbox = true;
-                        $scope.$parent['vm'].displayExitSharedFolderWarningLightbox = true;
-                        safeApply($scope.$parent['vm'].$scope);
-
-                    } else if (($scope.$parent['vm'].dragAndDropInitialFolder.ownerId == model.me.userId
-                            || $scope.$parent['vm'].dragAndDropInitialFolder.id == undefined)
-                        && ($scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId || $scope.$parent['vm'].dragAndDropTarget.ownerId == model.me.userId)) { //initial folder owner, target folder owner
-                        if (vm.folderId == FOLDER_TYPE.MY_BOARDS) vm.folderId = null;
-                        vm.display = false;
-                        await boardsService.moveBoardsToFolder(vm.boardIds, vm.folderId);
-
-                    } else {
-                        vm.display = false;
-                        $scope.$parent['vm'].displayMoveNoRightInFolderLightbox = true;
-                    }
-                } catch (e) {
-                    throw e;
-                }
-
-                $parse($scope.vm.onSubmit())({});
-                vm.closeForm();
-            };
         }
     }
 }

@@ -529,7 +529,6 @@ public class DefaultBoardService implements BoardService {
 
         // If user searches a term, remove folder filter
         if ((searchText == null || searchText.isEmpty()) && !allFolders) {
-            JsonObject folderIdMatch;
 
             if (folderId != null || isDeleted) {
                 query.match(new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field._ID), folderId));
@@ -565,8 +564,7 @@ public class DefaultBoardService implements BoardService {
     }
 
     private static void filterBoardWithoutFolder(UserInfos user, MongoQuery query) {
-        JsonObject folderIdMatch;
-        folderIdMatch = new JsonObject().putNull(String.format("%s.%s", Field.FOLDERID, Field._ID));
+        JsonObject folderIdMatch = new JsonObject().putNull(String.format("%s.%s", Field.FOLDERID, Field._ID));
         JsonObject userRequest = new JsonObject()
                 .put(String.format("%s.%s", Field.FOLDERID, Field.SHARED), new JsonObject()
                         .put(Mongo.NOT, new JsonObject()

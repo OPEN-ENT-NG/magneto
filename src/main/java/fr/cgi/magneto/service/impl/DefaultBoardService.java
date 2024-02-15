@@ -574,12 +574,11 @@ public class DefaultBoardService implements BoardService {
         JsonObject checkGroupRequest = new JsonObject()
                 .put(String.format("%s.%s.%s",Field.FOLDERID,Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.NIN, user.getGroupsIds()));
 
-        JsonObject emptySharedArray = new JsonObject()
-                .put(Mongo.AND, new JsonArray()
-                        .add(new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field.SHARED), new JsonObject().put(Mongo.SIZE, 0)))
-                        .add(new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field.OWNERID), user.getUserId())));
-        JsonObject andCondition = new JsonObject().put(Mongo.AND ,new JsonArray().add(userRequest).add(checkGroupRequest));
-        query.matchOr(new JsonArray().add(folderIdMatch).add(andCondition).add(emptySharedArray));
+        JsonObject notUserFolder = new JsonObject()
+                .put(String.format("%s.%s", Field.FOLDERID, Field.OWNERID),
+                        new JsonObject().put(Mongo.NE, user.getUserId()));
+        JsonObject andCondition = new JsonObject().put(Mongo.AND, new JsonArray().add(userRequest).add(checkGroupRequest).add(notUserFolder));
+        query.matchOr(new JsonArray().add(folderIdMatch).add(andCondition));
     }
 
     private JsonObject getAllBoardsEditableQuery(UserInfos user) {

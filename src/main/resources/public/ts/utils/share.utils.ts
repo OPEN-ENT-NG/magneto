@@ -38,7 +38,7 @@ export class ShareUtils {
             let hasIndividualShareRight: boolean = !!shareItem.userId && (shareItem.userId == model.me.userId) && (shareItem[shareRight] == true);
 
             let hasGroupShareRight: boolean = !!shareItem.groupId
-                && !!model.me.groupsIds.map((groupId: string) => {
+                && !!model.me.groupsIds.find((groupId: string) => {
                     shareItem.groupId == groupId && shareItem[shareRight] == true});
 
             if (hasIndividualShareRight || hasGroupShareRight) hasShareRight = true ;

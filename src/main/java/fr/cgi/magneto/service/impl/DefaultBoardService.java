@@ -468,9 +468,6 @@ public class DefaultBoardService implements BoardService {
                 );
 
         if (!getCount) {
-            if (page != null) {
-                query.page(page);
-            }
             query.project(new JsonObject()
                             .put(Field._ID, 1)
                             .put(Field.TITLE, 1)
@@ -558,6 +555,10 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.DISPLAY_NB_FAVORITES, 1));
         if (getCount) {
             query = query.count();
+        }else{
+            if (page != null) {
+                query.page(page);
+            }
         }
 
         return query.getAggregate();

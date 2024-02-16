@@ -6,12 +6,16 @@ import fr.cgi.magneto.core.constants.*;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
+import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.http.filter.SuperAdminFilter;
+
 
 import static fr.cgi.magneto.core.enums.Events.ACCESS;
 
@@ -23,6 +27,13 @@ public class MagnetoController extends ControllerHelper {
     public MagnetoController(ServiceFactory serviceFactory) {
         this.magnetoConfig = serviceFactory.magnetoConfig();
         this.eventStore = EventStoreFactory.getFactory().getEventStore(Magneto.class.getSimpleName());
+    }
+
+    @Get("/config")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(SuperAdminFilter.class)
+    public void getConfig(final HttpServerRequest request) {
+        renderJson(request, config);
     }
 
     @Get("")

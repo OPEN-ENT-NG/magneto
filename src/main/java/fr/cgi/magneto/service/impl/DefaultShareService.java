@@ -16,6 +16,7 @@ import org.entcore.common.mongodb.MongoDbResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DefaultShareService implements ShareService {
 
@@ -241,6 +242,9 @@ public class DefaultShareService implements ShareService {
     @Override
     public boolean checkRights(List<SharedElem> newSharedElem, JsonObject parent) {
         List<SharedElem> parentRights = getSharedElemList(parent.getJsonArray(Field.SHARED, new JsonArray()));
+
+        //remove bookmark
+       parentRights = parentRights.stream().filter(elem -> !elem.getTypeId().equals(Field.BOOKMARKID)).collect(Collectors.toList());
 
         return parentRights.stream()
                 .allMatch(parentRight -> newSharedElem.stream()

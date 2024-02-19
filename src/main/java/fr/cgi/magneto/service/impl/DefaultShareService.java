@@ -64,7 +64,7 @@ public class DefaultShareService implements ShareService {
                 List<SharedElem> elemsToRemove = new ArrayList<>();
                 sharedElems.forEach(sharedElem1 -> {
                     sharedElems.forEach(sharedElem2 -> {
-                        if (sharedElem1 != sharedElem2 && sharedElem2.hasSameId(sharedElem1) && sharedElem1.getRights().size() > sharedElem2.getRights().size()) {
+                        if (sharedElem1 != sharedElem2 && sharedElem2.hasSameId(sharedElem1) && sharedElem1.getRights().size() < sharedElem2.getRights().size()) {
                             elemsToRemove.add(sharedElem2);
                         }
                     });

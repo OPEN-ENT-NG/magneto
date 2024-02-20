@@ -55,6 +55,8 @@ public class Field {
     public static final String CARDIDS = "cardIds";
     public static final String BOARDIDS = "boardIds";
     public static final String PARENTID = "parentId";
+    public static final String PARENT = "parent";
+    public static final String PARENTOWNER = "parentOwner";
     public static final String FOLDERIDS = "folderIds";
     public static final String CHILDREN = "children";
     public static final String CHILDRENIDS = "childrenIds";

@@ -24,7 +24,9 @@ import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DefaultFolderService implements FolderService {
@@ -268,9 +270,15 @@ public class DefaultFolderService implements FolderService {
                     .onFailure(promise::fail)
                     .onSuccess(promise::complete);
         } else {
+            List<String> folderChildrenIds = new ArrayList<>();
+
             this.getFolderChildrenIds(folderIds)
+                    .compose(childrenFolderIds -> {
+                        folderChildrenIds.addAll(childrenFolderIds);
+                        return this.removeFolderParentIfNotSameOwnerAsParent(folderChildrenIds);
+                    })
                     .compose(childrenIds -> {
-                        folderIds.addAll(childrenIds);
+                        folderIds.addAll(folderChildrenIds);
                         return this.preDeleteFolders(folderIds);
                     })
                     .compose(r -> this.getBoardIdsInFolders(folderIds))
@@ -310,6 +318,97 @@ public class DefaultFolderService implements FolderService {
                 MongoDbResult.validResultHandler(PromiseHelper.handler(promise,
                         String.format("[Magneto@%s::preDeleteFolders] Failed to pre-delete folders",
                                 this.getClass().getSimpleName()))));
+        return promise.future();
+    }
+
+    private Future<Void> removeFolderParentIfNotSameOwnerAsParent (List<String> folderChildrenIds) {
+        Promise<Void> promise = Promise.promise();
+
+        this.getFolderIfNotSameOwnerAsParent(folderChildrenIds)
+                .compose(folderIdsObject -> {
+                    JsonArray folderIds = folderIdsObject.getJsonArray(Field.FOLDERIDS, new JsonArray());
+
+                    return this.removeFoldersParent(folderIds);
+                })
+                .onSuccess(promise::complete)
+                .onFailure(promise::fail);
+
+        return promise.future();
+    }
+
+    private Future<JsonObject> getFolderIfNotSameOwnerAsParent(List<String> folderChildrenIds) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        Map<String, JsonObject> folderIdsAccumulators = new HashMap<>();
+        folderIdsAccumulators.put(Field.FOLDERIDS, new JsonObject().put(Mongo.PUSH, String.format("$%s", Field._ID)));
+
+
+        JsonObject query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, folderChildrenIds))
+                        .put(Mongo.AND, new JsonArray()
+                                .add(new JsonObject().put(Field.PARENTID, new JsonObject()
+                                        .put(Mongo.EXISTS, true)))
+                                .add(new JsonObject().put(Field.PARENTID, new JsonObject()
+                                        .put(Mongo.NE, (String) null)))
+                                .add(new JsonObject().put(Field.PARENTID, new JsonObject()
+                                        .put(Mongo.NE, "")))
+                        )
+                )
+                .lookUp(this.collection, Field.PARENTID, Field._ID, Field.PARENT)
+                .addFields(Field.PARENTOWNER, new JsonObject()
+                                .put(Mongo.ARRAYELEMAT, new JsonArray().add(String.format("$%s.%s", Field.PARENT, Field.OWNERID)).add(0))
+                )
+                .match(new JsonObject().put(Mongo.EXPR, new JsonObject()
+                        .put(Mongo.NE, new JsonArray().add(String.format("$%s", Field.OWNERID)).add(String.format("$%s", Field.PARENTOWNER))
+                        )
+                ))
+                .group(null, folderIdsAccumulators)
+                .project(new JsonObject().put(Field._ID, 0).put(Field.FOLDERIDS, 1))
+                .getAggregate();
+
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::getFolderIfNotSameOwnerAsParent] Failed to get folders that do not have same owner as parent: ",
+                        this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+
+            JsonArray responseArray = results.right().getValue()
+                    .getJsonObject(Field.CURSOR, new JsonObject())
+                    .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+
+            JsonObject response = responseArray.size() > 0 ?
+                    responseArray.getJsonObject(0) : new JsonObject();
+
+            promise.complete(response);
+        }));
+
+        return promise.future();
+    }
+
+    private Future<Void> removeFoldersParent(JsonArray foldersToRemoveFromTree) {
+        Promise<Void> promise = Promise.promise();
+
+        JsonObject query = new JsonObject().put(Field._ID, new JsonObject()
+                .put(Mongo.IN, foldersToRemoveFromTree));
+
+        JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject()
+                .put(Field.PARENTID, (String) null));
+
+        mongoDb.update(this.collection, query, update, false, true, MongoDbResult.validResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::removeFoldersParent] Failed to remove folders parents", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+
+            promise.complete();
+        }));
+
         return promise.future();
     }
 

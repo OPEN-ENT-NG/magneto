@@ -233,6 +233,11 @@ public class DefaultBoardService implements BoardService {
                         promise.fail(message);
                         return Future.failedFuture(message);
                     }
+                }).compose(res ->{
+                    return folderService.getFolderByBoardId(boardId).onSuccess(resultat -> {
+                        String newBoardId = ((JsonObject) futures.get(Field.BOARD).result()).getString(Field.ID);
+                        folderService.moveBoardsToFolder(user.getUserId(), Collections.singletonList(newBoardId), resultat.getString(Field._ID));
+                    });//Voir si moveBoardsToFolder ajoute les droits
                 })
                 .onFailure(promise::fail)
                 .onSuccess(success -> promise.complete());

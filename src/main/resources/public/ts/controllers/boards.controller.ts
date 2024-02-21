@@ -111,6 +111,8 @@ interface IViewModel {
 
     isOwner(folderId: string): boolean;
 
+    isOwnerOfSelectedBoards()
+
     folderIdHasShareRight(folderId: string, right: string): boolean;
 
     folderHasShareRight(folder: Folder, right: string): boolean;
@@ -757,6 +759,9 @@ class Controller implements ng.IController, IViewModel {
         return  !!selectedFolder && selectedFolder.ownerId == model.me.userId;
     }
 
+    isOwnerOfSelectedBoards = (): boolean => {
+        return this.selectedBoards.every((board:Board) => !!board && !!board.owner && board.owner.userId === model.me.userId);
+    }
     /**
      * Return true if user has certain share right
      */

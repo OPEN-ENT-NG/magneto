@@ -21,7 +21,6 @@ import {hasRight} from "../utils/rights.utils";
 import {Draggable} from "../models/draggable.model";
 import {COLLECTION_NAVBAR_VIEWS} from "../core/enums/collection-navbar.enum";
 import {ShareUtils} from "../utils/share.utils";
-import {boolean} from "yargs";
 
 interface IViewModel {
     openedFolder: Folder;

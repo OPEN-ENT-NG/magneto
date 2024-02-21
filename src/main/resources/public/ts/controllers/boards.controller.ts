@@ -760,7 +760,7 @@ class Controller implements ng.IController, IViewModel {
     }
 
     isOwnerOfSelectedBoards = (): boolean => {
-        return this.selectedBoards.every(board => !!board && !!board.owner && board.owner.userId === model.me.userId);
+        return this.selectedBoards.every((board:Board) => !!board && !!board.owner && board.owner.userId === model.me.userId);
     }
     /**
      * Return true if user has certain share right

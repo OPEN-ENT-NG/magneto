@@ -256,7 +256,7 @@
             on-duplicate="vm.duplicateBoard"
             has-restore="vm.filter.isTrash"
             on-restore="vm.restoreBoardsOrFolders"
-            has-move="vm.filter.isMyBoards && vm.selectedFolderIds.length == 0 && vm.selectedBoardIds.length > 0 && vm.folderHasCreationRight()"
+            has-move="vm.filter.isMyBoards && vm.selectedFolderIds.length == 0 && vm.selectedBoardIds.length > 0 && vm.isOwnerOfSelectedBoards()"
             on-move="vm.moveBoards"
             has-rename="vm.hasRenameRight()"
             on-rename="vm.openRenameFolderForm">

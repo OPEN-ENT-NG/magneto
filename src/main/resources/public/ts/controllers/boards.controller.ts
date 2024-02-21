@@ -21,6 +21,7 @@ import {hasRight} from "../utils/rights.utils";
 import {Draggable} from "../models/draggable.model";
 import {COLLECTION_NAVBAR_VIEWS} from "../core/enums/collection-navbar.enum";
 import {ShareUtils} from "../utils/share.utils";
+import {boolean} from "yargs";
 
 interface IViewModel {
     openedFolder: Folder;
@@ -110,6 +111,8 @@ interface IViewModel {
     resetBoards(): void;
 
     isOwner(folderId: string): boolean;
+
+    isOwnerOfSelectedBoards()
 
     folderIdHasShareRight(folderId: string, right: string): boolean;
 
@@ -757,6 +760,9 @@ class Controller implements ng.IController, IViewModel {
         return  !!selectedFolder && selectedFolder.ownerId == model.me.userId;
     }
 
+    isOwnerOfSelectedBoards = (): boolean => {
+        return this.selectedBoards.every(board => !!board && !!board.owner && board.owner.userId === model.me.userId);
+    }
     /**
      * Return true if user has certain share right
      */

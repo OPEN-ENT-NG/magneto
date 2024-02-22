@@ -37,6 +37,7 @@
   }
 
   &-horizontal {
+    min-height: 170px;
     overflow-y: hidden;
     overflow-x: scroll;
     flex-wrap: nowrap;

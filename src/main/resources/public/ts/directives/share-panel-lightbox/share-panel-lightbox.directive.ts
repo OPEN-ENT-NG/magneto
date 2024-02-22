@@ -1,4 +1,4 @@
-import {ng, ShareAction, SharePayload} from "entcore";
+import {ng, notify, ShareAction, SharePayload} from "entcore";
 import {ILocationService, IParseService, IScope, IWindowService} from "angular";
 import {RootsConst} from "../../core/constants/roots.const";
 import {I18nUtils} from "../../utils/i18n.utils";
@@ -8,7 +8,7 @@ import {FOLDER_TYPE} from "../../core/enums/folder-type.enum";
 interface IViewModel extends ng.IController, ISharePanelProps {
     translate?(key: string, param: string): string;
     parentFolderIsShared?(): boolean;
-    handleFail(e:any);
+    handleFail();
 }
 
 interface ISharePanelProps {
@@ -60,8 +60,10 @@ class Controller implements IViewModel {
 
     $onDestroy() {
     }
-    handleFail(t:any){
-        console.log(t)
+
+    handleFail(){
+        console.log("i")
+        notify.error("WOW C PAS BIENG")
     }
 }
 

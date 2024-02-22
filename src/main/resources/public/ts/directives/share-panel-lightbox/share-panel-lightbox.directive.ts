@@ -8,7 +8,7 @@ import {FOLDER_TYPE} from "../../core/enums/folder-type.enum";
 interface IViewModel extends ng.IController, ISharePanelProps {
     translate?(key: string, param: string): string;
     parentFolderIsShared?(): boolean;
-    handleFail();
+    handleFail(error: JQueryXHR): void;
 }
 
 interface ISharePanelProps {
@@ -61,7 +61,7 @@ class Controller implements IViewModel {
     $onDestroy() {
     }
 
-    handleFail(){
+    handleFail(error: JQueryXHR) : void {
         console.log("i")
         notify.error("WOW C PAS BIENG")
     }
@@ -101,6 +101,10 @@ function directive($parse: IParseService) {
                 $resource: ShareableWithId,
                 $actions: ShareAction[]}): void => {
                 $parse($scope.vm.onValidate)(args);
+            }
+
+            vm.handleFail = (error: JQueryXHR) : void => {
+                notify.error("Hello");
             }
         }
     }

@@ -63,7 +63,7 @@ class Controller implements IViewModel {
 
     handleFail(error: JQueryXHR) : void {
         console.log("i")
-        notify.error("WOW C PAS BIENG")
+        notify.error("Hello in controller")
     }
 }
 

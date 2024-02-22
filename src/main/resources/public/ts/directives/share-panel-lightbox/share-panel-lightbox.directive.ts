@@ -8,6 +8,7 @@ import {FOLDER_TYPE} from "../../core/enums/folder-type.enum";
 interface IViewModel extends ng.IController, ISharePanelProps {
     translate?(key: string, param: string): string;
     parentFolderIsShared?(): boolean;
+    handleFail(e:any);
 }
 
 interface ISharePanelProps {
@@ -58,6 +59,9 @@ class Controller implements IViewModel {
     }
 
     $onDestroy() {
+    }
+    handleFail(t:any){
+        console.log(t)
     }
 }
 

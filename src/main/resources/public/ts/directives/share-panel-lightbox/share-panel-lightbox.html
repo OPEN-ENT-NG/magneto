@@ -4,7 +4,8 @@
 
     <share-panel auto-close="true"
                  app-prefix="vm.appPrefix"
-                 resources="vm.resources">
+                 resources="vm.resources"
+                 on-failure="vm.handleFail()">
     </share-panel>
 
     <div class="sharePanel-warning" ng-if="(vm.appPrefix == 'magneto/board') && !vm.parentFolderIsShared()">

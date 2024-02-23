@@ -243,7 +243,7 @@ public class BoardController extends ControllerHelper {
         RequestUtils.bodyToJson(request, pathPrefix + "boardList", boards ->
                 UserUtils.getUserInfos(eb, request, user -> {
                             List<String> boardIds = boards.getJsonArray(Field.BOARDIDS).getList();
-                            boardService.preDeleteBoards(user.getUserId(), boardIds, true)
+                            boardService.restoreBoards(user.getUserId(), boardIds)
                                     .onFailure(err -> renderError(request))
                                     .onSuccess(result -> renderJson(request, result));
                         }

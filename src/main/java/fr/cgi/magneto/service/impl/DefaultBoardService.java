@@ -9,6 +9,7 @@ import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
+import fr.cgi.magneto.helper.ShareHelper;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
@@ -273,11 +274,52 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
+    public Future<JsonObject> restoreBoards(String userId, List<String> boardIds){
+        Promise<JsonObject> promise = Promise.promise();
+        Future<JsonObject> preDeleteBoardsFuture = preDeleteBoards(userId,boardIds,true);
+        preDeleteBoardsFuture.compose(r -> this.handleInsertSharedArrayFromFolder(boardIds))
+                .onSuccess(success -> promise.complete(preDeleteBoardsFuture.result()))
+                .onFailure(promise::fail);
+
+        return promise.future();
+    }
+
+    private  Future<Void> handleInsertSharedArrayFromFolder(List<String> boardIds) {
+        Promise<Void> promise= Promise.promise();
+        List<Future<Void>> futures= new ArrayList<>();
+        boardIds.forEach(id ->{
+            futures.add(insertSharedArrayFromFolder(id));
+        });
+        FutureHelper.all(futures)
+                .onSuccess(s -> promise.complete())
+                .onFailure(promise::fail);
+        return promise.future();
+    }
+
+    private Future<Void> insertSharedArrayFromFolder(String boardId) {
+        Promise<Void> promise = Promise.promise();
+        this.folderService.getFolderByBoardId(boardId)
+                .onSuccess(folder -> {
+                    if (folder != null && !folder.isEmpty() && folder.containsKey(Field.SHARED) && !folder.getJsonArray(Field.SHARED).isEmpty()) {
+                        shareBoard(Collections.singletonList(boardId), ShareHelper.getSharedElem(folder.getJsonArray(Field.SHARED)), new ArrayList<>(), false)
+                                .onSuccess(s -> promise.complete())
+                                .onFailure(promise::fail);
+                    } else {
+                        promise.complete();
+                    }
+                })
+                .onFailure(promise::fail);
+        return promise.future();
+    }
+
+    @Override
     public Future<JsonObject> preDeleteBoards(String userId, List<String> boardIds, boolean restore) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
                 .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds)));
         JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
+        //ici ajouter ou fiare autre fonction ( surement autre fonction) poura jouter récupération parent avec lookup et rec shared ( pas oublier le workspace)
+        //Idée triche : faire la même chose que drag and drop pour le remettre dans le même dossier
         mongoDb.update(this.collection, query, update, false, true, MongoDbResult.validActionResultHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::preDeleteBoards] Failed to pre delete boards",

@@ -8,9 +8,9 @@
                    ng-model="vm.section.title"/>
         </div>
         <i class="magneto-card-settings notDraggable" data-ng-click="vm.openSectionOptions(); $event.stopPropagation();"
-           ng-show="vm.board.myRights.contrib !== undefined"></i>
+           ng-show="vm.board.myRights.publish !== undefined"></i>
         <card-list-item-options
-                ng-show="vm.isDisplayedOptions"
+                ng-show="vm.isDisplayedOptions && vm.board.myRights.publish !== undefined"
                 options="vm.section"
                 has-delete="vm.board.myRights.manager !== undefined"
                 on-delete="vm.openDeleteSection"

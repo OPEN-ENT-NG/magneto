@@ -318,8 +318,6 @@ public class DefaultBoardService implements BoardService {
         JsonObject query = new JsonObject()
                 .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds)));
         JsonObject update = new JsonObject().put(Mongo.SET, new JsonObject().put(Field.DELETED, !restore)).put(Mongo.UNSET, new JsonObject().put(Field.SHARED, 1));
-        //ici ajouter ou fiare autre fonction ( surement autre fonction) poura jouter récupération parent avec lookup et rec shared ( pas oublier le workspace)
-        //Idée triche : faire la même chose que drag and drop pour le remettre dans le même dossier
         mongoDb.update(this.collection, query, update, false, true, MongoDbResult.validActionResultHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::preDeleteBoards] Failed to pre delete boards",

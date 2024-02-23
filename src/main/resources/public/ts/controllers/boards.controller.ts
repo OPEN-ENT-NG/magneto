@@ -803,9 +803,8 @@ class Controller implements ng.IController, IViewModel {
     hasDuplicationRight = (): boolean => {
         let oneBoardSelectedOnly: boolean = this.selectedBoardIds.length == 1 && this.selectedFolderIds.length == 0;
         let isOwnerOrPublicOrShared: boolean =  !!this.selectedBoards.length && (this.selectedBoards[0].isMyBoard() || this.selectedBoards[0].public
-            || (!this.folderIsShared(this.selectedBoards[0].folderId) && this.selectedBoards[0].myRights.contrib)
-            || (this.folderIsShared(this.selectedBoards[0].folderId) && this.folderIdHasShareRight(this.selectedBoards[0].folderId, 'publish')));
-
+            ||  this.selectedBoards[0].myRights.contrib)
+         ;
         return oneBoardSelectedOnly && isOwnerOrPublicOrShared;
     };
 

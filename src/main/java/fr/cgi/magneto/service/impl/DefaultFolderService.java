@@ -567,17 +567,23 @@ public class DefaultFolderService implements FolderService {
                 ? Future.succeededFuture(new JsonArray())
                 : this.getFolderSharedRights(folderId);
 
+        JsonArray oldFolderSharedRightsList = new JsonArray();
+        List<SharedElem> newFolderSharedRightsList = new ArrayList<>();
+
         CompositeFuture.all(oldFolderSharedRights, newFolderSharedRights)
                 .compose(rightsList -> {
-                    JsonArray oldFolderSharedRightsList = rightsList.resultAt(0);
-                    List<SharedElem> newFolderSharedRightsList = ShareHelper.getSharedElem(rightsList.resultAt(1));
+                    oldFolderSharedRightsList.addAll(rightsList.resultAt(0));
+                    newFolderSharedRightsList.addAll(ShareHelper.getSharedElem(rightsList.resultAt(1)));
+
+                    return this.updateOldFolder(boardIds);
+                })
+                .compose(update -> {
 
                     Future<JsonObject> workspaceShareRights = this.serviceFactory.workSpaceService().setShareRights(boardIds, this.serviceFactory.shareService().getSharedJsonFromList(newFolderSharedRightsList));
-                    Future<JsonObject> updateOldFolderFuture = this.updateOldFolder(boardIds);
                     Future<JsonObject> updateNewFolderFuture = this.updateNewFolder(userId, boardIds, folderId);
                     Future<List<JsonObject>> handleBoardSharedRightsFuture = this.updateBoardsSharedRights(oldFolderSharedRightsList, newFolderSharedRightsList);
 
-                    return CompositeFuture.all(updateOldFolderFuture, updateNewFolderFuture, handleBoardSharedRightsFuture, workspaceShareRights);
+                    return CompositeFuture.all(updateNewFolderFuture, handleBoardSharedRightsFuture, workspaceShareRights);
                 })
                 .onFailure(error -> promise.fail(error.getMessage()))
                 .onSuccess(result -> promise.complete(result.resultAt(1)));
@@ -655,7 +661,7 @@ public class DefaultFolderService implements FolderService {
                                 , CollectionsConstant.BOARD_COLLECTION, true)));
 
         FutureHelper.all(updateBoardsSharedRightsFutures)
-                .onSuccess(result -> promise.complete(result.list()))
+                .onSuccess(result -> promise.complete(result.resultAt(0)))
                 .onFailure(promise::fail);
 
         return promise.future();
@@ -663,10 +669,12 @@ public class DefaultFolderService implements FolderService {
 
     private Future<JsonObject> updateNewFolder(String userId, List<String> boardIds, String folderId) {
         Promise<JsonObject> promise = Promise.promise();
+
         JsonObject query = new JsonObject()
                 .put(Field._ID, folderId);
         JsonObject update = new JsonObject().put(Mongo.PUSH,
                 new JsonObject().put(Field.BOARDIDS, new JsonObject().put(Mongo.EACH, new JsonArray(boardIds))));
+
         mongoDb.update(this.collection, query, update, false, false,
                 MongoDbResult.validActionResultHandler(results -> {
                     if (results.isLeft()) {

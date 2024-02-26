@@ -287,14 +287,14 @@ class Controller implements ng.IController, IViewModel {
                 return !isTargetAlreadyMyParent && !isTargetMyself && !isArchivedItem && !isPublicTarget;
             },
             async dragDropHandler(event: DragEvent, content?: any): Promise<void> {
-                let originalBoard: Board = new Board().build(JSON.parse(event.dataTransfer.getData("application/json")));
+                let originalBoard: Board = that.selectedBoards[0];
                 let targetItem: Folder = angular.element(event.srcElement).scope().vm.folder
                     || new Folder().navItemToFolder(angular.element(event.srcElement).scope().vm.folderTree);
 
-                let originalBoardData: Board = that.boards.find((board: Board) => board.id == originalBoard.id);
-                that.dragAndDropInitialFolder = !!originalBoardData.folderId ? that.folders.find((folder: Folder) => folder.id == originalBoardData.folderId)
+                that.dragAndDropInitialFolder = !!originalBoard.folderId ? that.folders.find((folder: Folder) => folder.id == originalBoard.folderId)
                     : new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: model.me.userId, title: MAIN_PAGE_TITLE, parentId: undefined});
-                if (originalBoardData.owner.userId != model.me.userId) { //not board owner
+
+                if (!that.isOwnerOfSelectedBoards()) { //not board owner
                     that.handleNoRightsDragAndDrop(that, originalBoard, targetItem);
                     return ;
                 } else if ((ShareUtils.folderOwnerNotShared(that.dragAndDropInitialFolder) || ShareUtils.folderOwnerAndSharedOrShareRights(that.dragAndDropInitialFolder))

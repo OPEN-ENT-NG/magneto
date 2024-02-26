@@ -26,8 +26,10 @@ public class MoveBoardRight implements ResourcesProvider {
                         .put(Field._ID, new JsonObject().put(Mongo.IN, boardIds))
                         .put(Field.OWNERID, user.getUserId());
                 MongoAppFilter.executeCountQuery(request, CollectionsConstant.BOARD_COLLECTION, isBoardsOwner, boardIds.size(), boardResult -> {
-                    if (Boolean.FALSE.equals(boardResult)) handler.handle(false);
-
+                    if (Boolean.FALSE.equals(boardResult)) {
+                        handler.handle(false);
+                        return;
+                    }
                     //is folder owner or shared with publish rights
                     JsonObject destinationFolderRights = new JsonObject();
                     ShareHelper.checkFolderShareRightsQuery(user, folderId, destinationFolderRights, Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT);

@@ -9,6 +9,7 @@ import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
+import fr.cgi.magneto.helper.ShareHelper;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
@@ -269,6 +270,45 @@ public class DefaultBoardService implements BoardService {
         } else {
             promise.complete(updateBoard.toJson());
         }
+        return promise.future();
+    }
+
+    @Override
+    public Future<JsonObject> restoreBoards(String userId, List<String> boardIds){
+        Promise<JsonObject> promise = Promise.promise();
+        Future<JsonObject> preDeleteBoardsFuture = preDeleteBoards(userId,boardIds,true);
+        preDeleteBoardsFuture.compose(r -> this.handleInsertSharedArrayFromFolder(boardIds))
+                .onSuccess(success -> promise.complete(preDeleteBoardsFuture.result()))
+                .onFailure(promise::fail);
+
+        return promise.future();
+    }
+
+    private  Future<Void> handleInsertSharedArrayFromFolder(List<String> boardIds) {
+        Promise<Void> promise= Promise.promise();
+        List<Future<Void>> futures= new ArrayList<>();
+        boardIds.forEach(id ->{
+            futures.add(insertSharedArrayFromFolder(id));
+        });
+        FutureHelper.all(futures)
+                .onSuccess(s -> promise.complete())
+                .onFailure(promise::fail);
+        return promise.future();
+    }
+
+    private Future<Void> insertSharedArrayFromFolder(String boardId) {
+        Promise<Void> promise = Promise.promise();
+        this.folderService.getFolderByBoardId(boardId)
+                .onSuccess(folder -> {
+                    if (folder != null && !folder.isEmpty() && folder.containsKey(Field.SHARED) && !folder.getJsonArray(Field.SHARED).isEmpty()) {
+                        shareBoard(Collections.singletonList(boardId), ShareHelper.getSharedElem(folder.getJsonArray(Field.SHARED)), new ArrayList<>(), false)
+                                .onSuccess(s -> promise.complete())
+                                .onFailure(promise::fail);
+                    } else {
+                        promise.complete();
+                    }
+                })
+                .onFailure(promise::fail);
         return promise.future();
     }
 

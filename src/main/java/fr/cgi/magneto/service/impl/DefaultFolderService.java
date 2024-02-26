@@ -23,10 +23,7 @@ import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultFolderService implements FolderService {
@@ -264,11 +261,13 @@ public class DefaultFolderService implements FolderService {
         Promise<JsonObject> promise = Promise.promise();
 
         if (restore) {
+            Future<JsonObject> preDeleteFoldersParentFuture = this.preDeleteFoldersParent(folderIds);
             getFolderChildrenIdsOwnerOnly(folderIds, ownerId)
                     .compose(childrenIds -> this.preRestoreChildren(childrenIds, ownerId))
-                    .compose(r -> this.preDeleteFoldersParent(folderIds))
+                    .compose(r -> preDeleteFoldersParentFuture)
+                    .compose(r -> this.handleSharedParent(folderIds))
                     .onFailure(promise::fail)
-                    .onSuccess(promise::complete);
+                    .onSuccess(r -> promise.complete(preDeleteFoldersParentFuture.result()));
         } else {
             List<String> folderChildrenIds = new ArrayList<>();
 
@@ -287,6 +286,56 @@ public class DefaultFolderService implements FolderService {
                     .onSuccess(promise::complete);
         }
         return promise.future();
+    }
+
+    private Future<JsonObject> handleSharedParent(List<String> folderIds) {
+        Promise<JsonObject> promise = Promise.promise();
+        List<Future<Void>> futures = new ArrayList<>();
+        folderIds.forEach(id ->{
+            futures.add(setSharedArrayFromParent(id));
+        });
+        FutureHelper.all(futures).onSuccess(t -> promise.complete(new JsonObject())).onFailure(promise::fail);
+        return promise.future();
+    }
+
+    private Future<Void> setSharedArrayFromParent(String id) {
+        Promise<Void> promise = Promise.promise();
+        this.getFolders(Collections.singletonList(id))
+                .onSuccess(folder -> {
+                    if (!folder.isEmpty()) {
+                        String folderId = folder.getJsonObject(0).getString(Field._ID);
+                        String parentId = folder.getJsonObject(0).getString(Field.PARENTID, "");
+                        if (parentId != null && !parentId.isEmpty()) {
+                            this.getFolders(Collections.singletonList(parentId)) //Get ParentData
+                                    .onSuccess(rest -> {
+                                        JsonArray sharedArray = rest.getJsonObject(0).getJsonArray(Field.SHARED, new JsonArray());
+                                        if (!sharedArray.isEmpty()) {
+                                            handleSharedDirectory(id, folderId, sharedArray, promise);
+                                        } else {
+                                            promise.complete();
+                                        }
+                                    })
+                                    .onFailure(promise::fail);
+                        } else {
+                            promise.complete();
+                        }
+                    } else {
+                        promise.complete();
+                    }
+                })
+                .onFailure(promise::fail);
+        return promise.future();
+    }
+
+    private void handleSharedDirectory(String id, String folderId, JsonArray sharedArray, Promise<Void> promise) {
+        List<SharedElem> sharedElems = ShareHelper.getSharedElem(sharedArray);
+        this.shareFolder(folderId, sharedElems, new ArrayList<>())
+                .compose(success -> this.getChildrenBoardsIds(id))
+                .compose(boardsIds -> this.serviceFactory.boardService().shareBoard(boardsIds,sharedElems, new ArrayList<>(), false))
+                .compose(boardsIds -> this.serviceFactory.workSpaceService().setShareRights(boardsIds,
+                        this.serviceFactory.shareService().getSharedJsonFromList(sharedElems)))
+                .onSuccess(s -> promise.complete())
+                .onFailure(promise::fail);
     }
 
     private Future<JsonObject> preDeleteFoldersParent(List<String> folderIds) {

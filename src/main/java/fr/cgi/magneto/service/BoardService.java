@@ -106,6 +106,8 @@ public interface BoardService {
      */
     Future<List<String>> getAllDocumentIds(String boardId, UserInfos user);
 
+    Future<JsonObject> restoreBoards(String userId, List<String> boardIds);
+
     /**
      * Pre delete boards
      *

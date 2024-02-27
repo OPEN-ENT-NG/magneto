@@ -285,7 +285,7 @@ public class DefaultFolderService implements FolderService {
             }
         });
         List<Future<JsonObject>> futures = new ArrayList<>();
-        folderBoardsIdMap.forEach((folderId, boardsIds) -> futures.add(setBordersIds(boardsIds, folderId)));
+        folderBoardsIdMap.forEach((folderId, boardsIds) -> futures.add(setBoardsIds(boardsIds, folderId)));
         FutureHelper.all(futures)
                 .onSuccess(t -> promise.complete())
                 .onFailure(promise::fail);
@@ -784,7 +784,7 @@ public class DefaultFolderService implements FolderService {
                 }));
         return promise.future();
     }
-    private Future<JsonObject> setBordersIds(List<String> boardIds, String folderId) {
+    private Future<JsonObject> setBoardsIds(List<String> boardIds, String folderId) {
         Promise<JsonObject> promise = Promise.promise();
 
         JsonObject query = new JsonObject()
@@ -795,7 +795,7 @@ public class DefaultFolderService implements FolderService {
         mongoDb.update(this.collection, query, update, true, false,
                 MongoDbResult.validActionResultHandler(results -> {
                     if (results.isLeft()) {
-                        String message = String.format("[Magneto@%s::setFoldersIds] Failed to move boards to folder",
+                        String message = String.format("[Magneto@%s::setBoardsIds] Failed to set boardsId to folder",
                                 this.getClass().getSimpleName());
                         log.error(String.format("%s : %s", message, results.left().getValue()));
                         promise.fail(message);

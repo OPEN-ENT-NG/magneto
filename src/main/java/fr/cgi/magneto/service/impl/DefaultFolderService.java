@@ -248,11 +248,88 @@ public class DefaultFolderService implements FolderService {
     private Future<JsonObject> preDeleteBoardsInFolderWithChildren(List<String> folderIds, boolean restore, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        this.getFolderChildrenIds(folderIds)
-                .compose(this::getBoardIdsInFolders)
-                .compose(childrenIds -> this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, restore))
-                .onFailure(promise::fail)
-                .onSuccess(promise::complete);
+        if (restore) {
+            this.getFolderChildrenIds(folderIds)
+                    .compose(this::getBoardIdsInFolders)
+                    .compose(childrenIds -> this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, true))
+                    .onFailure(promise::fail)
+                    .onSuccess(promise::complete);
+        } else {
+            this.getFolderChildrenIds(folderIds)
+                    .compose(this::getBoardIdsInFolders)
+                    .onSuccess(childrenIds -> {
+                        Future<JsonObject> preDeleteBoardsFuture = this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, false);
+                        preDeleteBoardsFuture
+                                .compose(t -> getBoardIfSameOwnerAsParent(childrenIds))
+                                .compose(this::updateFoldersBoardsIds)
+                                .onSuccess(t -> promise.complete(preDeleteBoardsFuture.result()));
+                    })
+                    .onFailure(promise::fail);
+        }
+        return promise.future();
+    }
+
+    Future<Void> updateFoldersBoardsIds(JsonArray boardsWithFolder) {
+        Promise<Void> promise = Promise.promise();
+        Map<String, List<String>> folderBoardsIdMap = new HashMap<>();
+        boardsWithFolder.forEach(boardWithFolderO -> {
+            JsonObject boardWithFolder = (JsonObject) boardWithFolderO;
+            if (boardWithFolder.containsKey(Field.OWNERID) && boardWithFolder.containsKey(Field.FOLDERID)
+                    && !boardWithFolder.getString(Field.FOLDERID).isEmpty()) {
+                List<String> boardsIds = new ArrayList<>();
+                if (folderBoardsIdMap.containsKey(boardWithFolder.getString(Field.FOLDERID))) {
+                    boardsIds = folderBoardsIdMap.get(boardWithFolder.getString(Field.FOLDERID));
+                }
+                boardsIds.add(boardWithFolder.getString(Field._ID));
+                folderBoardsIdMap.put(boardWithFolder.getString(Field.FOLDERID), boardsIds);
+            }
+        });
+        List<Future<JsonObject>> futures = new ArrayList<>();
+        folderBoardsIdMap.forEach((folderId, boardsIds) -> futures.add(setBordersIds(boardsIds, folderId)));
+        FutureHelper.all(futures)
+                .onSuccess(t -> promise.complete())
+                .onFailure(promise::fail);
+        return promise.future();
+    }
+    private Future<JsonArray> getBoardIfSameOwnerAsParent(List<String> boardsIds) {
+        Promise<JsonArray> promise = Promise.promise();
+
+//        Map<String, JsonObject> folderIdsAccumulators = new HashMap<>();
+//        folderIdsAccumulators.put(Field.FOLDERIDS, new JsonObject().put(Mongo.PUSH, String.format("$%s", Field._ID)));
+
+
+        JsonObject query = new MongoQuery(CollectionsConstant.BOARD_COLLECTION)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, boardsIds))
+                )
+                .lookUp(this.collection, Field._ID, Field.BOARDIDS, Field.FOLDER)
+                .unwind(Field.FOLDER, true)
+                .match(new JsonObject().put(Mongo.EXPR,
+                        new JsonObject().put(Mongo.EQ,
+                                new JsonArray()
+                                        .add(String.format("$%s", Field.OWNERID))
+                                        .add(String.format("$%s.%s", Field.FOLDER, Field.OWNERID)))))
+                .project(new JsonObject()
+                        .put(Field._ID, 1)
+                        .put(Field.OWNERID, 1)
+                        .put(Field.FOLDERID, String.format("$%s.%s", Field.FOLDER, Field._ID)))
+                .getAggregate();
+
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::getFolderIfNotSameOwnerAsParent] Failed to get folders that do not have same owner as parent: ",
+                        this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+
+            JsonArray responseArray = results.right().getValue()
+                    .getJsonObject(Field.CURSOR, new JsonObject())
+                    .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+
+            promise.complete(responseArray);
+        }));
 
         return promise.future();
     }
@@ -281,9 +358,9 @@ public class DefaultFolderService implements FolderService {
                         return this.preDeleteFolders(folderIds);
                     })
                     .compose(r -> this.getBoardIdsInFolders(folderIds))
-                    .compose(boardsIds -> this.updateBoardsFromFolder(folderIds, ownerId, boardsIds))
+//                    .compose(boardsIds -> this.updateBoardsFromFolder(folderIds, ownerId, boardsIds))
                     .onFailure(promise::fail)
-                    .onSuccess(promise::complete);
+                    .onSuccess(t ->promise.complete(new JsonObject()));
         }
         return promise.future();
     }
@@ -476,30 +553,6 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
-    private Future<JsonObject> updateBoardsFromFolder(List<String> folderChildrenIds, String ownerId, List<String> boardsIds) {
-        Promise<JsonObject> promise = Promise.promise();
-        this.serviceFactory.boardService().getOwnedBoardsIds(boardsIds, ownerId)
-                .compose(myBoards -> this.getFolders(folderChildrenIds)
-                        .onSuccess(res -> {
-                            List<Future<JsonObject>> foldersUpdate = new ArrayList<>();
-                            res.forEach(folderO -> {
-                                JsonObject folder = (JsonObject) folderO;
-                                JsonArray folderBoards = folder.getJsonArray(Field.BOARDIDS, new JsonArray());
-                                List<String> newBoardsIds = folderBoards.stream().filter(String.class::isInstance)
-                                        .map(String.class::cast)
-                                        .filter(bo -> !myBoards.contains(bo))
-                                        .collect(Collectors.toList());
-                                foldersUpdate.add(updateOldFolder(newBoardsIds));
-                            });
-                            FutureHelper.all(foldersUpdate)
-                                    .onSuccess(s -> promise.complete(new JsonObject()))
-                                    .onFailure(r -> promise.fail(r.getMessage()));
-                        }).onFailure(r -> promise.fail(r.getMessage()))).onFailure(r -> promise.fail(r.getMessage()));
-
-
-        return promise.future();
-    }
-
     @Override
     public Future<JsonArray> getFolders(List<String> folderChildrenIds) {
         Promise<JsonArray> promise = Promise.promise();
@@ -629,7 +682,7 @@ public class DefaultFolderService implements FolderService {
                 .compose(update -> {
 
                     Future<JsonObject> workspaceShareRights = this.serviceFactory.workSpaceService().setShareRights(boardIds, this.serviceFactory.shareService().getSharedJsonFromList(newFolderSharedRightsList));
-                    Future<JsonObject> updateNewFolderFuture = this.updateNewFolder(userId, boardIds, folderId);
+                    Future<JsonObject> updateNewFolderFuture = this.updateNewFolder(boardIds, folderId);
                     Future<List<JsonObject>> handleBoardSharedRightsFuture = this.updateBoardsSharedRights(oldFolderSharedRightsList, newFolderSharedRightsList);
 
                     return CompositeFuture.all(updateNewFolderFuture, handleBoardSharedRightsFuture, workspaceShareRights);
@@ -716,7 +769,7 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
-    private Future<JsonObject> updateNewFolder(String userId, List<String> boardIds, String folderId) {
+    private Future<JsonObject> updateNewFolder(List<String> boardIds, String folderId) {
         Promise<JsonObject> promise = Promise.promise();
 
         JsonObject query = new JsonObject()
@@ -728,6 +781,29 @@ public class DefaultFolderService implements FolderService {
                 MongoDbResult.validActionResultHandler(results -> {
                     if (results.isLeft()) {
                         String message = String.format("[Magneto@%s::updateNewFolder] Failed to move boards to folder",
+                                this.getClass().getSimpleName());
+                        log.error(String.format("%s : %s", message, results.left().getValue()));
+                        promise.fail(message);
+                        return;
+                    }
+                    promise.complete(results.right().getValue());
+                }));
+        return promise.future();
+    }
+    private Future<JsonObject> setBordersIds(List<String> boardIds, String folderId) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        log.info(folderId);
+        log.info(boardIds);
+        JsonObject query = new JsonObject()
+                .put(Field._ID, folderId);
+        JsonObject update = new JsonObject().put(Mongo.SET,
+                new JsonObject().put(Field.BOARDIDS, new JsonArray(boardIds)));
+
+        mongoDb.update(this.collection, query, update, true, false,
+                MongoDbResult.validActionResultHandler(results -> {
+                    if (results.isLeft()) {
+                        String message = String.format("[Magneto@%s::setFoldersIds] Failed to move boards to folder",
                                 this.getClass().getSimpleName());
                         log.error(String.format("%s : %s", message, results.left().getValue()));
                         promise.fail(message);

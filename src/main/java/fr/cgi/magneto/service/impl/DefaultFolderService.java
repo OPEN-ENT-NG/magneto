@@ -293,11 +293,6 @@ public class DefaultFolderService implements FolderService {
     }
     private Future<JsonArray> getBoardIfSameOwnerAsParent(List<String> boardsIds) {
         Promise<JsonArray> promise = Promise.promise();
-
-//        Map<String, JsonObject> folderIdsAccumulators = new HashMap<>();
-//        folderIdsAccumulators.put(Field.FOLDERIDS, new JsonObject().put(Mongo.PUSH, String.format("$%s", Field._ID)));
-
-
         JsonObject query = new MongoQuery(CollectionsConstant.BOARD_COLLECTION)
                 .match(new JsonObject()
                         .put(Field._ID, new JsonObject().put(Mongo.IN, boardsIds))

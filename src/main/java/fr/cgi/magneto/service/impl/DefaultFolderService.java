@@ -793,8 +793,6 @@ public class DefaultFolderService implements FolderService {
     private Future<JsonObject> setBordersIds(List<String> boardIds, String folderId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        log.info(folderId);
-        log.info(boardIds);
         JsonObject query = new JsonObject()
                 .put(Field._ID, folderId);
         JsonObject update = new JsonObject().put(Mongo.SET,

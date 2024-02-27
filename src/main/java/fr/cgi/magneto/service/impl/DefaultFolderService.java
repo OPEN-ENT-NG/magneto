@@ -255,16 +255,15 @@ public class DefaultFolderService implements FolderService {
                     if (restore) {
                         return this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, true);
                     } else {
-                        return handePreDeleteBoards(ownerId, childrenIds);
+                        return handlePreDeleteBoards(ownerId, childrenIds);
                     }
                 })
                 .onFailure(promise::fail)
                 .onSuccess(promise::complete);
-
         return promise.future();
     }
 
-    private Future<JsonObject> handePreDeleteBoards(String ownerId, List<String> childrenIds) {
+    private Future<JsonObject> handlePreDeleteBoards(String ownerId, List<String> childrenIds) {
         Promise<JsonObject> promise = Promise.promise();
         AtomicReference<JsonObject> result = new AtomicReference<>(new JsonObject());
 
@@ -298,7 +297,7 @@ public class DefaultFolderService implements FolderService {
         List<Future<JsonObject>> futures = new ArrayList<>();
         folderBoardsIdMap.forEach((folderId, boardsIds) -> futures.add(setBoardsIds(boardsIds, folderId)));
         FutureHelper.all(futures)
-                .onSuccess(t -> promise.complete())
+                .onSuccess(res -> promise.complete())
                 .onFailure(promise::fail);
         return promise.future();
     }

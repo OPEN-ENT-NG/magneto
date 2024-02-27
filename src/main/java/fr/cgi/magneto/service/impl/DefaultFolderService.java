@@ -358,7 +358,6 @@ public class DefaultFolderService implements FolderService {
                         return this.preDeleteFolders(folderIds);
                     })
                     .compose(r -> this.getBoardIdsInFolders(folderIds))
-//                    .compose(boardsIds -> this.updateBoardsFromFolder(folderIds, ownerId, boardsIds))
                     .onFailure(promise::fail)
                     .onSuccess(t ->promise.complete(new JsonObject()));
         }

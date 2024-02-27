@@ -272,14 +272,14 @@ public class DefaultFolderService implements FolderService {
                     result.set(boardsIds);
                     return getBoardIfSameOwnerAsParent(childrenIds);
                 })
-                .compose(this::updateFoldersBoardsIds)
+                .compose(res -> this.updateFoldersBoardsIds(res, childrenIds))
                 .onFailure(promise::fail)
                 .onSuccess(ignored -> promise.complete(result.get()));
 
         return promise.future();
     }
 
-    private Future<Void> updateFoldersBoardsIds(JsonArray boardsWithFolder) {
+    private Future<Void> updateFoldersBoardsIds(JsonArray boardsWithFolder, List<String> foldersIds) {
         Promise<Void> promise = Promise.promise();
         Map<String, List<String>> folderBoardsIdMap = new HashMap<>();
         boardsWithFolder.stream()
@@ -296,7 +296,11 @@ public class DefaultFolderService implements FolderService {
                     folderBoardsIdMap.put(boardWithFolder.getString(Field.FOLDERID), boardsIds);
                 });
         List<Future<JsonObject>> futures = new ArrayList<>();
-        folderBoardsIdMap.forEach((folderId, boardsIds) -> futures.add(setBoardsIds(boardsIds, folderId)));
+        foldersIds.forEach(folderId -> futures.add(
+                (folderBoardsIdMap.containsKey(folderId))
+                        ? setBoardsIds(folderBoardsIdMap.get(folderId), folderId)
+                        : setBoardsIds(new ArrayList<>(), folderId)
+        ));
         FutureHelper.all(futures)
                 .onSuccess(res -> promise.complete())
                 .onFailure(promise::fail);

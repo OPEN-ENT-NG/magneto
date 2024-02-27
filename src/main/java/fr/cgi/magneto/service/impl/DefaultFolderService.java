@@ -324,7 +324,7 @@ public class DefaultFolderService implements FolderService {
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(results -> {
             if (results.isLeft()) {
-                String message = String.format("[Magneto@%s::getFolderIfNotSameOwnerAsParent] Failed to get folders that do not have same owner as parent: ",
+                String message = String.format("[Magneto@%s::getBoardIfSameOwnerAsParent] Failed to get folders that do not have same owner as parent: ",
                         this.getClass().getSimpleName());
                 log.error(String.format("%s : %s", message, results.left().getValue()));
                 promise.fail(message);

@@ -278,6 +278,7 @@ public class DefaultFolderService implements FolderService {
 
         return promise.future();
     }
+
     private Future<Void> updateFoldersBoardsIds(JsonArray boardsWithFolder) {
         Promise<Void> promise = Promise.promise();
         Map<String, List<String>> folderBoardsIdMap = new HashMap<>();

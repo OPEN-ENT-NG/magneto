@@ -24,6 +24,7 @@ import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class DefaultFolderService implements FolderService {
@@ -248,42 +249,52 @@ public class DefaultFolderService implements FolderService {
     private Future<JsonObject> preDeleteBoardsInFolderWithChildren(List<String> folderIds, boolean restore, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        if (restore) {
-            this.getFolderChildrenIds(folderIds)
-                    .compose(this::getBoardIdsInFolders)
-                    .compose(childrenIds -> this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, true))
-                    .onFailure(promise::fail)
-                    .onSuccess(promise::complete);
-        } else {
-            this.getFolderChildrenIds(folderIds)
-                    .compose(this::getBoardIdsInFolders)
-                    .onSuccess(childrenIds -> {
-                        Future<JsonObject> preDeleteBoardsFuture = this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, false);
-                        preDeleteBoardsFuture
-                                .compose(t -> getBoardIfSameOwnerAsParent(childrenIds))
-                                .compose(this::updateFoldersBoardsIds)
-                                .onSuccess(t -> promise.complete(preDeleteBoardsFuture.result()));
-                    })
-                    .onFailure(promise::fail);
-        }
+        this.getFolderChildrenIds(folderIds)
+                .compose(this::getBoardIdsInFolders)
+                .compose(childrenIds -> {
+                    if (restore) {
+                        return this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, true);
+                    } else {
+                        return handePreDeleteBoards(ownerId, childrenIds);
+                    }
+                })
+                .onFailure(promise::fail)
+                .onSuccess(promise::complete);
+
         return promise.future();
     }
 
-    Future<Void> updateFoldersBoardsIds(JsonArray boardsWithFolder) {
+    private Future<JsonObject> handePreDeleteBoards(String ownerId, List<String> childrenIds) {
+        Promise<JsonObject> promise = Promise.promise();
+        AtomicReference<JsonObject> result = new AtomicReference<>(new JsonObject());
+
+        this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, false)
+                .compose(boardsIds -> {
+                    result.set(boardsIds);
+                    return getBoardIfSameOwnerAsParent(childrenIds);
+                })
+                .compose(this::updateFoldersBoardsIds)
+                .onFailure(promise::fail)
+                .onSuccess(ignored -> promise.complete(result.get()));
+
+        return promise.future();
+    }
+    private Future<Void> updateFoldersBoardsIds(JsonArray boardsWithFolder) {
         Promise<Void> promise = Promise.promise();
         Map<String, List<String>> folderBoardsIdMap = new HashMap<>();
-        boardsWithFolder.forEach(boardWithFolderO -> {
-            JsonObject boardWithFolder = (JsonObject) boardWithFolderO;
-            if (boardWithFolder.containsKey(Field.OWNERID) && boardWithFolder.containsKey(Field.FOLDERID)
-                    && !boardWithFolder.getString(Field.FOLDERID).isEmpty()) {
-                List<String> boardsIds = new ArrayList<>();
-                if (folderBoardsIdMap.containsKey(boardWithFolder.getString(Field.FOLDERID))) {
-                    boardsIds = folderBoardsIdMap.get(boardWithFolder.getString(Field.FOLDERID));
-                }
-                boardsIds.add(boardWithFolder.getString(Field._ID));
-                folderBoardsIdMap.put(boardWithFolder.getString(Field.FOLDERID), boardsIds);
-            }
-        });
+        boardsWithFolder.stream()
+                .filter(JsonObject.class::isInstance)
+                .map(JsonObject.class::cast)
+                .filter(boardWithFolder -> boardWithFolder.containsKey(Field.OWNERID) && boardWithFolder.containsKey(Field.FOLDERID)
+                        && !boardWithFolder.getString(Field.FOLDERID).isEmpty())
+                .forEach(boardWithFolder -> {
+                    List<String> boardsIds = new ArrayList<>();
+                    if (folderBoardsIdMap.containsKey(boardWithFolder.getString(Field.FOLDERID))) {
+                        boardsIds = folderBoardsIdMap.get(boardWithFolder.getString(Field.FOLDERID));
+                    }
+                    boardsIds.add(boardWithFolder.getString(Field._ID));
+                    folderBoardsIdMap.put(boardWithFolder.getString(Field.FOLDERID), boardsIds);
+                });
         List<Future<JsonObject>> futures = new ArrayList<>();
         folderBoardsIdMap.forEach((folderId, boardsIds) -> futures.add(setBoardsIds(boardsIds, folderId)));
         FutureHelper.all(futures)
@@ -291,6 +302,7 @@ public class DefaultFolderService implements FolderService {
                 .onFailure(promise::fail);
         return promise.future();
     }
+
     private Future<JsonArray> getBoardIfSameOwnerAsParent(List<String> boardsIds) {
         Promise<JsonArray> promise = Promise.promise();
         JsonObject query = new MongoQuery(CollectionsConstant.BOARD_COLLECTION)
@@ -354,7 +366,7 @@ public class DefaultFolderService implements FolderService {
                     })
                     .compose(r -> this.getBoardIdsInFolders(folderIds))
                     .onFailure(promise::fail)
-                    .onSuccess(t ->promise.complete(new JsonObject()));
+                    .onSuccess(result ->promise.complete(new JsonObject()));
         }
         return promise.future();
     }

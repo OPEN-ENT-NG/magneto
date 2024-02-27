@@ -287,14 +287,15 @@ class Controller implements ng.IController, IViewModel {
                 return !isTargetAlreadyMyParent && !isTargetMyself && !isArchivedItem && !isPublicTarget;
             },
             async dragDropHandler(event: DragEvent, content?: any): Promise<void> {
-                let originalBoard: Board = that.selectedBoards[0];
+                let originalBoard: Board = !!that.selectedBoards[0] ? that.selectedBoards[0]
+                    : that.getDragAndDropBoardData(that, new Board().build(JSON.parse(event.dataTransfer.getData("application/json"))));
                 let targetItem: Folder = angular.element(event.srcElement).scope().vm.folder
                     || new Folder().navItemToFolder(angular.element(event.srcElement).scope().vm.folderTree);
 
                 that.dragAndDropInitialFolder = !!originalBoard.folderId ? that.folders.find((folder: Folder) => folder.id == originalBoard.folderId)
                     : new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: model.me.userId, title: MAIN_PAGE_TITLE, parentId: undefined});
 
-                if (!that.isOwnerOfSelectedBoards()) { //not board owner
+                if ((!!that.selectedBoards[0] && !that.isOwnerOfSelectedBoards()) || (originalBoard.owner.userId != model.me.userId)) { //not board owner
                     that.handleNoRightsDragAndDrop(that, originalBoard, targetItem);
                     return ;
                 } else if ((ShareUtils.folderOwnerNotShared(that.dragAndDropInitialFolder) || ShareUtils.folderOwnerAndSharedOrShareRights(that.dragAndDropInitialFolder))
@@ -319,6 +320,10 @@ class Controller implements ng.IController, IViewModel {
                 }
             }
         };
+    }
+
+    getDragAndDropBoardData = (that: this, boardData: Board): Board => {
+        return that.boards.find((board: Board) => board.id == boardData.id);
     }
 
     handleNoRightsDragAndDrop = (that: this, originalBoard: Board, targetItem: Folder) => {

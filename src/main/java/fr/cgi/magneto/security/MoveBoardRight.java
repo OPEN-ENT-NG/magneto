@@ -26,13 +26,23 @@ public class MoveBoardRight implements ResourcesProvider {
                         .put(Field._ID, new JsonObject().put(Mongo.IN, boardIds))
                         .put(Field.OWNERID, user.getUserId());
                 MongoAppFilter.executeCountQuery(request, CollectionsConstant.BOARD_COLLECTION, isBoardsOwner, boardIds.size(), boardResult -> {
-                    if (Boolean.FALSE.equals(boardResult)) {
-                        handler.handle(false);
-                        return;
-                    }
-                    //is folder owner or shared with publish rights
                     JsonObject destinationFolderRights = new JsonObject();
-                    ShareHelper.checkFolderShareRightsQuery(user, folderId, destinationFolderRights, Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT);
+                    if (Boolean.FALSE.equals(boardResult)) { //not board owner
+                        //is main folder or folder not shared and owner is user
+                        destinationFolderRights
+                                .put(Field._ID, folderId)
+                                .put(Field.OWNERID, user.getUserId())
+                                .put(Mongo.OR, new JsonArray()
+                                        .add(new JsonObject().put(Field.SHARED, new JsonObject()
+                                                .put(Mongo.EXISTS, false)))
+                                        .add(new JsonObject().put(Field.SHARED, new JsonObject()
+                                                .put(Mongo.SIZE, 0))));
+                    } else { //board owner
+                        //is folder owner or shared with publish rights
+                        ShareHelper.checkFolderShareRightsQuery(user, folderId, destinationFolderRights, Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT);
+                    }
+
+
                     MongoAppFilter.executeCountQuery(request, CollectionsConstant.FOLDER_COLLECTION, destinationFolderRights, 1, folderResult -> {
                         handler.handle(Boolean.TRUE.equals(folderResult) && WorkflowHelper.hasRight(user, Rights.MANAGE_BOARD));
                     });

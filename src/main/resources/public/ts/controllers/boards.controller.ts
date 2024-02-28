@@ -295,7 +295,10 @@ class Controller implements ng.IController, IViewModel {
                 that.dragAndDropInitialFolder = !!originalBoard.folderId ? that.folders.find((folder: Folder) => folder.id == originalBoard.folderId)
                     : new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: model.me.userId, title: MAIN_PAGE_TITLE, parentId: undefined});
 
-                if ((!!that.selectedBoards[0] && !that.isOwnerOfSelectedBoards()) || (originalBoard.owner.userId != model.me.userId)) { //not board owner
+                if (ShareUtils.folderOwnerNotShared(that.dragAndDropInitialFolder) && ShareUtils.folderOwnerNotShared(targetItem)) { //not board owner
+                    //initial folder owner + not shared, target folder owner + not shared --> no board owner check
+                    await that.proceedOnDragAndDrop(originalBoard, targetItem);
+                }  else if ((!!that.selectedBoards[0] && !that.isOwnerOfSelectedBoards()) || (originalBoard.owner.userId != model.me.userId)) { //not board owner
                     that.handleNoRightsDragAndDrop(that, originalBoard, targetItem);
                     return ;
                 } else if ((ShareUtils.folderOwnerNotShared(that.dragAndDropInitialFolder) || ShareUtils.folderOwnerAndSharedOrShareRights(that.dragAndDropInitialFolder))
@@ -312,9 +315,6 @@ class Controller implements ng.IController, IViewModel {
                     that.dragAndDropTarget = targetItem;
                     that.displayExitSharedFolderWarningLightbox = true;
                     safeApply(that.$scope);
-                } else if (ShareUtils.folderOwnerNotShared(that.dragAndDropInitialFolder) && ShareUtils.folderOwnerNotShared(targetItem)) {
-                    //initial folder owner + not shared, target folder owner + not shared
-                    await that.proceedOnDragAndDrop(originalBoard, targetItem);
                 } else {
                     that.handleNoRightsDragAndDrop(that, originalBoard, targetItem);
                 }

@@ -31,7 +31,6 @@ public class DefaultShareService implements ShareService {
     public Future<JsonObject> upsertSharedArray(String id, JsonObject share, String collection, boolean checkOldRights) {
         Promise<JsonObject> promise = Promise.promise();
         JsonArray newShare = toMongoBasicShareFormat(share);
-        JsonObject query = new JsonObject().put(Field._ID, id);
 
         if (checkOldRights) {
             getOldDataToUpdate(id, collection).onSuccess(success -> {
@@ -40,10 +39,10 @@ public class DefaultShareService implements ShareService {
                     newShare.add(sharedElem.toJson());
                 });
 
-                updateMongo(collection, promise, query, newShare);
+                updateMongo(collection, promise, id, newShare);
             });
         } else {
-            updateMongo(collection, promise, query, newShare);
+            updateMongo(collection, promise, id, newShare);
         }
 
         return promise.future();
@@ -53,7 +52,6 @@ public class DefaultShareService implements ShareService {
     public Future<JsonObject> upsertSharedArray(String id, List<SharedElem> newShare, List<SharedElem> deletedShares, String collection, boolean checkOldRights) {
         Promise<JsonObject> promise = Promise.promise();
 
-        JsonObject query = new JsonObject().put(Field._ID, id);
         JsonArray shares = new JsonArray();
 
         if (checkOldRights) {
@@ -77,17 +75,19 @@ public class DefaultShareService implements ShareService {
                         shares.add(sharedElem.toJson());
                     }
                 });
-                updateMongo(collection, promise, query, shares);
+                updateMongo(collection, promise, id, shares);
             });
         } else {
             newShare.forEach(elem -> shares.add(elem.toJson()));
-            updateMongo(collection, promise, query, shares);
+            updateMongo(collection, promise, id, shares);
         }
 
         return promise.future();
     }
 
-    private void updateMongo(String collection, Promise<JsonObject> promise, JsonObject query, JsonArray newShare) {
+    private void updateMongo(String collection, Promise<JsonObject> promise, String id, JsonArray newShare) {
+        JsonObject query = new JsonObject().put(Field._ID, id).put(Field.DELETED, false);
+
         JsonObject update = new JsonObject()
                 .put(Mongo.SET, new JsonObject()
                         .put(Field.SHARED, newShare));

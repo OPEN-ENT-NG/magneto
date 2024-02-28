@@ -249,13 +249,15 @@ public class DefaultFolderService implements FolderService {
     private Future<JsonObject> preDeleteBoardsInFolderWithChildren(List<String> folderIds, boolean restore, String ownerId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        this.getFolderChildrenIds(folderIds)
+        Future<List<String>> foldersFuture = getFolderChildrenIds(folderIds);
+        foldersFuture
                 .compose(this::getBoardIdsInFolders)
                 .compose(childrenIds -> {
                     if (restore) {
                         return this.serviceFactory.boardService().preDeleteBoards(ownerId, childrenIds, true);
                     } else {
-                        return handlePreDeleteBoards(ownerId, childrenIds);
+                        folderIds.addAll(foldersFuture.result());
+                        return handlePreDeleteBoards(ownerId, childrenIds, folderIds);
                     }
                 })
                 .onFailure(promise::fail)
@@ -263,7 +265,7 @@ public class DefaultFolderService implements FolderService {
         return promise.future();
     }
 
-    private Future<JsonObject> handlePreDeleteBoards(String ownerId, List<String> childrenIds) {
+    private Future<JsonObject> handlePreDeleteBoards(String ownerId, List<String> childrenIds, List<String> folderIds) {
         Promise<JsonObject> promise = Promise.promise();
         AtomicReference<JsonObject> result = new AtomicReference<>(new JsonObject());
 
@@ -272,7 +274,7 @@ public class DefaultFolderService implements FolderService {
                     result.set(boardsIds);
                     return getBoardIfSameOwnerAsParent(childrenIds);
                 })
-                .compose(res -> this.updateFoldersBoardsIds(res, childrenIds))
+                .compose(res -> this.updateFoldersBoardsIds(res, folderIds))
                 .onFailure(promise::fail)
                 .onSuccess(ignored -> promise.complete(result.get()));
 
@@ -808,7 +810,7 @@ public class DefaultFolderService implements FolderService {
         JsonObject update = new JsonObject().put(Mongo.SET,
                 new JsonObject().put(Field.BOARDIDS, new JsonArray(boardIds)));
 
-        mongoDb.update(this.collection, query, update, true, false,
+        mongoDb.update(this.collection, query, update, false, false,
                 MongoDbResult.validActionResultHandler(results -> {
                     if (results.isLeft()) {
                         String message = String.format("[Magneto@%s::setBoardsIds] Failed to set boardsId to folder",

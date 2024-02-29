@@ -99,7 +99,7 @@ class Controller implements IViewModel {
 
 function directive() {
     return {
-        replace: true,
+        replace: false,
         restrict: 'E',
         templateUrl: `${RootsConst.directive}card-list/card-preview-image.html`,
         scope: {

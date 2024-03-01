@@ -16,7 +16,7 @@
         <i18n>magneto.folder.share.warning</i18n>
     </div>
 
-    <div class="sharePanel-warning" ng-if="vm.parentFolderIsShared()">
+    <div class="sharePanel-warning sharePanel-warning-restrict " ng-if="vm.parentFolderIsShared()">
         <div>[[vm.translate('magneto.share.warning', vm.parentFolder.title)]]</div>
     </div>
 </lightbox>

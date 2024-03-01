@@ -604,6 +604,11 @@ public class DefaultBoardService implements BoardService {
         return query.getAggregate();
     }
 
+    /**
+     * génerate the match to get boards from main page
+     * @param user
+     * @param query
+     */
     private static void filterBoardWithoutFolder(UserInfos user, MongoQuery query) {
         JsonObject folderIdMatch = new JsonObject().putNull(String.format("%s.%s", Field.FOLDERID, Field._ID));
         JsonObject userRequest = new JsonObject()
@@ -613,12 +618,20 @@ public class DefaultBoardService implements BoardService {
                                         .put(Field.USERID, user.getUserId()))));
 
         JsonObject checkGroupRequest = new JsonObject()
-                .put(String.format("%s.%s.%s",Field.FOLDERID,Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.NIN, user.getGroupsIds()));
+                .put(String.format("%s.%s.%s", Field.FOLDERID, Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.NIN, user.getGroupsIds()));
 
         JsonObject notUserFolder = new JsonObject()
                 .put(String.format("%s.%s", Field.FOLDERID, Field.OWNERID),
                         new JsonObject().put(Mongo.NE, user.getUserId()));
-        JsonObject andCondition = new JsonObject().put(Mongo.AND, new JsonArray().add(userRequest).add(checkGroupRequest).add(notUserFolder));
+        JsonObject folderNotShared = new JsonObject().put(String.format("%s,%s", Field.FOLDERID, Field.SHARED),
+                new JsonObject().put(Mongo.EXISTS, true).put(Mongo.NE, new JsonArray()));
+
+        JsonObject folderNotOwned = new JsonObject().put(Field.OWNERID, String.format("$%s.$%s", Field.FOLDERID, Field.OWNERID));
+
+        JsonObject filterPreviousBoardsInForeignFolders = new JsonObject().put(Mongo.AND, new JsonArray().add(folderNotShared).add(folderNotOwned));
+        JsonObject andCondition = new JsonObject().put(Mongo.AND,
+                new JsonArray().add(userRequest).add(checkGroupRequest).add(notUserFolder).add(filterPreviousBoardsInForeignFolders));
+
         query.matchOr(new JsonArray().add(folderIdMatch).add(andCondition));
     }
 

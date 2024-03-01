@@ -3,6 +3,8 @@
     text-align: center;
     font-style: italic;
     padding-bottom: 3%;
-    color: $magneto-red;
+    &-restrict{
+      color: $magneto-red;
+    }
   }
 }

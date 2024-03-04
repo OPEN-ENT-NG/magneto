@@ -517,40 +517,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.NBCARDS, new JsonObject().put(Mongo.SIZE, String.format("$%s", Field.CARDIDS)))
                             .put(Field.NBCARDSSECTIONS, 1)
                             .put(Field.MODIFICATIONDATE, 1)
-                            .put(Field.FOLDERID, new JsonObject().put(Mongo.FILTER,
-                                    new JsonObject()
-                                            .put(Mongo.INPUT, String.format("$%s", Field.FOLDERS))
-                                            .put(Mongo.AS, Field.FOLDER)
-                                            .put(Mongo.COND,
-                                                    new JsonObject().put(Mongo.AND, new JsonArray()
-                                                            .add(new JsonObject().put(Mongo.OR, new JsonArray()
-                                                                    .add(new JsonObject().put(Mongo.EQ, new JsonArray() //user is owner
-                                                                            .add(String.format("$$%s.%s", Field.FOLDER, Field.OWNERID))
-                                                                            .add(user.getUserId())))
-                                                                    .add(new JsonObject() //share field exists and is not empty
-                                                                            .put(Field.FOLDER, new JsonObject()
-                                                                                    .put(Field.SHARED, new JsonObject()
-                                                                                            .put(Mongo.OR, new JsonArray() //shared with user or user group
-                                                                                                    .add(new JsonObject()
-                                                                                                            .put(Mongo.IN, new JsonArray()
-                                                                                                                    .add(Field.USERID)
-                                                                                                                    .add(new JsonArray().add(user.getUserId())))
-                                                                                                    )
-                                                                                                    .add(new JsonObject()
-                                                                                                                    .put(Mongo.IN, new JsonArray()
-                                                                                                                            .add(Field.GROUPID)
-                                                                                                                            .add(new JsonArray().add(user.getGroupsIds())))
-                                                                                                    )
-                                                                                            )
-                                                                                    )
-                                                                            )
-                                                                    )
-                                                            ))
-                                                            .add(new JsonObject().put(Mongo.EQ, new JsonArray()
-                                                                    .add(String.format("$$%s.%s", Field.FOLDER, Field.DELETED))
-                                                                    .add(String.format("$%s", Field.DELETED)))))
-                                                    )
-                            ))
+                            .put(Field.FOLDERID, getFolderFiltersForGetBoards(user))
                             .put(Field.DESCRIPTION, 1)
                             .put(Field.OWNERID, 1)
                             .put(Field.OWNERNAME, 1)
@@ -604,6 +571,52 @@ public class DefaultBoardService implements BoardService {
         return query.getAggregate();
     }
 
+    private static JsonObject getFolderFiltersForGetBoards(UserInfos user) {
+        JsonObject sharedCheck = new JsonObject() //share field exists and is not empty
+                .put(Field.FOLDER, new JsonObject()
+                        .put(Field.SHARED, new JsonObject()
+                                .put(Mongo.OR, new JsonArray() //shared with user or user group
+                                        .add(new JsonObject()
+                                                .put(Mongo.IN, new JsonArray()
+                                                        .add(Field.USERID)
+                                                        .add(new JsonArray().add(user.getUserId())))
+                                        )
+                                        .add(new JsonObject()
+                                                .put(Mongo.IN, new JsonArray()
+                                                        .add(Field.GROUPID)
+                                                        .add(new JsonArray().add(user.getGroupsIds())))
+                                        )
+                                )
+                        )
+                );
+
+
+        JsonObject checkNull = new JsonObject().put(Mongo.IFNULL, new JsonArray().add(String.format("$$%s.%s", Field.FOLDER, Field.SHARED)).add(false));
+        JsonObject checkEmpty = new JsonObject().put(Mongo.NE,
+                new JsonArray().add(new JsonObject().put(String.format("$%s", Field.SIZE),
+                        new JsonObject().put(Mongo.IFNULL,
+                                new JsonArray().add(String.format("$$%s.%s", Field.FOLDER, Field.SHARED)).add(false))))
+                        .add(0));
+        JsonObject andCheckShared = new JsonObject().put(Mongo.AND, new JsonArray().add(checkNull).add(checkEmpty).add(sharedCheck));
+        return new JsonObject().put(Mongo.FILTER,
+                new JsonObject()
+                        .put(Mongo.INPUT, String.format("$%s", Field.FOLDERS))
+                        .put(Mongo.AS, Field.FOLDER)
+                        .put(Mongo.COND,
+                                new JsonObject().put(Mongo.AND, new JsonArray()
+                                        .add(new JsonObject().put(Mongo.OR, new JsonArray()
+                                                .add(new JsonObject().put(Mongo.EQ, new JsonArray() //user is owner
+                                                        .add(String.format("$$%s.%s", Field.FOLDER, Field.OWNERID))
+                                                        .add(user.getUserId())))
+                                                .add(andCheckShared)
+                                        ))
+                                        .add(new JsonObject().put(Mongo.EQ, new JsonArray()
+                                                .add(String.format("$$%s.%s", Field.FOLDER, Field.DELETED))
+                                                .add(String.format("$%s", Field.DELETED)))))
+                        )
+        );
+    }
+
     /**
      * génerate the match to get boards from main page
      * @param user
@@ -623,7 +636,7 @@ public class DefaultBoardService implements BoardService {
         JsonObject notUserFolder = new JsonObject()
                 .put(String.format("%s.%s", Field.FOLDERID, Field.OWNERID),
                         new JsonObject().put(Mongo.NE, user.getUserId()));
-        JsonObject folderNotShared = new JsonObject().put(String.format("%s,%s", Field.FOLDERID, Field.SHARED),
+        JsonObject folderNotShared = new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field.SHARED),
                 new JsonObject().put(Mongo.EXISTS, true).put(Mongo.NE, new JsonArray()));
 
         JsonObject folderNotOwned = new JsonObject().put(Field.OWNERID, String.format("$%s.$%s", Field.FOLDERID, Field.OWNERID));

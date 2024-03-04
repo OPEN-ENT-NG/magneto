@@ -134,6 +134,10 @@
       width: 60px;
     }
 
+    .cardListMinHeight {
+      min-height: 1000px;
+    }
+
     &-list {
       width: 100%;
       overflow-x: auto;

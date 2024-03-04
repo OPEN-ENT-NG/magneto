@@ -80,7 +80,7 @@
             </board-nav>
         </div>
 
-        <div class="cell boardContainer-container-body-list scrollbar">
+        <div class="cell boardContainer-container-body-list scrollbar" ng-class="{'cardListMinHeight': vm.notEmptyAndLayoutFree()}">
             <dropzone-overlay on-import="vm.draggable.dragDropFilesHandler($event)" can-drop="vm.board.myRights.publish !== undefined"
                               ng-if="vm.isDraggable">
             </dropzone-overlay>

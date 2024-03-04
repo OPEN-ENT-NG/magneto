@@ -101,6 +101,8 @@ interface IViewModel extends ng.IController {
 
     resetBoardView(): Promise<void>;
 
+    notEmptyAndLayoutFree(): boolean;
+
     onScroll(): void;
 
     resetCards(): void;
@@ -365,6 +367,10 @@ class Controller implements IViewModel {
         this.resetCards();
         await Promise.all([this.getCards(), this.getBoard()]);
         safeApply(this.$scope);
+    }
+
+    notEmptyAndLayoutFree(): boolean {
+        return this.cards.length > 0 && this.board.isLayoutFree();
     }
 
     initDraggable = (): void => {

@@ -69,4 +69,5 @@ public class Mongo {
 
     public static final String RESTRICT_SEARCH_WITH_MATCH = "restrictSearchWithMatch";
     public static final String IFNULL =  "$ifNull";
+    public static final String GT = "$gt";
 }

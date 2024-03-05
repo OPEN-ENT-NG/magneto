@@ -274,9 +274,9 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
-    public Future<JsonObject> restoreBoards(String userId, List<String> boardIds){
+    public Future<JsonObject> restoreBoards(String userId, List<String> boardIds) {
         Promise<JsonObject> promise = Promise.promise();
-        Future<JsonObject> preDeleteBoardsFuture = preDeleteBoards(userId,boardIds,true);
+        Future<JsonObject> preDeleteBoardsFuture = preDeleteBoards(userId, boardIds, true);
         preDeleteBoardsFuture.compose(r -> this.handleInsertSharedArrayFromFolder(boardIds))
                 .onSuccess(success -> promise.complete(preDeleteBoardsFuture.result()))
                 .onFailure(promise::fail);
@@ -284,10 +284,10 @@ public class DefaultBoardService implements BoardService {
         return promise.future();
     }
 
-    private  Future<Void> handleInsertSharedArrayFromFolder(List<String> boardIds) {
-        Promise<Void> promise= Promise.promise();
-        List<Future<Void>> futures= new ArrayList<>();
-        boardIds.forEach(id ->{
+    private Future<Void> handleInsertSharedArrayFromFolder(List<String> boardIds) {
+        Promise<Void> promise = Promise.promise();
+        List<Future<Void>> futures = new ArrayList<>();
+        boardIds.forEach(id -> {
             futures.add(insertSharedArrayFromFolder(id));
         });
         FutureHelper.all(futures)
@@ -517,40 +517,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.NBCARDS, new JsonObject().put(Mongo.SIZE, String.format("$%s", Field.CARDIDS)))
                             .put(Field.NBCARDSSECTIONS, 1)
                             .put(Field.MODIFICATIONDATE, 1)
-                            .put(Field.FOLDERID, new JsonObject().put(Mongo.FILTER,
-                                    new JsonObject()
-                                            .put(Mongo.INPUT, String.format("$%s", Field.FOLDERS))
-                                            .put(Mongo.AS, Field.FOLDER)
-                                            .put(Mongo.COND,
-                                                    new JsonObject().put(Mongo.AND, new JsonArray()
-                                                            .add(new JsonObject().put(Mongo.OR, new JsonArray()
-                                                                    .add(new JsonObject().put(Mongo.EQ, new JsonArray() //user is owner
-                                                                            .add(String.format("$$%s.%s", Field.FOLDER, Field.OWNERID))
-                                                                            .add(user.getUserId())))
-                                                                    .add(new JsonObject() //share field exists and is not empty
-                                                                            .put(Field.FOLDER, new JsonObject()
-                                                                                    .put(Field.SHARED, new JsonObject()
-                                                                                            .put(Mongo.OR, new JsonArray() //shared with user or user group
-                                                                                                    .add(new JsonObject()
-                                                                                                            .put(Mongo.IN, new JsonArray()
-                                                                                                                    .add(Field.USERID)
-                                                                                                                    .add(new JsonArray().add(user.getUserId())))
-                                                                                                    )
-                                                                                                    .add(new JsonObject()
-                                                                                                                    .put(Mongo.IN, new JsonArray()
-                                                                                                                            .add(Field.GROUPID)
-                                                                                                                            .add(new JsonArray().add(user.getGroupsIds())))
-                                                                                                    )
-                                                                                            )
-                                                                                    )
-                                                                            )
-                                                                    )
-                                                            ))
-                                                            .add(new JsonObject().put(Mongo.EQ, new JsonArray()
-                                                                    .add(String.format("$$%s.%s", Field.FOLDER, Field.DELETED))
-                                                                    .add(String.format("$%s", Field.DELETED)))))
-                                                    )
-                            ))
+                            .put(Field.FOLDERID, getFolderFiltersForGetBoards(user))
                             .put(Field.DESCRIPTION, 1)
                             .put(Field.OWNERID, 1)
                             .put(Field.OWNERNAME, 1)
@@ -595,7 +562,7 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.DISPLAY_NB_FAVORITES, 1));
         if (getCount) {
             query = query.count();
-        }else{
+        } else {
             if (page != null) {
                 query.page(page);
             }
@@ -604,6 +571,60 @@ public class DefaultBoardService implements BoardService {
         return query.getAggregate();
     }
 
+    private static JsonObject getFolderFiltersForGetBoards(UserInfos user) {
+        JsonObject sharedCheck = new JsonObject() //share field exists and is not empty
+                .put(Mongo.GT, new JsonArray().add(
+                                new JsonObject().put(Mongo.SIZE,
+                                        new JsonObject().put(Mongo.FILTER,
+                                                new JsonObject().put(Mongo.INPUT, String.format("$$%s.%s", Field.FOLDER, Field.SHARED))
+                                                        .put(Mongo.AS, Field.ALLFOLDERS)
+                                                        .put(Mongo.COND, new JsonObject().put(Mongo.OR,
+                                                                new JsonArray()
+                                                                        .add(new JsonObject().put(Mongo.EQ, new JsonArray()
+                                                                                        .add(String.format("$$%s.%s", Field.ALLFOLDERS, Field.USERID))
+                                                                                        .add(user.getUserId())
+                                                                                )
+                                                                        ).add(new JsonObject().put(Mongo.IN, new JsonArray()
+                                                                                        .add(String.format("$$%s.%s", Field.ALLFOLDERS, Field.GROUPID))
+                                                                                        .add(user.getGroupsIds())
+                                                                                )
+                                                                        )
+                                                        )))))
+                        .add(0)
+                );
+
+        JsonObject checkNull = new JsonObject().put(Mongo.IFNULL, new JsonArray().add(String.format("$$%s.%s", Field.FOLDER, Field.SHARED)).add(false));
+        JsonObject checkEmpty = new JsonObject().put(Mongo.NE,
+                new JsonArray().add(new JsonObject().put(String.format("$%s", Field.SIZE),
+                                new JsonObject().put(Mongo.IFNULL,
+                                        new JsonArray().add(String.format("$$%s.%s", Field.FOLDER, Field.SHARED)).add(false))))
+                        .add(0));
+        JsonObject andCheckShared = new JsonObject().put(Mongo.AND, new JsonArray().add(checkNull).add(checkEmpty).add(sharedCheck));
+        return new JsonObject().put(Mongo.FILTER,
+                new JsonObject()
+                        .put(Mongo.INPUT, String.format("$%s", Field.FOLDERS))
+                        .put(Mongo.AS, Field.FOLDER)
+                        .put(Mongo.COND,
+                                new JsonObject().put(Mongo.AND, new JsonArray()
+                                        .add(new JsonObject().put(Mongo.OR, new JsonArray()
+                                                .add(new JsonObject().put(Mongo.EQ, new JsonArray() //user is owner
+                                                        .add(String.format("$$%s.%s", Field.FOLDER, Field.OWNERID))
+                                                        .add(user.getUserId())))
+                                                .add(andCheckShared)
+                                        ))
+                                        .add(new JsonObject().put(Mongo.EQ, new JsonArray()
+                                                .add(String.format("$$%s.%s", Field.FOLDER, Field.DELETED))
+                                                .add(String.format("$%s", Field.DELETED)))))
+                        )
+        );
+    }
+
+    /**
+     * génerate the match to get boards from main page
+     *
+     * @param user
+     * @param query
+     */
     private static void filterBoardWithoutFolder(UserInfos user, MongoQuery query) {
         JsonObject folderIdMatch = new JsonObject().putNull(String.format("%s.%s", Field.FOLDERID, Field._ID));
         JsonObject userRequest = new JsonObject()
@@ -613,12 +634,20 @@ public class DefaultBoardService implements BoardService {
                                         .put(Field.USERID, user.getUserId()))));
 
         JsonObject checkGroupRequest = new JsonObject()
-                .put(String.format("%s.%s.%s",Field.FOLDERID,Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.NIN, user.getGroupsIds()));
+                .put(String.format("%s.%s.%s", Field.FOLDERID, Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.NIN, user.getGroupsIds()));
 
         JsonObject notUserFolder = new JsonObject()
                 .put(String.format("%s.%s", Field.FOLDERID, Field.OWNERID),
                         new JsonObject().put(Mongo.NE, user.getUserId()));
-        JsonObject andCondition = new JsonObject().put(Mongo.AND, new JsonArray().add(userRequest).add(checkGroupRequest).add(notUserFolder));
+        JsonObject folderNotShared = new JsonObject().put(String.format("%s.%s", Field.FOLDERID, Field.SHARED),
+                new JsonObject().put(Mongo.EXISTS, true).put(Mongo.NE, new JsonArray()));
+
+        JsonObject folderNotOwned = new JsonObject().put(Field.OWNERID, String.format("$%s.$%s", Field.FOLDERID, Field.OWNERID));
+
+        JsonObject filterPreviousBoardsInForeignFolders = new JsonObject().put(Mongo.AND, new JsonArray().add(folderNotShared).add(folderNotOwned));
+        JsonObject andCondition = new JsonObject().put(Mongo.AND,
+                new JsonArray().add(userRequest).add(checkGroupRequest).add(notUserFolder).add(filterPreviousBoardsInForeignFolders));
+
         query.matchOr(new JsonArray().add(folderIdMatch).add(andCondition));
     }
 
@@ -713,8 +742,8 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
-    public Future<List<String> > shareBoard(List<String> ids, JsonObject share, boolean checkOldRights) {
-        Promise<List<String> > promise = Promise.promise();
+    public Future<List<String>> shareBoard(List<String> ids, JsonObject share, boolean checkOldRights) {
+        Promise<List<String>> promise = Promise.promise();
         List<Future<JsonObject>> futures = new ArrayList<>();
         ids.forEach(id -> futures.add(this.shareService.upsertSharedArray(id, share, this.collection, checkOldRights)));
         FutureHelper.all(futures)
@@ -725,9 +754,9 @@ public class DefaultBoardService implements BoardService {
 
     @Override
     public Future<List<String>> shareBoard(List<String> ids, List<SharedElem> share, List<SharedElem> deletedShared, boolean b) {
-        Promise<List<String> > promise = Promise.promise();
+        Promise<List<String>> promise = Promise.promise();
         List<Future<JsonObject>> futures = new ArrayList<>();
-        ids.forEach(id -> futures.add(this.shareService.upsertSharedArray(id, share, deletedShared,this.collection, true)));
+        ids.forEach(id -> futures.add(this.shareService.upsertSharedArray(id, share, deletedShared, this.collection, true)));
         FutureHelper.all(futures)
                 .onSuccess(success -> promise.complete(ids))
                 .onFailure(error -> promise.fail(error.getMessage()));
@@ -739,8 +768,7 @@ public class DefaultBoardService implements BoardService {
         Promise<List<String>> promise = Promise.promise();
         JsonObject query = new MongoQuery(this.collection)
                 .match(new JsonObject()
-                        .put(Field._ID, new JsonObject().put(Mongo.IN, boardsIds)).put(Field.OWNERID,ownerId)).getAggregate()
-                ;
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, boardsIds)).put(Field.OWNERID, ownerId)).getAggregate();
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error("[Magneto@%s::getBoards] Failed to get boards", this.getClass().getSimpleName(),
@@ -752,7 +780,7 @@ public class DefaultBoardService implements BoardService {
                         .getJsonArray(Field.FIRSTBATCH, new JsonArray());
                 promise.complete(result.stream().filter(JsonObject.class::isInstance)
                         .map(JsonObject.class::cast)
-                        .map(board->board.getString(Field._ID))
+                        .map(board -> board.getString(Field._ID))
                         .collect(Collectors.toList()));
             }
         }));
@@ -794,6 +822,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.DISPLAY_NB_FAVORITES, 1));
         return query.getAggregate();
     }
+
     @Override
     public Future<List<Board>> getBoardsWithNbCards(List<String> resultIds) {
         Promise<List<Board>> promise = Promise.promise();

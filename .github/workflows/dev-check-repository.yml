@@ -12,14 +12,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Run yarn install
-        run: yarn install
-      - name: Run build node with Gulp
-        run: node_modules/gulp/bin/gulp.js build
-      - name: Run build node sass
-        run: yarn run build:sass
-      - name: Run test
-        run: yarn test
+      - name: Run npm install
+        working-directory: ./frontend
+        run: pnpm install
+      - name: Check Quality Code
+        working-directory: ./frontend
+        run: pnpm run format:check && pnpm run lint
+      - name: Run Build Vite
+        working-directory: ./frontend
+        run: pnpm build
+      - name: Run tests
+        working-directory: ./frontend
+        run: pnpm test
 
   build-gradle-test:
     runs-on: ubuntu-latest
@@ -31,6 +35,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Run build gradle
+        working-directory: ./backend
         run: gradle assemble -g gradle-user-home
       - name: Run gradle test
+        working-directory: ./backend
         run: gradle test  -g gradle-user-home --no-build-cache --rerun-tasks

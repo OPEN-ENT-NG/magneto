@@ -45,10 +45,10 @@ export default ({ mode }: { mode: string }) => {
       proxyObj,
     "/blog": proxyObj,
     "/explorer": proxyObj,
-    "/todoapp": proxyObj,
+    "/magneto": proxyObj,
   };
 
-  const base = mode === "production" ? "/todoapp" : "";
+  const base = mode === "production" ? "/magneto" : "";
 
   const build = {
     assetsDir: "public",

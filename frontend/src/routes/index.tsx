@@ -42,5 +42,5 @@ const routes = [
 ];
 
 export const router = createBrowserRouter(routes, {
-  basename: import.meta.env.PROD ? "/todoapp" : "/",
+  basename: import.meta.env.PROD ? "/magneto" : "/",
 });

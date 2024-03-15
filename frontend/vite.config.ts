@@ -45,6 +45,7 @@ export default ({ mode }: { mode: string }) => {
       proxyObj,
     "/blog": proxyObj,
     "/explorer": proxyObj,
+    "/todoapp": proxyObj,
     "/magneto": proxyObj,
   };
 

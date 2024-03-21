@@ -1,134 +1,27 @@
 #!/bin/bash
 
-if [ ! -e node_modules ]
-then
-  mkdir node_modules
-fi
+# Frontend
+cd frontend
+#./build.sh --no-docker clean init build
+./build.sh installDeps build
+cd ..
 
-case `uname -s` in
-  MINGW*)
-    USER_UID=1000
-    GROUP_UID=1000
-    ;;
-  *)
-    if [ -z ${USER_UID:+x} ]
-    then
-      USER_UID=`id -u`
-      GROUP_GID=`id -g`
-    fi
-esac
+# Create directory structure and copy frontend dist
+cd backend
+cp -R ../frontend/dist/* ./src/main/resources/
 
-clean () {
-  docker-compose run --rm -u "$USER_UID:$GROUP_GID" gradle gradle clean
-}
+# Move old ui to src/main/resources
+#cp -R ../frontend/old/* ./src/main/resources/public/
+#cp -R ../frontend/old/*.html ./src/main/resources/
 
-buildNode () {
-  case `uname -s` in
-    MINGW*)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --production=false --no-bin-links && node_modules/gulp/bin/gulp.js build && yarn run build:sass"
-      ;;
-    *)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --production=false && node_modules/gulp/bin/gulp.js build && yarn run build:sass"
-  esac
-}
+# Create view directory and copy HTML files
+mkdir -p ./src/main/resources/view
+mv ./src/main/resources/*.html ./src/main/resources/view
+cp -R ./src/main/resources/notify ./src/main/resources/view/notify
 
-buildGulp () {
-    docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "node_modules/gulp/bin/gulp.js build"
-}
+# Build .
+#./build.sh --no-docker clean build
+./build.sh clean build
 
-buildCss () {
-    docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn run build:sass"
-}
-
-buildGradle () {
-  docker-compose run --rm -u "$USER_UID:$GROUP_GID" gradle gradle shadowJar install publishToMavenLocal
-}
-
-testNode () {
-  rm -rf coverage
-  rm -rf */build
-  case `uname -s` in
-    MINGW*)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --no-bin-links && node_modules/gulp/bin/gulp.js drop-cache && yarn test"
-      ;;
-    *)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install && node_modules/gulp/bin/gulp.js drop-cache && yarn test"
-  esac
-}
-
-testNodeDev () {
-  rm -rf coverage
-  rm -rf */build
-  case `uname -s` in
-    MINGW*)
-       # DEBUG MODE using  NODE_OPTIONS=--unhandled-rejections=warn
-       # docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --no-bin-links && node_modules/gulp/bin/gulp.js drop-cache && NODE_OPTIONS=--unhandled-rejections=warn yarn run test:dev"
-
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --no-bin-links && node_modules/gulp/bin/gulp.js drop-cache && yarn run test:dev"
-      ;;
-    *)
-      # DEBUG MODE using  NODE_OPTIONS=--unhandled-rejections=warn
-      # docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install && node_modules/gulp/bin/gulp.js drop-cache && NODE_OPTIONS=--unhandled-rejections=warn yarn run test:dev"
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install && node_modules/gulp/bin/gulp.js drop-cache && yarn run test:dev"
-  esac
-}
-
-testGradle() {
-  docker-compose run --rm -u "$USER_UID:$GROUP_GID" gradle gradle test --no-build-cache --rerun-tasks
-}
-
-
-publish () {
-  if [ -e "?/.gradle" ] && [ ! -e "?/.gradle/gradle.properties" ]
-  then
-    echo "odeUsername=$NEXUS_ODE_USERNAME" > "?/.gradle/gradle.properties"
-    echo "odePassword=$NEXUS_ODE_PASSWORD" >> "?/.gradle/gradle.properties"
-    echo "sonatypeUsername=$NEXUS_SONATYPE_USERNAME" >> "?/.gradle/gradle.properties"
-    echo "sonatypePassword=$NEXUS_SONATYPE_PASSWORD" >> "?/.gradle/gradle.properties"
-  fi
-  docker-compose run --rm -u "$USER_UID:$GROUP_GID" gradle gradle publish
-}
-
-for param in "$@"
-do
-  case $param in
-    clean)
-      clean
-      ;;
-    buildNode)
-      buildNode
-      ;;
-    buildGulp)
-      buildGulp
-      ;;
-    buildCss)
-      buildCss
-      ;;
-    buildGradle)
-      buildGradle
-      ;;
-    install)
-      buildNode && buildGradle
-      ;;
-    publish)
-      publish
-      ;;
-    test)
-      testNode ; testGradle
-      ;;
-    testNode)
-      testNode
-      ;;
-    testNodeDev)
-      testNodeDev
-      ;;
-    testGradle)
-      testGradle
-      ;;
-    *)
-      echo "Invalid argument : $param"
-  esac
-  if [ ! $? -eq 0 ]; then
-    exit 1
-  fi
-done
+# Clean up - remove frontend/dist and backend/src/main/resources
+rm -rf ../frontend/dist

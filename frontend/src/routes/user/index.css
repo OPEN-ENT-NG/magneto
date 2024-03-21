@@ -1,0 +1,22 @@
+@page {
+    size: landscape;
+    orientation: landscape;
+    margin: 2.5cm;
+}
+body {
+    width: 100%;
+}
+svg {
+    max-height: 160mm;
+    max-width: 280mm;
+}
+
+#mindplot-canvas {
+    position: static;
+    background-image: none;
+    background-color: white;
+    width: auto;
+    height: auto;
+
+
+}

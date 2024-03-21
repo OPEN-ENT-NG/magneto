@@ -1,0 +1,17 @@
+version: "3"
+services:
+  node:
+    image: "opendigitaleducation/node:18-alpine-pnpm"
+    user: "node"
+    container_name: node_app
+    working_dir: /home/node/app
+    tty: true
+    stdin_open: true
+    ports:
+      - "4200:4200"
+    network_mode: host
+    volumes:
+      - ./:/home/node/app
+      - ~/.pnpm:/.pnpm
+      - ~/.npm:/.npm
+      - ~/.cache:/.cache

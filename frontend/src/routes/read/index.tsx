@@ -18,7 +18,7 @@ const bull = (
 );
 
 export const App = () => {
-  console.log("i am in app user");
+  console.log("i am in read");
   return (
     <>
       <div>coucou je suis info</div>
@@ -26,18 +26,18 @@ export const App = () => {
       <MaterialCard sx={{ minWidth: 275 }}>
         <CardContent>
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-            Word of the Day
+            read
           </Typography>
           <Typography variant="h5" component="div">
-            be{bull}nev{bull}o{bull}lent
+            be{bull}read
           </Typography>
           <Typography sx={{ mb: 1.5 }} color="text.secondary">
-            adjective
+            read
           </Typography>
           <Typography variant="body2">
-            well meaning and kindly.
+            well read and read.
             <br />
-            {'"a benevolent smile"'}
+            {'"a benevolent read"'}
           </Typography>
         </CardContent>
         <CardActions>

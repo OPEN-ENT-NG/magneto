@@ -37,6 +37,24 @@ const routes = [
           };
         },
       },
+      {
+        path: "board/{id}/view",
+        async lazy() {
+          const { App } = await import("./board");
+          return {
+            Component: App,
+          };
+        },
+      },
+      {
+        path: "board/{id}/reading",
+        async lazy() {
+          const { App } = await import("./read");
+          return {
+            Component: App,
+          };
+        },
+      },
     ],
   },
 ];

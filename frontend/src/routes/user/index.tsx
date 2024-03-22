@@ -24,6 +24,8 @@ export const App = () => {
       <div>coucou je suis user</div>
       <Link to={`/user`}>click to access user </Link>
       <Link to={`/info`}>click to access info </Link>
+      <Link to={`/board/{id}/view`}>click to access board </Link>
+      <Link to={`/board/{id}/reading`}>click to access read </Link>
       <Link to={`/`}>click to access /</Link>
     </>
   );

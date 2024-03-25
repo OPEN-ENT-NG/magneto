@@ -4,7 +4,7 @@
 cd frontend
 echo "soon en build"
 #./build.sh --no-docker clean init build
-chmod +x build.sh
+sudo chmod +x build.sh
 ./build.sh installDeps build
 cd ..
 

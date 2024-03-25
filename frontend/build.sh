@@ -80,6 +80,8 @@ doInit () {
   else
     docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install"
   fi
+  
+  echo "finito pipo l'init"
 
 }
 

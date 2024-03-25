@@ -28,8 +28,8 @@ fi
 if [ -z ${USER_UID:+x} ]
 then
   echo "in uid"
-  export USER_UID=1001
-  export GROUP_GID=1001
+  export USER_UID=0
+  export GROUP_GID=0
 fi
 
 # options
@@ -81,7 +81,7 @@ doInit () {
   if [ "$NO_DOCKER" = "true" ] ; then
     pnpm install
   else
-    sudo docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "sudo pnpm install"
+    sudo docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install"
   fi
 
   echo "finito pipo l'init"
@@ -113,7 +113,7 @@ localDep () {
 }
 
 installDeps() {
-  docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "sudo pnpm install"
+  docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install"
 }
 
 runTest() {

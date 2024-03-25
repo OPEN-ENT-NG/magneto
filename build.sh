@@ -2,6 +2,7 @@
 
 # Frontend
 cd frontend
+echo "soon en build"
 #./build.sh --no-docker clean init build
 ./build.sh installDeps build
 cd ..

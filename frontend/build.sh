@@ -28,8 +28,8 @@ fi
 if [ -z ${USER_UID:+x} ]
 then
   echo "in uid"
-  export USER_UID=1000
-  export GROUP_GID=1000
+  export USER_UID=1001
+  export GROUP_GID=1001
 fi
 
 # options

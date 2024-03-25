@@ -50,7 +50,7 @@ public class MagnetoController extends ControllerHelper {
                 .put(Field.WEBSOCKETENDPOINT, websocketEndpoint)
                 .put(Field.MAGNETO_UPDATE_FREQUENCY, updateFrequency)
                 .put(Field.MAGNETO_STANDALONE, isStandalone);
-        renderView(request, param);
+        renderView(request, param, "magneto.html", null);
         eventStore.createAndStoreEvent(ACCESS.name(), request);
     }
 }

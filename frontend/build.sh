@@ -113,7 +113,7 @@ localDep () {
 }
 
 installDeps() {
-  docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install"
+  docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "sudo pnpm install"
 }
 
 runTest() {

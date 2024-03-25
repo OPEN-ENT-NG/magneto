@@ -4,7 +4,8 @@
 cd frontend
 echo "soon en build"
 #./build.sh --no-docker clean init build
-./build.sh installDeps build
+sudo chmod -R 777 build.sh
+./build.sh localDep installDeps build
 cd ..
 
 # Create directory structure and copy frontend dist

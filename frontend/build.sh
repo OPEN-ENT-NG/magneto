@@ -27,8 +27,9 @@ fi
 
 if [ -z ${USER_UID:+x} ]
 then
-  export USER_UID=1000
-  export GROUP_GID=1000
+  echo "in uid"
+  export USER_UID=0
+  export GROUP_GID=0
 fi
 
 # options
@@ -67,6 +68,7 @@ doInit () {
   cp package.json.template package.json
   sed -i "s/%branch%/${BRANCH_NAME}/" package.json
   sed -i "s/%generateVersion%/${NPM_VERSION_SUFFIX}/" package.json
+  echo "2"
 
   if [ "$1" == "Dev" ]
   then
@@ -74,12 +76,15 @@ doInit () {
   else
     sed -i "s/%packageVersion%/${BRANCH_NAME}/" package.json
   fi
+  echo "3"
 
   if [ "$NO_DOCKER" = "true" ] ; then
     pnpm install
   else
-    docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install"
+    sudo docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install"
   fi
+
+  echo "finito pipo l'init"
 
 }
 

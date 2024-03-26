@@ -2,9 +2,9 @@
 
 # Frontend
 cd frontend
-echo "soon en build"
 #./build.sh --no-docker clean init build
-./build.sh installDeps build
+sudo chmod -R 777 build.sh
+./build.sh localDep installDeps build
 cd ..
 
 # Create directory structure and copy frontend dist
@@ -25,4 +25,4 @@ cp -R ./src/main/resources/notify ./src/main/resources/view/notify
 ./build.sh clean build
 
 # Clean up - remove frontend/dist and backend/src/main/resources
-rm -rf ../frontend/dist
+sudo rm -rf ../frontend/dist

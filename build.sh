@@ -2,7 +2,6 @@
 
 # Frontend
 cd frontend
-echo "soon en build"
 #./build.sh --no-docker clean init build
 sudo chmod -R 777 build.sh
 ./build.sh localDep installDeps build

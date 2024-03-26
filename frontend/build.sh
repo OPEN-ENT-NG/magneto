@@ -27,7 +27,6 @@ fi
 
 if [ -z ${USER_UID:+x} ]
 then
-  echo "in uid"
   export USER_UID=0
   export GROUP_GID=0
 fi

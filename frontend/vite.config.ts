@@ -56,9 +56,6 @@ export default ({ mode }: { mode: string }) => {
     assetsDir: "public",
     rollupOptions: {
       external: ["edifice-ts-client"],
-      input: {
-        main: resolve(__dirname, 'magneto.html')
-      },
       output: {
         manualChunks: {
           react: [

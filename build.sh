@@ -3,7 +3,6 @@
 # Frontend
 cd frontend
 #./build.sh --no-docker clean init build
-sudo chmod -R 777 build.sh
 ./build.sh localDep installDeps build
 cd ..
 
@@ -25,4 +24,4 @@ cp -R ./src/main/resources/notify ./src/main/resources/view/notify
 ./build.sh clean build
 
 # Clean up - remove frontend/dist and backend/src/main/resources
-sudo rm -rf ../frontend/dist
+rm -rf ../frontend/dist

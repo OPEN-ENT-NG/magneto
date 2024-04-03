@@ -54,11 +54,11 @@ public class CommentServiceTest {
                         "   \"modificationDate\":\"$comments.modificationDate\"\n" +
                         "}\n" +
                 "},\n" +
-                        "{\"$skip\":900},\n" +
-                        "{\"$limit\":30}]}");
+                        "{\"$skip\":26569},\n" +
+                        "{\"$limit\":163}]}");
 
 
-            JsonObject query = Whitebox.invokeMethod(commentService, "getAllCommentsQuery", "id", 30);
+            JsonObject query = Whitebox.invokeMethod(commentService, "getAllCommentsQuery", "id", 163);
 
             ctx.assertEquals(expected, query);
     }

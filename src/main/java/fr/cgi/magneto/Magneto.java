@@ -18,7 +18,8 @@ import org.entcore.common.storage.Storage;
 import org.entcore.common.storage.StorageFactory;
 
 public class Magneto extends BaseServer {
-	public static final Integer PAGE_SIZE = 30;
+	// todo fix via NGNA-2988
+	public static final Integer PAGE_SIZE = 163;
 
 	@Override
 	public void start() throws Exception {

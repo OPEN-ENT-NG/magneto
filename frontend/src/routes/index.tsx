@@ -59,6 +59,4 @@ const routes = [
   },
 ];
 
-export const router = createHashRouter(routes, {
-  basename: import.meta.env.PROD ? "" : "/",
-});
+export const router = createHashRouter(routes);

@@ -2,7 +2,7 @@ import React from "react";
 
 import { Heading, TreeView, Grid } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
-import Header from "../../components/header/Header"
+import Header from "../../components/header/Header";
 
 import { Card } from "~/components/card/Card.tsx";
 
@@ -104,11 +104,11 @@ export const App = () => {
                 name: "Section Element",
                 section: true,
               }}
-              onTreeItemBlur={function Ga() { }}
-              onTreeItemFocus={function Ga() { }}
-              onTreeItemFold={function Ga() { }}
-              onTreeItemSelect={function Ga() { }}
-              onTreeItemUnfold={function Ga() { }}
+              onTreeItemBlur={function Ga() {}}
+              onTreeItemFocus={function Ga() {}}
+              onTreeItemFold={function Ga() {}}
+              onTreeItemSelect={function Ga() {}}
+              onTreeItemUnfold={function Ga() {}}
             />
           </Grid.Col>
           <Grid.Col

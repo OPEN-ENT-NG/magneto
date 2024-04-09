@@ -1,5 +1,7 @@
-import { Checkbox, FormControl, Grid, ImagePicker, Input, Label, Radio, TextArea } from '@edifice-ui/react'
+import { Button, Checkbox, FormControl, Grid, ImagePicker, Input, Label, Radio, TextArea } from '@edifice-ui/react'
 import React from 'react'
+import "./createTab.scss";
+
 
 import ViewColumnOutlinedIcon from '@mui/icons-material/ViewColumnOutlined';
 import ViewQuiltOutlinedIcon from '@mui/icons-material/ViewQuiltOutlined';
@@ -13,7 +15,7 @@ export default function createTab() {
             <h4>Créer un tableau</h4>
             <Grid>
                 <Grid.Col
-                    sm="4"
+                    sm="2"
                     style={{
                         minHeight: "70rem",
                         padding: ".8rem",
@@ -27,12 +29,12 @@ export default function createTab() {
                         onUploadImage={function Ga() { }}
                         src={myImage}
                     />
-                    <div>
+                    <div className='font-red'>
                         Veuillez choisir une image *
                     </div>
                 </Grid.Col>
                 <Grid.Col
-                    sm="8"
+                    sm="10"
                     style={{
                         minHeight: "10rem",
                         padding: ".8rem",
@@ -40,7 +42,7 @@ export default function createTab() {
                 >
                     <div>
                         <div>
-                            <FormControl id="title">
+                            <FormControl id="title" className='space05'>
                                 <Label>
                                     Titre de mon tableau *:
                                 </Label>
@@ -50,7 +52,7 @@ export default function createTab() {
                                     type="text"
                                 />
                             </FormControl>
-                            <FormControl id="description">
+                            <FormControl id="description" className='space1half'>
                                 <Label>
                                     Description:
                                 </Label>
@@ -59,8 +61,8 @@ export default function createTab() {
                                 />
                             </FormControl>
                         </div>
-                        <div>
-                            <h6>Options du tableau</h6>
+                        <div className='space1half'>
+                            <h5 className='space1'>Options du tableau</h5>
                             <Checkbox
                                 label="Permettre aux utilisateurs de commenter les aimants"
                                 onChange={function Ga() { }}
@@ -71,7 +73,7 @@ export default function createTab() {
                             />
                         </div>
                         <div>
-                            <h6>Quelle disposition des aimants souhaitez-vous?</h6>
+                            <h5>Quelle disposition des aimants souhaitez-vous?</h5>
                             <div className="d-flex gap-16 align-items-center">
                                 <div className="d-flex gap-16 align-items-center">
                                     <Radio
@@ -103,7 +105,7 @@ export default function createTab() {
 
                             </div>
                         </div>
-                        <div>
+                        <div className='space1'>
                             <FormControl id="keywords">
                                 <Label>
                                     Mots-clés :
@@ -127,7 +129,27 @@ export default function createTab() {
                                 onUploadImage={function Ga() { }}
                                 src={myImage}
                             />
-                            <i>Pour un rendu optimal, nous conseillons de charger une image de minimum 1024x768px, format paysage.</i>
+                            <i className='font-little'>Pour un rendu optimal, nous conseillons de charger une image de minimum 1024x768px, format paysage.</i>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="but">
+                            <Button
+                                color="primary"
+                                type="button"
+                                variant="outline"
+                                className='ml-8'
+                            >
+                                Annuler
+                            </Button>
+                            <Button
+                                color="primary"
+                                type="submit"
+                                variant="filled"
+                                className='ml-8'
+                            >
+                                Enregistrer
+                            </Button>
                         </div>
                     </div>
                 </Grid.Col>

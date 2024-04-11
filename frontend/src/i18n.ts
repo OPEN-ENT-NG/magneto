@@ -1,35 +1,29 @@
-import i18n from "i18next";
-import Backend from "i18next-http-backend";
+import i18n, { Resource } from "i18next";
 import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import { dictionaries } from "~/dictionaries";
+
+const resources: Resource = {};
+Object.keys(dictionaries).forEach((k: string) => {
+  resources[k] = {
+    translation: dictionaries[k],
+  };
+});
+
+const supportedLngs = Object.keys(dictionaries);
 
 i18n
-  .use(Backend)
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    backend: {
-      loadPath: (_lngs: string[], namespaces: string[]) => {
-        const urls = namespaces.map((namespace: string) => {
-          if (namespace === "common") {
-            return `/i18n`;
-          }
-          return `/${namespace}/i18n`;
-        });
-        return urls;
-      },
-      parse: function (data: string) {
-        return JSON.parse(data);
-      },
+    detection: {
+      order: ["navigator"],
     },
-    defaultNS: "common",
-    ns: ["common", "app"],
+    resources,
     fallbackLng: "fr",
-    lng: "fr",
+    supportedLngs,
     interpolation: {
       escapeValue: false,
-      prefix: "[[",
-      suffix: "]]",
     },
-    debug: false,
-  });
-
-export default i18n;
+  })
+  .catch((err) => console.error("failed to init i18n provider", err));

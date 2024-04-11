@@ -10,7 +10,5 @@
       "type": ["string", "null"]
     }
   },
-  "required": [
-    "title"
-  ]
+  "required": ["title"]
 }

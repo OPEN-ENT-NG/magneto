@@ -16,8 +16,5 @@
       }
     }
   },
-  "required": [
-    "cardIds",
-    "boardId"
-  ]
+  "required": ["cardIds", "boardId"]
 }

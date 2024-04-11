@@ -1,0 +1,9 @@
+.treeview {
+  #listitem_public-boards {
+    [aria-label="fold/unfold button"] {
+      svg {
+        display: none;
+      }
+    }
+  }
+}

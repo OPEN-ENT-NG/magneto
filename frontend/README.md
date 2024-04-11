@@ -40,7 +40,7 @@ yarn dev
 ./build.sh runLocal
 ```
 
-### Troubleshoot "runLocal" 
+### Troubleshoot "runLocal"
 
 ```
 Emitted 'error' event on FSWatcher instance at:

@@ -57,14 +57,21 @@ export const App = () => {
   // this.selectedUpdateFolderForm = {id: null, title: ''};
   // this.deletedFolders = await this.getDeletedFolders();
 
-  let folders = getFolders(false);
-  let boardList = getBoards({isPublic: false,
-    isShared: false,
-    isDeleted: false,
-    sortBy: 'modificationDate'});
+  let folders;
 
-  console.log(folders);
-  console.log(boardList);
+  useEffect(() => {
+    getFolders(false).then(f => {
+      folders = f;
+      console.log(folders);
+    });
+  })
+  
+  // let boardList = getBoards({isPublic: false,
+  //   isShared: false,
+  //   isDeleted: false,
+  //   sortBy: 'modificationDate'});
+
+  // console.log(boardList);
 
   return (
     <>
@@ -81,7 +88,7 @@ export const App = () => {
           }}
         >
 
-          <TreeViewContainer/>
+        <TreeViewContainer/>
         </Grid.Col>
         <Grid.Col
           sm="8"

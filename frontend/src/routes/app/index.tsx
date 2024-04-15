@@ -7,8 +7,10 @@ import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
 import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
-import { getFolders } from "~/services/api/folders.service";
+// import { getFolders } from "~/services/api/folders.service";
 import { getBoards } from "~/services/api/boards.service";
+import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { formControlClasses } from "@mui/material";
 
 // const ExportModal = lazy(async () => await import("~/features/export-modal"));
 
@@ -57,14 +59,11 @@ export const App = () => {
   // this.selectedUpdateFolderForm = {id: null, title: ''};
   // this.deletedFolders = await this.getDeletedFolders();
 
-  let folders;
+  
+  const { folders } = useGetFoldersQuery(false);
+  console.log(folders);
 
-  useEffect(() => {
-    getFolders(false).then(f => {
-      folders = f;
-      console.log(folders);
-    });
-  })
+  // })
   
   // let boardList = getBoards({isPublic: false,
   //   isShared: false,

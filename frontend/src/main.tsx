@@ -10,6 +10,8 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
+import { Provider } from 'react-redux'
+import { setupStore } from './store'
 
 import { router } from "./routes";
 
@@ -23,6 +25,8 @@ if (process.env.NODE_ENV !== "production") {
     axe.default(React, root, 1000);
   });
 }
+
+const store = setupStore();
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -40,15 +44,20 @@ const queryClient = new QueryClient({
 
 root.render(
   <QueryClientProvider client={queryClient}>
-    <OdeClientProvider
-      params={{
-        app: "myApp",
-      }}
+    <Provider
+      store={store}
     >
-      <ThemeProvider>
-        <RouterProvider router={router} />
-      </ThemeProvider>
-    </OdeClientProvider>
+      <OdeClientProvider
+          params={{
+            app: "myApp",
+          }}
+        >
+        <ThemeProvider>
+          <RouterProvider router={router} />
+        </ThemeProvider>
+
+      </OdeClientProvider>     
+    </Provider>
     <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>,
 );

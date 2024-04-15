@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useState } from "react";
 
+// eslint-disable-next-line
 import {
-  // eslint-disable-line
   Button,
   Checkbox,
   FormControl,
@@ -92,7 +92,7 @@ export const CreateTab: FunctionComponent<props> = ({
       <Modal.Body>
         <Grid>
           <Grid.Col
-            sm="2"
+            sm="3"
             style={{
               minHeight: "70rem",
               padding: ".8rem",
@@ -109,7 +109,7 @@ export const CreateTab: FunctionComponent<props> = ({
             <div className="font-red">Veuillez choisir une image *</div>
           </Grid.Col>
           <Grid.Col
-            sm="10"
+            sm="9"
             style={{
               minHeight: "10rem",
               padding: ".8rem",
@@ -117,7 +117,7 @@ export const CreateTab: FunctionComponent<props> = ({
           >
             <div>
               <div>
-                <FormControl id="title" className="space05">
+                <FormControl id="title" className="mb-0-5">
                   <Label>Titre de mon tableau *:</Label>
                   <Input
                     placeholder=""
@@ -126,7 +126,7 @@ export const CreateTab: FunctionComponent<props> = ({
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </FormControl>
-                <FormControl id="description" className="space1half">
+                <FormControl id="description" className="mb-1-5">
                   <Label>Description:</Label>
                   <TextArea
                     size="md"
@@ -134,8 +134,8 @@ export const CreateTab: FunctionComponent<props> = ({
                   />
                 </FormControl>
               </div>
-              <div className="space1half">
-                <h5 className="space1">Options du tableau</h5>
+              <div className="mb-1-5">
+                <h5 className="mb-1">Options du tableau</h5>
                 <Checkbox
                   checked={IsCommentChecked}
                   label="Permettre aux utilisateurs de commenter les aimants"
@@ -191,7 +191,7 @@ export const CreateTab: FunctionComponent<props> = ({
                   </div>
                 </div>
               </div>
-              <div className="space1">
+              <div className="mb-1">
                 <FormControl id="keywords">
                   <Label>Mots-clés :</Label>
                   <Input
@@ -203,7 +203,7 @@ export const CreateTab: FunctionComponent<props> = ({
                 </FormControl>
               </div>
               <div>
-                <div>Image d'arrière plan du tableau :</div>
+                <div className="mb-0-5">Image d'arrière plan du tableau :</div>
                 <ImagePicker
                   addButtonLabel="Add image"
                   deleteButtonLabel="Delete image"
@@ -222,12 +222,12 @@ export const CreateTab: FunctionComponent<props> = ({
         </Grid>
       </Modal.Body>
       <Modal.Footer>
-        <div className="but">
+        <div className="right">
           <Button
             color="primary"
             type="button"
             variant="outline"
-            className="ml-8"
+            className="footer-button"
             onClick={reset}
           >
             Annuler
@@ -236,7 +236,7 @@ export const CreateTab: FunctionComponent<props> = ({
             color="primary"
             type="submit"
             variant="filled"
-            className="ml-8"
+            className="footer-button"
             onClick={onSubmit}
           >
             Enregistrer

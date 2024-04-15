@@ -1,9 +1,10 @@
 import React from "react";
 
-import { Heading, TreeView, Grid } from "@edifice-ui/react";
+import { TreeView, Grid } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
+import Header from "~/components/header/Header";
 
 // const ExportModal = lazy(async () => await import("~/features/export-modal"));
 
@@ -23,9 +24,7 @@ export const App = () => {
   console.log("i am in app");
   return (
     <>
-      <Heading headingStyle="h1" level="h1">
-        Magneto
-      </Heading>
+      <Header />
       <>
         <Grid>
           <Grid.Col

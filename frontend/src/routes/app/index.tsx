@@ -26,6 +26,7 @@ export interface AppProps {
 }
 
 export const App = () => {
+  const [isOpen, toggle] = useToggle(false);
   console.log("i am in app");
 
   /*const [isLoading, setIsLoading] = useState(false);

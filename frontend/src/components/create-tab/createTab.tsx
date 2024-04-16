@@ -79,170 +79,172 @@ export const CreateTab: FunctionComponent<props> = ({
   };
 
   return (
-    <Modal
-      id={"create"}
-      isOpen={isOpen}
-      onModalClose={reset}
-      size="lg"
-      viewport={false}
-    >
-      <Modal.Header onModalClose={reset}>
-        <h4>Créer un tableau</h4>
-      </Modal.Header>
-      <Modal.Body>
-        <Grid>
-          <Grid.Col
-            sm="3"
-            style={{
-              minHeight: "70rem",
-              padding: ".8rem",
-            }}
-          >
-            <ImagePicker
-              addButtonLabel="Add image"
-              deleteButtonLabel="Delete image"
-              label="Upload an image"
-              onDeleteImage={handleDeleteImage}
-              onUploadImage={handleUploadImage}
-              src={myImage}
-            />
-            <div className="font-red">Veuillez choisir une image *</div>
-          </Grid.Col>
-          <Grid.Col
-            sm="9"
-            style={{
-              minHeight: "10rem",
-              padding: ".8rem",
-            }}
-          >
-            <div>
+    <>
+      {isOpen && (<Modal
+        id={"create"}
+        isOpen={isOpen}
+        onModalClose={reset}
+        size="lg"
+        viewport={false}
+      >
+        <Modal.Header onModalClose={reset}>
+          <h4>Créer un tableau</h4>
+        </Modal.Header>
+        <Modal.Body>
+          <Grid>
+            <Grid.Col
+              sm="3"
+              style={{
+                minHeight: "70rem",
+                padding: ".8rem",
+              }}
+            >
+              <ImagePicker
+                addButtonLabel="Add image"
+                deleteButtonLabel="Delete image"
+                label="Upload an image"
+                onDeleteImage={handleDeleteImage}
+                onUploadImage={handleUploadImage}
+                src={myImage}
+              />
+              <div className="font-red">Veuillez choisir une image *</div>
+            </Grid.Col>
+            <Grid.Col
+              sm="9"
+              style={{
+                minHeight: "10rem",
+                padding: ".8rem",
+              }}
+            >
               <div>
-                <FormControl id="title" className="mb-0-5">
-                  <Label>Titre de mon tableau *:</Label>
-                  <Input
-                    placeholder=""
-                    size="md"
-                    type="text"
-                    onChange={(e) => setTitle(e.target.value)}
+                <div>
+                  <FormControl id="title" className="mb-0-5">
+                    <Label>Titre de mon tableau *:</Label>
+                    <Input
+                      placeholder=""
+                      size="md"
+                      type="text"
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormControl id="description" className="mb-1-5">
+                    <Label>Description:</Label>
+                    <TextArea
+                      size="md"
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </FormControl>
+                </div>
+                <div className="mb-1-5">
+                  <h5 className="mb-1">Options du tableau</h5>
+                  <Checkbox
+                    checked={IsCommentChecked}
+                    label="Permettre aux utilisateurs de commenter les aimants"
+                    onChange={() =>
+                      setIsCommentChecked((IsCommentChecked) => !IsCommentChecked)
+                    }
                   />
-                </FormControl>
-                <FormControl id="description" className="mb-1-5">
-                  <Label>Description:</Label>
-                  <TextArea
-                    size="md"
-                    onChange={(e) => setDescription(e.target.value)}
+                  <Checkbox
+                    checked={isFavoriteChecked}
+                    label="Afficher le nombre de favoris sur les aimants"
+                    onChange={() =>
+                      setIsFavoriteChecked(
+                        (isFavoriteChecked) => !isFavoriteChecked,
+                      )
+                    }
                   />
-                </FormControl>
-              </div>
-              <div className="mb-1-5">
-                <h5 className="mb-1">Options du tableau</h5>
-                <Checkbox
-                  checked={IsCommentChecked}
-                  label="Permettre aux utilisateurs de commenter les aimants"
-                  onChange={() =>
-                    setIsCommentChecked((IsCommentChecked) => !IsCommentChecked)
-                  }
-                />
-                <Checkbox
-                  checked={isFavoriteChecked}
-                  label="Afficher le nombre de favoris sur les aimants"
-                  onChange={() =>
-                    setIsFavoriteChecked(
-                      (isFavoriteChecked) => !isFavoriteChecked,
-                    )
-                  }
-                />
-              </div>
-              <div>
-                <h5>Quelle disposition des aimants souhaitez-vous?</h5>
-                <div className="d-flex gap-16 align-items-center">
+                </div>
+                <div>
+                  <h5>Quelle disposition des aimants souhaitez-vous?</h5>
                   <div className="d-flex gap-16 align-items-center">
-                    <Radio
-                      label="Libre"
-                      model={disposition}
-                      onChange={(e) => setDisposition(e.target.value)}
-                      value="free"
-                      checked={disposition == "free"}
-                    />
-                    <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
-                  </div>
-                  <div className="d-flex gap-16 align-items-center">
-                    <Radio
-                      label="Section verticale"
-                      model={disposition}
-                      onChange={(e) => setDisposition(e.target.value)}
-                      value="vertical"
-                      checked={disposition == "vertical"}
-                    />
-                    <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
-                  </div>
-                  <div className="d-flex gap-16 align-items-center">
-                    <Radio
-                      label="Section horizontale"
-                      model={disposition}
-                      onChange={(e) => {
-                        setDisposition(e.target.value);
-                        console.log(e.target.value);
-                      }}
-                      value="horizontal"
-                      checked={disposition == "horizontal"}
-                    />
-                    <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
+                    <div className="d-flex gap-16 align-items-center">
+                      <Radio
+                        label="Libre"
+                        model={disposition}
+                        onChange={(e) => setDisposition(e.target.value)}
+                        value="free"
+                        checked={disposition == "free"}
+                      />
+                      <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
+                    </div>
+                    <div className="d-flex gap-16 align-items-center">
+                      <Radio
+                        label="Section verticale"
+                        model={disposition}
+                        onChange={(e) => setDisposition(e.target.value)}
+                        value="vertical"
+                        checked={disposition == "vertical"}
+                      />
+                      <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
+                    </div>
+                    <div className="d-flex gap-16 align-items-center">
+                      <Radio
+                        label="Section horizontale"
+                        model={disposition}
+                        onChange={(e) => {
+                          setDisposition(e.target.value);
+                          console.log(e.target.value);
+                        }}
+                        value="horizontal"
+                        checked={disposition == "horizontal"}
+                      />
+                      <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mb-1">
-                <FormControl id="keywords">
-                  <Label>Mots-clés :</Label>
-                  <Input
-                    placeholder=""
-                    size="md"
-                    type="text"
-                    onChange={(e) => setKeyword(e.target.value)}
+                <div className="mb-1">
+                  <FormControl id="keywords">
+                    <Label>Mots-clés :</Label>
+                    <Input
+                      placeholder=""
+                      size="md"
+                      type="text"
+                      onChange={(e) => setKeyword(e.target.value)}
+                    />
+                  </FormControl>
+                </div>
+                <div>
+                  <div className="mb-0-5">Image d'arrière plan du tableau :</div>
+                  <ImagePicker
+                    addButtonLabel="Add image"
+                    deleteButtonLabel="Delete image"
+                    label="Upload an image"
+                    onDeleteImage={handleDeleteBackground}
+                    onUploadImage={handleUploadBackground}
+                    src={myImage}
                   />
-                </FormControl>
+                  <i className="font-little">
+                    Pour un rendu optimal, nous conseillons de charger une image
+                    de minimum 1024x768px, format paysage.
+                  </i>
+                </div>
               </div>
-              <div>
-                <div className="mb-0-5">Image d'arrière plan du tableau :</div>
-                <ImagePicker
-                  addButtonLabel="Add image"
-                  deleteButtonLabel="Delete image"
-                  label="Upload an image"
-                  onDeleteImage={handleDeleteBackground}
-                  onUploadImage={handleUploadBackground}
-                  src={myImage}
-                />
-                <i className="font-little">
-                  Pour un rendu optimal, nous conseillons de charger une image
-                  de minimum 1024x768px, format paysage.
-                </i>
-              </div>
-            </div>
-          </Grid.Col>
-        </Grid>
-      </Modal.Body>
-      <Modal.Footer>
-        <div className="right">
-          <Button
-            color="primary"
-            type="button"
-            variant="outline"
-            className="footer-button"
-            onClick={reset}
-          >
-            Annuler
-          </Button>
-          <Button
-            color="primary"
-            type="submit"
-            variant="filled"
-            className="footer-button"
-            onClick={onSubmit}
-          >
-            Enregistrer
-          </Button>
-        </div>
-      </Modal.Footer>
-    </Modal>
+            </Grid.Col>
+          </Grid>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className="right">
+            <Button
+              color="primary"
+              type="button"
+              variant="outline"
+              className="footer-button"
+              onClick={reset}
+            >
+              Annuler
+            </Button>
+            <Button
+              color="primary"
+              type="submit"
+              variant="filled"
+              className="footer-button"
+              onClick={onSubmit}
+            >
+              Enregistrer
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>)}
+    </>
   );
 };

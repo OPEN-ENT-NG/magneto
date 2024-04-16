@@ -11,6 +11,9 @@ import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 import { getBoards } from "~/services/api/boards.service";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { formControlClasses } from "@mui/material";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { useTranslation } from "react-i18next";
 
 // const ExportModal = lazy(async () => await import("~/features/export-modal"));
 
@@ -28,6 +31,7 @@ export interface AppProps {
 
 export const App = () => {
   console.log("i am in app");
+  const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [openedFolder, setOpenedFolder] = useState(null);
@@ -53,18 +57,27 @@ export const App = () => {
   const [selectedBoards, setSelectedBoards] = useState([]);
   const [selectedFolderIds, setSelectedFolderIds] = useState([]);
   const [selectedFolders, setSelectedFolders] = useState([]);
-  const [folderNavTrees, setFolderNavTrees] = useState([]);
+  const [folderNavTrees, setFolderNavTrees] = useState<FolderTreeNavItem[]>([]);
   const [folderMoveNavTrees, setFolderMoveNavTrees] = useState([]);
   // this.selectedUpdateBoardForm = new BoardForm();
   // this.selectedUpdateFolderForm = {id: null, title: ''};
   // this.deletedFolders = await this.getDeletedFolders();
 
   
-  const { folders } = useGetFoldersQuery(false);
+  const { data: folders } = useGetFoldersQuery(false);
   console.log(folders);
 
-  // })
+
+  // folderNavTrees.isOpened = false;
+  // folderNavTrees.iconClass = "magneto-earth";
+  // folderNavTrees.buildFolders(folders);
+  setFolderNavTrees([new FolderTreeNavItem({
+    id: FOLDER_TYPE.MY_BOARDS, title: t('magneto.my.boards'),
+    parentId: ''
+  })]);
+
   
+
   // let boardList = getBoards({isPublic: false,
   //   isShared: false,
   //   isDeleted: false,
@@ -87,7 +100,7 @@ export const App = () => {
           }}
         >
 
-        <TreeViewContainer/>
+        <TreeViewContainer />
         </Grid.Col>
         <Grid.Col
           sm="8"

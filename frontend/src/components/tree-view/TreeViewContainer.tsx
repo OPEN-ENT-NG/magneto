@@ -1,6 +1,7 @@
 import React from "react";
 
 import {  Button, TreeView } from "@edifice-ui/react";
+import { useSelector } from "react-redux";
 // import * as MaterialDesign from "react-icons/md";
 
 interface FolderTreeNavItem {
@@ -16,6 +17,7 @@ interface FolderTreeNavItem {
 
 //export const TreeViewContainer: React.FC<FolderTreeNavItem> = ({ id, name, iconClass, children, parentId, isOpened, ownerId, shared }) => {
   export const TreeViewContainer = () => {
+    const todos = useSelector(state => state.folderNavTrees);
 
 
     /**
@@ -147,7 +149,7 @@ interface FolderTreeNavItem {
   return (
     <>
       <TreeView
-        data={dataTree}
+        data={folderNavTrees}
         onTreeItemBlur={function Ga() {}}
         onTreeItemFocus={function Ga() {}}
         onTreeItemFold={function Ga() {}}

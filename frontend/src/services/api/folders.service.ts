@@ -15,13 +15,4 @@ export const foldersApi = createApi({
 
 })
 
-// export const getFolders = async (isDeleted: boolean): Promise<void> => {
-//   let urlParams: IHttpParams = {queryParams: {isDeleted: isDeleted}};
-//   return await odeServices.http().get(`/magneto/folders`, urlParams)
-//     .then(res => {
-//       res.map((folder: IFolderResponse) => new Folder().build(folder))
-//     });
-// };
-
-
 export const { useGetFoldersQuery } = foldersApi;

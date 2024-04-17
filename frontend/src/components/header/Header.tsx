@@ -32,3 +32,5 @@ const Header: React.FC<HeaderProps> = ({ onClick }) => {
     </AppHeader>
   );
 }
+
+export default Header;

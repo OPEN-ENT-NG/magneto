@@ -16,8 +16,7 @@ interface FolderTreeNavItem {
 }
 
 //export const TreeViewContainer: React.FC<FolderTreeNavItem> = ({ id, name, iconClass, children, parentId, isOpened, ownerId, shared }) => {
-  export const TreeViewContainer = () => {
-    const todos = useSelector(state => state.folderNavTrees);
+  export const TreeViewContainer = ({folders:folders, folderType:folderType}) => {
 
 
     /**
@@ -45,34 +44,7 @@ interface FolderTreeNavItem {
       }
   }
 
-  /**
-   * Populate/Update the children list from the given folder list
-   * @param folders Folder list
-   */
-  const buildFolders = (folders: Array<FolderTreeNavItem>): FolderTreeNavItem => {
-      let childrenFolders: Array<FolderTreeNavItem> =
-          folders.filter((folder: FolderTreeNavItem) => folder.parentId === this._id);
-
-      let newChildren: Array<FolderTreeNavItem> = [];
-
-      childrenFolders.forEach((folder: FolderTreeNavItem) => {
-          let childMatch: FolderTreeNavItem =
-              this.children.find((f: FolderTreeNavItem) => f.id === folder.id && f.name === folder.title);
-
-          if (childMatch === undefined) {
-              newChildren.push(new FolderTreeNavItem(folder).buildFolders(folders));
-          } else {
-              newChildren.push(childMatch.buildFolders(folders));
-          }
-      });
-
-      this.children = newChildren;
-
-      return this;
-  }
-
-
-  let dataTree = {
+  let treeExample = {
     children: [
       {
         children: [
@@ -143,76 +115,25 @@ interface FolderTreeNavItem {
   };
 
 
-
+  let dataTree = {
+    children: [],
+    id: folderType,
+    name: folderType,
+    section: true,
+  };
 
 
   return (
     <>
       <TreeView
-        data={folderNavTrees}
+        data={folders?? dataTree}
         onTreeItemBlur={function Ga() {}}
         onTreeItemFocus={function Ga() {}}
         onTreeItemFold={function Ga() {}}
         onTreeItemSelect={function Ga() {}}
         onTreeItemUnfold={function Ga() {}}
       />
-      <Button
-        type={'button'}
-      /**
-       * `primary`, `secondary`, `tertiary` or `danger`
-       */
-      color={'secondary'}
-      /**
-       * `filled`, `outline` or `ghost`
-       */
-      variant={'outline'}
-      /**
-       * `sm`, `md` or `lg`
-       */
-      size={'sm'}
-      /**
-       * Does it has a text ?
-       */
-      children={'Créer un dossier'}
-      /**
-       * Display Icon Component to the left
-       */
-      // leftIcon={<MaterialDesign.MdHelp />}
-    
-      /**
-       * Is it loading ?
-       */
-      isLoading={false}
-      ></Button>
-      <br/>
-      <Button
-        type={'button'}
-      /**
-       * `primary`, `secondary`, `tertiary` or `danger`
-       */
-      color={'secondary'}
-      /**
-       * `filled`, `outline` or `ghost`
-       */
-      variant={'outline'}
-      /**
-       * `sm`, `md` or `lg`
-       */
-      size={'sm'}
-      /**
-       * Does it has a text ?
-       */
-      children={'Afficher mes aimants favoris'}
-      /**
-       * Display Icon Component to the left
-       */
-      // leftIcon={<i></i>}
-    
-      /**
-       * Is it loading ?
-       */
-      isLoading={false}
-      ></Button>
+
 
     </>
   );

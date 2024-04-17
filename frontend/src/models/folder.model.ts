@@ -36,7 +36,7 @@ export class Folder {
         this._title = data.title;
         this._parentId = data.parentId;
         this._ownerId = data.ownerId;
-        this._shared = data.shared ? data.shared : [];
+        this._shared = data.shared ?? [];
         return this;
     }
 

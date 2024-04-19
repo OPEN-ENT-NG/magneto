@@ -96,14 +96,13 @@ export class SectionForm {
     this._cardIds.push(value);
   }
 
-  get displayed(): boolean {
+   get displayed(): boolean {
     return !!this._displayed;
   }
 
   set displayed(value: boolean) {
     this._displayed = value;
   }
-
   isValid(): boolean {
     return this.title !== null && this.title !== "";
   }
@@ -192,7 +191,7 @@ export class Section {
     return this._cards;
   }
 
-  get displayed(): boolean {
+   get displayed(): boolean {
     return !!this._displayed;
   }
 

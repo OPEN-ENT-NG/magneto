@@ -1,6 +1,10 @@
 import { odeServices } from "edifice-ts-client";
 
-import { Boards, IBoardPayload, IBoardsParamsRequest } from "~/models/board.model";
+import {
+  Boards,
+  IBoardPayload,
+  IBoardsParamsRequest,
+} from "~/models/board.model";
 
 export const getBoards = async (
   params: IBoardsParamsRequest,
@@ -29,12 +33,9 @@ export const getBoards = async (
 };
 
 export const createBoard = async (params: IBoardPayload): Promise<Boards> => {
-
-    return await odeServices.http().post(`/magneto/board`, params);
+  return await odeServices.http().post(`/magneto/board`, params);
 };
 
 export const getUrl = async (cover: File): Promise<string> => {
-    return await odeServices
-        .http()
-        .get(URL.createObjectURL(cover));
-}
+  return await odeServices.http().get(URL.createObjectURL(cover));
+};

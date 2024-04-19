@@ -3,15 +3,15 @@ import React from "react";
 
 import { TreeView, Grid, useToggle } from "@edifice-ui/react";
 //import { formControlClasses } from "@mui/material";
+//import { formControlClasses } from "@mui/material";
 import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
+import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 //import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 //import { getBoards } from "~/services/api/boards.service";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
-import { formControlClasses } from "@mui/material";
-import { CreateTab } from "~/components/create-tab/createTab";
 
 // const ExportModal = lazy(async () => await import("~/features/export-modal"));
 
@@ -61,11 +61,8 @@ export const App = () => {
   // this.selectedUpdateFolderForm = {id: null, title: ''};
   // this.deletedFolders = await this.getDeletedFolders();*/
 
-
   const { data: folders } = useGetFoldersQuery(false);
   console.log(folders);
-
-
 
   return (
     <>
@@ -170,11 +167,11 @@ export const App = () => {
                 name: "Section Element",
                 section: true,
               }}
-              onTreeItemBlur={function Ga() { }}
-              onTreeItemFocus={function Ga() { }}
-              onTreeItemFold={function Ga() { }}
-              onTreeItemSelect={function Ga() { }}
-              onTreeItemUnfold={function Ga() { }}
+              onTreeItemBlur={function Ga() {}}
+              onTreeItemFocus={function Ga() {}}
+              onTreeItemFold={function Ga() {}}
+              onTreeItemSelect={function Ga() {}}
+              onTreeItemUnfold={function Ga() {}}
             />
           </Grid.Col>
           <Grid.Col

@@ -1,4 +1,4 @@
-import { Behaviours, model, Shareable } from "entcore";
+//import { Behaviours, model, Shareable } from "entcore";
 
 import { Section } from "./section.model";
 import { FOLDER_TYPE } from "../core/enums/folder-type.enum";
@@ -180,12 +180,12 @@ export class BoardForm {
   }
 
   /*get sectionsIds(): Array<string> {
-    return this._sectionIds;
-  }
-
-  set sectionsIds(value: Array<string>) {
-    this._sectionIds = value;
-  }*/
+      return this._sectionIds;
+    }
+  
+    set sectionsIds(value: Array<string>) {
+      this._sectionIds = value;
+    }*/
 
   get tags(): Array<string> {
     return this._tags;
@@ -275,8 +275,8 @@ export class BoardForm {
     }
 
     /*if (this.sectionsIds) {
-      payload.sectionIds = this.sectionsIds;
-    }*/
+          payload.sectionIds = this.sectionsIds;
+        }*/
 
     if (this.tags) {
       payload.tags = this.tags;
@@ -480,9 +480,11 @@ export class Board /*implements Shareable*/ {
     this._tags = value;
   }
 
-    hasCardsSection(): boolean {
-        return !!this._sections ? this._sections.some(section => section.cards.length > 0) : false;
-    }
+  hasCardsSection(): boolean {
+    return this._sections
+      ? this._sections.some((section) => section.cards.length > 0)
+      : false;
+  }
 
   // cardIdsSection(): Array<string> {
   //     return !!this._sections ? this._sections.reduce((acc, section) => [...acc, ...section.cardIds], []) : [];
@@ -495,8 +497,8 @@ export class Board /*implements Shareable*/ {
   }
 
   /*isMyBoard(): boolean {
-    return this.owner.userId === model.me.userId;
-  }*/
+      return this.owner.userId === model.me.userId;
+    }*/
 
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;
@@ -534,11 +536,11 @@ export class Boards {
 
   constructor(data: IBoardsResponse) {
     /*this.all = data.all.map((board: IBoardItemResponse) =>
-      Behaviours.applicationsBehaviours.magneto.resource(
-        new Board().build(board),
-      ),
-    );*/
-      this.all = [];
+          Behaviours.applicationsBehaviours.magneto.resource(
+            new Board().build(board),
+          ),
+        );*/
+    this.all = [];
     this.page = data.page;
     this.pageCount = data.pageCount;
   }

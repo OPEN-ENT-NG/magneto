@@ -100,28 +100,9 @@ export const App = () => {
     deletedFolderNavTrees[0].isOpened = false;
     deletedFolderNavTrees[0].iconClass = "magneto.trash";
     
-    // setFolderNavTrees([...folderNavTrees, ...folders]);
     myFoldersObject = folderNavTrees[0].buildFolders(myFolders);
     deletedFoldersObject = deletedFolderNavTrees[0].buildFolders(deletedFolders);
-    console.log(myFoldersObject);
-    console.log(deletedFoldersObject);
-    // console.log(folderNavTrees);
   }
-
-  // useEffect(() => {
-    
-  // }, [folderNavTrees])
-
-  
-
-  
-
-  // let boardList = getBoards({isPublic: false,
-  //   isShared: false,
-  //   isDeleted: false,
-  //   sortBy: 'modificationDate'});
-
-  // console.log(boardList);
 
   return (
     <>

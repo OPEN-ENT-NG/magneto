@@ -1,4 +1,5 @@
 import React from "react";
+import "./TreeViewContent.scss";
 
 import {  Button, TreeView } from "@edifice-ui/react";
 import { useSelector } from "react-redux";
@@ -17,8 +18,7 @@ interface FolderTreeNavItem {
 
 //export const TreeViewContainer: React.FC<FolderTreeNavItem> = ({ id, name, iconClass, children, parentId, isOpened, ownerId, shared }) => {
   export const TreeViewContainer = ({folders:folders, folderType:folderType}) => {
-
-
+    
     /**
      * Check if the folder has a children (or sub-children) with the given id
      * @param folderId Folder identifier
@@ -127,14 +127,12 @@ interface FolderTreeNavItem {
     <>
       <TreeView
         data={folders?? dataTree}
-        onTreeItemBlur={function Ga() {}}
-        onTreeItemFocus={function Ga() {}}
-        onTreeItemFold={function Ga() {}}
-        onTreeItemSelect={function Ga() {}}
-        onTreeItemUnfold={function Ga() {}}
+        onTreeItemBlur={() => {console.log("blur")}}
+        onTreeItemFocus={() => {console.log("focus")}}
+        onTreeItemFold={() => {console.log("fold")}}
+        onTreeItemSelect={() => {console.log("clicked")}}
+        onTreeItemUnfold={() => {console.log("unfold")}}
       />
-
-
     </>
   );
 };

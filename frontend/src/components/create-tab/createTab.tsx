@@ -23,6 +23,9 @@ import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import myImage from "./collaborativeeditor-default.png";
 import { useBackground } from "../../hooks/useBackground";
 import { useThumb } from "../../hooks/useThumb";
+import { BoardForm, IBoardPayload } from "~/models/board.model";
+import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
+import { createBoard, getUrl } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -48,25 +51,36 @@ export const CreateTab: FunctionComponent<props> = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [disposition, setDisposition] = useState("free");
-  const [keyword, setKeyword] = useState("");
+  const [tagsTextInput, setTagsTextInput] = useState("");
+  const [tags, setTags] = useState([""]);
   const { background, handleDeleteBackground, handleUploadBackground } =
     useBackground({
       selectedResource: undefined,
     });
 
-  const onSubmit = function () {
-    console.log("yoo ptite liste");
-    console.log("thumbnail = " + thumbnail);
-    console.log("IsCommentChecked = " + IsCommentChecked);
-    console.log("isFavoriteChecked = " + isFavoriteChecked);
-    console.log("title = " + title);
-    console.log("description = " + description);
-    console.log("disposition = " + disposition);
-    console.log("keyword = " + keyword);
-    console.log("background = " + background);
+  const onSubmit = async (): Promise<void> => {
+    const board = new BoardForm();
+    board.title = title;
+    board.description = description;
+    //TODO : change this to work with a future workspace file manager
+    board.imageUrl = await getUrl(thumbnail as File);
+    board.backgroundUrl = await getUrl(background as File);
+    if (disposition == "vertical")
+      board.layoutType = LAYOUT_TYPE.VERTICAL;
+    else if (disposition == "horizontal")
+      board.layoutType = LAYOUT_TYPE.HORIZONTAL;
+    else
+      board.layoutType = LAYOUT_TYPE.FREE;
+    board.canComment = IsCommentChecked;
+    board.displayNbFavorites = isFavoriteChecked;
+    board.tags = tags;
+
+    const data = createBoard(board.toJSON());
+
+    toggle();
   };
 
-  const reset = function () {
+  const reset = (): void => {
     handleDeleteImage();
     handleDeleteBackground();
     setIsCommentChecked(false);
@@ -74,8 +88,40 @@ export const CreateTab: FunctionComponent<props> = ({
     setTitle("");
     setDescription("");
     setDisposition("free");
-    setKeyword("");
+    setTagsTextInput("");
     toggle();
+  };
+
+  const updateKeywords = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+
+    if (inputValue.length > 0 && inputValue[inputValue.length - 1] === ",") {
+      setTagsTextInput(inputValue.replace(",", ""));
+      return;
+    }
+
+    if (inputValue.length > 0 && inputValue[inputValue.length - 1] === " ") {
+      let inputArray = inputValue.split(" ");
+
+      inputArray = inputArray.map((keyword) => {
+        if (keyword === '') {
+          return '';
+        } else if (keyword[0] === "#") {
+          return keyword;
+        } else {
+          return "#" + keyword;
+        }
+      });
+
+      setTagsTextInput(inputArray.join(" "));
+    }
+
+    const updatedTags = inputValue
+      .split(" ")
+      .filter((keyword) => keyword !== '')
+      .map((keyword) => (keyword[0] === "#" ? keyword.substring(1).toLowerCase() : keyword.toLowerCase()));
+
+    setTags(updatedTags);
   };
 
   return (
@@ -157,7 +203,7 @@ export const CreateTab: FunctionComponent<props> = ({
                 <div>
                   <h5>Quelle disposition des aimants souhaitez-vous?</h5>
                   <div className="d-flex gap-16 align-items-center">
-                    <div className="d-flex gap-16 align-items-center">
+                    <div className="d-flex align-items-center">
                       <Radio
                         label="Libre"
                         model={disposition}
@@ -167,23 +213,23 @@ export const CreateTab: FunctionComponent<props> = ({
                       />
                       <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
                     </div>
-                    <div className="d-flex gap-16 align-items-center">
+                    <div className="d-flex align-items-center">
                       <Radio
                         label="Section verticale"
                         model={disposition}
                         onChange={(e) => setDisposition(e.target.value)}
                         value="vertical"
                         checked={disposition == "vertical"}
+                        className=""
                       />
                       <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
                     </div>
-                    <div className="d-flex gap-16 align-items-center">
+                    <div className="d-flex align-items-center">
                       <Radio
                         label="Section horizontale"
                         model={disposition}
                         onChange={(e) => {
                           setDisposition(e.target.value);
-                          console.log(e.target.value);
                         }}
                         value="horizontal"
                         checked={disposition == "horizontal"}
@@ -199,7 +245,11 @@ export const CreateTab: FunctionComponent<props> = ({
                       placeholder=""
                       size="md"
                       type="text"
-                      onChange={(e) => setKeyword(e.target.value)}
+                      value={tagsTextInput}
+                      onChange={(e) => {
+                        setTagsTextInput(e.target.value);
+                        updateKeywords(e);
+                      }}
                     />
                   </FormControl>
                 </div>

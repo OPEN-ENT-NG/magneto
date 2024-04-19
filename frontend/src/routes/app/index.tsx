@@ -78,7 +78,9 @@ export const App = () => {
             minHeight: "70rem",
             padding: ".8rem",
           }}
-        ></Grid.Col>
+        >
+          STUB
+        </Grid.Col>
         <Grid.Col
           sm="8"
           style={{

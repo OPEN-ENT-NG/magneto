@@ -79,7 +79,7 @@ export class BoardForm {
   private _backgroundUrl: string;
   private _folderId: string;
   private _cardIds: Array<string>;
-  private _sectionIds: Array<string>;
+  //private _sectionIds: Array<string>;
   private _public: boolean;
   private _tags: Array<string>;
   private _tagsTextInput: string;
@@ -95,7 +95,7 @@ export class BoardForm {
     this._backgroundUrl = "";
     this._folderId = "";
     this._cardIds = [];
-    this._sectionIds = [];
+    //this._sectionIds = [];
     this._public = false;
     this._tags = [];
     this._layoutType = LAYOUT_TYPE.FREE;
@@ -179,13 +179,13 @@ export class BoardForm {
     this._cardIds = value;
   }
 
-  get sectionsIds(): Array<string> {
+  /*get sectionsIds(): Array<string> {
     return this._sectionIds;
   }
 
   set sectionsIds(value: Array<string>) {
     this._sectionIds = value;
-  }
+  }*/
 
   get tags(): Array<string> {
     return this._tags;
@@ -274,9 +274,9 @@ export class BoardForm {
       payload.cardIds = this.cardIds;
     }
 
-    if (this.sectionsIds) {
+    /*if (this.sectionsIds) {
       payload.sectionIds = this.sectionsIds;
-    }
+    }*/
 
     if (this.tags) {
       payload.tags = this.tags;
@@ -306,7 +306,7 @@ export class BoardForm {
   }
 }
 
-export class Board implements Shareable {
+export class Board /*implements Shareable*/ {
   private _id: string;
   public _title: string = " ";
   private _imageUrl: string;
@@ -480,11 +480,9 @@ export class Board implements Shareable {
     this._tags = value;
   }
 
-  hasCardsSection(): boolean {
-    return this._sections
-      ? this._sections.some((section) => section.cards.length > 0)
-      : false;
-  }
+    hasCardsSection(): boolean {
+        return !!this._sections ? this._sections.some(section => section.cards.length > 0) : false;
+    }
 
   // cardIdsSection(): Array<string> {
   //     return !!this._sections ? this._sections.reduce((acc, section) => [...acc, ...section.cardIds], []) : [];
@@ -496,9 +494,9 @@ export class Board implements Shareable {
     );
   }
 
-  isMyBoard(): boolean {
+  /*isMyBoard(): boolean {
     return this.owner.userId === model.me.userId;
-  }
+  }*/
 
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;
@@ -535,11 +533,12 @@ export class Boards {
   pageCount: number;
 
   constructor(data: IBoardsResponse) {
-    this.all = data.all.map((board: IBoardItemResponse) =>
+    /*this.all = data.all.map((board: IBoardItemResponse) =>
       Behaviours.applicationsBehaviours.magneto.resource(
         new Board().build(board),
       ),
-    );
+    );*/
+      this.all = [];
     this.page = data.page;
     this.pageCount = data.pageCount;
   }

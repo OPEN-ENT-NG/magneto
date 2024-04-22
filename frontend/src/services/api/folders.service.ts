@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
 import { Folder } from "~/models/folder.model";
 //import { IHttpParams, odeServices } from "edifice-ts-client";
 
@@ -13,9 +14,9 @@ export const foldersApi = createApi({
     }),
     createFolder: builder.mutation({
       query: (folder: Folder) => ({
-        url: 'folder',
-        method: 'POST',
-        body: { title: folder.title, parentId: folder.parentId }
+        url: "folder",
+        method: "POST",
+        body: { title: folder.title, parentId: folder.parentId },
       }),
     }),
   }),

@@ -9,6 +9,7 @@ import { Card } from "~/components/card/Card.tsx";
 import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 import { CreateFolder } from "~/components/create-folder/CreateFolder";
+import Header from "~/components/header/Header";
 //import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 //import { getBoards } from "~/services/api/boards.service";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
@@ -86,7 +87,10 @@ export const App = () => {
           >
             DOSSIER
           </Button>
-          <CreateFolder isOpen={isCreateFolderOpen} toggle={toggleCreateFolderOpen} />
+          <CreateFolder
+            isOpen={isCreateFolderOpen}
+            toggle={toggleCreateFolderOpen}
+          />
         </Grid.Col>
         <Grid.Col
           sm="8"
@@ -177,11 +181,11 @@ export const App = () => {
                 name: "Section Element",
                 section: true,
               }}
-              onTreeItemBlur={function Ga() { }}
-              onTreeItemFocus={function Ga() { }}
-              onTreeItemFold={function Ga() { }}
-              onTreeItemSelect={function Ga() { }}
-              onTreeItemUnfold={function Ga() { }}
+              onTreeItemBlur={function Ga() {}}
+              onTreeItemFocus={function Ga() {}}
+              onTreeItemFold={function Ga() {}}
+              onTreeItemSelect={function Ga() {}}
+              onTreeItemUnfold={function Ga() {}}
             />
           </Grid.Col>
           <Grid.Col

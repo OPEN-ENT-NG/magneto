@@ -111,17 +111,19 @@ export const App = () => {
       
       <Grid>
         <Grid.Col
-          sm="4"
+          sm="3"
           style={{
             minHeight: "70rem",
             padding: ".8rem",
           }}
         >
 
-        <TreeViewContainer folders={myFoldersObject} folderType={FOLDER_TYPE.MY_BOARDS} />
-        <TreeViewContainer folders={{children: [], id: FOLDER_TYPE.PUBLIC_BOARDS, name: t("magneto.lycee.connecte.boards"), section: true}} folderType={FOLDER_TYPE.MY_BOARDS} />
-        <TreeViewContainer folders={deletedFoldersObject} folderType={FOLDER_TYPE.DELETED_BOARDS}/>
-        <TreeViewButtons />
+        <aside className="g-col-3 g-col-lg-2 g-col-xl-3 border-end pt-16 pe-16 d-none d-lg-block">
+          <TreeViewContainer folders={myFoldersObject} folderType={FOLDER_TYPE.MY_BOARDS} />
+          <TreeViewContainer folders={{children: [], id: FOLDER_TYPE.PUBLIC_BOARDS, name: t("magneto.lycee.connecte.boards"), section: true}} folderType={FOLDER_TYPE.MY_BOARDS} />
+          <TreeViewContainer folders={deletedFoldersObject} folderType={FOLDER_TYPE.DELETED_BOARDS}/>
+          <TreeViewButtons />
+        </aside>
 
         </Grid.Col>
         <Grid.Col

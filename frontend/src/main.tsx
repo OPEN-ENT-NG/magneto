@@ -1,6 +1,5 @@
 import React from "react";
 
-import "./i18n";
 import { OdeClientProvider, ThemeProvider } from "@edifice-ui/react";
 import {
   QueryCache,
@@ -14,6 +13,7 @@ import { Provider } from 'react-redux'
 import { setupStore } from './store'
 
 import { router } from "./routes";
+import '~/i18n';
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement!);

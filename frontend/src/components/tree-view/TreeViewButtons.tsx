@@ -1,12 +1,20 @@
 import React from "react";
 
+import { Add, AddUser, Folder, Plus, Save } from "@edifice-ui/icons";
 import {  Button, TreeView } from "@edifice-ui/react";
+import { Icon } from '@mdi/react';
+import { mdiFolderPlus, mdiStar } from '@mdi/js';
+import { useTranslation } from "react-i18next";
+
+
 
   export const TreeViewButtons = () => {
+  const { t } = useTranslation();
+
 
   return (
     <>
-      <div>
+      <div className="d-grid my-16">
         <Button
           type={'button'}
           /**
@@ -24,11 +32,11 @@ import {  Button, TreeView } from "@edifice-ui/react";
           /**
            * Does it has a text ?
            */
-          children={'Créer un dossier'}
+          children={t('magneto.create.folder')}
           /**
            * Display Icon Component to the left
            */
-          leftIcon={<Plus />}
+          leftIcon={<Icon path={mdiFolderPlus} size={1}></Icon>}
           
           /**
            * Is it loading ?
@@ -57,7 +65,7 @@ import {  Button, TreeView } from "@edifice-ui/react";
           /**
            * Display Icon Component to the left
            */
-          // leftIcon={<i></i>}
+          leftIcon={<Icon path={mdiStar} size={1}></Icon>}
           
           /**
            * Is it loading ?

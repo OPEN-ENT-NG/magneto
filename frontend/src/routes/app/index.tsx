@@ -1,7 +1,6 @@
 import React from "react";
 import { useEffect, useState } from 'react';
 
-
 import { Heading, TreeView, Grid } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 

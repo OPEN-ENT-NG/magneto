@@ -1,6 +1,6 @@
 import {FOLDER_TYPE} from "../core/enums/folder-type.enum";
 import {  } from "edifice-ts-client";
-import {Behaviours, model, Shareable} from "entcore";
+// import {Behaviours, model, Shareable} from "entcore";
 import {LAYOUT_TYPE} from "../core/enums/layout-type.enum";
 import {Section} from "./section.model";
 
@@ -301,7 +301,7 @@ export class BoardForm {
     }
 }
 
-export class Board implements Shareable {
+export class Board {
     private _id: string;
     public _title: string = " ";
     private _imageUrl: string;

@@ -7,7 +7,7 @@ import { ID } from "edifice-ts-client";
 import { Card } from "~/components/card/Card.tsx";
 import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 // import { getFolders } from "~/services/api/folders.service";
-import { getBoards } from "~/services/api/boards.service";
+import { getBoards, useGetBoardsQuery } from "~/services/api/boards.service";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { formControlClasses } from "@mui/material";
 import { FolderTreeNavItem, IFolderTreeNavItem } from "~/models/folder-tree.model";
@@ -15,6 +15,7 @@ import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { useTranslation } from "react-i18next";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { TreeViewButtons } from "~/components/tree-view/TreeViewButtons";
+import { Board, IBoardItemResponse } from "~/models/board.model";
 
 // const ExportModal = lazy(async () => await import("~/features/export-modal"));
 
@@ -102,6 +103,21 @@ export const App = () => {
     myFoldersObject = folderNavTrees[0].buildFolders(myFolders);
     deletedFoldersObject = deletedFolderNavTrees[0].buildFolders(deletedFolders);
   }
+
+  const { data: myBoardsResult, isLoading: getBoardsLoading, error: getBoardsError } = useGetBoardsQuery({
+    isPublic: false, isShared: false, isDeleted: false, sortBy: 'modificationDate'});
+  console.log(myBoardsResult);
+
+  // let boards;
+ 
+  if (getBoardsError) {
+    console.log("Boards error");
+  } else if (getBoardsLoading) {
+    console.log("Boards loading");
+  } else { 
+    setBoards(myBoardsResult.map(((board: IBoardItemResponse) => new Board().build(board)))); //convert folders to Folder[]
+  }
+
 
   return (
     <>

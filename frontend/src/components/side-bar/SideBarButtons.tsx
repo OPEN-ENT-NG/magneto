@@ -1,14 +1,13 @@
 import React from "react";
 
-import { Add, AddUser, Folder, Plus, Save } from "@edifice-ui/icons";
-import {  Button, TreeView } from "@edifice-ui/react";
+import {  Button } from "@edifice-ui/react";
 import { Icon } from '@mdi/react';
 import { mdiFolderPlus, mdiStar } from '@mdi/js';
 import { useTranslation } from "react-i18next";
 
 
 
-  export const TreeViewButtons = () => {
+  export const SideBarButtons = () => {
   const { t } = useTranslation();
 
 

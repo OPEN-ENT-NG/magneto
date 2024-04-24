@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { SideBar } from "~/components/side-bar/SideBar";
+import { ContentPage } from "~/components/content-page/ContentPage";
 
 // const ExportModal = lazy(async () => await import("~/features/export-modal"));
 
@@ -131,10 +132,9 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
-
         <SideBar />
-
         </Grid.Col>
+
         <Grid.Col
           sm="8"
           style={{
@@ -142,6 +142,7 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
+          <ContentPage />
           <Card title={"Main"} content={"NON"} />
         </Grid.Col>
       </Grid>

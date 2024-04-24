@@ -1,5 +1,4 @@
 import React from "react";
-import "./TreeViewContent.scss";
 
 import {  Button, TreeView } from "@edifice-ui/react";
 import { useSelector } from "react-redux";
@@ -18,7 +17,7 @@ interface FolderTreeNavItem {
   shared: any[];
 }
 
-export const FolderList = ({folderData:folderData}) => {
+export const FolderList = ({folderData:data}) => {
     
 
   return (

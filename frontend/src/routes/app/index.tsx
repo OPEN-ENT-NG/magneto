@@ -19,6 +19,7 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { SideBar } from "~/components/side-bar/SideBar";
+import { ContentPage } from "~/components/content-page/ContentPage";
 
 export interface AppProps {
   _id: string;
@@ -223,6 +224,7 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
+<<<<<<< HEAD
 
           <aside className="g-col-3 g-col-lg-2 g-col-xl-3 border-end pt-16 pe-16 d-none d-lg-block">
             <TreeViewContainer
@@ -249,7 +251,11 @@ export const App = () => {
         <SideBar />
 
 >>>>>>> 8076f6a... feat(react): #MAG-391 display main page
+=======
+        <SideBar />
+>>>>>>> c084fac... feat(react): #MAG-391 display main page
         </Grid.Col>
+
         <Grid.Col
           sm="8"
           style={{
@@ -257,6 +263,7 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
+          <ContentPage />
           <Card title={"Main"} content={"NON"} />
           <CreateTab isOpen={isOpen} toggle={toggle} />
         </Grid.Col>

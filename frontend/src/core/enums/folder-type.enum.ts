@@ -4,4 +4,3 @@ export enum FOLDER_TYPE {
   DELETED_BOARDS = "deleted-boards",
 }
 
-export const MAIN_PAGE_TITLE = "Mes tableaux";

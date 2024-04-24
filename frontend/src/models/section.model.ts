@@ -192,9 +192,9 @@ export class Section {
     return this._cards;
   }
 
-  // get displayed(): boolean {
-  //     return this._displayed;
-  // }
+  get displayed(): boolean {
+      return !!this._displayed;
+  }
 
   set displayed(value: boolean) {
     this._displayed = value;

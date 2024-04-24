@@ -1,4 +1,3 @@
-// import {model} from "entcore";
 import { FolderTreeNavItem } from "./folder-tree.model";
 
 export interface IFolderResponse {

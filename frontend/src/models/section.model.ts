@@ -193,7 +193,7 @@ export class Section {
   }
 
   get displayed(): boolean {
-      return !!this._displayed;
+    return !!this._displayed;
   }
 
   set displayed(value: boolean) {

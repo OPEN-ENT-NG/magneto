@@ -13,8 +13,5 @@
       }
     }
   },
-  "required": [
-    "sectionIds",
-    "boardId"
-  ]
+  "required": ["sectionIds", "boardId"]
 }

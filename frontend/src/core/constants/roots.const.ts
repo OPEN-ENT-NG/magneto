@@ -1,3 +1,3 @@
 export const RootsConst = {
-    directive: '/magneto/public/ts/directives/'
+  directive: "/magneto/public/ts/directives/",
 };

@@ -31,7 +31,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "resourceType", "boardId"
-  ]
+  "required": ["resourceType", "boardId"]
 }

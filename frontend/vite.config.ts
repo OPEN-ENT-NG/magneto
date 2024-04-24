@@ -14,26 +14,26 @@ export default ({ mode }: { mode: string }) => {
   // Proxy variables
   const headers = hasEnvFile
     ? {
-      "set-cookie": [
-        `oneSessionId=${envs.VITE_ONE_SESSION_ID}`,
-        `XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
-      ],
-      "Cache-Control": "public, max-age=300",
-    }
+        "set-cookie": [
+          `oneSessionId=${envs.VITE_ONE_SESSION_ID}`,
+          `XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
+        ],
+        "Cache-Control": "public, max-age=300",
+      }
     : {};
 
   const proxyObj = hasEnvFile
     ? {
-      target: envs.VITE_RECETTE,
-      changeOrigin: true,
-      headers: {
-        cookie: `oneSessionId=${envs.VITE_ONE_SESSION_ID};authenticated=true; XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
-      },
-    }
+        target: envs.VITE_RECETTE,
+        changeOrigin: true,
+        headers: {
+          cookie: `oneSessionId=${envs.VITE_ONE_SESSION_ID};authenticated=true; XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
+        },
+      }
     : {
-      target: envs.VITE_LOCALHOST || "http://localhost:8090",
-      changeOrigin: false,
-    };
+        target: envs.VITE_LOCALHOST || "http://localhost:8090",
+        changeOrigin: false,
+      };
 
   const proxy = {
     "/applications-list": proxyObj,
@@ -64,7 +64,7 @@ export default ({ mode }: { mode: string }) => {
             "react-error-boundary",
             "react-hook-form",
             "react-hot-toast",
-          ]
+          ],
         },
         paths: {
           "edifice-ts-client": "/assets/js/edifice-ts-client/index.js",
@@ -81,13 +81,13 @@ export default ({ mode }: { mode: string }) => {
     port: 4200,
     headers,
     open: true,
-    strictPort: true
+    strictPort: true,
   };
 
   const test = {
     globals: true,
-    environment: 'happy-dom',
-    setupFiles: './src/tests/setup.ts',
+    environment: "happy-dom",
+    setupFiles: "./src/tests/setup.ts",
   };
 
   return defineConfig({
@@ -95,6 +95,6 @@ export default ({ mode }: { mode: string }) => {
     build,
     plugins,
     server,
-    test
+    test,
   });
 };

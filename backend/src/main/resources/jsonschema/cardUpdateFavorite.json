@@ -7,7 +7,5 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "isFavorite"
-  ]
+  "required": ["isFavorite"]
 }

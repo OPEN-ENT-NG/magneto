@@ -14,7 +14,5 @@
       }
     }
   },
-  "required": [
-    "boardIds"
-  ]
+  "required": ["boardIds"]
 }

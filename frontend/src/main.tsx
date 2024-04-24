@@ -9,11 +9,11 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
-import { Provider } from 'react-redux'
-import { setupStore } from './store'
+import { Provider } from "react-redux";
+import { setupStore } from "./store";
 
 import { router } from "./routes";
-import '~/i18n';
+import "~/i18n";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement!);
@@ -44,19 +44,16 @@ const queryClient = new QueryClient({
 
 root.render(
   <QueryClientProvider client={queryClient}>
-    <Provider
-      store={store}
-    >
+    <Provider store={store}>
       <OdeClientProvider
-          params={{
-            app: "myApp",
-          }}
-        >
+        params={{
+          app: "myApp",
+        }}
+      >
         <ThemeProvider>
           <RouterProvider router={router} />
         </ThemeProvider>
-
-      </OdeClientProvider>     
+      </OdeClientProvider>
     </Provider>
     <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>,

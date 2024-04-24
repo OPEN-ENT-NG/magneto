@@ -1,7 +1,7 @@
 import React from "react";
 import "./TreeViewContent.scss";
 
-import {  Button, TreeView } from "@edifice-ui/react";
+import { Button, TreeView } from "@edifice-ui/react";
 import { useSelector } from "react-redux";
 
 // import * as MaterialDesign from "react-icons/md";
@@ -18,32 +18,38 @@ interface FolderTreeNavItem {
 }
 
 //export const TreeViewContainer: React.FC<FolderTreeNavItem> = ({ id, name, iconClass, children, parentId, isOpened, ownerId, shared }) => {
-  export const TreeViewContainer = ({folders:folders, folderType:folderType}) => {
-    
-    /**
-     * Check if the folder has a children (or sub-children) with the given id
-     * @param folderId Folder identifier
-     */
-    const childrenContainsId = (folderId: string): boolean => {
-      return this.id == folderId
-          || this.children.some((folder: FolderTreeNavItem) => folder.id === folderId
-          || folder.childrenContainsId(folderId));
-  }
+export const TreeViewContainer = ({
+  folders: folders,
+  folderType: folderType,
+}) => {
+  /**
+   * Check if the folder has a children (or sub-children) with the given id
+   * @param folderId Folder identifier
+   */
+  const childrenContainsId = (folderId: string): boolean => {
+    return (
+      this.id == folderId ||
+      this.children.some(
+        (folder: FolderTreeNavItem) =>
+          folder.id === folderId || folder.childrenContainsId(folderId),
+      )
+    );
+  };
 
   /**
    * Open all folders from the given children folder to the current folder
    * @param folderId Folder identifier
    */
   const openChildrenToId = (folderId: string): void => {
-      if (this.childrenContainsId(folderId)) {
-          this._isOpened = true;
-          if (this.children) {
-              this.children.forEach((folder: FolderTreeNavItem) => {
-                  folder.openChildrenToId(folderId);
-              });
-          }
+    if (this.childrenContainsId(folderId)) {
+      this._isOpened = true;
+      if (this.children) {
+        this.children.forEach((folder: FolderTreeNavItem) => {
+          folder.openChildrenToId(folderId);
+        });
       }
-  }
+    }
+  };
 
   let treeExample = {
     children: [
@@ -115,7 +121,6 @@ interface FolderTreeNavItem {
     section: true,
   };
 
-
   let dataTree = {
     children: [],
     id: folderType,
@@ -123,16 +128,25 @@ interface FolderTreeNavItem {
     section: true,
   };
 
-
   return (
     <>
       <TreeView
-        data={folders?? dataTree}
-        onTreeItemBlur={() => {console.log("blur")}}
-        onTreeItemFocus={() => {console.log("focus")}}
-        onTreeItemFold={() => {console.log("fold")}}
-        onTreeItemSelect={() => {console.log("clicked")}}
-        onTreeItemUnfold={() => {console.log("unfold")}}
+        data={folders ?? dataTree}
+        onTreeItemBlur={() => {
+          console.log("blur");
+        }}
+        onTreeItemFocus={() => {
+          console.log("focus");
+        }}
+        onTreeItemFold={() => {
+          console.log("fold");
+        }}
+        onTreeItemSelect={() => {
+          console.log("clicked");
+        }}
+        onTreeItemUnfold={() => {
+          console.log("unfold");
+        }}
       />
     </>
   );

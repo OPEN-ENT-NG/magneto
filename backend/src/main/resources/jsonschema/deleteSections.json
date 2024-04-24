@@ -20,7 +20,5 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "sectionIds"
-  ]
+  "required": ["sectionIds"]
 }

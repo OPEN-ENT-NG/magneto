@@ -30,7 +30,7 @@ export class CardComment {
     return this;
   }
 
-  build(data: ICardItemCommentResponse): CardComment {
+  build(data?: ICardItemCommentResponse): CardComment {
     if (data == null) return this;
     this._id = data._id ? data._id : "";
     this._ownerId = data.ownerId;

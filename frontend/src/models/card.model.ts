@@ -35,7 +35,7 @@ export interface ICardsResponse {
 }
 
 export interface ICardsParamsRequest {
-  page?: number;
+  page: number;
   boardId?: string;
   searchText?: string;
   sortBy?: string;
@@ -88,7 +88,7 @@ export class CardForm {
   private _resourceType: string;
   private _resourceUrl: string;
   private _resourceFileName: string;
-  private _resource: FileViewModel;
+  private _resource: FileViewModel | undefined;
   private _boardId: string;
   private _sectionId: string;
 
@@ -214,7 +214,7 @@ export class CardForm {
   }
 
   get resource(): FileViewModel {
-    return this._resource;
+    return this._resource ? this._resource : "";
   }
 
   set resource(value: FileViewModel) {
@@ -246,7 +246,7 @@ export class CardForm {
 }
 
 export class Card {
-  private _id: string;
+  private _id?: string;
   private _title: string;
   private _resourceId: string;
   private _resourceType: string;
@@ -261,13 +261,13 @@ export class Card {
   private _lastModifierId: string;
   private _lastModifierName: string;
   private _boardId: string;
-  private _boardTitle: string;
+  private _boardTitle?: string;
   private _parentId: string;
   private _metadata: IMetadata;
-  private _nbOfComments: number;
-  private _lastComment: CardComment;
-  private _nbOfFavorites: number;
-  private _liked: boolean;
+  private _nbOfComments?: number;
+  private _lastComment?: CardComment;
+  private _nbOfFavorites?: number;
+  private _liked?: boolean;
   private _resource?: FileViewModel;
 
   constructor() {
@@ -304,49 +304,49 @@ export class Card {
     return this;
   }
 
-  // build(data: ICardItemResponse): Card {
-  //     this._id = data._id ? data._id : data.id;
-  //     this._title = data.title;
-  //     this._resourceId = data.resourceId;
-  //     this._resourceType = data.resourceType;
-  //     this._resourceUrl = data.resourceUrl;
-  //     this._description = data.description;
-  //     this._caption = data.caption;
-  //     this._locked = data.locked;
-  //     this._modificationDate = data.modificationDate;
-  //     this._creationDate = data.creationDate;
-  //     this._ownerId = data.ownerId;
-  //     this._ownerName = data.ownerName;
-  //     this._lastModifierId = data.lastModifierId;
-  //     this._lastModifierName = data.lastModifierName;
-  //     this._boardId = data.boardId;
-  //     this._boardTitle = data.boardTitle;
-  //     this._parentId = data.parentId;
-  //     this._metadata = data.metadata;
-  //     this._nbOfComments = data.nbOfComments;
-  //     this._lastComment = (data.nbOfComments != null && data.nbOfComments > 0) ?
-  //                         new CardComment().build(data.lastComment) : null;
-  //     this._nbOfFavorites = data.nbOfFavorites;
-  //     this._liked = data.liked;
-  //     if(this._resourceType === "file")
-  //     this._resource = this.initResource();
-  //     return this;
-  // }
+  build(data: ICardItemResponse): Card {
+    this._id = data._id ? data._id : data.id;
+    this._title = data.title;
+    this._resourceId = data.resourceId;
+    this._resourceType = data.resourceType;
+    this._resourceUrl = data.resourceUrl;
+    this._description = data.description;
+    this._caption = data.caption;
+    this._locked = data.locked;
+    this._modificationDate = data.modificationDate;
+    this._creationDate = data.creationDate;
+    this._ownerId = data.ownerId;
+    this._ownerName = data.ownerName;
+    this._lastModifierId = data.lastModifierId;
+    this._lastModifierName = data.lastModifierName;
+    this._boardId = data.boardId;
+    this._boardTitle = data.boardTitle;
+    this._parentId = data.parentId;
+    this._metadata = data.metadata;
+    this._nbOfComments = data.nbOfComments;
+    this._lastComment = (data.nbOfComments != null && data.nbOfComments > 0) ?
+      new CardComment().build(data.lastComment) : undefined;
+    this._nbOfFavorites = data.nbOfFavorites;
+    this._liked = data.liked;
+    if (this._resourceType === "file")
+      this._resource = undefined;//this.initResource(); 
+    return this;
+  }
 
-  initResource(): FileViewModel {
+  initResource(): FileViewModel { //TODO : add FileViewModel to the project
     this._resource = new FileViewModel();
-    this._resource._id = this._resourceId;
+    /*this._resource._id = this._resourceId;
     this._resource.metadata = this.metadata;
     if (!this._resource.metadata["content-type"])
       this._resource.metadata["content-type"] = this.metadata.contentType;
     this._resource.name = this.title;
     this._resource.ownerName = this.ownerName;
-    this._resource.link = `/workspace/document/${this.resourceId}`;
+    this._resource.link = `/workspace/document/${this.resourceId}`;*/
     return this._resource;
   }
 
   get id(): string {
-    return this._id;
+    return this._id ? this._id : "";
   }
 
   get title(): string {
@@ -414,7 +414,7 @@ export class Card {
   }
 
   get boardTitle(): string {
-    return this._boardTitle;
+    return this._boardTitle ? this._boardTitle : "";
   }
 
   set boardTitle(value: string) {
@@ -454,7 +454,7 @@ export class Card {
   }
 
   get nbOfComments(): number {
-    return this._nbOfComments;
+    return this._nbOfComments ? this._nbOfComments : 0;
   }
 
   set nbOfComments(value: number) {
@@ -462,7 +462,7 @@ export class Card {
   }
 
   get lastComment(): CardComment {
-    return this._lastComment;
+    return this._lastComment ? this._lastComment : new CardComment();
   }
 
   set lastComment(value: CardComment) {
@@ -470,7 +470,7 @@ export class Card {
   }
 
   get nbOfFavorites(): number {
-    return this._nbOfFavorites;
+    return this._nbOfFavorites ? this._nbOfFavorites : 0;
   }
 
   set nbOfFavorites(value: number) {
@@ -478,7 +478,7 @@ export class Card {
   }
 
   get liked(): boolean {
-    return this._liked;
+    return this._liked ? this._liked : false;
   }
 
   set liked(value: boolean) {
@@ -496,7 +496,7 @@ export class Card {
   // }
 
   get resource(): FileViewModel {
-    return this._resource;
+    return this._resource ? this._resource : "";
   }
 
   set resource(value: FileViewModel) {

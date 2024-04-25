@@ -79,7 +79,7 @@ export class BoardForm {
   private _backgroundUrl: string;
   private _folderId: string;
   private _cardIds: Array<string>;
-  //private _sectionIds: Array<string>;
+  private _sectionIds: Array<string>;
   private _public: boolean;
   private _tags: Array<string>;
   private _tagsTextInput: string;
@@ -95,7 +95,7 @@ export class BoardForm {
     this._backgroundUrl = "";
     this._folderId = "";
     this._cardIds = [];
-    //this._sectionIds = [];
+    this._sectionIds = [];
     this._public = false;
     this._tags = [];
     this._layoutType = LAYOUT_TYPE.FREE;
@@ -179,13 +179,13 @@ export class BoardForm {
     this._cardIds = value;
   }
 
-  /*get sectionsIds(): Array<string> {
-      return this._sectionIds;
-    }
-  
-    set sectionsIds(value: Array<string>) {
-      this._sectionIds = value;
-    }*/
+  get sectionsIds(): Array<string> {
+    return this._sectionIds;
+  }
+
+  set sectionsIds(value: Array<string>) {
+    this._sectionIds = value;
+  }
 
   get tags(): Array<string> {
     return this._tags;
@@ -274,9 +274,9 @@ export class BoardForm {
       payload.cardIds = this.cardIds;
     }
 
-    /*if (this.sectionsIds) {
-          payload.sectionIds = this.sectionsIds;
-        }*/
+    if (this.sectionsIds && this.sectionsIds.length > 0) {
+      payload.sectionIds = this.sectionsIds;
+    }
 
     if (this.tags) {
       payload.tags = this.tags;

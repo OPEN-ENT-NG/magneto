@@ -46,7 +46,7 @@ export const CreateTab: FunctionComponent<props> = ({
   const { thumbnail, handleDeleteImage, handleUploadImage } = useThumb({
     selectedResource: undefined,
   });
-  const [IsCommentChecked, setIsCommentChecked] = useState(false);
+  const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -69,7 +69,7 @@ export const CreateTab: FunctionComponent<props> = ({
     else if (disposition == "horizontal")
       board.layoutType = LAYOUT_TYPE.HORIZONTAL;
     else board.layoutType = LAYOUT_TYPE.FREE;
-    board.canComment = IsCommentChecked;
+    board.canComment = isCommentChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
 
@@ -91,7 +91,7 @@ export const CreateTab: FunctionComponent<props> = ({
   };
 
   const updateKeywords = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
+    const inputValue: string = event.target.value;
 
     if (inputValue.length > 0 && inputValue[inputValue.length - 1] === ",") {
       setTagsTextInput(inputValue.replace(",", ""));
@@ -99,7 +99,7 @@ export const CreateTab: FunctionComponent<props> = ({
     }
 
     if (inputValue.length > 0 && inputValue[inputValue.length - 1] === " ") {
-      let inputArray = inputValue.split(" ");
+      let inputArray: string[] = inputValue.split(" ");
 
       inputArray = inputArray.map((keyword) => {
         if (keyword === "") {
@@ -114,7 +114,7 @@ export const CreateTab: FunctionComponent<props> = ({
       setTagsTextInput(inputArray.join(" "));
     }
 
-    const updatedTags = inputValue
+    const updatedTags: string[] = inputValue
       .split(" ")
       .filter((keyword) => keyword !== "")
       .map((keyword) =>
@@ -187,7 +187,7 @@ export const CreateTab: FunctionComponent<props> = ({
                   <div className="mb-1-5">
                     <h5 className="mb-1">Options du tableau</h5>
                     <Checkbox
-                      checked={IsCommentChecked}
+                      checked={isCommentChecked}
                       label="Permettre aux utilisateurs de commenter les aimants"
                       onChange={() =>
                         setIsCommentChecked(

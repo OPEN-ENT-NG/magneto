@@ -32,16 +32,6 @@ export class FolderTreeNavItem {
    */
   private _children: Array<FolderTreeNavItem>;
 
-  // /**
-  //  * Parent folder identifier
-  //  */
-  // private _parentId: string;
-
-  // /**
-  //  * Is opened in the folder tree or not
-  //  */
-  // private _isOpened: boolean;
-
   /**
    * Id of folder owner
    */
@@ -56,15 +46,12 @@ export class FolderTreeNavItem {
 
   constructor(
     folder: IFolderTreeNavItem,
-    isOpened?: boolean,
     iconClass?: string,
   ) {
     this._id = folder.id;
     this._name = folder.title;
-    // this._parentId = folder.parentId;
     this._children = [];
     // this._iconClass = iconClass ? iconClass : "";
-    // this._isOpened = (isOpened !== null && isOpened) ? isOpened : false;
     this._ownerId = folder.ownerId ? folder.ownerId : "";
     this._shared = folder.shared ? folder.shared : [];
     this._section = false;
@@ -101,22 +88,6 @@ export class FolderTreeNavItem {
   set children(value: Array<FolderTreeNavItem>) {
     this._children = value;
   }
-
-  // get parentId(): string {
-  //     return this._parentId;
-  // }
-
-  // set parentId(value: string) {
-  //     this._parentId = value;
-  // }
-
-  // get isOpened(): boolean {
-  //     return this._isOpened;
-  // }
-
-  // set isOpened(value: boolean) {
-  //     this._isOpened = value;
-  // }
 
   get ownerId(): string {
     return this._ownerId;
@@ -155,21 +126,6 @@ export class FolderTreeNavItem {
       )
     );
   }
-
-  // /**
-  //  * Open all folders from the given children folder to the current folder
-  //  * @param folderId Folder identifier
-  //  */
-  // openChildrenToId(folderId: string): void {
-  //     if (this.childrenContainsId(folderId)) {
-  //         this._isOpened = true;
-  //         if (this.children) {
-  //             this.children.forEach((folder: FolderTreeNavItem) => {
-  //                 folder.openChildrenToId(folderId);
-  //             });
-  //         }
-  //     }
-  // }
 
   /**
    * Populate/Update the children list from the given folder list

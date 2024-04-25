@@ -4,8 +4,6 @@ import "./TreeViewContent.scss";
 import { Button, TreeView } from "@edifice-ui/react";
 import { useSelector } from "react-redux";
 
-// import * as MaterialDesign from "react-icons/md";
-
 interface FolderTreeNavItem {
   id: string;
   name: string;
@@ -17,7 +15,6 @@ interface FolderTreeNavItem {
   shared: any[];
 }
 
-//export const TreeViewContainer: React.FC<FolderTreeNavItem> = ({ id, name, iconClass, children, parentId, isOpened, ownerId, shared }) => {
 export const TreeViewContainer = ({
   folders: folders,
   folderType: folderType,
@@ -49,76 +46,6 @@ export const TreeViewContainer = ({
         });
       }
     }
-  };
-
-  let treeExample = {
-    children: [
-      {
-        children: [
-          {
-            children: [
-              {
-                children: [
-                  {
-                    id: "12",
-                    name: "level 4 arborescence tree",
-                  },
-                  {
-                    id: "13",
-                    name: "nul james",
-                  },
-                ],
-                id: "8",
-                name: "level 3 arborescence tree",
-              },
-              {
-                id: "9",
-                name: "level 3 arborescence tree",
-              },
-            ],
-            id: "4",
-            name: "level 2 arborescence tree",
-          },
-          {
-            children: [
-              {
-                id: "10",
-                name: "level 3 arborescence tree",
-              },
-              {
-                id: "11",
-                name: "level 3 arborescence tree",
-              },
-            ],
-            id: "5",
-            name: "level 2 arborescence tree",
-          },
-        ],
-        id: "1",
-        name: "level 1 arborescence tree",
-      },
-      {
-        children: [
-          {
-            id: "6",
-            name: "level 2 arborescence tree",
-          },
-          {
-            id: "7",
-            name: "level 2 arborescence tree",
-          },
-        ],
-        id: "2",
-        name: "level 1 arborescence tree",
-      },
-      {
-        id: "3",
-        name: "level 1 arborescence tree",
-      },
-    ],
-    id: "root",
-    name: "Section Element",
-    section: true,
   };
 
   let dataTree = {

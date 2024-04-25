@@ -1,8 +1,6 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { TreeView, Grid, Heading, useToggle, Button } from "@edifice-ui/react";
-//import { formControlClasses } from "@mui/material";
+import { Grid, Heading, useToggle, Button } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
@@ -11,18 +9,13 @@ import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 //import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 //import { getBoards } from "~/services/api/boards.service";
+import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
-import { formControlClasses } from "@mui/material";
-import {
-  FolderTreeNavItem,
-  IFolderTreeNavItem,
-} from "~/models/folder-tree.model";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { useTranslation } from "react-i18next";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { TreeViewButtons } from "~/components/tree-view/TreeViewButtons";
-
-// const ExportModal = lazy(async () => await import("~/features/export-modal"));
 
 export interface AppProps {
   _id: string;
@@ -88,7 +81,6 @@ export const App = () => {
         parentId: "",
         section: true,
       },
-      false,
       "magneto-check-decagram",
     ),
   ]);
@@ -102,7 +94,6 @@ export const App = () => {
         parentId: "",
         section: true,
       },
-      false,
       "magneto-earth",
     ),
   ]);
@@ -116,14 +107,10 @@ export const App = () => {
         parentId: "",
         section: true,
       },
-      false,
       "magneto.trash",
     ),
   ]);
   const [folderMoveNavTrees, setFolderMoveNavTrees] = useState([]);
-  // this.selectedUpdateBoardForm = new BoardForm();
-  // this.selectedUpdateFolderForm = {id: null, title: ''};
-  // this.deletedFolders = await this.getDeletedFolders();
 
   const {
     data: myFoldersResult,
@@ -151,13 +138,6 @@ export const App = () => {
     let deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     );
-
-    // folderNavTrees[0].isOpened = false;
-    // folderNavTrees[0].iconClass = "magneto.my.boards";
-    // publicFolderNavTrees[0].isOpened = false;
-    // publicFolderNavTrees[0].iconClass = "'magneto.lycee.connecte.boards";
-    // deletedFolderNavTrees[0].isOpened = false;
-    // deletedFolderNavTrees[0].iconClass = "magneto.trash";
 
     myFoldersObject = folderNavTrees[0].buildFolders(myFolders);
     deletedFoldersObject =

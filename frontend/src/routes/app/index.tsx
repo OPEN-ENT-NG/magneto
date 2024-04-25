@@ -6,9 +6,8 @@ import { TreeView, Grid, useToggle, Button } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
-import { CreateTab } from "~/components/create-tab/createTab";
-import Header from "~/components/header/Header";
 import { CreateFolder } from "~/components/create-folder/CreateFolder";
+import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 //import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 //import { getBoards } from "~/services/api/boards.service";
@@ -181,11 +180,11 @@ export const App = () => {
                 name: "Section Element",
                 section: true,
               }}
-              onTreeItemBlur={function Ga() {}}
-              onTreeItemFocus={function Ga() {}}
-              onTreeItemFold={function Ga() {}}
-              onTreeItemSelect={function Ga() {}}
-              onTreeItemUnfold={function Ga() {}}
+              onTreeItemBlur={function Ga() { }}
+              onTreeItemFocus={function Ga() { }}
+              onTreeItemFold={function Ga() { }}
+              onTreeItemSelect={function Ga() { }}
+              onTreeItemUnfold={function Ga() { }}
             />
           </Grid.Col>
           <Grid.Col

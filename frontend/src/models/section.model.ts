@@ -103,7 +103,6 @@ export class SectionForm {
   set displayed(value: boolean) {
     this._displayed = value;
   }
-
   isValid(): boolean {
     return this.title !== null && this.title !== "";
   }

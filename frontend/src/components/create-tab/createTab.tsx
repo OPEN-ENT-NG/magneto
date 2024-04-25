@@ -75,7 +75,7 @@ export const CreateTab: FunctionComponent<props> = ({
 
     createBoard(board.toJSON());
 
-    toggle();
+    reset();
   };
 
   const reset = (): void => {

@@ -1,12 +1,12 @@
 import React from "react";
 //import { useState } from 'react';
 
-import { TreeView, Grid, useToggle } from "@edifice-ui/react";
-//import { formControlClasses } from "@mui/material";
+import { TreeView, Grid, useToggle, Button } from "@edifice-ui/react";
 //import { formControlClasses } from "@mui/material";
 import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
+import { CreateFolder } from "~/components/create-folder/CreateFolder";
 import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 //import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
@@ -30,6 +30,7 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
   console.log("i am in app");
+  const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
 
   /*const [isLoading, setIsLoading] = useState(false);
   const [openedFolder, setOpenedFolder] = useState(null);
@@ -76,7 +77,19 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
-          STUB
+          <Button
+            color="primary"
+            type="button"
+            variant="filled"
+            onClick={toggleCreateFolderOpen}
+            className="button"
+          >
+            DOSSIER
+          </Button>
+          <CreateFolder
+            isOpen={isCreateFolderOpen}
+            toggle={toggleCreateFolderOpen}
+          />
         </Grid.Col>
         <Grid.Col
           sm="8"

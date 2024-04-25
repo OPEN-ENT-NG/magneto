@@ -497,8 +497,8 @@ export class Board /*implements Shareable*/ {
   }
 
   /*isMyBoard(): boolean {
-      return this.owner.userId === model.me.userId;
-    }*/
+    return this.owner.userId === model.me.userId;
+  }*/
 
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;

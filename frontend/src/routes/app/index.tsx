@@ -1,7 +1,8 @@
 import React from "react";
 import { useState } from 'react';
 
-import { Heading, Grid, useToggle } from "@edifice-ui/react";
+import { TreeView, Heading, Grid, Button, useToggle } from "@edifice-ui/react";
+//import { formControlClasses } from "@mui/material";
 import { ID } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
@@ -14,6 +15,10 @@ import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { SideBar } from "~/components/side-bar/SideBar";
 import { ContentPage } from "~/components/content-page/ContentPage";
+import { Folder, IFolderResponse } from "~/models/folder.model";
+import { MagnetsCollectionModal } from "~/components/magnets-collection/MagnetsCollectionModal"
+//import { getBoards } from "~/services/api/boards.service";
+import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 export interface AppProps {
   _id: string;
@@ -30,6 +35,8 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
   const { t } = useTranslation();
+
+  const [isMagnetsCollectionOpen, toggleMagnetsCollectionOpen] = useToggle(false);
 
   // const [isLoading, setIsLoading] = useState(false);
   // const [openedFolder, setOpenedFolder] = useState(null);

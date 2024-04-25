@@ -44,10 +44,7 @@ export class FolderTreeNavItem {
 
   private _section: boolean;
 
-  constructor(
-    folder: IFolderTreeNavItem,
-    iconClass?: string,
-  ) {
+  constructor(folder: IFolderTreeNavItem, iconClass?: string) {
     this._id = folder.id;
     this._name = folder.title;
     this._children = [];

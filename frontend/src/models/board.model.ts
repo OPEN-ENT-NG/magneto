@@ -1,4 +1,4 @@
-import { Behaviours, model, Shareable } from "entcore";
+//import { Behaviours, model, Shareable } from "entcore";
 
 import { Section } from "./section.model";
 import { FOLDER_TYPE } from "../core/enums/folder-type.enum";
@@ -274,7 +274,7 @@ export class BoardForm {
       payload.cardIds = this.cardIds;
     }
 
-    if (this.sectionsIds) {
+    if (this.sectionsIds && this.sectionsIds.length > 0) {
       payload.sectionIds = this.sectionsIds;
     }
 
@@ -306,7 +306,7 @@ export class BoardForm {
   }
 }
 
-export class Board implements Shareable {
+export class Board /*implements Shareable*/ {
   private _id: string;
   public _title: string = " ";
   private _imageUrl: string;
@@ -496,9 +496,9 @@ export class Board implements Shareable {
     );
   }
 
-  isMyBoard(): boolean {
-    return this.owner.userId === model.me.userId;
-  }
+  /*isMyBoard(): boolean {
+      return this.owner.userId === model.me.userId;
+    }*/
 
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;
@@ -535,11 +535,12 @@ export class Boards {
   pageCount: number;
 
   constructor(data: IBoardsResponse) {
-    this.all = data.all.map((board: IBoardItemResponse) =>
-      Behaviours.applicationsBehaviours.magneto.resource(
-        new Board().build(board),
-      ),
-    );
+    /*this.all = data.all.map((board: IBoardItemResponse) =>
+          Behaviours.applicationsBehaviours.magneto.resource(
+            new Board().build(board),
+          ),
+        );*/
+    this.all = [];
     this.page = data.page;
     this.pageCount = data.pageCount;
   }

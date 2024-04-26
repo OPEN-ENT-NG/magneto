@@ -1,17 +1,15 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-
-import { Grid, Heading, useToggle, Button } from "@edifice-ui/react";
+import { Grid, useToggle } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
+import { useTranslation } from "react-i18next";
+
 import { Card } from "~/components/card/Card.tsx";
-import { CreateFolder } from "~/components/create-folder/CreateFolder";
-import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 import { TreeViewButtons } from "~/components/tree-view/TreeViewButtons";
 import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 
@@ -31,8 +29,8 @@ export interface AppProps {
 
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
-  console.log("i am in app");
-  const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
+  console.log("Magneto open", isOpen);
+  // const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
   const { t } = useTranslation();
 
   // const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +82,7 @@ export const App = () => {
   //     "magneto-check-decagram",
   //   ),
   // ]);
-  let folderNavTrees = [
+  const folderNavTrees = [
     new FolderTreeNavItem(
       {
         id: FOLDER_TYPE.MY_BOARDS,
@@ -121,7 +119,7 @@ export const App = () => {
   //     "magneto.trash",
   //   ),
   // ]);
-  let deletedFolderNavTrees = [
+  const deletedFolderNavTrees = [
     new FolderTreeNavItem(
       {
         id: FOLDER_TYPE.DELETED_BOARDS,

@@ -3,17 +3,6 @@ import "./TreeViewContent.scss";
 
 import { TreeView } from "@edifice-ui/react";
 
-interface FolderTreeNavItem {
-  id: string;
-  name: string;
-  iconClass: string;
-  children: Array<FolderTreeNavItem>;
-  parentId: string;
-  isOpened: boolean;
-  ownerId: string;
-  shared: any[];
-}
-
 export const TreeViewContainer = ({
   folders: folders,
   folderType: folderType,

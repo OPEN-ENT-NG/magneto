@@ -22,7 +22,6 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 
-
 export interface AppProps {
   _id: string;
   created: Date;
@@ -127,7 +126,7 @@ export const App = () => {
   //     "magneto.trash",
   //   ),
   // ]);
-  let deletedFolderNavTrees =[
+  let deletedFolderNavTrees = [
     new FolderTreeNavItem(
       {
         id: FOLDER_TYPE.DELETED_BOARDS,

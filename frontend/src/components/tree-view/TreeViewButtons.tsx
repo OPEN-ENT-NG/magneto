@@ -1,8 +1,8 @@
 import React from "react";
 
 import { Button } from "@edifice-ui/react";
-import { Icon } from "@mdi/react";
 import { mdiFolderPlus, mdiStar } from "@mdi/js";
+import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 export const TreeViewButtons = () => {

@@ -22,32 +22,32 @@ export const TreeViewContainer = ({
    * Check if the folder has a children (or sub-children) with the given id
    * @param folderId Folder identifier
    */
-  const childrenContainsId = (folderId: string): boolean => {
-    return (
-      this.id == folderId ||
-      this.children.some(
-        (folder: FolderTreeNavItem) =>
-          folder.id === folderId || folder.childrenContainsId(folderId),
-      )
-    );
-  };
+  // const childrenContainsId = (folderId: string): boolean => {
+  //   return (
+  //     this.id == folderId ||
+  //     this.children.some(
+  //       (folder: FolderTreeNavItem) =>
+  //         folder.id === folderId || folder.childrenContainsId(folderId),
+  //     )
+  //   );
+  // };
 
   /**
    * Open all folders from the given children folder to the current folder
    * @param folderId Folder identifier
    */
-  const openChildrenToId = (folderId: string): void => {
-    if (this.childrenContainsId(folderId)) {
-      this._isOpened = true;
-      if (this.children) {
-        this.children.forEach((folder: FolderTreeNavItem) => {
-          folder.openChildrenToId(folderId);
-        });
-      }
-    }
-  };
+  // const openChildrenToId = (folderId: string): void => {
+  //   if (this.childrenContainsId(folderId)) {
+  //     this._isOpened = true;
+  //     if (this.children) {
+  //       this.children.forEach((folder: FolderTreeNavItem) => {
+  //         folder.openChildrenToId(folderId);
+  //       });
+  //     }
+  //   }
+  // };
 
-  let dataTree = {
+  const dataTree = {
     children: [],
     id: folderType,
     name: folderType,

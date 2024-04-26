@@ -1,21 +1,27 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Grid, Heading, useToggle, Button } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
+<<<<<<< HEAD
 import { CreateFolder } from "~/components/create-folder/CreateFolder";
 import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 //import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 //import { getBoards } from "~/services/api/boards.service";
-import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
-import { useGetFoldersQuery } from "~/services/api/folders.service";
-import { FolderTreeNavItem } from "~/models/folder-tree.model";
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
-import { useTranslation } from "react-i18next";
-import { Folder, IFolderResponse } from "~/models/folder.model";
+=======
 import { TreeViewButtons } from "~/components/tree-view/TreeViewButtons";
+>>>>>>> css + linter
+import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
+
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
+import { Folder, IFolderResponse } from "~/models/folder.model";
+
+import { useGetFoldersQuery } from "~/services/api/folders.service";
+
 
 export interface AppProps {
   _id: string;
@@ -73,7 +79,18 @@ export const App = () => {
   // const [selectedBoards, setSelectedBoards] = useState([]);
   // const [selectedFolderIds, setSelectedFolderIds] = useState([]);
   // const [selectedFolders, setSelectedFolders] = useState([]);
-  const [folderNavTrees, setFolderNavTrees] = useState<FolderTreeNavItem[]>([
+  // const [folderNavTrees, setFolderNavTrees] = useState<FolderTreeNavItem[]>([
+  //   new FolderTreeNavItem(
+  //     {
+  //       id: FOLDER_TYPE.MY_BOARDS,
+  //       title: t("magneto.my.boards"),
+  //       parentId: "",
+  //       section: true,
+  //     },
+  //     "magneto-check-decagram",
+  //   ),
+  // ]);
+  let folderNavTrees = [
     new FolderTreeNavItem(
       {
         id: FOLDER_TYPE.MY_BOARDS,
@@ -83,23 +100,34 @@ export const App = () => {
       },
       "magneto-check-decagram",
     ),
-  ]);
-  const [publicFolderNavTrees, setpublicFolderNavTrees] = useState<
-    FolderTreeNavItem[]
-  >([
-    new FolderTreeNavItem(
-      {
-        id: FOLDER_TYPE.PUBLIC_BOARDS,
-        title: t("magneto.lycee.connecte.boards"),
-        parentId: "",
-        section: true,
-      },
-      "magneto-earth",
-    ),
-  ]);
-  const [deletedFolderNavTrees, setdeletedFolderNavTrees] = useState<
-    FolderTreeNavItem[]
-  >([
+  ];
+  // const [publicFolderNavTrees, setpublicFolderNavTrees] = useState<
+  //   FolderTreeNavItem[]
+  // >([
+  //   new FolderTreeNavItem(
+  //     {
+  //       id: FOLDER_TYPE.PUBLIC_BOARDS,
+  //       title: t("magneto.lycee.connecte.boards"),
+  //       parentId: "",
+  //       section: true,
+  //     },
+  //     "magneto-earth",
+  //   ),
+  // ]);
+  // const [deletedFolderNavTrees, setdeletedFolderNavTrees] = useState<
+  //   FolderTreeNavItem[]
+  // >([
+  //   new FolderTreeNavItem(
+  //     {
+  //       id: FOLDER_TYPE.DELETED_BOARDS,
+  //       title: t("magneto.trash"),
+  //       parentId: "",
+  //       section: true,
+  //     },
+  //     "magneto.trash",
+  //   ),
+  // ]);
+  let deletedFolderNavTrees =[
     new FolderTreeNavItem(
       {
         id: FOLDER_TYPE.DELETED_BOARDS,
@@ -109,7 +137,7 @@ export const App = () => {
       },
       "magneto.trash",
     ),
-  ]);
+  ];
   // const [folderMoveNavTrees, setFolderMoveNavTrees] = useState([]);
 
   const {

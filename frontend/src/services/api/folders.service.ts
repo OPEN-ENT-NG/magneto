@@ -1,5 +1,3 @@
-import { IHttpParams, odeServices } from "edifice-ts-client";
-import { Folder, IFolderResponse } from "../../models/folder.model";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const foldersApi = createApi({

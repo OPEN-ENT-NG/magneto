@@ -10,9 +10,9 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
-import { setupStore } from "./store";
 
 import { router } from "./routes";
+import { setupStore } from "./store";
 import "~/i18n";
 
 const rootElement = document.getElementById("root");

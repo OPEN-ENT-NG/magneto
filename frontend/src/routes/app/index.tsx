@@ -35,44 +35,44 @@ export const App = () => {
   const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
   const { t } = useTranslation();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [openedFolder, setOpenedFolder] = useState(null);
-  const [displayBoardLightbox, setDisplayBoardLightbox] = useState(false);
-  const [displayDeleteBoardLightbox, setDisplayDeleteBoardLightbox] =
-    useState(false);
-  const [displayFolderLightbox, setDisplayMoveBoardLightbox] = useState(false);
-  const [displayMoveBoardLightbox, setDisplayFolderLightbox] = useState(false);
-  const [displayCollectionLightbox, setDisplayCollectionLightbox] =
-    useState(false);
-  const [displayShareBoardLightbox, setDisplayShareBoardLightbox] =
-    useState(false);
-  const [displayShareFolderLightbox, setDisplayShareFolderLightbox] =
-    useState(false);
-  const [displayPublicShareBoardLightbox, setDisplayPublicShareBoardLightbox] =
-    useState(false);
-  const [
-    displayEnterSharedFolderWarningLightbox,
-    setDisplayEnterSharedFolderWarningLightbox,
-  ] = useState(false);
-  const [
-    displayExitSharedFolderWarningLightbox,
-    setDisplayExitSharedFolderWarningLightbox,
-  ] = useState(false);
-  const [
-    displayMoveNoRightInFolderLightbox,
-    setDisplayMoveNoRightInFolderLightbox,
-  ] = useState(false);
-  const [isFromMoveBoardLightbox, setIsFromMoveBoardLightbox] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [openedFolder, setOpenedFolder] = useState(null);
+  // const [displayBoardLightbox, setDisplayBoardLightbox] = useState(false);
+  // const [displayDeleteBoardLightbox, setDisplayDeleteBoardLightbox] =
+  //   useState(false);
+  // const [displayFolderLightbox, setDisplayMoveBoardLightbox] = useState(false);
+  // const [displayMoveBoardLightbox, setDisplayFolderLightbox] = useState(false);
+  // const [displayCollectionLightbox, setDisplayCollectionLightbox] =
+  //   useState(false);
+  // const [displayShareBoardLightbox, setDisplayShareBoardLightbox] =
+  //   useState(false);
+  // const [displayShareFolderLightbox, setDisplayShareFolderLightbox] =
+  //   useState(false);
+  // const [displayPublicShareBoardLightbox, setDisplayPublicShareBoardLightbox] =
+  //   useState(false);
+  // const [
+  //   displayEnterSharedFolderWarningLightbox,
+  //   setDisplayEnterSharedFolderWarningLightbox,
+  // ] = useState(false);
+  // const [
+  //   displayExitSharedFolderWarningLightbox,
+  //   setDisplayExitSharedFolderWarningLightbox,
+  // ] = useState(false);
+  // const [
+  //   displayMoveNoRightInFolderLightbox,
+  //   setDisplayMoveNoRightInFolderLightbox,
+  // ] = useState(false);
+  // const [isFromMoveBoardLightbox, setIsFromMoveBoardLightbox] = useState(false);
 
   //this.magnetoStandalone = this.$window.magnetoStandalone == "true";
   // this.filter = new BoardsFilter();
 
-  const [boards, setBoards] = useState([]);
-  const [currentFolderChildren, setCurrentFolderChildren] = useState([]);
-  const [selectedBoardIds, setSelectedBoardIds] = useState([]);
-  const [selectedBoards, setSelectedBoards] = useState([]);
-  const [selectedFolderIds, setSelectedFolderIds] = useState([]);
-  const [selectedFolders, setSelectedFolders] = useState([]);
+  // const [boards, setBoards] = useState([]);
+  // const [currentFolderChildren, setCurrentFolderChildren] = useState([]);
+  // const [selectedBoardIds, setSelectedBoardIds] = useState([]);
+  // const [selectedBoards, setSelectedBoards] = useState([]);
+  // const [selectedFolderIds, setSelectedFolderIds] = useState([]);
+  // const [selectedFolders, setSelectedFolders] = useState([]);
   const [folderNavTrees, setFolderNavTrees] = useState<FolderTreeNavItem[]>([
     new FolderTreeNavItem(
       {
@@ -110,7 +110,7 @@ export const App = () => {
       "magneto.trash",
     ),
   ]);
-  const [folderMoveNavTrees, setFolderMoveNavTrees] = useState([]);
+  // const [folderMoveNavTrees, setFolderMoveNavTrees] = useState([]);
 
   const {
     data: myFoldersResult,
@@ -132,10 +132,10 @@ export const App = () => {
   } else if (getFoldersLoading || getDeletedFoldersLoading) {
     console.log("loading");
   } else {
-    let myFolders = myFoldersResult.map((folder: IFolderResponse) =>
+    const myFolders = myFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     ); //convert folders to Folder[]
-    let deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
+    const deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     );
 

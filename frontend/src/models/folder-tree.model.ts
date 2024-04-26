@@ -1,5 +1,5 @@
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder } from "./folder.model";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 
 export interface IFolderTreeNavItem {
   id: string;
@@ -44,7 +44,7 @@ export class FolderTreeNavItem {
 
   private _section: boolean;
 
-  constructor(folder: IFolderTreeNavItem, iconClass?: string) {
+  constructor(folder: IFolderTreeNavItem /*, iconClass?: string*/) {
     this._id = folder.id;
     this._name = folder.title;
     this._children = [];
@@ -129,7 +129,7 @@ export class FolderTreeNavItem {
    * @param folders Folder list
    */
   buildFolders(folders: Array<Folder>): FolderTreeNavItem {
-    let childrenFolders: Array<Folder> = folders.filter((folder: Folder) => {
+    const childrenFolders: Array<Folder> = folders.filter((folder: Folder) => {
       if (
         this._id == FOLDER_TYPE.MY_BOARDS ||
         this._id == FOLDER_TYPE.DELETED_BOARDS
@@ -141,10 +141,10 @@ export class FolderTreeNavItem {
       }
     });
 
-    let newChildren: Array<FolderTreeNavItem> = [];
+    const newChildren: Array<FolderTreeNavItem> = [];
 
     childrenFolders.forEach((folder: Folder) => {
-      let childMatch: FolderTreeNavItem = this.children.find(
+      const childMatch: FolderTreeNavItem = this.children.find(
         (f: FolderTreeNavItem) => f.id === folder.id && f.name === folder.title,
       );
 

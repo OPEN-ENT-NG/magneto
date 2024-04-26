@@ -1,8 +1,7 @@
 import React from "react";
 import "./TreeViewContent.scss";
 
-import { Button, TreeView } from "@edifice-ui/react";
-import { useSelector } from "react-redux";
+import { TreeView } from "@edifice-ui/react";
 
 interface FolderTreeNavItem {
   id: string;

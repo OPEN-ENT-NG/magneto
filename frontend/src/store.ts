@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import type { PreloadedState } from "@reduxjs/toolkit";
+
 import { foldersApi } from "./services/api/folders.service";
 
 const rootReducer = combineReducers({

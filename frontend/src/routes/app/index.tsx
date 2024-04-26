@@ -5,15 +5,10 @@ import { Grid, Heading, useToggle, Button } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
 import { Card } from "~/components/card/Card.tsx";
-<<<<<<< HEAD
 import { CreateFolder } from "~/components/create-folder/CreateFolder";
 import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
-//import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
-//import { getBoards } from "~/services/api/boards.service";
-=======
 import { TreeViewButtons } from "~/components/tree-view/TreeViewButtons";
->>>>>>> css + linter
 import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
 
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";

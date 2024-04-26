@@ -1,18 +1,14 @@
 import { Grid, useToggle } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
-
 import { useTranslation } from "react-i18next";
 
 import { Card } from "~/components/card/Card.tsx";
 import Header from "~/components/header/Header";
 import { TreeViewButtons } from "~/components/tree-view/TreeViewButtons";
 import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
-
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
-
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
-
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 export interface AppProps {

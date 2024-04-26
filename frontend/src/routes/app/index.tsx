@@ -26,7 +26,6 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
   console.log("Magneto open", isOpen);
-  // const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
   const { t } = useTranslation();
 
   // const [isLoading, setIsLoading] = useState(false);

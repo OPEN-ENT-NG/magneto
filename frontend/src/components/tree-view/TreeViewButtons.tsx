@@ -1,12 +1,15 @@
 import React from "react";
 
-import { Button } from "@edifice-ui/react";
+import { Button, useToggle } from "@edifice-ui/react";
 import { mdiFolderPlus, mdiStar } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
+import { CreateFolder } from "../create-folder/CreateFolder";
 
 export const TreeViewButtons = () => {
   const { t } = useTranslation();
+
+  const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
 
   return (
     <>
@@ -19,6 +22,7 @@ export const TreeViewButtons = () => {
           children={t("magneto.create.folder")}
           leftIcon={<Icon path={mdiFolderPlus} size={1}></Icon>}
           isLoading={false}
+          onClick={toggleCreateFolderOpen}
         ></Button>
         <br />
         <Button
@@ -30,6 +34,10 @@ export const TreeViewButtons = () => {
           leftIcon={<Icon path={mdiStar} size={1}></Icon>}
           isLoading={false}
         ></Button>
+        <CreateFolder
+            isOpen={isCreateFolderOpen}
+            toggle={toggleCreateFolderOpen}
+        />
       </div>
     </>
   );

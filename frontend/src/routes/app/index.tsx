@@ -3,6 +3,7 @@ import { ID } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
 import { Card } from "~/components/card/Card.tsx";
+import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 import { TreeViewButtons } from "~/components/tree-view/TreeViewButtons";
 import { TreeViewContainer } from "~/components/tree-view/TreeViewContainer";
@@ -25,7 +26,6 @@ export interface AppProps {
 
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
-  console.log("Magneto open", isOpen);
   const { t } = useTranslation();
 
   // const [isLoading, setIsLoading] = useState(false);
@@ -200,6 +200,7 @@ export const App = () => {
           }}
         >
           <Card title={"Main"} content={"NON"} />
+          <CreateTab isOpen={isOpen} toggle={toggle} />
         </Grid.Col>
       </Grid>
     </>

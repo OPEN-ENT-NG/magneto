@@ -20,9 +20,9 @@ export const TreeViewButtons = () => {
           variant={"outline"}
           size={"sm"}
           children={t("magneto.create.folder")}
-          leftIcon={<Icon path={mdiFolderPlus} size={1}></Icon>}
           isLoading={false}
           onClick={toggleCreateFolderOpen}
+          leftIcon={<Icon path={mdiFolderPlus} size={1}></Icon>}
         ></Button>
         <br />
         <Button

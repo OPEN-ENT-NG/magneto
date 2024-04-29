@@ -35,8 +35,8 @@ export const TreeViewButtons = () => {
           isLoading={false}
         ></Button>
         <CreateFolder
-            isOpen={isCreateFolderOpen}
-            toggle={toggleCreateFolderOpen}
+          isOpen={isCreateFolderOpen}
+          toggle={toggleCreateFolderOpen}
         />
       </div>
     </>

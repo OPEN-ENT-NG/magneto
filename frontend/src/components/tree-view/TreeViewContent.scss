@@ -1,0 +1,14 @@
+.treeview {
+  #listitem_public-boards {
+    [aria-label="fold/unfold button"] {
+      svg {
+        display: none;
+      }
+    }
+  }
+
+  //temporary if Edifice fixes
+  li[role="treeitem"]:has(> div > ul:empty) .action-container svg {
+    display: none;
+  }
+}

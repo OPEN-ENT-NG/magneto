@@ -1,11 +1,11 @@
 {
-	"main" : "fr.cgi.magneto.Magneto",
-	"port" : 8205,
-	"app-name" : "Magneto",
-	"app-address" : "/magneto",
-	"app-icon" : "magneto-large",
-	"app-displayName" : "Magneto",
-	"mode": "dev",
-	"entcore.port" : 8090,
-	"auto-redeploy": false
+  "main": "fr.cgi.magneto.Magneto",
+  "port": 8205,
+  "app-name": "Magneto",
+  "app-address": "/magneto",
+  "app-icon": "magneto-large",
+  "app-displayName": "Magneto",
+  "mode": "dev",
+  "entcore.port": 8090,
+  "auto-redeploy": false
 }

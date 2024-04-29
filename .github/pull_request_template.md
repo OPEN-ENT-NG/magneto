@@ -13,4 +13,3 @@
 - [ ] If it is a consequent feature, I have added thorough tests.
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] Any dependent changes have been added to this project (must specify in **Description**)
-

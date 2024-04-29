@@ -1,12 +1,11 @@
-db.runCommand(
+db.runCommand({
+  createIndexes: "magneto.boards.access",
+  indexes: [
     {
-        createIndexes: "magneto.boards.access",
-        indexes: [
-            {
-                key: {
-                    "userId": 1,
-                },
-                name: "magneto_board_tags_access"
-            }
-        ]
-    });
+      key: {
+        userId: 1,
+      },
+      name: "magneto_board_tags_access",
+    },
+  ],
+});

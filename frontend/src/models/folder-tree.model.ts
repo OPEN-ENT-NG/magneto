@@ -1,3 +1,6 @@
+import { Folder } from "./folder.model";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+
 export interface IFolderTreeNavItem {
   id: string;
   title: string;
@@ -5,6 +8,7 @@ export interface IFolderTreeNavItem {
   isOpened?: boolean;
   ownerId?: string;
   shared?: any[];
+  section?: boolean;
 }
 
 export class FolderTreeNavItem {
@@ -18,25 +22,15 @@ export class FolderTreeNavItem {
    */
   private _name: string;
 
-  /**
-   * Folder icon CSS class (optional)
-   */
-  private _iconClass: string;
+  // /**
+  //  * Folder icon CSS class (optional)
+  //  */
+  // private _iconClass: string;
 
   /**
    * List of children folders
    */
   private _children: Array<FolderTreeNavItem>;
-
-  /**
-   * Parent folder identifier
-   */
-  private _parentId: string;
-
-  /**
-   * Is opened in the folder tree or not
-   */
-  private _isOpened: boolean;
 
   /**
    * Id of folder owner
@@ -48,19 +42,16 @@ export class FolderTreeNavItem {
    */
   private _shared: any[];
 
-  constructor(
-    folder: IFolderTreeNavItem,
-    isOpened?: boolean,
-    iconClass?: string,
-  ) {
+  private _section: boolean;
+
+  constructor(folder: IFolderTreeNavItem /*, iconClass?: string*/) {
     this._id = folder.id;
     this._name = folder.title;
-    this._parentId = folder.parentId;
     this._children = [];
-    this._iconClass = iconClass ? iconClass : "";
-    this._isOpened = isOpened !== null && isOpened ? isOpened : false;
+    // this._iconClass = iconClass ? iconClass : "";
     this._ownerId = folder.ownerId ? folder.ownerId : "";
     this._shared = folder.shared ? folder.shared : [];
+    this._section = false;
   }
 
   get id(): string {
@@ -79,13 +70,13 @@ export class FolderTreeNavItem {
     this._name = value;
   }
 
-  get iconClass(): string {
-    return this._iconClass;
-  }
+  // get iconClass(): string {
+  //     return this._iconClass;
+  // }
 
-  set iconClass(value: string) {
-    this._iconClass = value;
-  }
+  // set iconClass(value: string) {
+  //     this._iconClass = value;
+  // }
 
   get children(): Array<FolderTreeNavItem> {
     return this._children;
@@ -93,22 +84,6 @@ export class FolderTreeNavItem {
 
   set children(value: Array<FolderTreeNavItem>) {
     this._children = value;
-  }
-
-  get parentId(): string {
-    return this._parentId;
-  }
-
-  set parentId(value: string) {
-    this._parentId = value;
-  }
-
-  get isOpened(): boolean {
-    return this._isOpened;
-  }
-
-  set isOpened(value: boolean) {
-    this._isOpened = value;
   }
 
   get ownerId(): string {
@@ -127,6 +102,14 @@ export class FolderTreeNavItem {
     this._shared = value;
   }
 
+  get section(): boolean {
+    return this._section;
+  }
+
+  set section(value: boolean) {
+    this._section = value;
+  }
+
   /**
    * Check if the folder has a children (or sub-children) with the given id
    * @param folderId Folder identifier
@@ -142,32 +125,25 @@ export class FolderTreeNavItem {
   }
 
   /**
-   * Open all folders from the given children folder to the current folder
-   * @param folderId Folder identifier
-   */
-  openChildrenToId(folderId: string): void {
-    if (this.childrenContainsId(folderId)) {
-      this._isOpened = true;
-      if (this.children) {
-        this.children.forEach((folder: FolderTreeNavItem) => {
-          folder.openChildrenToId(folderId);
-        });
-      }
-    }
-  }
-
-  /**
    * Populate/Update the children list from the given folder list
    * @param folders Folder list
    */
-  buildFolders(folders: Array<IFolderTreeNavItem>): FolderTreeNavItem {
-    const childrenFolders: Array<IFolderTreeNavItem> = folders.filter(
-      (folder: IFolderTreeNavItem) => folder.parentId === this._id,
-    );
+  buildFolders(folders: Array<Folder>): FolderTreeNavItem {
+    const childrenFolders: Array<Folder> = folders.filter((folder: Folder) => {
+      if (
+        this._id == FOLDER_TYPE.MY_BOARDS ||
+        this._id == FOLDER_TYPE.DELETED_BOARDS
+      ) {
+        this.section = true;
+        return !folder.parentId;
+      } else {
+        return folder.parentId === this._id;
+      }
+    });
 
     const newChildren: Array<FolderTreeNavItem> = [];
 
-    childrenFolders.forEach((folder: IFolderTreeNavItem) => {
+    childrenFolders.forEach((folder: Folder) => {
       const childMatch: FolderTreeNavItem = this.children.find(
         (f: FolderTreeNavItem) => f.id === folder.id && f.name === folder.title,
       );

@@ -64,7 +64,7 @@ export default ({ mode }: { mode: string }) => {
             "react-error-boundary",
             "react-hook-form",
             "react-hot-toast",
-          ]
+          ],
         },
         paths: {
           "edifice-ts-client": "/assets/js/edifice-ts-client/index.js",
@@ -81,13 +81,13 @@ export default ({ mode }: { mode: string }) => {
     port: 4200,
     headers,
     open: true,
-    strictPort: true
+    strictPort: true,
   };
 
   const test = {
     globals: true,
-    environment: 'happy-dom',
-    setupFiles: './src/tests/setup.ts',
+    environment: "happy-dom",
+    setupFiles: "./src/tests/setup.ts",
   };
 
   return defineConfig({
@@ -95,6 +95,6 @@ export default ({ mode }: { mode: string }) => {
     build,
     plugins,
     server,
-    test
+    test,
   });
 };

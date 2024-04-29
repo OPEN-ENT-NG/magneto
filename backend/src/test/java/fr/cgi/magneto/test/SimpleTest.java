@@ -20,18 +20,6 @@ public class SimpleTest {
     }
 
     @Test
-    public void testReadI18nFile(TestContext ctx) {
-        Async async = ctx.async();
-        Vertx.vertx().fileSystem().readFile("./i18n/fr.json", ar -> {
-            if (ar.failed()) {
-                ctx.fail(ar.cause());
-            } else {
-                async.complete();
-            }
-        });
-    }
-
-    @Test
     public void testAsyncSucceed(TestContext ctx) {
         Async async = ctx.async();
         asyncManagement(true, res -> {

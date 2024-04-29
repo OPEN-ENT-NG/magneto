@@ -1,10 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-import { Folder } from "~/models/folder.model";
-//import { IHttpParams, odeServices } from "edifice-ts-client";
-
-//import { Folder, IFolderResponse } from "../../models/folder.model"
-
 export const foldersApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: "/magneto/" }),
   tagTypes: [],

@@ -56,6 +56,6 @@ module.exports = {
     "public",
     "scripts",
     "vite.config.ts",
-    "old"
+    "old",
   ],
 };

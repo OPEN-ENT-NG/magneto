@@ -1,10 +1,10 @@
 # À propos de l'application Magneto
 
-* Licence : [AGPL v3](http://www.gnu.org/licenses/agpl.txt) - Copyright Ville de Paris, Région Nouvelle Aquitaine, Région Hauts de France
-* Propriétaire(s) : CGI
-* Mainteneur(s) : CGI
-* Financeur(s) : Ville de Paris, Région Nouvelle Aquitaine
-* Description : Application de création et de gestion de tableaux dans l'OPEN ENT.
+- Licence : [AGPL v3](http://www.gnu.org/licenses/agpl.txt) - Copyright Ville de Paris, Région Nouvelle Aquitaine, Région Hauts de France
+- Propriétaire(s) : CGI
+- Mainteneur(s) : CGI
+- Financeur(s) : Ville de Paris, Région Nouvelle Aquitaine
+- Description : Application de création et de gestion de tableaux dans l'OPEN ENT.
 
 ## Configuration du module magneto dans le projet OPEN ENT
 
@@ -39,12 +39,13 @@ Dans le fichier 'ent-core.json.template' du projet OPEN ENT :
 
 Dans votre springboard, vous devez inclure des variables d'environnement :
 
-| **conf.properties**          | **Utilisation**                                            | **Exemple** |
-|------------------------------|------------------------------------------------------------|-------------|
-| "${magnetoUpdateFrequency}"  | Temps de fréquence de rafraichissement des favoris (en ms) | 10000       |
-| "${magnetoIsStandalone}"     | Informe de si Magneto est standalone ou pas                | false       |
+| **conf.properties**         | **Utilisation**                                            | **Exemple** |
+| --------------------------- | ---------------------------------------------------------- | ----------- |
+| "${magnetoUpdateFrequency}" | Temps de fréquence de rafraichissement des favoris (en ms) | 10000       |
+| "${magnetoIsStandalone}"    | Informe de si Magneto est standalone ou pas                | false       |
 
 Associer une route d'entrée à la configuration du module proxy intégré (`"name": "com.wse~http-proxy~1.0.0"`) :
+
 <pre>
       {
         "location": "/magneto",
@@ -52,15 +53,17 @@ Associer une route d'entrée à la configuration du module proxy intégré (`"na
       }
 </pre>
 
-
 ## Documentation
-Magneto est un outil de création permettant aux utilisateurs de créer et d’échanger des tableaux. 
+
+Magneto est un outil de création permettant aux utilisateurs de créer et d’échanger des tableaux.
 Il contient des aimants, chaque aimant ayant son propre type (texte, image, lien etc..).
 
 # Modèle de données - base MongoDB
-Deux collections sont utilisées : 
-* magneto.boards" : un document représente un tableau 
-* magneto.cards" : un document représente un aimant
+
+Deux collections sont utilisées :
+
+- magneto.boards" : un document représente un tableau
+- magneto.cards" : un document représente un aimant
 
 Exemple de document de la collection "magneto.boards" :
 
@@ -83,7 +86,6 @@ Exemple de document de la collection "magneto.boards" :
 "cardIds" : []
 }
 </pre>
-
 
 Description des champs d'un document de la collection "magneto.boards" :
 
@@ -149,24 +151,25 @@ Description des champs d'un document de la collection "magneto.cards" :
 </pre>
 
 # Gestion des droits
+
 Les droits de type "resource" sont gérés au niveau des boards.
 On en distingue 4 :
-* Lecture ("magneto.read") : lecture des tableaux
-* Contribution ("magneto.contrib") : réutilisation des tableaux / aimants
-* Modération ("magneto.publish") : créer des tableaux / gestion des aimants
-* Gestion ("magneto.manager") : modification des tableaux
+
+- Lecture ("magneto.read") : lecture des tableaux
+- Contribution ("magneto.contrib") : réutilisation des tableaux / aimants
+- Modération ("magneto.publish") : créer des tableaux / gestion des aimants
+- Gestion ("magneto.manager") : modification des tableaux
 
 Il y a 3 droits de type "workflow" :
-* "magneto.board.publish" : Partage et publication de tableau
-* "magneto.board.manage" : Création et gestion de tableau
-* "magneto.view" : Accéder a Magneto
 
+- "magneto.board.publish" : Partage et publication de tableau
+- "magneto.board.manage" : Création et gestion de tableau
+- "magneto.view" : Accéder a Magneto
 
 # Modèle front-end
 
 Le modèle front-end manipule 3 types d'objets :
-* "Boards" comprend une collection de "Board"
-* "Cards" comprend une collection de "Card"
-* "Folder"
 
-
+- "Boards" comprend une collection de "Board"
+- "Cards" comprend une collection de "Card"
+- "Folder"

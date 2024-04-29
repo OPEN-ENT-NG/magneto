@@ -31,10 +31,10 @@
       "type": "string"
     },
     "canComment": {
-        "type": "boolean"
+      "type": "boolean"
     },
     "displayNbFavorites": {
-        "type": "boolean"
+      "type": "boolean"
     },
     "cardIds": {
       "type": "array",
@@ -57,7 +57,5 @@
       }
     }
   },
-  "required": [
-    "title"
-  ]
+  "required": ["title"]
 }

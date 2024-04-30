@@ -1,28 +1,33 @@
 import React from "react";
 
-import {  Button, TreeView } from "@edifice-ui/react";
-import { useSelector } from "react-redux";
-import { useSpring, animated } from "@react-spring/web";
+import { Card } from "@edifice-ui/react";
+import {  animated } from "@react-spring/web";
+import { Folder } from "~/models/folder.model";
 
-// import * as MaterialDesign from "react-icons/md";
 
-interface FolderTreeNavItem {
-  id: string;
-  name: string;
-  iconClass: string;
-  children: Array<FolderTreeNavItem>;
-  parentId: string;
-  isOpened: boolean;
-  ownerId: string;
-  shared: any[];
-}
-
-export const FolderList = ({folderData:data}) => {
+export const FolderList = ({folderData}: any) => {
+    console.log(folderData);
     
 
   return (
     <>
-        folders.length ? (
+        {!!folderData ?? (
+            folderData.map((folder: Folder) => {
+                return(
+                    <Card>
+                        <Card.Body>
+                            <Card.Title>
+                            {folder.name}
+                            </Card.Title>
+                        </Card.Body>
+                    </Card>
+                )
+            })
+
+        )}
+
+        
+        {false  ? (
             <animated.ul className="grid ps-0 list-unstyled mb-24">
             {data?.pages[0]?.folders.map((folder: IFolder) => {
                 const { id, name } = folder;
@@ -53,7 +58,9 @@ export const FolderList = ({folderData:data}) => {
                 );
             })}
             </animated.ul>
-        ) : null;
+        ) 
+        : 
+        <div>coucou</div>}
     </>
   );
 };

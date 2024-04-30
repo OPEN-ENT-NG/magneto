@@ -1,6 +1,6 @@
 import React from "react";
 
-import {  Button, SearchButton, TreeView } from "@edifice-ui/react";
+import {  Button, SearchBar, TreeView } from "@edifice-ui/react";
 import { Icon } from '@mdi/react';
 import { mdiFolderPlus, mdiStar } from '@mdi/js';
 import { useTranslation } from "react-i18next";
@@ -20,8 +20,8 @@ import { FolderList } from "../folder-list/FolderList";
   const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
   const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);
 
-  let myFoldersObject;
-  let deletedFoldersObject;
+  let myFolders;
+  let deletedFolders;
   
 
   if (getFoldersError || getDeletedFoldersError) {
@@ -29,8 +29,8 @@ import { FolderList } from "../folder-list/FolderList";
   } else if (getFoldersLoading || getDeletedFoldersLoading) {
     console.log("loading");
   } else {
-    let myFolders = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
-    let deletedFolders = deletedFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder)));
+    myFolders = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
+    deletedFolders = deletedFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder)));
 
     // folderNavTrees[0].isOpened = false;
     // folderNavTrees[0].iconClass = "magneto.my.boards";
@@ -38,24 +38,21 @@ import { FolderList } from "../folder-list/FolderList";
     // publicFolderNavTrees[0].iconClass = "magneto.lycee.connecte.boards";
     // deletedFolderNavTrees[0].isOpened = false;
     // deletedFolderNavTrees[0].iconClass = "magneto.trash";
-    
-    myFoldersObject =new FolderTreeNavItem({
-        id: FOLDER_TYPE.MY_BOARDS, title: t('magneto.my.boards'), 
-        parentId: '', section: true
-    }, false, "magneto-check-decagram").buildFolders(myFolders);
-    deletedFoldersObject = new FolderTreeNavItem({
-            id: FOLDER_TYPE.DELETED_BOARDS, title: t('magneto.trash'),
-            parentId: '', section: true
-        }, false, "magneto.trash").buildFolders(deletedFolders);
   }
 
 
 
   return (
     <>
-          <SearchButton />
-          <FolderList />
-
+          <SearchBar
+            isVariant
+            onChange={function Ga(){}}
+            onClick={function Ga(){}}
+            placeholder="Search something...."
+            size="md"
+          />
+          <FolderList folderData={myFolders} />
+          {/* <BoardList /> */}
 
     </>
   );

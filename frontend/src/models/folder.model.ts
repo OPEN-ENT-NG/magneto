@@ -19,6 +19,7 @@ export class Folder {
   private _parentId: string;
   private _ownerId: string;
   private _shared: any[];
+    name: any;
 
   constructor() {
     this._id = "";

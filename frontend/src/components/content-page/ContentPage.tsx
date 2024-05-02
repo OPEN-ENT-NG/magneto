@@ -51,7 +51,7 @@ import { FolderList } from "../folder-list/FolderList";
             placeholder="Search something...."
             size="md"
           />
-          <FolderList folderData={myFolders} />
+          <FolderList folderData={myFolders} isLoading={getFoldersLoading} />
           {/* <BoardList /> */}
 
     </>

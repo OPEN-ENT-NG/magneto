@@ -1,0 +1,16 @@
+ul.grid {
+    padding-top: 15px;
+
+    li.folderSizing {
+        width: max-content !important;
+        
+        .card {
+            padding: unset !important;
+            margin: unset !important;
+        }
+
+    }
+}
+
+
+

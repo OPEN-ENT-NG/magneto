@@ -5,33 +5,36 @@ import {  animated, useSpring } from "@react-spring/web";
 
 import { useToaster } from "../../hooks/useToaster"
 
-import "./FolderList.scss";
+import "./BoardList.scss";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { IFolder } from "edifice-ts-client";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
-import { mdiFolderPlus } from "@mdi/js";
-import { Icon } from "@mui/material";
+import { useGetBoardsQuery } from "~/services/api/boards.service";
 
 
 
 
-export const FolderList = () => {
+export const BoardList = () => {
     const { currentApp } = useOdeClient();
     // const [isToasterOpen, setIsToasterOpen] = useToaster();
 
-    const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
-    const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);
-
-    let folderData;
-    let deletedFolders;
-    if (getFoldersError || getDeletedFoldersError) {
-        console.log("error");
-    } else if (getFoldersLoading || getDeletedFoldersLoading) {
-        console.log("loading");
+    const { data: myBoardsResult, isLoading: getBoardsLoading, error: getBoardsError } = useGetBoardsQuery({
+        isPublic: false,
+        isShared: true,
+        isDeleted: false,
+        searchText: '',
+        sortBy: 'modificationDate',
+        page: 0
+    });
+  
+    let boardData;
+    if (getBoardsError) {
+      console.log("error");
+    } else if (getBoardsLoading) {
+      console.log("loading");
     } else {
-        console.log("myFoldersResult", myFoldersResult);
-        folderData = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
-        deletedFolders = deletedFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder)));
+      console.log("myBoardsResult", myBoardsResult);
+      boardData = myBoardsResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Board[]
     }
 
     const springs = useSpring({
@@ -42,9 +45,9 @@ export const FolderList = () => {
 
   return (
     <>
-        {folderData?.length ? (
+        {boardData?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-            {folderData.map((folder: Folder) => {
+            {boardData.map((folder: Folder) => {
                 const { id, title } = folder;
                 return(
                     <animated.li
@@ -58,15 +61,14 @@ export const FolderList = () => {
                         <Card
                             app={currentApp!}
                             options={{
-                                type: "folder",
+                                type: "board",
                                 title,
                             }}
                             // onClick={() => {setIsToasterOpen()}}
-                            isLoading={getFoldersLoading || getDeletedFoldersLoading}
+                            isLoading={getBoardsLoading}
                             isSelectable={false}
                         >
                             <Card.Body>
-                                <Icon path={mdiFolderPlus} size={1}></Icon>
                                 <Card.Title>
                                 {title}
                                 </Card.Title>
@@ -83,7 +85,7 @@ export const FolderList = () => {
                     {/* <Card>
                         <Card.Body>
                             <Card.Title>
-                            {folderData[0].title}
+                            {boardData[0].title}
                             </Card.Title>
                         </Card.Body>
                     </Card> */}

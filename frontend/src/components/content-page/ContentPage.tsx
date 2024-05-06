@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-import {  Button, SearchBar, TreeView } from "@edifice-ui/react";
+import {  Button, SearchBar, TreeView, useToggle } from "@edifice-ui/react";
 import { Icon } from '@mdi/react';
 import { mdiFolderPlus, mdiStar } from '@mdi/js';
 import { useTranslation } from "react-i18next";
@@ -11,33 +11,35 @@ import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { Folder, IFolderResponse } from "../../models/folder.model";
 import { FolderTreeNavItem, IFolderTreeNavItem } from "~/models/folder-tree.model";
 import { FolderList } from "../folder-list/FolderList";
+import ToasterContainer from "../toaster-container/ToasterContainer";
+import { useToaster } from "~/hooks/useToaster";
+import { useGetBoardsQuery } from "~/services/api/boards.service";
+import { BoardList } from "../board-list/BoardList";
 
 
 
   export const ContentPage = () => {
   const { t } = useTranslation();
 
-  const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
-  const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);
+  // const [isToasterOpen, toggleIsToasterOpen] = useToaster();
 
-  let myFolders;
-  let deletedFolders;
-  
+  const { data: myBoardsResult, isLoading: getBoardsLoading, error: getBoardsError } = useGetBoardsQuery({
+      isPublic: false,
+      isShared: true,
+      isDeleted: false,
+      searchText: '',
+      sortBy: 'modificationDate',
+      page: 0
+  });
 
-  if (getFoldersError || getDeletedFoldersError) {
+  let myBoards;
+  if (getBoardsError) {
     console.log("error");
-  } else if (getFoldersLoading || getDeletedFoldersLoading) {
+  } else if (getBoardsLoading) {
     console.log("loading");
   } else {
-    myFolders = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
-    deletedFolders = deletedFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder)));
-
-    // folderNavTrees[0].isOpened = false;
-    // folderNavTrees[0].iconClass = "magneto.my.boards";
-    // publicFolderNavTrees[0].isOpened = false;
-    // publicFolderNavTrees[0].iconClass = "magneto.lycee.connecte.boards";
-    // deletedFolderNavTrees[0].isOpened = false;
-    // deletedFolderNavTrees[0].iconClass = "magneto.trash";
+    console.log(myBoardsResult);
+    myBoards = myBoardsResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Board[]
   }
 
 
@@ -51,8 +53,9 @@ import { FolderList } from "../folder-list/FolderList";
             placeholder="Search something...."
             size="md"
           />
-          <FolderList folderData={myFolders} isLoading={getFoldersLoading} />
-          {/* <BoardList /> */}
+          <FolderList />
+          <ToasterContainer />
+          <BoardList />
 
     </>
   );

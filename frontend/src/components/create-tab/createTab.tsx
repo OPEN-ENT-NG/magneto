@@ -63,8 +63,8 @@ export const CreateTab: FunctionComponent<props> = ({
     board.title = title;
     board.description = description;
     //TODO : change this to work with a future workspace file manager
-    board.imageUrl = await getUrl(thumbnail as File);
-    board.backgroundUrl = await getUrl(background as File);
+    // board.imageUrl = await getUrl(thumbnail as File);
+    // board.backgroundUrl = await getUrl(background as File);
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")
       board.layoutType = LAYOUT_TYPE.HORIZONTAL;
@@ -73,7 +73,7 @@ export const CreateTab: FunctionComponent<props> = ({
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
 
-    createBoard(board.toJSON());
+    // createBoard(board.toJSON());
 
     reset();
   };

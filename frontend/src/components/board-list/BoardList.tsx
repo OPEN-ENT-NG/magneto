@@ -10,6 +10,7 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { IFolder } from "edifice-ts-client";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
+import { Board, IBoardItemResponse, IBoardsResponse } from "~/models/board.model";
 
 
 
@@ -22,10 +23,9 @@ export const BoardList = () => {
         isPublic: false,
         isShared: true,
         isDeleted: false,
-        searchText: '',
         sortBy: 'modificationDate',
         page: 0
-    });
+    }) || {};
   
     let boardData;
     if (getBoardsError) {
@@ -34,7 +34,7 @@ export const BoardList = () => {
       console.log("loading");
     } else {
       console.log("myBoardsResult", myBoardsResult);
-      boardData = myBoardsResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Board[]
+      boardData = myBoardsResult.all.map(((board: IBoardItemResponse) => new Board().build(board))); //convert boards to Board[]
     }
 
     const springs = useSpring({
@@ -47,11 +47,11 @@ export const BoardList = () => {
     <>
         {boardData?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-            {boardData.map((folder: Folder) => {
-                const { id, title } = folder;
+            {boardData.map((board: Board) => {
+                const { id, title } = board;
                 return(
                     <animated.li
-                        className="g-col-4 z-1 folderSizing"
+                        className="g-col-4 z-1"
                         key={id}
                         style={{
                         position: "relative",
@@ -79,51 +79,9 @@ export const BoardList = () => {
                 )
             })}
         </animated.ul> 
-        ) : null
-        }
+        ) : null}
 
-                    {/* <Card>
-                        <Card.Body>
-                            <Card.Title>
-                            {boardData[0].title}
-                            </Card.Title>
-                        </Card.Body>
-                    </Card> */}
-        
-        {false  ? (
-            <animated.ul className="grid ps-0 list-unstyled mb-24">
-            {data?.pages[0]?.folders.map((folder: IFolder) => {
-                const { id, name } = folder;
-                return (
-                <animated.li
-                    className="g-col-4 z-1"
-                    key={id}
-                    style={{
-                    position: "relative",
-                    ...springs,
-                    }}
-                >
-                    <Card
-                    app={currentApp!}
-                    options={{
-                        type: "folder",
-                        name,
-                    }}
-                    isLoading={isFetching}
-                    isSelected={folderIds.includes(folder.id)}
-                    onOpen={() => {
-                        scrollToTop();
-                        openFolder({ folder, folderId: folder.id });
-                    }}
-                    onSelect={() => toggleSelect(folder)}
-                    />
-                </animated.li>
-                );
-            })}
-            </animated.ul>
-        ) 
-        : 
-        <div>coucou</div>}
+
     </>
   );
 };

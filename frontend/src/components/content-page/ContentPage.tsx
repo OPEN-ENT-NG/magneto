@@ -13,7 +13,6 @@ import { FolderTreeNavItem, IFolderTreeNavItem } from "~/models/folder-tree.mode
 import { FolderList } from "../folder-list/FolderList";
 import ToasterContainer from "../toaster-container/ToasterContainer";
 import { useToaster } from "~/hooks/useToaster";
-import { useGetBoardsQuery } from "~/services/api/boards.service";
 import { BoardList } from "../board-list/BoardList";
 
 
@@ -22,26 +21,6 @@ import { BoardList } from "../board-list/BoardList";
   const { t } = useTranslation();
 
   // const [isToasterOpen, toggleIsToasterOpen] = useToaster();
-
-  const { data: myBoardsResult, isLoading: getBoardsLoading, error: getBoardsError } = useGetBoardsQuery({
-      isPublic: false,
-      isShared: true,
-      isDeleted: false,
-      searchText: '',
-      sortBy: 'modificationDate',
-      page: 0
-  });
-
-  let myBoards;
-  if (getBoardsError) {
-    console.log("error");
-  } else if (getBoardsLoading) {
-    console.log("loading");
-  } else {
-    console.log(myBoardsResult);
-    myBoards = myBoardsResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Board[]
-  }
-
 
 
   return (

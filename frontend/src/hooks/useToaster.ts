@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useSelectedFolders } from "./useSelectedFolders";
 
 export const useToaster = () => {
-    const [isToasterOpen, setIsToasterOpen] = useState<boolean>(true);
+    const [isToasterOpen, setIsToasterOpen] = useState<boolean>(false);
+    // const [selectedFolders, setSelectedFolders] = useSelectedFolders();
 
-    useEffect(() => {
-        console.log(isToasterOpen);
+    const toasterDisplay = () => {
         setIsToasterOpen(!isToasterOpen);
-    }, []);
+    }
 
     return {
-        isToasterOpen,
+        toasterDisplay,
     };
 }

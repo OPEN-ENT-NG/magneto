@@ -6,9 +6,7 @@ import  { useToaster }  from "~/hooks/useToaster";
 
 export default function ToasterContainer() {
   const { t } = useTranslation();
-  const {
-    isToasterOpen,
-  } = useToaster();
+  const { isToasterOpen, } = useToaster();
 
   const transition = useTransition(isToasterOpen, {
     from: { opacity: 0, transform: "translateY(100%)" },

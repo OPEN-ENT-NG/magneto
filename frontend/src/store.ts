@@ -2,9 +2,11 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import type { PreloadedState } from "@reduxjs/toolkit";
 
 import { foldersApi } from "./services/api/folders.service";
+import { boardsApi } from "./services/api/boards.service";
 
 const rootReducer = combineReducers({
   [foldersApi.reducerPath]: foldersApi.reducer,
+  [boardsApi.reducerPath]: boardsApi.reducer,
 });
 
 export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
@@ -12,7 +14,9 @@ export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
       // adding the api middleware enables caching, invalidation, polling and other features of `rtk-query`
-      getDefaultMiddleware().concat(foldersApi.middleware),
+      getDefaultMiddleware()
+      .concat(foldersApi.middleware)
+      .concat(boardsApi.middleware),
     preloadedState,
   });
 };

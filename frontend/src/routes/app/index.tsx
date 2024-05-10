@@ -96,7 +96,6 @@ export const App = () => {
           }}
         >
           <ContentPage />
-          <Card title={"Main"} content={"NON"} />
           <CreateTab isOpen={isOpen} toggle={toggle} />
         </Grid.Col>
       </Grid>

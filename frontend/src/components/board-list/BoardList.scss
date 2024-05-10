@@ -1,0 +1,26 @@
+ul.grid {
+    padding-top: 15px;
+
+    li.boardSizing {
+        width: max-content !important;
+        
+        .card {
+            padding: unset !important;
+            margin: unset !important;
+            display: flex;
+
+            
+            flex-wrap: wrap !important;
+            flex-direction: column;
+
+            .board-image {
+                height: 16rem;
+            }
+
+            .card-section {
+                width: 100% !important;
+            }
+        }
+
+    }
+}

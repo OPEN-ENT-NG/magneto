@@ -11,6 +11,8 @@ import { IFolder } from "edifice-ts-client";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
 import { Board, IBoardItemResponse, IBoardsResponse } from "~/models/board.model";
+import { mdiAccountCircle, mdiCalendarBlank, mdiFolderPlus, mdiShareVariant, mdiStar } from "@mdi/js";
+import { Icon } from "@mui/material";
 
 
 
@@ -48,10 +50,10 @@ export const BoardList = () => {
         {boardData?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
             {boardData.map((board: Board) => {
-                const { id, title } = board;
+                const { id, title, imageUrl } = board;
                 return(
                     <animated.li
-                        className="g-col-4 z-1"
+                        className="g-col-4 z-1 boardSizing"
                         key={id}
                         style={{
                         position: "relative",
@@ -69,9 +71,26 @@ export const BoardList = () => {
                             isSelectable={false}
                         >
                             <Card.Body>
+                                {imageUrl && (
+                                    <img src={imageUrl} alt="Resource" className="board-image card-section" />
+                                )}
                                 <Card.Title>
-                                {title}
+                                    {title}
                                 </Card.Title>
+
+                                <div>
+                                    <Icon path={mdiFolderPlus} size={1} className="med-resource-card-text"></Icon>
+                                    <Card.Text className="med-resource-card-text">369 aimants</Card.Text>
+                                </div>
+
+                                <div>
+                                    <Icon path={mdiCalendarBlank} size={1}></Icon>
+                                    <Card.Text className="med-resource-card-text">date</Card.Text>
+                                    <Icon path={mdiStar} size={1}></Icon>
+                                    <Icon path={mdiAccountCircle} size={1}></Icon>
+                                    <Icon path={mdiShareVariant} size={1}></Icon>
+                                </div>
+                                    
                             </Card.Body>
                         </Card>
                     </animated.li>

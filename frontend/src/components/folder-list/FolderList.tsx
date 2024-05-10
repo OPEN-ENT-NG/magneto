@@ -61,7 +61,7 @@ export const FolderList = () => {
                                 type: "folder",
                                 title,
                             }}
-                            onClick={() => {setIsToasterOpen()}}
+                            // onClick={() => {setIsToasterOpen()}}
                             isLoading={getFoldersLoading || getDeletedFoldersLoading}
                             isSelectable={false}
                         >

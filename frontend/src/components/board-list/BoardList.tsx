@@ -33,8 +33,8 @@ export const BoardList = () => {
     } else if (getBoardsLoading) {
       console.log("loading");
     } else {
-      console.log("myBoardsResult", myBoardsResult);
       boardData = myBoardsResult.all.map(((board: IBoardItemResponse) => new Board().build(board))); //convert boards to Board[]
+      console.log("boardData", boardData);
     }
 
     const springs = useSpring({

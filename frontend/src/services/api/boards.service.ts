@@ -1,16 +1,10 @@
-import { odeServices } from "edifice-ts-client";
-
 import {
-  Boards,
-  IBoardPayload,
   IBoardsParamsRequest,
 } from "~/models/board.model";
+import { emptySplitApi } from "./empltySplitApi.service";
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export const boardsApi = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: "/magneto/" }),
-  tagTypes: [],
+export const boardsApi =  emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
     getBoards: builder.query({
       query: (params: IBoardsParamsRequest) => {

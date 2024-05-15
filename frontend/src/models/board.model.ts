@@ -37,7 +37,7 @@ export interface IBoardsResponse {
 
 export interface IBoardsParamsRequest {
   folderId?: string;
-  isPublic: boolean;
+  public: boolean;
   isShared: boolean;
   isDeleted: boolean;
   searchText?: string;
@@ -113,7 +113,7 @@ export class BoardForm {
     this.folderId = board.folderId;
     this.tags = board.tags;
     this.tagsTextInput = board.tagsTextInput;
-    this.public = board.public;
+    this.public = board.isPublished;
     this.layoutType = board.layoutType;
     this.canComment = board.canComment;
     this.displayNbFavorites = board.displayNbFavorites;
@@ -322,7 +322,7 @@ export class Board /*implements Shareable*/ {
   private _modificationDate: string;
   private _creationDate: string;
   private _folderId: string;
-  private _public: boolean;
+  private _isPublished: boolean;
   private _deleted: boolean;
   private _canComment: boolean;
   private _displayNbFavorites: boolean;
@@ -348,7 +348,7 @@ export class Board /*implements Shareable*/ {
     this._modificationDate = "";
     this._creationDate = "";
     this._folderId = "";
-    this._public = false;
+    this._isPublished = false;
     this.owner = { userId: "", displayName: "" };
     this.shared = [];
     this._deleted = false;
@@ -379,7 +379,7 @@ export class Board /*implements Shareable*/ {
     this._modificationDate = data.modificationDate;
     this._creationDate = data.creationDate;
     this._folderId = data.folderId;
-    this._public = data.public;
+    this._isPublished = data.public;
     this.owner = { userId: data.ownerId, displayName: data.ownerName };
     this.shared = data.shared;
     this._deleted = data.deleted;
@@ -444,8 +444,8 @@ export class Board /*implements Shareable*/ {
     return this._folderId;
   }
 
-  get public(): boolean {
-    return this._public;
+  get isPublished(): boolean {
+    return this._isPublished;
   }
 
   get deleted(): boolean {

@@ -30,13 +30,6 @@ import { FolderTreeNavItem, IFolderTreeNavItem } from "~/models/folder-tree.mode
   } else {
     let myFolders = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
     let deletedFolders = deletedFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder)));
-
-    // folderNavTrees[0].isOpened = false;
-    // folderNavTrees[0].iconClass = "magneto.my.boards";
-    // publicFolderNavTrees[0].isOpened = false;
-    // publicFolderNavTrees[0].iconClass = "magneto.lycee.connecte.boards";
-    // deletedFolderNavTrees[0].isOpened = false;
-    // deletedFolderNavTrees[0].iconClass = "magneto.trash";
     
     myFoldersObject =new FolderTreeNavItem({
         id: FOLDER_TYPE.MY_BOARDS, title: t('magneto.my.boards'), 

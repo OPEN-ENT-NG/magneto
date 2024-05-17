@@ -37,7 +37,7 @@ export interface IBoardsResponse {
 
 export interface IBoardsParamsRequest {
   folderId?: string;
-  public: boolean;
+  isPublic: boolean;
   isShared: boolean;
   isDeleted: boolean;
   searchText?: string;

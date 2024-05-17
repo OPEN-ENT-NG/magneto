@@ -24,9 +24,9 @@ export const FolderList = () => {
     const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);
 
     const filterFolderData = (): void => {
-        if (!!currentFolder.id || currentFolder.id == "my-boards" || currentFolder.id == "") {
+        if (!currentFolder.id || currentFolder.id == "my-boards" || currentFolder.id == "") {
             folderData = folderData.filter((folder: Folder) => !folder.parentId);
-        } else if (!!currentFolder) { 
+        } else if (!!currentFolder && !!currentFolder.id) { 
             folderData = folderData.filter((folder: Folder) => folder.parentId == currentFolder.id);
         } else {
             console.log("currentFolder undefined, try later or again");
@@ -56,10 +56,6 @@ export const FolderList = () => {
         if (myFoldersResult) filterFolderData();
     }, [currentFolder]);
 
-
-
-    
-
   return (
     <>
         {folderData?.length ? (
@@ -83,8 +79,7 @@ export const FolderList = () => {
                             }}
                             // onClick={() => {setIsToasterOpen()}}
                             isLoading={getFoldersLoading || getDeletedFoldersLoading}
-                            isSelectable={false}
-                            onDoubleClick={() => {setCurrentFolder(folder)}}
+                            onClick={() => {setCurrentFolder(folder)}}
                         >
                             <Card.Body>
                                 <Icon path={mdiFolderPlus} size={1}></Icon>

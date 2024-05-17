@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, useOdeClient, ActionBar } from "@edifice-ui/react";
 import {  animated, useSpring } from "@react-spring/web";
 
-import { useToaster } from "../../hooks/useToaster"
+import { useCurrentFolder } from "../../hooks/useCurrentFolder"
 
 import "./FolderList.scss";
 import { Folder, IFolderResponse } from "~/models/folder.model";
@@ -18,11 +18,22 @@ import { Icon } from "@mui/material";
 export const FolderList = () => {
     const { currentApp } = useOdeClient();
     // const [isToasterOpen, setIsToasterOpen] = useToaster();
+    const [currentFolder, setCurrentFolder] = useState(new Folder());
 
     const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
     const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);
 
-    let folderData;
+    const filterFolderData = (): void => {
+        if (!!currentFolder.id || currentFolder.id == "my-boards" || currentFolder.id == "") {
+            folderData = folderData.filter((folder: Folder) => !folder.parentId);
+        } else if (!!currentFolder) { 
+            folderData = folderData.filter((folder: Folder) => folder.parentId == currentFolder.id);
+        } else {
+            console.log("currentFolder undefined, try later or again");
+        }
+    }
+
+    let folderData: Folder[];
     let deletedFolders;
     if (getFoldersError || getDeletedFoldersError) {
         console.log("error");
@@ -31,13 +42,22 @@ export const FolderList = () => {
     } else {
         console.log("myFoldersResult", myFoldersResult);
         folderData = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
+        filterFolderData();
+        console.log("folderData", folderData);
         deletedFolders = deletedFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder)));
     }
 
     const springs = useSpring({
         from: { opacity: 0 },
         to: { opacity: 1 },
-      });
+    });
+
+    useEffect(() => {
+        if (myFoldersResult) filterFolderData();
+    }, [currentFolder]);
+
+
+
     
 
   return (
@@ -64,6 +84,7 @@ export const FolderList = () => {
                             // onClick={() => {setIsToasterOpen()}}
                             isLoading={getFoldersLoading || getDeletedFoldersLoading}
                             isSelectable={false}
+                            onDoubleClick={() => {setCurrentFolder(folder)}}
                         >
                             <Card.Body>
                                 <Icon path={mdiFolderPlus} size={1}></Icon>

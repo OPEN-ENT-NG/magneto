@@ -34,7 +34,7 @@ export const BoardList = () => {
         page: 0
     }) || {};
   
-    let boardData;
+    let boardData: Board[];
     if (getBoardsError) {
       console.log("error");
     } else if (getBoardsLoading) {

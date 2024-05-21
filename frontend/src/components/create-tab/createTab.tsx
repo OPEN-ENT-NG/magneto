@@ -77,6 +77,7 @@ export const CreateTab: FunctionComponent<props> = ({
     board.tags = tags;
 
     createBoard(board.toJSON());
+    createBoard(board.toJSON());
 
     reset();
   };

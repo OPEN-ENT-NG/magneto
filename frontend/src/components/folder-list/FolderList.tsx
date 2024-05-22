@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { Card, useOdeClient, ActionBar } from "@edifice-ui/react";
 import {  animated, useSpring } from "@react-spring/web";
 
-import { useCurrentFolder } from "../../hooks/useCurrentFolder"
 
 import "./FolderList.scss";
 import { Folder, IFolderResponse } from "~/models/folder.model";
@@ -15,10 +14,10 @@ import { Icon } from "@mui/material";
 
 
 
-export const FolderList = () => {
+export const FolderList = (currentFolder: Folder, setCurrentFolder: Dispatch<SetStateAction<Folder>>) => {
     const { currentApp } = useOdeClient();
     // const [isToasterOpen, setIsToasterOpen] = useToaster();
-    const [currentFolder, setCurrentFolder] = useState(new Folder());
+    
 
     const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
     const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);

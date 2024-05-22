@@ -13,7 +13,7 @@ import { FolderTreeNavItem, IFolderTreeNavItem } from "~/models/folder-tree.mode
 
 
 
-  export const SideBar = () => {
+  export const SideBar = (currentFolder: Folder, setCurrentFolder: any) => {
   const { t } = useTranslation();
 
   const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);

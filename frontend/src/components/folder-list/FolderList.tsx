@@ -1,18 +1,22 @@
-import React from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-import { Card, useOdeClient } from "@edifice-ui/react";
-import { mdiFolderPlus } from "@mdi/js";
-import { Icon } from "@mui/material";
-import { animated, useSpring } from "@react-spring/web";
+import { Card, useOdeClient, ActionBar } from "@edifice-ui/react";
+import {  animated, useSpring } from "@react-spring/web";
+
 
 import "./FolderList.scss";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { mdiFolderPlus } from "@mdi/js";
+import { Icon } from "@mui/material";
 
-export const FolderList = () => {
+
+
+
+export const FolderList = (currentFolder: Folder, setCurrentFolder: Dispatch<SetStateAction<Folder>>) => {
     const { currentApp } = useOdeClient();
     // const [isToasterOpen, setIsToasterOpen] = useToaster();
-    const [currentFolder, setCurrentFolder] = useState(new Folder());
+    
 
     const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
     const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);

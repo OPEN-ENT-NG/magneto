@@ -17,10 +17,9 @@ import { useTranslation } from "react-i18next";
 
 
 
-export const BoardList = () => {
+export const BoardList = (currentFolder: Folder) => {
     const { user, currentApp } = useOdeClient();
     const { t } = useTranslation();
-    const [currentFolder, setCurrentFolder] = useState(new Folder());
 
   const userId = user ? user?.userId : "";
 
@@ -57,7 +56,6 @@ export const BoardList = () => {
     }, [currentFolder]);
 
     const { data: myBoardsResult, isLoading: getBoardsLoading, error: getBoardsError } = useGetBoardsQuery(boardsQuery) || {};
-    
     if (getBoardsError) {
         console.log("error");
     } else if (getBoardsLoading) {
@@ -66,6 +64,7 @@ export const BoardList = () => {
         boardData = myBoardsResult.all.map(((board: IBoardItemResponse) => new Board().build(board))); //convert boards to Board[]
         console.log("boardData", boardData);
     }
+    
 
 
   return (

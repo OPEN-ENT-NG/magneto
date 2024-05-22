@@ -9,7 +9,7 @@ import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
-export const SideBar = () => {
+  export const SideBar = (currentFolder: Folder, setCurrentFolder: any) => {
   const { t } = useTranslation();
 
   const {

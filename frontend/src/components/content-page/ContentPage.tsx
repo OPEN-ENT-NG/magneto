@@ -1,7 +1,6 @@
 import React from "react";
 
 import { SearchBar } from "@edifice-ui/react";
-import { useTranslation } from "react-i18next";
 
 import { BoardList } from "../board-list/BoardList";
 import { FolderList } from "../folder-list/FolderList";

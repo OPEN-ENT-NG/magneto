@@ -1,6 +1,5 @@
 import { Button, ActionBar } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
-import { useTranslation } from "react-i18next";
 
 import { useToaster } from "~/hooks/useToaster";
 

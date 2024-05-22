@@ -1,19 +1,15 @@
 import React from "react";
 
-import { Card, useOdeClient, ActionBar } from "@edifice-ui/react";
+import { mdiFolderPlus } from "@mdi/js";
+import { Icon } from "@mui/material";
+import { Card, useOdeClient } from "@edifice-ui/react";
 import { animated, useSpring } from "@react-spring/web";
-
-import { useToaster } from "../../hooks/useToaster";
 
 import "./FolderList.scss";
 import { Folder, IFolderResponse } from "~/models/folder.model";
-
-import { IFolder } from "edifice-ts-client";
-
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 
-import { mdiFolderPlus } from "@mdi/js";
-import { Icon } from "@mui/material";
+
 
 export const FolderList = () => {
   const { currentApp } = useOdeClient();
@@ -31,7 +27,6 @@ export const FolderList = () => {
   } = useGetFoldersQuery(true);
 
   let folderData;
-  let deletedFolders;
   if (getFoldersError || getDeletedFoldersError) {
     console.log("error");
   } else if (getFoldersLoading || getDeletedFoldersLoading) {
@@ -41,9 +36,6 @@ export const FolderList = () => {
     folderData = myFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     ); //convert folders to Folder[]
-    deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
-      new Folder().build(folder),
-    );
   }
 
   const springs = useSpring({

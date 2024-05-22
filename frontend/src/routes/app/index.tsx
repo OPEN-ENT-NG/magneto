@@ -1,9 +1,7 @@
 import React from "react";
-import { useState } from "react";
 
 import { Grid, useToggle } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
-import { useTranslation } from "react-i18next";
 
 import { ContentPage } from "~/components/content-page/ContentPage";
 import { CreateTab } from "~/components/create-tab/createTab";

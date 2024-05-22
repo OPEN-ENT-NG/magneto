@@ -24,7 +24,7 @@ export interface AppProps {
 
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
-  
+
   return (
     <>
       <Header onClick={toggle} />

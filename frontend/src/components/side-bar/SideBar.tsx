@@ -7,9 +7,7 @@ import { FOLDER_TYPE } from "../../core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "../../models/folder.model";
 import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
-import {
-  FolderTreeNavItem,
-} from "~/models/folder-tree.model";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
 export const SideBar = () => {
   const { t } = useTranslation();

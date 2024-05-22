@@ -15,10 +15,7 @@ import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
 import "./BoardList.scss";
-import {
-  Board,
-  IBoardItemResponse,
-} from "~/models/board.model";
+import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
 
 export const BoardList = () => {

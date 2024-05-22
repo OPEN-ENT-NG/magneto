@@ -8,7 +8,6 @@ import { FolderList } from "../folder-list/FolderList";
 import ToasterContainer from "../toaster-container/ToasterContainer";
 
 export const ContentPage = () => {
-
   // const [isToasterOpen, toggleIsToasterOpen] = useToaster();
 
   return (

@@ -1,8 +1,8 @@
 import React from "react";
 
+import { Card, useOdeClient } from "@edifice-ui/react";
 import { mdiFolderPlus } from "@mdi/js";
 import { Icon } from "@mui/material";
-import { Card, useOdeClient } from "@edifice-ui/react";
 import { animated, useSpring } from "@react-spring/web";
 
 import "./FolderList.scss";
@@ -18,16 +18,11 @@ export const FolderList = () => {
     isLoading: getFoldersLoading,
     error: getFoldersError,
   } = useGetFoldersQuery(false);
-  const {
-    data: deletedFoldersResult,
-    isLoading: getDeletedFoldersLoading,
-    error: getDeletedFoldersError,
-  } = useGetFoldersQuery(true);
 
   let folderData;
-  if (getFoldersError || getDeletedFoldersError) {
+  if (getFoldersError) {
     console.log("error");
-  } else if (getFoldersLoading || getDeletedFoldersLoading) {
+  } else if (getFoldersLoading) {
     console.log("loading");
   } else {
     console.log("myFoldersResult", myFoldersResult);

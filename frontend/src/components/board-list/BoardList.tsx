@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Card, useOdeClient, ActionBar, Tooltip } from "@edifice-ui/react";
+import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
 import {
   mdiAccountCircle,
   mdiCalendarBlank,
@@ -12,20 +12,14 @@ import {
 import { Icon } from "@mdi/react";
 import { animated, useSpring } from "@react-spring/web";
 import dayjs from "dayjs";
-import { IFolder } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
-
-import { useToaster } from "../../hooks/useToaster";
 
 import "./BoardList.scss";
 import {
   Board,
   IBoardItemResponse,
-  IBoardsResponse,
 } from "~/models/board.model";
-import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
-import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 export const BoardList = () => {
   const { user, currentApp } = useOdeClient();

@@ -1,18 +1,14 @@
 import React from "react";
 import { useState } from "react";
 
-import { Heading, Grid, useToggle } from "@edifice-ui/react";
-import { formControlClasses } from "@mui/material";
+import { Grid, useToggle } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
-import { Card } from "~/components/card/Card.tsx";
 import { ContentPage } from "~/components/content-page/ContentPage";
 import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
-import { Board, IBoardItemResponse } from "~/models/board.model";
-import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
 export interface AppProps {
   _id: string;
@@ -28,47 +24,7 @@ export interface AppProps {
 
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
-  const { t } = useTranslation();
-
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [openedFolder, setOpenedFolder] = useState(null);
-  // const [displayBoardLightbox, setDisplayBoardLightbox] = useState(false);
-  // const [displayDeleteBoardLightbox, setDisplayDeleteBoardLightbox] =
-  //   useState(false);
-  // const [displayFolderLightbox, setDisplayMoveBoardLightbox] = useState(false);
-  // const [displayMoveBoardLightbox, setDisplayFolderLightbox] = useState(false);
-  // const [displayCollectionLightbox, setDisplayCollectionLightbox] =
-  //   useState(false);
-  // const [displayShareBoardLightbox, setDisplayShareBoardLightbox] =
-  //   useState(false);
-  // const [displayShareFolderLightbox, setDisplayShareFolderLightbox] =
-  //   useState(false);
-  // const [displayPublicShareBoardLightbox, setDisplayPublicShareBoardLightbox] =
-  //   useState(false);
-  // const [
-  //   displayEnterSharedFolderWarningLightbox,
-  //   setDisplayEnterSharedFolderWarningLightbox,
-  // ] = useState(false);
-  // const [
-  //   displayExitSharedFolderWarningLightbox,
-  //   setDisplayExitSharedFolderWarningLightbox,
-  // ] = useState(false);
-  // const [
-  //   displayMoveNoRightInFolderLightbox,
-  //   setDisplayMoveNoRightInFolderLightbox,
-  // ] = useState(false);
-  // const [isFromMoveBoardLightbox, setIsFromMoveBoardLightbox] = useState(false);
-
-  //this.magnetoStandalone = this.$window.magnetoStandalone == "true";
-  // this.filter = new BoardsFilter();
-
-  const [boards, setBoards] = useState([]);
-  // const [currentFolderChildren, setCurrentFolderChildren] = useState([]);
-  // const [selectedBoardIds, setSelectedBoardIds] = useState([]);
-  // const [selectedBoards, setSelectedBoards] = useState([]);
-  // const [selectedFolderIds, setSelectedFolderIds] = useState([]);
-  // const [selectedFolders, setSelectedFolders] = useState([]);
-
+  
   return (
     <>
       <Header onClick={toggle} />

@@ -1,8 +1,5 @@
 import React from "react";
 
-import { Button, TreeView } from "@edifice-ui/react";
-import { mdiFolderPlus, mdiStar } from "@mdi/js";
-import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { SideBarButtons } from "./SideBarButtons";
@@ -12,7 +9,6 @@ import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import {
   FolderTreeNavItem,
-  IFolderTreeNavItem,
 } from "~/models/folder-tree.model";
 
 export const SideBar = () => {

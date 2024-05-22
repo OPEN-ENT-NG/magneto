@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { useToaster } from "~/hooks/useToaster";
 
 export default function ToasterContainer() {
-  const { t } = useTranslation();
   const { isToasterOpen } = useToaster();
 
   const transition = useTransition(isToasterOpen, {

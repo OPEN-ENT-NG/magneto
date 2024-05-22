@@ -1,19 +1,18 @@
 import React from "react";
-import { useState } from 'react';
+import { useState } from "react";
 
 import { Heading, Grid, useToggle } from "@edifice-ui/react";
+import { formControlClasses } from "@mui/material";
 import { ID } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
 import { Card } from "~/components/card/Card.tsx";
+import { ContentPage } from "~/components/content-page/ContentPage";
 import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
-
-import { formControlClasses } from "@mui/material";
-import { FolderTreeNavItem } from "~/models/folder-tree.model";
-import { Board, IBoardItemResponse } from "~/models/board.model";
 import { SideBar } from "~/components/side-bar/SideBar";
-import { ContentPage } from "~/components/content-page/ContentPage";
+import { Board, IBoardItemResponse } from "~/models/board.model";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
 export interface AppProps {
   _id: string;
@@ -70,7 +69,6 @@ export const App = () => {
   // const [selectedFolderIds, setSelectedFolderIds] = useState([]);
   // const [selectedFolders, setSelectedFolders] = useState([]);
 
-
   return (
     <>
       <Header onClick={toggle} />
@@ -83,9 +81,7 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
-
-        <SideBar />
-
+          <SideBar />
         </Grid.Col>
 
         <Grid.Col

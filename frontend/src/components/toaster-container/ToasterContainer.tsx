@@ -2,11 +2,11 @@ import { Button, ActionBar } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
-import  { useToaster }  from "~/hooks/useToaster";
+import { useToaster } from "~/hooks/useToaster";
 
 export default function ToasterContainer() {
   const { t } = useTranslation();
-  const { isToasterOpen, } = useToaster();
+  const { isToasterOpen } = useToaster();
 
   const transition = useTransition(isToasterOpen, {
     from: { opacity: 0, transform: "translateY(100%)" },
@@ -54,26 +54,14 @@ export default function ToasterContainer() {
                       )
                     );
                   })} */}
-                <Button
-                    color="primary"
-                    type="button"
-                    variant="filled"
-                    >
-                    Créer
-                    </Button>
-                    <Button
-                    color="primary"
-                    type="button"
-                    variant="filled"
-                    >
-                    Modifier
-                    </Button>
-                    <Button
-                    color="primary"
-                    type="button"
-                    variant="filled"
-                    >
-                    Publier
+                <Button color="primary" type="button" variant="filled">
+                  Créer
+                </Button>
+                <Button color="primary" type="button" variant="filled">
+                  Modifier
+                </Button>
+                <Button color="primary" type="button" variant="filled">
+                  Publier
                 </Button>
               </ActionBar>
             </animated.div>

@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { Folder } from "~/models/folder.model";
+
 import { emptySplitApi } from "./empltySplitApi.service";
+import { Folder } from "~/models/folder.model";
 
 export const foldersApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({

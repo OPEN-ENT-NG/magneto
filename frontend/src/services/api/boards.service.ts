@@ -1,10 +1,7 @@
-import {
-  IBoardsParamsRequest,
-} from "~/models/board.model";
 import { emptySplitApi } from "./empltySplitApi.service";
+import { IBoardsParamsRequest } from "~/models/board.model";
 
-
-export const boardsApi =  emptySplitApi.injectEndpoints({
+export const boardsApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
     getBoards: builder.query({
       query: (params: IBoardsParamsRequest) => {
@@ -27,7 +24,7 @@ export const boardsApi =  emptySplitApi.injectEndpoints({
         ) {
           urlParams += `&searchText=${params.searchText}`;
         }
-        
+
         return `boards${urlParams}`;
       },
     }),

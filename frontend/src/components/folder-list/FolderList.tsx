@@ -9,8 +9,6 @@ import "./FolderList.scss";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 
-
-
 export const FolderList = () => {
   const { currentApp } = useOdeClient();
   // const [isToasterOpen, setIsToasterOpen] = useToaster();

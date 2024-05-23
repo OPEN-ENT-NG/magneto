@@ -58,7 +58,11 @@ export const FolderList = () => {
                     title,
                   }}
                   // onClick={() => {setIsToasterOpen()}}
+<<<<<<< HEAD
                   isLoading={getFoldersLoading}
+=======
+                  isLoading={getFoldersLoading || getDeletedFoldersLoading}
+>>>>>>> feat(react): #MAG-391 display magneto elements (#181)
                   isSelectable={false}
                 >
                   <Card.Body>

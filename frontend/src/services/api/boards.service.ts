@@ -1,5 +1,5 @@
 import { emptySplitApi } from "./empltySplitApi.service";
-import { IBoardsParamsRequest } from "~/models/board.model";
+import { IBoardPayload, IBoardsParamsRequest } from "~/models/board.model";
 
 export const boardsApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -28,7 +28,20 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         return `boards${urlParams}`;
       },
     }),
+    createBoard: builder.mutation({
+      query: (params: IBoardPayload) => ({
+        url: "board",
+        method: "POST",
+        body: params,
+      }),
+    }),
+    getUrl: builder.query({
+      query: (cover: File) => {
+        return URL.createObjectURL(cover);
+      },
+    }),
   }),
 });
 
-export const { useGetBoardsQuery } = boardsApi;
+export const { useGetBoardsQuery, useCreateBoardMutation, useGetUrlQuery } =
+  boardsApi;

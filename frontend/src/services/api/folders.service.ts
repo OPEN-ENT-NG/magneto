@@ -1,8 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { emptySplitApi } from "./empltySplitApi.service";
+import { Folder } from "~/models/folder.model";
 
-export const foldersApi = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: "/magneto/" }),
-  tagTypes: [],
+export const foldersApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
     getFolders: builder.query({
       query: (isDeleted: boolean) => `folders?isDeleted=${isDeleted}`,

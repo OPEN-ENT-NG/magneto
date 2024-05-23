@@ -21,11 +21,11 @@ import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 
 import myImage from "./collaborativeeditor-default.png";
-import { useBackground } from "../../hooks/useBackground";
-import { useThumb } from "../../hooks/useThumb";
+// import { useBackground } from "../../hooks/useBackground";
+// import { useThumb } from "../../hooks/useThumb";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { BoardForm } from "~/models/board.model";
-import { createBoard, getUrl } from "~/services/api/boards.service";
+import { useCreateBoardMutation } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -43,9 +43,9 @@ export const CreateTab: FunctionComponent<props> = ({
   isOpen,
   toggle,
 }: props) => {
-  const { thumbnail, handleDeleteImage, handleUploadImage } = useThumb({
-    selectedResource: undefined,
-  });
+  // const { thumbnail, handleDeleteImage, handleUploadImage } = useThumb({
+  //   selectedResource: undefined,
+  // });
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
@@ -53,18 +53,21 @@ export const CreateTab: FunctionComponent<props> = ({
   const [disposition, setDisposition] = useState("free");
   const [tagsTextInput, setTagsTextInput] = useState("");
   const [tags, setTags] = useState([""]);
-  const { background, handleDeleteBackground, handleUploadBackground } =
-    useBackground({
-      selectedResource: undefined,
-    });
+  const [createBoard] = useCreateBoardMutation();
+  // const { background, handleDeleteBackground, handleUploadBackground } =
+  //   useBackground({
+  //     selectedResource: undefined,
+  //   });
 
   const onSubmit = async (): Promise<void> => {
     const board = new BoardForm();
     board.title = title;
     board.description = description;
     //TODO : change this to work with a future workspace file manager
-    board.imageUrl = await getUrl(thumbnail as File);
-    board.backgroundUrl = await getUrl(background as File);
+
+    // board.imageUrl = getUrl(thumbnail as File);
+    // board.backgroundUrl = getUrl(background as File);
+
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")
       board.layoutType = LAYOUT_TYPE.HORIZONTAL;
@@ -77,6 +80,19 @@ export const CreateTab: FunctionComponent<props> = ({
 
     reset();
   };
+
+  // const getUrl = (image: File): string => {
+  //   const {data: imageUrl, isLoading: getImageUrlLoading, error: getImageUrlError,} = useGetUrlQuery(image as File);
+  //   if (getImageUrlError) {
+  //     console.log("error");
+  //     return "";
+  //   } else if (getImageUrlLoading) {
+  //     console.log("loading");
+  //     return "";
+  //   } else {
+  //     return imageUrl;
+  //   }
+  // };
 
   const reset = (): void => {
     handleDeleteImage();

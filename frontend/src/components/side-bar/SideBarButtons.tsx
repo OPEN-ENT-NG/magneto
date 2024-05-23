@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import { CreateFolder } from "../create-folder/CreateFolder";
 
-export const TreeViewButtons = () => {
+export const SideBarButtons = () => {
   const { t } = useTranslation();
 
   const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);

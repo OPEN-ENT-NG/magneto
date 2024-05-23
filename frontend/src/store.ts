@@ -1,18 +1,17 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import type { PreloadedState } from "@reduxjs/toolkit";
 
-import { foldersApi } from "./services/api/folders.service";
+import { emptySplitApi } from "./services/api/empltySplitApi.service";
 
 const rootReducer = combineReducers({
-  [foldersApi.reducerPath]: foldersApi.reducer,
+  [emptySplitApi.reducerPath]: emptySplitApi.reducer,
 });
 
 export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
   return configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
-      // adding the api middleware enables caching, invalidation, polling and other features of `rtk-query`
-      getDefaultMiddleware().concat(foldersApi.middleware),
+      getDefaultMiddleware().concat(emptySplitApi.middleware),
     preloadedState,
   });
 };

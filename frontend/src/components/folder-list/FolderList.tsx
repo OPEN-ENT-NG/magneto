@@ -60,7 +60,6 @@ export const FolderList = (currentFolder: Folder, onSelect: (folder: Folder) => 
     <>
       {folderData?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-<<<<<<< HEAD
           {folderData.map((folder: Folder) => {
             const { id, title } = folder;
             return (
@@ -79,11 +78,7 @@ export const FolderList = (currentFolder: Folder, onSelect: (folder: Folder) => 
                     title,
                   }}
                   // onClick={() => {setIsToasterOpen()}}
-<<<<<<< HEAD
                   isLoading={getFoldersLoading}
-=======
-                  isLoading={getFoldersLoading || getDeletedFoldersLoading}
->>>>>>> feat(react): #MAG-391 display magneto elements (#181)
                   isSelectable={false}
                 >
                   <Card.Body>
@@ -96,42 +91,6 @@ export const FolderList = (currentFolder: Folder, onSelect: (folder: Folder) => 
           })}
         </animated.ul>
       ) : null}
-=======
-            {folderData.map((folder: Folder) => {
-                const { id, title } = folder;
-                return(
-                    <animated.li
-                        className="g-col-4 z-1 folderSizing"
-                        key={id}
-                        style={{
-                        position: "relative",
-                        ...springs
-                        }}
-                    >
-                        <Card
-                            app={currentApp!}
-                            options={{
-                                type: "folder",
-                                title,
-                            }}
-                            // onClick={() => {setIsToasterOpen()}}
-                            isLoading={getFoldersLoading || getDeletedFoldersLoading}
-                            onClick={() => {onSelect(folder)}}
-                        >
-                            <Card.Body>
-                                <Icon path={mdiFolderPlus} size={1}></Icon>
-                                <Card.Title>
-                                {title}
-                                </Card.Title>
-                            </Card.Body>
-                        </Card>
-                    </animated.li>
-                    
-                )
-            })}
-        </animated.ul> 
-        ) : null}
->>>>>>> 424
     </>
   );
 };

@@ -1,10 +1,11 @@
+import { odeServices } from "edifice-ts-client";
+
+import { emptySplitApi } from "./empltySplitApi.service";
 import {
   Board,
   IBoardsParamsRequest,
   IBoardPayload,
 } from "~/models/board.model";
-import { emptySplitApi } from "./empltySplitApi.service";
-import { odeServices } from "edifice-ts-client";
 
 export const boardsApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({

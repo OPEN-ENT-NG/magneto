@@ -324,16 +324,18 @@ export class Card {
     this._parentId = data.parentId;
     this._metadata = data.metadata;
     this._nbOfComments = data.nbOfComments;
-    this._lastComment = (data.nbOfComments != null && data.nbOfComments > 0) ?
-      new CardComment().build(data.lastComment) : undefined;
+    this._lastComment =
+      data.nbOfComments != null && data.nbOfComments > 0
+        ? new CardComment().build(data.lastComment)
+        : undefined;
     this._nbOfFavorites = data.nbOfFavorites;
     this._liked = data.liked;
-    if (this._resourceType === "file")
-      this._resource = undefined;//this.initResource(); 
+    if (this._resourceType === "file") this._resource = undefined; //this.initResource();
     return this;
   }
 
-  initResource(): FileViewModel { //TODO : add FileViewModel to the project
+  initResource(): FileViewModel {
+    //TODO : add FileViewModel to the project
     this._resource = new FileViewModel();
     /*this._resource._id = this._resourceId;
     this._resource.metadata = this.metadata;

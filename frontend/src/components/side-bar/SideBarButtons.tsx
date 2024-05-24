@@ -12,7 +12,8 @@ export const SideBarButtons = () => {
   const { t } = useTranslation();
 
   const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
-  const [isMagnetsCollectionOpen, toggleMagnetsCollectionOpen] = useToggle(false);
+  const [isMagnetsCollectionOpen, toggleMagnetsCollectionOpen] =
+    useToggle(false);
 
   return (
     <>

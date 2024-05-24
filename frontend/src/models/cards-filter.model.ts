@@ -1,78 +1,78 @@
 export class CardsFilter {
-    private _page: number;
-    private _boardId: string;
-    private _sortBy: string;
-    private _isShared: boolean;
-    private _isPublic: boolean;
-    private _isFavorite: boolean;
-    private _searchText: string;
+  private _page: number;
+  private _boardId: string;
+  private _sortBy: string;
+  private _isShared: boolean;
+  private _isPublic: boolean;
+  private _isFavorite: boolean;
+  private _searchText: string;
 
-    constructor() {
-        this._page = 0;
-        this._isShared = false;
-        this._isPublic = false;
-        this._isFavorite = true;
-        this._sortBy = '';
-        this._searchText = '';
-    }
+  constructor() {
+    this._page = 0;
+    this._isShared = false;
+    this._isPublic = false;
+    this._isFavorite = true;
+    this._sortBy = "";
+    this._searchText = "";
+  }
 
-    get page(): number {
-        return this._page;
-    }
+  get page(): number {
+    return this._page;
+  }
 
-    set page(value: number) {
-        this._page = value;
-    }
+  set page(value: number) {
+    this._page = value;
+  }
 
-    nextPage() {
-        this._page++;
-    }
+  nextPage() {
+    this._page++;
+  }
 
-    get searchText(): string {
-        return this._searchText;
-    }
+  get searchText(): string {
+    return this._searchText;
+  }
 
-    set searchText(value: string) {
-        this._searchText = value;
-    }
+  set searchText(value: string) {
+    this._searchText = value;
+  }
 
-    get sortBy(): string {
-        return this._sortBy;
-    }
+  get sortBy(): string {
+    return this._sortBy;
+  }
 
-    set sortBy(value: string) {
-        this._sortBy = value;
-    }
+  set sortBy(value: string) {
+    this._sortBy = value;
+  }
 
-    get isPublic(): boolean {
-        return this._isPublic;
-    }
+  get isPublic(): boolean {
+    return this._isPublic;
+  }
 
-    set isPublic(value: boolean) {
-        this._isPublic = value;
-    }
+  set isPublic(value: boolean) {
+    this._isPublic = value;
+  }
 
-    get isFavorite(): boolean {
-        return this._isFavorite;
-    }
+  get isFavorite(): boolean {
+    return this._isFavorite;
+  }
 
-    set isFavorite(value: boolean) {
-        this._isFavorite = value;
-    }
+  set isFavorite(value: boolean) {
+    this._isFavorite = value;
+  }
 
-    get isShared(): boolean {
-        return this._isShared;
-    }
+  get isShared(): boolean {
+    return this._isShared;
+  }
 
-    set isShared(value: boolean) {
-        this._isShared = value;
-    }
+  set isShared(value: boolean) {
+    this._isShared = value;
+  }
 
-    get boardId(): string {
-        return this._boardId;
-    }
+  get boardId(): string {
+    return this._boardId;
+  }
 
-    set boardId(value: string) {
-        this._boardId = value;
-    }
+  set boardId(value: string) {
+    this._boardId = value;
+  }
 }

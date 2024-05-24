@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Heading, Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
-import { ContentPage } from "~/components/content-page/ContentPage";
 import { CreateTab } from "~/components/create-tab/createTab";
 import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
@@ -11,6 +10,7 @@ import { BoardList } from "~/components/board-list/BoardList";
 import { FolderList } from "~/components/folder-list/FolderList";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { Folder } from "~/models/folder.model";
+import { useTranslation } from "react-i18next";
 
 export interface AppProps {
   _id: string;
@@ -31,6 +31,9 @@ export const App = () => {
   const [currentFolder, setCurrentFolder] = useState(new Folder());
 
 
+  const handleSelectFolder = (folder: Folder) => {
+    setCurrentFolder(folder);
+  }
 
 
   return (
@@ -64,7 +67,7 @@ export const App = () => {
             placeholder="Search something...."
             size="md"
           />
-          <FolderList currentFolder={currentFolder} setCurrentFolder={setCurrentFolder} />
+          <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} />
           <ToasterContainer />
           <BoardList currentFolder={currentFolder} />
           <CreateTab isOpen={isOpen} toggle={toggle} />

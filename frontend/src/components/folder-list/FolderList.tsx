@@ -13,7 +13,7 @@ import { Icon } from "@mui/material";
 
 
 
-export const FolderList = (currentFolder: Folder, setCurrentFolder: Dispatch<SetStateAction<Folder>>) => {
+export const FolderList = (currentFolder: Folder, onSelect: (folder: Folder) => void) => {
     const { currentApp } = useOdeClient();
     // const [isToasterOpen, setIsToasterOpen] = useToaster();
     
@@ -50,9 +50,11 @@ export const FolderList = (currentFolder: Folder, setCurrentFolder: Dispatch<Set
     to: { opacity: 1 },
   });
 
-    useEffect(() => {
-        if (myFoldersResult) filterFolderData();
-    }, [currentFolder]);
+  useEffect(() => {
+      if (myFoldersResult) filterFolderData();
+  }, [currentFolder]);
+
+
 
   return (
     <>
@@ -114,7 +116,7 @@ export const FolderList = (currentFolder: Folder, setCurrentFolder: Dispatch<Set
                             }}
                             // onClick={() => {setIsToasterOpen()}}
                             isLoading={getFoldersLoading || getDeletedFoldersLoading}
-                            onClick={() => {setCurrentFolder(folder)}}
+                            onClick={() => {onSelect(folder)}}
                         >
                             <Card.Body>
                                 <Icon path={mdiFolderPlus} size={1}></Icon>

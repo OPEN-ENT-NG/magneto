@@ -7,7 +7,6 @@ import {  animated, useSpring } from "@react-spring/web";
 import { useToaster } from "../../hooks/useToaster"
 
 import "./BoardList.scss";
-import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
 import { Board, IBoardItemResponse, IBoardsParamsRequest, IBoardsResponse } from "~/models/board.model";
 import { mdiAccountCircle, mdiCalendarBlank, mdiCrown, mdiEarth, mdiMagnet, mdiShareVariant } from "@mdi/js";

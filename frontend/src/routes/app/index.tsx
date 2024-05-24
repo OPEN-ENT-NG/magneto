@@ -49,7 +49,7 @@ export const App = () => {
           }}
         >
 
-        <SideBar currentFolder={currentFolder} setCurrentFolder={setCurrentFolder} />
+        <SideBar currentFolder={currentFolder} setCurrentFolder={handleSelectFolder} />
 
         </Grid.Col>
 

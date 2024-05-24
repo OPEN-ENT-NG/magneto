@@ -9,7 +9,12 @@ import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
-  export const SideBar = (currentFolder: Folder, setCurrentFolder: any) => {
+type SideBarProps = {
+  currentFolder: Folder;
+  onSelect: (folder: Folder) => void;
+}
+
+  export const SideBar: React.FunctionComponent<SideBarProps> = ({ currentFolder, onSelect }) => {
   const { t } = useTranslation();
 
   const {
@@ -23,18 +28,21 @@ import { FolderTreeNavItem } from "~/models/folder-tree.model";
     error: getDeletedFoldersError,
   } = useGetFoldersQuery(true);
 
-  let myFoldersObject;
-  let deletedFoldersObject;
+
+  let myFolders: Folder[];
+  let deletedFolders: Folder[]
+  let myFoldersObject: FolderTreeNavItem;
+  let deletedFoldersObject: FolderTreeNavItem;
 
   if (getFoldersError || getDeletedFoldersError) {
     console.log("error");
   } else if (getFoldersLoading || getDeletedFoldersLoading) {
     console.log("loading");
   } else {
-    const myFolders = myFoldersResult.map((folder: IFolderResponse) =>
+    myFolders = myFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     ); //convert folders to Folder[]
-    const deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
+    deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     );
 
@@ -64,8 +72,11 @@ import { FolderTreeNavItem } from "~/models/folder-tree.model";
     <>
       <aside className="g-col-3 g-col-lg-2 g-col-xl-3 border-end pt-16 pe-16 d-none d-lg-block">
         <TreeViewContainer
-          folders={myFoldersObject}
+          folders={myFolders ?? []}
+          folderObject={myFoldersObject ?? undefined}
           folderType={FOLDER_TYPE.MY_BOARDS}
+          currentFolder={currentFolder}
+          onSelect={onSelect}
         />
         <TreeViewContainer
           folders={{
@@ -75,10 +86,14 @@ import { FolderTreeNavItem } from "~/models/folder-tree.model";
             section: true,
           }}
           folderType={FOLDER_TYPE.MY_BOARDS}
+          
         />
         <TreeViewContainer
-          folders={deletedFoldersObject}
+          folders={deletedFolders}
+          folderObject={deletedFoldersObject}
           folderType={FOLDER_TYPE.DELETED_BOARDS}
+          currentFolder={currentFolder}
+          onSelect={onSelect}
         />
         <SideBarButtons />
       </aside>

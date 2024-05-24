@@ -10,16 +10,17 @@ import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { mdiFolderPlus } from "@mdi/js";
 import { Icon } from "@mui/material";
 
+type FolderListProps = {
+  currentFolder: Folder;
+  onSelect: (folder: Folder) => void;
+}
 
-
-
-export const FolderList = (currentFolder: Folder, onSelect: (folder: Folder) => void) => {
+export const FolderList: React.FunctionComponent<FolderListProps> = ({ currentFolder, onSelect }) => {
     const { currentApp } = useOdeClient();
     // const [isToasterOpen, setIsToasterOpen] = useToaster();
     
 
     const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
-    const { data: deletedFoldersResult, isLoading: getDeletedFoldersLoading, error: getDeletedFoldersError } = useGetFoldersQuery(true);
 
     const filterFolderData = (): void => {
         if (!currentFolder.id || currentFolder.id == "my-boards" || currentFolder.id == "") {
@@ -32,17 +33,15 @@ export const FolderList = (currentFolder: Folder, onSelect: (folder: Folder) => 
     }
 
     let folderData: Folder[];
-    let deletedFolders;
-    if (getFoldersError || getDeletedFoldersError) {
+    if (getFoldersError) {
         console.log("error");
-    } else if (getFoldersLoading || getDeletedFoldersLoading) {
+    } else if (getFoldersLoading ) {
         console.log("loading");
     } else {
         console.log("myFoldersResult", myFoldersResult);
         folderData = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
         filterFolderData();
         console.log("folderData", folderData);
-        deletedFolders = deletedFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder)));
     }
 
   const springs = useSpring({
@@ -79,7 +78,8 @@ export const FolderList = (currentFolder: Folder, onSelect: (folder: Folder) => 
                   }}
                   // onClick={() => {setIsToasterOpen()}}
                   isLoading={getFoldersLoading}
-                  isSelectable={false}
+                  isSelectable={true}
+                  onClick={() => {onSelect(folder)}}
                 >
                   <Card.Body>
                     <Icon path={mdiFolderPlus} size={1}></Icon>

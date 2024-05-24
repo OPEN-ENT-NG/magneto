@@ -2,39 +2,23 @@ import React from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView } from "@edifice-ui/react";
+import { Folder } from "~/models/folder.model";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
-export const TreeViewContainer = ({
-  folders: folders,
-  folderType: folderType,
+type TreeViewContainerProps = {
+  folders: Folder[],
+  folderObject: FolderTreeNavItem,
+  folderType: string,
+  currentFolder: Folder;
+  onSelect: (folder: Folder) => void;
+}
+
+export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> = ({
+  folders,
+  folderType,
+  currentFolder,
+  onSelect
 }) => {
-  /**
-   * Check if the folder has a children (or sub-children) with the given id
-   * @param folderId Folder identifier
-   */
-  // const childrenContainsId = (folderId: string): boolean => {
-  //   return (
-  //     this.id == folderId ||
-  //     this.children.some(
-  //       (folder: FolderTreeNavItem) =>
-  //         folder.id === folderId || folder.childrenContainsId(folderId),
-  //     )
-  //   );
-  // };
-
-  /**
-   * Open all folders from the given children folder to the current folder
-   * @param folderId Folder identifier
-   */
-  // const openChildrenToId = (folderId: string): void => {
-  //   if (this.childrenContainsId(folderId)) {
-  //     this._isOpened = true;
-  //     if (this.children) {
-  //       this.children.forEach((folder: FolderTreeNavItem) => {
-  //         folder.openChildrenToId(folderId);
-  //       });
-  //     }
-  //   }
-  // };
 
   const dataTree = {
     children: [],
@@ -42,6 +26,10 @@ export const TreeViewContainer = ({
     name: folderType,
     section: true,
   };
+
+  const selectFolder = (folderId: string): void => {
+
+  }
 
   return (
     <>
@@ -56,8 +44,8 @@ export const TreeViewContainer = ({
         onTreeItemFold={() => {
           console.log("fold");
         }}
-        onTreeItemSelect={() => {
-          console.log("clicked");
+        onTreeItemSelect={(item) => {
+          console.log("clicked", item);
         }}
         onTreeItemUnfold={() => {
           console.log("unfold");

@@ -87,7 +87,7 @@ export class Folder {
     const finalFolder: Folder = new Folder();
     finalFolder.id = navItem.id;
     finalFolder.title = navItem.name;
-    finalFolder.parentId = navItem.parentId;
+    // finalFolder.parentId = navItem.parentId;
     finalFolder.ownerId = navItem.ownerId;
     finalFolder.shared = navItem.shared;
 

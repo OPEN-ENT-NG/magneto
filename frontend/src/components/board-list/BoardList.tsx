@@ -12,11 +12,12 @@ import { Board, IBoardItemResponse, IBoardsParamsRequest, IBoardsResponse } from
 import { mdiAccountCircle, mdiCalendarBlank, mdiCrown, mdiEarth, mdiMagnet, mdiShareVariant } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
+import { Folder } from "~/models/folder.model";
 
 
 
 
-export const BoardList = (currentFolder: Folder) => {
+export const BoardList: React.FunctionComponent<Folder> = ({currentFolder}) => {
     const { user, currentApp } = useOdeClient();
     const { t } = useTranslation();
 

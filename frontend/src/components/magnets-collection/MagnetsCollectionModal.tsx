@@ -14,12 +14,11 @@ import { animated, useSpring } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
 import { CardsFilter } from "../../models/cards-filter.model";
-import { getAllCardsCollection } from "../../services/api/cards.service";
-import { Board } from "~/models/board.model";
-import { Card as CardModel } from "~/models/card.model";
+import { useGetAllCardsCollectionQuery } from "../../services/api/cards.service";
+import { Board, IBoardItemResponse } from "~/models/board.model";
+import { Card as CardModel, ICardItemResponse } from "~/models/card.model";
 import "./MagnetsCollectionModal.scss";
-import { ICardsParamsRequest } from "~/models/card.model";
-import { getAllBoards } from "~/services/api/boards.service";
+import { useGetBoardsQuery } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -33,31 +32,69 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   const { currentApp } = useOdeClient();
   const { t } = useTranslation();
 
-  const [cardsData, setCardsData] = useState<CardModel[]>([]);
-  const [boardData, setBoardData] = useState<Board[]>([]);
-  const [boardsWithCards, setBoardsWithCards] = useState<Board[]>([]);
+  //const [cardsData, setCardsData] = useState<CardModel[]>([]);
+  //const [boardData, setBoardData] = useState<Board[]>([]);
+  //const [boardsWithCards, setBoardsWithCards] = useState<Board[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [switchBoard, toggleSwitchBoard] = useToggle(false);
   const filter = new CardsFilter();
-  const baseParams: ICardsParamsRequest = {
+
+  const {
+    data: myBoardsResult,
+    isLoading: getBoardsLoading,
+    error: getBoardsError,
+  } = useGetBoardsQuery({
+    isPublic: false,
+    isShared: true,
+    isDeleted: false,
+    sortBy: "modificationDate",
+    page: 0,
+  }) || {};
+
+  let boardData: Board[] = [];
+  let boardsWithCards: Board[] = [];
+  let cardsData: CardModel[] = [];
+
+  const {
+    data: myCardsResult,
+    isLoading: getCardsLoading,
+    error: getCardsError,
+  } = useGetAllCardsCollectionQuery({
     page: filter.page,
     sortBy: filter.sortBy,
     searchText: filter.searchText,
     isShared: filter.isShared,
     isPublic: filter.isPublic,
     isFavorite: filter.isFavorite,
-  };
-  //const [params, setParams] = useState<ICardsParamsRequest>(baseParams);
+  }) || {};
 
-  const fetchCards = async () => {
-    try {
-      getAllCardsCollection(baseParams).then((cards) => {
-        setCardsData(cards.all);
-      });
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données:", error);
-    }
-  };
+  if (getCardsError) {
+    console.log("error");
+  } else if (getCardsLoading) {
+    console.log("loading");
+  } else {
+    cardsData = myCardsResult.all.map((card: ICardItemResponse) =>
+      new CardModel().build(card),
+    );
+    console.log("cardsData", cardsData);
+  }
+
+  if (getBoardsError) {
+    console.log("error");
+  } else if (getBoardsLoading) {
+    console.log("loading");
+  } else {
+    boardData = myBoardsResult.all.map((board: IBoardItemResponse) =>
+      new Board().build(board),
+    );
+    boardsWithCards = boardData.map((board) => {
+      return {
+        ...board,
+        cards: cardsData.filter((card) => card.boardId === board._id),
+      } as Board;
+    });
+    console.log("boardData", boardData);
+  }
 
   const springs = useSpring({
     from: { opacity: 0 },
@@ -96,7 +133,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                         title: card.title,
                       }}
                       // onClick={() => {setIsToasterOpen()}}
-                      // isLoading={getBoardsLoading}
+                      isLoading={getBoardsLoading}
                       isSelectable={false}
                     >
                       <Card.Body flexDirection={"column"}>
@@ -136,7 +173,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                   }
                 }).length > 0 && (
                   <div>
-                    <h2>{board.title}</h2>
+                    <h2>{board._title}</h2>
                     <animated.ul className="grid ps-0 list-unstyled mb-24">
                       {board.cards
                         .filter((card) => {
@@ -166,7 +203,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                                 title: card.title,
                               }}
                               // onClick={() => {setIsToasterOpen()}}
-                              // isLoading={getBoardsLoading}
+                              isLoading={getBoardsLoading}
                               isSelectable={false}
                             >
                               <Card.Body flexDirection={"column"}>
@@ -220,36 +257,14 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     };
   }, [observerTarget]);
 
-  const fetchBoards = async () => {
-    try {
-      getAllBoards({
-        isPublic: false,
-        isShared: true,
-        isDeleted: false,
-        sortBy: "modificationDate",
-        page: 0,
-      }).then((boards) => {
-        setBoardData(boards);
-      });
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchCards();
-    fetchBoards();
-  }, []);
-
-  useEffect(() => {
-    setBoardsWithCards(
-      boardData.map((board) => {
-        return {
-          ...board,
-          cards: cardsData.filter((card) => card.boardId === board._id),
-        } as Board;
-      }),
-    );
+    boardsWithCards = boardData.map((board) => {
+      return {
+        ...board,
+        cards: cardsData.filter((card) => card.boardId === board._id),
+      } as Board;
+    });
+    console.log(boardsWithCards);
   }, [boardData]);
 
   return (
@@ -280,7 +295,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
             </div>
             <Box sx={{ width: "100%" }}>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <Tabs value={1} aria-label="basic tabs example">
+                <Tabs value={0} aria-label="basic tabs example">
                   <Tab label="AIMANTS MIS EN FAVORIS" />
                 </Tabs>
               </Box>

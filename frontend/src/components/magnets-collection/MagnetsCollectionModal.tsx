@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 
 import {
   Card,
@@ -32,9 +32,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   const { currentApp } = useOdeClient();
   const { t } = useTranslation();
 
-  //const [cardsData, setCardsData] = useState<CardModel[]>([]);
-  //const [boardData, setBoardData] = useState<Board[]>([]);
-  //const [boardsWithCards, setBoardsWithCards] = useState<Board[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [switchBoard, toggleSwitchBoard] = useToggle(false);
   const filter = new CardsFilter();
@@ -76,7 +73,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     cardsData = myCardsResult.all.map((card: ICardItemResponse) =>
       new CardModel().build(card),
     );
-    console.log("cardsData", cardsData);
   }
 
   if (getBoardsError) {
@@ -93,7 +89,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
         cards: cardsData.filter((card) => card.boardId === board._id),
       } as Board;
     });
-    console.log("boardData", boardData);
   }
 
   const springs = useSpring({
@@ -154,7 +149,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                   </animated.li>
                 ))}
           </animated.ul>
-          <div ref={observerTarget}></div>
         </div>
       );
     } else {
@@ -233,39 +227,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
       );
     }
   };
-
-  const observerTarget = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchCards();
-        }
-      },
-      { threshold: 1 },
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
-      }
-    };
-  }, [observerTarget]);
-
-  useEffect(() => {
-    boardsWithCards = boardData.map((board) => {
-      return {
-        ...board,
-        cards: cardsData.filter((card) => card.boardId === board._id),
-      } as Board;
-    });
-    console.log(boardsWithCards);
-  }, [boardData]);
 
   return (
     <>

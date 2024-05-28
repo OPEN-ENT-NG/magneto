@@ -14,29 +14,32 @@ import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
 import { Folder } from "~/models/folder.model";
 
+type BoardListProps = {
+  currentFolder: Folder;
+  onSelect: (folder: Folder) => void;
+}
 
-
-
-export const BoardList: React.FunctionComponent<Folder> = ({currentFolder}) => {
+export const BoardList: React.FunctionComponent<BoardListProps> = ({ currentFolder }) => {
     const { user, currentApp } = useOdeClient();
     const { t } = useTranslation();
 
   const userId = user ? user?.userId : "";
 
     let boardData;
-    let boardsQuery: IBoardsParamsRequest = {
-        isPublic: false,
-        isShared: true,
-        isDeleted: false,
-        sortBy: 'modificationDate',
-        page: 0
-    }
+    const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({ 
+      isPublic: false,
+      isShared: true,
+      isDeleted: false,
+      sortBy: 'modificationDate',
+      page: 0
+  });
+    
     
     const getFolderBoards = (): void => {
         if (!currentFolder.id || currentFolder.id == "my-boards" || currentFolder.id == "") {
-            boardsQuery.folderId = undefined;
+            setBoardsQuery({...boardsQuery, folderId : undefined});
         } else if (!!currentFolder && !!currentFolder.id) { 
-            boardsQuery.folderId = currentFolder.id;
+          setBoardsQuery({...boardsQuery, folderId : currentFolder.id});
         } else {
             console.log("currentFolder undefined, try later or again");
         }

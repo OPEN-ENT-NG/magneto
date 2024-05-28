@@ -15,6 +15,7 @@ type TreeViewContainerProps = {
 
 export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> = ({
   folders,
+  folderObject,
   folderType,
   currentFolder,
   onSelect
@@ -28,13 +29,15 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
   };
 
   const selectFolder = (folderId: string): void => {
-
+    const clickedFolder: Folder = folders.find((folder: Folder) => folder.id == folderId)?? new Folder();
+    console.log("clickedFolder", clickedFolder);
+    onSelect(clickedFolder);
   }
 
   return (
     <>
       <TreeView
-        data={folders ?? dataTree}
+        data={folderObject ?? dataTree}
         onTreeItemBlur={() => {
           console.log("blur");
         }}
@@ -45,6 +48,7 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
           console.log("fold");
         }}
         onTreeItemSelect={(item) => {
+          selectFolder(item);
           console.log("clicked", item);
         }}
         onTreeItemUnfold={() => {

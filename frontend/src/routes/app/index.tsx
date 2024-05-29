@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { ReactSortable } from "react-sortablejs";
 
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
@@ -36,6 +37,7 @@ export const App = () => {
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [folderIds, setFolderIds] = useState<String[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
+  const [boardTargetFolder, setBoardTargetFolder] = useState(new Folder());
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
@@ -55,7 +57,7 @@ export const App = () => {
   return (
     <>
       <Header onClick={toggle} />
-
+      <ReactSortable> 
       <Grid>
         <Grid.Col
           sm="3"
@@ -64,52 +66,32 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
-          <SideBar onSelect={handleSelectFolder} />
+
+          <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} />
+
         </Grid.Col>
 
-        <Grid.Col
-          sm="8"
-          style={{
-            minHeight: "10rem",
-            padding: ".8rem",
-          }}
-        >
-          <SearchBar
-            isVariant
-            onChange={function Ga() {}}
-            onClick={function Ga() {}}
-            placeholder="Search something...."
-            size="md"
-          />
-          <FolderList
-            currentFolder={currentFolder}
-            onSelect={handleSelectFolder}
-            folderIds={folderIds}
-            selectedFolders={selectedFolders}
-            setFolderIds={setFolderIds}
-            setSelectedFolders={setSelectedFolders}
-          />
-          <BoardList
-            currentFolder={currentFolder}
-            boardIds={boardIds}
-            selectedBoards={selectedBoards}
-            setBoardIds={setBoardIds}
-            setSelectedBoards={setSelectedBoards}
-          />
-          <ToasterContainer
-            isToasterOpen={
-              selectedBoards.length > 0 || selectedFolders.length > 0
-            }
-            boards={selectedBoards}
-            folders={selectedFolders}
-            boardIds={boardIds}
-            folderIds={folderIds}
-            currentFolder={currentFolder}
-            reset={resetBoardsAndFolders}
-          />
-          <CreateBoard isOpen={isOpen} toggle={toggle} />
-        </Grid.Col>
+          <Grid.Col
+            sm="8"
+            style={{
+              minHeight: "10rem",
+              padding: ".8rem",
+            }}
+          >
+            <SearchBar
+              isVariant
+              onChange={function Ga(){}}
+              onClick={function Ga(){}}
+              placeholder="Search something...."
+              size="md"
+            />
+            <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} />
+            <ToasterContainer />
+            <BoardList currentFolder={currentFolder} />
+            <CreateTab isOpen={isOpen} toggle={toggle} />
+          </Grid.Col>
       </Grid>
-    </>
+      </ReactSortable>
+    </> 
   );
 };

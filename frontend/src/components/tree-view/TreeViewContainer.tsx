@@ -2,8 +2,10 @@ import React from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView } from "@edifice-ui/react";
-import { Folder } from "~/models/folder.model";
+import { Folder, IFolderResponse } from "~/models/folder.model";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { t } from "i18next";
 
 type TreeViewContainerProps = {
   folders: Folder[],
@@ -21,6 +23,8 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
   onSelect
 }) => {
 
+  console.log(folderObject);
+
   const dataTree = {
     children: [],
     id: folderType,
@@ -29,7 +33,17 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
   };
 
   const selectFolder = (folderId: string): void => {
-    const clickedFolder: Folder = folders.find((folder: Folder) => folder.id == folderId)?? new Folder();
+    let clickedFolder: Folder;
+    console.log(folderId)
+    if (folderId == FOLDER_TYPE.MY_BOARDS) {
+      clickedFolder = new Folder().build(({_id: folderId, title: t("magneto.my.boards")} as IFolderResponse));
+    } else if (folderId == FOLDER_TYPE.PUBLIC_BOARDS) {
+      clickedFolder = new Folder().build(({_id: folderId, title: t("magneto.lycee.connecte.boards"), isPublic: true,} as IFolderResponse));
+    } else if (folderId == FOLDER_TYPE.DELETED_BOARDS) {
+      clickedFolder = new Folder().build(({_id: folderId, title: t("magneto.trash"), deleted: true,} as IFolderResponse));
+    } else {
+      clickedFolder = folders.find((folder: Folder) => folder.id == folderId)?? new Folder();
+    }
     console.log("clickedFolder", clickedFolder);
     onSelect(clickedFolder);
   }

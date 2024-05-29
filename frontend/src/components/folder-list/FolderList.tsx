@@ -9,6 +9,7 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { mdiFolderPlus } from "@mdi/js";
 import { Icon } from "@mui/material";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 
 type FolderListProps = {
   currentFolder: Folder;
@@ -18,14 +19,17 @@ type FolderListProps = {
 export const FolderList: React.FunctionComponent<FolderListProps> = ({ currentFolder, onSelect }) => {
     const { currentApp } = useOdeClient();
     // const [isToasterOpen, setIsToasterOpen] = useToaster();
+    const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
     
 
-    const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(false);
+    const { data: myFoldersResult, isLoading: getFoldersLoading, error: getFoldersError } = useGetFoldersQuery(foldersQuery);
 
     const filterFolderData = (): void => {
-        if (!currentFolder.id || currentFolder.id == "my-boards" || currentFolder.id == "") {
+        if (!currentFolder.id || currentFolder.id == FOLDER_TYPE.MY_BOARDS || currentFolder.id == FOLDER_TYPE.DELETED_BOARDS || currentFolder.id == "") {
             folderData = folderData.filter((folder: Folder) => !folder.parentId);
-        } else if (!!currentFolder && !!currentFolder.id) { 
+        } else if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
+            folderData = [];
+        } else if (!!currentFolder && !!currentFolder.id) {
             folderData = folderData.filter((folder: Folder) => folder.parentId == currentFolder.id);
         } else {
             console.log("currentFolder undefined, try later or again");
@@ -50,7 +54,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({ currentFo
   });
 
   useEffect(() => {
-      if (myFoldersResult) filterFolderData();
+    setFoldersQuery(currentFolder.id == FOLDER_TYPE.DELETED_BOARDS || !!currentFolder.deleted);
   }, [currentFolder]);
 
 

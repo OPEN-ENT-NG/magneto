@@ -13,10 +13,10 @@ import { mdiAccountCircle, mdiCalendarBlank, mdiCrown, mdiEarth, mdiMagnet, mdiS
 import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
 import { Folder } from "~/models/folder.model";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 
 type BoardListProps = {
   currentFolder: Folder;
-  onSelect: (folder: Folder) => void;
 }
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({ currentFolder }) => {
@@ -25,23 +25,22 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({ currentFold
 
   const userId = user ? user?.userId : "";
 
-    let boardData;
-    const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({ 
-      isPublic: false,
-      isShared: true,
-      isDeleted: false,
-      sortBy: 'modificationDate',
-      page: 0
+  let boardData;
+  const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({ 
+    isPublic: false,
+    isShared: true,
+    isDeleted: false,
+    sortBy: 'modificationDate',
   });
     
     
     const getFolderBoards = (): void => {
-        if (!currentFolder.id || currentFolder.id == "my-boards" || currentFolder.id == "") {
-            setBoardsQuery({...boardsQuery, folderId : undefined});
+        if (!currentFolder.id || currentFolder.id == FOLDER_TYPE.MY_BOARDS || currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS || currentFolder.id == FOLDER_TYPE.DELETED_BOARDS || currentFolder.id == "") {
+          setBoardsQuery({...boardsQuery, folderId: undefined, isPublic: !!currentFolder.isPublic, isDeleted: !!currentFolder.deleted});
         } else if (!!currentFolder && !!currentFolder.id) { 
-          setBoardsQuery({...boardsQuery, folderId : currentFolder.id});
+          setBoardsQuery({...boardsQuery, folderId: currentFolder.id, isPublic: !!currentFolder.isPublic, isDeleted: !!currentFolder.deleted});
         } else {
-            console.log("currentFolder undefined, try later or again");
+          console.log("currentFolder undefined, try later or again");
         }
     }
 
@@ -89,7 +88,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({ currentFold
                             app={currentApp!}
                             options={{
                                 type: "board",
-                                title,
+                                title: "",
                             }}
                             // onClick={() => {setIsToasterOpen()}}
                             isLoading={getBoardsLoading}

@@ -62,6 +62,7 @@ type SideBarProps = {
         title: t("magneto.trash"),
         parentId: "",
         section: true,
+        deleted: true
       },
       false,
       "magneto.trash",
@@ -79,13 +80,17 @@ type SideBarProps = {
           onSelect={onSelect}
         />
         <TreeViewContainer
-          folders={{
+          folders={myFolders ?? []}
+          folderObject={{
             children: [],
             id: FOLDER_TYPE.PUBLIC_BOARDS,
             name: t("magneto.lycee.connecte.boards"),
             section: true,
+            isPublic: true
           }}
           folderType={FOLDER_TYPE.MY_BOARDS}
+          currentFolder={currentFolder}
+          onSelect={onSelect}
           
         />
         <TreeViewContainer

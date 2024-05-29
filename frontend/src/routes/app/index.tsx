@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ReactSortable } from "react-sortablejs";
 
 import { Heading, Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
@@ -29,6 +30,7 @@ export const App = () => {
   const { t } = useTranslation();
 
   const [currentFolder, setCurrentFolder] = useState(new Folder());
+  const [boardTargetFolder, setBoardTargetFolder] = useState(new Folder());
 
 
   const handleSelectFolder = (folder: Folder) => {
@@ -39,40 +41,41 @@ export const App = () => {
   return (
     <>
       <Header onClick={toggle} />
+      <ReactSortable>
+        <Grid>
+          <Grid.Col
+            sm="3"
+            style={{
+              minHeight: "70rem",
+              padding: ".8rem",
+            }}
+          >
 
-      <Grid>
-        <Grid.Col
-          sm="3"
-          style={{
-            minHeight: "70rem",
-            padding: ".8rem",
-          }}
-        >
+          <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} />
 
-        <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} />
+          </Grid.Col>
 
-        </Grid.Col>
-
-        <Grid.Col
-          sm="8"
-          style={{
-            minHeight: "10rem",
-            padding: ".8rem",
-          }}
-        >
-          <SearchBar
-            isVariant
-            onChange={function Ga(){}}
-            onClick={function Ga(){}}
-            placeholder="Search something...."
-            size="md"
-          />
-          <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} />
-          <ToasterContainer />
-          <BoardList currentFolder={currentFolder} />
-          <CreateTab isOpen={isOpen} toggle={toggle} />
-        </Grid.Col>
-      </Grid>
+          <Grid.Col
+            sm="8"
+            style={{
+              minHeight: "10rem",
+              padding: ".8rem",
+            }}
+          >
+            <SearchBar
+              isVariant
+              onChange={function Ga(){}}
+              onClick={function Ga(){}}
+              placeholder="Search something...."
+              size="md"
+            />
+            <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} />
+            <ToasterContainer />
+            <BoardList currentFolder={currentFolder} />
+            <CreateTab isOpen={isOpen} toggle={toggle} />
+          </Grid.Col>
+        </Grid>
+        </ReactSortable>
     </>
   );
 };

@@ -23,7 +23,6 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
   onSelect
 }) => {
 
-  console.log(folderObject);
 
   const dataTree = {
     children: [],
@@ -34,7 +33,6 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
 
   const selectFolder = (folderId: string): void => {
     let clickedFolder: Folder;
-    console.log(folderId)
     if (folderId == FOLDER_TYPE.MY_BOARDS) {
       clickedFolder = new Folder().build(({_id: folderId, title: t("magneto.my.boards")} as IFolderResponse));
     } else if (folderId == FOLDER_TYPE.PUBLIC_BOARDS) {
@@ -44,7 +42,6 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
     } else {
       clickedFolder = folders.find((folder: Folder) => folder.id == folderId)?? new Folder();
     }
-    console.log("clickedFolder", clickedFolder);
     onSelect(clickedFolder);
   }
 

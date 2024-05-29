@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
-import {
-  mdiAccountCircle,
-  mdiCalendarBlank,
-  mdiCrown,
-  mdiEarth,
-  mdiMagnet,
-  mdiShareVariant,
-} from "@mdi/js";
-import { Icon } from "@mdi/react";
 import { animated, useSpring } from "@react-spring/web";
-import dayjs from "dayjs";
-import { useTranslation } from "react-i18next";
 
 import "./BoardList.scss";
+import { BoardItem } from "~/components/board-item/BoardItem";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import {
   Board,
@@ -29,10 +18,11 @@ import {
 
 type BoardListProps = {
   currentFolder: Folder;
-  boardIds: String[];
+  boardIds: string[];
   selectedBoards: Board[];
-  setBoardIds: React.Dispatch<React.SetStateAction<String[]>>;
+  setBoardIds: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
+  onDragAndDrop: (board: Board) => void;
   searchText: string;
 };
 
@@ -42,13 +32,9 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   selectedBoards,
   setBoardIds,
   setSelectedBoards,
+  onDragAndDrop,
   searchText,
 }) => {
-  const { user, currentApp } = useOdeClient();
-  const { t } = useTranslation();
-
-  const userId = user ? user?.userId : "";
-
   let boardData;
   let allBoardData;
   const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
@@ -68,10 +54,6 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     from: { opacity: 0 },
     to: { opacity: 1 },
   });
-
-  const isSameAsUser = (id: string) => {
-    return id == userId;
-  };
 
   useEffect(() => {
     if (
@@ -133,7 +115,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     if (boardIds.includes(resource.id)) {
       setBoardIds(
         boardIds.filter(
-          (selectedResource: String) => selectedResource !== resource.id,
+          (selectedResource: string) => selectedResource !== resource.id,
         ),
       );
       setSelectedBoards(
@@ -196,82 +178,13 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                     ...springs,
                   }}
                 >
-                  <Card
-                    app={currentApp!}
-                    isSelectable={true}
-                    isSelected={boardIds.includes(id)}
-                    onSelect={() => toggleSelect(board)}
-                  >
-                    <Card.Body flexDirection={"column"}>
-                      <Card.Image
-                        imageSrc={imageUrl}
-                        variant="landscape"
-                      ></Card.Image>
-                      <Card.Title>{title}</Card.Title>
-
-                      <div className="board-number-magnets">
-                        <Icon
-                          path={mdiMagnet}
-                          size={1}
-                          className="med-resource-card-text"
-                        ></Icon>
-                        <Card.Text className="med-resource-card-text board-text">
-                          {nbCards} {t("magneto.magnets")}
-                        </Card.Text>
-                      </div>
-
-                      <div className="board-about">
-                        <div className="board-about">
-                          <Tooltip
-                            message={t("magneto.board.date.update")}
-                            placement="bottom"
-                          >
-                            <Icon path={mdiCalendarBlank} size={1}></Icon>
-                          </Tooltip>
-                          <Card.Text className="med-resource-card-text">
-                            {dayjs(
-                              modificationDate,
-                              "YYYY-MM-DD HH:mm:ss",
-                            ).format("DD MMMM YYYY")}
-                          </Card.Text>
-                        </div>
-                        <div className="board-about">
-                          <Tooltip
-                            message={t("magneto.board.tooltip.my.board")}
-                            placement="bottom"
-                          >
-                            {!isSameAsUser(owner.userId) && (
-                              <Icon path={mdiCrown} size={1}></Icon>
-                            )}
-                          </Tooltip>
-                          <Tooltip
-                            message={t("magneto.board.owner")}
-                            placement="bottom"
-                          >
-                            {isSameAsUser(owner.userId) && (
-                              <Icon path={mdiAccountCircle} size={1}></Icon>
-                            )}
-                          </Tooltip>
-                          <Tooltip
-                            message={t("magneto.board.tooltip.shared.board")}
-                            placement="bottom"
-                          >
-                            {shared?.length && (
-                              <Icon path={mdiShareVariant} size={1}></Icon>
-                            )}
-                          </Tooltip>
-                          <Tooltip
-                            message={t("magneto.board.tooltip.shared.board")}
-                            placement="bottom"
-                          >
-                            {isPublished && (
-                              <Icon path={mdiEarth} size={1}></Icon>
-                            )}
-                          </Tooltip>
-                        </div>
-                      </div>
-                    </Card.Body>
-                  </Card>
+                  <BoardItem
+                    board={board}
+                    areBoardsLoading={getBoardsLoading}
+                    boardIds={boardIds}
+                    onDragAndDropBoard={onDragAndDrop}
+                    onSelect={toggleSelect}
+                  />
                 </animated.li>
               );
             })}

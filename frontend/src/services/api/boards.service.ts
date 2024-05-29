@@ -61,7 +61,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       invalidatesTags: ["Boards"],
     }),
     duplicateBoard: builder.mutation({
-      query: (boardId: String) => ({
+      query: (boardId: string) => ({
         url: `board/duplicate/${boardId}`,
         method: "PUT",
       }),
@@ -76,7 +76,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       invalidatesTags: ["Boards"],
     }),
     preDeleteBoards: builder.mutation({
-      query: (boardIds: String[]) => ({
+      query: (boardIds: string[]) => ({
         url: `boards/predelete`,
         method: "PUT",
         body: { boardIds: boardIds },
@@ -84,7 +84,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       invalidatesTags: ["Boards"],
     }),
     deleteBoards: builder.mutation({
-      query: (boardIds: String[]) => ({
+      query: (boardIds: string[]) => ({
         url: `boards`,
         method: "DELETE",
         body: { boardIds: boardIds },
@@ -92,7 +92,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       invalidatesTags: ["Boards"],
     }),
     restorePreDeleteBoards: builder.mutation({
-      query: (boardIds: String[]) => ({
+      query: (boardIds: string[]) => ({
         url: `boards/restore`,
         method: "put",
         body: { boardIds: boardIds },
@@ -103,6 +103,13 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       query: (cover: File) => {
         return URL.createObjectURL(cover);
       },
+    }),
+    moveBoardsToFolder: builder.mutation({
+      query: (params: { boardIds: string[]; folderId: string }) => ({
+        url: `boards/folder/${params.folderId}`,
+        method: "PUT",
+        body: { boardIds: params.boardIds },
+      }),
     }),
   }),
 });

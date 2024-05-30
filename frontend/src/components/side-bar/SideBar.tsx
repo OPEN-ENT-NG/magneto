@@ -9,7 +9,13 @@ import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
-export const SideBar = () => {
+type SideBarProps = {
+  onSelect: (folder: Folder) => void;
+};
+
+export const SideBar: React.FunctionComponent<SideBarProps> = ({
+  onSelect,
+}) => {
   const { t } = useTranslation();
 
   const {
@@ -23,18 +29,20 @@ export const SideBar = () => {
     error: getDeletedFoldersError,
   } = useGetFoldersQuery(true);
 
-  let myFoldersObject;
-  let deletedFoldersObject;
+  let myFolders: Folder[];
+  let deletedFolders: Folder[];
+  let myFoldersObject: FolderTreeNavItem;
+  let deletedFoldersObject: FolderTreeNavItem;
 
   if (getFoldersError || getDeletedFoldersError) {
     console.log("error");
   } else if (getFoldersLoading || getDeletedFoldersLoading) {
     console.log("loading");
   } else {
-    const myFolders = myFoldersResult.map((folder: IFolderResponse) =>
+    myFolders = myFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     ); //convert folders to Folder[]
-    const deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
+    deletedFolders = deletedFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     );
 
@@ -54,6 +62,7 @@ export const SideBar = () => {
         title: t("magneto.trash"),
         parentId: "",
         section: true,
+        deleted: true,
       },
       false,
       "magneto.trash",
@@ -64,21 +73,28 @@ export const SideBar = () => {
     <>
       <aside className="g-col-3 g-col-lg-2 g-col-xl-3 border-end pt-16 pe-16 d-none d-lg-block">
         <TreeViewContainer
-          folders={myFoldersObject}
+          folders={myFolders ?? []}
+          folderObject={myFoldersObject ?? undefined}
           folderType={FOLDER_TYPE.MY_BOARDS}
+          onSelect={onSelect}
         />
         <TreeViewContainer
-          folders={{
+          folders={myFolders ?? []}
+          folderObject={{
             children: [],
             id: FOLDER_TYPE.PUBLIC_BOARDS,
             name: t("magneto.lycee.connecte.boards"),
             section: true,
+            isPublic: true,
           }}
           folderType={FOLDER_TYPE.MY_BOARDS}
+          onSelect={onSelect}
         />
         <TreeViewContainer
-          folders={deletedFoldersObject}
+          folders={deletedFolders}
+          folderObject={deletedFoldersObject}
           folderType={FOLDER_TYPE.DELETED_BOARDS}
+          onSelect={onSelect}
         />
         <SideBarButtons />
       </aside>

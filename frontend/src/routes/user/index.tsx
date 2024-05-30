@@ -18,7 +18,6 @@ export interface AppProps {
 }
 
 export const App = () => {
-  console.log("i am in app user");
   return (
     <>
       <div>coucou je suis user</div>

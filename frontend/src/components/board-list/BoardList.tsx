@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
 import {
@@ -15,29 +15,75 @@ import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
 import "./BoardList.scss";
-import { Board, IBoardItemResponse } from "~/models/board.model";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import {
+  Board,
+  IBoardItemResponse,
+  IBoardsParamsRequest,
+} from "~/models/board.model";
+import { Folder } from "~/models/folder.model";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
 
-export const BoardList = () => {
+type BoardListProps = {
+  currentFolder: Folder;
+};
+
+export const BoardList: React.FunctionComponent<BoardListProps> = ({
+  currentFolder,
+}) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation();
-  // const [isToasterOpen, setIsToasterOpen] = useToaster();
 
   const userId = user ? user?.userId : "";
+
+  let boardData;
+  const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
+    isPublic: false,
+    isShared: true,
+    isDeleted: false,
+    sortBy: "modificationDate",
+  });
+
+  const springs = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+  });
+
+  const isSameAsUser = (id: string) => {
+    return id == userId;
+  };
+
+  useEffect(() => {
+    if (
+      !currentFolder.id ||
+      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+      currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
+      currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
+      currentFolder.id == ""
+    ) {
+      setBoardsQuery({
+        ...boardsQuery,
+        folderId: undefined,
+        isPublic: !!currentFolder.isPublic,
+        isDeleted: !!currentFolder.deleted,
+      });
+    } else if (!!currentFolder && !!currentFolder.id) {
+      setBoardsQuery({
+        ...boardsQuery,
+        folderId: currentFolder.id,
+        isPublic: !!currentFolder.isPublic,
+        isDeleted: !!currentFolder.deleted,
+      });
+    } else {
+      console.log("currentFolder undefined, try later or again");
+    }
+  }, [currentFolder]);
 
   const {
     data: myBoardsResult,
     isLoading: getBoardsLoading,
     error: getBoardsError,
-  } = useGetBoardsQuery({
-    isPublic: false,
-    isShared: true,
-    isDeleted: false,
-    sortBy: "modificationDate",
-    page: 0,
-  }) || {};
-
-  let boardData: Board[];
+  } = useGetBoardsQuery(boardsQuery) || {};
   if (getBoardsError) {
     console.log("error");
   } else if (getBoardsLoading) {
@@ -48,15 +94,6 @@ export const BoardList = () => {
     ); //convert boards to Board[]
     console.log("boardData", boardData);
   }
-
-  const springs = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-  });
-
-  const isSameAsUser = (id: string) => {
-    return id == userId;
-  };
 
   return (
     <>
@@ -86,11 +123,10 @@ export const BoardList = () => {
                   app={currentApp!}
                   options={{
                     type: "board",
-                    title,
+                    title: "",
                   }}
                   // onClick={() => {setIsToasterOpen()}}
                   isLoading={getBoardsLoading}
-                  isSelectable={false}
                 >
                   <Card.Body flexDirection={"column"}>
                     <Card.Image

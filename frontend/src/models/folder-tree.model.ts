@@ -43,6 +43,8 @@ export class FolderTreeNavItem {
   private _shared: any[];
 
   private _section: boolean;
+  private _deleted: boolean;
+  private _isPublic: boolean;
 
   constructor(folder: IFolderTreeNavItem /*, iconClass?: string*/) {
     this._id = folder.id;
@@ -52,6 +54,8 @@ export class FolderTreeNavItem {
     this._ownerId = folder.ownerId ? folder.ownerId : "";
     this._shared = folder.shared ? folder.shared : [];
     this._section = false;
+    this._deleted = false;
+    this._isPublic = false;
   }
 
   get id(): string {
@@ -110,6 +114,22 @@ export class FolderTreeNavItem {
     this._section = value;
   }
 
+  get deleted(): boolean {
+    return this._deleted;
+  }
+
+  set deleted(value: boolean) {
+    this._deleted = value;
+  }
+
+  get isPublic(): boolean {
+    return this._isPublic;
+  }
+
+  set isPublic(value: boolean) {
+    this._isPublic = value;
+  }
+
   /**
    * Check if the folder has a children (or sub-children) with the given id
    * @param folderId Folder identifier
@@ -121,6 +141,16 @@ export class FolderTreeNavItem {
         (folder: FolderTreeNavItem) =>
           folder.id === folderId || folder.childrenContainsId(folderId),
       )
+    );
+  }
+
+  setFolderFieldValue(
+    folders: Folder[],
+    fieldName: string,
+    fieldValue: any,
+  ): Folder[] {
+    return folders.map(
+      (folder: Folder) => ((folder as any)[fieldName] = fieldValue),
     );
   }
 

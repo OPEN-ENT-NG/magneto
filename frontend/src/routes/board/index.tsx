@@ -18,7 +18,6 @@ const bull = (
 );
 
 export const App = () => {
-  console.log("i am in board");
   return (
     <>
       <div>coucou je suis info</div>

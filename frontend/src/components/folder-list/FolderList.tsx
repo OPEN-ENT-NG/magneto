@@ -42,10 +42,8 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({ currentFo
     } else if (getFoldersLoading ) {
         console.log("loading");
     } else {
-        console.log("myFoldersResult", myFoldersResult);
         folderData = myFoldersResult.map(((folder: IFolderResponse) => new Folder().build(folder))); //convert folders to Folder[]
         filterFolderData();
-        console.log("folderData", folderData);
     }
 
   const springs = useSpring({

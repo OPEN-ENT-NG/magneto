@@ -86,19 +86,19 @@ export class Folder {
     this._shared = value;
   }
 
-  get deleted(): any[] {
+  get deleted(): boolean {
     return this._deleted;
   }
 
-  set deleted(value: any[]) {
+  set deleted(value: boolean) {
     this._deleted = value;
   }
 
-  get isPublic(): any[] {
+  get isPublic(): boolean {
     return this._isPublic;
   }
 
-  set isPublic(value: any[]) {
+  set isPublic(value: boolean) {
     this._isPublic = value;
   }
 
@@ -112,7 +112,6 @@ export class Folder {
     const finalFolder: Folder = new Folder();
     finalFolder.id = navItem.id;
     finalFolder.title = navItem.name;
-    // finalFolder.parentId = navItem.parentId;
     finalFolder.ownerId = navItem.ownerId;
     finalFolder.shared = navItem.shared;
     finalFolder.deleted = !!navItem.deleted;

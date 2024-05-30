@@ -60,7 +60,6 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
         }}
         onTreeItemSelect={(item) => {
           selectFolder(item);
-          console.log("clicked", item);
         }}
         onTreeItemUnfold={() => {
           console.log("unfold");

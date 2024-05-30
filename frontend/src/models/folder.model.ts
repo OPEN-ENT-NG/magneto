@@ -6,6 +6,8 @@ export interface IFolderResponse {
   parentId: string;
   ownerId: string;
   shared?: any[];
+  deleted?: boolean;
+  isPublic?: boolean;
 }
 
 export interface IFolderForm {
@@ -19,6 +21,8 @@ export class Folder {
   private _parentId: string;
   private _ownerId: string;
   private _shared: any[];
+  private _deleted: boolean;
+  private _isPublic: boolean;
 
   constructor() {
     this._id = "";
@@ -26,6 +30,8 @@ export class Folder {
     this._parentId = "";
     this._ownerId = "";
     this._shared = [];
+    this._deleted = false;
+    this._isPublic = false;
     return this;
   }
 
@@ -35,6 +41,8 @@ export class Folder {
     this._parentId = data.parentId;
     this._ownerId = data.ownerId;
     this._shared = data.shared ? data.shared : [];
+    this._deleted = !!data.deleted;
+    this._isPublic = !!data.isPublic;
     return this;
   }
 
@@ -78,6 +86,22 @@ export class Folder {
     this._shared = value;
   }
 
+  get deleted(): boolean {
+    return this._deleted;
+  }
+
+  set deleted(value: boolean) {
+    this._deleted = value;
+  }
+
+  get isPublic(): boolean {
+    return this._isPublic;
+  }
+
+  set isPublic(value: boolean) {
+    this._isPublic = value;
+  }
+
   isMyFolder(): boolean {
     return false; //todo
     // return this.ownerId === model.me.userId;
@@ -87,10 +111,10 @@ export class Folder {
     const finalFolder: Folder = new Folder();
     finalFolder.id = navItem.id;
     finalFolder.title = navItem.name;
-    finalFolder.parentId = navItem.parentId;
     finalFolder.ownerId = navItem.ownerId;
     finalFolder.shared = navItem.shared;
-
+    finalFolder.deleted = !!navItem.deleted;
+    finalFolder.isPublic = !!navItem.isPublic;
     return finalFolder;
   }
 }

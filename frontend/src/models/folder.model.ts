@@ -102,7 +102,6 @@ export class Folder {
     this._isPublic = value;
   }
 
-
   isMyFolder(): boolean {
     return false; //todo
     // return this.ownerId === model.me.userId;

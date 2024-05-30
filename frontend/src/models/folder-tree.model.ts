@@ -122,7 +122,6 @@ export class FolderTreeNavItem {
     this._deleted = value;
   }
 
-  
   get isPublic(): boolean {
     return this._isPublic;
   }
@@ -130,7 +129,6 @@ export class FolderTreeNavItem {
   set isPublic(value: boolean) {
     this._isPublic = value;
   }
-
 
   /**
    * Check if the folder has a children (or sub-children) with the given id
@@ -146,8 +144,14 @@ export class FolderTreeNavItem {
     );
   }
 
-  setFolderFieldValue(folders: Folder[], fieldName: string, fieldValue: any): Folder[] {
-    return folders.map((folder: Folder) => (folder as any)[fieldName] = fieldValue);
+  setFolderFieldValue(
+    folders: Folder[],
+    fieldName: string,
+    fieldValue: any,
+  ): Folder[] {
+    return folders.map(
+      (folder: Folder) => ((folder as any)[fieldName] = fieldValue),
+    );
   }
 
   /**

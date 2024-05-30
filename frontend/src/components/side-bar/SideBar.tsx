@@ -10,11 +10,12 @@ import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
 type SideBarProps = {
-  currentFolder: Folder;
   onSelect: (folder: Folder) => void;
-}
+};
 
-  export const SideBar: React.FunctionComponent<SideBarProps> = ({ currentFolder, onSelect }) => {
+export const SideBar: React.FunctionComponent<SideBarProps> = ({
+  onSelect,
+}) => {
   const { t } = useTranslation();
 
   const {
@@ -28,9 +29,8 @@ type SideBarProps = {
     error: getDeletedFoldersError,
   } = useGetFoldersQuery(true);
 
-
   let myFolders: Folder[];
-  let deletedFolders: Folder[]
+  let deletedFolders: Folder[];
   let myFoldersObject: FolderTreeNavItem;
   let deletedFoldersObject: FolderTreeNavItem;
 
@@ -62,7 +62,7 @@ type SideBarProps = {
         title: t("magneto.trash"),
         parentId: "",
         section: true,
-        deleted: true
+        deleted: true,
       },
       false,
       "magneto.trash",
@@ -85,11 +85,10 @@ type SideBarProps = {
             id: FOLDER_TYPE.PUBLIC_BOARDS,
             name: t("magneto.lycee.connecte.boards"),
             section: true,
-            isPublic: true
+            isPublic: true,
           }}
           folderType={FOLDER_TYPE.MY_BOARDS}
           onSelect={onSelect}
-          
         />
         <TreeViewContainer
           folders={deletedFolders}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import {  Grid, useToggle, SearchBar } from "@edifice-ui/react";
+import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
 import { BoardList } from "~/components/board-list/BoardList";
@@ -10,7 +10,6 @@ import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { Folder } from "~/models/folder.model";
-
 
 export interface AppProps {
   _id: string;
@@ -29,11 +28,9 @@ export const App = () => {
 
   const [currentFolder, setCurrentFolder] = useState(new Folder());
 
-
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
-  }
-
+  };
 
   return (
     <>
@@ -47,9 +44,7 @@ export const App = () => {
             padding: ".8rem",
           }}
         >
-
-        <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} />
-
+          <SideBar onSelect={handleSelectFolder} />
         </Grid.Col>
 
         <Grid.Col
@@ -61,12 +56,15 @@ export const App = () => {
         >
           <SearchBar
             isVariant
-            onChange={function Ga(){}}
-            onClick={function Ga(){}}
+            onChange={function Ga() {}}
+            onClick={function Ga() {}}
             placeholder="Search something...."
             size="md"
           />
-          <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} />
+          <FolderList
+            currentFolder={currentFolder}
+            onSelect={handleSelectFolder}
+          />
           <ToasterContainer />
           <BoardList currentFolder={currentFolder} />
           <CreateTab isOpen={isOpen} toggle={toggle} />

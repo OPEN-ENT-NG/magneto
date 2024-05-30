@@ -44,7 +44,16 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     sortBy: "modificationDate",
   });
 
-  const getFolderBoards = (): void => {
+  const springs = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+  });
+
+  const isSameAsUser = (id: string) => {
+    return id == userId;
+  };
+
+  useEffect(() => {
     if (
       !currentFolder.id ||
       currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
@@ -68,19 +77,6 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     } else {
       console.log("currentFolder undefined, try later or again");
     }
-  };
-
-  const springs = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-  });
-
-  const isSameAsUser = (id: string) => {
-    return id == userId;
-  };
-
-  useEffect(() => {
-    getFolderBoards();
   }, [currentFolder]);
 
   const {

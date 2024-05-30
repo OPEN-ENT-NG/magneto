@@ -24,8 +24,8 @@ export class Folder {
   private _deleted: boolean;
   private _isPublic: boolean;
 
-  constructor() {
-    this._id = "";
+  constructor(id?: string) {
+    this._id = (id != null ? id : "");
     this._title = "";
     this._parentId = "";
     this._ownerId = "";

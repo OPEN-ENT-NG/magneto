@@ -1,30 +1,39 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 
 import { Button, FormControl, Input, Label, Modal } from "@edifice-ui/react";
 
 import "./CreateFolder.scss";
 import { Folder } from "../../models/folder.model";
-import { useCreateFolderMutation } from "~/services/api/folders.service";
+import { useCreateFolderMutation, useUpdateFolderMutation } from "~/services/api/folders.service";
 
 type props = {
   isOpen: boolean;
   toggle: () => void;
+  folderToUpdate?: Folder;
 };
 
 export const CreateFolder: FunctionComponent<props> = ({
   isOpen,
   toggle,
+  folderToUpdate,
 }: props) => {
   const [title, setTitle] = useState("");
   const [parentId] = useState("");
   const [addFolder] = useCreateFolderMutation();
+  const [updateFolder] = useUpdateFolderMutation();
 
   const onSubmit = async (): Promise<void> => {
     const folder = new Folder();
     folder.title = title;
     folder.parentId = parentId;
-    await addFolder(folder);
-    console.log("Dossier " + title + " créé!");
+    if (folderToUpdate != null) {
+      folder.id = folderToUpdate.id;
+      await updateFolder(folder);
+    }
+    else {
+      await addFolder(folder);
+      console.log("Dossier " + title + " créé!");
+    }
     toggle();
   };
 
@@ -32,6 +41,12 @@ export const CreateFolder: FunctionComponent<props> = ({
     setTitle("");
     toggle();
   };
+
+  useEffect(() => {
+    if (folderToUpdate != null) {
+      setTitle(folderToUpdate.title);
+    }
+  }, [folderToUpdate]);
 
   return (
     <>
@@ -44,7 +59,11 @@ export const CreateFolder: FunctionComponent<props> = ({
           viewport={false}
         >
           <Modal.Header onModalClose={reset}>
-            <h4>Créer un dossier</h4>
+            {folderToUpdate != null ? (
+              <h4>Modifier un dossier</h4>
+            ) : (
+              <h4>Créer un dossier</h4>
+            )}
           </Modal.Header>
           <Modal.Body>
             <FormControl id="title" className="mb-0-5">

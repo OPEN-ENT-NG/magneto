@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
@@ -10,6 +10,8 @@ import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { Folder } from "~/models/folder.model";
+import { Board } from "~/models/board.model";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 
 export interface AppProps {
   _id: string;
@@ -26,11 +28,23 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
 
-  const [currentFolder, setCurrentFolder] = useState(new Folder());
+  const [currentFolder, setCurrentFolder] = useState(new Folder(FOLDER_TYPE.MY_BOARDS));
+
+  const [boardIds, setBoardIds] = useState<String[]>([]);
+  const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
+  const [folderIds, setFolderIds] = useState<String[]>([]);
+  const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
   };
+
+  useEffect(() => {
+    setBoardIds([]);
+    setFolderIds([]);
+    setSelectedBoards([]);
+    setSelectedFolders([]);
+  }, [currentFolder]);
 
   return (
     <>
@@ -56,17 +70,34 @@ export const App = () => {
         >
           <SearchBar
             isVariant
-            onChange={function Ga() {}}
-            onClick={function Ga() {}}
+            onChange={function Ga() { }}
+            onClick={function Ga() { }}
             placeholder="Search something...."
             size="md"
           />
           <FolderList
             currentFolder={currentFolder}
             onSelect={handleSelectFolder}
+            folderIds={folderIds}
+            selectedFolders={selectedFolders}
+            setFolderIds={setFolderIds}
+            setSelectedFolders={setSelectedFolders}
           />
-          <ToasterContainer />
-          <BoardList currentFolder={currentFolder} />
+          <BoardList
+            currentFolder={currentFolder}
+            boardIds={boardIds}
+            selectedBoards={selectedBoards}
+            setBoardIds={setBoardIds}
+            setSelectedBoards={setSelectedBoards}
+          />
+          <ToasterContainer
+            isToasterOpen={selectedBoards.length > 0 || selectedFolders.length > 0}
+            boards={selectedBoards}
+            folders={selectedFolders}
+            boardIds={boardIds}
+            folderIds={folderIds}
+            currentFolder={currentFolder}
+          />
           <CreateTab isOpen={isOpen} toggle={toggle} />
         </Grid.Col>
       </Grid>

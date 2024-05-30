@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 
 // eslint-disable-next-line
 import {
@@ -26,12 +26,13 @@ import myImage from "./collaborativeeditor-default.png";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useBackground } from "~/hooks/useBackground";
 import { useThumb } from "~/hooks/useThumb";
-import { BoardForm } from "~/models/board.model";
-import { useCreateBoardMutation } from "~/services/api/boards.service";
+import { Board, BoardForm } from "~/models/board.model";
+import { useCreateBoardMutation, useUpdateBoardMutation } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
   toggle: () => void;
+  boardToUpdate?: Board;
 };
 
 export interface FormInputs {
@@ -44,6 +45,7 @@ export interface FormInputs {
 export const CreateTab: FunctionComponent<props> = ({
   isOpen,
   toggle,
+  boardToUpdate,
 }: props) => {
   const { handleDeleteImage, handleUploadImage } = useThumb({
     selectedResource: undefined,
@@ -56,12 +58,12 @@ export const CreateTab: FunctionComponent<props> = ({
   const [tagsTextInput, setTagsTextInput] = useState("");
   const [tags, setTags] = useState([""]);
   const [createBoard] = useCreateBoardMutation();
+  const [updateBoard] = useUpdateBoardMutation();
   const { handleDeleteBackground, handleUploadBackground } = useBackground({
     selectedResource: undefined,
   });
 
-  const onSubmit = async (): Promise<void> => {
-    const board = new BoardForm();
+  const setBoardFromForm = (board: BoardForm) => {
     board.title = title;
     board.description = description;
     //TODO : change this to work with a future workspace file manager
@@ -76,23 +78,34 @@ export const CreateTab: FunctionComponent<props> = ({
     board.canComment = isCommentChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
+  }
 
-    createBoard(board.toJSON());
+  const onSubmit = (): void => {
+    const board = new BoardForm();
+    setBoardFromForm(board)
+
+    if (boardToUpdate != null) {
+      board.id = boardToUpdate.id;
+      updateBoard(board.toJSON())
+    }
+    else {
+      createBoard(board.toJSON());
+    }
 
     reset();
   };
 
-  //
-
   const reset = (): void => {
-    handleDeleteImage();
-    handleDeleteBackground();
-    setIsCommentChecked(false);
-    setIsFavoriteChecked(false);
-    setTitle("");
-    setDescription("");
-    setDisposition("free");
-    setTagsTextInput("");
+    if (boardToUpdate == null) {
+      handleDeleteImage();
+      handleDeleteBackground();
+      setIsCommentChecked(false);
+      setIsFavoriteChecked(false);
+      setTitle("");
+      setDescription("");
+      setDisposition("free");
+      setTagsTextInput("");
+    }
     toggle();
   };
 
@@ -132,6 +145,18 @@ export const CreateTab: FunctionComponent<props> = ({
     setTags(updatedTags);
   };
 
+  useEffect(() => {
+    if (boardToUpdate != null) {
+      setIsCommentChecked(boardToUpdate.canComment);
+      setIsFavoriteChecked(boardToUpdate.displayNbFavorites);
+      setTitle(boardToUpdate.title);
+      setDescription(boardToUpdate.description);
+      setDisposition(boardToUpdate.layoutType);
+      setTagsTextInput(boardToUpdate.tagsTextInput);
+      setTags(boardToUpdate.tags);
+    }
+  }, [boardToUpdate]);
+
   return (
     <>
       {isOpen && (
@@ -143,7 +168,11 @@ export const CreateTab: FunctionComponent<props> = ({
           viewport={false}
         >
           <Modal.Header onModalClose={reset}>
-            <h4>Créer un tableau</h4>
+            {boardToUpdate != null ? (
+              <h4>Modifier un tableau</h4>
+            ) : (
+              <h4>Créer un tableau</h4>
+            )}
           </Modal.Header>
           <Modal.Body>
             <Grid>
@@ -176,6 +205,7 @@ export const CreateTab: FunctionComponent<props> = ({
                     <FormControl id="title" className="mb-0-5">
                       <Label>Titre de mon tableau *:</Label>
                       <Input
+                        value={title}
                         placeholder=""
                         size="md"
                         type="text"
@@ -186,6 +216,7 @@ export const CreateTab: FunctionComponent<props> = ({
                       <Label>Description:</Label>
                       <TextArea
                         size="md"
+                        value={description}
                         onChange={(e) => setDescription(e.target.value)}
                       />
                     </FormControl>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
+import { Card, useOdeClient, Tooltip, useToggle } from "@edifice-ui/react";
 import {
   mdiAccountCircle,
   mdiCalendarBlank,
@@ -23,13 +23,22 @@ import {
 } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
+import { ToasterContainer } from "../toaster-container/ToasterContainer";
 
 type BoardListProps = {
-  currentFolder: Folder;
+  currentFolder: Folder,
+  boardIds: String[],
+  selectedBoards: Board[],
+  setBoardIds: React.Dispatch<React.SetStateAction<String[]>>,
+  setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
 };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
   currentFolder,
+  boardIds,
+  selectedBoards,
+  setBoardIds,
+  setSelectedBoards
 }) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation();
@@ -92,7 +101,25 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     boardData = myBoardsResult.all.map((board: IBoardItemResponse) =>
       new Board().build(board),
     ); //convert boards to Board[]
-    console.log("boardData", boardData);
+    //console.log("boardData", boardData);
+  }
+
+  async function toggleSelect(resource: Board) {
+    if (boardIds.includes(resource.id)) {
+      setBoardIds(
+        boardIds.filter(
+          (selectedResource: String) => selectedResource !== resource.id,
+        ),
+      );
+      setSelectedBoards(
+        selectedBoards.filter(
+          (selectedResource) => selectedResource.id !== resource.id,
+        ),
+      );
+      return;
+    }
+    setBoardIds([...boardIds, resource.id]);
+    setSelectedBoards([...selectedBoards, resource]);
   }
 
   return (
@@ -127,6 +154,9 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                   }}
                   // onClick={() => {setIsToasterOpen()}}
                   isLoading={getBoardsLoading}
+                  isSelectable={true}
+                  isSelected={boardIds.includes(id)}
+                  onSelect={() => toggleSelect(board)}
                 >
                   <Card.Body flexDirection={"column"}>
                     <Card.Image

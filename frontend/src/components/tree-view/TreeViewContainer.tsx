@@ -2,40 +2,22 @@ import React from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView } from "@edifice-ui/react";
+import { t } from "i18next";
 
-export const TreeViewContainer = ({
-  folders: folders,
-  folderType: folderType,
-}) => {
-  /**
-   * Check if the folder has a children (or sub-children) with the given id
-   * @param folderId Folder identifier
-   */
-  // const childrenContainsId = (folderId: string): boolean => {
-  //   return (
-  //     this.id == folderId ||
-  //     this.children.some(
-  //       (folder: FolderTreeNavItem) =>
-  //         folder.id === folderId || folder.childrenContainsId(folderId),
-  //     )
-  //   );
-  // };
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
+import { Folder, IFolderResponse } from "~/models/folder.model";
 
-  /**
-   * Open all folders from the given children folder to the current folder
-   * @param folderId Folder identifier
-   */
-  // const openChildrenToId = (folderId: string): void => {
-  //   if (this.childrenContainsId(folderId)) {
-  //     this._isOpened = true;
-  //     if (this.children) {
-  //       this.children.forEach((folder: FolderTreeNavItem) => {
-  //         folder.openChildrenToId(folderId);
-  //       });
-  //     }
-  //   }
-  // };
+type TreeViewContainerProps = {
+  folders: Folder[];
+  folderObject: FolderTreeNavItem;
+  folderType: string;
+  onSelect: (folder: Folder) => void;
+};
 
+export const TreeViewContainer: React.FunctionComponent<
+  TreeViewContainerProps
+> = ({ folders, folderObject, folderType, onSelect }) => {
   const dataTree = {
     children: [],
     id: folderType,
@@ -43,10 +25,36 @@ export const TreeViewContainer = ({
     section: true,
   };
 
+  const selectFolder = (folderId: string): void => {
+    let clickedFolder: Folder;
+    if (folderId == FOLDER_TYPE.MY_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.my.boards"),
+      } as IFolderResponse);
+    } else if (folderId == FOLDER_TYPE.PUBLIC_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.lycee.connecte.boards"),
+        isPublic: true,
+      } as IFolderResponse);
+    } else if (folderId == FOLDER_TYPE.DELETED_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.trash"),
+        deleted: true,
+      } as IFolderResponse);
+    } else {
+      clickedFolder =
+        folders.find((folder: Folder) => folder.id == folderId) ?? new Folder();
+    }
+    onSelect(clickedFolder);
+  };
+
   return (
     <>
       <TreeView
-        data={folders ?? dataTree}
+        data={folderObject ?? dataTree}
         onTreeItemBlur={() => {
           console.log("blur");
         }}
@@ -56,8 +64,8 @@ export const TreeViewContainer = ({
         onTreeItemFold={() => {
           console.log("fold");
         }}
-        onTreeItemSelect={() => {
-          console.log("clicked");
+        onTreeItemSelect={(item) => {
+          selectFolder(item);
         }}
         onTreeItemUnfold={() => {
           console.log("unfold");

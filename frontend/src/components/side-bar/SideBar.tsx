@@ -76,7 +76,6 @@ type SideBarProps = {
           folders={myFolders ?? []}
           folderObject={myFoldersObject ?? undefined}
           folderType={FOLDER_TYPE.MY_BOARDS}
-          currentFolder={currentFolder}
           onSelect={onSelect}
         />
         <TreeViewContainer
@@ -89,7 +88,6 @@ type SideBarProps = {
             isPublic: true
           }}
           folderType={FOLDER_TYPE.MY_BOARDS}
-          currentFolder={currentFolder}
           onSelect={onSelect}
           
         />
@@ -97,7 +95,6 @@ type SideBarProps = {
           folders={deletedFolders}
           folderObject={deletedFoldersObject}
           folderType={FOLDER_TYPE.DELETED_BOARDS}
-          currentFolder={currentFolder}
           onSelect={onSelect}
         />
         <SideBarButtons />

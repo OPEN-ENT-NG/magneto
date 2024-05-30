@@ -1,15 +1,15 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { Card, useOdeClient, ActionBar } from "@edifice-ui/react";
+import { Card, useOdeClient } from "@edifice-ui/react";
+import { mdiFolderPlus } from "@mdi/js";
+import { Icon } from "@mui/material";
 import {  animated, useSpring } from "@react-spring/web";
 
 
 import "./FolderList.scss";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
-import { mdiFolderPlus } from "@mdi/js";
-import { Icon } from "@mui/material";
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 
 type FolderListProps = {
   currentFolder: Folder;

@@ -2,16 +2,17 @@ import React from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView } from "@edifice-ui/react";
-import { Folder, IFolderResponse } from "~/models/folder.model";
-import { FolderTreeNavItem } from "~/models/folder-tree.model";
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { t } from "i18next";
+
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { FolderTreeNavItem } from "~/models/folder-tree.model";
+import { Folder, IFolderResponse } from "~/models/folder.model";
+
 
 type TreeViewContainerProps = {
   folders: Folder[],
   folderObject: FolderTreeNavItem,
   folderType: string,
-  currentFolder: Folder;
   onSelect: (folder: Folder) => void;
 }
 
@@ -19,7 +20,6 @@ export const TreeViewContainer: React.FunctionComponent<TreeViewContainerProps> 
   folders,
   folderObject,
   folderType,
-  currentFolder,
   onSelect
 }) => {
 

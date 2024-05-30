@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 
-import { Heading, Grid, useToggle, SearchBar } from "@edifice-ui/react";
+import {  Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
+import { BoardList } from "~/components/board-list/BoardList";
 import { CreateTab } from "~/components/create-tab/createTab";
+import { FolderList } from "~/components/folder-list/FolderList";
 import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
-import { BoardList } from "~/components/board-list/BoardList";
-import { FolderList } from "~/components/folder-list/FolderList";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { Folder } from "~/models/folder.model";
-import { useTranslation } from "react-i18next";
+
 
 export interface AppProps {
   _id: string;
@@ -26,7 +26,6 @@ export interface AppProps {
 
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
-  const { t } = useTranslation();
 
   const [currentFolder, setCurrentFolder] = useState(new Folder());
 

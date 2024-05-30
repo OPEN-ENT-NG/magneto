@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
-import dayjs from 'dayjs';
 
+import dayjs from 'dayjs';
 import { Card, useOdeClient, ActionBar, Tooltip } from "@edifice-ui/react";
 import {  animated, useSpring } from "@react-spring/web";
 
-import { useToaster } from "../../hooks/useToaster"
 
 import "./BoardList.scss";
-import { useGetBoardsQuery } from "~/services/api/boards.service";
-import { Board, IBoardItemResponse, IBoardsParamsRequest, IBoardsResponse } from "~/models/board.model";
 import { mdiAccountCircle, mdiCalendarBlank, mdiCrown, mdiEarth, mdiMagnet, mdiShareVariant } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
-import { Folder } from "~/models/folder.model";
+
+import { useToaster } from "../../hooks/useToaster"
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { Board, IBoardItemResponse, IBoardsParamsRequest, IBoardsResponse } from "~/models/board.model";
+import { Folder } from "~/models/folder.model";
+import { useGetBoardsQuery } from "~/services/api/boards.service";
 
 type BoardListProps = {
   currentFolder: Folder;

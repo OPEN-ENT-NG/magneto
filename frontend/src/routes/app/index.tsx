@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DndProvider } from 'react-dnd';
-
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
@@ -57,18 +57,7 @@ export const App = () => {
   return (
     <>
       <Header onClick={toggle} />
-<<<<<<< Updated upstream
-      <ReactSortable> 
-      <Grid>
-        <Grid.Col
-          sm="3"
-          style={{
-            minHeight: "70rem",
-            padding: ".8rem",
-          }}
-        >
-=======
-      <DndProvider >
+      <DndProvider backend={HTML5Backend}>
         <Grid>
           <Grid.Col
             sm="3"
@@ -77,7 +66,6 @@ export const App = () => {
               padding: ".8rem",
             }}
           >
->>>>>>> Stashed changes
 
           <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} />
 
@@ -102,14 +90,8 @@ export const App = () => {
             <BoardList currentFolder={currentFolder} />
             <CreateTab isOpen={isOpen} toggle={toggle} />
           </Grid.Col>
-<<<<<<< Updated upstream
-      </Grid>
-      </ReactSortable>
-    </> 
-=======
         </Grid>
-        </DndProvider>
-    </>
->>>>>>> Stashed changes
+      </DndProvider>
+    </> 
   );
 };

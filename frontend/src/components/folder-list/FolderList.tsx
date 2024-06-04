@@ -112,7 +112,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                   ...springs,
                 }}
               >
-                <Card
+                {/* <Card
                   app={currentApp!}
                   options={{
                     type: "folder",
@@ -130,7 +130,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                     <Icon path={mdiFolderPlus} size={1}></Icon>
                     <Card.Title className="title">{title}</Card.Title>
                   </Card.Body>
-                </Card>
+                </Card> */}
               </animated.li>
             );
           })}

@@ -23,9 +23,8 @@ interface BoardItemProps {
   nbCards: number,
   shared: any,
   owner: any,
-  modificationDate,
-  isPublished,
-  current},
+  modificationDate: string,
+  isPublished : boolean,},
   areBoardsLoading : boolean
 }
 

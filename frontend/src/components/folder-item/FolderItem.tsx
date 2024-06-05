@@ -34,24 +34,24 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   return (
     <>
       <div ref={drop}>
-              <Card
-        app={currentApp!}
-        options={{
-          type: "folder",
-          folderTitle,
-        }}
-        // onClick={() => {setIsToasterOpen()}}
-        isLoading={areFoldersLoading}
-        isSelectable={true}
-        onClick={() => {
-          onSelect(folder);
-        }}
-      >
-        <Card.Body>
-          <Icon path={mdiFolderPlus} size={1}></Icon>
-          <Card.Title>{folder.title}</Card.Title>
-        </Card.Body>
-      </Card>
+        <Card
+          app={currentApp!}
+          options={{
+            type: "folder",
+            folderTitle,
+          }}
+          // onClick={() => {setIsToasterOpen()}}
+          isLoading={areFoldersLoading}
+          isSelectable={true}
+          onClick={() => {
+            onSelect(folder);
+          }}
+        >
+          <Card.Body>
+            <Icon path={mdiFolderPlus} size={1}></Icon>
+            <Card.Title>{folder.title}</Card.Title>
+          </Card.Body>
+        </Card>
       </div>
 
               

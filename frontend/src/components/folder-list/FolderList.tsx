@@ -9,6 +9,8 @@ import "./FolderList.scss";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { FolderItem } from "../folder-item/FolderItem";
+import { useDrop } from "react-dnd";
 
 type FolderListProps = {
   currentFolder: Folder;
@@ -97,6 +99,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     );
   }, [currentFolder]);
 
+
   return (
     <>
       {folderData?.length ? (
@@ -112,6 +115,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                   ...springs,
                 }}
               >
+                <FolderItem folder={folder} areFoldersLoading={getFoldersLoading} onSelect={onSelect}/>
                 {/* <Card
                   app={currentApp!}
                   options={{

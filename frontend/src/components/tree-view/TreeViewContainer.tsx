@@ -40,27 +40,29 @@ export const TreeViewContainer: React.FunctionComponent<
   // e.preventDefault()
   // e.stopPropagation()
 
-  // const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   dispatch({ type: 'SET_DROP_DEPTH', dropDepth: data.dropDepth + 1 });
-  // };
-  // const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   dispatch({ type: 'SET_DROP_DEPTH', dropDepth: data.dropDepth - 1 });
-  //   if (data.dropDepth > 0) return
-  //   dispatch({ type: 'SET_IN_DROP_ZONE', inDropZone: false })
-  // };
-  // const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // };
-  // const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-  //   console.log("dropped SideBar", e);
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // };
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch({ type: 'SET_DROP_DEPTH', dropDepth: data.dropDepth + 1 });
+  };
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch({ type: 'SET_DROP_DEPTH', dropDepth: data.dropDepth - 1 });
+    if (data.dropDepth > 0) return
+    dispatch({ type: 'SET_IN_DROP_ZONE', inDropZone: false })
+  };
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const handleDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("dropped SideBar", e.target.closest("li")?.id);
+    console.log("dropped SideBar", e);
+    // console.log("dropped SideBar", e);
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   const selectFolder = (folderId: string) => {
     let clickedFolder;
@@ -90,13 +92,12 @@ export const TreeViewContainer: React.FunctionComponent<
 
   return (
     <>
-<div ref={drop}>
-    {/* <div className={'drag-drop-zone'}
+    <div className={'drag-drop-zone'}
           onDragOver={handleDragOver}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-        > */}
+        >
       <TreeView
         data={folderObject ?? dataTree}
         onTreeItemBlur={() => {

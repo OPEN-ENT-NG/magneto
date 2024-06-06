@@ -36,7 +36,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({board, areBo
 
   const [{ isDragging }, drag] = useDrag({
     type: 'board',
-    item: "_id",
+    item: {board},
     collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
     }),
@@ -63,6 +63,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({board, areBo
         }}
         // onClick={() => {setIsToasterOpen()}}
         isLoading={areBoardsLoading}
+        isSelectable={true}
       >
         <Card.Body flexDirection={"column"}>
           <Card.Image

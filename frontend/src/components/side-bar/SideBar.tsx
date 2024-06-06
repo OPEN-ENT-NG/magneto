@@ -69,6 +69,22 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
     ).buildFolders(deletedFolders);
   }
 
+  const reducer = (state: { fileList: string | any[]; }, action: { type: any; dropDepth: any; inDropZone: any; files: any; }) => {
+    switch (action.type) {
+      case 'SET_DROP_DEPTH':
+        return { ...state, dropDepth: action.dropDepth }
+      case 'SET_IN_DROP_ZONE':
+        return { ...state, inDropZone: action.inDropZone };
+      case 'ADD_FILE_TO_LIST':
+        return { ...state, fileList: state.fileList.concat(action.files) };
+      default:
+        return state;
+    }
+  };
+  const [data, dispatch] = React.useReducer(
+    reducer, { dropDepth: 0, inDropZone: false, fileList: [] }
+  )
+
   return (
     <>
       <aside className="g-col-3 g-col-lg-2 g-col-xl-3 border-end pt-16 pe-16 d-none d-lg-block">
@@ -77,6 +93,8 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           folderObject={myFoldersObject ?? undefined}
           folderType={FOLDER_TYPE.MY_BOARDS}
           onSelect={onSelect}
+          data={data} 
+          dispatch={dispatch}
         />
         <TreeViewContainer
           folders={myFolders ?? []}
@@ -89,12 +107,16 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           }}
           folderType={FOLDER_TYPE.MY_BOARDS}
           onSelect={onSelect}
+          data={data} 
+          dispatch={dispatch}
         />
         <TreeViewContainer
           folders={deletedFolders}
           folderObject={deletedFoldersObject}
           folderType={FOLDER_TYPE.DELETED_BOARDS}
           onSelect={onSelect}
+          data={data} 
+          dispatch={dispatch}
         />
         <SideBarButtons />
       </aside>

@@ -27,7 +27,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const [, drop] = useDrop(
     () => ({
       accept: "board",
-      drop: () => console.log("dropped")
+      drop: (item: any) => console.log("dropped", item)
     }),
   )
 

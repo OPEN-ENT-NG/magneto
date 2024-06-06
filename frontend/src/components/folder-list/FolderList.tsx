@@ -116,25 +116,6 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                 }}
               >
                 <FolderItem folder={folder} areFoldersLoading={getFoldersLoading} onSelect={onSelect}/>
-                {/* <Card
-                  app={currentApp!}
-                  options={{
-                    type: "folder",
-                    title,
-                  }}
-                  isLoading={getFoldersLoading}
-                  isSelectable={true}
-                  isSelected={folderIds.includes(id)}
-                  onSelect={() => toggleSelect(folder)}
-                  onClick={() => {
-                    onSelect(folder);
-                  }}
-                >
-                  <Card.Body>
-                    <Icon path={mdiFolderPlus} size={1}></Icon>
-                    <Card.Title className="title">{title}</Card.Title>
-                  </Card.Body>
-                </Card> */}
               </animated.li>
             );
           })}

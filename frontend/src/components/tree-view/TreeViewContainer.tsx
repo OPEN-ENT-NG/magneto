@@ -28,10 +28,10 @@ export const TreeViewContainer: React.FunctionComponent<
     section: true,
   };
 
-  const [, drop] = useDrop(
+  const [, droppedBoard] = useDrop(
     () => ({
       accept: "board",
-      drop: (item: any) => console.log("dropped", item)
+      droppedBoard: (item: any) => console.log("dropped info", item)
     }),
   )
 
@@ -90,6 +90,13 @@ export const TreeViewContainer: React.FunctionComponent<
     onSelect(clickedFolder);
   };
 
+  // const [, drop] = useDrop(
+  //   () => ({
+  //     accept: "board",
+  //     drop: (item: any) => console.log("dropped", item.board)
+  //   }),
+  // )
+
   return (
     <>
     <div className={'drag-drop-zone'}
@@ -97,6 +104,7 @@ export const TreeViewContainer: React.FunctionComponent<
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          ref={droppedBoard}
         >
       <TreeView
         data={folderObject ?? dataTree}

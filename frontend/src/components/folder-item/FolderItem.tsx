@@ -33,7 +33,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   return (
     <>
-      <div ref={drop}>
+      <div ref={drop} draggable="true">
         <Card
           app={currentApp!}
           options={{

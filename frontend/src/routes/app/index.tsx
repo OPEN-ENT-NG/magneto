@@ -13,6 +13,7 @@ import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
+import { Board } from "~/models/board.model";
 
 export interface AppProps {
   _id: string;
@@ -37,6 +38,7 @@ export const App = () => {
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [folderIds, setFolderIds] = useState<String[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
+  const [dragAndDropBoard, setDragAndDropBoard] = useState(new Board());
   const [boardTargetFolder, setBoardTargetFolder] = useState(new Folder());
 
   const handleSelectFolder = (folder: Folder) => {
@@ -54,6 +56,10 @@ export const App = () => {
     resetBoardsAndFolders();
   }, [currentFolder]);
 
+  const handleDragAndDropBoard = (board: Board) => {
+    setDragAndDropBoard(board);
+  };
+
   return (
     <>
       <Header onClick={toggle} />
@@ -67,7 +73,7 @@ export const App = () => {
             }}
           >
 
-          <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} />
+          <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} dragAndDropBoard={dragAndDropBoard} onDragAndDrop={handleDragAndDropBoard}/>
 
         </Grid.Col>
 
@@ -87,7 +93,7 @@ export const App = () => {
             />
             <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} />
             <ToasterContainer />
-            <BoardList currentFolder={currentFolder} />
+            <BoardList currentFolder={currentFolder} onDragAndDrop={handleDragAndDropBoard}/>
             <CreateTab isOpen={isOpen} toggle={toggle} />
           </Grid.Col>
         </Grid>

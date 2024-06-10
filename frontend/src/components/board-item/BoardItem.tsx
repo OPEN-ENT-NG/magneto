@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDrag } from 'react-dnd';
 
 import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
 import "./BoardItem.scss";
+import { Board } from "~/models/board.model";
 
 interface BoardItemProps {
   board: {id: string,
@@ -24,11 +25,16 @@ interface BoardItemProps {
   shared: any,
   owner: any,
   modificationDate: string,
-  isPublished : boolean,},
-  areBoardsLoading : boolean
+  isPublished : boolean,};
+  areBoardsLoading : boolean;
+  onDragAndDrop: (board: any) => void;
 }
 
-export const BoardItem: React.FunctionComponent<BoardItemProps> = ({board, areBoardsLoading}) => {
+export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
+  board, 
+  areBoardsLoading,
+  onDragAndDrop
+}) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation();
 
@@ -45,6 +51,10 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({board, areBo
   const isSameAsUser = (id: string) => {
     return id == userId;
   };
+
+  useEffect(() => {
+    onDragAndDrop(board);
+  }, [isDragging])
 
   return (
     <div

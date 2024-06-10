@@ -89,6 +89,13 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         return URL.createObjectURL(cover);
       },
     }),
+    moveBoardsToFolder: builder.mutation({
+      query: (boardId: string, folderId: string) => ({
+        url: `boards/folder/${folderId}`,
+        method: "PUT",
+        body: {boardIds: [boardId]},
+      }),
+    }),
   }),
 });
 

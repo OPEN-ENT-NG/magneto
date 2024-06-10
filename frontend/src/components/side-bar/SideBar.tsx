@@ -8,13 +8,18 @@ import { Folder, IFolderResponse } from "../../models/folder.model";
 import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
+import { Board } from "~/models/board.model";
 
 type SideBarProps = {
   onSelect: (folder: Folder) => void;
+  dragAndDropBoard: Board;
+  onDragAndDrop: (board: Board) => void;
 };
 
 export const SideBar: React.FunctionComponent<SideBarProps> = ({
-  onSelect,
+  onSelect, 
+  dragAndDropBoard, 
+  onDragAndDrop
 }) => {
   const { t } = useTranslation();
 
@@ -95,6 +100,8 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           onSelect={onSelect}
           data={data} 
           dispatch={dispatch}
+          dragAndDropBoard={dragAndDropBoard} 
+          onDragAndDrop={onDragAndDrop}
         />
         <TreeViewContainer
           folders={myFolders ?? []}
@@ -109,6 +116,8 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           onSelect={onSelect}
           data={data} 
           dispatch={dispatch}
+          dragAndDropBoard={dragAndDropBoard} 
+          onDragAndDrop={onDragAndDrop}
         />
         <TreeViewContainer
           folders={deletedFolders}
@@ -117,6 +126,8 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           onSelect={onSelect}
           data={data} 
           dispatch={dispatch}
+          dragAndDropBoard={dragAndDropBoard} 
+          onDragAndDrop={onDragAndDrop}
         />
         <SideBarButtons />
       </aside>

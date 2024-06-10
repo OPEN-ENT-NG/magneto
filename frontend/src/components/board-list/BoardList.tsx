@@ -32,6 +32,7 @@ type BoardListProps = {
   selectedBoards: Board[];
   setBoardIds: React.Dispatch<React.SetStateAction<String[]>>;
   setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
+  onDragAndDrop: (board: Board) => void;
 };
 
 // const boardData = {id, title, imageUrl, backgroundUrl, description, cardIds, sections, layoutType, tags, 
@@ -44,6 +45,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   selectedBoards,
   setBoardIds,
   setSelectedBoards,
+  onDragAndDrop
 }) => {
   const { user } = useOdeClient();
 
@@ -144,7 +146,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                   ...springs,
                 }} 
               >
-                <BoardItem board={board} areBoardsLoading={getBoardsLoading} />
+                <BoardItem board={board} areBoardsLoading={getBoardsLoading} onDragAndDrop={onDragAndDrop}/>
               </animated.li>
             );
           })}

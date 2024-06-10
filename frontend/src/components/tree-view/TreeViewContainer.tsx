@@ -8,6 +8,8 @@ import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useDrop } from "react-dnd";
+import { Board } from "~/models/board.model";
+import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
 
 type TreeViewContainerProps = {
   folders: Folder[];
@@ -16,11 +18,13 @@ type TreeViewContainerProps = {
   onSelect: (folder: Folder) => void;
   data: any;
   dispatch: any;
+  dragAndDropBoard: Board;
+  onDragAndDrop: (board: any) => void;
 };
 
 export const TreeViewContainer: React.FunctionComponent<
   TreeViewContainerProps
-> = ({ folders, folderObject, folderType, onSelect, data, dispatch }) => {
+> = ({ folders, folderObject, folderType, onSelect, data, dispatch, dragAndDropBoard, onDragAndDrop}) => {
   const dataTree = {
     children: [],
     id: folderType,
@@ -28,12 +32,14 @@ export const TreeViewContainer: React.FunctionComponent<
     section: true,
   };
 
-  const [, droppedBoard] = useDrop(
-    () => ({
-      accept: "board",
-      droppedBoard: (item: any) => console.log("dropped info", item)
-    }),
-  )
+  const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
+
+  // const [, droppedBoard] = useDrop(
+  //   () => ({
+  //     accept: "board",
+  //     droppedBoard: (item: any) => console.log("dropped info", item)
+  //   }),
+  // )
 
   // const { data, dispatch } = props;
 
@@ -59,6 +65,9 @@ export const TreeViewContainer: React.FunctionComponent<
   const handleDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log("dropped SideBar", e.target.closest("li")?.id);
     console.log("dropped SideBar", e);
+    console.log("dropped board", dragAndDropBoard);
+
+    e.target.closest("li")?.id ?? moveBoardsToFolder(dragAndDropBoard.id, e.target.closest("li")?.id);
     // console.log("dropped SideBar", e);
     e.preventDefault();
     e.stopPropagation();
@@ -90,12 +99,6 @@ export const TreeViewContainer: React.FunctionComponent<
     onSelect(clickedFolder);
   };
 
-  // const [, drop] = useDrop(
-  //   () => ({
-  //     accept: "board",
-  //     drop: (item: any) => console.log("dropped", item.board)
-  //   }),
-  // )
 
   return (
     <>

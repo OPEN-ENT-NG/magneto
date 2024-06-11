@@ -90,10 +90,10 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       },
     }),
     moveBoardsToFolder: builder.mutation({
-      query: (boardId: string, folderId: string) => ({
-        url: `boards/folder/${folderId}`,
+      query: (params: {boardId: string, folderId: string}) => ({
+        url: `boards/folder/${params.folderId}`,
         method: "PUT",
-        body: {boardIds: [boardId]},
+        body: {boardIds: [params.boardId]},
       }),
     }),
   }),

@@ -7,7 +7,6 @@ import { t } from "i18next";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
-import { useDrop } from "react-dnd";
 import { Board } from "~/models/board.model";
 import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
 
@@ -34,18 +33,6 @@ export const TreeViewContainer: React.FunctionComponent<
 
   const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
 
-  // const [, droppedBoard] = useDrop(
-  //   () => ({
-  //     accept: "board",
-  //     droppedBoard: (item: any) => console.log("dropped info", item)
-  //   }),
-  // )
-
-  // const { data, dispatch } = props;
-
-  // e.preventDefault()
-  // e.stopPropagation()
-
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -63,12 +50,14 @@ export const TreeViewContainer: React.FunctionComponent<
     e.stopPropagation();
   };
   const handleDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("dropped SideBar", e.target.closest("li")?.id);
-    console.log("dropped SideBar", e);
-    console.log("dropped board", dragAndDropBoard);
+    if (!!e.target.closest("li")?.id) {
+      let droppedFolderId = e.target.closest("li")?.id.split('_')[1];
+      console.log(droppedFolderId);
 
-    e.target.closest("li")?.id ?? moveBoardsToFolder(dragAndDropBoard.id, e.target.closest("li")?.id);
-    // console.log("dropped SideBar", e);
+      moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: droppedFolderId});
+
+      onDragAndDrop(undefined);
+    } 
     e.preventDefault();
     e.stopPropagation();
   };
@@ -107,7 +96,6 @@ export const TreeViewContainer: React.FunctionComponent<
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          ref={droppedBoard}
         >
       <TreeView
         data={folderObject ?? dataTree}

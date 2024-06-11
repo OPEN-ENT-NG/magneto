@@ -39,7 +39,6 @@ export const App = () => {
   const [folderIds, setFolderIds] = useState<String[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
   const [dragAndDropBoard, setDragAndDropBoard] = useState(new Board());
-  const [boardTargetFolder, setBoardTargetFolder] = useState(new Folder());
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
@@ -91,7 +90,7 @@ export const App = () => {
               placeholder="Search something...."
               size="md"
             />
-            <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} />
+            <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} onDragAndDrop={handleDragAndDropBoard}/>
             <ToasterContainer />
             <BoardList currentFolder={currentFolder} onDragAndDrop={handleDragAndDropBoard}/>
             <CreateTab isOpen={isOpen} toggle={toggle} />

@@ -19,6 +19,7 @@ type FolderListProps = {
   selectedFolders: Folder[];
   setFolderIds: React.Dispatch<React.SetStateAction<String[]>>;
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
+  onDragAndDrop: (board: Board) => void;
 };
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
@@ -28,6 +29,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   selectedFolders,
   setFolderIds,
   setSelectedFolders,
+  onDragAndDrop
 }) => {
   const { currentApp } = useOdeClient();
   const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
@@ -115,7 +117,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                   ...springs,
                 }}
               >
-                <FolderItem folder={folder} areFoldersLoading={getFoldersLoading} onSelect={onSelect}/>
+                <FolderItem folder={folder} areFoldersLoading={getFoldersLoading} onSelect={onSelect} onDragAndDrop={onDragAndDrop}/>
               </animated.li>
             );
           })}

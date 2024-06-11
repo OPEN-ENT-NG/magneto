@@ -5,29 +5,39 @@ import { mdiFolderPlus } from "@mdi/js";
 import { Icon } from "@mui/material";
 
 import "./FolderItem.scss";
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder } from "~/models/folder.model";
 import { useDrop } from "react-dnd";
+import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
+import { Board } from "~/models/board.model";
 
 type FolderListProps = {
     folder: Folder;
     areFoldersLoading: boolean;
     onSelect: (folder: Folder) => void;
+    onDragAndDrop: (board: any) => void;
 };
 
 export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     folder,
     areFoldersLoading,
     onSelect,
+    onDragAndDrop
 }) => {
   const { currentApp } = useOdeClient();
+  const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
 
   const folderTitle = folder.title;
 
   const [, drop] = useDrop(
     () => ({
       accept: "board",
-      drop: (item: any) => console.log("dropped", item.board)
+      drop: (item: any) => {
+        console.log("dropped", item.board);
+
+      moveBoardsToFolder({boardId: item.board.id, folderId: folder.id});
+
+        onDragAndDrop(undefined);
+      }
     }),
   )
 

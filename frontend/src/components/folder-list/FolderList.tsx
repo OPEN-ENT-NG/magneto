@@ -13,9 +13,9 @@ import { useGetFoldersQuery } from "~/services/api/folders.service";
 type FolderListProps = {
   currentFolder: Folder;
   onSelect: (folder: Folder) => void;
-  folderIds: String[],
-  selectedFolders: Folder[],
-  setFolderIds: React.Dispatch<React.SetStateAction<String[]>>,
+  folderIds: String[];
+  selectedFolders: Folder[];
+  setFolderIds: React.Dispatch<React.SetStateAction<String[]>>;
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
 };
 
@@ -25,7 +25,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   folderIds,
   selectedFolders,
   setFolderIds,
-  setSelectedFolders
+  setSelectedFolders,
 }) => {
   const { currentApp } = useOdeClient();
   // const [isToasterOpen, setIsToasterOpen] = useToaster();

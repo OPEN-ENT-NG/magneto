@@ -21,7 +21,7 @@ export const useActions = () => {
         manage,
         publish,
         comment,
-        favorites
+        favorites,
       ]);
       return availableRights;
     },

@@ -4,7 +4,10 @@ import { Button, FormControl, Input, Label, Modal } from "@edifice-ui/react";
 
 import "./CreateFolder.scss";
 import { Folder } from "../../models/folder.model";
-import { useCreateFolderMutation, useUpdateFolderMutation } from "~/services/api/folders.service";
+import {
+  useCreateFolderMutation,
+  useUpdateFolderMutation,
+} from "~/services/api/folders.service";
 
 type props = {
   isOpen: boolean;
@@ -29,8 +32,7 @@ export const CreateFolder: FunctionComponent<props> = ({
     if (folderToUpdate != null) {
       folder.id = folderToUpdate.id;
       await updateFolder(folder);
-    }
-    else {
+    } else {
       await addFolder(folder);
       console.log("Dossier " + title + " créé!");
     }

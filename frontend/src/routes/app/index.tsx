@@ -9,9 +9,9 @@ import { FolderList } from "~/components/folder-list/FolderList";
 import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
-import { Folder } from "~/models/folder.model";
-import { Board } from "~/models/board.model";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { Board } from "~/models/board.model";
+import { Folder } from "~/models/folder.model";
 
 export interface AppProps {
   _id: string;
@@ -28,7 +28,9 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
 
-  const [currentFolder, setCurrentFolder] = useState(new Folder(FOLDER_TYPE.MY_BOARDS));
+  const [currentFolder, setCurrentFolder] = useState(
+    new Folder(FOLDER_TYPE.MY_BOARDS),
+  );
 
   const [boardIds, setBoardIds] = useState<String[]>([]);
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
@@ -70,8 +72,8 @@ export const App = () => {
         >
           <SearchBar
             isVariant
-            onChange={function Ga() { }}
-            onClick={function Ga() { }}
+            onChange={function Ga() {}}
+            onClick={function Ga() {}}
             placeholder="Search something...."
             size="md"
           />
@@ -91,7 +93,9 @@ export const App = () => {
             setSelectedBoards={setSelectedBoards}
           />
           <ToasterContainer
-            isToasterOpen={selectedBoards.length > 0 || selectedFolders.length > 0}
+            isToasterOpen={
+              selectedBoards.length > 0 || selectedFolders.length > 0
+            }
             boards={selectedBoards}
             folders={selectedFolders}
             boardIds={boardIds}

@@ -1,18 +1,12 @@
-import { odeServices } from "edifice-ts-client";
-
 import { emptySplitApi } from "./empltySplitApi.service";
-import {
-  Board,
-  IBoardsParamsRequest,
-  IBoardPayload,
-} from "~/models/board.model";
+import { IBoardsParamsRequest, IBoardPayload } from "~/models/board.model";
 
 export const boardsApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
     getBoards: builder.query({
       query: (params: IBoardsParamsRequest) => {
         let urlParams: string =
-          `?isPublic=${params.public}&isShared=${params.isShared}` +
+          `?isPublic=${params.isPublic}&isShared=${params.isShared}` +
           `&isDeleted=${params.isDeleted}&sortBy=${params.sortBy}`;
 
         if (params.folderId) {
@@ -83,5 +77,13 @@ export const boardsApi = emptySplitApi.injectEndpoints({
   }),
 });
 
-export const { useGetBoardsQuery, useCreateBoardMutation, useUpdateBoardMutation, useDuplicateBoardMutation, useMoveBoardsMutation, usePreDeleteBoardsMutation, useDeleteBoardsMutation, useGetUrlQuery } =
-  boardsApi;
+export const {
+  useGetBoardsQuery,
+  useCreateBoardMutation,
+  useUpdateBoardMutation,
+  useDuplicateBoardMutation,
+  useMoveBoardsMutation,
+  usePreDeleteBoardsMutation,
+  useDeleteBoardsMutation,
+  useGetUrlQuery,
+} = boardsApi;

@@ -27,7 +27,10 @@ import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useBackground } from "~/hooks/useBackground";
 import { useThumb } from "~/hooks/useThumb";
 import { Board, BoardForm } from "~/models/board.model";
-import { useCreateBoardMutation, useUpdateBoardMutation } from "~/services/api/boards.service";
+import {
+  useCreateBoardMutation,
+  useUpdateBoardMutation,
+} from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -78,17 +81,16 @@ export const CreateTab: FunctionComponent<props> = ({
     board.canComment = isCommentChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
-  }
+  };
 
   const onSubmit = (): void => {
     const board = new BoardForm();
-    setBoardFromForm(board)
+    setBoardFromForm(board);
 
     if (boardToUpdate != null) {
       board.id = boardToUpdate.id;
-      updateBoard(board.toJSON())
-    }
-    else {
+      updateBoard(board.toJSON());
+    } else {
       createBoard(board.toJSON());
     }
 

@@ -37,4 +37,10 @@ export const foldersApi = emptySplitApi.injectEndpoints({
   }),
 });
 
-export const { useGetFoldersQuery, useCreateFolderMutation, useUpdateFolderMutation, usePreDeleteFoldersMutation, useDeleteFoldersMutation } = foldersApi;
+export const {
+  useGetFoldersQuery,
+  useCreateFolderMutation,
+  useUpdateFolderMutation,
+  usePreDeleteFoldersMutation,
+  useDeleteFoldersMutation,
+} = foldersApi;

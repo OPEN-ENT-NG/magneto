@@ -1,3 +1,3 @@
-import { workspace } from "entcore";
+//import { workspace } from "entcore";
 
-export class FileViewModel extends workspace.v2.models.Element {}
+export class FileViewModel /*extends workspace.v2.models.Element*/ {}

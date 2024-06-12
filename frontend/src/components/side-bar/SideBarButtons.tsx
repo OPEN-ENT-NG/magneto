@@ -6,11 +6,14 @@ import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { CreateFolder } from "../create-folder/CreateFolder";
+import { MagnetsCollectionModal } from "../magnets-collection/MagnetsCollectionModal";
 
 export const SideBarButtons = () => {
   const { t } = useTranslation();
 
   const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
+  const [isMagnetsCollectionOpen, toggleMagnetsCollectionOpen] =
+    useToggle(false);
 
   return (
     <>
@@ -34,10 +37,15 @@ export const SideBarButtons = () => {
           children={"Afficher mes aimants favoris"}
           leftIcon={<Icon path={mdiStar} size={1}></Icon>}
           isLoading={false}
+          onClick={toggleMagnetsCollectionOpen}
         ></Button>
         <CreateFolder
           isOpen={isCreateFolderOpen}
           toggle={toggleCreateFolderOpen}
+        />
+        <MagnetsCollectionModal
+          isOpen={isMagnetsCollectionOpen}
+          toggle={toggleMagnetsCollectionOpen}
         />
       </div>
     </>

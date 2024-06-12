@@ -1,0 +1,47 @@
+ul.grid {
+  padding-top: 15px;
+  columns: 4;
+  -webkit-columns: 4;
+  -moz-columns: 4;
+
+  width: 100% !important;
+
+  li.boardSizing {
+    .card {
+      padding: unset !important;
+      margin: unset !important;
+      display: flex;
+
+      flex-wrap: wrap !important;
+      flex-direction: column;
+
+      .board-number-magnets {
+        display: inline-flex;
+
+        svg {
+          color: #ffb600;
+          font-size: 16px;
+        }
+
+        svg + p {
+          margin-left: 0.5rem;
+          font-size: 13px;
+        }
+      }
+
+      .board-about {
+        display: inline-flex;
+        width: 100%;
+
+        svg + p {
+          margin-left: 0.5rem;
+          font-size: 13px;
+        }
+
+        > div:first-child {
+          margin-left: auto !important;
+        }
+      }
+    }
+  }
+}

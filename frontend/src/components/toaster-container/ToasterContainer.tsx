@@ -15,6 +15,7 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
+import { CreateFolder } from "../create-folder/CreateFolder";
 
 export interface ToasterContainerProps {
   isToasterOpen: boolean;
@@ -38,6 +39,7 @@ export const ToasterContainer = ({
   const [isCreateOpen, toggleCreate] = useToggle(false);
   const [isMoveOpen, toggleMove] = useToggle(false);
   const [isMoveDelete, toggleDelete] = useToggle(false);
+  const [isCreateFolder, toggleCreateFolder] = useToggle(false);
 
   const [duplicateBoard] = useDuplicateBoardMutation();
 
@@ -157,7 +159,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     Ouvrir
                   </Button>
@@ -202,7 +204,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     Partager
                   </Button>
@@ -218,7 +220,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       Partager à toute la plateforme
                     </Button>
@@ -233,7 +235,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       Ne plus partager à toute la plateforme
                     </Button>
@@ -255,7 +257,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={toggleCreateFolder}
                   >
                     Renommer
                   </Button>
@@ -280,6 +282,11 @@ export const ToasterContainer = ({
             folderIds={folderIds}
             isPredelete={currentFolder.id != FOLDER_TYPE.DELETED_BOARDS}
           />
+        </>
+      )}
+      {folders != null && (
+        <>
+          <CreateFolder isOpen={isCreateFolder} toggle={toggleCreateFolder} folderToUpdate={folders[0]} />
         </>
       )}
     </>

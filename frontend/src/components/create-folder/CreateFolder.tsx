@@ -74,6 +74,7 @@ export const CreateFolder: FunctionComponent<props> = ({
                 placeholder=""
                 size="md"
                 type="text"
+                value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </FormControl>

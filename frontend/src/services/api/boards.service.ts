@@ -56,17 +56,17 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       }),
     }),
     preDeleteBoards: builder.mutation({
-      query: (boardIds: String[]) => ({
+      query: (boardIds) => ({
         url: `boards/predelete`,
         method: "PUT",
-        body: boardIds,
+        body: { boardIds: boardIds },
       }),
     }),
     deleteBoards: builder.mutation({
-      query: (boardIds: String[]) => ({
+      query: (boardIds) => ({
         url: `boards`,
         method: "DELETE",
-        body: boardIds,
+        body: { boardIds: boardIds },
       }),
     }),
     getUrl: builder.query({

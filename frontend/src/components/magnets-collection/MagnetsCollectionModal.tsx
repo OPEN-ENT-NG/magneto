@@ -86,7 +86,9 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     boardsWithCards = boardData.map((board: Board) => {
       return {
         ...board,
-        cards: cardsData.filter((card: CardModel) => card.boardId === board._id),
+        cards: cardsData.filter(
+          (card: CardModel) => card.boardId === board._id,
+        ),
       } as Board;
     });
   }
@@ -165,59 +167,59 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                     return card;
                   }
                 }).length > 0 && (
-                    <div>
-                      <h2>{board._title}</h2>
-                      <animated.ul className="grid ps-0 list-unstyled mb-24">
-                        {board.cards
-                          .filter((card: CardModel) => {
-                            if (searchText === "") {
-                              return card;
-                            } else if (
-                              card.title
-                                .toLowerCase()
-                                .includes(searchText.toLowerCase())
-                            ) {
-                              return card;
-                            }
-                          })
-                          .map((card: CardModel) => (
-                            <animated.li
-                              className="g-col-4 z-1 boardSizing"
-                              key={card.id}
-                              style={{
-                                position: "relative",
-                                ...springs,
+                  <div>
+                    <h2>{board._title}</h2>
+                    <animated.ul className="grid ps-0 list-unstyled mb-24">
+                      {board.cards
+                        .filter((card: CardModel) => {
+                          if (searchText === "") {
+                            return card;
+                          } else if (
+                            card.title
+                              .toLowerCase()
+                              .includes(searchText.toLowerCase())
+                          ) {
+                            return card;
+                          }
+                        })
+                        .map((card: CardModel) => (
+                          <animated.li
+                            className="g-col-4 z-1 boardSizing"
+                            key={card.id}
+                            style={{
+                              position: "relative",
+                              ...springs,
+                            }}
+                          >
+                            <Card
+                              app={currentApp!}
+                              options={{
+                                type: "board",
+                                title: card.title,
                               }}
+                              isLoading={getBoardsLoading}
+                              isSelectable={false}
                             >
-                              <Card
-                                app={currentApp!}
-                                options={{
-                                  type: "board",
-                                  title: card.title,
-                                }}
-                                isLoading={getBoardsLoading}
-                                isSelectable={false}
-                              >
-                                <Card.Body flexDirection={"column"}>
-                                  <Card.Title>{card.title}</Card.Title>
+                              <Card.Body flexDirection={"column"}>
+                                <Card.Title>{card.title}</Card.Title>
 
-                                  <div className="board-number-magnets">
-                                    <Icon
-                                      path={mdiMagnet}
-                                      size={1}
-                                      className="med-resource-card-text"
-                                    ></Icon>
-                                    <Card.Text className="med-resource-card-text board-text">
-                                      {card.resourceType} {t("magneto.magnets")}
-                                    </Card.Text>
-                                  </div>
-                                </Card.Body>
-                              </Card>
-                            </animated.li>
-                          ))}
-                      </animated.ul>
-                    </div>
-                  )}
+                                <div className="board-number-magnets">
+                                  <Icon
+                                    path={mdiMagnet}
+                                    size={1}
+                                    className="med-resource-card-text"
+                                  ></Icon>
+                                  <Card.Text className="med-resource-card-text board-text">
+                                    {card.resourceType} {t("magneto.magnets")}
+                                  </Card.Text>
+                                </div>
+                              </Card.Body>
+                            </Card>
+                          </animated.li>
+                        ))}
+                    </animated.ul>
+                  </div>
+                )}
               </ul>
             ))}
           </ul>

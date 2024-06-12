@@ -24,10 +24,10 @@ import myImage from "./collaborativeeditor-default.png";
 // import { useBackground } from "../../hooks/useBackground";
 // import { useThumb } from "../../hooks/useThumb";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
-import { BoardForm } from "~/models/board.model";
-import { useCreateBoardMutation, useGetUrlQuery } from "~/services/api/boards.service";
 import { useBackground } from "~/hooks/useBackground";
 import { useThumb } from "~/hooks/useThumb";
+import { BoardForm } from "~/models/board.model";
+import { useCreateBoardMutation } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -45,7 +45,7 @@ export const CreateTab: FunctionComponent<props> = ({
   isOpen,
   toggle,
 }: props) => {
-  const { thumbnail, handleDeleteImage, handleUploadImage } = useThumb({
+  const { handleDeleteImage, handleUploadImage } = useThumb({
     selectedResource: undefined,
   });
   const [isCommentChecked, setIsCommentChecked] = useState(false);
@@ -56,10 +56,9 @@ export const CreateTab: FunctionComponent<props> = ({
   const [tagsTextInput, setTagsTextInput] = useState("");
   const [tags, setTags] = useState([""]);
   const [createBoard] = useCreateBoardMutation();
-  const { background, handleDeleteBackground, handleUploadBackground } =
-    useBackground({
-      selectedResource: undefined,
-    });
+  const { handleDeleteBackground, handleUploadBackground } = useBackground({
+    selectedResource: undefined,
+  });
 
   const onSubmit = async (): Promise<void> => {
     const board = new BoardForm();
@@ -67,8 +66,8 @@ export const CreateTab: FunctionComponent<props> = ({
     board.description = description;
     //TODO : change this to work with a future workspace file manager
 
-    board.imageUrl = "" //getUrl(thumbnail as File);
-    board.backgroundUrl = "" //getUrl(background as File);
+    board.imageUrl = ""; //getUrl(thumbnail as File);
+    board.backgroundUrl = ""; //getUrl(background as File);
 
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")
@@ -83,7 +82,7 @@ export const CreateTab: FunctionComponent<props> = ({
     reset();
   };
 
-  // 
+  //
 
   const reset = (): void => {
     handleDeleteImage();

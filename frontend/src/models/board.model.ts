@@ -1,5 +1,6 @@
 //import { Behaviours, model, Shareable } from "entcore";
 
+import { Card } from "./card.model";
 import { Section } from "./section.model";
 import { FOLDER_TYPE } from "../core/enums/folder-type.enum";
 import {} from "edifice-ts-client";
@@ -307,7 +308,7 @@ export class BoardForm {
 }
 
 export class Board /*implements Shareable*/ {
-  private _id: string;
+  public _id: string;
   public _title: string = " ";
   private _imageUrl: string;
   private _backgroundUrl: string;
@@ -326,6 +327,7 @@ export class Board /*implements Shareable*/ {
   private _deleted: boolean;
   private _canComment: boolean;
   private _displayNbFavorites: boolean;
+  private _cards: Card[];
 
   // Share resource properties
   public shared: any[];
@@ -354,6 +356,7 @@ export class Board /*implements Shareable*/ {
     this._deleted = false;
     this._canComment = false;
     this._displayNbFavorites = false;
+    this._cards = [];
     return this;
   }
 
@@ -497,8 +500,8 @@ export class Board /*implements Shareable*/ {
   }
 
   /*isMyBoard(): boolean {
-    return this.owner.userId === model.me.userId;
-  }*/
+        return this.owner.userId === model.me.userId;
+    }*/
 
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;
@@ -526,6 +529,14 @@ export class Board /*implements Shareable*/ {
 
   set displayNbFavorites(value: boolean) {
     this._displayNbFavorites = value;
+  }
+
+  get cards(): Card[] {
+    return this._cards;
+  }
+
+  set cards(value: Card[]) {
+    this._cards = value;
   }
 }
 

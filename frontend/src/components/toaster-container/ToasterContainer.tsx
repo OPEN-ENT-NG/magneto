@@ -13,6 +13,7 @@ import { DeleteModal } from "../delete-modal/DeleteModal";
 import { MoveBoard } from "../move-board/MoveBoard";
 import { CreateTab } from "~/components/create-tab/createTab";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { useRestoreBoardsAndFolders } from "~/hooks/useRestoreBoardsAndFolders";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
@@ -44,6 +45,11 @@ export const ToasterContainer = ({
 
   const [duplicateBoard] = useDuplicateBoardMutation();
 
+  const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
+    boardIds: boardIds,
+    folderIds: folderIds
+  });
+
   const transition = useTransition(isToasterOpen, {
     from: { opacity: 0, transform: "translateY(100%)" },
     enter: { opacity: 1, transform: "translateY(0)" },
@@ -63,6 +69,8 @@ export const ToasterContainer = ({
   };
 
   const isTrash = () => {
+    console.log(currentFolder);
+    console.log(currentFolder.id == FOLDER_TYPE.DELETED_BOARDS);
     return currentFolder.id == FOLDER_TYPE.DELETED_BOARDS;
   };
 
@@ -160,7 +168,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -205,7 +213,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     {t("magneto.share")}
                   </Button>
@@ -221,7 +229,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -236,7 +244,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       Ne plus partager à toute la plateforme
                     </Button>
@@ -260,7 +268,17 @@ export const ToasterContainer = ({
                     variant="filled"
                     onClick={toggleCreateFolder}
                   >
-                    {t("magneto.board.move")}
+                    {t("magneto.move")}
+                  </Button>
+                )}
+                {isTrash() && (
+                  <Button
+                    type="button"
+                    color="primary"
+                    variant="filled"
+                    onClick={restoreBoardsAndFolders}
+                  >
+                    {t("magneto.restore")}
                   </Button>
                 )}
               </ActionBar>

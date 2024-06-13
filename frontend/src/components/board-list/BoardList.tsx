@@ -97,6 +97,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   } else if (getBoardsLoading) {
     console.log("loading");
   } else {
+    console.log(boardData);
     boardData = myBoardsResult.all.map((board: IBoardItemResponse) =>
       new Board().build(board),
     ); //convert boards to Board[]
@@ -120,6 +121,11 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     setBoardIds([...boardIds, resource.id]);
     setSelectedBoards([...selectedBoards, resource]);
   }
+
+  useEffect(() => {
+    setBoardIds([]);
+    setSelectedBoards([]);
+  }, [boardData]);
 
   return (
     <>

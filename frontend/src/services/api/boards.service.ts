@@ -27,6 +27,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
 
         return `boards${urlParams}`;
       },
+      providesTags: ['Boards'],
     }),
     createBoard: builder.mutation({
       query: (params: IBoardPayload) => ({
@@ -34,6 +35,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "POST",
         body: params,
       }),
+      invalidatesTags: ['Boards'],
     }),
     updateBoard: builder.mutation({
       query: (params: IBoardPayload) => ({
@@ -41,12 +43,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: params,
       }),
+      invalidatesTags: ['Boards'],
     }),
     duplicateBoard: builder.mutation({
       query: (boardId: String) => ({
         url: `board/duplicate/${boardId}`,
         method: "PUT",
       }),
+      invalidatesTags: ['Boards'],
     }),
     moveBoards: builder.mutation({
       query: (params) => ({
@@ -54,20 +58,31 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: { boardIds: params.boardIds },
       }),
+      invalidatesTags: ['Boards'],
     }),
     preDeleteBoards: builder.mutation({
-      query: (boardIds) => ({
+      query: (boardIds: String[]) => ({
         url: `boards/predelete`,
         method: "PUT",
         body: { boardIds: boardIds },
       }),
+      invalidatesTags: ['Boards'],
     }),
     deleteBoards: builder.mutation({
-      query: (boardIds) => ({
+      query: (boardIds: String[]) => ({
         url: `boards`,
         method: "DELETE",
         body: { boardIds: boardIds },
       }),
+      invalidatesTags: ['Boards'],
+    }),
+    restorePreDeleteBoards: builder.mutation({
+      query: (boardIds: String[]) => ({
+        url: `boards/restore`,
+        method: "put",
+        body: { boardIds: boardIds },
+      }),
+      invalidatesTags: ['Boards'],
     }),
     getUrl: builder.query({
       query: (cover: File) => {
@@ -85,5 +100,6 @@ export const {
   useMoveBoardsMutation,
   usePreDeleteBoardsMutation,
   useDeleteBoardsMutation,
+  useRestorePreDeleteBoardsMutation,
   useGetUrlQuery,
 } = boardsApi;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { Card, useOdeClient } from "@edifice-ui/react";
 import { mdiFolderPlus } from "@mdi/js";
 import { Icon } from "@mui/material";
@@ -28,7 +27,6 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   setSelectedFolders,
 }) => {
   const { currentApp } = useOdeClient();
-  // const [isToasterOpen, setIsToasterOpen] = useToaster();
   const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
 
   const {
@@ -36,6 +34,8 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     isLoading: getFoldersLoading,
     error: getFoldersError,
   } = useGetFoldersQuery(foldersQuery);
+
+  let folderData: Folder[] = [];
 
   const filterFolderData = (): void => {
     if (
@@ -56,15 +56,14 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     }
   };
 
-  let folderData: Folder[];
   if (getFoldersError) {
     console.log("error");
   } else if (getFoldersLoading) {
     console.log("loading");
-  } else {
+  } else if (myFoldersResult) {
     folderData = myFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
-    ); //convert folders to Folder[]
+    ); // convert folders to Folder[]
     filterFolderData();
   }
 
@@ -96,6 +95,11 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
       currentFolder.id == FOLDER_TYPE.DELETED_BOARDS || !!currentFolder.deleted,
     );
   }, [currentFolder]);
+
+  useEffect(() => {
+    setFolderIds([]);
+    setSelectedFolders([]);
+  }, [folderData]);
 
   return (
     <>

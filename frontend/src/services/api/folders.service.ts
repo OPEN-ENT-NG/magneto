@@ -5,6 +5,7 @@ export const foldersApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
     getFolders: builder.query({
       query: (isDeleted: boolean) => `folders?isDeleted=${isDeleted}`,
+      providesTags: ['Folders'],
     }),
     createFolder: builder.mutation({
       query: (folder: Folder) => ({
@@ -12,6 +13,7 @@ export const foldersApi = emptySplitApi.injectEndpoints({
         method: "POST",
         body: { title: folder.title, parentId: folder.parentId },
       }),
+      invalidatesTags: ['Folders'],
     }),
     updateFolder: builder.mutation({
       query: (folder: Folder) => ({
@@ -19,13 +21,23 @@ export const foldersApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: { title: folder.title },
       }),
+      invalidatesTags: ['Folders'],
     }),
     preDeleteFolders: builder.mutation({
       query: (folderIds: String[]) => ({
         url: "folders/predelete",
         method: "PUT",
-        body: folderIds,
+        body: { folderIds: folderIds },
       }),
+      invalidatesTags: ['Folders'],
+    }),
+    restorePreDeleteFolders: builder.mutation({
+      query: (folderIds: String[]) => ({
+        url: `folders/restore`,
+        method: "put",
+        body: { folderIds: folderIds },
+      }),
+      invalidatesTags: ['Folders'],
     }),
     deleteFolders: builder.mutation({
       query: (folderIds: String[]) => ({
@@ -33,6 +45,7 @@ export const foldersApi = emptySplitApi.injectEndpoints({
         method: "DELETE",
         body: folderIds,
       }),
+      invalidatesTags: ['Folders'],
     }),
   }),
 });
@@ -42,5 +55,6 @@ export const {
   useCreateFolderMutation,
   useUpdateFolderMutation,
   usePreDeleteFoldersMutation,
+  useRestorePreDeleteFoldersMutation,
   useDeleteFoldersMutation,
 } = foldersApi;

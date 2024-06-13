@@ -18,9 +18,10 @@ export const usePredefinedToasts = ({
   const executeFunction = async () => {
     try {
       await func(parameter);
+      console.log("success")
       toast.success(successMessage || "Operation successful!");
     } catch (error) {
-      console.error(error);
+      console.log(error);
       toast.error(failureMessage || "Operation failed!");
     }
   };

@@ -1,8 +1,10 @@
 import React, { FunctionComponent } from "react";
 
+import { t } from "i18next";
 // eslint-disable-next-line
 import { Button, Modal } from "@edifice-ui/react";
 
+import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import {
   usePreDeleteBoardsMutation,
   useDeleteBoardsMutation,
@@ -32,6 +34,34 @@ export const DeleteModal: FunctionComponent<props> = ({
   const [deleteBoards] = useDeleteBoardsMutation();
   const [deleteFolders] = useDeleteFoldersMutation();
 
+  const preDeleteBoardsAndToast = usePredefinedToasts({
+    func: preDeleteBoards,
+    parameter: boardIds,
+    successMessage: t("magneto.predelete.elements.confirm"),
+    failureMessage: t("magneto.predelete.elements.error"),
+  });
+
+  const deleteBoardsAndToast = usePredefinedToasts({
+    func: deleteBoards,
+    parameter: boardIds,
+    successMessage: t("magneto.delete.elements.confirm"),
+    failureMessage: t("magneto.delete.elements.error"),
+  });
+
+  const preDeleteFoldersAndToast = usePredefinedToasts({
+    func: preDeleteFolders,
+    parameter: folderIds,
+    successMessage: t("magneto.predelete.elements.confirm"),
+    failureMessage: t("magneto.predelete.elements.error"),
+  });
+
+  const deleteFoldersAndToast = usePredefinedToasts({
+    func: deleteFolders,
+    parameter: folderIds,
+    successMessage: t("magneto.delete.elements.confirm"),
+    failureMessage: t("magneto.delete.elements.error"),
+  });
+
   const onSubmit = (): void => {
     if (isPredelete) onSubmitPredelete();
     else onSubmitDelete();
@@ -39,19 +69,15 @@ export const DeleteModal: FunctionComponent<props> = ({
   };
 
   const onSubmitPredelete = (): void => {
-    if (boardIds.length > 0) preDeleteBoards(boardIds);
-    if (folderIds.length > 0) preDeleteFolders(folderIds);
+    if (boardIds.length > 0) preDeleteBoardsAndToast();
 
-    //TODO send toast of success/failure
-    return;
+    if (folderIds.length > 0) preDeleteFoldersAndToast();
   };
 
   const onSubmitDelete = (): void => {
-    if (boardIds.length > 0) deleteBoards(boardIds);
-    if (folderIds.length > 0) deleteFolders(folderIds);
+    if (boardIds.length > 0) deleteBoardsAndToast();
 
-    //TODO send toast of success/failure
-    return;
+    if (folderIds.length > 0) deleteFoldersAndToast();
   };
 
   return (
@@ -65,19 +91,13 @@ export const DeleteModal: FunctionComponent<props> = ({
           viewport={false}
         >
           <Modal.Header onModalClose={toggle}>
-            <h2>Supprimer les tableaux/dossiers</h2>
+            <h2>{t("magneto.delete.elements")}</h2>
           </Modal.Header>
           <Modal.Body>
             {isPredelete ? (
-              <div>
-                Êtes-vous sûr(e) de vouloir mettre les tableaux/dossiers
-                sélectionnés à la corbeille ?
-              </div>
+              <div>{t("magneto.predelete.elements.message")}</div>
             ) : (
-              <div>
-                Êtes-vous sûr(e) de vouloir supprimer définitivement les
-                tableaux/dossiers sélectionnés ?
-              </div>
+              <div>{t("magneto.delete.elements.message")}</div>
             )}
           </Modal.Body>
           <Modal.Footer>
@@ -89,7 +109,7 @@ export const DeleteModal: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={toggle}
               >
-                Annuler
+                {t("magneto.cancel")}
               </Button>
               <Button
                 color="primary"
@@ -98,7 +118,7 @@ export const DeleteModal: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={onSubmit}
               >
-                Enregistrer
+                {t("magneto.save")}
               </Button>
             </div>
           </Modal.Footer>

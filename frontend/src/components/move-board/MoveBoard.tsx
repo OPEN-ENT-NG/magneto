@@ -87,7 +87,7 @@ export const MoveBoard: FunctionComponent<props> = ({
           viewport={false}
         >
           <Modal.Header onModalClose={toggle}>
-            <h2>Déplacer le tableau</h2>
+            <h2>{t("magneto.board.move")}</h2>
           </Modal.Header>
           <Modal.Body>
             {myFoldersObject && (
@@ -108,7 +108,7 @@ export const MoveBoard: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={toggle}
               >
-                Annuler
+                {t("magneto.cancel")}
               </Button>
               <Button
                 color="primary"
@@ -117,7 +117,7 @@ export const MoveBoard: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={onSubmit}
               >
-                Enregistrer
+                {t("magneto.save")}
               </Button>
             </div>
           </Modal.Footer>

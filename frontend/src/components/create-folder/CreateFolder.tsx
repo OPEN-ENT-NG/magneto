@@ -1,8 +1,9 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 
 import { Button, FormControl, Input, Label, Modal } from "@edifice-ui/react";
-
 import "./CreateFolder.scss";
+import { t } from "i18next";
+
 import { Folder } from "../../models/folder.model";
 import {
   useCreateFolderMutation,
@@ -62,14 +63,14 @@ export const CreateFolder: FunctionComponent<props> = ({
         >
           <Modal.Header onModalClose={reset}>
             {folderToUpdate != null ? (
-              <h4>Modifier un dossier</h4>
+              <h4>{t("magneto.folder.rename")}</h4>
             ) : (
-              <h4>Créer un dossier</h4>
+              <h4>{t("magneto.create.folder")}</h4>
             )}
           </Modal.Header>
           <Modal.Body>
             <FormControl id="title" className="mb-0-5">
-              <Label>Nom du dossier :</Label>
+              <Label>{t("magneto.create.folder.name")} :</Label>
               <Input
                 placeholder=""
                 size="md"
@@ -88,7 +89,7 @@ export const CreateFolder: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={reset}
               >
-                Annuler
+                {t("magneto.cancel")}
               </Button>
               <Button
                 color="primary"
@@ -98,7 +99,7 @@ export const CreateFolder: FunctionComponent<props> = ({
                 disabled={title == ""}
                 onClick={onSubmit}
               >
-                Enregistrer
+                {t("magneto.save")}
               </Button>
             </div>
           </Modal.Footer>

@@ -118,7 +118,6 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                     type: "folder",
                     title,
                   }}
-                  // onClick={() => {setIsToasterOpen()}}
                   isLoading={getFoldersLoading}
                   isSelectable={true}
                   isSelected={folderIds.includes(id)}

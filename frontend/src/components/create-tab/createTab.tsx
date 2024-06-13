@@ -19,6 +19,7 @@ import "./createTab.scss";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
+import { t } from "i18next";
 
 import myImage from "./collaborativeeditor-default.png";
 // import { useBackground } from "../../hooks/useBackground";
@@ -171,9 +172,9 @@ export const CreateTab: FunctionComponent<props> = ({
         >
           <Modal.Header onModalClose={reset}>
             {boardToUpdate != null ? (
-              <h4>Modifier un tableau</h4>
+              <h4>{t("magneto.board.properties")}</h4>
             ) : (
-              <h4>Créer un tableau</h4>
+              <h4>{t("magneto.create.board")}</h4>
             )}
           </Modal.Header>
           <Modal.Body>
@@ -193,7 +194,9 @@ export const CreateTab: FunctionComponent<props> = ({
                   onUploadImage={handleUploadImage}
                   src={myImage}
                 />
-                <div className="font-red">Veuillez choisir une image *</div>
+                <div className="font-red">
+                  {t("magneto.board.manage.ask.image")}
+                </div>
               </Grid.Col>
               <Grid.Col
                 sm="9"
@@ -205,7 +208,7 @@ export const CreateTab: FunctionComponent<props> = ({
                 <div>
                   <div>
                     <FormControl id="title" className="mb-0-5">
-                      <Label>Titre de mon tableau *:</Label>
+                      <Label>{t("magneto.create.board.title")} *:</Label>
                       <Input
                         value={title}
                         placeholder=""
@@ -215,7 +218,7 @@ export const CreateTab: FunctionComponent<props> = ({
                       />
                     </FormControl>
                     <FormControl id="description" className="mb-1-5">
-                      <Label>Description:</Label>
+                      <Label>{t("magneto.create.board.description")}</Label>
                       <TextArea
                         size="md"
                         value={description}
@@ -224,7 +227,9 @@ export const CreateTab: FunctionComponent<props> = ({
                     </FormControl>
                   </div>
                   <div className="mb-1-5">
-                    <h5 className="mb-1">Options du tableau</h5>
+                    <h5 className="mb-1">
+                      {t("magneto.create.board.options")}
+                    </h5>
                     <Checkbox
                       checked={isCommentChecked}
                       label="Permettre aux utilisateurs de commenter les aimants"
@@ -249,7 +254,7 @@ export const CreateTab: FunctionComponent<props> = ({
                     <div className="d-flex gap-16 align-items-center">
                       <div className="d-flex align-items-center">
                         <Radio
-                          label="Libre"
+                          label={t("magneto.create.board.display.free")}
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="free"
@@ -259,7 +264,7 @@ export const CreateTab: FunctionComponent<props> = ({
                       </div>
                       <div className="d-flex align-items-center">
                         <Radio
-                          label="Section verticale"
+                          label={t("magneto.create.board.display.vertical")}
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="vertical"
@@ -270,7 +275,7 @@ export const CreateTab: FunctionComponent<props> = ({
                       </div>
                       <div className="d-flex align-items-center">
                         <Radio
-                          label="Section horizontale"
+                          label={t("magneto.create.board.display.horizontal")}
                           model={disposition}
                           onChange={(e) => {
                             setDisposition(e.target.value);
@@ -284,7 +289,7 @@ export const CreateTab: FunctionComponent<props> = ({
                   </div>
                   <div className="mb-1">
                     <FormControl id="keywords">
-                      <Label>Mots-clés :</Label>
+                      <Label>{t("magneto.board.keywords")}</Label>
                       <Input
                         placeholder=""
                         size="md"
@@ -299,7 +304,7 @@ export const CreateTab: FunctionComponent<props> = ({
                   </div>
                   <div>
                     <div className="mb-0-5">
-                      Image d'arrière plan du tableau :
+                      {t("magneto.board.background.title")}
                     </div>
                     <ImagePicker
                       addButtonLabel="Add image"
@@ -310,8 +315,7 @@ export const CreateTab: FunctionComponent<props> = ({
                       src={myImage}
                     />
                     <i className="font-little">
-                      Pour un rendu optimal, nous conseillons de charger une
-                      image de minimum 1024x768px, format paysage.
+                      {t("magneto.board.background.warning")}
                     </i>
                   </div>
                 </div>
@@ -327,7 +331,7 @@ export const CreateTab: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={reset}
               >
-                Annuler
+                {t("magneto.cancel")}
               </Button>
               <Button
                 color="primary"
@@ -336,7 +340,7 @@ export const CreateTab: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={onSubmit}
               >
-                Enregistrer
+                {t("magneto.save")}
               </Button>
             </div>
           </Modal.Footer>

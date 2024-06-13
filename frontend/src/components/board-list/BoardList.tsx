@@ -69,19 +69,19 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
       currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
       currentFolder.id == ""
     ) {
-      setBoardsQuery({
-        ...boardsQuery,
+      setBoardsQuery((prevBoardsQuery) => ({
+        ...prevBoardsQuery,
         folderId: undefined,
         isPublic: !!currentFolder.isPublic,
         isDeleted: !!currentFolder.deleted,
-      });
+      }));
     } else if (!!currentFolder && !!currentFolder.id) {
-      setBoardsQuery({
-        ...boardsQuery,
+      setBoardsQuery((prevBoardsQuery) => ({
+        ...prevBoardsQuery,
         folderId: currentFolder.id,
         isPublic: !!currentFolder.isPublic,
         isDeleted: !!currentFolder.deleted,
-      });
+      }));
     } else {
       console.log("currentFolder undefined, try later or again");
     }

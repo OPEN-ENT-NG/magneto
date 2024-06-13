@@ -6,7 +6,9 @@ import {
   useOdeClient,
 } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
+import { t } from "i18next";
 
+import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
 import { MoveBoard } from "../move-board/MoveBoard";
 import { CreateTab } from "~/components/create-tab/createTab";
@@ -15,7 +17,6 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
-import { CreateFolder } from "../create-folder/CreateFolder";
 
 export interface ToasterContainerProps {
   isToasterOpen: boolean;
@@ -159,9 +160,9 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
-                    Ouvrir
+                    {t("magneto.open")}
                   </Button>
                 )}
                 {isMyBoards() &&
@@ -173,7 +174,7 @@ export const ToasterContainer = ({
                       variant="filled"
                       onClick={toggleCreate}
                     >
-                      Propriétés
+                      {t("magneto.properties")}
                     </Button>
                   )}
                 {hasDuplicationRight() && (
@@ -183,7 +184,7 @@ export const ToasterContainer = ({
                     variant="filled"
                     onClick={() => duplicateBoard(boardIds[0])}
                   >
-                    Dupliquer
+                    {t("magneto.duplicate")}
                   </Button>
                 )}
                 {isMyBoards() &&
@@ -196,7 +197,7 @@ export const ToasterContainer = ({
                       variant="filled"
                       onClick={toggleMove}
                     >
-                      Déplacer
+                      {t("magneto.move")}
                     </Button>
                   )}
                 {hasShareRight() && (
@@ -204,9 +205,9 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
-                    Partager
+                    {t("magneto.share")}
                   </Button>
                 )}
                 {!currentFolder.shared &&
@@ -220,22 +221,22 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
-                      Partager à toute la plateforme
+                      {t("magneto.public.share")}
                     </Button>
                   )}
                 {isMyBoards() &&
                   boardIds.length == 1 &&
                   folderIds.length == 0 &&
-                  isMyBoards() &&
+                  allBoardsMine() &&
                   canPublish &&
                   boards[0].isPublished && (
                     <Button
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       Ne plus partager à toute la plateforme
                     </Button>
@@ -249,7 +250,7 @@ export const ToasterContainer = ({
                       variant="filled"
                       onClick={toggleDelete}
                     >
-                      Supprimer
+                      {t("magneto.delete")}
                     </Button>
                   )}
                 {hasRenameRight() && (
@@ -259,7 +260,7 @@ export const ToasterContainer = ({
                     variant="filled"
                     onClick={toggleCreateFolder}
                   >
-                    Renommer
+                    {t("magneto.board.move")}
                   </Button>
                 )}
               </ActionBar>
@@ -286,7 +287,11 @@ export const ToasterContainer = ({
       )}
       {folders != null && (
         <>
-          <CreateFolder isOpen={isCreateFolder} toggle={toggleCreateFolder} folderToUpdate={folders[0]} />
+          <CreateFolder
+            isOpen={isCreateFolder}
+            toggle={toggleCreateFolder}
+            folderToUpdate={folders[0]}
+          />
         </>
       )}
     </>

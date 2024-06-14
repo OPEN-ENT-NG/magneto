@@ -41,11 +41,15 @@ export const App = () => {
     setCurrentFolder(folder);
   };
 
-  useEffect(() => {
+  const resetBoardsAndFolders = () => {
     setBoardIds([]);
     setFolderIds([]);
     setSelectedBoards([]);
     setSelectedFolders([]);
+  }
+
+  useEffect(() => {
+    resetBoardsAndFolders();
   }, [currentFolder]);
 
   return (
@@ -72,8 +76,8 @@ export const App = () => {
         >
           <SearchBar
             isVariant
-            onChange={function Ga() {}}
-            onClick={function Ga() {}}
+            onChange={function Ga() { }}
+            onClick={function Ga() { }}
             placeholder="Search something...."
             size="md"
           />
@@ -101,6 +105,7 @@ export const App = () => {
             boardIds={boardIds}
             folderIds={folderIds}
             currentFolder={currentFolder}
+            reset={resetBoardsAndFolders}
           />
           <CreateTab isOpen={isOpen} toggle={toggle} />
         </Grid.Col>

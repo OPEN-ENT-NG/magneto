@@ -122,11 +122,6 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     setSelectedBoards([...selectedBoards, resource]);
   }
 
-  useEffect(() => {
-    setBoardIds([]);
-    setSelectedBoards([]);
-  }, [boardData]);
-
   return (
     <>
       {boardData?.length ? (

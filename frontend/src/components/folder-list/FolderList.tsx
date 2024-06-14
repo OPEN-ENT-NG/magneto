@@ -96,11 +96,6 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     );
   }, [currentFolder]);
 
-  useEffect(() => {
-    setFolderIds([]);
-    setSelectedFolders([]);
-  }, [folderData]);
-
   return (
     <>
       {folderData?.length ? (

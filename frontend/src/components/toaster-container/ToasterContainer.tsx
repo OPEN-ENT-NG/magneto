@@ -26,6 +26,7 @@ export interface ToasterContainerProps {
   boardIds: String[];
   folderIds: String[];
   currentFolder: Folder;
+  reset: () => void;
 }
 export const ToasterContainer = ({
   isToasterOpen,
@@ -34,6 +35,7 @@ export const ToasterContainer = ({
   boardIds,
   folderIds,
   currentFolder,
+  reset,
 }: ToasterContainerProps) => {
   const { data: actions } = useActions();
   const canPublish = isActionAvailable("publish", actions);
@@ -190,7 +192,10 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={() => duplicateBoard(boardIds[0])}
+                    onClick={() => {
+                      duplicateBoard(boardIds[0]);
+                      reset();
+                    }}
                   >
                     {t("magneto.duplicate")}
                   </Button>
@@ -276,7 +281,10 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={restoreBoardsAndFolders}
+                    onClick={() => {
+                      restoreBoardsAndFolders();
+                      reset();
+                    }}
                   >
                     {t("magneto.restore")}
                   </Button>
@@ -292,14 +300,16 @@ export const ToasterContainer = ({
             isOpen={isCreateOpen}
             toggle={toggleCreate}
             boardToUpdate={boards[0]}
+            reset={reset}
           />
-          <MoveBoard isOpen={isMoveOpen} toggle={toggleMove} boards={boards} />
+          <MoveBoard isOpen={isMoveOpen} toggle={toggleMove} boards={boards} reset={reset} />
           <DeleteModal
             isOpen={isMoveDelete}
             toggle={toggleDelete}
             boardIds={boardIds}
             folderIds={folderIds}
             isPredelete={currentFolder.id != FOLDER_TYPE.DELETED_BOARDS}
+            reset={reset}
           />
         </>
       )}
@@ -309,6 +319,7 @@ export const ToasterContainer = ({
             isOpen={isCreateFolder}
             toggle={toggleCreateFolder}
             folderToUpdate={folders[0]}
+            reset={reset}
           />
         </>
       )}

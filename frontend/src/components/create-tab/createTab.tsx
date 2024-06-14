@@ -37,6 +37,7 @@ type props = {
   isOpen: boolean;
   toggle: () => void;
   boardToUpdate?: Board;
+  reset?: () => void;
 };
 
 export interface FormInputs {
@@ -50,6 +51,7 @@ export const CreateTab: FunctionComponent<props> = ({
   isOpen,
   toggle,
   boardToUpdate,
+  reset
 }: props) => {
   const { handleDeleteImage, handleUploadImage } = useThumb({
     selectedResource: undefined,
@@ -91,14 +93,15 @@ export const CreateTab: FunctionComponent<props> = ({
     if (boardToUpdate != null) {
       board.id = boardToUpdate.id;
       updateBoard(board.toJSON());
+      if (reset != null) reset();
     } else {
       createBoard(board.toJSON());
     }
 
-    reset();
+    resetFields();
   };
 
-  const reset = (): void => {
+  const resetFields = (): void => {
     if (boardToUpdate == null) {
       handleDeleteImage();
       handleDeleteBackground();
@@ -166,11 +169,11 @@ export const CreateTab: FunctionComponent<props> = ({
         <Modal
           id={"create"}
           isOpen={isOpen}
-          onModalClose={reset}
+          onModalClose={resetFields}
           size="lg"
           viewport={false}
         >
-          <Modal.Header onModalClose={reset}>
+          <Modal.Header onModalClose={resetFields}>
             {boardToUpdate != null ? (
               <h4>{t("magneto.board.properties")}</h4>
             ) : (
@@ -329,7 +332,7 @@ export const CreateTab: FunctionComponent<props> = ({
                 type="button"
                 variant="outline"
                 className="footer-button"
-                onClick={reset}
+                onClick={resetFields}
               >
                 {t("magneto.cancel")}
               </Button>

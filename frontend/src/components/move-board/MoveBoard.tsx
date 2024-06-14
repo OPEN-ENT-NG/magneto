@@ -17,12 +17,14 @@ type props = {
   isOpen: boolean;
   toggle: () => void;
   boards: Board[];
+  reset: () => void;
 };
 
 export const MoveBoard: FunctionComponent<props> = ({
   isOpen,
   toggle,
   boards,
+  reset,
 }: props) => {
   const [moveBoards] = useMoveBoardsMutation();
   const [currentFolder, setCurrentFolder] = useState<Folder>(new Folder());
@@ -73,6 +75,7 @@ export const MoveBoard: FunctionComponent<props> = ({
       boardIds: boardIds,
       folderId: currentFolder.id,
     });
+    reset();
     toggle();
   };
 

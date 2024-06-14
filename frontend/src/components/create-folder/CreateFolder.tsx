@@ -14,12 +14,14 @@ type props = {
   isOpen: boolean;
   toggle: () => void;
   folderToUpdate?: Folder;
+  reset?: () => void;
 };
 
 export const CreateFolder: FunctionComponent<props> = ({
   isOpen,
   toggle,
   folderToUpdate,
+  reset,
 }: props) => {
   const [title, setTitle] = useState("");
   const [parentId] = useState("");
@@ -33,6 +35,7 @@ export const CreateFolder: FunctionComponent<props> = ({
     if (folderToUpdate != null) {
       folder.id = folderToUpdate.id;
       await updateFolder(folder);
+      if (reset != null) reset();
     } else {
       await addFolder(folder);
       console.log("Dossier " + title + " créé!");
@@ -40,7 +43,7 @@ export const CreateFolder: FunctionComponent<props> = ({
     toggle();
   };
 
-  const reset = (): void => {
+  const resetFields = (): void => {
     setTitle("");
     toggle();
   };
@@ -57,11 +60,11 @@ export const CreateFolder: FunctionComponent<props> = ({
         <Modal
           id={"createFolder"}
           isOpen={isOpen}
-          onModalClose={reset}
+          onModalClose={resetFields}
           size="lg"
           viewport={false}
         >
-          <Modal.Header onModalClose={reset}>
+          <Modal.Header onModalClose={resetFields}>
             {folderToUpdate != null ? (
               <h4>{t("magneto.folder.rename")}</h4>
             ) : (
@@ -87,7 +90,7 @@ export const CreateFolder: FunctionComponent<props> = ({
                 type="button"
                 variant="outline"
                 className="footer-button"
-                onClick={reset}
+                onClick={resetFields}
               >
                 {t("magneto.cancel")}
               </Button>

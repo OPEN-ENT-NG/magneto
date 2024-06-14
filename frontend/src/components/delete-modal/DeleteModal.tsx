@@ -20,6 +20,7 @@ type props = {
   boardIds: String[];
   folderIds: String[];
   isPredelete: boolean;
+  reset: () => void;
 };
 
 export const DeleteModal: FunctionComponent<props> = ({
@@ -28,6 +29,7 @@ export const DeleteModal: FunctionComponent<props> = ({
   boardIds,
   folderIds,
   isPredelete,
+  reset
 }: props) => {
   const [preDeleteBoards] = usePreDeleteBoardsMutation();
   const [preDeleteFolders] = usePreDeleteFoldersMutation();
@@ -65,19 +67,28 @@ export const DeleteModal: FunctionComponent<props> = ({
   const onSubmit = (): void => {
     if (isPredelete) onSubmitPredelete();
     else onSubmitDelete();
+    reset();
     toggle();
   };
 
   const onSubmitPredelete = (): void => {
-    if (boardIds.length > 0) preDeleteBoardsAndToast();
-
-    if (folderIds.length > 0) preDeleteFoldersAndToast();
+    if (boardIds.length > 0) {
+      preDeleteBoardsAndToast();
+      if (folderIds.length > 0) {
+        preDeleteFolders(folderIds);  //If we're predeleting folders and boards, only send one notification
+      }
+    }
+    else if (folderIds.length > 0) preDeleteFoldersAndToast();
   };
 
   const onSubmitDelete = (): void => {
-    if (boardIds.length > 0) deleteBoardsAndToast();
-
-    if (folderIds.length > 0) deleteFoldersAndToast();
+    if (boardIds.length > 0) {
+      deleteBoardsAndToast();
+      if (folderIds.length > 0) {
+        deleteFolders(folderIds);  //If we're deleting folders and boards, only send one notification
+      }
+    }
+    else if (folderIds.length > 0) deleteFoldersAndToast();
   };
 
   return (

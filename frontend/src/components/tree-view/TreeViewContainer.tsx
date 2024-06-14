@@ -1,14 +1,16 @@
 import React from "react";
 import "./TreeViewContent.scss";
 
-import { TreeView } from "@edifice-ui/react";
+import { TreeView, useOdeClient } from "@edifice-ui/react";
 import { t } from "i18next";
 
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { Board } from "~/models/board.model";
 import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
+import { userInfo } from "os";
+import { folderOwnerAndSharedOrShareRights, folderOwnerNotShared } from "~/services/utils/share.utils";
 
 type TreeViewContainerProps = {
   folders: Folder[];
@@ -32,6 +34,7 @@ export const TreeViewContainer: React.FunctionComponent<
   };
 
   const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
+  const { user } = useOdeClient();
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -50,17 +53,68 @@ export const TreeViewContainer: React.FunctionComponent<
     e.stopPropagation();
   };
   const handleDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!!e.target.closest("li")?.id) {
-      let droppedFolderId = e.target.closest("li")?.id.split('_')[1];
-      console.log(droppedFolderId);
+    if (!!e.target.closest("li")?.id && e.target.closest("li")?.id.startsWith('listitem')) {
+      let targetFolderId = e.target.closest("li")?.id.split('_')[1];
+      console.log(targetFolderId);
 
-      moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: droppedFolderId});
+      let targetFolder = targetFolderId == FOLDER_TYPE.MY_BOARDS ? new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""})
+      : folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId);
+
+      let dragAndDropInitialFolder = !!dragAndDropBoard.folderId ? folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId)
+      : new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""});
+
+      if (dragAndDropBoard.owner.userId != user.userId) { //not board owner
+        handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
+        return ;
+    } else if ((folderOwnerNotShared(dragAndDropInitialFolder) || folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
+            && folderOwnerAndSharedOrShareRights(targetFolder)) {
+        //initial folder owner + not shared or has right + shared, target folder has right + shared
+        // dragAndDropBoard = dragAndDropBoard;
+        // dragAndDropTarget = targetFolder;
+        // displayEnterSharedFolderWarningLightbox = true;
+    } else if (folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder)
+        && folderOwnerNotShared(targetFolder)) {
+        //initial folder has right + shared, target folder owner + not shared
+        // dragAndDropBoard = dragAndDropBoard;
+        // dragAndDropTarget = targetFolder;
+        // displayExitSharedFolderWarningLightbox = true;
+    } else if (folderOwnerNotShared(dragAndDropInitialFolder) && folderOwnerNotShared(targetFolder)) {
+        //initial folder owner + not shared, target folder owner + not shared
+        await proceedOnDragAndDrop(dragAndDropBoard, targetFolder);
+    } else {
+        handleNoRightsDragAndDrop(that, dragAndDropBoard, targetFolder);
+    }
+
+
+
+
+      //check folder rights (method)
+      //get folder
+      //check if is public boards or deleted 
+      //check rights
+      
+
+      
 
       onDragAndDrop(undefined);
     } 
     e.preventDefault();
     e.stopPropagation();
   };
+
+  const proceedOnDragAndDrop = async (dragAndDropBoard: Board, dragAndDropTarget: Folder) {
+
+
+
+
+    moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: targetFolderId})
+    .catch((e)=> {console.log(e);});
+  }
+
+  const handleNoRightsDragAndDrop =  (dragAndDropBoard: Board, dragAndDropTarget) {
+
+  }  
+ 
 
   const selectFolder = (folderId: string) => {
     let clickedFolder;

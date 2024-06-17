@@ -12,13 +12,13 @@ import { Board } from "~/models/board.model";
 
 type SideBarProps = {
   onSelect: (folder: Folder) => void;
-  dragAndDropBoard: Board;
-  onDragAndDrop: (board: Board) => void;
+  dragAndDropBoards: Board[];
+  onDragAndDrop: (boards: Board[]) => void;
 };
 
 export const SideBar: React.FunctionComponent<SideBarProps> = ({
   onSelect, 
-  dragAndDropBoard, 
+  dragAndDropBoards, 
   onDragAndDrop
 }) => {
   const { t } = useTranslation();
@@ -100,7 +100,7 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           onSelect={onSelect}
           data={data} 
           dispatch={dispatch}
-          dragAndDropBoard={dragAndDropBoard} 
+          dragAndDropBoards={dragAndDropBoards} 
           onDragAndDrop={onDragAndDrop}
         />
         <TreeViewContainer
@@ -116,7 +116,7 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           onSelect={onSelect}
           data={data} 
           dispatch={dispatch}
-          dragAndDropBoard={dragAndDropBoard} 
+          dragAndDropBoards={dragAndDropBoards} 
           onDragAndDrop={onDragAndDrop}
         />
         <TreeViewContainer
@@ -126,7 +126,7 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
           onSelect={onSelect}
           data={data} 
           dispatch={dispatch}
-          dragAndDropBoard={dragAndDropBoard} 
+          dragAndDropBoards={dragAndDropBoards} 
           onDragAndDrop={onDragAndDrop}
         />
         <SideBarButtons />

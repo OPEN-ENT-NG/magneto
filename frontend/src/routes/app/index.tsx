@@ -38,7 +38,7 @@ export const App = () => {
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [folderIds, setFolderIds] = useState<String[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
-  const [dragAndDropBoard, setDragAndDropBoard] = useState(new Board());
+  const [dragAndDropBoards, setdragAndDropBoards] = useState<Board[]>([]);
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
@@ -55,8 +55,8 @@ export const App = () => {
     resetBoardsAndFolders();
   }, [currentFolder]);
 
-  const handleDragAndDropBoard = (board: Board) => {
-    setDragAndDropBoard(board);
+  const handledragAndDropBoards = (boards: Board[]) => {
+    setdragAndDropBoards(boards);
   };
 
   return (
@@ -72,7 +72,7 @@ export const App = () => {
             }}
           >
 
-          <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} dragAndDropBoard={dragAndDropBoard} onDragAndDrop={handleDragAndDropBoard}/>
+          <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} dragAndDropBoards={dragAndDropBoards} onDragAndDrop={handledragAndDropBoards}/>
 
         </Grid.Col>
 
@@ -90,9 +90,9 @@ export const App = () => {
               placeholder="Search something...."
               size="md"
             />
-            <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} onDragAndDrop={handleDragAndDropBoard}/>
+            <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} onDragAndDrop={handledragAndDropBoards}/>
             <ToasterContainer />
-            <BoardList currentFolder={currentFolder} onDragAndDrop={handleDragAndDropBoard}/>
+            <BoardList currentFolder={currentFolder} onDragAndDrop={handledragAndDropBoards}/>
             <CreateTab isOpen={isOpen} toggle={toggle} />
           </Grid.Col>
         </Grid>

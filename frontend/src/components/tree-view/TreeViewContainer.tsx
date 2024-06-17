@@ -19,13 +19,13 @@ type TreeViewContainerProps = {
   onSelect: (folder: Folder) => void;
   data: any;
   dispatch: any;
-  dragAndDropBoard: Board;
+  dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
 };
 
 export const TreeViewContainer: React.FunctionComponent<
   TreeViewContainerProps
-> = ({ folders, folderObject, folderType, onSelect, data, dispatch, dragAndDropBoard, onDragAndDrop}) => {
+> = ({ folders, folderObject, folderType, onSelect, data, dispatch, dragAndDropBoards, onDragAndDrop}) => {
   const dataTree = {
     children: [],
     id: folderType,
@@ -60,27 +60,29 @@ export const TreeViewContainer: React.FunctionComponent<
 
       let targetFolder: Folder = getFolderData(targetFolderId ?? "");
 
+      let dragAndDropBoard: Board = dragAndDropBoards[0] ?? new Board();  
+
       let dragAndDropInitialFolder = !dragAndDropBoard.folderId ? new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""})
       : folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId) ?? new Folder();
 
-      if (dragAndDropBoard.owner.userId != user.userId || targetFolderId == FOLDER_TYPE.PUBLIC_BOARDS) { //not board owner
+      if ((!!dragAndDropBoards[0] && isOwnerOfSelectedBoards()) || targetFolderId == FOLDER_TYPE.PUBLIC_BOARDS) { //not board owner
           handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
           return ;
       } else if ((folderOwnerNotShared(dragAndDropInitialFolder) || folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
               && folderOwnerAndSharedOrShareRights(targetFolder)) {
           //initial folder owner + not shared or has right + shared, target folder has right + shared
-          // dragAndDropBoard = dragAndDropBoard;
+          // dragAndDropBoards = dragAndDropBoards;
           // dragAndDropTarget = targetFolder;
           // displayEnterSharedFolderWarningLightbox = true;
       } else if (folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder)
           && folderOwnerNotShared(targetFolder)) {
           //initial folder has right + shared, target folder owner + not shared
-          // dragAndDropBoard = dragAndDropBoard;
+          // dragAndDropBoards = dragAndDropBoards;
           // dragAndDropTarget = targetFolder;
           // displayExitSharedFolderWarningLightbox = true;
       } else if (folderOwnerNotShared(dragAndDropInitialFolder) && folderOwnerNotShared(targetFolder)) {
           //initial folder owner + not shared, target folder owner + not shared
-          proceedOnDragAndDrop(dragAndDropBoard, targetFolder);
+          proceedOnDragAndDrop(dragAndDropBoards, targetFolder);
       } else {
           handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
       }
@@ -124,35 +126,38 @@ export const TreeViewContainer: React.FunctionComponent<
     return clickedFolder;
   } 
 
-  const proceedOnDragAndDrop = async (dragAndDropBoard: Board, dragAndDropTarget: Folder, isFromMoveBoardLightbox?: boolean) => {
+  const proceedOnDragAndDrop = async (dragAndDropBoards: Board[], dragAndDropTarget: Folder, isFromMoveBoardLightbox?: boolean) => {
     let dragAndDropTargetId: string = dragAndDropTarget.id;
+    let dragAndDropBoardsIds: string [] = dragAndDropBoards.map((board: Board) => board._id);
 
+    // submitted from lightbox
     if (isFromMoveBoardLightbox) {
-      moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: dragAndDropTargetId})
+      moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
         .catch((e)=> {console.log(e);});
       resetDragAndDrop();
        onFormSubmit();
       return ;
     }
     resetDragAndDrop();
-    let idOriginalItem: string = dragAndDropBoard.id;
+    let idOriginalItem: string = dragAndDropBoards[0].id;
 
-    if (!!dragAndDropBoard) {
-        if (dragAndDropTarget.id == FOLDER_TYPE.DELETED_BOARDS) {
+    // sublitted directly
+    if (dragAndDropBoards.length > 0) {
+        if (dragAndDropTargetId == FOLDER_TYPE.DELETED_BOARDS) {
             //openDeleteForm();
         } else {
-          moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: dragAndDropTargetId})
+          moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
             .catch((e)=> {console.log(e);});
            onFormSubmit();
         }
     } else {
         // Move one board
-        let draggedItemIds: string[] = boards.filter(board => board.id === idOriginalItem).map(board => board.id);
+        let draggedItemIds: string[] = dragAndDropBoards.filter(board => board.id === idOriginalItem).map(board => board.id);
         if (dragAndDropTarget.id == FOLDER_TYPE.DELETED_BOARDS) {
-            selectedBoardIds = draggedItemIds;
+          dragAndDropBoards = draggedItemIds;
             // openDeleteForm();
         } else {
-          moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: dragAndDropTargetId})
+          moveBoardsToFolder({boardIds: dragAndDropBoards.id, folderId: dragAndDropTargetId})
             .catch((e)=> {console.log(e);});
           onFormSubmit();
         }
@@ -162,6 +167,10 @@ export const TreeViewContainer: React.FunctionComponent<
   const handleNoRightsDragAndDrop =  (dragAndDropBoard: Board, dragAndDropTarget: Folder) => {
     //return modale (message, onSubmit, onCancel)
   }  
+
+  const isOwnerOfSelectedBoards = (): boolean => {
+    return this.selectedBoards.every((board:Board) => !!board && !!board.owner && board.owner.userId === model.me.userId);
+}
 
   const resetDragAndDrop = (): void => {
     onSelect(new Folder());

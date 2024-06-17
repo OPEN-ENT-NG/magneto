@@ -27,7 +27,7 @@ interface BoardItemProps {
   modificationDate: string,
   isPublished : boolean,};
   areBoardsLoading : boolean;
-  onDragAndDrop: (board: any) => void;
+  onDragAndDrop: (board: any[]) => void;
 }
 
 export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
@@ -53,7 +53,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   };
 
   useEffect(() => {
-    onDragAndDrop(board);
+    onDragAndDrop([board]);
   }, [isDragging])
 
   return (

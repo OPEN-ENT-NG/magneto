@@ -52,49 +52,43 @@ export const TreeViewContainer: React.FunctionComponent<
     e.preventDefault();
     e.stopPropagation();
   };
+
   const handleDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!!e.target.closest("li")?.id && e.target.closest("li")?.id.startsWith('listitem')) {
+    if (!!e.target.closest("li")?.id && e.target.closest("li")?.id.startsWith('listitem') && !!e.target.closest("li")?.id.split('_')[1]) {
       let targetFolderId = e.target.closest("li")?.id.split('_')[1];
       console.log(targetFolderId);
 
-      let targetFolder = targetFolderId == FOLDER_TYPE.MY_BOARDS ? new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""})
-      : folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId);
+      let targetFolder: Folder = getFolderData(targetFolderId ?? "");
 
-      let dragAndDropInitialFolder = !!dragAndDropBoard.folderId ? folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId)
-      : new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""});
+      let dragAndDropInitialFolder = !dragAndDropBoard.folderId ? new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""})
+      : folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId) ?? new Folder();
 
-      if (dragAndDropBoard.owner.userId != user.userId) { //not board owner
-        handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
-        return ;
-    } else if ((folderOwnerNotShared(dragAndDropInitialFolder) || folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
-            && folderOwnerAndSharedOrShareRights(targetFolder)) {
-        //initial folder owner + not shared or has right + shared, target folder has right + shared
-        // dragAndDropBoard = dragAndDropBoard;
-        // dragAndDropTarget = targetFolder;
-        // displayEnterSharedFolderWarningLightbox = true;
-    } else if (folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder)
-        && folderOwnerNotShared(targetFolder)) {
-        //initial folder has right + shared, target folder owner + not shared
-        // dragAndDropBoard = dragAndDropBoard;
-        // dragAndDropTarget = targetFolder;
-        // displayExitSharedFolderWarningLightbox = true;
-    } else if (folderOwnerNotShared(dragAndDropInitialFolder) && folderOwnerNotShared(targetFolder)) {
-        //initial folder owner + not shared, target folder owner + not shared
-        await proceedOnDragAndDrop(dragAndDropBoard, targetFolder);
-    } else {
-        handleNoRightsDragAndDrop(that, dragAndDropBoard, targetFolder);
-    }
-
-
-
+      if (dragAndDropBoard.owner.userId != user.userId || targetFolderId == FOLDER_TYPE.PUBLIC_BOARDS) { //not board owner
+          handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
+          return ;
+      } else if ((folderOwnerNotShared(dragAndDropInitialFolder) || folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
+              && folderOwnerAndSharedOrShareRights(targetFolder)) {
+          //initial folder owner + not shared or has right + shared, target folder has right + shared
+          // dragAndDropBoard = dragAndDropBoard;
+          // dragAndDropTarget = targetFolder;
+          // displayEnterSharedFolderWarningLightbox = true;
+      } else if (folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder)
+          && folderOwnerNotShared(targetFolder)) {
+          //initial folder has right + shared, target folder owner + not shared
+          // dragAndDropBoard = dragAndDropBoard;
+          // dragAndDropTarget = targetFolder;
+          // displayExitSharedFolderWarningLightbox = true;
+      } else if (folderOwnerNotShared(dragAndDropInitialFolder) && folderOwnerNotShared(targetFolder)) {
+          //initial folder owner + not shared, target folder owner + not shared
+          proceedOnDragAndDrop(dragAndDropBoard, targetFolder);
+      } else {
+          handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
+      }
 
       //check folder rights (method)
       //get folder
       //check if is public boards or deleted 
       //check rights
-      
-
-      
 
       onDragAndDrop(undefined);
     } 
@@ -102,18 +96,82 @@ export const TreeViewContainer: React.FunctionComponent<
     e.stopPropagation();
   };
 
-  const proceedOnDragAndDrop = async (dragAndDropBoard: Board, dragAndDropTarget: Folder) {
 
+  const getFolderData =  (folderId: string): Folder => {
+    let clickedFolder;
+    if (folderId == FOLDER_TYPE.MY_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.my.boards"),
+      } as IFolderResponse);
+    } else if (folderId == FOLDER_TYPE.PUBLIC_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.lycee.connecte.boards"),
+        isPublic: true,
+      } as IFolderResponse);
+    } else if (folderId == FOLDER_TYPE.DELETED_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.trash"),
+        deleted: true,
+      } as IFolderResponse);
+    } else {
+      clickedFolder =
+        folders.find((folder: Folder) => folder.id == folderId) ?? new Folder();
+    }
 
+    return clickedFolder;
+  } 
 
+  const proceedOnDragAndDrop = async (dragAndDropBoard: Board, dragAndDropTarget: Folder, isFromMoveBoardLightbox?: boolean) => {
+    let dragAndDropTargetId: string = dragAndDropTarget.id;
 
-    moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: targetFolderId})
-    .catch((e)=> {console.log(e);});
+    if (isFromMoveBoardLightbox) {
+      moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: dragAndDropTargetId})
+        .catch((e)=> {console.log(e);});
+      resetDragAndDrop();
+       onFormSubmit();
+      return ;
+    }
+    resetDragAndDrop();
+    let idOriginalItem: string = dragAndDropBoard.id;
+
+    if (!!dragAndDropBoard) {
+        if (dragAndDropTarget.id == FOLDER_TYPE.DELETED_BOARDS) {
+            //openDeleteForm();
+        } else {
+          moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: dragAndDropTargetId})
+            .catch((e)=> {console.log(e);});
+           onFormSubmit();
+        }
+    } else {
+        // Move one board
+        let draggedItemIds: string[] = boards.filter(board => board.id === idOriginalItem).map(board => board.id);
+        if (dragAndDropTarget.id == FOLDER_TYPE.DELETED_BOARDS) {
+            selectedBoardIds = draggedItemIds;
+            // openDeleteForm();
+        } else {
+          moveBoardsToFolder({boardId: dragAndDropBoard.id, folderId: dragAndDropTargetId})
+            .catch((e)=> {console.log(e);});
+          onFormSubmit();
+        }
+    }    
   }
 
-  const handleNoRightsDragAndDrop =  (dragAndDropBoard: Board, dragAndDropTarget) {
-
+  const handleNoRightsDragAndDrop =  (dragAndDropBoard: Board, dragAndDropTarget: Folder) => {
+    //return modale (message, onSubmit, onCancel)
   }  
+
+  const resetDragAndDrop = (): void => {
+    onSelect(new Folder());
+    onDragAndDrop(undefined);
+  }
+
+  const onFormSubmit = (): void => {
+    // update boards
+    // update folders ?
+  }
  
 
   const selectFolder = (folderId: string) => {

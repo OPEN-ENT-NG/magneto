@@ -2,7 +2,6 @@ import React from "react";
 
 import { Button, Modal } from "@edifice-ui/react";
 
-import { title } from "process";
 import { useTranslation } from "react-i18next";
 
 type MessageModaleProps = {
@@ -54,7 +53,6 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
                         type="submit"
                         variant="filled"
                         className="footer-button"
-                        disabled={title == ""}
                         onClick={onSubmit}
                     >
                     { t("magneto.confirm")}

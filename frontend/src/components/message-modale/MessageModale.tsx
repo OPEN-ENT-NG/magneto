@@ -2,16 +2,15 @@ import React from "react";
 
 import { Button, Modal } from "@edifice-ui/react";
 
-import "./FolderItem.scss";
 import { title } from "process";
 import { useTranslation } from "react-i18next";
 
 type MessageModaleProps = {
     isOpen: boolean;
     key: string;
-    param: string;
+    param?: string;
     hasSubmit: boolean;
-    onSubmit:() => void;
+    onSubmit?:() => void;
     onCancel: () => void;
 };
 
@@ -21,7 +20,7 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
     param,
     hasSubmit,
     onSubmit,
-    onCancel
+    onCancel,
 }) => {
     const { t } = useTranslation();
     
@@ -36,7 +35,7 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
                 viewport={false}
                 >
                 <Modal.Body>
-                    {t(key, param)}
+                    {param ? t(key, param) : t(key)}
                 </Modal.Body>
 
                 <Modal.Footer>

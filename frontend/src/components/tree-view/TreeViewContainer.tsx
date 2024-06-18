@@ -11,6 +11,7 @@ import { Board } from "~/models/board.model";
 import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
 import { userInfo } from "os";
 import { folderOwnerAndSharedOrShareRights, folderOwnerNotShared } from "~/services/utils/share.utils";
+import { MessageModale } from "../message-modale/MessageModale";
 
 type TreeViewContainerProps = {
   folders: Folder[];
@@ -56,22 +57,21 @@ export const TreeViewContainer: React.FunctionComponent<
   const handleDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!!e.target.closest("li")?.id && e.target.closest("li")?.id.startsWith('listitem') && !!e.target.closest("li")?.id.split('_')[1]) {
       let targetFolderId = e.target.closest("li")?.id.split('_')[1];
-      console.log(targetFolderId);
-
       let targetFolder: Folder = getFolderData(targetFolderId ?? "");
-
-      let dragAndDropBoard: Board = dragAndDropBoards[0] ?? new Board();  
-
+      let dragAndDropBoard: Board = dragAndDropBoards[0] ?? new Board(); 
+      let dragAndDropBoardsIds: string[] = dragAndDropBoards.map((board: Board) => board._id);
       let dragAndDropInitialFolder = !dragAndDropBoard.folderId ? new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""})
       : folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId) ?? new Folder();
 
       if ((!!dragAndDropBoards[0] && !isOwnerOfSelectedBoards()) || targetFolderId == FOLDER_TYPE.PUBLIC_BOARDS) { //not board owner
-          handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
+          handleNoRightsDragAndDrop();
           return ;
       } else if ((folderOwnerNotShared(dragAndDropInitialFolder) || folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
               && folderOwnerAndSharedOrShareRights(targetFolder)) {
           //initial folder owner + not shared or has right + shared, target folder has right + shared
           console.log("enter shared");
+
+          confirmSharedFolderDragAndDrop(dragAndDropBoardsIds, targetFolder, "magneto.folder.share.drag.in.warning", targetFolder.title)
 
           // dragAndDropBoards = dragAndDropBoards;
           // dragAndDropTarget = targetFolder;
@@ -81,6 +81,9 @@ export const TreeViewContainer: React.FunctionComponent<
           //initial folder has right + shared, target folder owner + not shared
           console.log("exit shared");
 
+          confirmSharedFolderDragAndDrop(dragAndDropBoardsIds, targetFolder, "magneto.folder.share.drag.out.warning", dragAndDropInitialFolder.title)
+
+
           // dragAndDropBoards = dragAndDropBoards;
           // dragAndDropTarget = targetFolder;
           // displayExitSharedFolderWarningLightbox = true;
@@ -88,7 +91,7 @@ export const TreeViewContainer: React.FunctionComponent<
           //initial folder owner + not shared, target folder owner + not shared
           proceedOnDragAndDrop(dragAndDropBoards, targetFolder);
       } else {
-          handleNoRightsDragAndDrop(dragAndDropBoard, targetFolder);
+          handleNoRightsDragAndDrop();
       }
 
       onDragAndDrop(undefined);
@@ -143,15 +146,39 @@ export const TreeViewContainer: React.FunctionComponent<
     if (dragAndDropTargetId == FOLDER_TYPE.DELETED_BOARDS) {
         //openDeleteForm();
     } else {
-      moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
-        .catch((e)=> {console.log(e);});
-        onFormSubmit();
+      dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTargetId);
     }
   }
 
-  const handleNoRightsDragAndDrop =  (dragAndDropBoard: Board, dragAndDropTarget: Folder) => {
-    //return modale (message, onSubmit, onCancel)
-  }  
+
+  const handleNoRightsDragAndDrop =  () => {
+
+    return <MessageModale 
+      isOpen={true}
+      key={"magneto.folder.drag.drop.right.error"}
+      hasSubmit={false}
+      onCancel={() => {resetDragAndDrop()}}>
+      </MessageModale>;
+  }
+
+  const confirmSharedFolderDragAndDrop =  (dragAndDropBoardsIds: string[], dragAndDropTarget: Folder, key: string, param: string) => {
+
+    return <MessageModale 
+      isOpen={true}
+      key={key}
+      param={param}
+      hasSubmit={false}
+      onSubmit={() => {dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id)}}
+      onCancel={() => {resetDragAndDrop()}}>
+      </MessageModale>;
+  }
+
+  const dragAndDropBoardsCall =  (dragAndDropBoardsIds: string[], dragAndDropTargetId: string): void => {
+
+    moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
+        .catch((e)=> {console.log(e);});
+    onFormSubmit();
+  }
 
   const isOwnerOfSelectedBoards = (): boolean => {
     return dragAndDropBoards.every((board:Board) => !!board && !!board.owner && board.owner.userId === user.userId);

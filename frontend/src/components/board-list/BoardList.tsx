@@ -97,11 +97,9 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   } else if (getBoardsLoading) {
     console.log("loading");
   } else {
-    console.log(boardData);
     boardData = myBoardsResult.all.map((board: IBoardItemResponse) =>
       new Board().build(board),
     ); //convert boards to Board[]
-    //console.log("boardData", boardData);
   }
 
   async function toggleSelect(resource: Board) {

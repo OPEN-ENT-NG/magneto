@@ -38,7 +38,6 @@ export const CreateFolder: FunctionComponent<props> = ({
       if (reset != null) reset();
     } else {
       await addFolder(folder);
-      console.log("Dossier " + title + " créé!");
     }
     toggle();
   };

@@ -46,11 +46,7 @@ export const MoveBoard: FunctionComponent<props> = ({
   let myFolders: Folder[] = [];
   let myFoldersObject: FolderTreeNavItem | undefined = undefined;
 
-  if (getFoldersError) {
-    console.log("error");
-  } else if (getFoldersLoading) {
-    console.log("loading");
-  } else {
+  if (!getFoldersError && !getFoldersLoading) {
     myFolders = myFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
     ); //convert folders to Folder[]

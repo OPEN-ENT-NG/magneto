@@ -71,21 +71,31 @@ export const DeleteModal: FunctionComponent<props> = ({
     toggle();
   };
 
-  const onSubmitPredelete = (): void => {
+  const onSubmitPredelete = async (): Promise<void> => {
     if (boardIds.length > 0) {
       preDeleteBoardsAndToast();
-      if (folderIds.length > 0) {
-        preDeleteFolders(folderIds);  //If we're predeleting folders and boards, only send one notification
+      try {
+        if (folderIds.length > 0) {
+          await preDeleteFolders(folderIds);  //If we're predeleting folders and boards, only send one notification
+        }
+      }
+      catch (error) {
+        console.error(error);
       }
     }
     else if (folderIds.length > 0) preDeleteFoldersAndToast();
   };
 
-  const onSubmitDelete = (): void => {
+  const onSubmitDelete = async (): Promise<void> => {
     if (boardIds.length > 0) {
       deleteBoardsAndToast();
-      if (folderIds.length > 0) {
-        deleteFolders(folderIds);  //If we're deleting folders and boards, only send one notification
+      try {
+        if (folderIds.length > 0) {
+          await deleteFolders(folderIds);  //If we're predeleting folders and boards, only send one notification
+        }
+      }
+      catch (error) {
+        console.error(error);
       }
     }
     else if (folderIds.length > 0) deleteFoldersAndToast();

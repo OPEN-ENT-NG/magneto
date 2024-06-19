@@ -4,7 +4,7 @@ import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
 
 import { BoardList } from "~/components/board-list/BoardList";
-import { CreateTab } from "~/components/create-tab/createTab";
+import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { FolderList } from "~/components/folder-list/FolderList";
 import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
@@ -107,7 +107,7 @@ export const App = () => {
             currentFolder={currentFolder}
             reset={resetBoardsAndFolders}
           />
-          <CreateTab isOpen={isOpen} toggle={toggle} />
+          <CreateBoard isOpen={isOpen} toggle={toggle} />
         </Grid.Col>
       </Grid>
     </>

@@ -11,7 +11,7 @@ import { t } from "i18next";
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
 import { MoveBoard } from "../move-board/MoveBoard";
-import { CreateTab } from "~/components/create-tab/createTab";
+import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { useRestoreBoardsAndFolders } from "~/hooks/useRestoreBoardsAndFolders";
 import { Board } from "~/models/board.model";
@@ -71,8 +71,6 @@ export const ToasterContainer = ({
   };
 
   const isTrash = () => {
-    console.log(currentFolder);
-    console.log(currentFolder.id == FOLDER_TYPE.DELETED_BOARDS);
     return currentFolder.id == FOLDER_TYPE.DELETED_BOARDS;
   };
 
@@ -296,7 +294,7 @@ export const ToasterContainer = ({
       })}
       {boards != null && (
         <>
-          <CreateTab
+          <CreateBoard
             isOpen={isCreateOpen}
             toggle={toggleCreate}
             boardToUpdate={boards[0]}

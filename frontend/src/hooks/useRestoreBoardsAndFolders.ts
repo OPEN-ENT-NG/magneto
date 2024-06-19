@@ -40,7 +40,6 @@ export const useRestoreBoardsAndFolders = ({
         if (folderIds.length > 0) {
             await restorePreDeleteFoldersToast();
         }
-        //TODO reset all data
     };
 
     return restoreBoardsAndFolders;

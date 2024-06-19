@@ -29,17 +29,22 @@ export const CreateFolder: FunctionComponent<props> = ({
   const [updateFolder] = useUpdateFolderMutation();
 
   const onSubmit = async (): Promise<void> => {
-    const folder = new Folder();
-    folder.title = title;
-    folder.parentId = parentId;
-    if (folderToUpdate != null) {
-      folder.id = folderToUpdate.id;
-      await updateFolder(folder);
-      if (reset != null) reset();
-    } else {
-      await addFolder(folder);
+    try {
+      const folder = new Folder();
+      folder.title = title;
+      folder.parentId = parentId;
+      if (folderToUpdate != null) {
+        folder.id = folderToUpdate.id;
+        await updateFolder(folder);
+        if (reset != null) reset();
+      } else {
+        await addFolder(folder);
+      }
+      toggle();
     }
-    toggle();
+    catch (error) {
+      console.error(error);
+    }
   };
 
   const resetFields = (): void => {

@@ -22,15 +22,15 @@ export const useRestoreBoardsAndFolders = ({
     const restorePreDeleteBoardsToast = usePredefinedToasts({
         func: restorePreDeleteBoards,
         parameter: boardIds,
-        successMessage: t("Tableau(x) restauré(s)!"),
-        failureMessage: t("Un problème est survenu, tableau(x) non restauré(s) :("),
+        successMessage: t("magneto.restore.elements.confirm"),
+        failureMessage: t("magneto.restore.elements.error"),
     });
 
     const restorePreDeleteFoldersToast = usePredefinedToasts({
         func: restorePreDeleteFolders,
         parameter: folderIds,
-        successMessage: t("Tableau(x) restauré(s)!"),
-        failureMessage: t("Un problème est survenu, dossier(s) non restauré(s) :("),
+        successMessage: t("magneto.restore.elements.confirm"),
+        failureMessage: t("magneto.restore.elements.error"),
     });
 
     const restoreBoardsAndFolders = async () => {

@@ -14,7 +14,7 @@ import {
   TextArea,
 } from "@edifice-ui/react";
 
-import "./createTab.scss";
+import "./CreateBoard.scss";
 
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
@@ -47,7 +47,7 @@ export interface FormInputs {
   formSlug: string;
 }
 
-export const CreateTab: FunctionComponent<props> = ({
+export const CreateBoard: FunctionComponent<props> = ({
   isOpen,
   toggle,
   boardToUpdate,

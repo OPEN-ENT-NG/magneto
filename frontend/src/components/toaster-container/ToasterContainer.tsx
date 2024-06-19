@@ -249,7 +249,7 @@ export const ToasterContainer = ({
                       variant="filled"
                       onClick={function Ga() { }}
                     >
-                      Ne plus partager à toute la plateforme
+                      {t("magneto.public.unshare")}
                     </Button>
                   )}
                 {!isPublic() &&

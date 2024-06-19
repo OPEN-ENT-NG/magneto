@@ -37,10 +37,20 @@
   align-items: center;
 }
 
-.gap-16 {
-  gap: 16px;
+.justify-around {
+  justify-content: space-around;
 }
 
-.justify-between {
-  justify-content: space-between;
+.text-icon-pair {
+  gap: 0.25em;
+}
+
+.text {
+  margin-right: 0.15em;
+  margin-left: 0.15em;
+  width: max-content;
+}
+
+.mg-12 {
+  margin-right: 0.75em;
 }

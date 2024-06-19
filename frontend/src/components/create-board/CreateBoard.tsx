@@ -254,38 +254,40 @@ export const CreateBoard: FunctionComponent<props> = ({
                   </div>
                   <div>
                     <h5>Quelle disposition des aimants souhaitez-vous?</h5>
-                    <div className="d-flex gap-16 align-items-center">
-                      <div className="d-flex align-items-center">
+                    <div className="d-flex justify-around align-items-center">
+                      <div className="d-flex align-items-center text-icon-pair mg-75">
                         <Radio
-                          label={t("magneto.create.board.display.free")}
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="free"
                           checked={disposition == "free"}
+                          className="mg-4"
                         />
+                        <span className="text">{t("magneto.create.board.display.free")}</span>
                         <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div className="d-flex align-items-center">
+                      <div className="d-flex align-items-center text-icon-pair mg-75">
                         <Radio
-                          label={t("magneto.create.board.display.vertical")}
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="vertical"
                           checked={disposition == "vertical"}
-                          className=""
+                          className="mg-4"
                         />
+                        <span className="text">{t("magneto.create.board.display.vertical")}</span>
                         <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div className="d-flex align-items-center">
+                      <div className="d-flex align-items-center text-icon-pair">
                         <Radio
-                          label={t("magneto.create.board.display.horizontal")}
                           model={disposition}
                           onChange={(e) => {
                             setDisposition(e.target.value);
                           }}
                           value="horizontal"
                           checked={disposition == "horizontal"}
+                          className="mg-4"
                         />
+                        <span className="text">{t("magneto.create.board.display.horizontal")}</span>
                         <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
                     </div>

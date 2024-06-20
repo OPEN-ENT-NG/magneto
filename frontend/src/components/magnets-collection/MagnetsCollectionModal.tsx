@@ -239,7 +239,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
           viewport={false}
         >
           <Modal.Header onModalClose={toggle}>
-            <h4>Collection d'aimants</h4>
+            <h4>{t("magneto.cards.collection")}</h4>
           </Modal.Header>
           <Modal.Body>
             <SearchBar
@@ -252,7 +252,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
             />
             <div>
               <Switch value={switchBoard} onChange={toggleSwitchBoard} />
-              Ranger par tableau
+              {t("magneto.cards.collection.board.view")}
             </div>
             <Box sx={{ width: "100%" }}>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>

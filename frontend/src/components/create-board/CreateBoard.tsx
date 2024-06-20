@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 
 // eslint-disable-next-line
 import {
@@ -14,11 +14,12 @@ import {
   TextArea,
 } from "@edifice-ui/react";
 
-import "./createTab.scss";
+import "./CreateBoard.scss";
 
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
+import { t } from "i18next";
 
 import myImage from "./collaborativeeditor-default.png";
 // import { useBackground } from "../../hooks/useBackground";
@@ -26,12 +27,17 @@ import myImage from "./collaborativeeditor-default.png";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useBackground } from "~/hooks/useBackground";
 import { useThumb } from "~/hooks/useThumb";
-import { BoardForm } from "~/models/board.model";
-import { useCreateBoardMutation } from "~/services/api/boards.service";
+import { Board, BoardForm } from "~/models/board.model";
+import {
+  useCreateBoardMutation,
+  useUpdateBoardMutation,
+} from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
   toggle: () => void;
+  boardToUpdate?: Board;
+  reset?: () => void;
 };
 
 export interface FormInputs {
@@ -41,9 +47,11 @@ export interface FormInputs {
   formSlug: string;
 }
 
-export const CreateTab: FunctionComponent<props> = ({
+export const CreateBoard: FunctionComponent<props> = ({
   isOpen,
   toggle,
+  boardToUpdate,
+  reset,
 }: props) => {
   const { handleDeleteImage, handleUploadImage } = useThumb({
     selectedResource: undefined,
@@ -56,12 +64,12 @@ export const CreateTab: FunctionComponent<props> = ({
   const [tagsTextInput, setTagsTextInput] = useState("");
   const [tags, setTags] = useState([""]);
   const [createBoard] = useCreateBoardMutation();
+  const [updateBoard] = useUpdateBoardMutation();
   const { handleDeleteBackground, handleUploadBackground } = useBackground({
     selectedResource: undefined,
   });
 
-  const onSubmit = async (): Promise<void> => {
-    const board = new BoardForm();
+  const setBoardFromForm = (board: BoardForm) => {
     board.title = title;
     board.description = description;
     //TODO : change this to work with a future workspace file manager
@@ -76,23 +84,34 @@ export const CreateTab: FunctionComponent<props> = ({
     board.canComment = isCommentChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
-
-    createBoard(board.toJSON());
-
-    reset();
   };
 
-  //
+  const onSubmit = (): void => {
+    const board = new BoardForm();
+    setBoardFromForm(board);
 
-  const reset = (): void => {
-    handleDeleteImage();
-    handleDeleteBackground();
-    setIsCommentChecked(false);
-    setIsFavoriteChecked(false);
-    setTitle("");
-    setDescription("");
-    setDisposition("free");
-    setTagsTextInput("");
+    if (boardToUpdate != null) {
+      board.id = boardToUpdate.id;
+      updateBoard(board.toJSON());
+      if (reset != null) reset();
+    } else {
+      createBoard(board.toJSON());
+    }
+
+    resetFields();
+  };
+
+  const resetFields = (): void => {
+    if (boardToUpdate == null) {
+      handleDeleteImage();
+      handleDeleteBackground();
+      setIsCommentChecked(false);
+      setIsFavoriteChecked(false);
+      setTitle("");
+      setDescription("");
+      setDisposition("free");
+      setTagsTextInput("");
+    }
     toggle();
   };
 
@@ -132,18 +151,34 @@ export const CreateTab: FunctionComponent<props> = ({
     setTags(updatedTags);
   };
 
+  useEffect(() => {
+    if (boardToUpdate != null) {
+      setIsCommentChecked(boardToUpdate.canComment);
+      setIsFavoriteChecked(boardToUpdate.displayNbFavorites);
+      setTitle(boardToUpdate.title);
+      setDescription(boardToUpdate.description);
+      setDisposition(boardToUpdate.layoutType);
+      setTagsTextInput(boardToUpdate.tagsTextInput);
+      setTags(boardToUpdate.tags);
+    }
+  }, [boardToUpdate]);
+
   return (
     <>
       {isOpen && (
         <Modal
           id={"create"}
           isOpen={isOpen}
-          onModalClose={reset}
+          onModalClose={resetFields}
           size="lg"
           viewport={false}
         >
-          <Modal.Header onModalClose={reset}>
-            <h4>Créer un tableau</h4>
+          <Modal.Header onModalClose={resetFields}>
+            {boardToUpdate != null ? (
+              <h4>{t("magneto.board.properties")}</h4>
+            ) : (
+              <h4>{t("magneto.create.board")}</h4>
+            )}
           </Modal.Header>
           <Modal.Body>
             <Grid>
@@ -162,7 +197,9 @@ export const CreateTab: FunctionComponent<props> = ({
                   onUploadImage={handleUploadImage}
                   src={myImage}
                 />
-                <div className="font-red">Veuillez choisir une image *</div>
+                <div className="font-red">
+                  {t("magneto.board.manage.ask.image")}
+                </div>
               </Grid.Col>
               <Grid.Col
                 sm="9"
@@ -174,8 +211,9 @@ export const CreateTab: FunctionComponent<props> = ({
                 <div>
                   <div>
                     <FormControl id="title" className="mb-0-5">
-                      <Label>Titre de mon tableau *:</Label>
+                      <Label>{t("magneto.create.board.title")} *:</Label>
                       <Input
+                        value={title}
                         placeholder=""
                         size="md"
                         type="text"
@@ -183,15 +221,18 @@ export const CreateTab: FunctionComponent<props> = ({
                       />
                     </FormControl>
                     <FormControl id="description" className="mb-1-5">
-                      <Label>Description:</Label>
+                      <Label>{t("magneto.create.board.description")}</Label>
                       <TextArea
                         size="md"
+                        value={description}
                         onChange={(e) => setDescription(e.target.value)}
                       />
                     </FormControl>
                   </div>
                   <div className="mb-1-5">
-                    <h5 className="mb-1">Options du tableau</h5>
+                    <h5 className="mb-1">
+                      {t("magneto.create.board.options")}
+                    </h5>
                     <Checkbox
                       checked={isCommentChecked}
                       label="Permettre aux utilisateurs de commenter les aimants"
@@ -213,45 +254,53 @@ export const CreateTab: FunctionComponent<props> = ({
                   </div>
                   <div>
                     <h5>Quelle disposition des aimants souhaitez-vous?</h5>
-                    <div className="d-flex gap-16 align-items-center">
-                      <div className="d-flex align-items-center">
+                    <div className="d-flex justify-around align-items-center">
+                      <div className="d-flex align-items-center text-icon-pair mg-75">
                         <Radio
-                          label="Libre"
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="free"
                           checked={disposition == "free"}
+                          className="mg-4"
                         />
+                        <span className="text">
+                          {t("magneto.create.board.display.free")}
+                        </span>
                         <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div className="d-flex align-items-center">
+                      <div className="d-flex align-items-center text-icon-pair mg-75">
                         <Radio
-                          label="Section verticale"
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="vertical"
                           checked={disposition == "vertical"}
-                          className=""
+                          className="mg-4"
                         />
+                        <span className="text">
+                          {t("magneto.create.board.display.vertical")}
+                        </span>
                         <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div className="d-flex align-items-center">
+                      <div className="d-flex align-items-center text-icon-pair">
                         <Radio
-                          label="Section horizontale"
                           model={disposition}
                           onChange={(e) => {
                             setDisposition(e.target.value);
                           }}
                           value="horizontal"
                           checked={disposition == "horizontal"}
+                          className="mg-4"
                         />
+                        <span className="text">
+                          {t("magneto.create.board.display.horizontal")}
+                        </span>
                         <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
                     </div>
                   </div>
                   <div className="mb-1">
                     <FormControl id="keywords">
-                      <Label>Mots-clés :</Label>
+                      <Label>{t("magneto.board.keywords")}</Label>
                       <Input
                         placeholder=""
                         size="md"
@@ -266,7 +315,7 @@ export const CreateTab: FunctionComponent<props> = ({
                   </div>
                   <div>
                     <div className="mb-0-5">
-                      Image d'arrière plan du tableau :
+                      {t("magneto.board.background.title")}
                     </div>
                     <ImagePicker
                       addButtonLabel="Add image"
@@ -277,8 +326,7 @@ export const CreateTab: FunctionComponent<props> = ({
                       src={myImage}
                     />
                     <i className="font-little">
-                      Pour un rendu optimal, nous conseillons de charger une
-                      image de minimum 1024x768px, format paysage.
+                      {t("magneto.board.background.warning")}
                     </i>
                   </div>
                 </div>
@@ -292,9 +340,9 @@ export const CreateTab: FunctionComponent<props> = ({
                 type="button"
                 variant="outline"
                 className="footer-button"
-                onClick={reset}
+                onClick={resetFields}
               >
-                Annuler
+                {t("magneto.cancel")}
               </Button>
               <Button
                 color="primary"
@@ -303,7 +351,7 @@ export const CreateTab: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={onSubmit}
               >
-                Enregistrer
+                {t("magneto.save")}
               </Button>
             </div>
           </Modal.Footer>

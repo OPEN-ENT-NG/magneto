@@ -1,37 +1,61 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 
 import { Button, FormControl, Input, Label, Modal } from "@edifice-ui/react";
-
 import "./CreateFolder.scss";
+import { t } from "i18next";
+
 import { Folder } from "../../models/folder.model";
-import { useCreateFolderMutation } from "~/services/api/folders.service";
+import {
+  useCreateFolderMutation,
+  useUpdateFolderMutation,
+} from "~/services/api/folders.service";
 
 type props = {
   isOpen: boolean;
   toggle: () => void;
+  folderToUpdate?: Folder;
+  reset?: () => void;
 };
 
 export const CreateFolder: FunctionComponent<props> = ({
   isOpen,
   toggle,
+  folderToUpdate,
+  reset,
 }: props) => {
   const [title, setTitle] = useState("");
   const [parentId] = useState("");
   const [addFolder] = useCreateFolderMutation();
+  const [updateFolder] = useUpdateFolderMutation();
 
   const onSubmit = async (): Promise<void> => {
-    const folder = new Folder();
-    folder.title = title;
-    folder.parentId = parentId;
-    await addFolder(folder);
-    console.log("Dossier " + title + " créé!");
-    toggle();
+    try {
+      const folder = new Folder();
+      folder.title = title;
+      folder.parentId = parentId;
+      if (folderToUpdate != null) {
+        folder.id = folderToUpdate.id;
+        await updateFolder(folder);
+        if (reset != null) reset();
+      } else {
+        await addFolder(folder);
+      }
+      toggle();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const reset = (): void => {
+  const resetFields = (): void => {
     setTitle("");
     toggle();
   };
+
+  useEffect(() => {
+    if (folderToUpdate != null) {
+      setTitle(folderToUpdate.title);
+    }
+  }, [folderToUpdate]);
 
   return (
     <>
@@ -39,20 +63,25 @@ export const CreateFolder: FunctionComponent<props> = ({
         <Modal
           id={"createFolder"}
           isOpen={isOpen}
-          onModalClose={reset}
+          onModalClose={resetFields}
           size="lg"
           viewport={false}
         >
-          <Modal.Header onModalClose={reset}>
-            <h4>Créer un dossier</h4>
+          <Modal.Header onModalClose={resetFields}>
+            {folderToUpdate != null ? (
+              <h4>{t("magneto.folder.rename")}</h4>
+            ) : (
+              <h4>{t("magneto.create.folder")}</h4>
+            )}
           </Modal.Header>
           <Modal.Body>
             <FormControl id="title" className="mb-0-5">
-              <Label>Nom du dossier :</Label>
+              <Label>{t("magneto.create.folder.name")} :</Label>
               <Input
                 placeholder=""
                 size="md"
                 type="text"
+                value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </FormControl>
@@ -64,9 +93,9 @@ export const CreateFolder: FunctionComponent<props> = ({
                 type="button"
                 variant="outline"
                 className="footer-button"
-                onClick={reset}
+                onClick={resetFields}
               >
-                Annuler
+                {t("magneto.cancel")}
               </Button>
               <Button
                 color="primary"
@@ -76,7 +105,7 @@ export const CreateFolder: FunctionComponent<props> = ({
                 disabled={title == ""}
                 onClick={onSubmit}
               >
-                Enregistrer
+                {t("magneto.save")}
               </Button>
             </div>
           </Modal.Footer>

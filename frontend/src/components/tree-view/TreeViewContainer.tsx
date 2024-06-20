@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView, useOdeClient } from "@edifice-ui/react";
@@ -36,6 +36,16 @@ export const TreeViewContainer: React.FunctionComponent<
 
   const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
   const { user } = useOdeClient();
+  const [showModale, setShowModale] = useState(false);
+  const [modaleProps, setModaleProps] = useState({isOpen: false,
+    key: "",
+    param: "",
+    hasSubmit: false,
+    onSubmit: () => {},
+    onCancel: () => {
+      setShowModale(false);
+      resetDragAndDrop();
+    }})
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -133,13 +143,13 @@ export const TreeViewContainer: React.FunctionComponent<
     let dragAndDropBoardsIds: string [] = dragAndDropBoards.map((board: Board) => board._id);
 
     // submitted from lightbox
-    if (isFromMoveBoardLightbox) {
-      moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
-        .catch((e)=> {console.log(e);});
-      resetDragAndDrop();
-       onFormSubmit();
-      return ;
-    }
+    // if (isFromMoveBoardLightbox) {
+    //   moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
+    //     .catch((e)=> {console.log(e);});
+    //   resetDragAndDrop();
+    //    onFormSubmit();
+    //   return ;
+    // }
     resetDragAndDrop();
 
     // submitted directly
@@ -151,26 +161,14 @@ export const TreeViewContainer: React.FunctionComponent<
   }
 
 
-  const handleNoRightsDragAndDrop =  () => {
-
-    return <MessageModale 
-      isOpen={true}
-      key={"magneto.folder.drag.drop.right.error"}
-      hasSubmit={false}
-      onCancel={() => {resetDragAndDrop()}}>
-      </MessageModale>;
+  const handleNoRightsDragAndDrop =  (): void => {
+    setModaleProps({...modaleProps, key: "magneto.folder.drag.drop.right.error"});
+    setShowModale(true);
   }
 
   const confirmSharedFolderDragAndDrop =  (dragAndDropBoardsIds: string[], dragAndDropTarget: Folder, key: string, param: string) => {
-
-    return <MessageModale 
-      isOpen={true}
-      key={key}
-      param={param}
-      hasSubmit={false}
-      onSubmit={() => {dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id)}}
-      onCancel={() => {resetDragAndDrop()}}>
-      </MessageModale>;
+    setModaleProps({...modaleProps, key: key, param: param, hasSubmit: true, onSubmit: () => dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id)});
+    setShowModale(true);
   }
 
   const dragAndDropBoardsCall =  (dragAndDropBoardsIds: string[], dragAndDropTargetId: string): void => {
@@ -249,6 +247,18 @@ export const TreeViewContainer: React.FunctionComponent<
         }}
       />
     </div>
+
+    <MessageModale 
+      isOpen={showModale}
+      key={modaleProps.key}
+      param={modaleProps.param}
+      hasSubmit={modaleProps.hasSubmit}
+      onSubmit={modaleProps.onSubmit}
+      onCancel={() => {
+        setShowModale(false);
+        resetDragAndDrop();
+        }}>
+    </MessageModale>
     </>
   );
 };

@@ -22,6 +22,8 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
     onCancel,
 }) => {
     const { t } = useTranslation();
+
+    console.log(key);
     
     return (
         <>
@@ -34,7 +36,7 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
                 viewport={false}
                 >
                 <Modal.Body>
-                    {param ? t(key, param) : t(key)}
+                    {param && param != "" ? t(key, param) : t(key)}
                 </Modal.Body>
 
                 <Modal.Footer>

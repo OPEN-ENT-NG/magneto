@@ -19,6 +19,7 @@ import "./CreateBoard.scss";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
+import { odeServices } from "edifice-ts-client";
 import { t } from "i18next";
 
 import myImage from "./collaborativeeditor-default.png";
@@ -26,7 +27,7 @@ import myImage from "./collaborativeeditor-default.png";
 // import { useThumb } from "../../hooks/useThumb";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useBackground } from "~/hooks/useBackground";
-import { useThumb } from "~/hooks/useThumb";
+import useImageHandler from "~/hooks/useImageHandler";
 import { Board, BoardForm } from "~/models/board.model";
 import {
   useCreateBoardMutation,
@@ -53,9 +54,8 @@ export const CreateBoard: FunctionComponent<props> = ({
   boardToUpdate,
   reset,
 }: props) => {
-  const { handleDeleteImage, handleUploadImage } = useThumb({
-    selectedResource: undefined,
-  });
+
+  const { handleUploadImage, handleDeleteImage, fetchCoverBlob } = useImageHandler("");
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
@@ -68,6 +68,7 @@ export const CreateBoard: FunctionComponent<props> = ({
   const { handleDeleteBackground, handleUploadBackground } = useBackground({
     selectedResource: undefined,
   });
+
 
   const setBoardFromForm = (board: BoardForm) => {
     board.title = title;
@@ -86,19 +87,26 @@ export const CreateBoard: FunctionComponent<props> = ({
     board.tags = tags;
   };
 
-  const onSubmit = (): void => {
+  const onSubmit = async (): Promise<void> => {
     const board = new BoardForm();
     setBoardFromForm(board);
+    fetchCoverBlob().then((blob) => {
+      odeServices.workspace().saveFile(blob, {
+        visibility: "protected",
+        application: "media-library"
+      }).then((response) => {
+        board.imageUrl = "/workspace/document/" + (response._id != null ? response._id : "undefined");
+        if (boardToUpdate != null) {
+          board.id = boardToUpdate.id;
+          updateBoard(board.toJSON());
+          if (reset != null) reset();
+        } else {
+          createBoard(board.toJSON());
+        }
 
-    if (boardToUpdate != null) {
-      board.id = boardToUpdate.id;
-      updateBoard(board.toJSON());
-      if (reset != null) reset();
-    } else {
-      createBoard(board.toJSON());
-    }
-
-    resetFields();
+        resetFields();
+      });
+    });
   };
 
   const resetFields = (): void => {

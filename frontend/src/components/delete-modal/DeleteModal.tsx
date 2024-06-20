@@ -29,7 +29,7 @@ export const DeleteModal: FunctionComponent<props> = ({
   boardIds,
   folderIds,
   isPredelete,
-  reset
+  reset,
 }: props) => {
   const [preDeleteBoards] = usePreDeleteBoardsMutation();
   const [preDeleteFolders] = usePreDeleteFoldersMutation();
@@ -76,14 +76,12 @@ export const DeleteModal: FunctionComponent<props> = ({
       preDeleteBoardsAndToast();
       try {
         if (folderIds.length > 0) {
-          await preDeleteFolders(folderIds);  //If we're predeleting folders and boards, only send one notification
+          await preDeleteFolders(folderIds); //If we're predeleting folders and boards, only send one notification
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.error(error);
       }
-    }
-    else if (folderIds.length > 0) preDeleteFoldersAndToast();
+    } else if (folderIds.length > 0) preDeleteFoldersAndToast();
   };
 
   const onSubmitDelete = async (): Promise<void> => {
@@ -91,14 +89,12 @@ export const DeleteModal: FunctionComponent<props> = ({
       deleteBoardsAndToast();
       try {
         if (folderIds.length > 0) {
-          await deleteFolders(folderIds);  //If we're predeleting folders and boards, only send one notification
+          await deleteFolders(folderIds); //If we're predeleting folders and boards, only send one notification
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.error(error);
       }
-    }
-    else if (folderIds.length > 0) deleteFoldersAndToast();
+    } else if (folderIds.length > 0) deleteFoldersAndToast();
   };
 
   return (

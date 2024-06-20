@@ -46,7 +46,7 @@ export const App = () => {
     setFolderIds([]);
     setSelectedBoards([]);
     setSelectedFolders([]);
-  }
+  };
 
   useEffect(() => {
     resetBoardsAndFolders();
@@ -76,8 +76,8 @@ export const App = () => {
         >
           <SearchBar
             isVariant
-            onChange={function Ga() { }}
-            onClick={function Ga() { }}
+            onChange={function Ga() {}}
+            onClick={function Ga() {}}
             placeholder="Search something...."
             size="md"
           />

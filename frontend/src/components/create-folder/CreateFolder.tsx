@@ -41,8 +41,7 @@ export const CreateFolder: FunctionComponent<props> = ({
         await addFolder(folder);
       }
       toggle();
-    }
-    catch (error) {
+    } catch (error) {
       console.error(error);
     }
   };

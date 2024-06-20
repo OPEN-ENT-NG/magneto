@@ -27,7 +27,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
 
         return `boards${urlParams}`;
       },
-      providesTags: ['Boards'],
+      providesTags: ["Boards"],
     }),
     createBoard: builder.mutation({
       query: (params: IBoardPayload) => ({
@@ -35,7 +35,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "POST",
         body: params,
       }),
-      invalidatesTags: ['Boards'],
+      invalidatesTags: ["Boards"],
     }),
     updateBoard: builder.mutation({
       query: (params: IBoardPayload) => ({
@@ -43,14 +43,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: params,
       }),
-      invalidatesTags: ['Boards'],
+      invalidatesTags: ["Boards"],
     }),
     duplicateBoard: builder.mutation({
       query: (boardId: String) => ({
         url: `board/duplicate/${boardId}`,
         method: "PUT",
       }),
-      invalidatesTags: ['Boards'],
+      invalidatesTags: ["Boards"],
     }),
     moveBoards: builder.mutation({
       query: (params) => ({
@@ -58,7 +58,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: { boardIds: params.boardIds },
       }),
-      invalidatesTags: ['Boards'],
+      invalidatesTags: ["Boards"],
     }),
     preDeleteBoards: builder.mutation({
       query: (boardIds: String[]) => ({
@@ -66,7 +66,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: { boardIds: boardIds },
       }),
-      invalidatesTags: ['Boards'],
+      invalidatesTags: ["Boards"],
     }),
     deleteBoards: builder.mutation({
       query: (boardIds: String[]) => ({
@@ -74,7 +74,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "DELETE",
         body: { boardIds: boardIds },
       }),
-      invalidatesTags: ['Boards'],
+      invalidatesTags: ["Boards"],
     }),
     restorePreDeleteBoards: builder.mutation({
       query: (boardIds: String[]) => ({
@@ -82,7 +82,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "put",
         body: { boardIds: boardIds },
       }),
-      invalidatesTags: ['Boards'],
+      invalidatesTags: ["Boards"],
     }),
     getUrl: builder.query({
       query: (cover: File) => {

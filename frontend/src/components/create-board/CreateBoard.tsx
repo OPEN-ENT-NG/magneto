@@ -51,7 +51,7 @@ export const CreateBoard: FunctionComponent<props> = ({
   isOpen,
   toggle,
   boardToUpdate,
-  reset
+  reset,
 }: props) => {
   const { handleDeleteImage, handleUploadImage } = useThumb({
     selectedResource: undefined,
@@ -263,7 +263,9 @@ export const CreateBoard: FunctionComponent<props> = ({
                           checked={disposition == "free"}
                           className="mg-4"
                         />
-                        <span className="text">{t("magneto.create.board.display.free")}</span>
+                        <span className="text">
+                          {t("magneto.create.board.display.free")}
+                        </span>
                         <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
                       <div className="d-flex align-items-center text-icon-pair mg-75">
@@ -274,7 +276,9 @@ export const CreateBoard: FunctionComponent<props> = ({
                           checked={disposition == "vertical"}
                           className="mg-4"
                         />
-                        <span className="text">{t("magneto.create.board.display.vertical")}</span>
+                        <span className="text">
+                          {t("magneto.create.board.display.vertical")}
+                        </span>
                         <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
                       <div className="d-flex align-items-center text-icon-pair">
@@ -287,7 +291,9 @@ export const CreateBoard: FunctionComponent<props> = ({
                           checked={disposition == "horizontal"}
                           className="mg-4"
                         />
-                        <span className="text">{t("magneto.create.board.display.horizontal")}</span>
+                        <span className="text">
+                          {t("magneto.create.board.display.horizontal")}
+                        </span>
                         <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
                     </div>

@@ -49,7 +49,7 @@ export const ToasterContainer = ({
 
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
     boardIds: boardIds,
-    folderIds: folderIds
+    folderIds: folderIds,
   });
 
   const transition = useTransition(isToasterOpen, {
@@ -168,7 +168,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -216,7 +216,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
                     {t("magneto.share")}
                   </Button>
@@ -232,7 +232,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -247,7 +247,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.public.unshare")}
                     </Button>
@@ -300,7 +300,12 @@ export const ToasterContainer = ({
             boardToUpdate={boards[0]}
             reset={reset}
           />
-          <MoveBoard isOpen={isMoveOpen} toggle={toggleMove} boards={boards} reset={reset} />
+          <MoveBoard
+            isOpen={isMoveOpen}
+            toggle={toggleMove}
+            boards={boards}
+            reset={reset}
+          />
           <DeleteModal
             isOpen={isMoveDelete}
             toggle={toggleDelete}

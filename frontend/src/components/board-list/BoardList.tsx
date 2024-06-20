@@ -26,10 +26,18 @@ import { useGetBoardsQuery } from "~/services/api/boards.service";
 
 type BoardListProps = {
   currentFolder: Folder;
+  boardIds: String[];
+  selectedBoards: Board[];
+  setBoardIds: React.Dispatch<React.SetStateAction<String[]>>;
+  setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
 };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
   currentFolder,
+  boardIds,
+  selectedBoards,
+  setBoardIds,
+  setSelectedBoards,
 }) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation();
@@ -61,19 +69,19 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
       currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
       currentFolder.id == ""
     ) {
-      setBoardsQuery({
-        ...boardsQuery,
+      setBoardsQuery((prevBoardsQuery) => ({
+        ...prevBoardsQuery,
         folderId: undefined,
         isPublic: !!currentFolder.isPublic,
         isDeleted: !!currentFolder.deleted,
-      });
+      }));
     } else if (!!currentFolder && !!currentFolder.id) {
-      setBoardsQuery({
-        ...boardsQuery,
+      setBoardsQuery((prevBoardsQuery) => ({
+        ...prevBoardsQuery,
         folderId: currentFolder.id,
         isPublic: !!currentFolder.isPublic,
         isDeleted: !!currentFolder.deleted,
-      });
+      }));
     } else {
       console.log("currentFolder undefined, try later or again");
     }
@@ -92,7 +100,24 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     boardData = myBoardsResult.all.map((board: IBoardItemResponse) =>
       new Board().build(board),
     ); //convert boards to Board[]
-    console.log("boardData", boardData);
+  }
+
+  async function toggleSelect(resource: Board) {
+    if (boardIds.includes(resource.id)) {
+      setBoardIds(
+        boardIds.filter(
+          (selectedResource: String) => selectedResource !== resource.id,
+        ),
+      );
+      setSelectedBoards(
+        selectedBoards.filter(
+          (selectedResource) => selectedResource.id !== resource.id,
+        ),
+      );
+      return;
+    }
+    setBoardIds([...boardIds, resource.id]);
+    setSelectedBoards([...selectedBoards, resource]);
   }
 
   return (
@@ -127,6 +152,9 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                   }}
                   // onClick={() => {setIsToasterOpen()}}
                   isLoading={getBoardsLoading}
+                  isSelectable={true}
+                  isSelected={boardIds.includes(id)}
+                  onSelect={() => toggleSelect(board)}
                 >
                   <Card.Body flexDirection={"column"}>
                     <Card.Image

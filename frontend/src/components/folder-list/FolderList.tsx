@@ -13,14 +13,21 @@ import { useGetFoldersQuery } from "~/services/api/folders.service";
 type FolderListProps = {
   currentFolder: Folder;
   onSelect: (folder: Folder) => void;
+  folderIds: String[];
+  selectedFolders: Folder[];
+  setFolderIds: React.Dispatch<React.SetStateAction<String[]>>;
+  setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
 };
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
   currentFolder,
   onSelect,
+  folderIds,
+  selectedFolders,
+  setFolderIds,
+  setSelectedFolders,
 }) => {
   const { currentApp } = useOdeClient();
-  // const [isToasterOpen, setIsToasterOpen] = useToaster();
   const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
 
   const {
@@ -28,6 +35,8 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     isLoading: getFoldersLoading,
     error: getFoldersError,
   } = useGetFoldersQuery(foldersQuery);
+
+  let folderData: Folder[] = [];
 
   const filterFolderData = (): void => {
     if (
@@ -48,15 +57,14 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     }
   };
 
-  let folderData: Folder[];
   if (getFoldersError) {
     console.log("error");
   } else if (getFoldersLoading) {
     console.log("loading");
-  } else {
+  } else if (myFoldersResult) {
     folderData = myFoldersResult.map((folder: IFolderResponse) =>
       new Folder().build(folder),
-    ); //convert folders to Folder[]
+    ); // convert folders to Folder[]
     filterFolderData();
   }
 
@@ -64,6 +72,24 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     from: { opacity: 0 },
     to: { opacity: 1 },
   });
+
+  async function toggleSelect(resource: Folder) {
+    if (folderIds.includes(resource.id)) {
+      setFolderIds(
+        folderIds.filter(
+          (selectedResource: String) => selectedResource !== resource.id,
+        ),
+      );
+      setSelectedFolders(
+        selectedFolders.filter(
+          (selectedResource) => selectedResource.id !== resource.id,
+        ),
+      );
+      return;
+    }
+    setFolderIds([...folderIds, resource.id]);
+    setSelectedFolders([...selectedFolders, resource]);
+  }
 
   useEffect(() => {
     setFoldersQuery(
@@ -92,9 +118,10 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                     type: "folder",
                     title,
                   }}
-                  // onClick={() => {setIsToasterOpen()}}
                   isLoading={getFoldersLoading}
                   isSelectable={true}
+                  isSelected={folderIds.includes(id)}
+                  onSelect={() => toggleSelect(folder)}
                   onClick={() => {
                     onSelect(folder);
                   }}

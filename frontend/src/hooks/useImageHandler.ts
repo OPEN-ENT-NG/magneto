@@ -13,25 +13,33 @@ export default function useImageHandler(initialCover: string | Blob | File) {
 
     const handleDeleteImage = () => setCover("");
 
-    const fetchCoverBlob = async (): Promise<Blob> => {
+    const fetchUrl = async (): Promise<string> => {
+        let blob: Blob = new Blob();
         if (typeof cover === "string") {
-            return await odeServices.http().get(cover, {
+            blob = await odeServices.http().get(cover, {
                 responseType: "blob",
             });
         } else if (cover) {
-            return await odeServices
+            blob = await odeServices
                 .http()
                 .get(URL.createObjectURL(cover as Blob), {
                     responseType: "blob",
                 });
         }
-        return new Blob();
-    };
+
+        const response = await odeServices.workspace().saveFile(blob, {
+            visibility: "protected",
+            application: "media-library"
+        });
+
+        return "/workspace/document/" + (response._id != null ? response._id : "undefined");
+
+    }
 
     return {
         cover,
         handleUploadImage,
         handleDeleteImage,
-        fetchCoverBlob,
+        fetchUrl,
     };
 }

@@ -21,7 +21,6 @@ import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import { t } from "i18next";
 
-import myImage from "./collaborativeeditor-default.png";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
 import { Board, BoardForm } from "~/models/board.model";
@@ -50,9 +49,18 @@ export const CreateBoard: FunctionComponent<props> = ({
   boardToUpdate,
   reset,
 }: props) => {
-
-  const { cover: thumbnail, handleUploadImage: handleUploadImageThumbnail, handleDeleteImage: handleDeleteImageThumbnail, fetchUrl: fetchThumbnailUrl } = useImageHandler("");
-  const { cover: background, handleUploadImage: handleUploadImageBackground, handleDeleteImage: handleDeleteImageBackground, fetchUrl: fetchBackgroundUrl } = useImageHandler("");
+  const {
+    cover: thumbnail,
+    handleUploadImage: handleUploadImageThumbnail,
+    handleDeleteImage: handleDeleteImageThumbnail,
+    fetchUrl: fetchThumbnailUrl,
+  } = useImageHandler("");
+  const {
+    cover: background,
+    handleUploadImage: handleUploadImageBackground,
+    handleDeleteImage: handleDeleteImageBackground,
+    fetchUrl: fetchBackgroundUrl,
+  } = useImageHandler("");
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
@@ -65,15 +73,13 @@ export const CreateBoard: FunctionComponent<props> = ({
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
 
-
   const setBoardFromForm = async (board: BoardForm) => {
     board.title = title;
     board.description = description;
 
     if (thumbnailSrc != "" && thumbnail == "") {
       board.imageUrl = thumbnailSrc;
-    }
-    else if (thumbnail != "") {
+    } else if (thumbnail != "") {
       await fetchThumbnailUrl().then((url) => {
         board.imageUrl = url;
       });
@@ -81,8 +87,7 @@ export const CreateBoard: FunctionComponent<props> = ({
 
     if (backgroundSrc != "" && background == "") {
       board.backgroundUrl = backgroundSrc;
-    }
-    else if (background != "") {
+    } else if (background != "") {
       await fetchBackgroundUrl().then((url) => {
         board.backgroundUrl = url;
       });
@@ -110,7 +115,7 @@ export const CreateBoard: FunctionComponent<props> = ({
     }
 
     resetFields();
-  }
+  };
 
   const resetFields = (): void => {
     if (boardToUpdate == null) {
@@ -218,7 +223,8 @@ export const CreateBoard: FunctionComponent<props> = ({
                 {(thumbnail == "" || thumbnail == null) && (
                   <div className="font-red">
                     {t("magneto.board.manage.ask.image")}
-                  </div>)}
+                  </div>
+                )}
               </Grid.Col>
               <Grid.Col
                 sm="9"

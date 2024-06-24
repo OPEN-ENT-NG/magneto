@@ -21,12 +21,8 @@ import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import { t } from "i18next";
 
-import myImage from "./collaborativeeditor-default.png";
-// import { useBackground } from "../../hooks/useBackground";
-// import { useThumb } from "../../hooks/useThumb";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
-import { useBackground } from "~/hooks/useBackground";
-import { useThumb } from "~/hooks/useThumb";
+import useImageHandler from "~/hooks/useImageHandler";
 import { Board, BoardForm } from "~/models/board.model";
 import {
   useCreateBoardMutation,
@@ -53,9 +49,18 @@ export const CreateBoard: FunctionComponent<props> = ({
   boardToUpdate,
   reset,
 }: props) => {
-  const { handleDeleteImage, handleUploadImage } = useThumb({
-    selectedResource: undefined,
-  });
+  const {
+    cover: thumbnail,
+    handleUploadImage: handleUploadImageThumbnail,
+    handleDeleteImage: handleDeleteImageThumbnail,
+    fetchUrl: fetchThumbnailUrl,
+  } = useImageHandler("");
+  const {
+    cover: background,
+    handleUploadImage: handleUploadImageBackground,
+    handleDeleteImage: handleDeleteImageBackground,
+    fetchUrl: fetchBackgroundUrl,
+  } = useImageHandler("");
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
@@ -63,19 +68,30 @@ export const CreateBoard: FunctionComponent<props> = ({
   const [disposition, setDisposition] = useState("free");
   const [tagsTextInput, setTagsTextInput] = useState("");
   const [tags, setTags] = useState([""]);
+  const [thumbnailSrc, setThumbnailSrc] = useState("");
+  const [backgroundSrc, setBackgroundSrc] = useState("");
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
-  const { handleDeleteBackground, handleUploadBackground } = useBackground({
-    selectedResource: undefined,
-  });
 
-  const setBoardFromForm = (board: BoardForm) => {
+  const setBoardFromForm = async (board: BoardForm) => {
     board.title = title;
     board.description = description;
-    //TODO : change this to work with a future workspace file manager
 
-    board.imageUrl = ""; //getUrl(thumbnail as File);
-    board.backgroundUrl = ""; //getUrl(background as File);
+    if (thumbnailSrc != "" && thumbnail == "") {
+      board.imageUrl = thumbnailSrc;
+    } else if (thumbnail != "") {
+      await fetchThumbnailUrl().then((url) => {
+        board.imageUrl = url;
+      });
+    }
+
+    if (backgroundSrc != "" && background == "") {
+      board.backgroundUrl = backgroundSrc;
+    } else if (background != "") {
+      await fetchBackgroundUrl().then((url) => {
+        board.backgroundUrl = url;
+      });
+    }
 
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")
@@ -86,9 +102,9 @@ export const CreateBoard: FunctionComponent<props> = ({
     board.tags = tags;
   };
 
-  const onSubmit = (): void => {
+  const onSubmit = async (): Promise<void> => {
     const board = new BoardForm();
-    setBoardFromForm(board);
+    await setBoardFromForm(board);
 
     if (boardToUpdate != null) {
       board.id = boardToUpdate.id;
@@ -103,14 +119,16 @@ export const CreateBoard: FunctionComponent<props> = ({
 
   const resetFields = (): void => {
     if (boardToUpdate == null) {
-      handleDeleteImage();
-      handleDeleteBackground();
+      handleDeleteImageThumbnail();
+      handleDeleteImageBackground();
       setIsCommentChecked(false);
       setIsFavoriteChecked(false);
       setTitle("");
       setDescription("");
       setDisposition("free");
       setTagsTextInput("");
+      setThumbnailSrc("");
+      setBackgroundSrc("");
     }
     toggle();
   };
@@ -160,6 +178,8 @@ export const CreateBoard: FunctionComponent<props> = ({
       setDisposition(boardToUpdate.layoutType);
       setTagsTextInput(boardToUpdate.tagsTextInput);
       setTags(boardToUpdate.tags);
+      setThumbnailSrc(boardToUpdate.imageUrl);
+      setBackgroundSrc(boardToUpdate.backgroundUrl);
     }
   }, [boardToUpdate]);
 
@@ -193,13 +213,19 @@ export const CreateBoard: FunctionComponent<props> = ({
                   addButtonLabel="Add image"
                   deleteButtonLabel="Delete image"
                   label="Upload an image"
-                  onDeleteImage={handleDeleteImage}
-                  onUploadImage={handleUploadImage}
-                  src={myImage}
+                  onDeleteImage={() => {
+                    handleDeleteImageThumbnail();
+                    setThumbnailSrc("");
+                  }}
+                  onUploadImage={handleUploadImageThumbnail}
+                  src={thumbnailSrc}
                 />
-                <div className="font-red">
-                  {t("magneto.board.manage.ask.image")}
-                </div>
+                {(thumbnail == "" || thumbnail == null) &&
+                  thumbnailSrc == "" && (
+                    <div className="font-red">
+                      {t("magneto.board.manage.ask.image")}
+                    </div>
+                  )}
               </Grid.Col>
               <Grid.Col
                 sm="9"
@@ -321,9 +347,12 @@ export const CreateBoard: FunctionComponent<props> = ({
                       addButtonLabel="Add image"
                       deleteButtonLabel="Delete image"
                       label="Upload an image"
-                      onDeleteImage={handleDeleteBackground}
-                      onUploadImage={handleUploadBackground}
-                      src={myImage}
+                      onDeleteImage={() => {
+                        handleDeleteImageBackground();
+                        setBackgroundSrc("");
+                      }}
+                      onUploadImage={handleUploadImageBackground}
+                      src={backgroundSrc}
                     />
                     <i className="font-little">
                       {t("magneto.board.background.warning")}
@@ -350,6 +379,9 @@ export const CreateBoard: FunctionComponent<props> = ({
                 variant="filled"
                 className="footer-button"
                 onClick={onSubmit}
+                disabled={
+                  (thumbnailSrc == "" && thumbnail == "") || title == ""
+                }
               >
                 {t("magneto.save")}
               </Button>

@@ -220,11 +220,12 @@ export const CreateBoard: FunctionComponent<props> = ({
                   onUploadImage={handleUploadImageThumbnail}
                   src={thumbnailSrc}
                 />
-                {(thumbnail == "" || thumbnail == null) && (
-                  <div className="font-red">
-                    {t("magneto.board.manage.ask.image")}
-                  </div>
-                )}
+                {(thumbnail == "" || thumbnail == null) &&
+                  thumbnailSrc == "" && (
+                    <div className="font-red">
+                      {t("magneto.board.manage.ask.image")}
+                    </div>
+                  )}
               </Grid.Col>
               <Grid.Col
                 sm="9"
@@ -378,7 +379,9 @@ export const CreateBoard: FunctionComponent<props> = ({
                 variant="filled"
                 className="footer-button"
                 onClick={onSubmit}
-                disabled={thumbnailSrc == "" && thumbnail == ""}
+                disabled={
+                  (thumbnailSrc == "" && thumbnail == "") || title == ""
+                }
               >
                 {t("magneto.save")}
               </Button>

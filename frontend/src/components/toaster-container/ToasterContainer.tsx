@@ -168,7 +168,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -211,12 +211,22 @@ export const ToasterContainer = ({
                       {t("magneto.move")}
                     </Button>
                   )}
+                {hasRenameRight() && (
+                  <Button
+                    type="button"
+                    color="primary"
+                    variant="filled"
+                    onClick={toggleCreateFolder}
+                  >
+                    {t("magneto.rename")}
+                  </Button>
+                )}
                 {hasShareRight() && (
                   <Button
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     {t("magneto.share")}
                   </Button>
@@ -232,7 +242,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -247,7 +257,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.public.unshare")}
                     </Button>
@@ -264,16 +274,6 @@ export const ToasterContainer = ({
                       {t("magneto.delete")}
                     </Button>
                   )}
-                {hasRenameRight() && (
-                  <Button
-                    type="button"
-                    color="primary"
-                    variant="filled"
-                    onClick={toggleCreateFolder}
-                  >
-                    {t("magneto.move")}
-                  </Button>
-                )}
                 {isTrash() && (
                   <Button
                     type="button"

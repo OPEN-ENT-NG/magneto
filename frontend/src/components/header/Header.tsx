@@ -1,7 +1,8 @@
-import { AppHeader, Breadcrumb, Button } from "@edifice-ui/react";
+import { AppHeader, Button } from "@edifice-ui/react";
 import "./Header.scss";
-import myimg from "./uni-magneto.png"
 import { t } from "i18next";
+
+import myimg from "./uni-magneto.png";
 
 interface HeaderProps {
   onClick: () => void;

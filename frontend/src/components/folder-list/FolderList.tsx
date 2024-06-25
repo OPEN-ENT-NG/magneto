@@ -128,7 +128,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                 >
                   <Card.Body>
                     <Icon path={mdiFolderPlus} size={1}></Icon>
-                    <Card.Title>{title}</Card.Title>
+                    <Card.Title className="title">{title}</Card.Title>
                   </Card.Body>
                 </Card>
               </animated.li>

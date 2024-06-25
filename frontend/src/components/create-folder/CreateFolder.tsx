@@ -40,7 +40,7 @@ export const CreateFolder: FunctionComponent<props> = ({
       } else {
         await addFolder(folder);
       }
-      toggle();
+      resetFields();
     } catch (error) {
       console.error(error);
     }

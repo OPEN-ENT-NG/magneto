@@ -1,3 +1,22 @@
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 2.25em;
+  margin-bottom: 0.25em;
+}
+
+.header-text {
+  font-family: 'Comfortaa', cursive;
+  font-size: 1.75em;
+  color: #ecbe30;
+  margin-left: 0.6em;
+  line-height: 1;
+  font-weight: bold;
+}
+
 .button {
   margin-left: auto;
 }

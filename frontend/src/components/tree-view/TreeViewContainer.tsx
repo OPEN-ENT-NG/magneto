@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView, useOdeClient } from "@edifice-ui/react";
@@ -9,8 +9,7 @@ import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { Board } from "~/models/board.model";
 import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
-import { userInfo } from "os";
-import { folderOwnerAndSharedOrShareRights, folderOwnerNotShared } from "~/services/utils/share.utils";
+import { UserRights } from "~/services/utils/share.utils";
 import { MessageModale } from "../message-modale/MessageModale";
 
 type TreeViewContainerProps = {
@@ -36,16 +35,18 @@ export const TreeViewContainer: React.FunctionComponent<
 
   const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
   const { user } = useOdeClient();
+  const [ userRights ] = useState<UserRights>(new UserRights(user));
   const [showModale, setShowModale] = useState(false);
   const [modaleProps, setModaleProps] = useState({isOpen: false,
-    key: "",
+    i18nKey: "",
     param: "",
     hasSubmit: false,
     onSubmit: () => {},
     onCancel: () => {
       setShowModale(false);
       resetDragAndDrop();
-    }})
+    }});
+  // const [i18nKey, setI18nKe y] = useState("");
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -73,11 +74,11 @@ export const TreeViewContainer: React.FunctionComponent<
       let dragAndDropInitialFolder = !dragAndDropBoard.folderId ? new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""})
       : folders.find((folder: Folder) => folder.id == dragAndDropBoard.folderId) ?? new Folder();
 
-      if ((!!dragAndDropBoards[0] && !isOwnerOfSelectedBoards()) || targetFolderId == FOLDER_TYPE.PUBLIC_BOARDS) { //not board owner
+      if ((!!dragAndDropBoards[0] && isOwnerOfSelectedBoards()) || targetFolderId == FOLDER_TYPE.PUBLIC_BOARDS) { //not board owner
           handleNoRightsDragAndDrop();
           return ;
-      } else if ((folderOwnerNotShared(dragAndDropInitialFolder) || folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
-              && folderOwnerAndSharedOrShareRights(targetFolder)) {
+      } else if ((userRights.folderOwnerNotShared(dragAndDropInitialFolder) || userRights.folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
+              && userRights.folderOwnerAndSharedOrShareRights(targetFolder)) {
           //initial folder owner + not shared or has right + shared, target folder has right + shared
           console.log("enter shared");
 
@@ -86,8 +87,8 @@ export const TreeViewContainer: React.FunctionComponent<
           // dragAndDropBoards = dragAndDropBoards;
           // dragAndDropTarget = targetFolder;
           // displayEnterSharedFolderWarningLightbox = true;
-      } else if (folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder)
-          && folderOwnerNotShared(targetFolder)) {
+      } else if (userRights.folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder)
+          && userRights.folderOwnerNotShared(targetFolder)) {
           //initial folder has right + shared, target folder owner + not shared
           console.log("exit shared");
 
@@ -97,7 +98,7 @@ export const TreeViewContainer: React.FunctionComponent<
           // dragAndDropBoards = dragAndDropBoards;
           // dragAndDropTarget = targetFolder;
           // displayExitSharedFolderWarningLightbox = true;
-      } else if (folderOwnerNotShared(dragAndDropInitialFolder) && folderOwnerNotShared(targetFolder)) {
+      } else if (userRights.folderOwnerNotShared(dragAndDropInitialFolder) && userRights.folderOwnerNotShared(targetFolder)) {
           //initial folder owner + not shared, target folder owner + not shared
           proceedOnDragAndDrop(dragAndDropBoards, targetFolder);
       } else {
@@ -162,12 +163,14 @@ export const TreeViewContainer: React.FunctionComponent<
 
 
   const handleNoRightsDragAndDrop =  (): void => {
-    setModaleProps({...modaleProps, key: "magneto.folder.drag.drop.right.error"});
+    setModaleProps({...modaleProps, i18nKey: "magneto.folder.drag.drop.right.error"});
+    console.log(modaleProps);
     setShowModale(true);
   }
 
-  const confirmSharedFolderDragAndDrop =  (dragAndDropBoardsIds: string[], dragAndDropTarget: Folder, key: string, param: string) => {
-    setModaleProps({...modaleProps, key: key, param: param, hasSubmit: true, onSubmit: () => dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id)});
+  const confirmSharedFolderDragAndDrop =  (dragAndDropBoardsIds: string[], dragAndDropTarget: Folder, i18nKey: string, param: string) => {
+    setModaleProps({...modaleProps, i18nKey: i18nKey, param: param, hasSubmit: true, onSubmit: () => dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id)});
+    console.log(modaleProps);
     setShowModale(true);
   }
 
@@ -219,6 +222,10 @@ export const TreeViewContainer: React.FunctionComponent<
     onSelect(clickedFolder);
   };
 
+  useEffect(() => {
+    setModaleProps(modaleProps);
+  }, [modaleProps]);
+
 
   return (
     <>
@@ -250,14 +257,11 @@ export const TreeViewContainer: React.FunctionComponent<
 
     <MessageModale 
       isOpen={showModale}
-      key={modaleProps.key}
+      i18nKey={modaleProps.i18nKey}
       param={modaleProps.param}
       hasSubmit={modaleProps.hasSubmit}
       onSubmit={modaleProps.onSubmit}
-      onCancel={() => {
-        setShowModale(false);
-        resetDragAndDrop();
-        }}>
+      onCancel={modaleProps.onCancel}>
     </MessageModale>
     </>
   );

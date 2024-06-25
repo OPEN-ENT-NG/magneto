@@ -1,11 +1,17 @@
-import { useOdeClient } from "@edifice-ui/react";
+import { IUserInfo } from "edifice-ts-client";
 import { rights } from "~/core/constants/rights.const";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { SHARE_RIGHTS } from "~/core/enums/rights.enum";
 import { Folder } from "~/models/folder.model";
 
+export class UserRights {
+    private user: IUserInfo|any;
 
-export const getRight = (right: string) : string => {
+    constructor(user: IUserInfo|any) {
+        this.user = user;
+    }
+
+    public getRight = (right: string) : string => {
     let shareRight: string;
 
     switch (right) {
@@ -29,18 +35,17 @@ export const getRight = (right: string) : string => {
     return shareRight;
 }
 
-export const folderHasShareRights = (folder: Folder, right: string) : boolean => {
-    const { user } = useOdeClient();
-
-    let shareRight: string = getRight(right);
+public folderHasShareRights = (folder: Folder, right: string) : boolean => {
+    
+    let shareRight: string = this.getRight(right);
     if (!folder || !folder.shared) return false;
 
     let hasShareRight: boolean = false;
     folder.shared.forEach((shareItem: any) => {
-        let hasIndividualShareRight: boolean = !!shareItem.userId && (shareItem.userId == user.userId) && (shareItem[shareRight] == true);
+        let hasIndividualShareRight: boolean = !!shareItem.userId && (shareItem.userId == this.user.userId) && (shareItem[shareRight] == true);
 
         let hasGroupShareRight: boolean = !!shareItem.groupId
-            && !!user.groupsIds.find((groupId: string) => {
+            && !!this.user.groupsIds.find((groupId: string) => {
                 shareItem.groupId == groupId && shareItem[shareRight] == true});
 
         if (hasIndividualShareRight || hasGroupShareRight) hasShareRight = true ;
@@ -49,28 +54,31 @@ export const folderHasShareRights = (folder: Folder, right: string) : boolean =>
     return hasShareRight;
 }
 
-export const hasFolderCreationRight = (openedFolder: Folder): boolean => { // main page || folder owner || has folder share rights
-    const { user } = useOdeClient();
+public hasFolderCreationRight = (openedFolder: Folder): boolean => { // main page || folder owner || has folder share rights
     let currentFolder = !!openedFolder ? openedFolder : null;
 
     return currentFolder == null
         || currentFolder.id == FOLDER_TYPE.MY_BOARDS
-        || currentFolder.ownerId == user.userId
-        || folderHasShareRights(currentFolder, SHARE_RIGHTS.PUBLISH);
+        || currentFolder.ownerId == this.user.userId
+        || this.folderHasShareRights(currentFolder, SHARE_RIGHTS.PUBLISH);
 }
 
-export const folderOwnerOrMainPage = (folder: Folder): boolean => {
-    const { user } = useOdeClient();
-    let isFolderOwner: boolean = !!folder && folder.ownerId == user.userId;
+public folderOwnerOrMainPage = (folder: Folder): boolean => {
+    let isFolderOwner: boolean = !!folder && folder.ownerId == this.user.userId;
     let isMainPage: boolean = folder == null || folder.id == undefined || folder.id == FOLDER_TYPE.MY_BOARDS;
 
     return isFolderOwner || isMainPage;
 }
 
-export const folderOwnerNotShared = (folder: Folder): boolean => {
-    return folderOwnerOrMainPage(folder) && (!folder.shared || folder.shared.length == 0);
+public folderOwnerNotShared = (folder: Folder): boolean => {
+    return this.folderOwnerOrMainPage(folder) && (!folder.shared || folder.shared.length == 0);
 }
 
-export const folderOwnerAndSharedOrShareRights = (folder: Folder): boolean => {
-    return (folderOwnerOrMainPage(folder) && !!folder.shared && folder.shared.length > 0) || folderHasShareRights(folder, SHARE_RIGHTS.PUBLISH);
+public folderOwnerAndSharedOrShareRights = (folder: Folder): boolean => {
+    return (this.folderOwnerOrMainPage(folder) && !!folder.shared && folder.shared.length > 0) || this.folderHasShareRights(folder, SHARE_RIGHTS.PUBLISH);
+}
+
+
+
+
 }

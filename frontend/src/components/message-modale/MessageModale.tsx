@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 type MessageModaleProps = {
     isOpen: boolean;
-    key: string;
+    i18nKey: string;
     param?: string;
     hasSubmit: boolean;
     onSubmit?:() => void;
@@ -15,7 +15,7 @@ type MessageModaleProps = {
 
 export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
     isOpen,
-    key,
+    i18nKey,
     param,
     hasSubmit,
     onSubmit,
@@ -23,7 +23,7 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    console.log(key);
+    console.log(i18nKey);
     
     return (
         <>
@@ -36,7 +36,7 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
                 viewport={false}
                 >
                 <Modal.Body>
-                    {param && param != "" ? t(key, param) : t(key)}
+                    {!!i18nKey && !!param && param != "" ? t(i18nKey, param) : t(i18nKey)}
                 </Modal.Body>
 
                 <Modal.Footer>

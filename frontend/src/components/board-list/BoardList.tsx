@@ -1,19 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useDrag } from 'react-dnd';
 
-import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
-import {
-  mdiAccountCircle,
-  mdiCalendarBlank,
-  mdiCrown,
-  mdiEarth,
-  mdiMagnet,
-  mdiShareVariant,
-} from "@mdi/js";
-import { Icon } from "@mdi/react";
+import { useOdeClient } from "@edifice-ui/react";
 import { animated, useSpring } from "@react-spring/web";
-import dayjs from "dayjs";
-import { useTranslation } from "react-i18next";
 
 import "./BoardList.scss";
 import { BoardItem } from "~/components/board-item/BoardItem";
@@ -32,12 +20,8 @@ type BoardListProps = {
   selectedBoards: Board[];
   setBoardIds: React.Dispatch<React.SetStateAction<String[]>>;
   setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
-  onDragAndDrop: (board: Board) => void;
+  onDragAndDrop: (boards: Board[]) => void;
 };
-
-// const boardData = {id, title, imageUrl, backgroundUrl, description, cardIds, sections, layoutType, tags, 
-//   tagsTextInput, nbCards, nbCardsSections, modificationDate, creationDate, folderId, isPublished, owner, shared, 
-//   deleted, canComment, displayNbFavorites };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
   currentFolder,

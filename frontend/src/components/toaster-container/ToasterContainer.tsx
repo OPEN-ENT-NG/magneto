@@ -168,7 +168,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -226,7 +226,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
                     {t("magneto.share")}
                   </Button>
@@ -242,7 +242,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -257,7 +257,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.public.unshare")}
                     </Button>

@@ -8,7 +8,7 @@ import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { Board } from "~/models/board.model";
-import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
+import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/services/utils/share.utils";
 import { MessageModale } from "../message-modale/MessageModale";
 
@@ -33,7 +33,7 @@ export const TreeViewContainer: React.FunctionComponent<
     section: true,
   };
 
-  const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
+  const [moveBoardsToFolder] = useMoveBoardsMutation();
   const { user } = useOdeClient();
   const [ userRights ] = useState<UserRights>(new UserRights(user));
   const [showModale, setShowModale] = useState(false);

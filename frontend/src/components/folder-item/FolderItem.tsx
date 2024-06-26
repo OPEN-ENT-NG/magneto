@@ -7,7 +7,7 @@ import { Icon } from "@mui/material";
 import "./FolderItem.scss";
 import { Folder } from "~/models/folder.model";
 import { useDrop } from "react-dnd";
-import { useMoveBoardsToFolderMutation } from "~/services/api/boards.service";
+import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { Board } from "~/models/board.model";
 
 type FolderListProps = {
@@ -24,7 +24,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     onDragAndDrop
 }) => {
   const { currentApp } = useOdeClient();
-  const [moveBoardsToFolder] = useMoveBoardsToFolderMutation();
+  const [moveBoardsToFolder] = useMoveBoardsMutation();
 
   const folderTitle = folder.title;
 

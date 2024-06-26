@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
@@ -13,7 +13,6 @@ import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
-import { Board } from "~/models/board.model";
 
 export interface AppProps {
   _id: string;
@@ -90,10 +89,34 @@ export const App = () => {
               placeholder="Search something...."
               size="md"
             />
-            <FolderList currentFolder={currentFolder} onSelect={handleSelectFolder} onDragAndDrop={handledragAndDropBoards}/>
-            <ToasterContainer />
-            <BoardList currentFolder={currentFolder} onDragAndDrop={handledragAndDropBoards}/>
-            <CreateTab isOpen={isOpen} toggle={toggle} />
+            <FolderList 
+              currentFolder={currentFolder} 
+              onSelect={handleSelectFolder}
+              folderIds={folderIds}
+              selectedFolders={selectedFolders}
+              setFolderIds={setFolderIds}
+              setSelectedFolders={setSelectedFolders}
+              onDragAndDrop={handledragAndDropBoards}
+            />
+            <BoardList 
+              currentFolder={currentFolder} 
+              boardIds={boardIds}
+              selectedBoards={selectedBoards}
+              setBoardIds={setBoardIds}
+              setSelectedBoards={setSelectedBoards}
+              onDragAndDrop={handledragAndDropBoards}
+            />
+            <ToasterContainer 
+              isToasterOpen={
+                selectedBoards.length > 0 || selectedFolders.length > 0}
+              boards={selectedBoards}
+              folders={selectedFolders}
+              boardIds={boardIds}
+              folderIds={folderIds}
+              currentFolder={currentFolder}
+              reset={resetBoardsAndFolders}
+            />
+            <CreateBoard isOpen={isOpen} toggle={toggle} />
           </Grid.Col>
         </Grid>
       </DndProvider>

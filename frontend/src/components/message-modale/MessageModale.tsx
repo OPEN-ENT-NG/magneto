@@ -22,8 +22,6 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
     onCancel,
 }) => {
     const { t } = useTranslation();
-
-    console.log(i18nKey);
     
     return (
         <>

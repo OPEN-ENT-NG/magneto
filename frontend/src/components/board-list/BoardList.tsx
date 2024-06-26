@@ -16,11 +16,11 @@ import { useGetBoardsQuery } from "~/services/api/boards.service";
 
 type BoardListProps = {
   currentFolder: Folder;
-  boardIds: String[];
+  boardIds: string[];
   selectedBoards: Board[];
   setBoardIds: React.Dispatch<React.SetStateAction<String[]>>;
   setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
-  onDragAndDrop: (boards: Board[]) => void;
+  onDragAndDrop: (board: Board) => void;
 };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
@@ -130,7 +130,13 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                   ...springs,
                 }} 
               >
-                <BoardItem board={board} areBoardsLoading={getBoardsLoading} onDragAndDrop={onDragAndDrop}/>
+                <BoardItem 
+                  board={board} 
+                  areBoardsLoading={getBoardsLoading}
+                  boardIds={boardIds} 
+                  onDragAndDropBoard={onDragAndDrop} 
+                  onSelect={toggleSelect}
+                />
               </animated.li>
             );
           })}

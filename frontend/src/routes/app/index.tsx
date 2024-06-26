@@ -37,7 +37,7 @@ export const App = () => {
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [folderIds, setFolderIds] = useState<String[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
-  const [dragAndDropBoards, setdragAndDropBoards] = useState<Board[]>([]);
+  const [dragAndDropBoards, setDragAndDropBoards] = useState<Board[]>([]);
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
@@ -54,8 +54,12 @@ export const App = () => {
     resetBoardsAndFolders();
   }, [currentFolder]);
 
-  const handledragAndDropBoards = (boards: Board[]) => {
-    setdragAndDropBoards(boards);
+  const handleDragAndDropBoards = (board: Board) => {
+    if (!!board && selectedBoards.find((selectedBoard: Board) => {selectedBoard._id == board._id})) {
+      setDragAndDropBoards(selectedBoards);
+    } else if (!!board) {
+      setDragAndDropBoards([board]);
+    }
   };
 
   return (
@@ -70,10 +74,13 @@ export const App = () => {
               padding: ".8rem",
             }}
           >
-
-          <SideBar currentFolder={currentFolder} onSelect={handleSelectFolder} dragAndDropBoards={dragAndDropBoards} onDragAndDrop={handledragAndDropBoards}/>
-
-        </Grid.Col>
+            <SideBar 
+              currentFolder={currentFolder} 
+              onSelect={handleSelectFolder} 
+              dragAndDropBoards={dragAndDropBoards} 
+              onDragAndDrop={handleDragAndDropBoards}
+            />
+          </Grid.Col>
 
           <Grid.Col
             sm="8"
@@ -96,7 +103,7 @@ export const App = () => {
               selectedFolders={selectedFolders}
               setFolderIds={setFolderIds}
               setSelectedFolders={setSelectedFolders}
-              onDragAndDrop={handledragAndDropBoards}
+              onDragAndDrop={handleDragAndDropBoards}
             />
             <BoardList 
               currentFolder={currentFolder} 
@@ -104,7 +111,7 @@ export const App = () => {
               selectedBoards={selectedBoards}
               setBoardIds={setBoardIds}
               setSelectedBoards={setSelectedBoards}
-              onDragAndDrop={handledragAndDropBoards}
+              onDragAndDrop={handleDragAndDropBoards}
             />
             <ToasterContainer 
               isToasterOpen={

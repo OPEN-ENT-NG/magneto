@@ -19,21 +19,25 @@ import { Board } from "~/models/board.model";
 
 interface BoardItemProps {
   board: {id: string,
-  title: string,
-  imageUrl: string,
-  nbCards: number,
-  shared: any,
-  owner: any,
-  modificationDate: string,
-  isPublished : boolean,};
+    title: string,
+    imageUrl: string,
+    nbCards: number,
+    shared: any,
+    owner: any,
+    modificationDate: string,
+    isPublished : boolean,};
   areBoardsLoading : boolean;
-  onDragAndDrop: (board: any[]) => void;
+  boardIds: string[];
+  onDragAndDropBoard: (board: any) => void;
+  onSelect: (board: any) => void;
 }
 
 export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   board, 
   areBoardsLoading,
-  onDragAndDrop
+  boardIds,
+  onDragAndDropBoard,
+  onSelect
 }) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation();
@@ -54,7 +58,8 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   };
 
   useEffect(() => {
-    onDragAndDrop([board]);
+    console.log("coucou alice", board);
+    onDragAndDropBoard(board);
   }, [isDragging])
 
   return (
@@ -75,6 +80,8 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
         // onClick={() => {setIsToasterOpen()}}
         isLoading={areBoardsLoading}
         isSelectable={true}
+        isSelected={boardIds.includes(board.id)}
+        onSelect={() => onSelect(board)}
       >
         <Card.Body flexDirection={"column"}>
           <Card.Image

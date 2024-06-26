@@ -13,7 +13,7 @@ import { Board } from "~/models/board.model";
 type SideBarProps = {
   onSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
-  onDragAndDrop: (boards: Board[]) => void;
+  onDragAndDrop: (board: Board) => void;
 };
 
 export const SideBar: React.FunctionComponent<SideBarProps> = ({

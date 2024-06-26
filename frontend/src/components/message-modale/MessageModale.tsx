@@ -36,7 +36,7 @@ export const MessageModale: React.FunctionComponent<MessageModaleProps> = ({
                 viewport={false}
                 >
                 <Modal.Body>
-                    {!!i18nKey && !!param && param != "" ? t(i18nKey, param) : t(i18nKey)}
+                    {!!i18nKey && !!param && param != "" ? t(i18nKey, {0: param}) : t(i18nKey)}
                 </Modal.Body>
 
                 <Modal.Footer>

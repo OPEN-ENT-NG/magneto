@@ -46,6 +46,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
     collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
     }),
+    // end: //...
   });
 
   const isSameAsUser = (id: string) => {

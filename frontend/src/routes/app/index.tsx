@@ -55,7 +55,7 @@ export const App = () => {
   }, [currentFolder]);
 
   const handleDragAndDropBoards = (board: Board) => {
-    if (!!board && selectedBoards.find((selectedBoard: Board) => {selectedBoard._id == board._id})) {
+    if (!!board && selectedBoards.find((selectedBoard: Board) => selectedBoard._id == board._id)) {
       setDragAndDropBoards(selectedBoards);
     } else if (!!board) {
       setDragAndDropBoards([board]);

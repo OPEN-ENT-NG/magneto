@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
+import { t } from "i18next";
 
 import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
@@ -27,6 +28,7 @@ export interface AppProps {
 
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
+  const [searchBarResetter, resetSearchBar] = useState(0);
 
   const [currentFolder, setCurrentFolder] = useState(
     new Folder(FOLDER_TYPE.MY_BOARDS),
@@ -36,9 +38,12 @@ export const App = () => {
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [folderIds, setFolderIds] = useState<String[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
+  const [searchText, setSearchText] = useState<string>("");
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
+    setSearchText("");
+    resetSearchBar(searchBarResetter + 1);
   };
 
   const resetBoardsAndFolders = () => {
@@ -75,11 +80,13 @@ export const App = () => {
           }}
         >
           <SearchBar
-            isVariant
-            onChange={function Ga() {}}
-            onClick={function Ga() {}}
-            placeholder="Search something...."
+            onChange={(e) => {
+              setSearchText(e.target.value);
+            }}
+            placeholder={t("magneto.search.placeholder")}
             size="md"
+            isVariant
+            key={searchBarResetter}
           />
           <FolderList
             currentFolder={currentFolder}
@@ -88,6 +95,7 @@ export const App = () => {
             selectedFolders={selectedFolders}
             setFolderIds={setFolderIds}
             setSelectedFolders={setSelectedFolders}
+            searchText={searchText}
           />
           <BoardList
             currentFolder={currentFolder}
@@ -95,6 +103,7 @@ export const App = () => {
             selectedBoards={selectedBoards}
             setBoardIds={setBoardIds}
             setSelectedBoards={setSelectedBoards}
+            searchText={searchText}
           />
           <ToasterContainer
             isToasterOpen={

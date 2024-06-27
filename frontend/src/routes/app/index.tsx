@@ -41,7 +41,6 @@ export const App = () => {
   const [searchText, setSearchText] = useState<string>("");
 
   const handleSelectFolder = (folder: Folder) => {
-    console.log("reset la barre");
     setCurrentFolder(folder);
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);

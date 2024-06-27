@@ -163,7 +163,6 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   }
 
   const boardsToDisplay = searchText !== "" ? allBoardData : boardData;
-  console.log(boardsToDisplay);
 
   return (
     <>

@@ -246,7 +246,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
               onChange={(e) => {
                 setSearchText(e.target.value);
               }}
-              placeholder="Search something...."
+              placeholder={t("magneto.search.placeholder")}
               size="md"
               isVariant
             />

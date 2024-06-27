@@ -17,6 +17,7 @@ type FolderListProps = {
   selectedFolders: Folder[];
   setFolderIds: React.Dispatch<React.SetStateAction<String[]>>;
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
+  searchText: string;
 };
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
@@ -26,6 +27,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   selectedFolders,
   setFolderIds,
   setSelectedFolders,
+  searchText,
 }) => {
   const { currentApp } = useOdeClient();
   const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
@@ -101,39 +103,49 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     <>
       {folderData?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-          {folderData.map((folder: Folder) => {
-            const { id, title } = folder;
-            return (
-              <animated.li
-                className="g-col-4 z-1 folderSizing"
-                key={id}
-                style={{
-                  position: "relative",
-                  ...springs,
-                }}
-              >
-                <Card
-                  app={currentApp!}
-                  options={{
-                    type: "folder",
-                    title,
-                  }}
-                  isLoading={getFoldersLoading}
-                  isSelectable={true}
-                  isSelected={folderIds.includes(id)}
-                  onSelect={() => toggleSelect(folder)}
-                  onClick={() => {
-                    onSelect(folder);
+          {folderData
+            .filter((folder: Folder) => {
+              if (searchText === "") {
+                return folder;
+              } else if (
+                folder.title.toLowerCase().includes(searchText.toLowerCase())
+              ) {
+                return folder;
+              }
+            })
+            .map((folder: Folder) => {
+              const { id, title } = folder;
+              return (
+                <animated.li
+                  className="g-col-4 z-1 folderSizing"
+                  key={id}
+                  style={{
+                    position: "relative",
+                    ...springs,
                   }}
                 >
-                  <Card.Body>
-                    <Icon path={mdiFolderPlus} size={1}></Icon>
-                    <Card.Title className="title">{title}</Card.Title>
-                  </Card.Body>
-                </Card>
-              </animated.li>
-            );
-          })}
+                  <Card
+                    app={currentApp!}
+                    options={{
+                      type: "folder",
+                      title,
+                    }}
+                    isLoading={getFoldersLoading}
+                    isSelectable={true}
+                    isSelected={folderIds.includes(id)}
+                    onSelect={() => toggleSelect(folder)}
+                    onClick={() => {
+                      onSelect(folder);
+                    }}
+                  >
+                    <Card.Body>
+                      <Icon path={mdiFolderPlus} size={1}></Icon>
+                      <Card.Title className="title">{title}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                </animated.li>
+              );
+            })}
         </animated.ul>
       ) : null}
     </>

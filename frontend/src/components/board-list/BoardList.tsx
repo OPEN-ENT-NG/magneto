@@ -22,7 +22,10 @@ import {
   IBoardsParamsRequest,
 } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
-import { useGetBoardsQuery } from "~/services/api/boards.service";
+import {
+  useGetBoardsQuery,
+  useGetAllBoardsQuery,
+} from "~/services/api/boards.service";
 
 type BoardListProps = {
   currentFolder: Folder;
@@ -30,6 +33,7 @@ type BoardListProps = {
   selectedBoards: Board[];
   setBoardIds: React.Dispatch<React.SetStateAction<String[]>>;
   setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
+  searchText: string;
 };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
@@ -38,6 +42,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   selectedBoards,
   setBoardIds,
   setSelectedBoards,
+  searchText,
 }) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation();
@@ -45,12 +50,19 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   const userId = user ? user?.userId : "";
 
   let boardData;
+  let allBoardData;
   const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
     isPublic: false,
     isShared: true,
     isDeleted: false,
     sortBy: "modificationDate",
   });
+  const allBoardsQuery = {
+    isPublic: false,
+    isShared: true,
+    isDeleted: false,
+    sortBy: "modificationDate",
+  };
 
   const springs = useSpring({
     from: { opacity: 0 },
@@ -102,6 +114,21 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     ); //convert boards to Board[]
   }
 
+  const {
+    data: myAllBoardsResult,
+    isLoading: getAllBoardsLoading,
+    error: getAllBoardsError,
+  } = useGetAllBoardsQuery(allBoardsQuery) || {};
+  if (getAllBoardsError) {
+    console.log("error");
+  } else if (getAllBoardsLoading) {
+    console.log("loading");
+  } else {
+    allBoardData = myAllBoardsResult.all.map((board: IBoardItemResponse) =>
+      new Board().build(board),
+    ); //convert boards to Board[]
+  }
+
   async function toggleSelect(resource: Board) {
     if (boardIds.includes(resource.id)) {
       setBoardIds(
@@ -120,115 +147,134 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     setSelectedBoards([...selectedBoards, resource]);
   }
 
+  function isInFilter(board: Board) {
+    if (
+      board.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      (board.description != null &&
+        board.description.toLowerCase().includes(searchText.toLowerCase()))
+    )
+      return true;
+    if (board.tags == null || board.tags.length == 0) {
+      return false;
+    }
+    return board.tags.some((tag) =>
+      tag.toLowerCase().includes(searchText.toLowerCase()),
+    );
+  }
+
+  const boardsToDisplay = searchText !== "" ? allBoardData : boardData;
+
   return (
     <>
-      {boardData?.length ? (
+      {boardsToDisplay?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-          {boardData.map((board: Board) => {
-            const {
-              id,
-              title,
-              imageUrl,
-              nbCards,
-              shared,
-              owner,
-              modificationDate,
-              isPublished,
-            } = board;
-            return (
-              <animated.li
-                className="g-col-4 z-1 boardSizing"
-                key={id}
-                style={{
-                  position: "relative",
-                  ...springs,
-                }}
-              >
-                <Card
-                  app={currentApp!}
-                  options={{
-                    type: "board",
-                    title: "",
+          {boardsToDisplay
+            .filter((board: Board) => {
+              if (searchText === "") {
+                return board;
+              } else if (isInFilter(board)) {
+                return board;
+              }
+            })
+            .map((board: Board) => {
+              const {
+                id,
+                title,
+                imageUrl,
+                nbCards,
+                shared,
+                owner,
+                modificationDate,
+                isPublished,
+              } = board;
+              return (
+                <animated.li
+                  className="g-col-4 z-1 boardSizing"
+                  key={id}
+                  style={{
+                    position: "relative",
+                    ...springs,
                   }}
-                  // onClick={() => {setIsToasterOpen()}}
-                  isLoading={getBoardsLoading}
-                  isSelectable={true}
-                  isSelected={boardIds.includes(id)}
-                  onSelect={() => toggleSelect(board)}
                 >
-                  <Card.Body flexDirection={"column"}>
-                    <Card.Image
-                      imageSrc={imageUrl}
-                      variant="landscape"
-                    ></Card.Image>
-                    <Card.Title>{title}</Card.Title>
+                  <Card
+                    app={currentApp!}
+                    isSelectable={true}
+                    isSelected={boardIds.includes(id)}
+                    onSelect={() => toggleSelect(board)}
+                  >
+                    <Card.Body flexDirection={"column"}>
+                      <Card.Image
+                        imageSrc={imageUrl}
+                        variant="landscape"
+                      ></Card.Image>
+                      <Card.Title>{title}</Card.Title>
 
-                    <div className="board-number-magnets">
-                      <Icon
-                        path={mdiMagnet}
-                        size={1}
-                        className="med-resource-card-text"
-                      ></Icon>
-                      <Card.Text className="med-resource-card-text board-text">
-                        {nbCards} {t("magneto.magnets")}
-                      </Card.Text>
-                    </div>
-
-                    <div className="board-about">
-                      <div className="board-about">
-                        <Tooltip
-                          message={t("magneto.board.date.update")}
-                          placement="bottom"
-                        >
-                          <Icon path={mdiCalendarBlank} size={1}></Icon>
-                        </Tooltip>
-                        <Card.Text className="med-resource-card-text">
-                          {dayjs(
-                            modificationDate,
-                            "YYYY-MM-DD HH:mm:ss",
-                          ).format("DD MMMM YYYY")}
+                      <div className="board-number-magnets">
+                        <Icon
+                          path={mdiMagnet}
+                          size={1}
+                          className="med-resource-card-text"
+                        ></Icon>
+                        <Card.Text className="med-resource-card-text board-text">
+                          {nbCards} {t("magneto.magnets")}
                         </Card.Text>
                       </div>
+
                       <div className="board-about">
-                        <Tooltip
-                          message={t("magneto.board.tooltip.my.board")}
-                          placement="bottom"
-                        >
-                          {!isSameAsUser(owner.userId) && (
-                            <Icon path={mdiCrown} size={1}></Icon>
-                          )}
-                        </Tooltip>
-                        <Tooltip
-                          message={t("magneto.board.owner")}
-                          placement="bottom"
-                        >
-                          {isSameAsUser(owner.userId) && (
-                            <Icon path={mdiAccountCircle} size={1}></Icon>
-                          )}
-                        </Tooltip>
-                        <Tooltip
-                          message={t("magneto.board.tooltip.shared.board")}
-                          placement="bottom"
-                        >
-                          {shared?.length && (
-                            <Icon path={mdiShareVariant} size={1}></Icon>
-                          )}
-                        </Tooltip>
-                        <Tooltip
-                          message={t("magneto.board.tooltip.shared.board")}
-                          placement="bottom"
-                        >
-                          {isPublished && (
-                            <Icon path={mdiEarth} size={1}></Icon>
-                          )}
-                        </Tooltip>
+                        <div className="board-about">
+                          <Tooltip
+                            message={t("magneto.board.date.update")}
+                            placement="bottom"
+                          >
+                            <Icon path={mdiCalendarBlank} size={1}></Icon>
+                          </Tooltip>
+                          <Card.Text className="med-resource-card-text">
+                            {dayjs(
+                              modificationDate,
+                              "YYYY-MM-DD HH:mm:ss",
+                            ).format("DD MMMM YYYY")}
+                          </Card.Text>
+                        </div>
+                        <div className="board-about">
+                          <Tooltip
+                            message={t("magneto.board.tooltip.my.board")}
+                            placement="bottom"
+                          >
+                            {!isSameAsUser(owner.userId) && (
+                              <Icon path={mdiCrown} size={1}></Icon>
+                            )}
+                          </Tooltip>
+                          <Tooltip
+                            message={t("magneto.board.owner")}
+                            placement="bottom"
+                          >
+                            {isSameAsUser(owner.userId) && (
+                              <Icon path={mdiAccountCircle} size={1}></Icon>
+                            )}
+                          </Tooltip>
+                          <Tooltip
+                            message={t("magneto.board.tooltip.shared.board")}
+                            placement="bottom"
+                          >
+                            {shared?.length && (
+                              <Icon path={mdiShareVariant} size={1}></Icon>
+                            )}
+                          </Tooltip>
+                          <Tooltip
+                            message={t("magneto.board.tooltip.shared.board")}
+                            placement="bottom"
+                          >
+                            {isPublished && (
+                              <Icon path={mdiEarth} size={1}></Icon>
+                            )}
+                          </Tooltip>
+                        </div>
                       </div>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </animated.li>
-            );
-          })}
+                    </Card.Body>
+                  </Card>
+                </animated.li>
+              );
+            })}
         </animated.ul>
       ) : null}
     </>

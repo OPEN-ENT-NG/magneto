@@ -29,6 +29,21 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       },
       providesTags: ["Boards"],
     }),
+    getAllBoards: builder.query({
+      query: (params: IBoardsParamsRequest) => {
+        let urlParams: string =
+          `?isPublic=${params.isPublic}&isShared=${params.isShared}` +
+          `&isDeleted=${params.isDeleted}&sortBy=${params.sortBy}` +
+          `&allFolders=true`;
+
+        if (params.page != null) {
+          urlParams += `&page=${params.page}`;
+        }
+
+        return `boards${urlParams}`;
+      },
+      providesTags: ["Boards"],
+    }),
     createBoard: builder.mutation({
       query: (params: IBoardPayload) => ({
         url: "board",
@@ -94,6 +109,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
 
 export const {
   useGetBoardsQuery,
+  useGetAllBoardsQuery,
   useCreateBoardMutation,
   useUpdateBoardMutation,
   useDuplicateBoardMutation,

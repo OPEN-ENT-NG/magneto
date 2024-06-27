@@ -26,3 +26,11 @@
     display: none;
   }
 }
+
+.drawer-button {
+  margin-right: 2;
+
+  @media (min-width: 1025px) {
+    display: none !important;
+  }
+}

@@ -12,6 +12,7 @@ import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
@@ -43,10 +44,7 @@ export const App = () => {
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
-  const {
-    windowDimensions: { width },
-    adaptColumns,
-  } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
@@ -87,7 +85,7 @@ export const App = () => {
         </Grid.Col>
 
         <Grid.Col
-          lg={adaptColumns()}
+          lg={adaptColumns(width)}
           md="8"
           sm="4"
           style={{

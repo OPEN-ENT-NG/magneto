@@ -22,14 +22,5 @@ export default function useWindowDimensions() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const adaptColumns = () => {
-    let str = "";
-    if (windowDimensions.width == 1024) {
-      str = "9";
-    } else if (windowDimensions.width < 1280) str = "6";
-    else str = "9";
-    return str;
-  };
-
-  return { windowDimensions, adaptColumns };
+  return windowDimensions;
 }

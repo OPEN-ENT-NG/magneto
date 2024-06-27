@@ -74,9 +74,7 @@ export const CreateBoard: FunctionComponent<props> = ({
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
 
-  const {
-    windowDimensions: { width },
-  } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
   const setBoardFromForm = async (board: BoardForm) => {
     board.title = title;

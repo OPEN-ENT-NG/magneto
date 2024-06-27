@@ -2,7 +2,6 @@ import { AppHeader, Button } from "@edifice-ui/react";
 import "./Header.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { t } from "i18next";
 
 import myimg from "./uni-magneto.png";
@@ -13,8 +12,6 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
-  const isAbove1025px = useMediaQuery("(min-width:1025px)");
-
   return (
     <AppHeader>
       <IconButton
@@ -22,10 +19,7 @@ const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
         aria-label="open drawer"
         onClick={toggleDrawer}
         edge="start"
-        sx={{
-          mr: 2,
-          display: isAbove1025px ? "none" : "inline-flex",
-        }}
+        className="drawer-button"
       >
         <MenuIcon />
       </IconButton>

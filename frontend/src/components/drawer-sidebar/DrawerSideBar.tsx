@@ -19,16 +19,14 @@ export const DrawerSideBar: React.FunctionComponent<DrawerSideBarProps> = ({
   drawer,
   toggleDrawer,
 }) => {
-  const {
-    windowDimensions: { width },
-  } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   return (
     <Drawer
       open={drawer}
       onClose={toggleDrawer}
       PaperProps={{
         sx: {
-          height: width > 767 ? "calc(100% - 67px)" : "calc(100% - 28px)",
+          height: width > 767 ? "calc(100% - 67px)" : "calc(100% - 28px)", //size (and place just the line under) the drawer so it starts just under the ENT header (which changes at 768px)
           top: width > 767 ? 67 : 43,
         },
       }}

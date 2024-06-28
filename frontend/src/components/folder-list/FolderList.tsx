@@ -10,15 +10,16 @@ import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { FolderItem } from "../folder-item/FolderItem";
-import { useDrop } from "react-dnd";
+import { Board } from "~/models/board.model";
 
 type FolderListProps = {
   currentFolder: Folder;
   onSelect: (folder: Folder) => void;
-  folderIds: String[];
+  folderIds: string[];
   selectedFolders: Folder[];
-  setFolderIds: React.Dispatch<React.SetStateAction<String[]>>;
+  setFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
+  dragAndDropBoards: Board[]; 
   onDragAndDrop: (board: Board) => void;
 };
 
@@ -29,6 +30,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   selectedFolders,
   setFolderIds,
   setSelectedFolders,
+  dragAndDropBoards,
   onDragAndDrop
 }) => {
   const { currentApp } = useOdeClient();
@@ -81,7 +83,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     if (folderIds.includes(resource.id)) {
       setFolderIds(
         folderIds.filter(
-          (selectedResource: String) => selectedResource !== resource.id,
+          (selectedResource: string) => selectedResource !== resource.id,
         ),
       );
       setSelectedFolders(
@@ -117,7 +119,14 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                   ...springs,
                 }}
               >
-                <FolderItem folder={folder} areFoldersLoading={getFoldersLoading} onSelect={onSelect} onDragAndDrop={onDragAndDrop}/>
+                <FolderItem 
+                  folder={folder} 
+                  folders={folderData} 
+                  areFoldersLoading={getFoldersLoading} 
+                  onSelect={onSelect} 
+                  dragAndDropBoards={dragAndDropBoards} 
+                  onDragAndDrop={onDragAndDrop}
+                />
               </animated.li>
             );
           })}

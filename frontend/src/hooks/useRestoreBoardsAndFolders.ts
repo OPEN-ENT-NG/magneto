@@ -5,8 +5,8 @@ import { useRestorePreDeleteBoardsMutation } from "~/services/api/boards.service
 import { useRestorePreDeleteFoldersMutation } from "~/services/api/folders.service";
 
 interface useRestoreBoardsAndFoldersProps {
-  boardIds: String[];
-  folderIds: String[];
+  boardIds: string[];
+  folderIds: string[];
 }
 
 export const useRestoreBoardsAndFolders = ({

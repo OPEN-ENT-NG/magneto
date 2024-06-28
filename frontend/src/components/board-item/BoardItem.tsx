@@ -58,7 +58,6 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   };
 
   useEffect(() => {
-    console.log("coucou alice", board);
     onDragAndDropBoard(board);
   }, [isDragging])
 

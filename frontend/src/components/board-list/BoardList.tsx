@@ -18,7 +18,7 @@ type BoardListProps = {
   currentFolder: Folder;
   boardIds: string[];
   selectedBoards: Board[];
-  setBoardIds: React.Dispatch<React.SetStateAction<String[]>>;
+  setBoardIds: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
   onDragAndDrop: (board: Board) => void;
 };
@@ -92,7 +92,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     if (boardIds.includes(resource.id)) {
       setBoardIds(
         boardIds.filter(
-          (selectedResource: String) => selectedResource !== resource.id,
+          (selectedResource: string) => selectedResource !== resource.id,
         ),
       );
       setSelectedBoards(

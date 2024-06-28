@@ -46,7 +46,6 @@ export const TreeViewContainer: React.FunctionComponent<
       setShowModale(false);
       resetDragAndDrop();
     }});
-  // const [i18nKey, setI18nKe y] = useState("");
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -80,24 +79,11 @@ export const TreeViewContainer: React.FunctionComponent<
       } else if ((userRights.folderOwnerNotShared(dragAndDropInitialFolder) || userRights.folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
               && userRights.folderOwnerAndSharedOrShareRights(targetFolder)) {
           //initial folder owner + not shared or has right + shared, target folder has right + shared
-          console.log("enter shared");
-
           confirmSharedFolderDragAndDrop(dragAndDropBoardsIds, targetFolder, "magneto.folder.share.drag.in.warning", targetFolder.title)
-
-          // dragAndDropBoards = dragAndDropBoards;
-          // dragAndDropTarget = targetFolder;
-          // displayEnterSharedFolderWarningLightbox = true;
       } else if (userRights.folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder)
           && userRights.folderOwnerNotShared(targetFolder)) {
           //initial folder has right + shared, target folder owner + not shared
-          console.log("exit shared");
-
           confirmSharedFolderDragAndDrop(dragAndDropBoardsIds, targetFolder, "magneto.folder.share.drag.out.warning", dragAndDropInitialFolder.title)
-
-
-          // dragAndDropBoards = dragAndDropBoards;
-          // dragAndDropTarget = targetFolder;
-          // displayExitSharedFolderWarningLightbox = true;
       } else if (userRights.folderOwnerNotShared(dragAndDropInitialFolder) && userRights.folderOwnerNotShared(targetFolder)) {
           //initial folder owner + not shared, target folder owner + not shared
           proceedOnDragAndDrop(dragAndDropBoards, targetFolder);
@@ -107,7 +93,6 @@ export const TreeViewContainer: React.FunctionComponent<
 
       onDragAndDrop(undefined);
     } 
-    // e.preventDefault();
     e.stopPropagation();
   };
 
@@ -139,18 +124,10 @@ export const TreeViewContainer: React.FunctionComponent<
     return clickedFolder;
   } 
 
-  const proceedOnDragAndDrop = async (dragAndDropBoards: Board[], dragAndDropTarget: Folder, isFromMoveBoardLightbox?: boolean) => {
+  const proceedOnDragAndDrop = async (dragAndDropBoards: Board[], dragAndDropTarget: Folder) => {
     let dragAndDropTargetId: string = dragAndDropTarget.id;
     let dragAndDropBoardsIds: string [] = dragAndDropBoards.map((board: Board) => board._id);
 
-    // submitted from lightbox
-    // if (isFromMoveBoardLightbox) {
-    //   moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
-    //     .catch((e)=> {console.log(e);});
-    //   resetDragAndDrop();
-    //    onFormSubmit();
-    //   return ;
-    // }
     resetDragAndDrop();
 
     // submitted directly
@@ -178,7 +155,6 @@ export const TreeViewContainer: React.FunctionComponent<
 
     moveBoardsToFolder({boardIds: dragAndDropBoardsIds, folderId: dragAndDropTargetId})
         .catch((e)=> {console.log(e);});
-    onFormSubmit();
   }
 
   const isOwnerOfSelectedBoards = (): boolean => {
@@ -188,11 +164,6 @@ export const TreeViewContainer: React.FunctionComponent<
   const resetDragAndDrop = (): void => {
     onSelect(new Folder());
     onDragAndDrop(undefined);
-  }
-
-  const onFormSubmit = (): void => {
-    // update boards
-    // update folders ?
   }
  
 

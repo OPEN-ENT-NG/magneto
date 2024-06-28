@@ -419,7 +419,7 @@ export class Board /*implements Shareable*/ {
     return this._sections;
   }
 
-  get sectionsIds(): Array<String> {
+  get sectionsIds(): Array<string> {
     return this._sections.map((section) => section.id);
   }
 
@@ -493,7 +493,7 @@ export class Board /*implements Shareable*/ {
   //     return !!this._sections ? this._sections.reduce((acc, section) => [...acc, ...section.cardIds], []) : [];
   // }
 
-  sortSections(value: Array<String>) {
+  sortSections(value: Array<string>) {
     return this._sections.sort(
       (a, b) => value.indexOf(a.id) - value.indexOf(b.id),
     );

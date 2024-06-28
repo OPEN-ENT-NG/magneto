@@ -33,9 +33,9 @@ export const App = () => {
     new Folder(FOLDER_TYPE.MY_BOARDS),
   );
 
-  const [boardIds, setBoardIds] = useState<String[]>([]);
+  const [boardIds, setBoardIds] = useState<string[]>([]);
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
-  const [folderIds, setFolderIds] = useState<String[]>([]);
+  const [folderIds, setFolderIds] = useState<string[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
   const [dragAndDropBoards, setDragAndDropBoards] = useState<Board[]>([]);
 
@@ -103,6 +103,7 @@ export const App = () => {
               selectedFolders={selectedFolders}
               setFolderIds={setFolderIds}
               setSelectedFolders={setSelectedFolders}
+              dragAndDropBoards={dragAndDropBoards} 
               onDragAndDrop={handleDragAndDropBoards}
             />
             <BoardList 

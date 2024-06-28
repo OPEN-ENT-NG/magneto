@@ -67,7 +67,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       let dragAndDropInitialFolder = !boards[0].folderId ? new Folder().build({_id: FOLDER_TYPE.MY_BOARDS, ownerId: user.userId, title: MAIN_PAGE_TITLE, parentId: ""})
       : folders.find((folder: Folder) => folder.id == boards[0].folderId) ?? new Folder();
 
-      if ((!boards[0] && isOwnerOfSelectedBoards(boards)) || folder.id == FOLDER_TYPE.PUBLIC_BOARDS) { //not board owner
+      if ((!boards[0] && isOwnerOfSelectedBoards(boards)) || folder.id == FOLDER_TYPE.PUBLIC_BOARDS || folder.id == FOLDER_TYPE.DELETED_BOARDS || !!folder.deleted) { //not board owner
           handleNoRightsDragAndDrop();
           return ;
       } else if ((userRights.folderOwnerNotShared(dragAndDropInitialFolder) || userRights.folderOwnerAndSharedOrShareRights(dragAndDropInitialFolder))
@@ -95,13 +95,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     let dragAndDropBoardsIds: string [] = dragAndDropBoards.map((board: Board) => board._id);
 
     resetDragAndDrop();
-
-    // submitted directly
-    if (dragAndDropTargetId == FOLDER_TYPE.DELETED_BOARDS) {
-        //openDeleteForm();
-    } else {
-      dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTargetId);
-    }
+    dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTargetId);
   }
 
 

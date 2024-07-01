@@ -112,7 +112,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   };
 
   const magnetsCardsToDisplay = () => {
-    console.log(switchBoard);
     if (!switchBoard) {
       return (
         <div>

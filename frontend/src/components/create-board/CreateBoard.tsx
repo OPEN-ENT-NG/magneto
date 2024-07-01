@@ -23,6 +23,7 @@ import { t } from "i18next";
 
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
+import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board, BoardForm } from "~/models/board.model";
 import {
   useCreateBoardMutation,
@@ -72,6 +73,8 @@ export const CreateBoard: FunctionComponent<props> = ({
   const [backgroundSrc, setBackgroundSrc] = useState("");
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
+
+  const { width } = useWindowDimensions();
 
   const setBoardFromForm = async (board: BoardForm) => {
     board.title = title;
@@ -203,9 +206,10 @@ export const CreateBoard: FunctionComponent<props> = ({
           <Modal.Body>
             <Grid>
               <Grid.Col
-                sm="3"
+                lg={width < 1280 ? "2" : "3"}
+                md="2"
+                sm="4"
                 style={{
-                  minHeight: "70rem",
                   padding: ".8rem",
                 }}
               >
@@ -228,9 +232,10 @@ export const CreateBoard: FunctionComponent<props> = ({
                   )}
               </Grid.Col>
               <Grid.Col
-                sm="9"
+                lg={width < 1280 ? "6" : "9"}
+                md="6"
+                sm="4"
                 style={{
-                  minHeight: "10rem",
                   padding: ".8rem",
                 }}
               >

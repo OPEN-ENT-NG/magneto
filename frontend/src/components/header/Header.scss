@@ -20,3 +20,11 @@
 .button {
   margin-left: auto;
 }
+
+.drawer-button {
+  margin-right: 2;
+
+  @media (min-width: 1025px) {
+    display: none !important;
+  }
+}

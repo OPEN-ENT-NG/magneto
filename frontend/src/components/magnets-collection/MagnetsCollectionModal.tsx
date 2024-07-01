@@ -9,7 +9,8 @@ import {
 } from "@edifice-ui/react";
 import { mdiMagnet } from "@mdi/js";
 import Icon from "@mdi/react";
-import { Box, Switch, Tab, Tabs } from "@mui/material";
+import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
+import { Switch } from "@mui/material";
 import { animated, useSpring } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
@@ -19,6 +20,7 @@ import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card as CardModel, ICardItemResponse } from "~/models/card.model";
 import "./MagnetsCollectionModal.scss";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
+import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -65,6 +67,8 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     isFavorite: filter.isFavorite,
   }) || {};
 
+  const [duplicateBoard] = useDuplicateBoardMutation();
+
   if (getCardsError) {
     console.log("error");
   } else if (getCardsLoading) {
@@ -98,7 +102,17 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     to: { opacity: 1 },
   });
 
+  const onDuplicate = async (boardId: string) => {
+    await duplicateBoard(boardId);
+  };
+
+  const onLeave = () => {
+    toggleSwitchBoard(false);
+    toggle();
+  };
+
   const magnetsCardsToDisplay = () => {
+    console.log(switchBoard);
     if (!switchBoard) {
       return (
         <div>
@@ -168,7 +182,25 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                   }
                 }).length > 0 && (
                   <div>
-                    <h2>{board._title}</h2>
+                    <div className="parent">
+                      <h2>{board._title}</h2>
+                      <span
+                        onClick={() => {
+                          onDuplicate(board._id);
+                        }}
+                        className="duplicateText"
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            onDuplicate(board._id);
+                          }
+                        }}
+                      >
+                        <FileCopyOutlinedIcon />
+                        {t("magneto.cards.collection.board.duplicate")}
+                      </span>
+                    </div>
                     <animated.ul className="grid ps-0 list-unstyled mb-24">
                       {board.cards
                         .filter((card: CardModel) => {
@@ -234,11 +266,11 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
         <Modal
           id={"createFolder"}
           isOpen={isOpen}
-          onModalClose={toggle}
+          onModalClose={onLeave}
           size="lg"
           viewport={false}
         >
-          <Modal.Header onModalClose={toggle}>
+          <Modal.Header onModalClose={onLeave}>
             <h4>{t("magneto.cards.collection")}</h4>
           </Modal.Header>
           <Modal.Body>
@@ -249,19 +281,20 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
               placeholder={t("magneto.search.placeholder")}
               size="md"
               isVariant
+              className="searchbar"
             />
+            <div className="headerFav">
+              {t("magneto.cards.collection.favorite")}
+            </div>
             <div>
-              <Switch value={switchBoard} onChange={toggleSwitchBoard} />
+              <Switch
+                value={switchBoard}
+                onChange={toggleSwitchBoard}
+                className="switchFav"
+              />
               {t("magneto.cards.collection.board.view")}
             </div>
-            <Box sx={{ width: "100%" }}>
-              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <Tabs value={0} aria-label="basic tabs example">
-                  <Tab label="AIMANTS MIS EN FAVORIS" />
-                </Tabs>
-              </Box>
-              {magnetsCardsToDisplay()}
-            </Box>
+            {magnetsCardsToDisplay()}
           </Modal.Body>
         </Modal>
       )}

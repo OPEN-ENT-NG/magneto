@@ -15,6 +15,7 @@ type props = {
   toggle: () => void;
   folderToUpdate?: Folder;
   reset?: () => void;
+  toggleDrawer?: () => void;
 };
 
 export const CreateFolder: FunctionComponent<props> = ({
@@ -22,6 +23,7 @@ export const CreateFolder: FunctionComponent<props> = ({
   toggle,
   folderToUpdate,
   reset,
+  toggleDrawer,
 }: props) => {
   const [title, setTitle] = useState("");
   const [parentId] = useState("");
@@ -40,6 +42,7 @@ export const CreateFolder: FunctionComponent<props> = ({
       } else {
         await addFolder(folder);
       }
+      if (toggleDrawer != null) toggleDrawer();
       resetFields();
     } catch (error) {
       console.error(error);

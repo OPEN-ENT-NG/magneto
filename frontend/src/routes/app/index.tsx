@@ -6,13 +6,17 @@ import { t } from "i18next";
 
 import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
+import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
 import { FolderList } from "~/components/folder-list/FolderList";
 import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import adaptColumns from "~/hooks/useAdaptColumns";
+import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
+import "./index.scss";
 
 export interface AppProps {
   _id: string;
@@ -39,6 +43,8 @@ export const App = () => {
   const [folderIds, setFolderIds] = useState<String[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
   const [searchText, setSearchText] = useState<string>("");
+  const [drawer, toggleDrawer] = useToggle(false);
+  const { width } = useWindowDimensions();
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolder(folder);
@@ -59,13 +65,19 @@ export const App = () => {
 
   return (
     <>
-      <Header onClick={toggle} />
-
+      <Header onClick={toggle} toggleDrawer={toggleDrawer} />
+      <DrawerSideBar
+        onSelect={handleSelectFolder}
+        drawer={drawer}
+        toggleDrawer={toggleDrawer}
+      />
       <Grid>
         <Grid.Col
-          sm="3"
+          lg={width < 1280 ? "2" : "3"} //Since number of columns reduce by 4 at 1280px but doesnt take in account our md columns configuration until 1024px, we're manually changing it
+          md="2"
+          sm="4"
+          className="gridSidebar"
           style={{
-            minHeight: "70rem",
             padding: ".8rem",
           }}
         >
@@ -73,7 +85,9 @@ export const App = () => {
         </Grid.Col>
 
         <Grid.Col
-          sm="8"
+          lg={adaptColumns(width)}
+          md="8"
+          sm="4"
           style={{
             minHeight: "10rem",
             padding: ".8rem",

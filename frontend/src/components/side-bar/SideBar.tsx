@@ -11,10 +11,14 @@ import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
 type SideBarProps = {
   onSelect: (folder: Folder) => void;
+  toggleDrawer?: () => void;
+  className?: string;
 };
 
 export const SideBar: React.FunctionComponent<SideBarProps> = ({
   onSelect,
+  toggleDrawer,
+  className,
 }) => {
   const { t } = useTranslation();
 
@@ -71,12 +75,20 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
 
   return (
     <>
-      <aside className="g-col-3 g-col-lg-2 g-col-xl-3 border-end pt-16 pe-16 d-none d-lg-block">
+      <aside
+        className={
+          "g-col-3 g-col-lg-2 g-col-xl-3 border-end pt-16 pe-16 d-lg-block " +
+          className
+        }
+      >
         <TreeViewContainer
           folders={myFolders ?? []}
           folderObject={myFoldersObject ?? undefined}
           folderType={FOLDER_TYPE.MY_BOARDS}
-          onSelect={onSelect}
+          onSelect={(folder) => {
+            onSelect(folder);
+            if (toggleDrawer != null) toggleDrawer();
+          }}
         />
         <TreeViewContainer
           folders={myFolders ?? []}
@@ -88,15 +100,21 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
             isPublic: true,
           }}
           folderType={FOLDER_TYPE.MY_BOARDS}
-          onSelect={onSelect}
+          onSelect={(folder) => {
+            onSelect(folder);
+            if (toggleDrawer != null) toggleDrawer();
+          }}
         />
         <TreeViewContainer
           folders={deletedFolders}
           folderObject={deletedFoldersObject}
           folderType={FOLDER_TYPE.DELETED_BOARDS}
-          onSelect={onSelect}
+          onSelect={(folder) => {
+            onSelect(folder);
+            if (toggleDrawer != null) toggleDrawer();
+          }}
         />
-        <SideBarButtons />
+        <SideBarButtons toggleDrawer={toggleDrawer} />
       </aside>
     </>
   );

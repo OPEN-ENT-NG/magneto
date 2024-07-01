@@ -8,7 +8,13 @@ import { useTranslation } from "react-i18next";
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { MagnetsCollectionModal } from "../magnets-collection/MagnetsCollectionModal";
 
-export const SideBarButtons = () => {
+type SideBarButtonsProps = {
+  toggleDrawer: () => void;
+};
+
+export const SideBarButtons: React.FunctionComponent<SideBarButtonsProps> = ({
+  toggleDrawer,
+}) => {
   const { t } = useTranslation();
 
   const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
@@ -42,6 +48,7 @@ export const SideBarButtons = () => {
         <CreateFolder
           isOpen={isCreateFolderOpen}
           toggle={toggleCreateFolderOpen}
+          toggleDrawer={toggleDrawer}
         />
         <MagnetsCollectionModal
           isOpen={isMagnetsCollectionOpen}

@@ -48,7 +48,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   const folderTitle = folder.title;
 
-  const [, drop] = useDrop(
+  const [isOver, drop] = useDrop(
     () => ({
       accept: "board",
       drop: (item: any) => {
@@ -101,7 +101,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   const handleNoRightsDragAndDrop =  (): void => {
     setModaleProps({...modaleProps, i18nKey: "magneto.folder.drag.drop.right.error"});
-    console.log(modaleProps);
     setShowModale(true);
   }
 
@@ -127,10 +126,17 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   }
 
 
+  useEffect(() => {
+    console.log("isOver", !!isOver);
+  },[isOver]);
+
 
   return (
     <>
-      <div ref={drop} draggable="true">
+      <div ref={drop} draggable="true"
+      style= {{
+        "borderColor": !!isOver ? `#000000 !important` : ``
+      }}>
         <Card
           app={currentApp!}
           options={{

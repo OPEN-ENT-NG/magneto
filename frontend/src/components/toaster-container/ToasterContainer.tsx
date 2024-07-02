@@ -18,6 +18,7 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
+import { ShareModalMagneto } from "../share-modal/ShareModalMagneto";
 
 export interface ToasterContainerProps {
   isToasterOpen: boolean;
@@ -44,6 +45,8 @@ export const ToasterContainer = ({
   const [isMoveOpen, toggleMove] = useToggle(false);
   const [isMoveDelete, toggleDelete] = useToggle(false);
   const [isCreateFolder, toggleCreateFolder] = useToggle(false);
+  const [isShareFolder, toggleShareFolder] = useToggle(false);
+  const [isShareBoard, toggleShareBoard] = useToggle(false);
 
   const [duplicateBoard] = useDuplicateBoardMutation();
 
@@ -59,6 +62,8 @@ export const ToasterContainer = ({
   });
 
   const { user } = useOdeClient();
+
+  let shareOptions = {};
 
   const userId = user ? user?.userId : "";
 
@@ -153,6 +158,25 @@ export const ToasterContainer = ({
     return false;
   };
 
+  const openShareModal = () => {
+    if (boardIds.length > 0) {
+      shareOptions = {
+        resourceCreatorId: userId,
+        resourceId: boardIds[0],
+        resourceRights: [], //TODO : Ajouter ce nouveau tableau des droits (modif à faire dans le back)
+      };
+      toggleShareBoard();
+    }
+    else if (boardIds.length > 0) {
+      shareOptions = {
+        resourceCreatorId: userId,
+        resourceId: folderIds[0],
+        resourceRights: [], //TODO : Ajouter ce nouveau tableau des droits (modif à faire dans le back)
+      };
+      toggleShareFolder();
+    }
+  }
+
   return (
     <>
       {transition((style, isToasterOpen) => {
@@ -168,7 +192,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -226,7 +250,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={openShareModal}
                   >
                     {t("magneto.share")}
                   </Button>
@@ -242,7 +266,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -257,7 +281,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.public.unshare")}
                     </Button>
@@ -314,6 +338,11 @@ export const ToasterContainer = ({
             isPredelete={currentFolder.id != FOLDER_TYPE.DELETED_BOARDS}
             reset={reset}
           />
+          <ShareModalMagneto
+            isOpen={isShareBoard}
+            toggle={toggleShareBoard}
+            shareOptions={shareOptions}
+          />
         </>
       )}
       {folders != null && (
@@ -323,6 +352,11 @@ export const ToasterContainer = ({
             toggle={toggleCreateFolder}
             folderToUpdate={folders[0]}
             reset={reset}
+          />
+          <ShareModalMagneto
+            isOpen={isShareFolder}
+            toggle={toggleShareFolder}
+            shareOptions={shareOptions}
           />
         </>
       )}

@@ -53,4 +53,25 @@ public class MagnetoController extends ControllerHelper {
         renderView(request, param, "index.html", null);
         eventStore.createAndStoreEvent(ACCESS.name(), request);
     }
+
+    @Override
+    protected boolean shouldNormalizedRights() {
+        return true;
+    }
+
+    public static Optional<UserInfos> getCreatorForModel(final JsonObject json) {
+        if(!json.containsKey("ownerId")){
+            return Optional.empty();
+        }
+        final UserInfos user = new UserInfos();
+        user.setUserId(json.getJsonObject("ownerId"));
+        return Optional.of(user);
+    }
+
+    @Override
+    protected Function<JsonObject, Optional<String>> jsonToOwnerId() {
+        return json -> {
+            return getCreatorForModel(json).map(user -> user.getUserId());
+        };
+    }
 }

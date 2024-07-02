@@ -45,8 +45,8 @@
     ]
   },
   "dependencies": {
-    "@edifice-ui/icons": "1.4.4",
-    "@edifice-ui/react": "1.4.5",
+    "@edifice-ui/icons": "1.5.10",
+    "@edifice-ui/react": "1.5.10",
     "@react-spring/web": "9.7.3",
     "@reduxjs/toolkit": "^2.0.1",
     "@tanstack/react-query": "4.36.1",

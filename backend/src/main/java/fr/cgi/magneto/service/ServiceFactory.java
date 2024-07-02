@@ -13,6 +13,7 @@ import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.share.impl.MongoDbShareService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.storage.Storage;
+import org.entcore.common.share.ShareNormalizer;
 
 import java.util.Map;
 
@@ -30,6 +31,7 @@ public class ServiceFactory {
     private final BoardService boardService;
     private final CardService cardService;
     private final Map<String, SecuredAction> securedActions;
+    private final ShareNormalizer shareNormalizer;
 
     public ServiceFactory(Vertx vertx, Storage storage, MagnetoConfig magnetoConfig, Neo4j neo4j, Sql sql, MongoDb mongoDb, Map<String, SecuredAction> securedActions) {
         this.vertx = vertx;
@@ -40,6 +42,7 @@ public class ServiceFactory {
         this.mongoDb = mongoDb;
         this.securedActions = securedActions;
         this.webClient = initWebClient();
+        this.shareNormalizer = new ShareNormalizer(securedActions);
         this.folderService = new DefaultFolderService(CollectionsConstant.FOLDER_COLLECTION, mongoDb, this);
         this.cardService = new DefaultCardService(CollectionsConstant.CARD_COLLECTION, mongoDb, this);
         this.boardService = new DefaultBoardService(CollectionsConstant.BOARD_COLLECTION, mongoDb, this);
@@ -51,6 +54,10 @@ public class ServiceFactory {
 
     public MagnetoConfig magnetoConfig() {
         return this.magnetoConfig;
+    }
+
+    public ShareNormalizer shareNormalizer() {
+        return this.shareNormalizer;
     }
 
     public BoardService boardService() {
@@ -104,7 +111,7 @@ public class ServiceFactory {
     }
 
     public Map<String, SecuredAction> securedActions() {
-        return securedActions;
+        return this.securedActions;
     }
 
     private WebClient initWebClient() {

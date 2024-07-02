@@ -15,7 +15,10 @@ import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.SuperAdminFilter;
+import org.entcore.common.user.UserInfos;
 
+import java.util.Optional;
+import java.util.function.Function;
 
 import static fr.cgi.magneto.core.enums.Events.ACCESS;
 

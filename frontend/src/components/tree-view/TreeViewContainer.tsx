@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from "react";
+import React, { Children } from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView, useOdeClient } from "@edifice-ui/react";
 import { t } from "i18next";
 
-import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
-import { Board } from "~/models/board.model";
-import { FolderTreeNavItem } from "~/models/folder-tree.model";
+import { getFolderTypeData } from "./utils";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
-import { useMoveBoardsMutation } from "~/services/api/boards.service";
-import { UserRights } from "~/services/utils/share.utils";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type TreeViewContainerProps = {
-  folders: Folder[];
-  folderObject: FolderTreeNavItem;
-  folderType: string;
+  folderType: FOLDER_TYPE;
   onSelect: (folder: Folder) => void;
   data: any;
   dispatch: any;
@@ -27,25 +24,15 @@ type TreeViewContainerProps = {
 
 export const TreeViewContainer: React.FunctionComponent<
   TreeViewContainerProps
-> = ({
-  folders,
-  folderObject,
-  folderType,
-  onSelect,
-  data,
-  dispatch,
-  dragAndDropBoards,
-  onDragAndDrop,
-  onDisplayModal,
-  modalData,
-  onSetModalData,
-}) => {
+> = ({ folderType, onSelect }) => {
+  const { folderObject, folders, selectedNodeIds, setSelectedNodeIds } = useFoldersNavigation();
   const dataTree = {
-    children: [],
-    id: folderType,
-    name: folderType,
+    children: [{ title: "a", children: ["a", "b"] }, "b"],
+    id: FOLDER_TYPE.PUBLIC_BOARDS,
+    name: t("magneto.lycee.connecte.boards"),
     section: true,
-  };
+    isPublic: true,
+  }
 
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const { user } = useOdeClient();
@@ -117,14 +104,14 @@ export const TreeViewContainer: React.FunctionComponent<
       );
       const dragAndDropInitialFolder = !dragAndDropBoard.folderId
         ? new Folder().build({
-            _id: FOLDER_TYPE.MY_BOARDS,
-            ownerId: user.userId,
-            title: MAIN_PAGE_TITLE,
-            parentId: "",
-          })
+          _id: FOLDER_TYPE.MY_BOARDS,
+          ownerId: user.userId,
+          title: MAIN_PAGE_TITLE,
+          parentId: "",
+        })
         : folders.find(
-            (folder: Folder) => folder.id == dragAndDropBoard.folderId,
-          ) ?? new Folder();
+          (folder: Folder) => folder.id == dragAndDropBoard.folderId,
+        ) ?? new Folder();
 
       if (
         (!dragAndDropBoards[0] && isOwnerOfSelectedBoards()) ||
@@ -314,21 +301,22 @@ export const TreeViewContainer: React.FunctionComponent<
         onDrop={handleDrop}
       >
         <TreeView
-          data={folderObject ?? dataTree}
+          selectedNodesIds={selectedNodeIds}
+          data={data || dataTree}
           onTreeItemBlur={() => {
             console.log("blur");
           }}
           onTreeItemFocus={() => {
             console.log("focus");
           }}
-          onTreeItemFold={() => {
-            console.log("fold");
+          onTreeItemFold={(item) => {
+            onTreeItemfold(item);
           }}
           onTreeItemSelect={(item) => {
             selectFolder(item);
           }}
-          onTreeItemUnfold={() => {
-            console.log("unfold");
+          onTreeItemUnfold={(item) => {
+            onTreeItemUnFold(item);
           }}
         />
       </div>

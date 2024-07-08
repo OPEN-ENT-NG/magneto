@@ -17,6 +17,7 @@ import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import "./index.scss";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 export interface AppProps {
   _id: string;
@@ -33,7 +34,7 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
-
+  const { setCurrentFolder: setCurrentFolderP } = useFoldersNavigation()
   const [currentFolder, setCurrentFolder] = useState(
     new Folder(FOLDER_TYPE.MY_BOARDS),
   );
@@ -47,6 +48,7 @@ export const App = () => {
   const { width } = useWindowDimensions();
 
   const handleSelectFolder = (folder: Folder) => {
+    setCurrentFolderP(folder)
     setCurrentFolder(folder);
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);
@@ -59,7 +61,7 @@ export const App = () => {
     setSelectedFolders([]);
   };
 
-  useEffect(() => {
+  useEffect(() => {  
     resetBoardsAndFolders();
   }, [currentFolder]);
 

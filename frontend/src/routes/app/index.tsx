@@ -34,7 +34,7 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
-  const { setCurrentFolder: setCurrentFolderP } = useFoldersNavigation()
+  const { setCurrentFolder: setCurrentFolderP } = useFoldersNavigation();
   const [currentFolder, setCurrentFolder] = useState(
     new Folder(FOLDER_TYPE.MY_BOARDS),
   );
@@ -48,7 +48,7 @@ export const App = () => {
   const { width } = useWindowDimensions();
 
   const handleSelectFolder = (folder: Folder) => {
-    setCurrentFolderP(folder)
+    setCurrentFolderP(folder);
     setCurrentFolder(folder);
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);
@@ -61,7 +61,7 @@ export const App = () => {
     setSelectedFolders([]);
   };
 
-  useEffect(() => {  
+  useEffect(() => {
     resetBoardsAndFolders();
   }, [currentFolder]);
 

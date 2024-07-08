@@ -19,7 +19,9 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
 }) => {
   const { getFolders } = useFoldersNavigation();
 
-  useEffect(() => { getFolders() }, []);
+  useEffect(() => {
+    getFolders();
+  }, []);
 
   return (
     <>

@@ -15,7 +15,6 @@ export const useFoldersLogic = () => {
     useState<FolderObjectState>(initialFolderObject);
   const [triggerFetch, setTriggerFetch] =
     useState<TriggerFetchState>(initialTriggerFetch);
-
   const { myFolders, deletedFolders } = triggerFetch;
 
   const processFolders = useCallback(

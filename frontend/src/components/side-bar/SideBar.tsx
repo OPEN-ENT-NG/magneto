@@ -56,6 +56,8 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
     fileList: [],
   });
 
+  useEffect(() => { getFolders() }, []);
+
   return (
     <>
       <aside

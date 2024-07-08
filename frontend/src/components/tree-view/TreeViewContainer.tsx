@@ -1,29 +1,30 @@
-import React from "react";
+import React, { Children } from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView } from "@edifice-ui/react";
 import { t } from "i18next";
 
+import { getFolderTypeData } from "./utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
-import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type TreeViewContainerProps = {
-  folders: Folder[];
-  folderObject: FolderTreeNavItem;
-  folderType: string;
+  folderType: FOLDER_TYPE;
   onSelect: (folder: Folder) => void;
 };
 
 export const TreeViewContainer: React.FunctionComponent<
   TreeViewContainerProps
-> = ({ folders, folderObject, folderType, onSelect }) => {
-  const dataTree = {
-    children: [],
-    id: folderType,
-    name: folderType,
+> = ({ folderType, onSelect }) => {
+  const { folderObject, folders, selectedNodeIds, setSelectedNodeIds } = useFoldersNavigation();
+  const dataTree={
+    children: [{title:"a",children:["a","b"]},"b"],
+    id: FOLDER_TYPE.PUBLIC_BOARDS,
+    name: t("magneto.lycee.connecte.boards"),
     section: true,
-  };
+    isPublic: true,
+  }
 
   const selectFolder = (folderId: string): void => {
     let clickedFolder: Folder;
@@ -51,24 +52,44 @@ export const TreeViewContainer: React.FunctionComponent<
     onSelect(clickedFolder);
   };
 
+  const onTreeItemUnFold = (itemId: string) => {
+
+    setSelectedNodeIds((prevSelectedNodeIds) => {
+      const prevLastNodeId = prevSelectedNodeIds.slice(-1)[0];
+      const lastNodeId = itemId === prevLastNodeId ? "" : prevLastNodeId
+      const filteredNodeIds = prevSelectedNodeIds.slice(0, -1).filter(id => id !== itemId);
+      return [...filteredNodeIds, itemId, lastNodeId];
+    });
+  };
+
+  const onTreeItemfold = (itemId: string) => {
+    setSelectedNodeIds((prevSelectedNodeIds) => {
+      const filteredNodeIds = prevSelectedNodeIds.filter((id, index) => id !== itemId || index === prevSelectedNodeIds.length - 1);
+      return filteredNodeIds;
+    });
+  };
+
+  const data = getFolderTypeData(folderType, folderObject);
+
   return (
     <>
       <TreeView
-        data={folderObject ?? dataTree}
+        selectedNodesIds={selectedNodeIds}
+        data={data || dataTree}
         onTreeItemBlur={() => {
           console.log("blur");
         }}
         onTreeItemFocus={() => {
           console.log("focus");
         }}
-        onTreeItemFold={() => {
-          console.log("fold");
+        onTreeItemFold={(item) => {
+          onTreeItemfold(item);
         }}
         onTreeItemSelect={(item) => {
           selectFolder(item);
         }}
-        onTreeItemUnfold={() => {
-          console.log("unfold");
+        onTreeItemUnfold={(item) => {
+          onTreeItemUnFold(item);
         }}
       />
     </>

@@ -77,7 +77,7 @@ export const App = () => {
     setSelectedFolders([]);
   };
 
-  useEffect(() => {  
+  useEffect(() => {
     resetBoardsAndFolders();
   }, [currentFolder]);
 

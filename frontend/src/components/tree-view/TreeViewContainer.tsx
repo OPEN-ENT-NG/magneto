@@ -44,7 +44,7 @@ export const TreeViewContainer: React.FunctionComponent<
     name: folderType,
     section: true,
     isPublic: true,
-  }
+  };
 
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const { user } = useOdeClient();

@@ -30,7 +30,9 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
 }) => {
   const { getFolders } = useFoldersNavigation();
 
-  useEffect(() => { getFolders() }, []);
+  useEffect(() => {
+    getFolders();
+  }, []);
 
   const reducer = (
     state: { fileList: any[] },

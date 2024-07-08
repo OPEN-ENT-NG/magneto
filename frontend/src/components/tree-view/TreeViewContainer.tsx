@@ -32,7 +32,7 @@ export const TreeViewContainer: React.FunctionComponent<
     name: t("magneto.lycee.connecte.boards"),
     section: true,
     isPublic: true,
-  }
+  };
 
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const { user } = useOdeClient();
@@ -210,6 +210,14 @@ export const TreeViewContainer: React.FunctionComponent<
       ...modalData,
       i18nKey: "magneto.folder.drag.drop.right.error",
       onCancel: () => closeDragAndDropModal(),
+  const onTreeItemUnFold = (itemId: string) => {
+    setSelectedNodeIds((prevSelectedNodeIds) => {
+      const prevLastNodeId = prevSelectedNodeIds.slice(-1)[0];
+      const lastNodeId = itemId === prevLastNodeId ? "" : prevLastNodeId;
+      const filteredNodeIds = prevSelectedNodeIds
+        .slice(0, -1)
+        .filter((id) => id !== itemId);
+      return [...filteredNodeIds, itemId, lastNodeId];
     });
     onDisplayModal(true);
   };
@@ -228,6 +236,13 @@ export const TreeViewContainer: React.FunctionComponent<
       onSubmit: () =>
         dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id),
       onCancel: () => closeDragAndDropModal(),
+  const onTreeItemfold = (itemId: string) => {
+    setSelectedNodeIds((prevSelectedNodeIds) => {
+      const filteredNodeIds = prevSelectedNodeIds.filter(
+        (id, index) =>
+          id !== itemId || index === prevSelectedNodeIds.length - 1,
+      );
+      return filteredNodeIds;
     });
     onDisplayModal(true);
   };

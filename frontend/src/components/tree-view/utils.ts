@@ -16,4 +16,3 @@ export const getFolderTypeData = (
       return folderObject.myFolderObject;
   }
 };
-

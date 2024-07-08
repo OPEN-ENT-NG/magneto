@@ -3,10 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { t } from "i18next";
 
 import { FolderObjectState, TriggerFetchState } from "./types";
-import {
-  initialFolderObject,
-  initialTriggerFetch,
-} from "./utils";
+import { initialFolderObject, initialTriggerFetch } from "./utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
@@ -18,7 +15,7 @@ export const useFoldersLogic = () => {
     useState<FolderObjectState>(initialFolderObject);
   const [triggerFetch, setTriggerFetch] =
     useState<TriggerFetchState>(initialTriggerFetch);
-    
+
   const { myFolders, deletedFolders } = triggerFetch;
 
   const processFolders = useCallback(
@@ -36,10 +33,7 @@ export const useFoldersLogic = () => {
           section: true,
         }).buildFolders(preparedFolders);
 
-        setFolders((prevFolders) => [
-            ...prevFolders,
-            ...preparedFolders
-          ]);
+        setFolders((prevFolders) => [...prevFolders, ...preparedFolders]);
 
         setFolderObject((prevFolderObject) => ({
           ...prevFolderObject,
@@ -86,7 +80,6 @@ export const useFoldersLogic = () => {
       setTriggerFetch({ ...triggerFetch, deletedFolders: false });
     }
   }, [deletedFolders, deletedFoldersResult, processFolders, triggerFetch]);
-
 
   return { folders, folderObject, getFolders };
 };

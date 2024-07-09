@@ -23,8 +23,8 @@ export interface ToasterContainerProps {
   isToasterOpen: boolean;
   boards: Board[];
   folders: Folder[];
-  boardIds: String[];
-  folderIds: String[];
+  boardIds: string[];
+  folderIds: string[];
   currentFolder: Folder;
   reset: () => void;
 }

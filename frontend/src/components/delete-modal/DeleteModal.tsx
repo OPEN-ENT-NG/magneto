@@ -17,8 +17,8 @@ import {
 type props = {
   isOpen: boolean;
   toggle: () => void;
-  boardIds: String[];
-  folderIds: String[];
+  boardIds: string[];
+  folderIds: string[];
   isPredelete: boolean;
   reset: () => void;
 };

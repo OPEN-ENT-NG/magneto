@@ -42,7 +42,7 @@
   "magneto.create.board.options.display.favorites": "Afficher le nombre de favoris sur les aimants",
   "magneto.delete.section": "Supprimer la section",
   "magneto.delete.section.message": "Voulez-vous également supprimer les aimants contenus dans la section ? Si non, ils seront déplacés dans la première section.",
-  "magneto.search.placeholder": "Rechercher ...",
+  "magneto.search.placeholder": "Rechercher par titre, mots clés, description...",
   "magneto.open": "Ouvrir",
   "magneto.delete": "Supprimer",
   "magneto.properties": "Propriétés",

@@ -204,10 +204,11 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                   >
                     <Card.Body flexDirection={"column"}>
                       <Card.Image
+                        className="image-landscape"
                         imageSrc={imageUrl}
-                        variant="landscape"
+                        variant={"landscape"}
                       ></Card.Image>
-                      <Card.Title>{title}</Card.Title>
+                      <Card.Title className="title">{title}</Card.Title>
 
                       <div className="board-number-magnets">
                         <Icon
@@ -221,7 +222,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                       </div>
 
                       <div className="board-about">
-                        <div className="board-about">
+                        <div className="board-about-left-content">
                           <Tooltip
                             message={t("magneto.board.date.update")}
                             placement="bottom"
@@ -235,7 +236,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                             ).format("DD MMMM YYYY")}
                           </Card.Text>
                         </div>
-                        <div className="board-about">
+                        <div className="board-about-right-content">
                           <Tooltip
                             message={t("magneto.board.tooltip.my.board")}
                             placement="bottom"

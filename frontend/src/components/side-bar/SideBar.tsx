@@ -58,6 +58,10 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
 
   useEffect(() => { getFolders() }, []);
 
+  useEffect(() => {
+    getFolders();
+  }, []);
+
   return (
     <>
       <aside

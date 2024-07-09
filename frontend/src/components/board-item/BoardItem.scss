@@ -7,7 +7,9 @@
   flex-direction: column;
 
   .board-number-magnets {
-    display: inline-flex;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     svg {
       color: #ffb600;
@@ -15,22 +17,33 @@
     }
 
     svg + p {
-      margin-left: 0.5rem;
       font-size: 13px;
     }
   }
 
   .board-about {
-    display: inline-flex;
+    display: flex;
+    justify-content: space-between;
     width: 100%;
+    .board-about-left-content,
+    .board-about-right-content {
+      margin: 0 !important;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
 
-    svg + p {
-      margin-left: 0.5rem;
-      font-size: 13px;
-    }
-
-    > div:first-child {
-      margin-left: auto !important;
+      .med-resource-card-text {
+        font-size: 13px;
+      }
     }
   }
+}
+.title {
+  width: 100%;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-body {
+  width: 100%;
 }

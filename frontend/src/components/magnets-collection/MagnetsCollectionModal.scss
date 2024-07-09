@@ -45,3 +45,44 @@ ul.grid {
     }
   }
 }
+
+.headerFav {
+  color: #368daf;
+  margin-bottom: 5px;
+  padding-bottom: 10px;
+  padding-top: 3px;
+  border-bottom: solid 3px;
+  box-sizing: border-box;
+  height: 100%;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: initial;
+  font-size: initial;
+  font-weight: normal;
+  text-transform: uppercase;
+  margin-top: 1.5em;
+}
+
+.searchbar {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.switchFav {
+  margin-bottom: 10px;
+}
+
+.parent {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.duplicateText {
+  font-size: 14px;
+  line-height: 45px;
+  text-decoration: underline;
+  cursor: pointer;
+}

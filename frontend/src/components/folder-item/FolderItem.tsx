@@ -60,57 +60,57 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     const boards = dragAndDropBoards;
     if (hasDrop && !!boards.length) {
       const dragAndDropBoardsIds: string[] = boards.map(
-          (board: Board) => board._id,
+        (board: Board) => board._id,
       );
       const dragAndDropInitialFolder = !boards[0].folderId
-          ? new Folder().build({
+        ? new Folder().build({
             _id: FOLDER_TYPE.MY_BOARDS,
             ownerId: user.userId,
             title: MAIN_PAGE_TITLE,
             parentId: "",
           })
-          : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
+        : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
           new Folder();
 
       if (
-          (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
-          folder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
-          folder.id == FOLDER_TYPE.DELETED_BOARDS ||
-          !!folder.deleted
+        (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
+        folder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
+        folder.id == FOLDER_TYPE.DELETED_BOARDS ||
+        !!folder.deleted
       ) {
         //not board owner
         handleNoRightsDragAndDrop();
         return;
       } else if (
-          (userRights.folderOwnerNotShared(dragAndDropInitialFolder) ||
-              userRights.folderOwnerAndSharedOrShareRights(
-                  dragAndDropInitialFolder,
-              )) &&
-          userRights.folderOwnerAndSharedOrShareRights(folder)
+        (userRights.folderOwnerNotShared(dragAndDropInitialFolder) ||
+          userRights.folderOwnerAndSharedOrShareRights(
+            dragAndDropInitialFolder,
+          )) &&
+        userRights.folderOwnerAndSharedOrShareRights(folder)
       ) {
         //initial folder owner + not shared or has right + shared, target folder has right + shared
         confirmSharedFolderDragAndDrop(
-            dragAndDropBoardsIds,
-            folder,
-            "magneto.folder.share.drag.in.warning",
-            folder.title,
+          dragAndDropBoardsIds,
+          folder,
+          "magneto.folder.share.drag.in.warning",
+          folder.title,
         );
       } else if (
-          userRights.folderOwnerAndSharedOrShareRights(
-              dragAndDropInitialFolder,
-          ) &&
-          userRights.folderOwnerNotShared(folder)
+        userRights.folderOwnerAndSharedOrShareRights(
+          dragAndDropInitialFolder,
+        ) &&
+        userRights.folderOwnerNotShared(folder)
       ) {
         //initial folder has right + shared, target folder owner + not shared
         confirmSharedFolderDragAndDrop(
-            dragAndDropBoardsIds,
-            folder,
-            "magneto.folder.share.drag.out.warning",
-            dragAndDropInitialFolder.title,
+          dragAndDropBoardsIds,
+          folder,
+          "magneto.folder.share.drag.out.warning",
+          dragAndDropInitialFolder.title,
         );
       } else if (
-          userRights.folderOwnerNotShared(dragAndDropInitialFolder) &&
-          userRights.folderOwnerNotShared(folder)
+        userRights.folderOwnerNotShared(dragAndDropInitialFolder) &&
+        userRights.folderOwnerNotShared(folder)
       ) {
         //initial folder owner + not shared, target folder owner + not shared
         proceedOnDragAndDrop(boards, folder);

@@ -58,7 +58,7 @@ export const TreeViewContainer: React.FunctionComponent<
   };
   const handleDragLeave = (e: React.ChangeEvent<HTMLInputElement>) => {
     removeFolderHighlight(e);
-    
+
     e.preventDefault();
     e.stopPropagation();
     dispatch({ type: "SET_DROP_DEPTH", dropDepth: data.dropDepth - 1 });
@@ -81,8 +81,7 @@ export const TreeViewContainer: React.FunctionComponent<
       }
       targetElement.classList.remove("drag-over");
     }
-
-  }
+  };
 
   const handleDragOver = (e: React.ChangeEvent<HTMLInputElement>) => {
     let targetElement: HTMLElement;

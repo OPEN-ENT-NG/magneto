@@ -159,16 +159,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
               }
             })
             .map((board: Board) => {
-              const {
-                id,
-                title,
-                imageUrl,
-                nbCards,
-                shared,
-                owner,
-                modificationDate,
-                isPublished,
-              } = board;
+              const { id } = board;
               return (
                 <animated.li
                   className="g-col-4 z-1 boardSizing"

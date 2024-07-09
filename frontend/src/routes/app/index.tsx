@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { ID } from "edifice-ts-client";
+import { t } from "i18next";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { t } from "i18next";
 
 import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
@@ -92,20 +92,20 @@ export const App = () => {
   return (
     <>
       <Header onClick={toggle} toggleDrawer={toggleDrawer} />
-      <DndProvider backend={HTML5Backend}>      
-      <DrawerSideBar
-        onSelect={handleSelectFolder}
-        drawer={drawer}
-        toggleDrawer={toggleDrawer}
-      />
+      <DndProvider backend={HTML5Backend}>
+        <DrawerSideBar
+          onSelect={handleSelectFolder}
+          drawer={drawer}
+          toggleDrawer={toggleDrawer}
+        />
         <Grid>
           <Grid.Col
             lg={width < 1280 ? "2" : "3"} //Since number of columns reduce by 4 at 1280px but doesnt take in account our md columns configuration until 1024px, we're manually changing it
-          md="2"
-          sm="4"
-          className="gridSidebar"
+            md="2"
+            sm="4"
+            className="gridSidebar"
             style={{
-                padding: ".8rem",
+              padding: ".8rem",
             }}
           >
             <SideBar
@@ -173,12 +173,12 @@ export const App = () => {
             />
             <CreateBoard isOpen={isOpen} toggle={toggle} />
             <MessageModal
-                isOpen={showModal}
-                i18nKey={modalProps.i18nKey}
-                param={modalProps.param}
-                hasSubmit={modalProps.hasSubmit}
-                onSubmit={modalProps.onSubmit}
-                onCancel={modalProps.onCancel}
+              isOpen={showModal}
+              i18nKey={modalProps.i18nKey}
+              param={modalProps.param}
+              hasSubmit={modalProps.hasSubmit}
+              onSubmit={modalProps.onSubmit}
+              onCancel={modalProps.onCancel}
             ></MessageModal>
           </Grid.Col>
         </Grid>

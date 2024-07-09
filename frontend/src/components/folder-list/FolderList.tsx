@@ -100,7 +100,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
               }
             })
             .map((folder: Folder) => {
-              const { id, title } = folder;
+              const { id } = folder;
               return (
                 <animated.li
                   className="g-col-4 z-1 folderSizing"
@@ -121,7 +121,6 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                     modalData={modalProps}
                     onSetModalData={onSetModalProps}
                   />
-
                 </animated.li>
               );
             })}

@@ -21,7 +21,6 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import "./index.scss";
 
-
 export interface AppProps {
   _id: string;
   created: Date;
@@ -107,7 +106,10 @@ export const App = () => {
             isVariant={false}
             key={searchBarResetter}
           />
-          <FolderTitle text={currentFolder.title} SVGLeft={<Icon path={mdiFolder} />} />
+          <FolderTitle
+            text={currentFolder.title}
+            SVGLeft={<Icon path={mdiFolder} />}
+          />
           <FolderList
             currentFolder={currentFolder}
             onSelect={handleSelectFolder}

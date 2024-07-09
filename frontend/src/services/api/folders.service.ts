@@ -24,7 +24,7 @@ export const foldersApi = emptySplitApi.injectEndpoints({
       invalidatesTags: ["Folders"],
     }),
     preDeleteFolders: builder.mutation({
-      query: (folderIds: String[]) => ({
+      query: (folderIds: string[]) => ({
         url: "folders/predelete",
         method: "PUT",
         body: { folderIds: folderIds },
@@ -32,7 +32,7 @@ export const foldersApi = emptySplitApi.injectEndpoints({
       invalidatesTags: ["Folders"],
     }),
     restorePreDeleteFolders: builder.mutation({
-      query: (folderIds: String[]) => ({
+      query: (folderIds: string[]) => ({
         url: `folders/restore`,
         method: "put",
         body: { folderIds: folderIds },
@@ -40,7 +40,7 @@ export const foldersApi = emptySplitApi.injectEndpoints({
       invalidatesTags: ["Folders"],
     }),
     deleteFolders: builder.mutation({
-      query: (folderIds: String[]) => ({
+      query: (folderIds: string[]) => ({
         url: "folders",
         method: "DELETE",
         body: folderIds,

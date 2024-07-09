@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Button,
   ActionBar,
@@ -11,13 +13,17 @@ import { t } from "i18next";
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
 import { MoveBoard } from "../move-board/MoveBoard";
+import { ShareModalMagneto } from "../share-modal/ShareModalMagneto";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
 import { useRestoreBoardsAndFolders } from "~/hooks/useRestoreBoardsAndFolders";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
+import { useUserRightsStore } from "~/stores";
+import { checkUserRight } from "~/utils/checkUserRight";
 
 export interface ToasterContainerProps {
   isToasterOpen: boolean;
@@ -44,6 +50,9 @@ export const ToasterContainer = ({
   const [isMoveOpen, toggleMove] = useToggle(false);
   const [isMoveDelete, toggleDelete] = useToggle(false);
   const [isCreateFolder, toggleCreateFolder] = useToggle(false);
+  const [isShareFolder, toggleShareFolder] = useToggle(false);
+  const [isShareBoard, toggleShareBoard] = useToggle(false);
+  const [shareOptions, setShareOptions] = useState();
 
   const [duplicateBoard] = useDuplicateBoardMutation();
 
@@ -153,6 +162,27 @@ export const ToasterContainer = ({
     return false;
   };
 
+  const openShareModal = async () => {
+    if (boardIds.length > 0) {
+      const userRights = await checkUserRight(boards[0].rights);
+      const { setUserRights } = useUserRightsStore.getState();
+      setUserRights(userRights);
+      setShareOptions({
+        resourceCreatorId: userId,
+        resourceId: boardIds[0],
+        resourceRights: [boards[0].rights], //TODO : Ajouter ce nouveau tableau des droits (modif à faire dans le back)
+      } as any);
+      toggleShareBoard();
+    } else if (folderIds.length > 0) {
+      setShareOptions({
+        resourceCreatorId: userId,
+        resourceId: folderIds[0],
+        resourceRights: [folders[0].rights], //TODO : Ajouter ce nouveau tableau des droits (modif à faire dans le back)
+      } as any);
+      toggleShareFolder();
+    }
+  };
+
   return (
     <>
       {transition((style, isToasterOpen) => {
@@ -226,7 +256,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={openShareModal}
                   >
                     {t("magneto.share")}
                   </Button>
@@ -314,6 +344,12 @@ export const ToasterContainer = ({
             isPredelete={currentFolder.id != FOLDER_TYPE.DELETED_BOARDS}
             reset={reset}
           />
+          <ShareModalMagneto
+            isOpen={isShareBoard}
+            toggle={toggleShareBoard}
+            shareOptions={shareOptions}
+            resourceType={RESOURCE_BIG_TYPE.BOARD}
+          />
         </>
       )}
       {folders != null && (
@@ -323,6 +359,12 @@ export const ToasterContainer = ({
             toggle={toggleCreateFolder}
             folderToUpdate={folders[0]}
             reset={reset}
+          />
+          <ShareModalMagneto
+            isOpen={isShareFolder}
+            toggle={toggleShareFolder}
+            shareOptions={shareOptions}
+            resourceType={RESOURCE_BIG_TYPE.FOLDER}
           />
         </>
       )}

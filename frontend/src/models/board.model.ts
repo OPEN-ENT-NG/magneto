@@ -28,6 +28,7 @@ export interface IBoardItemResponse {
   ownerName: string;
   canComment: boolean;
   displayNbFavorites: boolean;
+  rights: any[];
 }
 
 export interface IBoardsResponse {
@@ -331,6 +332,7 @@ export class Board /*implements Shareable*/ {
 
   // Share resource properties
   public shared: any[];
+  public rights: any[];
   public owner: IBoardOwner;
   public myRights: any;
 
@@ -353,6 +355,7 @@ export class Board /*implements Shareable*/ {
     this._isPublished = false;
     this.owner = { userId: "", displayName: "" };
     this.shared = [];
+    this.rights = [];
     this._deleted = false;
     this._canComment = false;
     this._displayNbFavorites = false;
@@ -385,6 +388,7 @@ export class Board /*implements Shareable*/ {
     this._isPublished = data.public;
     this.owner = { userId: data.ownerId, displayName: data.ownerName };
     this.shared = data.shared;
+    this.rights = data.rights;
     this._deleted = data.deleted;
     this._canComment = data.canComment;
     this._displayNbFavorites = data.displayNbFavorites;

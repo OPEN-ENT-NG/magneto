@@ -87,7 +87,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
             imageSrc={board.imageUrl}
             variant="landscape"
           ></Card.Image>
-          <Card.Title>{board.title}</Card.Title>
+          <Card.Title className="title">{board.title}</Card.Title>
 
           <div className="board-number-magnets">
             <Icon
@@ -101,7 +101,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
           </div>
 
           <div className="board-about">
-            <div className="board-about">
+            <div className="board-about-left-content">
               <Tooltip
                 message={t("magneto.board.date.update")}
                 placement="bottom"
@@ -114,7 +114,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                 )}
               </Card.Text>
             </div>
-            <div className="board-about">
+            <div className="board-about-right-content">
               <Tooltip
                 message={t("magneto.board.tooltip.my.board")}
                 placement="bottom"

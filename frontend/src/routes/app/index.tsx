@@ -24,6 +24,7 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import "./index.scss";
 
+
 export interface AppProps {
   _id: string;
   created: Date;

@@ -38,7 +38,10 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
 
   useEffect(() => {
     setSelectedNodeIds((prevState) => {
-      return [...prevState.slice(0, -1).filter((item) => item !== currentFolder.id), currentFolder.id];
+      return [
+        ...prevState.slice(0, -1).filter((item) => item !== currentFolder.id),
+        currentFolder.id,
+      ];
     });
   }, [currentFolder]);
 

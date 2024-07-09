@@ -31,6 +31,7 @@ import io.vertx.core.logging.LoggerFactory;
 import org.bson.conversions.Bson;
 import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
+import org.entcore.common.share.ShareNormalizer;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -43,6 +44,7 @@ public class DefaultBoardService implements BoardService {
     private final FolderService folderService;
     private final SectionService sectionService;
     private final CardService cardService;
+    private final ShareNormalizer shareNormalizer;
 
     private final ShareService shareService;
 
@@ -56,8 +58,31 @@ public class DefaultBoardService implements BoardService {
         this.cardService = serviceFactory.cardService();
         this.sectionService = serviceFactory.sectionService();
         this.shareService = serviceFactory.shareService();
-
+        this.shareNormalizer = serviceFactory.shareNormalizer();
     }
+
+    public Optional<UserInfos> getCreatorForModel(final JsonObject json) {
+        if(!json.containsKey("ownerId")){
+            return Optional.empty();
+        }
+        final UserInfos user = new UserInfos();
+        user.setUserId(json.getString("ownerId"));
+        user.setUsername(json.getString("ownerName"));
+        return Optional.of(user);
+    }
+
+    private JsonObject addNormalizedShares(final JsonObject board) {
+        try {
+            if(board != null) {
+                this.shareNormalizer.addNormalizedRights(board, e -> getCreatorForModel(e).map(UserInfos::getUserId));
+            }
+            return board;
+        }
+        catch (Exception e) {
+            log.error(String.format("[Magneto@%s::addNormalizedShares] Failed to apply normalized shares : %s", this.getClass().getSimpleName(), e.getMessage()));
+            return board;
+        }
+	}
 
     @Override
     public Future<JsonObject> create(UserInfos user, JsonObject board, boolean defaultSection, I18nHelper i18n) {
@@ -408,7 +433,10 @@ public class DefaultBoardService implements BoardService {
                     promise.fail(fail.getMessage());
                 })
                 .onSuccess(success -> {
-                    JsonArray boards = fetchAllBoardsFuture.result();
+                    JsonArray boards = new JsonArray(fetchAllBoardsFuture.result()
+                    .stream()
+                    .map(board -> addNormalizedShares((JsonObject) board))
+                    .collect(Collectors.toList()));
                     int boardsCount = (fetchAllBoardsCountFuture.result().isEmpty()) ? 0 :
                             fetchAllBoardsCountFuture.result().getJsonObject(0).getInteger(Field.COUNT);
                     promise.complete(new JsonObject()

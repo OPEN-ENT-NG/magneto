@@ -6,6 +6,7 @@ export interface IFolderResponse {
   parentId: string;
   ownerId: string;
   shared?: any[];
+  rights?: any[];
   deleted?: boolean;
   isPublic?: boolean;
 }
@@ -23,6 +24,7 @@ export class Folder {
   private _shared: any[];
   private _deleted: boolean;
   private _isPublic: boolean;
+  private _rights: any[];
 
   constructor(id?: string) {
     this._id = id != null ? id : "";
@@ -30,6 +32,7 @@ export class Folder {
     this._parentId = "";
     this._ownerId = "";
     this._shared = [];
+    this._rights = [];
     this._deleted = false;
     this._isPublic = false;
     return this;
@@ -41,6 +44,7 @@ export class Folder {
     this._parentId = data.parentId;
     this._ownerId = data.ownerId;
     this._shared = data.shared ? data.shared : [];
+    this._rights = data.rights ? data.rights : [];
     this._deleted = !!data.deleted;
     this._isPublic = !!data.isPublic;
     return this;
@@ -80,6 +84,14 @@ export class Folder {
 
   get shared(): any[] {
     return this._shared;
+  }
+
+  set rights(value: any[]) {
+    this._rights = value;
+  }
+
+  get rights(): any[] {
+    return this._rights;
   }
 
   set shared(value: any[]) {

@@ -3,4 +3,9 @@
   li[role="treeitem"]:has(> div > ul:empty) .action-container svg {
     display: none;
   }
+
+  .drag-over {
+    border: solid #e4e4e4;
+    border-radius: 0.8rem;
+  }
 }

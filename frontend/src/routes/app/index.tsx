@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
+import { mdiFolder } from "@mdi/js";
+import Icon from "@mdi/react";
 import { ID } from "edifice-ts-client";
 import { t } from "i18next";
 
@@ -8,6 +10,7 @@ import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
 import { FolderList } from "~/components/folder-list/FolderList";
+import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
@@ -17,6 +20,7 @@ import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import "./index.scss";
+
 
 export interface AppProps {
   _id: string;
@@ -97,11 +101,13 @@ export const App = () => {
             onChange={(e) => {
               setSearchText(e.target.value);
             }}
+            onClick={() => null}
             placeholder={t("magneto.search.placeholder")}
             size="md"
-            isVariant
+            isVariant={false}
             key={searchBarResetter}
           />
+          <FolderTitle text={currentFolder.title} SVGLeft={<Icon path={mdiFolder} />} />
           <FolderList
             currentFolder={currentFolder}
             onSelect={handleSelectFolder}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { Card, useOdeClient } from "@edifice-ui/react";
-import { mdiFolderPlus } from "@mdi/js";
-import { Icon } from "@mui/material";
 import "./FolderItem.scss";
+import { mdiFolder } from "@mdi/js";
+import Icon from "@mdi/react";
 import { useDrop } from "react-dnd";
 
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
@@ -209,7 +209,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           }}
         >
           <Card.Body>
-            <Icon path={mdiFolderPlus} size={1}></Icon>
+            <Icon path={mdiFolder} size={2} color={"#e20037"} />
             <Card.Title>{folder.title}</Card.Title>
           </Card.Body>
         </Card>

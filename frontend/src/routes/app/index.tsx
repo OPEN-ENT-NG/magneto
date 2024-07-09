@@ -55,8 +55,8 @@ export const App = () => {
     i18nKey: "",
     param: "",
     hasSubmit: false,
-    onSubmit: () => { },
-    onCancel: () => { },
+    onSubmit: () => {},
+    onCancel: () => {},
   });
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
@@ -137,7 +137,10 @@ export const App = () => {
               isVariant={false}
               key={searchBarResetter}
             />
-            <FolderTitle text={currentFolder.title} SVGLeft={<Icon path={mdiFolder} />} />
+            <FolderTitle
+              text={currentFolder.title}
+              SVGLeft={<Icon path={mdiFolder} />}
+            />
             <FolderList
               currentFolder={currentFolder}
               onSelect={handleSelectFolder}

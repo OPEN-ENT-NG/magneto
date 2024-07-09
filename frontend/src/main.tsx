@@ -7,7 +7,6 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { t } from "i18next";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
@@ -48,7 +47,7 @@ root.render(
     <Provider store={store}>
       <OdeClientProvider
         params={{
-          app: t("magneto.title"),
+          app: "magneto",
         }}
       >
         <ThemeProvider>

@@ -7,16 +7,27 @@ import { FOLDER_TYPE } from "../../core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "../../models/folder.model";
 import { useGetFoldersQuery } from "../../services/api/folders.service";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
+import { Board } from "~/models/board.model";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 
 type SideBarProps = {
   onSelect: (folder: Folder) => void;
+  dragAndDropBoards: Board[];
+  onDragAndDrop: (board: Board) => void;
+  onSetShowModal: (show: boolean) => void;
+  modalProps: any;
+  onSetModalProps: (modalProps: any) => void;
   toggleDrawer?: () => void;
   className?: string;
 };
 
 export const SideBar: React.FunctionComponent<SideBarProps> = ({
   onSelect,
+  dragAndDropBoards,
+  onDragAndDrop,
+  onSetShowModal,
+  modalProps,
+  onSetModalProps,
   toggleDrawer,
   className,
 }) => {
@@ -73,6 +84,28 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
     ).buildFolders(deletedFolders);
   }
 
+  const reducer = (
+    state: { fileList: any[] },
+    action: { type: any; dropDepth: any; inDropZone: any; files: any },
+  ) => {
+    switch (action.type) {
+      case "SET_DROP_DEPTH":
+        return { ...state, dropDepth: action.dropDepth };
+      case "SET_IN_DROP_ZONE":
+        return { ...state, inDropZone: action.inDropZone };
+      case "ADD_FILE_TO_LIST":
+        return { ...state, fileList: state.fileList.concat(action.files) };
+      default:
+        return state;
+    }
+  };
+
+  const [data, dispatch] = React.useReducer(reducer, {
+    dropDepth: 0,
+    inDropZone: false,
+    fileList: [],
+  });
+
   return (
     <>
       <aside
@@ -89,6 +122,13 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
             onSelect(folder);
             if (toggleDrawer != null) toggleDrawer();
           }}
+          data={data}
+          dispatch={dispatch}
+          dragAndDropBoards={dragAndDropBoards}
+          onDragAndDrop={onDragAndDrop}
+          onDisplayModal={onSetShowModal}
+          modalData={modalProps}
+          onSetModalData={onSetModalProps}
         />
         <TreeViewContainer
           folders={myFolders ?? []}
@@ -104,6 +144,13 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
             onSelect(folder);
             if (toggleDrawer != null) toggleDrawer();
           }}
+          data={data}
+          dispatch={dispatch}
+          dragAndDropBoards={dragAndDropBoards}
+          onDragAndDrop={onDragAndDrop}
+          onDisplayModal={onSetShowModal}
+          modalData={modalProps}
+          onSetModalData={onSetModalProps}
         />
         <TreeViewContainer
           folders={deletedFolders}
@@ -113,6 +160,13 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
             onSelect(folder);
             if (toggleDrawer != null) toggleDrawer();
           }}
+          data={data}
+          dispatch={dispatch}
+          dragAndDropBoards={dragAndDropBoards}
+          onDragAndDrop={onDragAndDrop}
+          onDisplayModal={onSetShowModal}
+          modalData={modalProps}
+          onSetModalData={onSetModalProps}
         />
         <SideBarButtons toggleDrawer={toggleDrawer} />
       </aside>

@@ -57,6 +57,16 @@ export const TreeViewContainer: React.FunctionComponent<
     dispatch({ type: "SET_DROP_DEPTH", dropDepth: data.dropDepth + 1 });
   };
   const handleDragLeave = (e: React.ChangeEvent<HTMLInputElement>) => {
+    removeFolderHighlight(e);
+    
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch({ type: "SET_DROP_DEPTH", dropDepth: data.dropDepth - 1 });
+    if (data.dropDepth > 0) return;
+    dispatch({ type: "SET_IN_DROP_ZONE", inDropZone: false });
+  };
+
+  const removeFolderHighlight = (e: React.ChangeEvent<HTMLInputElement>) => {
     let targetElement: HTMLElement;
     if (e.target.closest("li")?.id) {
       if (
@@ -72,12 +82,7 @@ export const TreeViewContainer: React.FunctionComponent<
       targetElement.classList.remove("drag-over");
     }
 
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch({ type: "SET_DROP_DEPTH", dropDepth: data.dropDepth - 1 });
-    if (data.dropDepth > 0) return;
-    dispatch({ type: "SET_IN_DROP_ZONE", inDropZone: false });
-  };
+  }
 
   const handleDragOver = (e: React.ChangeEvent<HTMLInputElement>) => {
     let targetElement: HTMLElement;
@@ -169,6 +174,7 @@ export const TreeViewContainer: React.FunctionComponent<
       }
 
       onDragAndDrop(undefined);
+      removeFolderHighlight(e);
     }
     e.stopPropagation();
   };

@@ -23,6 +23,7 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
+import org.entcore.common.share.ShareRoles;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +44,8 @@ public class ShareBoardController extends ControllerHelper {
     private final ServiceFactory serviceFactory;
     private final ShareBookMarkService shareBookMarkService;
 
+    private JsonObject rights;
+
     public ShareBoardController(ServiceFactory serviceFactory) {
         this.boardService = serviceFactory.boardService();
         this.folderService = serviceFactory.folderService();
@@ -50,6 +53,7 @@ public class ShareBoardController extends ControllerHelper {
         this.magnetoShareService = serviceFactory.shareService();
         this.shareBookMarkService = serviceFactory.shareBookMarkService();
         this.serviceFactory = serviceFactory;
+        this.rights = ShareRoles.getSecuredActionNameByNormalizedRole(serviceFactory.securedActions());
 
     }
 
@@ -68,6 +72,20 @@ public class ShareBoardController extends ControllerHelper {
 
     @SecuredAction(value = Rights.PUBLISH, type = ActionType.RESOURCE)
     public void initPublishRight(final HttpServerRequest request) {
+    }
+
+    @Get("/board/rights/sharing")
+    @ApiDoc("Get rights")
+    @SecuredAction(value="", type = ActionType.AUTHENTICATED)
+    public void getRightsByBoard(final HttpServerRequest request) {
+        renderJson(request, rights);
+    }
+
+    @Get("/folder/rights/sharing")
+    @ApiDoc("Get rights")
+    @SecuredAction(value="", type = ActionType.AUTHENTICATED)
+    public void getRightsByFolder(final HttpServerRequest request) {
+        renderJson(request, rights);
     }
 
     @Get("/:type/share/json/:id")

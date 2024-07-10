@@ -242,7 +242,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                 <div>
                   <div>
                     <FormControl id="title" className="mb-0-5">
-                      <Label>{t("magneto.create.board.title")} *:</Label>
+                      <Label>{t("magneto.create.board.title")} * :</Label>
                       <Input
                         value={title}
                         placeholder=""
@@ -252,7 +252,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                       />
                     </FormControl>
                     <FormControl id="description" className="mb-1-5">
-                      <Label>{t("magneto.create.board.description")}</Label>
+                      <Label>{t("magneto.create.board.description")} :</Label>
                       <TextArea
                         size="md"
                         value={description}
@@ -294,10 +294,15 @@ export const CreateBoard: FunctionComponent<props> = ({
                           checked={disposition == "free"}
                           className="mg-4"
                         />
-                        <span className="text">
+                        <span className="text"
+                          onClick={() => setDisposition("free")}
+                          style={{ cursor: 'pointer' }}
+                        >
                           {t("magneto.create.board.display.free")}
                         </span>
-                        <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
+                        <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }}
+                          onClick={() => setDisposition("free")}
+                        />
                       </div>
                       <div className="d-flex align-items-center text-icon-pair mg-75">
                         <Radio
@@ -307,10 +312,15 @@ export const CreateBoard: FunctionComponent<props> = ({
                           checked={disposition == "vertical"}
                           className="mg-4"
                         />
-                        <span className="text">
+                        <span className="text"
+                          onClick={() => setDisposition("vertical")}
+                          style={{ cursor: 'pointer' }}>
                           {t("magneto.create.board.display.vertical")}
                         </span>
-                        <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
+                        <ViewColumnOutlinedIcon sx={{ fontSize: 60 }}
+                          onClick={() => setDisposition("vertical")}
+                          style={{ cursor: 'pointer' }}
+                        />
                       </div>
                       <div className="d-flex align-items-center text-icon-pair">
                         <Radio
@@ -331,7 +341,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                   </div>
                   <div className="mb-1">
                     <FormControl id="keywords">
-                      <Label>{t("magneto.board.keywords")}</Label>
+                      <Label>{t("magneto.board.keywords")} :</Label>
                       <Input
                         placeholder=""
                         size="md"
@@ -370,9 +380,9 @@ export const CreateBoard: FunctionComponent<props> = ({
           <Modal.Footer>
             <div className="right">
               <Button
-                color="primary"
+                color="tertiary"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 className="footer-button"
                 onClick={resetFields}
               >

@@ -16,3 +16,26 @@ export const getFolderTypeData = (
       return folderObject.myFolderObject;
   }
 };
+
+// fonctions de fold et unfold, elles seront utilisées quand on aura des retours de edifice
+
+// const onTreeItemUnFold = (itemId: string) => {
+//   setSelectedNodeIds((prevSelectedNodeIds) => {
+//     const prevLastNodeId = prevSelectedNodeIds.slice(-1)[0];
+//     const lastNodeId = itemId === prevLastNodeId ? "" : prevLastNodeId;
+//     const filteredNodeIds = prevSelectedNodeIds
+//       .slice(0, -1)
+//       .filter((id) => id !== itemId);
+//     return [...filteredNodeIds, itemId, lastNodeId];
+//   });
+// };
+
+// const onTreeItemfold = (itemId: string) => {
+//   setSelectedNodeIds((prevSelectedNodeIds) => {
+//     const filteredNodeIds = prevSelectedNodeIds.filter(
+//       (id, index) =>
+//         id !== itemId || index === prevSelectedNodeIds.length - 1,
+//     );
+//     return filteredNodeIds;
+//   });
+// };

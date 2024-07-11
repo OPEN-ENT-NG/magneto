@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Grid, useToggle, SearchBar, useOdeClient } from "@edifice-ui/react";
 import { mdiFolder } from "@mdi/js";
@@ -17,7 +17,6 @@ import Header from "~/components/header/Header";
 import { MessageModal } from "~/components/message-modal/MessageModal";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
@@ -41,17 +40,7 @@ export const App = () => {
   const { t } = useTranslation("magneto");
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
-  const { user } = useOdeClient();
-  const { setCurrentFolder: setCurrentFolderP } = useFoldersNavigation();
-  const [currentFolder, setCurrentFolder] = useState(
-    new Folder(FOLDER_TYPE.MY_BOARDS).build({
-      _id: FOLDER_TYPE.MY_BOARDS,
-      title: t("magneto.my.boards"),
-      ownerId: user?.userId ?? "",
-      parentId: "",
-    }),
-  );
-
+  const { setCurrentFolder, currentFolder } = useFoldersNavigation();
   const [boardIds, setBoardIds] = useState<string[]>([]);
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [folderIds, setFolderIds] = useState<string[]>([]);
@@ -73,7 +62,6 @@ export const App = () => {
   // let hasEmptyState;
 
   const handleSelectFolder = (folder: Folder) => {
-    setCurrentFolderP(folder);
     setCurrentFolder(folder);
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);
@@ -145,13 +133,16 @@ export const App = () => {
               padding: ".8rem",
             }}
           >
-            <SearchBar
-              onClick={() => null}
-              placeholder={t("magneto.search.placeholder")}
-              size="md"
-              isVariant={false}
-              key={searchBarResetter}
-            />
+            <div className="search-bar-wrapper">
+              <SearchBar
+                onClick={() => null}
+                placeholder={t("magneto.search.placeholder")}
+                size="md"
+                isVariant={false}
+                key={searchBarResetter}
+                onChange={(event) => setSearchText(event.target.value)}
+              />
+            </div>
             <FolderTitle
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}

@@ -30,10 +30,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
 }) => {
   const { getFolders } = useFoldersNavigation();
 
-  useEffect(() => {
-    getFolders();
-  }, []);
-
   const reducer = (
     state: { fileList: any[] },
     action: { type: any; dropDepth: any; inDropZone: any; files: any },
@@ -55,10 +51,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
     inDropZone: false,
     fileList: [],
   });
-
-  useEffect(() => {
-    getFolders();
-  }, []);
 
   useEffect(() => {
     getFolders();

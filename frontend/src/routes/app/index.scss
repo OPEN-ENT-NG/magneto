@@ -1,7 +1,16 @@
 .gridSidebar {
   padding: ".8rem";
-
   @media (max-width: 1024px) {
     display: none;
   }
+}
+.search-bar-wrapper {
+  box-sizing: border-box;
+  background: #fafafa;
+  padding: 2rem 11rem;
+  margin: -0.8rem -4rem 1.5rem -4.1rem;
+  border-bottom: var(--edifice-border-width) var(--edifice-border-style)
+    var(--edifice-border-color) !important;
+  border-left: var(--edifice-border-width) var(--edifice-border-style)
+    var(--edifice-border-color) !important;
 }

@@ -55,7 +55,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   });
 
   const isSameAsUser = (id: string) => {
-    return id == userId;
+    return id === userId;
   };
 
   useEffect(() => {
@@ -84,6 +84,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
       >
         <Card.Body flexDirection={"column"}>
           <Card.Image
+            className="image-c"
             imageSrc={board.imageUrl}
             variant="landscape"
           ></Card.Image>
@@ -109,39 +110,42 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                 <Icon path={mdiCalendarBlank} size={1}></Icon>
               </Tooltip>
               <Card.Text className="med-resource-card-text">
-                {dayjs(board.modificationDate, "YYYY-MM-DD HH:mm:ss").format(
-                  "DD MMMM YYYY",
-                )}
+                {dayjs(board.modificationDate, {
+                  locale: "fr",
+                  format: "YYYY-MM-DD HH:mm:ss",
+                }).format("DD MMMM YYYY")}
               </Card.Text>
             </div>
             <div className="board-about-right-content">
-              <Tooltip
-                message={t("magneto.board.tooltip.my.board")}
-                placement="bottom"
-              >
-                {!isSameAsUser(board.owner.userId) && (
-                  <Icon path={mdiCrown} size={1}></Icon>
-                )}
-              </Tooltip>
-              <Tooltip message={t("magneto.board.owner")} placement="bottom">
-                {isSameAsUser(board.owner.userId) && (
+              {!isSameAsUser(board.owner.userId) && (
+                <Tooltip
+                  message={t("magneto.board.tooltip.my.board")}
+                  placement="bottom"
+                >
                   <Icon path={mdiAccountCircle} size={1}></Icon>
-                )}
-              </Tooltip>
-              <Tooltip
-                message={t("magneto.board.tooltip.shared.board")}
-                placement="bottom"
-              >
-                {board.shared?.length && (
+                </Tooltip>
+              )}
+              {isSameAsUser(board.owner.userId) && (
+                <Tooltip message={t("magneto.board.owner")} placement="bottom">
+                  <Icon path={mdiCrown} size={1}></Icon>
+                </Tooltip>
+              )}
+              {board.shared?.length && (
+                <Tooltip
+                  message={t("magneto.board.tooltip.shared.board")}
+                  placement="bottom"
+                >
                   <Icon path={mdiShareVariant} size={1}></Icon>
-                )}
-              </Tooltip>
-              <Tooltip
-                message={t("magneto.board.tooltip.shared.board")}
-                placement="bottom"
-              >
-                {board.isPublished && <Icon path={mdiEarth} size={1}></Icon>}
-              </Tooltip>
+                </Tooltip>
+              )}
+              {board.isPublished && (
+                <Tooltip
+                  message={t("magneto.board.tooltip.shared.board")}
+                  placement="bottom"
+                >
+                  <Icon path={mdiEarth} size={1}></Icon>
+                </Tooltip>
+              )}
             </div>
           </div>
         </Card.Body>

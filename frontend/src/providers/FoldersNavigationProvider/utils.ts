@@ -2,7 +2,11 @@ import { FolderObjectState, TriggerFetchState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 
-export const initialCurrentFolder: Folder = new Folder(FOLDER_TYPE.MY_BOARDS);
+export const initialCurrentFolder = () => {
+  const folder = new Folder(FOLDER_TYPE.MY_BOARDS);
+  folder.title = t("magneto.my.boards");
+  return folder;
+};
 
 export const initialFolderObject: FolderObjectState = {
   myFolderObject: null,

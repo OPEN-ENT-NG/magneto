@@ -31,8 +31,9 @@ export const useFoldersNavigation = () => {
 export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   children,
 }) => {
-  const [currentFolder, setCurrentFolder] =
-    useState<Folder>(initialCurrentFolder);
+  const [currentFolder, setCurrentFolder] = useState<Folder>(
+    initialCurrentFolder(),
+  );
   const [selectedNodeIds, setSelectedNodeIds] = useState<string[]>([""]);
   const { folders, folderObject, getFolders } = useFoldersLogic();
 
@@ -55,7 +56,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       folderObject,
       getFolders,
     }),
-    [currentFolder, selectedNodeIds, folders, folderObject, getFolders],
+    [currentFolder, selectedNodeIds, folders, folderObject],
   );
 
   return (

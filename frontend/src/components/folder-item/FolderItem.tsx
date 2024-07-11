@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Card, useOdeClient } from "@edifice-ui/react";
 import "./FolderItem.scss";
-import { mdiFolder } from "@mdi/js";
+import { mdiFolder, mdiFolderAccount } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useDrop } from "react-dnd";
 
@@ -35,9 +35,8 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   modalData,
   onSetModalData,
 }) => {
-  const { currentApp } = useOdeClient();
+  const { currentApp, user } = useOdeClient();
   const [moveBoardsToFolder] = useMoveBoardsMutation();
-  const { user } = useOdeClient();
   const [userRights] = useState<UserRights>(new UserRights(user));
 
   const [hasDrop, setHasDrop] = useState<boolean>(false);
@@ -209,7 +208,11 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           }}
         >
           <Card.Body>
-            <Icon path={mdiFolder} size={2} color={"#e20037"} />
+            {user?.userId === folder.ownerId ? (
+              <Icon path={mdiFolder} size={2} color={"#3BA6CF"} />
+            ) : (
+              <Icon path={mdiFolderAccount} size={2} color={"#3BA6CF"} />
+            )}
             <Card.Title>{folder.title}</Card.Title>
           </Card.Body>
         </Card>

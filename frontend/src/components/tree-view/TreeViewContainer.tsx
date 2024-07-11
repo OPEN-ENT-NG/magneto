@@ -42,11 +42,10 @@ export const TreeViewContainer: React.FunctionComponent<
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const { user } = useOdeClient();
   const [userRights] = useState<UserRights>(new UserRights(user));
-  const { folderObject, folders, selectedNodeIds, setSelectedNodeIds } =
-    useFoldersNavigation();
+  const { folderObject, folders } = useFoldersNavigation();
 
   const dataTree = {
-    children: [{ title: "a", children: ["a", "b"] }, "b"],
+    children: [],
     id: FOLDER_TYPE.PUBLIC_BOARDS,
     name: t("magneto.lycee.connecte.boards"),
     section: true,
@@ -305,26 +304,6 @@ export const TreeViewContainer: React.FunctionComponent<
   useEffect(() => {
     onSetModalData(modalData);
   }, [modalData]);
-  const onTreeItemUnFold = (itemId: string) => {
-    setSelectedNodeIds((prevSelectedNodeIds) => {
-      const prevLastNodeId = prevSelectedNodeIds.slice(-1)[0];
-      const lastNodeId = itemId === prevLastNodeId ? "" : prevLastNodeId;
-      const filteredNodeIds = prevSelectedNodeIds
-        .slice(0, -1)
-        .filter((id) => id !== itemId);
-      return [...filteredNodeIds, itemId, lastNodeId];
-    });
-  };
-
-  const onTreeItemfold = (itemId: string) => {
-    setSelectedNodeIds((prevSelectedNodeIds) => {
-      const filteredNodeIds = prevSelectedNodeIds.filter(
-        (id, index) =>
-          id !== itemId || index === prevSelectedNodeIds.length - 1,
-      );
-      return filteredNodeIds;
-    });
-  };
 
   const datas = getFolderTypeData(folderType, folderObject);
 
@@ -338,23 +317,14 @@ export const TreeViewContainer: React.FunctionComponent<
         onDrop={handleDrop}
       >
         <TreeView
-          selectedNodesIds={selectedNodeIds}
           data={datas || dataTree}
-          onTreeItemBlur={() => {
-            console.log("blur");
-          }}
-          onTreeItemFocus={() => {
-            console.log("focus");
-          }}
-          onTreeItemFold={(item) => {
-            onTreeItemfold(item);
-          }}
+          onTreeItemBlur={() => {}}
+          onTreeItemFocus={() => {}}
+          onTreeItemFold={() => {}}
           onTreeItemSelect={(item) => {
             selectFolder(item);
           }}
-          onTreeItemUnfold={(item) => {
-            onTreeItemUnFold(item);
-          }}
+          onTreeItemUnfold={() => {}}
         />
       </div>
     </>

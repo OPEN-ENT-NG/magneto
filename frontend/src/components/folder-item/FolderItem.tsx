@@ -17,6 +17,7 @@ type FolderListProps = {
   folders: Folder[];
   areFoldersLoading: boolean;
   onSelect: (folder: Folder) => void;
+  toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
   onDisplayModal: (show: boolean) => void;
@@ -34,6 +35,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   onDisplayModal,
   modalData,
   onSetModalData,
+  toggleSelect,
 }) => {
   const { currentApp, user } = useOdeClient();
   const [moveBoardsToFolder] = useMoveBoardsMutation();
@@ -206,6 +208,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           onClick={() => {
             onSelect(folder);
           }}
+          onSelect={() => toggleSelect(folder)}
         >
           <Card.Body>
             {user?.userId === folder.ownerId ? (

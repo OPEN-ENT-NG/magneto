@@ -32,7 +32,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   toggle,
 }: props) => {
   const { currentApp } = useOdeClient();
-  const { t } = useTranslation();
+  const { t } = useTranslation('magneto');
 
   const [searchText, setSearchText] = useState<string>("");
   const [switchBoard, toggleSwitchBoard] = useToggle(false);
@@ -180,77 +180,77 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                     return card;
                   }
                 }).length > 0 && (
-                  <div>
-                    <div className="parent">
-                      <h2>{board._title}</h2>
-                      <span
-                        onClick={() => {
-                          onDuplicate(board._id);
-                        }}
-                        className="duplicateText"
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
+                    <div>
+                      <div className="parent">
+                        <h2>{board._title}</h2>
+                        <span
+                          onClick={() => {
                             onDuplicate(board._id);
-                          }
-                        }}
-                      >
-                        <FileCopyOutlinedIcon />
-                        {t("magneto.cards.collection.board.duplicate")}
-                      </span>
-                    </div>
-                    <animated.ul className="grid ps-0 list-unstyled mb-24">
-                      {board.cards
-                        .filter((card: CardModel) => {
-                          if (searchText === "") {
-                            return card;
-                          } else if (
-                            card.title
-                              .toLowerCase()
-                              .includes(searchText.toLowerCase())
-                          ) {
-                            return card;
-                          }
-                        })
-                        .map((card: CardModel) => (
-                          <animated.li
-                            className="g-col-4 z-1 boardSizing"
-                            key={card.id}
-                            style={{
-                              position: "relative",
-                              ...springs,
-                            }}
-                          >
-                            <Card
-                              app={currentApp!}
-                              options={{
-                                type: "board",
-                                title: card.title,
+                          }}
+                          className="duplicateText"
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              onDuplicate(board._id);
+                            }
+                          }}
+                        >
+                          <FileCopyOutlinedIcon />
+                          {t("magneto.cards.collection.board.duplicate")}
+                        </span>
+                      </div>
+                      <animated.ul className="grid ps-0 list-unstyled mb-24">
+                        {board.cards
+                          .filter((card: CardModel) => {
+                            if (searchText === "") {
+                              return card;
+                            } else if (
+                              card.title
+                                .toLowerCase()
+                                .includes(searchText.toLowerCase())
+                            ) {
+                              return card;
+                            }
+                          })
+                          .map((card: CardModel) => (
+                            <animated.li
+                              className="g-col-4 z-1 boardSizing"
+                              key={card.id}
+                              style={{
+                                position: "relative",
+                                ...springs,
                               }}
-                              isLoading={getBoardsLoading}
-                              isSelectable={false}
                             >
-                              <Card.Body flexDirection={"column"}>
-                                <Card.Title>{card.title}</Card.Title>
+                              <Card
+                                app={currentApp!}
+                                options={{
+                                  type: "board",
+                                  title: card.title,
+                                }}
+                                isLoading={getBoardsLoading}
+                                isSelectable={false}
+                              >
+                                <Card.Body flexDirection={"column"}>
+                                  <Card.Title>{card.title}</Card.Title>
 
-                                <div className="board-number-magnets">
-                                  <Icon
-                                    path={mdiMagnet}
-                                    size={1}
-                                    className="med-resource-card-text"
-                                  ></Icon>
-                                  <Card.Text className="med-resource-card-text board-text">
-                                    {card.resourceType} {t("magneto.magnets")}
-                                  </Card.Text>
-                                </div>
-                              </Card.Body>
-                            </Card>
-                          </animated.li>
-                        ))}
-                    </animated.ul>
-                  </div>
-                )}
+                                  <div className="board-number-magnets">
+                                    <Icon
+                                      path={mdiMagnet}
+                                      size={1}
+                                      className="med-resource-card-text"
+                                    ></Icon>
+                                    <Card.Text className="med-resource-card-text board-text">
+                                      {card.resourceType} {t("magneto.magnets")}
+                                    </Card.Text>
+                                  </div>
+                                </Card.Body>
+                              </Card>
+                            </animated.li>
+                          ))}
+                      </animated.ul>
+                    </div>
+                  )}
               </ul>
             ))}
           </ul>

@@ -1,4 +1,4 @@
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { usePredefinedToasts } from "./usePredefinedToasts";
 import { useRestorePreDeleteBoardsMutation } from "~/services/api/boards.service";
@@ -13,6 +13,7 @@ export const useRestoreBoardsAndFolders = ({
   boardIds,
   folderIds,
 }: useRestoreBoardsAndFoldersProps) => {
+  const { t } = useTranslation('magneto');
   const [restorePreDeleteBoards] = useRestorePreDeleteBoardsMutation();
   const [restorePreDeleteFolders] = useRestorePreDeleteFoldersMutation();
 

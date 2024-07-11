@@ -20,7 +20,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('magneto');
 
   return (
     <>

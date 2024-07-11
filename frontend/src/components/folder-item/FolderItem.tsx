@@ -64,6 +64,8 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       const dragAndDropBoardsIds: string[] = boards.map(
         (board: Board) => board._id,
       );
+      console.log(boards[0]);
+      console.log(folder);
       const dragAndDropInitialFolder = !boards[0].folderId
         ? new Folder().build({
             _id: FOLDER_TYPE.MY_BOARDS,
@@ -73,7 +75,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           })
         : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
           new Folder();
-
+      console.log(dragAndDropInitialFolder);
       if (
         (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
         folder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
@@ -134,7 +136,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       (board: Board) => board._id,
     );
 
-    resetDragAndDrop();
+    onDragAndDrop(undefined);
     dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTargetId);
   };
 
@@ -186,7 +188,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   const closeDragAndDropModal = (): void => {
     onDisplayModal(false);
-    resetDragAndDrop();
+    onDragAndDrop(undefined);
   };
 
   const resetDragAndDrop = (): void => {
@@ -196,7 +198,11 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   return (
     <>
-      <div ref={drop} draggable="true" className={isOver ? "drag-over" : ""}>
+      <div
+        ref={drop}
+        draggable="true"
+        className={isOver ? "drag-over" : "no-drag-over"}
+      >
         <Card
           isSelected={isSelected}
           app={currentApp!}

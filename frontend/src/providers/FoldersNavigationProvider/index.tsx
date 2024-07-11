@@ -60,6 +60,8 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     (folderId: string, folderType: FOLDER_TYPE | "basicFolder") => {
       if (currentFolder.id === folderId) return;
 
+      console.log("tonper");
+
       setCurrentFolder((prevFolder) => {
         if (prevFolder.id === folderId) return prevFolder;
 

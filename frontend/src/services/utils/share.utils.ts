@@ -83,6 +83,8 @@ export class UserRights {
   };
 
   public folderOwnerNotShared = (folder: Folder): boolean => {
+    console.log(folder);
+    console.log(this.folderOwnerOrMainPage(folder));
     return (
       this.folderOwnerOrMainPage(folder) &&
       (!folder.shared || folder.shared.length == 0)

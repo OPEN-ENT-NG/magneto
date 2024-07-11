@@ -43,6 +43,8 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     isDeleted: false,
     sortBy: "modificationDate",
   });
+  const [isBoardDragged, setIsBoardDragged] = useState<boolean>(false);
+
   const allBoardsQuery = {
     isPublic: false,
     isShared: true,
@@ -173,6 +175,9 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                     board={board}
                     areBoardsLoading={getBoardsLoading}
                     boardIds={boardIds}
+                    selectedBoardsData={selectedBoards}
+                    isBoardDragged={isBoardDragged}
+                    setIsBoardDragged={setIsBoardDragged}
                     onDragAndDropBoard={onDragAndDrop}
                     onSelect={toggleSelect}
                   />

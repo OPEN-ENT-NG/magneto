@@ -139,6 +139,7 @@ export const TreeViewContainer: React.FunctionComponent<
       ) {
         //not board owner
         handleNoRightsDragAndDrop();
+        removeFolderHighlight(e);
         return;
       } else if (
         (userRights.folderOwnerNotShared(dragAndDropInitialFolder) ||
@@ -174,6 +175,7 @@ export const TreeViewContainer: React.FunctionComponent<
         //initial folder owner + not shared, target folder owner + not shared
         proceedOnDragAndDrop(dragAndDropBoards, targetFolder);
       } else {
+        removeFolderHighlight(e);
         handleNoRightsDragAndDrop();
       }
 
@@ -219,7 +221,7 @@ export const TreeViewContainer: React.FunctionComponent<
       (board: Board) => board._id,
     );
 
-    resetDragAndDrop();
+    onDragAndDrop(undefined);
     dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTargetId);
   };
 
@@ -271,17 +273,38 @@ export const TreeViewContainer: React.FunctionComponent<
 
   const closeDragAndDropModal = (): void => {
     onDisplayModal(false);
-    resetDragAndDrop();
+    onDragAndDrop(undefined);
   };
 
   const resetDragAndDrop = (): void => {
-    handleSelect("", folderType);
+    //handleSelect("", folderType);
     onDragAndDrop(undefined);
   };
 
   useEffect(() => {
     onSetModalData(modalData);
   }, [modalData]);
+
+  const onTreeItemUnFold = (itemId: string) => {
+    setSelectedNodeIds((prevSelectedNodeIds) => {
+      const prevLastNodeId = prevSelectedNodeIds.slice(-1)[0];
+      const lastNodeId = itemId === prevLastNodeId ? "" : prevLastNodeId;
+      const filteredNodeIds = prevSelectedNodeIds
+        .slice(0, -1)
+        .filter((id) => id !== itemId);
+      return [...filteredNodeIds, itemId, lastNodeId];
+    });
+  };
+
+  const onTreeItemfold = (itemId: string) => {
+    setSelectedNodeIds((prevSelectedNodeIds) => {
+      const filteredNodeIds = prevSelectedNodeIds.filter(
+        (id, index) =>
+          id !== itemId || index === prevSelectedNodeIds.length - 1,
+      );
+      return filteredNodeIds;
+    });
+  };
 
   const datas = getFolderTypeData(folderType, folderObject);
 

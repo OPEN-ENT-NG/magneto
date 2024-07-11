@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
 import {
@@ -15,6 +15,7 @@ import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
 
 import "./BoardItem.scss";
+import { Board } from "~/models/board.model";
 
 interface BoardItemProps {
   board: {
@@ -29,6 +30,9 @@ interface BoardItemProps {
   };
   areBoardsLoading: boolean;
   boardIds: string[];
+  selectedBoardsData: Board[];
+  isBoardDragged: boolean;
+  setIsBoardDragged: (isDragged: boolean) => void;
   onDragAndDropBoard: (board: any) => void;
   onSelect: (board: any) => void;
 }
@@ -37,6 +41,9 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   board,
   areBoardsLoading,
   boardIds,
+  selectedBoardsData,
+  isBoardDragged,
+  setIsBoardDragged,
   onDragAndDropBoard,
   onSelect,
 }) => {
@@ -44,6 +51,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   const { t } = useTranslation("magneto");
 
   const userId = user ? user?.userId : "";
+  const [isDragged, setIsDragged] = useState<boolean>(false);
 
   const [{ isDragging }, drag] = useDrag({
     type: "board",
@@ -51,7 +59,6 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
-    // end: //...
   });
 
   const isSameAsUser = (id: string) => {
@@ -60,14 +67,25 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
 
   useEffect(() => {
     onDragAndDropBoard(board);
+    setIsBoardDragged(isDragging);
   }, [isDragging]);
+
+  useEffect(() => {
+    setIsDragged(
+      isBoardDragged &&
+        !!selectedBoardsData.find(
+          (selectedBoard: Board) =>
+            selectedBoard && selectedBoard._id == board.id,
+        ),
+    );
+  }, [isBoardDragged, selectedBoardsData]);
 
   return (
     <div
       ref={drag}
       className={`board ${isDragging ? "dragging" : ""}`}
       style={{
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDragging || isDragged ? 0.5 : 1,
         cursor: "move",
       }}
     >

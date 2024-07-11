@@ -87,6 +87,7 @@ export const App = () => {
       setDragAndDropBoards(selectedBoards);
     } else if (board) {
       setDragAndDropBoards([board]);
+      resetBoardsAndFolders();
     }
   };
 

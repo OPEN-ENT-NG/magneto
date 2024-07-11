@@ -130,7 +130,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                   <Icon path={mdiCrown} size={1}></Icon>
                 </Tooltip>
               )}
-              {board.shared?.length>0 && (
+              {board.shared?.length > 0 && (
                 <Tooltip
                   message={t("magneto.board.tooltip.shared.board")}
                   placement="bottom"

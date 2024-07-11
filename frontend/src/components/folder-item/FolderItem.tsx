@@ -15,8 +15,7 @@ import { UserRights } from "~/services/utils/share.utils";
 
 type FolderListProps = {
   folder: Folder;
-  folders: Folder[];
-  isSelected: boolean;
+  foldersData: Folder[];
   areFoldersLoading: boolean;
   toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
@@ -27,9 +26,8 @@ type FolderListProps = {
 };
 
 export const FolderItem: React.FunctionComponent<FolderListProps> = ({
-  isSelected,
   folder,
-  folders,
+  foldersData,
   areFoldersLoading,
   dragAndDropBoards,
   onDragAndDrop,
@@ -67,11 +65,11 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       const dragAndDropInitialFolder = !boards[0].folderId
         ? new Folder().build({
             _id: FOLDER_TYPE.MY_BOARDS,
-            ownerId: user.userId,
+            ownerId: user?.userId ?? "",
             title: MAIN_PAGE_TITLE,
             parentId: "",
           })
-        : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
+        : foldersData.find((folder: Folder) => folder.id == boards[0].folderId) ??
           new Folder();
 
       if (
@@ -180,7 +178,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const isOwnerOfSelectedBoards = (boards: Board[]): boolean => {
     return boards.every(
       (board: Board) =>
-        !!board && !!board.owner && board.owner.userId === user.userId,
+        !!board && !!board.owner && board.owner.userId ===( user?.userId ?? ""),
     );
   };
 
@@ -198,7 +196,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     <>
       <div ref={drop} draggable="true" className={isOver ? "drag-over" : ""}>
         <Card
-          isSelected={isSelected}
           app={currentApp!}
           options={{
             type: "folder",

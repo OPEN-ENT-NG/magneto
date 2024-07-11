@@ -81,5 +81,5 @@ export const useFoldersLogic = () => {
     }
   }, [deletedFolders, deletedFoldersResult, processFolders, triggerFetch]);
 
-  return { folders, folderObject, getFolders };
+  return { folders, folderObject, getFolders, setFolders };
 };

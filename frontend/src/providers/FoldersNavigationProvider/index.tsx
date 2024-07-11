@@ -41,7 +41,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   const [currentFolder, setCurrentFolder] = useState<Folder>(
     useInitialCurrentFolder(),
   );
-  const { folders, folderObject, getFolders } = useFoldersLogic();
+  const { folders, folderObject, getFolders, setFolders } = useFoldersLogic();
   const myBoardsRef = useRef<TreeViewHandlers>(null);
   const publicBoardsRef = useRef<TreeViewHandlers>(null);
   const deletedBoardsRef = useRef<TreeViewHandlers>(null);
@@ -91,10 +91,11 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       folders,
       folderObject,
       getFolders,
+      setFolders,
       handleSelect,
       folderNavigationRefs,
     }),
-    [currentFolder, folders, folderObject, folderNavigationRefs],
+    [currentFolder, folders, folderObject, folderNavigationRefs, getFolders, setFolders],
   );
 
   return (

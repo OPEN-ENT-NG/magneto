@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { animated, useSpring } from "@react-spring/web";
 
@@ -10,6 +10,8 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 type FolderListProps = {
+  folders: Folder[];
+  onSetFolders: Dispatch<SetStateAction<Folder[]>>;
   currentFolder: Folder;
   folderIds: string[];
   selectedFolders: Folder[];
@@ -24,6 +26,8 @@ type FolderListProps = {
 };
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
+  folders,
+  onSetFolders,
   currentFolder,
   dragAndDropBoards,
   onDragAndDrop,
@@ -44,37 +48,40 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     error: getFoldersError,
   } = useGetFoldersQuery(foldersQuery);
 
-  let folderData: Folder[] = [];
 
-  const filterFolderData = (): void => {
+  const filterFolderData = (folderData: Folder[]): void => {
     if (
       !currentFolder.id ||
       currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
       currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
       currentFolder.id == ""
     ) {
-      folderData = folderData.filter((folder: Folder) => !folder.parentId);
+      onSetFolders(folderData.filter((folder: Folder) => !folder.parentId));
+      console.log(folderData);
     } else if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
-      folderData = [];
+      onSetFolders([]);
     } else if (!!currentFolder && !!currentFolder.id) {
-      folderData = folderData.filter(
-        (folder: Folder) => folder.parentId == currentFolder.id,
-      );
+      onSetFolders(folderData.filter(
+        (folder: Folder) => folder.parentId == currentFolder.id
+      ));
     } else {
       console.log("currentFolder undefined, try later or again");
     }
   };
 
-  if (getFoldersError) {
-    console.log("error");
-  } else if (getFoldersLoading) {
-    console.log("loading");
-  } else if (myFoldersResult) {
-    folderData = myFoldersResult.map((folder: IFolderResponse) =>
-      new Folder().build(folder),
-    ); // convert folders to Folder[]
-    filterFolderData();
-  }
+  useEffect(() => {
+    let folderData: Folder[];
+    if (getFoldersError) {
+      console.log("error");
+    } else if (getFoldersLoading) {
+      console.log("loading");
+    } else if (myFoldersResult) {
+      folderData = myFoldersResult.map((folder: IFolderResponse) =>
+        new Folder().build(folder)); // convert folders to Folder[]
+      filterFolderData(folderData);
+    }
+  }, [foldersQuery]);
+
 
   const springs = useSpring({
     from: { opacity: 0 },
@@ -107,9 +114,9 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
 
   return (
     <>
-      {folderData?.length ? (
+      {folders?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-          {folderData
+          {folders
             .filter((folder: Folder) => {
               if (searchText === "") {
                 return folder;
@@ -135,7 +142,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                       .map((item: Folder) => item.id)
                       .includes(folder.id)}
                     folder={folder}
-                    folders={folderData}
+                    foldersData={folders}
                     areFoldersLoading={getFoldersLoading}
                     toggleSelect={toggleSelect}
                     dragAndDropBoards={dragAndDropBoards}

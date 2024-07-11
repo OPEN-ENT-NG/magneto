@@ -31,6 +31,7 @@ export type FoldersNavigationContextType = {
   folders: Folder[];
   folderObject: FolderObjectState;
   getFolders: () => void;
+  setFolders: Dispatch<SetStateAction<Folder[]>>;
   handleSelect: (
     folderId: string,
     folderType: FOLDER_TYPE | "basicFolder",

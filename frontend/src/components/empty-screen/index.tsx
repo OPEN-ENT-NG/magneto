@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 export default function EmptyScreenApp(): JSX.Element {
   const { appCode } = useOdeClient();
   const { theme } = useOdeTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation('magneto');
 
   return (
     <EmptyScreen

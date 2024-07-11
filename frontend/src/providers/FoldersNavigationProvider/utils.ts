@@ -1,4 +1,4 @@
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { FolderObjectState, TriggerFetchState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
@@ -18,6 +18,7 @@ export const initialTriggerFetch: TriggerFetchState = {
 
 //prepareFolders non utilisé pour l'instant
 export const prepareFolders = (folderId: string, folders: Folder[]): Folder => {
+  const { t } = useTranslation('magneto');
   switch (folderId) {
     case FOLDER_TYPE.MY_BOARDS:
       return new Folder().build({

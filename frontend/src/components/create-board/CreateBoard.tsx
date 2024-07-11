@@ -19,7 +19,7 @@ import "./CreateBoard.scss";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
@@ -50,6 +50,7 @@ export const CreateBoard: FunctionComponent<props> = ({
   boardToUpdate,
   reset,
 }: props) => {
+  const { t } = useTranslation('magneto');
   const {
     cover: thumbnail,
     handleUploadImage: handleUploadImageThumbnail,

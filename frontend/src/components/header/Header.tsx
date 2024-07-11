@@ -2,7 +2,7 @@ import { AppHeader, Button } from "@edifice-ui/react";
 import "./Header.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import myimg from "./uni-magneto.png";
 
@@ -12,6 +12,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
+  const { t } = useTranslation('magneto');
   return (
     <AppHeader>
       <IconButton

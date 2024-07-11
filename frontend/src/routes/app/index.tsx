@@ -4,7 +4,7 @@ import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { mdiFolder } from "@mdi/js";
 import Icon from "@mdi/react";
 import { ID } from "edifice-ts-client";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -38,6 +38,7 @@ export interface AppProps {
 }
 
 export const App = () => {
+  const { t } = useTranslation('magneto');
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
   const { setCurrentFolder: setCurrentFolderP } = useFoldersNavigation();
@@ -56,8 +57,8 @@ export const App = () => {
     i18nKey: "",
     param: "",
     hasSubmit: false,
-    onSubmit: () => {},
-    onCancel: () => {},
+    onSubmit: () => { },
+    onCancel: () => { },
   });
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);

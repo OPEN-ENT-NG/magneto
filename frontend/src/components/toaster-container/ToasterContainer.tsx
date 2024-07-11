@@ -8,7 +8,7 @@ import {
   useOdeClient,
 } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
@@ -43,6 +43,7 @@ export const ToasterContainer = ({
   currentFolder,
   reset,
 }: ToasterContainerProps) => {
+  const { t } = useTranslation('magneto');
   const { data: actions } = useActions();
   const canPublish = isActionAvailable("publish", actions);
 
@@ -198,7 +199,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -272,7 +273,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -287,7 +288,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.public.unshare")}
                     </Button>

@@ -10,6 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
+import { EmptyState } from "~/components/empty-state/EmptyState";
 import { FolderList } from "~/components/folder-list/FolderList";
 import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
@@ -23,9 +24,6 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import "./index.scss";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import EmptyScreenApp from "~/components/empty-screen";
-import { userInfo } from "os";
-import { EmptyState } from "~/components/empty-state/EmptyState";
 
 export interface AppProps {
   _id: string;
@@ -45,7 +43,12 @@ export const App = () => {
   const { user } = useOdeClient();
   const { setCurrentFolder: setCurrentFolderP } = useFoldersNavigation();
   const [currentFolder, setCurrentFolder] = useState(
-    new Folder(FOLDER_TYPE.MY_BOARDS).build({_id: FOLDER_TYPE.MY_BOARDS, title: t("magneto.my.boards"), ownerId: user?.userId ?? "", parentId: "" }),
+    new Folder(FOLDER_TYPE.MY_BOARDS).build({
+      _id: FOLDER_TYPE.MY_BOARDS,
+      title: t("magneto.my.boards"),
+      ownerId: user?.userId ?? "",
+      parentId: "",
+    }),
   );
 
   const [boardIds, setBoardIds] = useState<string[]>([]);
@@ -65,8 +68,8 @@ export const App = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
-
-  let hasEmptyState = true;
+  const [hasEmptyState, setHasEmptyState] = useState<boolean>(false);
+  // let hasEmptyState;
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolderP(folder);
@@ -86,10 +89,9 @@ export const App = () => {
     resetBoardsAndFolders();
   }, [currentFolder]);
 
-  // useEffect(() => {
-  //   hasEmptyState = !boardIds.length && !folderIds.length;
-  //   hasEmptyState = false;
-  // }, [boardIds, folderIds]);
+  useEffect(() => {
+    setHasEmptyState(!boardIds.length && !folderIds.length);
+  }, [boardIds, folderIds]);
 
   const handleDragAndDropBoards = (board: Board) => {
     if (
@@ -153,9 +155,9 @@ export const App = () => {
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}
             />
-            { hasEmptyState ?
+            {hasEmptyState ? (
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
-              :
+            ) : (
               <div>
                 <FolderList
                   currentFolder={currentFolder}
@@ -201,8 +203,7 @@ export const App = () => {
                   onCancel={modalProps.onCancel}
                 ></MessageModal>
               </div>
-            }
-            
+            )}
           </Grid.Col>
         </Grid>
       </DndProvider>

@@ -141,9 +141,9 @@ export const App = () => {
               SVGLeft={<Icon path={mdiFolder} />}
             />
 
-            {!folders.length ? (
+            {(!folders.length && !boards.length) ??
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
-            ) : null}
+            }
 
             <FolderList
               selectedFolderIds={selectedFolderIds}
@@ -188,6 +188,7 @@ export const App = () => {
               onSubmit={modalProps.onSubmit}
               onCancel={modalProps.onCancel}
             ></MessageModal>
+
           </Grid.Col>
         </Grid>
       </DndProvider>

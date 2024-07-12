@@ -6,18 +6,27 @@ import IconButton from "@mui/material/IconButton";
 
 import { SideBar } from "../side-bar/SideBar";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
-import { Folder } from "~/models/folder.model";
+import { Board } from "~/models/board.model";
 
 type DrawerSideBarProps = {
-  onSelect: (folder: Folder) => void;
   drawer: boolean;
-  toggleDrawer: () => void;
+  dragAndDropBoards: Board[];
+  onDragAndDrop: (board: Board) => void;
+  onSetShowModal: (show: boolean) => void;
+  modalProps: any;
+  onSetModalProps: (modalProps: any) => void;
+  toggleDrawer?: () => void;
+  className?: string;
 };
 
 export const DrawerSideBar: React.FunctionComponent<DrawerSideBarProps> = ({
-  onSelect,
   drawer,
   toggleDrawer,
+  dragAndDropBoards,
+  onDragAndDrop,
+  onSetShowModal,
+  modalProps,
+  onSetModalProps,
 }) => {
   const { width } = useWindowDimensions();
   return (
@@ -35,9 +44,13 @@ export const DrawerSideBar: React.FunctionComponent<DrawerSideBarProps> = ({
         <ChevronLeftIcon />
       </IconButton>
       <SideBar
-        onSelect={onSelect}
         className="drawer"
         toggleDrawer={toggleDrawer}
+        dragAndDropBoards={dragAndDropBoards}
+        onDragAndDrop={onDragAndDrop}
+        onSetShowModal={onSetShowModal}
+        modalProps={modalProps}
+        onSetModalProps={onSetModalProps}
       />
     </Drawer>
   );

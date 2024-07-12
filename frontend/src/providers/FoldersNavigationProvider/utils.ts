@@ -1,3 +1,5 @@
+import { t } from "i18next";
+
 import { FolderObjectState, TriggerFetchState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";

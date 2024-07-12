@@ -40,7 +40,7 @@ export const App = () => {
   const { t } = useTranslation("magneto");
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
-  const { setCurrentFolder, currentFolder } = useFoldersNavigation();
+  const { currentFolder } = useFoldersNavigation();
   const [boardIds, setBoardIds] = useState<string[]>([]);
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [folderIds, setFolderIds] = useState<string[]>([]);
@@ -61,13 +61,9 @@ export const App = () => {
   const [hasEmptyState, setHasEmptyState] = useState<boolean>(false);
   // let hasEmptyState;
 
-  const handleSelectFolder = (folder: Folder) => {
-    setCurrentFolder(folder);
+  const resetBoardsAndFolders = () => {
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);
-  };
-
-  const resetBoardsAndFolders = () => {
     setBoardIds([]);
     setFolderIds([]);
     setSelectedBoards([]);
@@ -100,9 +96,13 @@ export const App = () => {
       <Header onClick={toggle} toggleDrawer={toggleDrawer} />
       <DndProvider backend={HTML5Backend}>
         <DrawerSideBar
-          onSelect={handleSelectFolder}
           drawer={drawer}
           toggleDrawer={toggleDrawer}
+          dragAndDropBoards={dragAndDropBoards}
+          onDragAndDrop={handleDragAndDropBoards}
+          onSetShowModal={setShowModal}
+          modalProps={modalProps}
+          onSetModalProps={setModalProps}
         />
         <Grid>
           <Grid.Col
@@ -115,7 +115,6 @@ export const App = () => {
             }}
           >
             <SideBar
-              onSelect={handleSelectFolder}
               dragAndDropBoards={dragAndDropBoards}
               onDragAndDrop={handleDragAndDropBoards}
               onSetShowModal={setShowModal}
@@ -147,55 +146,48 @@ export const App = () => {
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}
             />
-            {hasEmptyState ? (
-              <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
-            ) : (
-              <div>
-                <FolderList
-                  currentFolder={currentFolder}
-                  onSelect={handleSelectFolder}
-                  folderIds={folderIds}
-                  selectedFolders={selectedFolders}
-                  setFolderIds={setFolderIds}
-                  setSelectedFolders={setSelectedFolders}
-                  searchText={searchText}
-                  dragAndDropBoards={dragAndDropBoards}
-                  onDragAndDrop={handleDragAndDropBoards}
-                  onSetShowModal={setShowModal}
-                  modalProps={modalProps}
-                  onSetModalProps={setModalProps}
-                />
-                <BoardList
-                  currentFolder={currentFolder}
-                  boardIds={boardIds}
-                  selectedBoards={selectedBoards}
-                  setBoardIds={setBoardIds}
-                  setSelectedBoards={setSelectedBoards}
-                  searchText={searchText}
-                  onDragAndDrop={handleDragAndDropBoards}
-                />
-                <ToasterContainer
-                  isToasterOpen={
-                    selectedBoards.length > 0 || selectedFolders.length > 0
-                  }
-                  boards={selectedBoards}
-                  folders={selectedFolders}
-                  boardIds={boardIds}
-                  folderIds={folderIds}
-                  currentFolder={currentFolder}
-                  reset={resetBoardsAndFolders}
-                />
-                <CreateBoard isOpen={isOpen} toggle={toggle} />
-                <MessageModal
-                  isOpen={showModal}
-                  i18nKey={modalProps.i18nKey}
-                  param={modalProps.param}
-                  hasSubmit={modalProps.hasSubmit}
-                  onSubmit={modalProps.onSubmit}
-                  onCancel={modalProps.onCancel}
-                ></MessageModal>
-              </div>
-            )}
+            <FolderList
+              currentFolder={currentFolder}
+              folderIds={folderIds}
+              selectedFolders={selectedFolders}
+              setFolderIds={setFolderIds}
+              setSelectedFolders={setSelectedFolders}
+              searchText={searchText}
+              dragAndDropBoards={dragAndDropBoards}
+              onDragAndDrop={handleDragAndDropBoards}
+              onSetShowModal={setShowModal}
+              modalProps={modalProps}
+              onSetModalProps={setModalProps}
+            />
+            <BoardList
+              currentFolder={currentFolder}
+              boardIds={boardIds}
+              selectedBoards={selectedBoards}
+              setBoardIds={setBoardIds}
+              setSelectedBoards={setSelectedBoards}
+              searchText={searchText}
+              onDragAndDrop={handleDragAndDropBoards}
+            />
+            <ToasterContainer
+              isToasterOpen={
+                selectedBoards.length > 0 || selectedFolders.length > 0
+              }
+              boards={selectedBoards}
+              folders={selectedFolders}
+              boardIds={boardIds}
+              folderIds={folderIds}
+              currentFolder={currentFolder}
+              reset={resetBoardsAndFolders}
+            />
+            <CreateBoard isOpen={isOpen} toggle={toggle} />
+            <MessageModal
+              isOpen={showModal}
+              i18nKey={modalProps.i18nKey}
+              param={modalProps.param}
+              hasSubmit={modalProps.hasSubmit}
+              onSubmit={modalProps.onSubmit}
+              onCancel={modalProps.onCancel}
+            ></MessageModal>
           </Grid.Col>
         </Grid>
       </DndProvider>

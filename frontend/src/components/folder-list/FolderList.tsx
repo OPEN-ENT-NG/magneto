@@ -11,7 +11,6 @@ import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 type FolderListProps = {
   currentFolder: Folder;
-  onSelect: (folder: Folder) => void;
   folderIds: string[];
   selectedFolders: Folder[];
   setFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
@@ -26,7 +25,6 @@ type FolderListProps = {
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
   currentFolder,
-  onSelect,
   dragAndDropBoards,
   onDragAndDrop,
   onSetShowModal,
@@ -136,7 +134,6 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                     folder={folder}
                     folders={folderData}
                     areFoldersLoading={getFoldersLoading}
-                    onSelect={onSelect}
                     toggleSelect={toggleSelect}
                     dragAndDropBoards={dragAndDropBoards}
                     onDragAndDrop={onDragAndDrop}

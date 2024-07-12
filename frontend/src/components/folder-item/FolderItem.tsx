@@ -9,6 +9,7 @@ import { useDrop } from "react-dnd";
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/services/utils/share.utils";
 
@@ -16,7 +17,6 @@ type FolderListProps = {
   folder: Folder;
   folders: Folder[];
   areFoldersLoading: boolean;
-  onSelect: (folder: Folder) => void;
   toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
@@ -29,7 +29,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   folder,
   folders,
   areFoldersLoading,
-  onSelect,
   dragAndDropBoards,
   onDragAndDrop,
   onDisplayModal,
@@ -40,8 +39,8 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const { currentApp, user } = useOdeClient();
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const [userRights] = useState<UserRights>(new UserRights(user));
-
   const [hasDrop, setHasDrop] = useState<boolean>(false);
+  const { handleSelect } = useFoldersNavigation();
 
   const folderTitle = folder.title;
 
@@ -161,7 +160,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id),
       onCancel: () => closeDragAndDropModal(),
     });
-    console.log(modalData);
     onDisplayModal(true);
   };
 
@@ -190,7 +188,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   };
 
   const resetDragAndDrop = (): void => {
-    onSelect(new Folder());
+    handleSelect("", "basicFolder");
     onDragAndDrop(undefined);
   };
 
@@ -206,7 +204,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           isLoading={areFoldersLoading}
           isSelectable={true}
           onClick={() => {
-            onSelect(folder);
+            handleSelect(folder.id, "basicFolder");
           }}
           onSelect={() => toggleSelect(folder)}
         >

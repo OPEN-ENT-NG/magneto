@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 
-import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
+import { Grid, useToggle, SearchBar, useOdeClient } from "@edifice-ui/react";
 import { mdiFolder } from "@mdi/js";
 import Icon from "@mdi/react";
-import { ID } from "edifice-ts-client";
 import { t } from "i18next";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -11,6 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
+import { EmptyState } from "~/components/empty-state/EmptyState";
 import { FolderList } from "~/components/folder-list/FolderList";
 import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
@@ -32,7 +32,7 @@ export interface AppProps {
   map: string;
   modified: Date;
   name: string;
-  owner: { userId: ID; displayName: string };
+  owner: { userId: string; displayName: string };
   shared: any[];
   thumbnail: string;
 }
@@ -40,9 +40,15 @@ export interface AppProps {
 export const App = () => {
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
+  const { user } = useOdeClient();
   const { setCurrentFolder: setCurrentFolderP } = useFoldersNavigation();
   const [currentFolder, setCurrentFolder] = useState(
-    new Folder(FOLDER_TYPE.MY_BOARDS),
+    new Folder(FOLDER_TYPE.MY_BOARDS).build({
+      _id: FOLDER_TYPE.MY_BOARDS,
+      title: t("magneto.my.boards"),
+      ownerId: user?.userId ?? "",
+      parentId: "",
+    }),
   );
 
   const [boardIds, setBoardIds] = useState<string[]>([]);
@@ -62,6 +68,8 @@ export const App = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
+  const [hasEmptyState, setHasEmptyState] = useState<boolean>(false);
+  // let hasEmptyState;
 
   const handleSelectFolder = (folder: Folder) => {
     setCurrentFolderP(folder);
@@ -80,6 +88,10 @@ export const App = () => {
   useEffect(() => {
     resetBoardsAndFolders();
   }, [currentFolder]);
+
+  useEffect(() => {
+    setHasEmptyState(!boardIds.length && !folderIds.length);
+  }, [boardIds, folderIds]);
 
   const handleDragAndDropBoards = (board: Board) => {
     if (
@@ -143,49 +155,55 @@ export const App = () => {
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}
             />
-            <FolderList
-              currentFolder={currentFolder}
-              onSelect={handleSelectFolder}
-              folderIds={folderIds}
-              selectedFolders={selectedFolders}
-              setFolderIds={setFolderIds}
-              setSelectedFolders={setSelectedFolders}
-              searchText={searchText}
-              dragAndDropBoards={dragAndDropBoards}
-              onDragAndDrop={handleDragAndDropBoards}
-              onSetShowModal={setShowModal}
-              modalProps={modalProps}
-              onSetModalProps={setModalProps}
-            />
-            <BoardList
-              currentFolder={currentFolder}
-              boardIds={boardIds}
-              selectedBoards={selectedBoards}
-              setBoardIds={setBoardIds}
-              setSelectedBoards={setSelectedBoards}
-              searchText={searchText}
-              onDragAndDrop={handleDragAndDropBoards}
-            />
-            <ToasterContainer
-              isToasterOpen={
-                selectedBoards.length > 0 || selectedFolders.length > 0
-              }
-              boards={selectedBoards}
-              folders={selectedFolders}
-              boardIds={boardIds}
-              folderIds={folderIds}
-              currentFolder={currentFolder}
-              reset={resetBoardsAndFolders}
-            />
-            <CreateBoard isOpen={isOpen} toggle={toggle} />
-            <MessageModal
-              isOpen={showModal}
-              i18nKey={modalProps.i18nKey}
-              param={modalProps.param}
-              hasSubmit={modalProps.hasSubmit}
-              onSubmit={modalProps.onSubmit}
-              onCancel={modalProps.onCancel}
-            ></MessageModal>
+            {hasEmptyState ? (
+              <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
+            ) : (
+              <div>
+                <FolderList
+                  currentFolder={currentFolder}
+                  onSelect={handleSelectFolder}
+                  folderIds={folderIds}
+                  selectedFolders={selectedFolders}
+                  setFolderIds={setFolderIds}
+                  setSelectedFolders={setSelectedFolders}
+                  searchText={searchText}
+                  dragAndDropBoards={dragAndDropBoards}
+                  onDragAndDrop={handleDragAndDropBoards}
+                  onSetShowModal={setShowModal}
+                  modalProps={modalProps}
+                  onSetModalProps={setModalProps}
+                />
+                <BoardList
+                  currentFolder={currentFolder}
+                  boardIds={boardIds}
+                  selectedBoards={selectedBoards}
+                  setBoardIds={setBoardIds}
+                  setSelectedBoards={setSelectedBoards}
+                  searchText={searchText}
+                  onDragAndDrop={handleDragAndDropBoards}
+                />
+                <ToasterContainer
+                  isToasterOpen={
+                    selectedBoards.length > 0 || selectedFolders.length > 0
+                  }
+                  boards={selectedBoards}
+                  folders={selectedFolders}
+                  boardIds={boardIds}
+                  folderIds={folderIds}
+                  currentFolder={currentFolder}
+                  reset={resetBoardsAndFolders}
+                />
+                <CreateBoard isOpen={isOpen} toggle={toggle} />
+                <MessageModal
+                  isOpen={showModal}
+                  i18nKey={modalProps.i18nKey}
+                  param={modalProps.param}
+                  hasSubmit={modalProps.hasSubmit}
+                  onSubmit={modalProps.onSubmit}
+                  onCancel={modalProps.onCancel}
+                ></MessageModal>
+              </div>
+            )}
           </Grid.Col>
         </Grid>
       </DndProvider>

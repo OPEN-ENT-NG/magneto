@@ -41,7 +41,7 @@ export class Folder {
   build(data: IFolderResponse): Folder {
     this._id = data._id;
     this._title = data.title;
-    this._parentId = data.parentId;
+    this._parentId = data.parentId ? data.parentId : "";
     this._ownerId = data.ownerId;
     this._shared = data.shared ? data.shared : [];
     this._rights = data.rights ? data.rights : [];

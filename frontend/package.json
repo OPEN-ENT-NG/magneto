@@ -54,6 +54,7 @@
     "@mui/icons-material": "5.15.0",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
+    "@cgi-learning-hub/ui": "1.0.0",
     "dayjs": "1.11.10",
     "i18next": "23.5.1",
     "i18next-http-backend": "2.2.2",

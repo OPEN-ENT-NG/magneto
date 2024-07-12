@@ -31,7 +31,7 @@ export const CreateFolder: FunctionComponent<props> = ({
   const [addFolder] = useCreateFolderMutation();
   const [updateFolder] = useUpdateFolderMutation();
 
-  const formId = `createFolder_${useId}`
+  const formId = `createFolder_${useId}`;
 
   const onSubmit = async (): Promise<void> => {
     try {
@@ -73,7 +73,11 @@ export const CreateFolder: FunctionComponent<props> = ({
           viewport={false}
         >
           <Modal.Header onModalClose={resetFields}>
-            {t(folderToUpdate != null ? "magneto.folder.rename" : "magneto.create.folder")}
+            {t(
+              folderToUpdate != null
+                ? "magneto.folder.rename"
+                : "magneto.create.folder",
+            )}
           </Modal.Header>
           <Modal.Body>
             <form id={formId}>

@@ -15,12 +15,18 @@ export const initialTriggerFetch: TriggerFetchState = {
 };
 
 //prepareFolders non utilisé pour l'instant
-export const prepareFolders = (folderId: string, folders: Folder[], folderTitle: string): Folder => {
-  switch (folderId) {  //TODO : gérer la nouvelle variable folderTitle pour les composants qui vont appeler prepareFolders (ou transformer le utils en hook), sinon le useTranslation n'a pas le droit d'être utilisé
+export const prepareFolders = (
+  folderId: string,
+  folders: Folder[],
+  folderTitle: string,
+): Folder => {
+  switch (
+    folderId //TODO : gérer la nouvelle variable folderTitle pour les composants qui vont appeler prepareFolders (ou transformer le utils en hook), sinon le useTranslation n'a pas le droit d'être utilisé
+  ) {
     case FOLDER_TYPE.MY_BOARDS:
       return new Folder().build({
         _id: folderId,
-        title: folderTitle, //t("magneto.my.boards"), 
+        title: folderTitle, //t("magneto.my.boards"),
       } as IFolderResponse);
     case FOLDER_TYPE.PUBLIC_BOARDS:
       return new Folder().build({

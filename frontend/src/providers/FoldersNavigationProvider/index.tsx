@@ -45,10 +45,6 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     });
   }, [currentFolder]);
 
-  useEffect(() => {
-    console.log(selectedNodeIds);
-  }, [selectedNodeIds]);
-
   const value = useMemo<FoldersNavigationContextType>(
     () => ({
       currentFolder,

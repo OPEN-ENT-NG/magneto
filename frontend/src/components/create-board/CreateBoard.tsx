@@ -50,7 +50,7 @@ export const CreateBoard: FunctionComponent<props> = ({
   boardToUpdate,
   reset,
 }: props) => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const {
     cover: thumbnail,
     handleUploadImage: handleUploadImageThumbnail,

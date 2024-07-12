@@ -25,7 +25,7 @@ export const CreateFolder: FunctionComponent<props> = ({
   reset,
   toggleDrawer,
 }: props) => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const [title, setTitle] = useState("");
   const [parentId] = useState("");
   const [addFolder] = useCreateFolderMutation();

@@ -41,7 +41,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   onSelect,
 }) => {
   const { user, currentApp } = useOdeClient();
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
 
   const userId = user ? user?.userId : "";
 

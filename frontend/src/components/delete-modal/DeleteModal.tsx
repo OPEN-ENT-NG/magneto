@@ -31,7 +31,7 @@ export const DeleteModal: FunctionComponent<props> = ({
   isPredelete,
   reset,
 }: props) => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const [preDeleteBoards] = usePreDeleteBoardsMutation();
   const [preDeleteFolders] = usePreDeleteFoldersMutation();
   const [deleteBoards] = useDeleteBoardsMutation();

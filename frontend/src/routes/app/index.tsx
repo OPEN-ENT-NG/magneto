@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { Grid, useToggle, SearchBar, useOdeClient } from "@edifice-ui/react";
 import { mdiFolder } from "@mdi/js";
 import Icon from "@mdi/react";
-import { useTranslation } from "react-i18next";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useTranslation } from "react-i18next";
 
 import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
@@ -38,7 +38,7 @@ export interface AppProps {
 }
 
 export const App = () => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
   const { user } = useOdeClient();
@@ -63,8 +63,8 @@ export const App = () => {
     i18nKey: "",
     param: "",
     hasSubmit: false,
-    onSubmit: () => { },
-    onCancel: () => { },
+    onSubmit: () => {},
+    onCancel: () => {},
   });
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);

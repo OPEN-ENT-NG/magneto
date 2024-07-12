@@ -18,7 +18,7 @@ export const initialTriggerFetch: TriggerFetchState = {
 
 //prepareFolders non utilisé pour l'instant
 export const prepareFolders = (folderId: string, folders: Folder[]): Folder => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   switch (folderId) {
     case FOLDER_TYPE.MY_BOARDS:
       return new Folder().build({

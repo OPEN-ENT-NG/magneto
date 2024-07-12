@@ -43,7 +43,7 @@ export const ToasterContainer = ({
   currentFolder,
   reset,
 }: ToasterContainerProps) => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const { data: actions } = useActions();
   const canPublish = isActionAvailable("publish", actions);
 
@@ -199,7 +199,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -273,7 +273,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -288,7 +288,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.public.unshare")}
                     </Button>

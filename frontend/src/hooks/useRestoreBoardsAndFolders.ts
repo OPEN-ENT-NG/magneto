@@ -13,7 +13,7 @@ export const useRestoreBoardsAndFolders = ({
   boardIds,
   folderIds,
 }: useRestoreBoardsAndFoldersProps) => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const [restorePreDeleteBoards] = useRestorePreDeleteBoardsMutation();
   const [restorePreDeleteFolders] = useRestorePreDeleteFoldersMutation();
 

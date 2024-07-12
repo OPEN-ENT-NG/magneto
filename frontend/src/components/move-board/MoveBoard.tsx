@@ -26,7 +26,7 @@ export const MoveBoard: FunctionComponent<props> = ({
   boards,
   reset,
 }: props) => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const [moveBoards] = useMoveBoardsMutation();
   const [currentFolder, setCurrentFolder] = useState<Folder>(new Folder());
 

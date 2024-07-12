@@ -10,7 +10,7 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 export const useFoldersLogic = () => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   const [folders, setFolders] = useState<Folder[]>([]);
   const [folderObject, setFolderObject] =
     useState<FolderObjectState>(initialFolderObject);

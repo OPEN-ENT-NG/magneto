@@ -12,7 +12,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
   return (
     <AppHeader>
       <IconButton

@@ -10,7 +10,6 @@ import { useTranslation } from "react-i18next";
 import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
-import { EmptyState } from "~/components/empty-state/EmptyState";
 import { FolderList } from "~/components/folder-list/FolderList";
 import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
@@ -58,7 +57,7 @@ export const App = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
-  const [hasEmptyState, setHasEmptyState] = useState<boolean>(false);
+  const [, setHasEmptyState] = useState<boolean>(false);
   // let hasEmptyState;
 
   const resetBoardsAndFolders = () => {

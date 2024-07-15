@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { FolderObjectState, TriggerFetchState } from "./types";
 import { initialFolderObject, initialTriggerFetch } from "./utils";
@@ -10,6 +10,7 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 export const useFoldersLogic = () => {
+  const { t } = useTranslation("magneto");
   const [folders, setFolders] = useState<Folder[]>([]);
   const [folderObject, setFolderObject] =
     useState<FolderObjectState>(initialFolderObject);

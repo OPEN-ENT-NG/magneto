@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 
 import { Button, FormControl, Input, Label, Modal } from "@edifice-ui/react";
 import "./CreateFolder.scss";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { Folder } from "../../models/folder.model";
 import {
@@ -25,6 +25,7 @@ export const CreateFolder: FunctionComponent<props> = ({
   reset,
   toggleDrawer,
 }: props) => {
+  const { t } = useTranslation("magneto");
   const [title, setTitle] = useState("");
   const [parentId] = useState("");
   const [addFolder] = useCreateFolderMutation();

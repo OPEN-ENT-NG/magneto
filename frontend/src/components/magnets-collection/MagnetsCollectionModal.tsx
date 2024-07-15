@@ -32,7 +32,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   toggle,
 }: props) => {
   const { currentApp } = useOdeClient();
-  const { t } = useTranslation();
+  const { t } = useTranslation("magneto");
 
   const [searchText, setSearchText] = useState<string>("");
   const [switchBoard, toggleSwitchBoard] = useToggle(false);

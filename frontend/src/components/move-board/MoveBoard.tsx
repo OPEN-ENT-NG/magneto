@@ -3,7 +3,7 @@ import React, { FunctionComponent, useState } from "react";
 // eslint-disable-next-line
 import { Button, Modal, useOdeClient } from "@edifice-ui/react";
 
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
@@ -26,6 +26,7 @@ export const MoveBoard: FunctionComponent<props> = ({
   boards,
   reset,
 }: props) => {
+  const { t } = useTranslation("magneto");
   const [moveBoards] = useMoveBoardsMutation();
   const [currentFolder, setCurrentFolder] = useState<Folder>(new Folder());
 

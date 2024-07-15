@@ -80,7 +80,8 @@ export const CreateFolder: FunctionComponent<props> = ({
           <Modal.Body>
             <FormControl id="title" className="mb-0-5">
               <Label className="label-style">
-                {t("magneto.create.folder.name")} :<Label>*</Label>
+                {t("magneto.create.folder.name")}
+                <Label>*</Label>
               </Label>
               <Input
                 placeholder={t("magneto.create.folder.name")}

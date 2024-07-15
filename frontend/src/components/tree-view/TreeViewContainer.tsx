@@ -14,7 +14,6 @@ import { UserRights } from "~/services/utils/share.utils";
 
 type TreeViewContainerProps = {
   folderType: FOLDER_TYPE;
-  onSelect: (folder: Folder) => void;
   data: any;
   dispatch: any;
   dragAndDropBoards: Board[];
@@ -28,7 +27,6 @@ export const TreeViewContainer: React.FunctionComponent<
   TreeViewContainerProps
 > = ({
   folderType,
-  onSelect,
   data,
   dispatch,
   dragAndDropBoards,
@@ -42,11 +40,16 @@ export const TreeViewContainer: React.FunctionComponent<
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const { user } = useOdeClient();
   const [userRights] = useState<UserRights>(new UserRights(user));
-  const { folderObject, folders, selectedNodeIds, setSelectedNodeIds } =
-    useFoldersNavigation();
+  const {
+    folderObject,
+    folders,
+    handleSelect,
+    folderNavigationRefs,
+    currentFolder,
+  } = useFoldersNavigation();
 
   const dataTree = {
-    children: [{ title: "a", children: ["a", "b"] }, "b"],
+    children: [],
     id: FOLDER_TYPE.PUBLIC_BOARDS,
     name: t("magneto.lycee.connecte.boards"),
     section: true,
@@ -272,61 +275,22 @@ export const TreeViewContainer: React.FunctionComponent<
   };
 
   const resetDragAndDrop = (): void => {
-    onSelect(new Folder());
+    handleSelect("", folderType);
     onDragAndDrop(undefined);
-  };
-
-  const selectFolder = (folderId: string) => {
-    let clickedFolder;
-    if (folderId == FOLDER_TYPE.MY_BOARDS) {
-      clickedFolder = new Folder().build({
-        _id: folderId,
-        title: t("magneto.my.boards"),
-      } as IFolderResponse);
-    } else if (folderId == FOLDER_TYPE.PUBLIC_BOARDS) {
-      clickedFolder = new Folder().build({
-        _id: folderId,
-        title: t("magneto.lycee.connecte.boards"),
-        isPublic: true,
-      } as IFolderResponse);
-    } else if (folderId == FOLDER_TYPE.DELETED_BOARDS) {
-      clickedFolder = new Folder().build({
-        _id: folderId,
-        title: t("magneto.trash"),
-        deleted: true,
-      } as IFolderResponse);
-    } else {
-      clickedFolder =
-        folders.find((folder: Folder) => folder.id == folderId) ?? new Folder();
-    }
-    onSelect(clickedFolder);
   };
 
   useEffect(() => {
     onSetModalData(modalData);
   }, [modalData]);
-  const onTreeItemUnFold = (itemId: string) => {
-    setSelectedNodeIds((prevSelectedNodeIds) => {
-      const prevLastNodeId = prevSelectedNodeIds.slice(-1)[0];
-      const lastNodeId = itemId === prevLastNodeId ? "" : prevLastNodeId;
-      const filteredNodeIds = prevSelectedNodeIds
-        .slice(0, -1)
-        .filter((id) => id !== itemId);
-      return [...filteredNodeIds, itemId, lastNodeId];
-    });
-  };
-
-  const onTreeItemfold = (itemId: string) => {
-    setSelectedNodeIds((prevSelectedNodeIds) => {
-      const filteredNodeIds = prevSelectedNodeIds.filter(
-        (id, index) =>
-          id !== itemId || index === prevSelectedNodeIds.length - 1,
-      );
-      return filteredNodeIds;
-    });
-  };
 
   const datas = getFolderTypeData(folderType, folderObject);
+
+  useEffect(() => {
+    const ref = folderNavigationRefs[folderType];
+    if (ref.current && currentFolder.id) {
+      ref.current.select(currentFolder.id);
+    }
+  }, [currentFolder, folderType, folderNavigationRefs]);
 
   return (
     <>
@@ -338,23 +302,15 @@ export const TreeViewContainer: React.FunctionComponent<
         onDrop={handleDrop}
       >
         <TreeView
-          selectedNodesIds={selectedNodeIds}
+          ref={folderNavigationRefs[folderType]}
           data={datas || dataTree}
-          onTreeItemBlur={() => {
-            console.log("blur");
-          }}
-          onTreeItemFocus={() => {
-            console.log("focus");
-          }}
-          onTreeItemFold={(item) => {
-            onTreeItemfold(item);
-          }}
+          onTreeItemBlur={() => {}}
+          onTreeItemFocus={() => {}}
+          onTreeItemFold={() => {}}
           onTreeItemSelect={(item) => {
-            selectFolder(item);
+            handleSelect(item, folderType);
           }}
-          onTreeItemUnfold={(item) => {
-            onTreeItemUnFold(item);
-          }}
+          onTreeItemUnfold={() => {}}
         />
       </div>
     </>

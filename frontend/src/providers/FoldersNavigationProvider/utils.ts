@@ -1,8 +1,14 @@
+import { t } from "i18next";
+
 import { FolderObjectState, TriggerFetchState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 
-export const initialCurrentFolder: Folder = new Folder(FOLDER_TYPE.MY_BOARDS);
+export const initialCurrentFolder = () => {
+  const folder = new Folder(FOLDER_TYPE.MY_BOARDS);
+  folder.title = t("magneto.my.boards");
+  return folder;
+};
 
 export const initialFolderObject: FolderObjectState = {
   myFolderObject: null,
@@ -13,16 +19,20 @@ export const initialTriggerFetch: TriggerFetchState = {
   myFolders: false,
   deletedFolders: false,
 };
+export const prepareFolderTitle = (folderType: FOLDER_TYPE | "basicFolder") => {
+  if (folderType === FOLDER_TYPE.MY_BOARDS) return "magneto.my.boards";
+  if (folderType === FOLDER_TYPE.PUBLIC_BOARDS)
+    return "magneto.lycee.connecte.boards";
+  if (folderType === FOLDER_TYPE.DELETED_BOARDS) return "magneto.trash";
+  return "basicFolder";
+};
 
-//prepareFolders non utilisé pour l'instant
-export const prepareFolders = (
+export const prepareFolder = (
   folderId: string,
   folders: Folder[],
   folderTitle: string,
 ): Folder => {
-  switch (
-    folderId //TODO : gérer la nouvelle variable folderTitle pour les composants qui vont appeler prepareFolders (ou transformer le utils en hook), sinon le useTranslation n'a pas le droit d'être utilisé
-  ) {
+  switch (folderId) {
     case FOLDER_TYPE.MY_BOARDS:
       return new Folder().build({
         _id: folderId,

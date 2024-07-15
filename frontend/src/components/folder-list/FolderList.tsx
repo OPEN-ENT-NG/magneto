@@ -11,7 +11,6 @@ import { useGetFoldersQuery } from "~/services/api/folders.service";
 
 type FolderListProps = {
   currentFolder: Folder;
-  onSelect: (folder: Folder) => void;
   folderIds: string[];
   selectedFolders: Folder[];
   setFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
@@ -26,13 +25,16 @@ type FolderListProps = {
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
   currentFolder,
-  onSelect,
   dragAndDropBoards,
   onDragAndDrop,
   onSetShowModal,
   modalProps,
   onSetModalProps,
   searchText,
+  setFolderIds,
+  folderIds,
+  setSelectedFolders,
+  selectedFolders,
 }) => {
   const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
 
@@ -85,6 +87,24 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     );
   }, [currentFolder]);
 
+  const toggleSelect = async (resource: Folder) => {
+    if (folderIds.includes(resource.id)) {
+      setFolderIds(
+        folderIds.filter(
+          (selectedResource: String) => selectedResource !== resource.id,
+        ),
+      );
+      setSelectedFolders(
+        selectedFolders.filter(
+          (selectedResource) => selectedResource.id !== resource.id,
+        ),
+      );
+      return;
+    }
+    setFolderIds([...folderIds, resource.id]);
+    setSelectedFolders([...selectedFolders, resource]);
+  };
+
   return (
     <>
       {folderData?.length ? (
@@ -114,7 +134,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                     folder={folder}
                     folders={folderData}
                     areFoldersLoading={getFoldersLoading}
-                    onSelect={onSelect}
+                    toggleSelect={toggleSelect}
                     dragAndDropBoards={dragAndDropBoards}
                     onDragAndDrop={onDragAndDrop}
                     onDisplayModal={onSetShowModal}

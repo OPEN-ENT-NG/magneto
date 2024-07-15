@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 
 import { Card, useOdeClient } from "@edifice-ui/react";
 import "./FolderItem.scss";
-import { mdiFolder } from "@mdi/js";
+import { mdiFolder, mdiFolderAccount } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useDrop } from "react-dnd";
 
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/services/utils/share.utils";
 
@@ -16,7 +17,7 @@ type FolderListProps = {
   folder: Folder;
   folders: Folder[];
   areFoldersLoading: boolean;
-  onSelect: (folder: Folder) => void;
+  toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
   onDisplayModal: (show: boolean) => void;
@@ -28,19 +29,18 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   folder,
   folders,
   areFoldersLoading,
-  onSelect,
   dragAndDropBoards,
   onDragAndDrop,
   onDisplayModal,
   modalData,
   onSetModalData,
+  toggleSelect,
 }) => {
-  const { currentApp } = useOdeClient();
+  const { currentApp, user } = useOdeClient();
   const [moveBoardsToFolder] = useMoveBoardsMutation();
-  const { user } = useOdeClient();
   const [userRights] = useState<UserRights>(new UserRights(user));
-
   const [hasDrop, setHasDrop] = useState<boolean>(false);
+  const { handleSelect } = useFoldersNavigation();
 
   const folderTitle = folder.title;
 
@@ -160,7 +160,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id),
       onCancel: () => closeDragAndDropModal(),
     });
-    console.log(modalData);
     onDisplayModal(true);
   };
 
@@ -189,7 +188,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   };
 
   const resetDragAndDrop = (): void => {
-    onSelect(new Folder());
+    handleSelect("", "basicFolder");
     onDragAndDrop(undefined);
   };
 
@@ -205,11 +204,16 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           isLoading={areFoldersLoading}
           isSelectable={true}
           onClick={() => {
-            onSelect(folder);
+            handleSelect(folder.id, "basicFolder");
           }}
+          onSelect={() => toggleSelect(folder)}
         >
           <Card.Body>
-            <Icon path={mdiFolder} size={2} color={"#e20037"} />
+            {user?.userId === folder.ownerId ? (
+              <Icon path={mdiFolder} size={2} color={"#3BA6CF"} />
+            ) : (
+              <Icon path={mdiFolderAccount} size={2} color={"#3BA6CF"} />
+            )}
             <Card.Title>{folder.title}</Card.Title>
           </Card.Body>
         </Card>

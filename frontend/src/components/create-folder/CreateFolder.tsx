@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useId, useState } from "react";
 
 import { Button, FormControl, Input, Label, Modal } from "@edifice-ui/react";
 import "./CreateFolder.scss";
@@ -30,6 +30,8 @@ export const CreateFolder: FunctionComponent<props> = ({
   const [parentId] = useState("");
   const [addFolder] = useCreateFolderMutation();
   const [updateFolder] = useUpdateFolderMutation();
+
+  const formId = `createFolder_${useId}`;
 
   const onSubmit = async (): Promise<void> => {
     try {
@@ -68,50 +70,49 @@ export const CreateFolder: FunctionComponent<props> = ({
           id={"createFolder"}
           isOpen={isOpen}
           onModalClose={resetFields}
-          size="lg"
           viewport={false}
         >
           <Modal.Header onModalClose={resetFields}>
-            {folderToUpdate != null ? (
-              <h4>{t("magneto.folder.rename")}</h4>
-            ) : (
-              <h4>{t("magneto.create.folder")}</h4>
+            {t(
+              folderToUpdate != null
+                ? "magneto.folder.rename"
+                : "magneto.create.folder",
             )}
           </Modal.Header>
           <Modal.Body>
-            <FormControl id="title" className="mb-0-5">
-              <Label>{t("magneto.create.folder.name")} :</Label>
-              <Input
-                placeholder=""
-                size="md"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </FormControl>
+            <form id={formId}>
+              <FormControl id="title" isRequired>
+                <Label>{t("magneto.create.folder.name")}</Label>
+                <Input
+                  placeholder={t("magneto.create.folder.name")}
+                  size="md"
+                  type="text"
+                  value={title}
+                  aria-required={true}
+                  maxLength={60}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </FormControl>
+            </form>
           </Modal.Body>
           <Modal.Footer>
-            <div className="right">
-              <Button
-                color="primary"
-                type="button"
-                variant="outline"
-                className="footer-button"
-                onClick={resetFields}
-              >
-                {t("magneto.cancel")}
-              </Button>
-              <Button
-                color="primary"
-                type="submit"
-                variant="filled"
-                className="footer-button"
-                disabled={title == ""}
-                onClick={onSubmit}
-              >
-                {t("magneto.save")}
-              </Button>
-            </div>
+            <Button
+              color="tertiary"
+              type="button"
+              variant="ghost"
+              onClick={resetFields}
+            >
+              {t("magneto.cancel")}
+            </Button>
+            <Button
+              color="primary"
+              type="submit"
+              variant="filled"
+              disabled={title === ""}
+              onClick={onSubmit}
+            >
+              {t("magneto.create")}
+            </Button>
           </Modal.Footer>
         </Modal>
       )}

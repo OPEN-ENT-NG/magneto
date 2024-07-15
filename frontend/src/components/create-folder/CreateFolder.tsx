@@ -9,6 +9,7 @@ import {
   useCreateFolderMutation,
   useUpdateFolderMutation,
 } from "~/services/api/folders.service";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type props = {
   isOpen: boolean;
@@ -27,9 +28,9 @@ export const CreateFolder: FunctionComponent<props> = ({
 }: props) => {
   const { t } = useTranslation("magneto");
   const [title, setTitle] = useState("");
-  const [parentId] = useState("");
   const [addFolder] = useCreateFolderMutation();
   const [updateFolder] = useUpdateFolderMutation();
+  const { currentFolder } = useFoldersNavigation();
 
   const formId = `createFolder_${useId}`;
 
@@ -37,7 +38,7 @@ export const CreateFolder: FunctionComponent<props> = ({
     try {
       const folder = new Folder();
       folder.title = title;
-      folder.parentId = parentId;
+      folder.parentId = currentFolder.id;
       if (folderToUpdate != null) {
         folder.id = folderToUpdate.id;
         await updateFolder(folder);

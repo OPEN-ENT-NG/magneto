@@ -2,13 +2,11 @@ import React, { useEffect } from "react";
 
 import { SideBarButtons } from "./SideBarButtons";
 import { FOLDER_TYPE } from "../../core/enums/folder-type.enum";
-import { Folder } from "../../models/folder.model";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { Board } from "~/models/board.model";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type SideBarProps = {
-  onSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: Board) => void;
   onSetShowModal: (show: boolean) => void;
@@ -19,7 +17,6 @@ type SideBarProps = {
 };
 
 export const SideBar: React.FunctionComponent<SideBarProps> = ({
-  onSelect,
   dragAndDropBoards,
   onDragAndDrop,
   onSetShowModal,
@@ -29,10 +26,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
   className,
 }) => {
   const { getFolders } = useFoldersNavigation();
-
-  useEffect(() => {
-    getFolders();
-  }, []);
 
   const reducer = (
     state: { fileList: any[] },
@@ -60,10 +53,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
     getFolders();
   }, []);
 
-  useEffect(() => {
-    getFolders();
-  }, []);
-
   return (
     <>
       <aside
@@ -74,10 +63,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
       >
         <TreeViewContainer
           folderType={FOLDER_TYPE.MY_BOARDS}
-          onSelect={(folder) => {
-            onSelect(folder);
-            if (toggleDrawer != null) toggleDrawer();
-          }}
           data={data}
           dispatch={dispatch}
           dragAndDropBoards={dragAndDropBoards}
@@ -88,10 +73,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
         />
         <TreeViewContainer
           folderType={FOLDER_TYPE.PUBLIC_BOARDS}
-          onSelect={(folder) => {
-            onSelect(folder);
-            if (toggleDrawer != null) toggleDrawer();
-          }}
           data={data}
           dispatch={dispatch}
           dragAndDropBoards={dragAndDropBoards}
@@ -102,10 +83,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
         />
         <TreeViewContainer
           folderType={FOLDER_TYPE.DELETED_BOARDS}
-          onSelect={(folder) => {
-            onSelect(folder);
-            if (toggleDrawer != null) toggleDrawer();
-          }}
           data={data}
           dispatch={dispatch}
           dragAndDropBoards={dragAndDropBoards}

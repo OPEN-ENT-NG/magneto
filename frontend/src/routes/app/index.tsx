@@ -58,7 +58,7 @@ export const App = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
-  const { folders, setFolders } = useFoldersNavigation();
+  const { folders } = useFoldersNavigation();
 
   const resetBoardsAndFolders = () => {
     setSearchText("");
@@ -144,13 +144,13 @@ export const App = () => {
               SVGLeft={<Icon path={mdiFolder} />}
             />
 
-            {(!folders.length && !boards.length) ??
+            {(!folders.length) ??
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
             }
 
             <FolderList
-              folders={folders}
-              onSetFolders={setFolders}
+              // folders={folders}
+              // onSetFolders={setFolders}
               currentFolder={currentFolder}
               selectedFolderIds={selectedFolderIds}
               selectedFolders={selectedFolders}

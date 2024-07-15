@@ -8,14 +8,15 @@ import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type FolderListProps = {
-  folders: Folder[];
-  onSetFolders: Dispatch<SetStateAction<Folder[]>>;
+  // folders: Folder[];
+  // onSetFolders: Dispatch<SetStateAction<Folder[]>>;
   currentFolder: Folder;
-  folderIds: string[];
+  selectedFolderIds: string[];
   selectedFolders: Folder[];
-  setFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: Board) => void;
@@ -26,8 +27,8 @@ type FolderListProps = {
 };
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
-  folders,
-  onSetFolders,
+  // folders,
+  // onSetFolders,
   currentFolder,
   dragAndDropBoards,
   onDragAndDrop,
@@ -35,12 +36,14 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   modalProps,
   onSetModalProps,
   searchText,
-  setFolderIds,
-  folderIds,
+  setSelectedFolderIds,
+  selectedFolderIds,
   setSelectedFolders,
   selectedFolders,
 }) => {
   const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
+  const { folders, getFolders, setFolders } = useFoldersNavigation();
+
 
   const {
     data: myFoldersResult,
@@ -56,32 +59,18 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
       currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
       currentFolder.id == ""
     ) {
-      onSetFolders(folderData.filter((folder: Folder) => !folder.parentId));
+      setFolders(folderData.filter((folder: Folder) => !folder.parentId));
       console.log(folderData);
     } else if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
-      onSetFolders([]);
+      setFolders([]);
     } else if (!!currentFolder && !!currentFolder.id) {
-      onSetFolders(folderData.filter(
+      setFolders(folderData.filter(
         (folder: Folder) => folder.parentId == currentFolder.id
       ));
     } else {
       console.log("currentFolder undefined, try later or again");
     }
   };
-
-  useEffect(() => {
-    let folderData: Folder[];
-    if (getFoldersError) {
-      console.log("error");
-    } else if (getFoldersLoading) {
-      console.log("loading");
-    } else if (myFoldersResult) {
-      folderData = myFoldersResult.map((folder: IFolderResponse) =>
-        new Folder().build(folder)); // convert folders to Folder[]
-      filterFolderData(folderData);
-    }
-  }, [foldersQuery]);
-
 
   const springs = useSpring({
     from: { opacity: 0 },
@@ -92,12 +81,23 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
     setFoldersQuery(
       currentFolder.id == FOLDER_TYPE.DELETED_BOARDS || !!currentFolder.deleted,
     );
+
+    let folderData: Folder[];
+    if (getFoldersError) {
+      console.log("error");
+    } else if (getFoldersLoading) {
+      console.log("loading");
+    } else if (myFoldersResult) {
+      folderData = myFoldersResult.map((folder: IFolderResponse) =>
+        new Folder().build(folder)); // convert folders to Folder[]
+      filterFolderData(folderData);
+    }
   }, [currentFolder]);
 
   const toggleSelect = async (resource: Folder) => {
-    if (folderIds.includes(resource.id)) {
-      setFolderIds(
-        folderIds.filter(
+    if (selectedFolderIds.includes(resource.id)) {
+      setSelectedFolderIds(
+        selectedFolderIds.filter(
           (selectedResource: String) => selectedResource !== resource.id,
         ),
       );
@@ -108,7 +108,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
       );
       return;
     }
-    setFolderIds([...folderIds, resource.id]);
+    setSelectedFolderIds([...selectedFolderIds, resource.id]);
     setSelectedFolders([...selectedFolders, resource]);
   };
 

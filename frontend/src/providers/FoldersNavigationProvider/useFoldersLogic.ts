@@ -14,7 +14,7 @@ export const useFoldersLogic = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [folderObject, setFolderObject] =
     useState<FolderObjectState>(initialFolderObject);
-  const [triggerFetch, setTriggerFetch] =
+  const [triggerFetch, setTriggerFetch]  =
     useState<TriggerFetchState>(initialTriggerFetch);
   const { myFolders, deletedFolders } = triggerFetch;
 

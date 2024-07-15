@@ -10,6 +10,7 @@ import {
   useCreateFolderMutation,
   useUpdateFolderMutation,
 } from "~/services/api/folders.service";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 
 type props = {
   isOpen: boolean;
@@ -38,7 +39,7 @@ export const CreateFolder: FunctionComponent<props> = ({
     try {
       const folder = new Folder();
       folder.title = title;
-      folder.parentId = currentFolder.id;
+      folder.parentId = (currentFolder.id == FOLDER_TYPE.MY_BOARDS ? "" : currentFolder.id);
       if (folderToUpdate != null) {
         folder.id = folderToUpdate.id;
         await updateFolder(folder);

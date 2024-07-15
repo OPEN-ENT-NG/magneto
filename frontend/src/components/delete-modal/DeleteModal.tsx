@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 // eslint-disable-next-line
 import { Button, Modal } from "@edifice-ui/react";
 
@@ -31,6 +31,7 @@ export const DeleteModal: FunctionComponent<props> = ({
   isPredelete,
   reset,
 }: props) => {
+  const { t } = useTranslation("magneto");
   const [preDeleteBoards] = usePreDeleteBoardsMutation();
   const [preDeleteFolders] = usePreDeleteFoldersMutation();
   const [deleteBoards] = useDeleteBoardsMutation();

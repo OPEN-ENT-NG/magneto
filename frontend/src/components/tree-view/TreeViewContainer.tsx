@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView, useOdeClient } from "@edifice-ui/react";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { getFolderTypeData } from "./utils";
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
@@ -37,6 +37,8 @@ export const TreeViewContainer: React.FunctionComponent<
   modalData,
   onSetModalData,
 }) => {
+  const { t } = useTranslation("magneto");
+
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const { user } = useOdeClient();
   const [userRights] = useState<UserRights>(new UserRights(user));

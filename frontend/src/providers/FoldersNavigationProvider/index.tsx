@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { TreeViewHandlers } from "@edifice-ui/react";
+import { useTranslation } from "react-i18next";
 
 import {
   FolderNavigationRefs,
@@ -16,7 +17,8 @@ import {
   FoldersNavigationProviderProps,
 } from "./types";
 import { useFoldersLogic } from "./useFoldersLogic";
-import { initialCurrentFolder, prepareFolder } from "./utils";
+import { useInitialCurrentFolder } from "./useInitialCurrentFolder";
+import { prepareFolder, prepareFolderTitle } from "./utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder } from "~/models/folder.model";
 
@@ -37,13 +39,13 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   children,
 }) => {
   const [currentFolder, setCurrentFolder] = useState<Folder>(
-    initialCurrentFolder(),
+    useInitialCurrentFolder(),
   );
   const { folders, folderObject, getFolders } = useFoldersLogic();
-
   const myBoardsRef = useRef<TreeViewHandlers>(null);
   const publicBoardsRef = useRef<TreeViewHandlers>(null);
   const deletedBoardsRef = useRef<TreeViewHandlers>(null);
+  const { t } = useTranslation("magneto");
 
   const folderNavigationRefs: FolderNavigationRefs = useMemo(
     () => ({
@@ -61,7 +63,11 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       setCurrentFolder((prevFolder) => {
         if (prevFolder.id === folderId) return prevFolder;
 
-        const newFolder = prepareFolder(folderId, folders);
+        const newFolder = prepareFolder(
+          folderId,
+          folders,
+          t(prepareFolderTitle(folderType)),
+        );
 
         setTimeout(() => {
           Object.entries(folderNavigationRefs).forEach(([type, ref]) => {
@@ -75,7 +81,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
         return newFolder;
       });
     },
-    [currentFolder.id, folders, folderNavigationRefs],
+    [currentFolder, folders, folderNavigationRefs],
   );
 
   const value = useMemo<FoldersNavigationContextType>(

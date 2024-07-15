@@ -8,7 +8,7 @@ import {
   useOdeClient,
 } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
@@ -43,6 +43,7 @@ export const ToasterContainer = ({
   currentFolder,
   reset,
 }: ToasterContainerProps) => {
+  const { t } = useTranslation("magneto");
   const { data: actions } = useActions();
   const canPublish = isActionAvailable("publish", actions);
 

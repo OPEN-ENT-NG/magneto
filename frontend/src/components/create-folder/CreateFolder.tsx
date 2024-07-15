@@ -5,11 +5,11 @@ import "./CreateFolder.scss";
 import { useTranslation } from "react-i18next";
 
 import { Folder } from "../../models/folder.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import {
   useCreateFolderMutation,
   useUpdateFolderMutation,
 } from "~/services/api/folders.service";
-import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type props = {
   isOpen: boolean;

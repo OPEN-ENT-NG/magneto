@@ -1,5 +1,4 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
-
 import { Board } from "~/models/folder.model";
 
 export interface ModalProviderProviderProps {

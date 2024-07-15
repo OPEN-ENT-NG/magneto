@@ -68,21 +68,23 @@ export const CreateFolder: FunctionComponent<props> = ({
           id={"createFolder"}
           isOpen={isOpen}
           onModalClose={resetFields}
-          size="lg"
+          size="md"
           viewport={false}
         >
           <Modal.Header onModalClose={resetFields}>
-            {folderToUpdate != null ? (
-              <h4>{t("magneto.folder.rename")}</h4>
-            ) : (
-              <h4>{t("magneto.create.folder")}</h4>
-            )}
+            <h4 className="strong-title">
+              {folderToUpdate
+                ? t("magneto.folder.rename")
+                : t("magneto.create.folder")}
+            </h4>
           </Modal.Header>
           <Modal.Body>
             <FormControl id="title" className="mb-0-5">
-              <Label>{t("magneto.create.folder.name")} :</Label>
+              <Label className="label-style">
+                {t("magneto.create.folder.name")} :<Label>*</Label>
+              </Label>
               <Input
-                placeholder=""
+                placeholder={t("magneto.create.folder.name")}
                 size="md"
                 type="text"
                 value={title}
@@ -93,9 +95,9 @@ export const CreateFolder: FunctionComponent<props> = ({
           <Modal.Footer>
             <div className="right">
               <Button
-                color="primary"
+                color="tertiary"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 className="footer-button"
                 onClick={resetFields}
               >
@@ -109,7 +111,7 @@ export const CreateFolder: FunctionComponent<props> = ({
                 disabled={title == ""}
                 onClick={onSubmit}
               >
-                {t("magneto.save")}
+                {t("magneto.create")}
               </Button>
             </div>
           </Modal.Footer>

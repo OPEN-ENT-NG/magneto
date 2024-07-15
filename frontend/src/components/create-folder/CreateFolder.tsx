@@ -108,7 +108,7 @@ export const CreateFolder: FunctionComponent<props> = ({
               color="primary"
               type="submit"
               variant="filled"
-              disabled={title == ""}
+              disabled={title === ""}
               onClick={onSubmit}
             >
               {t("magneto.create")}

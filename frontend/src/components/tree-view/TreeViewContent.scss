@@ -24,4 +24,21 @@
     border: solid #e4e4e4;
     border-radius: 0.8rem;
   }
+  .action-container [role="button"][aria-label="foldUnfold"] {
+    font-size: 0;
+    color: transparent;
+
+    &::before,
+    &::after {
+      display: none !important;
+    }
+
+    svg {
+      pointer-events: none;
+    }
+    svg * {
+      font-size: initial;
+      color: initial;
+    }
+  }
 }

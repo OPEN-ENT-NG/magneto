@@ -1,5 +1,8 @@
-import { Dispatch, ReactNode, SetStateAction } from "react";
+import { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 
+import { TreeViewHandlers } from "@edifice-ui/react";
+
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder } from "~/models/folder.model";
 
@@ -16,13 +19,21 @@ export interface TriggerFetchState {
   myFolders: boolean;
   deletedFolders: boolean;
 }
+export interface FolderNavigationRefs {
+  [FOLDER_TYPE.MY_BOARDS]: RefObject<TreeViewHandlers>;
+  [FOLDER_TYPE.PUBLIC_BOARDS]: RefObject<TreeViewHandlers>;
+  [FOLDER_TYPE.DELETED_BOARDS]: RefObject<TreeViewHandlers>;
+}
 
 export type FoldersNavigationContextType = {
   currentFolder: Folder;
   setCurrentFolder: Dispatch<SetStateAction<Folder>>;
-  selectedNodeIds: string[];
-  setSelectedNodeIds: Dispatch<SetStateAction<string[]>>;
   folders: Folder[];
   folderObject: FolderObjectState;
   getFolders: () => void;
+  handleSelect: (
+    folderId: string,
+    folderType: FOLDER_TYPE | "basicFolder",
+  ) => void;
+  folderNavigationRefs: FolderNavigationRefs;
 };

@@ -26,9 +26,9 @@ export class Folder {
   private _isPublic: boolean;
   private _rights: any[];
 
-  constructor(id?: string) {
+  constructor(id?: string, title?: string) {
     this._id = id != null ? id : "";
-    this._title = "";
+    this._title = title != null ? title : "";
     this._parentId = "";
     this._ownerId = "";
     this._shared = [];

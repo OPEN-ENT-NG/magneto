@@ -15,7 +15,7 @@ type SideBarButtonsProps = {
 export const SideBarButtons: React.FunctionComponent<SideBarButtonsProps> = ({
   toggleDrawer,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("magneto");
 
   const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
   const [isMagnetsCollectionOpen, toggleMagnetsCollectionOpen] =

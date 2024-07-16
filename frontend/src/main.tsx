@@ -48,7 +48,7 @@ root.render(
     <Provider store={store}>
       <OdeClientProvider
         params={{
-          app: "magneto",
+          app: "Magnéto",
         }}
       >
         <ThemeProvider>

@@ -142,8 +142,9 @@ export const App = () => {
               SVGLeft={<Icon path={mdiFolder} />}
             />
 
-            {(!folders.length) ??
+            {(!folders.length) ?
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
+              : null
             }
 
             <FolderList

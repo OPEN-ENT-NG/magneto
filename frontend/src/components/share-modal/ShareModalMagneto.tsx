@@ -30,7 +30,7 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
       {isOpen && (
         <OdeClientProvider
           params={{
-            app: `magneto/${resourceType}`,
+            app: `Magnéto/${resourceType}`,
           }}
         >
           <ShareModal

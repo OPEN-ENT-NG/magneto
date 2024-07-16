@@ -1,17 +1,18 @@
 import React, { FunctionComponent, useState } from "react";
 
 // eslint-disable-next-line
-import { Button, Modal, useOdeClient } from "@edifice-ui/react";
+import { Button, Modal, TreeView, useOdeClient } from "@edifice-ui/react";
 
 import { useTranslation } from "react-i18next";
 
-import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+import { getFolderTypeData } from "../tree-view/utils";
 
 type props = {
   isOpen: boolean;
@@ -28,7 +29,11 @@ export const MoveBoard: FunctionComponent<props> = ({
 }: props) => {
   const { t } = useTranslation("magneto");
   const [moveBoards] = useMoveBoardsMutation();
-  const [currentFolder, setCurrentFolder] = useState<Folder>(new Folder());
+  const [selectedFolderId, setSelectedFolderId] = useState<string>("");
+  const {
+    folderObject,
+    folderNavigationRefs,
+  } = useFoldersNavigation();
 
   const { user } = useOdeClient();
 
@@ -36,6 +41,14 @@ export const MoveBoard: FunctionComponent<props> = ({
 
   const isSameAsUser = (id: string) => {
     return id == userId;
+  };
+
+  const dataTree = {
+    children: [],
+    id: FOLDER_TYPE.MY_BOARDS,
+    name: t("magneto.my.boards"),
+    section: true,
+    isPublic: false,
   };
 
   const {
@@ -70,11 +83,13 @@ export const MoveBoard: FunctionComponent<props> = ({
       });
     moveBoards({
       boardIds: boardIds,
-      folderId: currentFolder.id,
+      folderId: selectedFolderId,
     });
     reset();
     toggle();
   };
+
+  const datas = getFolderTypeData(FOLDER_TYPE.MY_BOARDS, folderObject);
 
   return (
     <>
@@ -91,11 +106,12 @@ export const MoveBoard: FunctionComponent<props> = ({
           </Modal.Header>
           <Modal.Body>
             {myFoldersObject && (
-              <TreeViewContainer
-                folders={myFolders ?? []}
-                folderObject={myFoldersObject ?? undefined}
-                folderType={FOLDER_TYPE.MY_BOARDS}
-                onSelect={setCurrentFolder}
+              <TreeView
+                ref={folderNavigationRefs[FOLDER_TYPE.MY_BOARDS]}
+                data={datas || dataTree}
+                onTreeItemSelect={(item) => {
+                  setSelectedFolderId(item);
+                }}
               />
             )}
           </Modal.Body>
@@ -115,6 +131,7 @@ export const MoveBoard: FunctionComponent<props> = ({
                 type="submit"
                 variant="filled"
                 className="footer-button"
+                disabled={selectedFolderId === ""}
                 onClick={onSubmit}
               >
                 {t("magneto.save")}

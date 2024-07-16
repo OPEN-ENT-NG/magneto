@@ -24,6 +24,8 @@ import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
 import { useUserRightsStore } from "~/stores";
 import { checkUserRight } from "~/utils/checkUserRight";
+import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 export interface ToasterContainerProps {
   isToasterOpen: boolean;
@@ -53,9 +55,14 @@ export const ToasterContainer = ({
   const [isCreateFolder, toggleCreateFolder] = useToggle(false);
   const [isShareFolder, toggleShareFolder] = useToggle(false);
   const [isShareBoard, toggleShareBoard] = useToggle(false);
+  const [boardPublicShareModal, toggleBoardPublicShareModal] = useToggle(false);
   const [shareOptions, setShareOptions] = useState();
 
   const [duplicateBoard] = useDuplicateBoardMutation();
+
+  const {
+    folders: allFolders,
+  } = useFoldersNavigation();
 
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
     boardIds: boardIds,
@@ -77,11 +84,13 @@ export const ToasterContainer = ({
   };
 
   const isMyBoards = () => {
-    return currentFolder.id == FOLDER_TYPE.MY_BOARDS;
+    return currentFolder.id == FOLDER_TYPE.MY_BOARDS
+      || allFolders.some((folder: Folder) => folder.id === currentFolder.id && !folder.deleted);
   };
 
   const isTrash = () => {
-    return currentFolder.id == FOLDER_TYPE.DELETED_BOARDS;
+    return currentFolder.id == FOLDER_TYPE.DELETED_BOARDS
+      || allFolders.some((folder: Folder) => folder.id === currentFolder.id && folder.deleted);
   };
 
   const isPublic = () => {
@@ -108,6 +117,10 @@ export const ToasterContainer = ({
         if (folder.ownerId != userId) return folder;
       }).length == 0
     );
+  };
+
+  const hasSharedElement = () => {
+    return !boards.every((board: Board) => board.rights.length <= 1);
   };
 
   const hasDuplicationRight = () => {
@@ -171,14 +184,14 @@ export const ToasterContainer = ({
       setShareOptions({
         resourceCreatorId: userId,
         resourceId: boardIds[0],
-        resourceRights: [boards[0].rights], //TODO : Ajouter ce nouveau tableau des droits (modif à faire dans le back)
+        resourceRights: [boards[0].rights],
       } as any);
       toggleShareBoard();
     } else if (folderIds.length > 0) {
       setShareOptions({
         resourceCreatorId: userId,
         resourceId: folderIds[0],
-        resourceRights: [folders[0].rights], //TODO : Ajouter ce nouveau tableau des droits (modif à faire dans le back)
+        resourceRights: [folders[0].rights],
       } as any);
       toggleShareFolder();
     }
@@ -199,7 +212,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() {}}
+                    onClick={function Ga() { }}
                   >
                     {t("magneto.open")}
                   </Button>
@@ -262,7 +275,7 @@ export const ToasterContainer = ({
                     {t("magneto.share")}
                   </Button>
                 )}
-                {!currentFolder.shared &&
+                {!(currentFolder.rights.length > 1) &&
                   isMyBoards() &&
                   boardIds.length == 1 &&
                   folderIds.length == 0 &&
@@ -273,7 +286,7 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={toggleBoardPublicShareModal}
                     >
                       {t("magneto.public.share")}
                     </Button>
@@ -288,21 +301,9 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={toggleBoardPublicShareModal}
                     >
                       {t("magneto.public.unshare")}
-                    </Button>
-                  )}
-                {!isPublic() &&
-                  ((allBoardsMine() && boards.length > 0) ||
-                    (allFoldersMine() && folders.length > 0)) && (
-                    <Button
-                      type="button"
-                      color="primary"
-                      variant="filled"
-                      onClick={toggleDelete}
-                    >
-                      {t("magneto.delete")}
                     </Button>
                   )}
                 {isTrash() && (
@@ -318,6 +319,18 @@ export const ToasterContainer = ({
                     {t("magneto.restore")}
                   </Button>
                 )}
+                {!isPublic() &&
+                  ((allBoardsMine() && boards.length > 0) ||
+                    (allFoldersMine() && folders.length > 0)) && (
+                    <Button
+                      type="button"
+                      color="primary"
+                      variant="filled"
+                      onClick={toggleDelete}
+                    >
+                      {t("magneto.delete")}
+                    </Button>
+                  )}
               </ActionBar>
             </animated.div>
           )
@@ -344,12 +357,18 @@ export const ToasterContainer = ({
             folderIds={folderIds}
             isPredelete={currentFolder.id != FOLDER_TYPE.DELETED_BOARDS}
             reset={reset}
+            hasSharedElement={hasSharedElement}
           />
           <ShareModalMagneto
             isOpen={isShareBoard}
             toggle={toggleShareBoard}
             shareOptions={shareOptions}
             resourceType={RESOURCE_BIG_TYPE.BOARD}
+          />
+          <BoardPublicShareModal
+            isOpen={boardPublicShareModal}
+            toggle={toggleBoardPublicShareModal}
+            board={boards[0]}
           />
         </>
       )}

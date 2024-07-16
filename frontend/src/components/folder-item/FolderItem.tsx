@@ -16,7 +16,6 @@ import { UserRights } from "~/services/utils/share.utils";
 type FolderListProps = {
   folder: Folder;
   foldersData: Folder[];
-  areFoldersLoading: boolean;
   toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
@@ -28,7 +27,6 @@ type FolderListProps = {
 export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   folder,
   foldersData,
-  areFoldersLoading,
   dragAndDropBoards,
   onDragAndDrop,
   onDisplayModal,
@@ -201,7 +199,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
             type: "folder",
             folderTitle,
           }}
-          isLoading={areFoldersLoading}
+          isLoading={false}
           isSelectable={true}
           onClick={() => {
             handleSelect(folder.id, "basicFolder");

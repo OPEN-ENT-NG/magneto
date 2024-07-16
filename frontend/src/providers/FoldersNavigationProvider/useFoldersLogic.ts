@@ -8,6 +8,7 @@ import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { useFoldersNavigation } from ".";
 
 export const useFoldersLogic = () => {
   const { t } = useTranslation("magneto");
@@ -17,8 +18,9 @@ export const useFoldersLogic = () => {
   const [triggerFetch, setTriggerFetch]  =
     useState<TriggerFetchState>(initialTriggerFetch);
   const { myFolders, deletedFolders } = triggerFetch;
+  const { currentFolder } = useFoldersNavigation();
 
-  const processFolders = useCallback(
+  const processFolders = useCallback( //process sidebar folders
     (
       result: IFolderResponse[] | undefined,
       folderType: FOLDER_TYPE,
@@ -45,6 +47,34 @@ export const useFoldersLogic = () => {
     },
     [],
   );
+
+  const filterDisplayedFolders = useCallback( //process folder list
+    (
+      folderData: Folder[] | undefined,
+      currentFolder: Folder,
+    ) => {
+      if (folderData) {
+        if (
+          !currentFolder.id ||
+          currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+          currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
+          currentFolder.id == ""
+        ) {
+          setFolders(folderData.filter((folder: Folder) => !folder.parentId));
+          console.log(folderData);
+        } else if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
+          setFolders([]);
+        } else if (!!currentFolder && !!currentFolder.id) {
+          setFolders(folderData.filter(
+            (folder: Folder) => folder.parentId == currentFolder.id
+          ));
+        } else {
+          console.log("currentFolder undefined, try later or again");
+        }
+      }
+    },
+    [currentFolder, folders],
+  )
 
   const { data: myFoldersResult } = useGetFoldersQuery(false, {
     skip: !myFolders,
@@ -83,3 +113,4 @@ export const useFoldersLogic = () => {
 
   return { folders, folderObject, getFolders, setFolders };
 };
+     

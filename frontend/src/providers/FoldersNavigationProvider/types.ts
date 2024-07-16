@@ -28,10 +28,13 @@ export interface FolderNavigationRefs {
 export type FoldersNavigationContextType = {
   currentFolder: Folder;
   setCurrentFolder: Dispatch<SetStateAction<Folder>>;
-  folders: Folder[];
+  folderData: Folder[];
+  setFolderData: Dispatch<SetStateAction<Folder[]>>;
   folderObject: FolderObjectState;
-  getFolders: () => void;
+  setFolderObject: Dispatch<SetStateAction<FolderObjectState>>;
+  folders: Folder[];
   setFolders: Dispatch<SetStateAction<Folder[]>>;
+  getFolders: () => void;
   handleSelect: (
     folderId: string,
     folderType: FOLDER_TYPE | "basicFolder",

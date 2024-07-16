@@ -86,7 +86,6 @@ export const App = () => {
     }
   };
 
-  console.log(folders);
 
   return (
     <>
@@ -144,14 +143,12 @@ export const App = () => {
               SVGLeft={<Icon path={mdiFolder} />}
             />
 
-            {(!folders.length) ??
+            {(!folders.length) ?
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
+              : null
             }
 
             <FolderList
-              // folders={folders}
-              // onSetFolders={setFolders}
-              currentFolder={currentFolder}
               selectedFolderIds={selectedFolderIds}
               selectedFolders={selectedFolders}
               setSelectedFolderIds={setSelectedFolderIds}

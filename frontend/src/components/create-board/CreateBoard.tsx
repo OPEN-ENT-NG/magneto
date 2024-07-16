@@ -243,7 +243,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                 <div>
                   <div>
                     <FormControl id="title" className="mb-0-5">
-                      <Label>{t("magneto.create.board.title")} *:</Label>
+                      <Label>{t("magneto.create.board.title")} * :</Label>
                       <Input
                         value={title}
                         placeholder=""
@@ -253,7 +253,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                       />
                     </FormControl>
                     <FormControl id="description" className="mb-1-5">
-                      <Label>{t("magneto.create.board.description")}</Label>
+                      <Label>{t("magneto.create.board.description")} :</Label>
                       <TextArea
                         size="md"
                         value={description}
@@ -332,7 +332,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                   </div>
                   <div className="mb-1">
                     <FormControl id="keywords">
-                      <Label>{t("magneto.board.keywords")}</Label>
+                      <Label>{t("magneto.board.keywords")} :</Label>
                       <Input
                         placeholder=""
                         size="md"
@@ -371,9 +371,9 @@ export const CreateBoard: FunctionComponent<props> = ({
           <Modal.Footer>
             <div className="right">
               <Button
-                color="primary"
+                color="tertiary"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 className="footer-button"
                 onClick={resetFields}
               >
@@ -389,7 +389,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                   (thumbnailSrc == "" && thumbnail == "") || title == ""
                 }
               >
-                {t("magneto.save")}
+                {boardToUpdate ? t("magneto.save") : t("magneto.create")}
               </Button>
             </div>
           </Modal.Footer>

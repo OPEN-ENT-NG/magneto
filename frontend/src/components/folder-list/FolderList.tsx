@@ -131,6 +131,9 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                   }}
                 >
                   <FolderItem
+                    isSelected={selectedFolders
+                      .map((item: Folder) => item.id)
+                      .includes(folder.id)}
                     folder={folder}
                     folders={folderData}
                     areFoldersLoading={getFoldersLoading}

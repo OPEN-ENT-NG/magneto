@@ -3,7 +3,7 @@
 import { Card } from "./card.model";
 import { Section } from "./section.model";
 import { FOLDER_TYPE } from "../core/enums/folder-type.enum";
-import { } from "edifice-ts-client";
+import {} from "edifice-ts-client";
 import { LAYOUT_TYPE } from "../core/enums/layout-type.enum";
 
 export interface IBoardItemResponse {
@@ -375,9 +375,9 @@ export class Board /*implements Shareable*/ {
     this._tags = data.tags;
     this._tagsTextInput = data.tags
       ? data.tags
-        .map((tag: string) => "#" + tag)
-        .toString()
-        .replace(/,/g, " ")
+          .map((tag: string) => "#" + tag)
+          .toString()
+          .replace(/,/g, " ")
       : "";
 
     this._nbCards = data.nbCards;

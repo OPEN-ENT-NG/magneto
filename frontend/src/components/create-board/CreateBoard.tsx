@@ -1,26 +1,24 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 
-// eslint-disable-next-line
+// eslint-disable-next-line import/order
 import {
   Button,
   Checkbox,
   FormControl,
   Grid,
-  ImagePicker,
   Input,
   Label,
   Modal,
   Radio,
   TextArea,
 } from "@edifice-ui/react";
-
 import "./CreateBoard.scss";
-
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import { useTranslation } from "react-i18next";
 
+import UniqueImagePicker from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
@@ -214,16 +212,21 @@ export const CreateBoard: FunctionComponent<props> = ({
                   padding: ".8rem",
                 }}
               >
-                <ImagePicker
+                <UniqueImagePicker
                   addButtonLabel="Add image"
                   deleteButtonLabel="Delete image"
                   label="Upload an image"
-                  onDeleteImage={() => {
-                    handleDeleteImageThumbnail();
-                    setThumbnailSrc("");
-                  }}
                   onUploadImage={handleUploadImageThumbnail}
+                  onDeleteImage={handleDeleteImageThumbnail}
                   src={thumbnailSrc}
+                  onImageChange={(file) => {
+                    if (file) {
+                      handleUploadImageThumbnail(file);
+                    } else {
+                      handleDeleteImageThumbnail();
+                      setThumbnailSrc("");
+                    }
+                  }}
                 />
                 {(thumbnail == "" || thumbnail == null) &&
                   thumbnailSrc == "" && (
@@ -243,7 +246,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                 <div>
                   <div>
                     <FormControl id="title" className="mb-0-5">
-                      <Label>{t("magneto.create.board.title")} *:</Label>
+                      <Label>{t("magneto.create.board.title")} * :</Label>
                       <Input
                         value={title}
                         placeholder=""
@@ -253,7 +256,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                       />
                     </FormControl>
                     <FormControl id="description" className="mb-1-5">
-                      <Label>{t("magneto.create.board.description")}</Label>
+                      <Label>{t("magneto.create.board.description")} :</Label>
                       <TextArea
                         size="md"
                         value={description}
@@ -332,7 +335,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                   </div>
                   <div className="mb-1">
                     <FormControl id="keywords">
-                      <Label>{t("magneto.board.keywords")}</Label>
+                      <Label>{t("magneto.board.keywords")} :</Label>
                       <Input
                         placeholder=""
                         size="md"
@@ -349,16 +352,21 @@ export const CreateBoard: FunctionComponent<props> = ({
                     <div className="mb-0-5">
                       {t("magneto.board.background.title")}
                     </div>
-                    <ImagePicker
+                    <UniqueImagePicker
                       addButtonLabel="Add image"
                       deleteButtonLabel="Delete image"
                       label="Upload an image"
-                      onDeleteImage={() => {
-                        handleDeleteImageBackground();
-                        setBackgroundSrc("");
-                      }}
                       onUploadImage={handleUploadImageBackground}
+                      onDeleteImage={handleDeleteImageBackground}
                       src={backgroundSrc}
+                      onImageChange={(file) => {
+                        if (file) {
+                          handleUploadImageBackground(file);
+                        } else {
+                          handleDeleteImageBackground();
+                          setBackgroundSrc("");
+                        }
+                      }}
                     />
                     <i className="font-little">
                       {t("magneto.board.background.warning")}
@@ -371,9 +379,9 @@ export const CreateBoard: FunctionComponent<props> = ({
           <Modal.Footer>
             <div className="right">
               <Button
-                color="primary"
+                color="tertiary"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 className="footer-button"
                 onClick={resetFields}
               >
@@ -389,7 +397,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                   (thumbnailSrc == "" && thumbnail == "") || title == ""
                 }
               >
-                {t("magneto.save")}
+                {boardToUpdate ? t("magneto.save") : t("magneto.create")}
               </Button>
             </div>
           </Modal.Footer>

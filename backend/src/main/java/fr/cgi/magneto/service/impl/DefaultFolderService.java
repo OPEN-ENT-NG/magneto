@@ -22,6 +22,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
+import org.entcore.common.share.ShareNormalizer;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,6 +33,7 @@ public class DefaultFolderService implements FolderService {
     public final MongoDb mongoDb;
     public final String collection;
     private final ServiceFactory serviceFactory;
+    private final ShareNormalizer shareNormalizer;
 
     protected static final Logger log = LoggerFactory.getLogger(DefaultFolderService.class);
 
@@ -39,6 +41,29 @@ public class DefaultFolderService implements FolderService {
         this.collection = collection;
         this.mongoDb = mongo;
         this.serviceFactory = serviceFactory;
+        this.shareNormalizer = serviceFactory.shareNormalizer();
+    }
+
+    public Optional<UserInfos> getCreatorForModel(final JsonObject json) {
+        if (!json.containsKey(Field.OWNERID)){
+            return Optional.empty();
+        }
+        final UserInfos user = new UserInfos();
+        user.setUserId(json.getString(Field.OWNERID));
+        return Optional.of(user);
+    }
+
+    private JsonObject addNormalizedShares(final JsonObject folder) {
+        try {
+            if(folder != null) {
+                this.shareNormalizer.addNormalizedRights(folder, e -> getCreatorForModel(e).map(UserInfos::getUserId));
+            }
+            return folder;
+        }
+        catch (Exception e) {
+            log.error(String.format("[Magneto@%s::addNormalizedShares] Failed to apply normalized shares : %s", this.getClass().getSimpleName(), e.getMessage()));
+            return folder;
+        }
     }
 
     @Override
@@ -67,7 +92,13 @@ public class DefaultFolderService implements FolderService {
                 promise.fail(message);
                 return;
             }
-            promise.complete(results.right().getValue());
+            JsonArray folders = new JsonArray(results.right().getValue()
+                    .stream()
+                    .filter(JsonObject.class::isInstance)
+                    .map(JsonObject.class::cast)
+                    .map(folder -> addNormalizedShares(folder))
+                    .collect(Collectors.toList()));
+            promise.complete(folders);
         }));
         return promise.future();
     }
@@ -578,7 +609,13 @@ public class DefaultFolderService implements FolderService {
                 promise.fail(message);
                 return;
             }
-            promise.complete(results.right().getValue());
+            JsonArray folders = new JsonArray(results.right().getValue()
+                    .stream()
+                    .filter(JsonObject.class::isInstance)
+                    .map(JsonObject.class::cast)
+                    .map(folder -> addNormalizedShares(folder))
+                    .collect(Collectors.toList()));
+            promise.complete(folders);
         }));
         return promise.future();
     }

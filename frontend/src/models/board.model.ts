@@ -455,6 +455,10 @@ export class Board /*implements Shareable*/ {
     return this._isPublished;
   }
 
+  set isPublished(value: boolean) {
+    this._isPublished = value;
+  }
+
   get deleted(): boolean {
     return this._deleted;
   }

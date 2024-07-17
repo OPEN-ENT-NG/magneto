@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 
 import { OdeClientProvider, ShareModal } from "@edifice-ui/react";
+import { useTranslation } from "react-i18next";
 
 import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
 
@@ -17,6 +18,8 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
   shareOptions,
   resourceType,
 }: props) => {
+  const { t } = useTranslation("magneto");
+
   const handleShareClose = (): void => {
     toggle();
   };
@@ -24,6 +27,16 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
   const handleShareSuccess = (): void => {
     toggle();
   };
+
+  useEffect(() => {
+    const checkTitle = () => {
+      if (document.title !== t("magneto.title")) {
+        document.title = t("magneto.title");
+      }
+    };
+    const intervalId = setInterval(checkTitle, 250);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <>

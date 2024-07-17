@@ -45,11 +45,11 @@ public class DefaultFolderService implements FolderService {
     }
 
     public Optional<UserInfos> getCreatorForModel(final JsonObject json) {
-        if(!json.containsKey("ownerId")){
+        if (!json.containsKey(Field.OWNERID)){
             return Optional.empty();
         }
         final UserInfos user = new UserInfos();
-        user.setUserId(json.getString("ownerId"));
+        user.setUserId(json.getString(Field.OWNERID));
         return Optional.of(user);
     }
 
@@ -94,7 +94,9 @@ public class DefaultFolderService implements FolderService {
             }
             JsonArray folders = new JsonArray(results.right().getValue()
                     .stream()
-                    .map(folder -> addNormalizedShares((JsonObject) folder))
+                    .filter(JsonObject.class::isInstance)
+                    .map(JsonObject.class::cast)
+                    .map(folder -> addNormalizedShares(folder))
                     .collect(Collectors.toList()));
             promise.complete(folders);
         }));
@@ -609,7 +611,9 @@ public class DefaultFolderService implements FolderService {
             }
             JsonArray folders = new JsonArray(results.right().getValue()
                     .stream()
-                    .map(folder -> addNormalizedShares((JsonObject) folder))
+                    .filter(JsonObject.class::isInstance)
+                    .map(JsonObject.class::cast)
+                    .map(folder -> addNormalizedShares(folder))
                     .collect(Collectors.toList()));
             promise.complete(folders);
         }));

@@ -21,6 +21,7 @@ type props = {
   folderIds: string[];
   isPredelete: boolean;
   reset: () => void;
+  hasSharedElement: () => boolean;
 };
 
 export const DeleteModal: FunctionComponent<props> = ({
@@ -30,6 +31,7 @@ export const DeleteModal: FunctionComponent<props> = ({
   folderIds,
   isPredelete,
   reset,
+  hasSharedElement,
 }: props) => {
   const { t } = useTranslation("magneto");
   const [preDeleteBoards] = usePreDeleteBoardsMutation();
@@ -113,7 +115,12 @@ export const DeleteModal: FunctionComponent<props> = ({
           </Modal.Header>
           <Modal.Body>
             {isPredelete ? (
-              <div>{t("magneto.predelete.elements.message")}</div>
+              <>
+                <div>{t("magneto.predelete.elements.message")}</div>
+                {hasSharedElement() && (
+                  <div>{t("magneto.folder.share.predelete.warning")}</div>
+                )}
+              </>
             ) : (
               <div>{t("magneto.delete.elements.message")}</div>
             )}

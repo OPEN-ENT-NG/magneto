@@ -196,8 +196,8 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                           }
                         }}
                       >
-                        <FileCopyOutlinedIcon />
-                        {t("magneto.cards.collection.board.duplicate")}
+                        <FileCopyOutlinedIcon className="copy-icon" />
+                        {" " + t("magneto.cards.collection.board.duplicate")}
                       </span>
                     </div>
                     <animated.ul className="grid ps-0 list-unstyled mb-24">

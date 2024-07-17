@@ -61,12 +61,12 @@ public class DefaultBoardService implements BoardService {
     }
 
     public Optional<UserInfos> getCreatorForModel(final JsonObject json) {
-        if(!json.containsKey("ownerId")){
+        if(!json.containsKey(Field.OWNERID)){
             return Optional.empty();
         }
         final UserInfos user = new UserInfos();
-        user.setUserId(json.getString("ownerId"));
-        user.setUsername(json.getString("ownerName"));
+        user.setUserId(json.getString(Field.OWNERID));
+        user.setUsername(json.getString(Field.OWNERNAME));
         return Optional.of(user);
     }
 
@@ -434,7 +434,9 @@ public class DefaultBoardService implements BoardService {
                 .onSuccess(success -> {
                     JsonArray boards = new JsonArray(fetchAllBoardsFuture.result()
                     .stream()
-                    .map(board -> addNormalizedShares((JsonObject) board))
+                    .filter(JsonObject.class::isInstance)
+                    .map(JsonObject.class::cast)
+                    .map(board -> addNormalizedShares(board))
                     .collect(Collectors.toList()));
                     int boardsCount = (fetchAllBoardsCountFuture.result().isEmpty()) ? 0 :
                             fetchAllBoardsCountFuture.result().getJsonObject(0).getInteger(Field.COUNT);

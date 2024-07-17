@@ -23,6 +23,7 @@ import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board, BoardForm } from "~/models/board.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
@@ -61,6 +62,7 @@ export const CreateBoard: FunctionComponent<props> = ({
     handleDeleteImage: handleDeleteImageBackground,
     fetchUrl: fetchBackgroundUrl,
   } = useImageHandler("");
+  const { currentFolder } = useFoldersNavigation();
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
@@ -78,6 +80,7 @@ export const CreateBoard: FunctionComponent<props> = ({
   const setBoardFromForm = async (board: BoardForm) => {
     board.title = title;
     board.description = description;
+    board.folderId = currentFolder.id;
 
     if (thumbnailSrc != "" && thumbnail == "") {
       board.imageUrl = thumbnailSrc;

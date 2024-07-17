@@ -10,6 +10,7 @@ import {
 import { useTransition, animated } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
+import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
 import { MoveBoard } from "../move-board/MoveBoard";
@@ -20,12 +21,11 @@ import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
 import { useRestoreBoardsAndFolders } from "~/hooks/useRestoreBoardsAndFolders";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
 import { useUserRightsStore } from "~/stores";
 import { checkUserRight } from "~/utils/checkUserRight";
-import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
-import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 export interface ToasterContainerProps {
   isToasterOpen: boolean;
@@ -60,9 +60,7 @@ export const ToasterContainer = ({
 
   const [duplicateBoard] = useDuplicateBoardMutation();
 
-  const {
-    folders: allFolders,
-  } = useFoldersNavigation();
+  const { folders: allFolders } = useFoldersNavigation();
 
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
     boardIds: boardIds,
@@ -84,13 +82,21 @@ export const ToasterContainer = ({
   };
 
   const isMyBoards = () => {
-    return currentFolder.id == FOLDER_TYPE.MY_BOARDS
-      || allFolders.some((folder: Folder) => folder.id === currentFolder.id && !folder.deleted);
+    return (
+      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+      allFolders.some(
+        (folder: Folder) => folder.id === currentFolder.id && !folder.deleted,
+      )
+    );
   };
 
   const isTrash = () => {
-    return currentFolder.id == FOLDER_TYPE.DELETED_BOARDS
-      || allFolders.some((folder: Folder) => folder.id === currentFolder.id && folder.deleted);
+    return (
+      currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
+      allFolders.some(
+        (folder: Folder) => folder.id === currentFolder.id && folder.deleted,
+      )
+    );
   };
 
   const isPublic = () => {
@@ -212,7 +218,7 @@ export const ToasterContainer = ({
                     type="button"
                     color="primary"
                     variant="filled"
-                    onClick={function Ga() { }}
+                    onClick={function Ga() {}}
                   >
                     {t("magneto.open")}
                   </Button>

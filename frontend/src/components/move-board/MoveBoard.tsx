@@ -5,14 +5,14 @@ import { Button, Modal, TreeView, useOdeClient } from "@edifice-ui/react";
 
 import { useTranslation } from "react-i18next";
 
+import { getFolderTypeData } from "../tree-view/utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
-import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import { getFolderTypeData } from "../tree-view/utils";
 
 type props = {
   isOpen: boolean;
@@ -30,10 +30,7 @@ export const MoveBoard: FunctionComponent<props> = ({
   const { t } = useTranslation("magneto");
   const [moveBoards] = useMoveBoardsMutation();
   const [selectedFolderId, setSelectedFolderId] = useState<string>("");
-  const {
-    folderObject,
-    folderNavigationRefs,
-  } = useFoldersNavigation();
+  const { folderObject, folderNavigationRefs } = useFoldersNavigation();
 
   const { user } = useOdeClient();
 

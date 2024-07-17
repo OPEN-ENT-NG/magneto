@@ -114,18 +114,16 @@ export const DeleteModal: FunctionComponent<props> = ({
             <h2>{t("magneto.delete.elements")}</h2>
           </Modal.Header>
           <Modal.Body>
-            <div>
-              {isPredelete ? (
-                <>
-                  <div>{t("magneto.predelete.elements.message")}</div>
-                  {hasSharedElement() && (
-                    <div>{t("magneto.folder.share.predelete.warning")}</div>
-                  )}
-                </>
-              ) : (
-                <div>{t("magneto.delete.elements.message")}</div>
-              )}
-            </div>
+            {isPredelete ? (
+              <>
+                <div>{t("magneto.predelete.elements.message")}</div>
+                {hasSharedElement() && (
+                  <div>{t("magneto.folder.share.predelete.warning")}</div>
+                )}
+              </>
+            ) : (
+              <div>{t("magneto.delete.elements.message")}</div>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <div className="right">

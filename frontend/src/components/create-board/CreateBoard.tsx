@@ -173,8 +173,6 @@ export const CreateBoard: FunctionComponent<props> = ({
 
   useEffect(() => {
     if (boardToUpdate != null) {
-      console.log("slip");
-
       setIsCommentChecked(boardToUpdate.canComment);
       setIsFavoriteChecked(boardToUpdate.displayNbFavorites);
       setTitle(boardToUpdate.title);

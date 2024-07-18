@@ -14,7 +14,7 @@ import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/services/utils/share.utils";
 
 type FolderListProps = {
-  isSelected: boolean
+  isSelected: boolean;
   folder: Folder;
   toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
@@ -62,13 +62,13 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       );
       const dragAndDropInitialFolder = !boards[0].folderId
         ? new Folder().build({
-          _id: FOLDER_TYPE.MY_BOARDS,
-          ownerId: user?.userId ?? "",
-          title: MAIN_PAGE_TITLE,
-          parentId: "",
-        })
+            _id: FOLDER_TYPE.MY_BOARDS,
+            ownerId: user?.userId ?? "",
+            title: MAIN_PAGE_TITLE,
+            parentId: "",
+          })
         : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
-        new Folder();
+          new Folder();
 
       if (
         (!boards[0] && isOwnerOfSelectedBoards(boards)) ||

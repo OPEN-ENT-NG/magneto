@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { SideBarButtons } from "./SideBarButtons";
 import { FOLDER_TYPE } from "../../core/enums/folder-type.enum";
@@ -24,7 +24,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
   toggleDrawer,
   className,
 }) => {
-
   const reducer = (
     state: { fileList: any[] },
     action: { type: any; dropDepth: any; inDropZone: any; files: any },

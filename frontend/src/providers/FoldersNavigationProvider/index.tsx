@@ -53,8 +53,8 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   const [folderObject, setFolderObject] =
     useState<FolderObjectState>(initialFolderObject);
   const [folders, setFolders] = useState<Folder[]>([]);
-  const {currentData:myBoardsData} = useGetFoldersQuery(false)
-  const {currentData:deletedBoardsData} = useGetFoldersQuery(true)
+  const { currentData: myBoardsData } = useGetFoldersQuery(false);
+  const { currentData: deletedBoardsData } = useGetFoldersQuery(true);
 
   const myBoardsRef = useRef<TreeViewHandlers>(null);
   const publicBoardsRef = useRef<TreeViewHandlers>(null);
@@ -95,7 +95,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       });
     },
     [currentFolder, folderData, folderNavigationRefs],
-  );   
+  );
 
   const processFolders = useCallback(
     (
@@ -130,16 +130,13 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
 
   useEffect(() => {
     setFolderData([]);
+    processFolders(myBoardsData, FOLDER_TYPE.MY_BOARDS, "magneto.my.boards");
     processFolders(
-      myBoardsData,
-      FOLDER_TYPE.MY_BOARDS,
-      "magneto.my.boards",
-    );processFolders(
       deletedBoardsData,
       FOLDER_TYPE.DELETED_BOARDS,
       "magneto.trash",
     );
-  }, [myBoardsData,deletedBoardsData,currentFolder]);
+  }, [myBoardsData, deletedBoardsData, currentFolder]);
 
   useEffect(() => {
     if (folderData.length && currentFolder) {

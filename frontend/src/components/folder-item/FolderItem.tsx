@@ -15,9 +15,6 @@ import { UserRights } from "~/services/utils/share.utils";
 
 type FolderListProps = {
   folder: Folder;
-  folders: Folder[];
-  isSelected: boolean;
-  areFoldersLoading: boolean;
   toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
@@ -27,10 +24,7 @@ type FolderListProps = {
 };
 
 export const FolderItem: React.FunctionComponent<FolderListProps> = ({
-  isSelected,
   folder,
-  folders,
-  areFoldersLoading,
   dragAndDropBoards,
   onDragAndDrop,
   onDisplayModal,
@@ -42,7 +36,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [hasDrop, setHasDrop] = useState<boolean>(false);
-  const { handleSelect } = useFoldersNavigation();
+  const { folders, handleSelect } = useFoldersNavigation();
 
   const folderTitle = folder.title;
 
@@ -67,7 +61,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       const dragAndDropInitialFolder = !boards[0].folderId
         ? new Folder().build({
             _id: FOLDER_TYPE.MY_BOARDS,
-            ownerId: user.userId,
+            ownerId: user?.userId ?? "",
             title: MAIN_PAGE_TITLE,
             parentId: "",
           })
@@ -180,7 +174,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const isOwnerOfSelectedBoards = (boards: Board[]): boolean => {
     return boards.every(
       (board: Board) =>
-        !!board && !!board.owner && board.owner.userId === user.userId,
+        !!board && !!board.owner && board.owner.userId === (user?.userId ?? ""),
     );
   };
 
@@ -198,13 +192,12 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     <>
       <div ref={drop} draggable="true" className={isOver ? "drag-over" : ""}>
         <Card
-          isSelected={isSelected}
           app={currentApp!}
           options={{
             type: "folder",
             folderTitle,
           }}
-          isLoading={areFoldersLoading}
+          isLoading={false}
           isSelectable={true}
           onClick={() => {
             handleSelect(folder.id, "basicFolder");

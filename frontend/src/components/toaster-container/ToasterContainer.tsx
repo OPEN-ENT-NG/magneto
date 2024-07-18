@@ -172,7 +172,7 @@ export const ToasterContainer = ({
 
       const hasGroupShareRight: boolean =
         !!shareItem.groupId &&
-        !!user.groupsIds.find((groupId: string) => {
+        !!user?.groupsIds.find((groupId: string) => {
           shareItem.groupId == groupId && shareItem[shareRight] == true;
         });
 

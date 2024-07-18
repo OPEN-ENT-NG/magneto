@@ -5,13 +5,13 @@ import { useRestorePreDeleteBoardsMutation } from "~/services/api/boards.service
 import { useRestorePreDeleteFoldersMutation } from "~/services/api/folders.service";
 
 interface useRestoreBoardsAndFoldersProps {
-  boardIds: string[];
-  folderIds: string[];
+  selectedBoardIds: string[];
+  selectedFolderIds: string[];
 }
 
 export const useRestoreBoardsAndFolders = ({
-  boardIds,
-  folderIds,
+  selectedBoardIds,
+  selectedFolderIds,
 }: useRestoreBoardsAndFoldersProps) => {
   const { t } = useTranslation("magneto");
   const [restorePreDeleteBoards] = useRestorePreDeleteBoardsMutation();
@@ -19,23 +19,23 @@ export const useRestoreBoardsAndFolders = ({
 
   const restorePreDeleteBoardsToast = usePredefinedToasts({
     func: restorePreDeleteBoards,
-    parameter: boardIds,
+    parameter: selectedBoardIds,
     successMessage: t("magneto.restore.elements.confirm"),
     failureMessage: t("magneto.restore.elements.error"),
   });
 
   const restorePreDeleteFoldersToast = usePredefinedToasts({
     func: restorePreDeleteFolders,
-    parameter: folderIds,
+    parameter: selectedFolderIds,
     successMessage: t("magneto.restore.elements.confirm"),
     failureMessage: t("magneto.restore.elements.error"),
   });
 
   const restoreBoardsAndFolders = async () => {
-    if (boardIds.length > 0) {
+    if (selectedBoardIds.length > 0) {
       await restorePreDeleteBoardsToast();
     }
-    if (folderIds.length > 0) {
+    if (selectedFolderIds.length > 0) {
       await restorePreDeleteFoldersToast();
     }
   };

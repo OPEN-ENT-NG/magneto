@@ -2,8 +2,8 @@ import { useState, useCallback, useEffect } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { BoardObjectState, TriggerFetchState } from "./types";
-import { initialBoardObject, initialTriggerFetch } from "./utils";
+import { TriggerFetchState } from "./types";
+import { initialTriggerFetch } from "./utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Board, IBoardItemResponse } from "~/models/board.model";
@@ -13,42 +13,21 @@ import { useFoldersNavigation } from "../FoldersNavigationProvider";
 export const useBoardsLogic = () => {
   const { t } = useTranslation("magneto");
   const [boards, setBoards] = useState<Board[]>([]);
-  const [boardObject, setBoardObject] =
-    useState<BoardObjectState>(initialBoardObject);
   const [triggerFetch, setTriggerFetch]  =
     useState<TriggerFetchState>(initialTriggerFetch);
   const { myBoards, myAllBoards } = triggerFetch;
-
-//   const [boardObject, setBoardObject] =
-//     useState<BoardObjectState>(initialBoardObject);
-//   const [triggerFetch, setTriggerFetch]  =
-//     useState<TriggerFetchState>(initialTriggerFetch);
-//   const { myBoards, myAllBoards } = triggerFetch;
   const { currentFolder } = useFoldersNavigation();
 
   const processBoards = useCallback( //process board list
     (
       result: IBoardItemResponse[] | undefined,
-      boardType: FOLDER_TYPE,
+      folderType: FOLDER_TYPE,
       title: string,
     ) => {
       if (result) {
         const preparedBoards = result.map((item) => new Board().build(item));
-        const boardObject = new FolderTreeNavItem({
-          id: boardType,
-          title: t(title),
-          parentId: "",
-          section: true,
-        }).buildBoards(preparedBoards);
 
         setBoards((prevBoards) => [...prevBoards, ...preparedBoards]);
-
-        setBoardObject((prevBoardObject) => ({
-          ...prevBoardObject,
-          [boardType === FOLDER_TYPE.MY_BOARDS
-            ? "myBoardObject"
-            : "deletedBoardObject"]: boardObject,
-        }));
       }
     },
     [],
@@ -105,6 +84,6 @@ export const useBoardsLogic = () => {
     }
   }, [myAllBoards, myAllBoardsResult, processBoards, triggerFetch]);
 
-  return { boards, boardObject, getBoards, setBoards };
+  return { boards, getBoards, setBoards };
 };
      

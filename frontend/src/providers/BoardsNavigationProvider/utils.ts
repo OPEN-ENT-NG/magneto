@@ -1,19 +1,14 @@
 import { t } from "i18next";
 
-import { BoardObjectState, TriggerFetchState } from "./types";
+import { TriggerFetchState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 
 
-export const initialBoardObject: BoardObjectState = {
-  myBoardObject: null,
-  deletedBoardObject: null,
-};
-
 export const initialTriggerFetch: TriggerFetchState = {
   myBoards: false,
-  deletedBoards: false,
+  myAllBoards: false,
 };
 
 export const prepareBoardsState = (

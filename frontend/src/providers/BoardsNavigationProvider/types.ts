@@ -10,10 +10,7 @@ export interface BoardsNavigationProviderProps {
   children: ReactNode;
 }
 
-export interface BoardObjectState {
-  myBoardObject: FolderTreeNavItem | null;
-  deletedBoardObject: FolderTreeNavItem | null;
-}
+
 
 export interface TriggerFetchState {
   myBoards: boolean;
@@ -26,19 +23,7 @@ export interface BoardNavigationRefs {
 }
 
 export type BoardsNavigationContextType = {
-  currentBoard: Board;
-  setCurrentBoard: Dispatch<SetStateAction<Board>>;
-  boardData: Board[];
-  setBoardData: Dispatch<SetStateAction<Board[]>>;
-  boardObject: BoardObjectState;
-  setBoardObject: Dispatch<SetStateAction<BoardObjectState>>;
   boards: Board[];
   setBoards: Dispatch<SetStateAction<Board[]>>;
-  getBoards: () => void;
-  handleSelect: (
-    boardId: string,
-    boardType: FOLDER_TYPE | "basicBoard",
-  ) => void;
-  boardNavigationRefs: BoardNavigationRefs;
 };
 

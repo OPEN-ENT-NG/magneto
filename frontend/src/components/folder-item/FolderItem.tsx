@@ -15,7 +15,6 @@ import { UserRights } from "~/services/utils/share.utils";
 
 type FolderListProps = {
   folder: Folder;
-  foldersData: Folder[];
   toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
@@ -26,7 +25,6 @@ type FolderListProps = {
 
 export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   folder,
-  foldersData,
   dragAndDropBoards,
   onDragAndDrop,
   onDisplayModal,
@@ -38,7 +36,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [hasDrop, setHasDrop] = useState<boolean>(false);
-  const { handleSelect } = useFoldersNavigation();
+  const { folders, handleSelect } = useFoldersNavigation();
 
   const folderTitle = folder.title;
 
@@ -67,7 +65,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
             title: MAIN_PAGE_TITLE,
             parentId: "",
           })
-        : foldersData.find((folder: Folder) => folder.id == boards[0].folderId) ??
+        : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
           new Folder();
 
       if (
@@ -176,7 +174,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const isOwnerOfSelectedBoards = (boards: Board[]): boolean => {
     return boards.every(
       (board: Board) =>
-        !!board && !!board.owner && board.owner.userId ===( user?.userId ?? ""),
+        !!board && !!board.owner && board.owner.userId === (user?.userId ?? ""),
     );
   };
 

@@ -88,8 +88,9 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                       .map((item: Folder) => item.id)
                       .includes(folder.id)}
                     folder={folder}
-                    foldersData={folders}
-                    toggleSelect={() => {toggleSelect(folder);}}
+                    toggleSelect={() => {
+                      toggleSelect(folder);
+                    }}
                     dragAndDropBoards={dragAndDropBoards}
                     onDragAndDrop={onDragAndDrop}
                     onDisplayModal={onSetShowModal}

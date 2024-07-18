@@ -7,7 +7,6 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useTranslation } from "react-i18next";
 
-import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
 import { EmptyState } from "~/components/empty-state/EmptyState";
@@ -86,7 +85,6 @@ export const App = () => {
     }
   };
 
-
   return (
     <>
       <Header onClick={toggle} toggleDrawer={toggleDrawer} />
@@ -143,10 +141,9 @@ export const App = () => {
               SVGLeft={<Icon path={mdiFolder} />}
             />
 
-            {(!folders.length) ?
+            {!folders.length ? (
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
-              : null
-            }
+            ) : null}
 
             <FolderList
               selectedFolderIds={selectedFolderIds}
@@ -191,7 +188,6 @@ export const App = () => {
               onSubmit={modalProps.onSubmit}
               onCancel={modalProps.onCancel}
             ></MessageModal>
-
           </Grid.Col>
         </Grid>
       </DndProvider>

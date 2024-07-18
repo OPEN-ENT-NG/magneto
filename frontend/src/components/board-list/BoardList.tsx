@@ -150,7 +150,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
 
   useEffect(() => {
     setBoards(searchText !== "" ? allBoardData : boardData);
-  }, [searchText]); 
+  }, [searchText]);
 
   return (
     <>

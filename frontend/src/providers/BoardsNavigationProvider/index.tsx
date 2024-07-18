@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import {
   BoardsNavigationContextType,
   BoardsNavigationProviderProps,
-  TriggerFetchState,
+  TriggerFetchBoardState,
 } from "./types";
 import {
   prepareBoardsState,
@@ -22,6 +22,7 @@ import {
 import { Board } from "~/models/board.model";
 import { useFoldersNavigation } from "../FoldersNavigationProvider";
 import { useGetAllBoardsQuery, useGetBoardsQuery } from "~/services/api/boards.service";
+import { S } from "vitest/dist/reporters-5f784f42.js";
 
 const BoardsNavigationContext = createContext<BoardsNavigationContextType | null>(null);
 
@@ -37,17 +38,17 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   children,
 }) => {
   const { currentFolder } = useFoldersNavigation();
-  const [boardData, setBoardData] = useState<Board[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
-  const [triggerFetch, setTriggerFetch] = useState<TriggerFetchState>(initialTriggerFetch);
+  const [searchText, setSearchText] = useState<string>("");
+  const [triggerFetch, setTriggerFetch] = useState<TriggerFetchBoardState>(initialTriggerFetch);
 
   const { t } = useTranslation("magneto");
 
   const { data: myBoardsResult } = useGetBoardsQuery(
     {
-    isPublic: currentFolder.isPublic,
+    isPublic: !!currentFolder.isPublic,
     isShared: !!currentFolder.shared && !!currentFolder.shared.length,
-    isDeleted: currentFolder.deleted,
+    isDeleted: !!currentFolder.deleted,
     sortBy: "modificationDate",
     }, 
     {
@@ -57,9 +58,9 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
 
   const { data: myAllBoardsResult } = useGetAllBoardsQuery(
     {
-      isPublic: currentFolder.isPublic,
+      isPublic: !!currentFolder.isPublic,
       isShared: !!currentFolder.shared && !!currentFolder.shared.length,
-      isDeleted: currentFolder.deleted,
+      isDeleted: !!currentFolder.deleted,
       sortBy: "modificationDate",
     }, 
     {
@@ -68,37 +69,38 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   );
 
   const getBoards = useCallback(() => {
-      setBoardData([]);
+      setBoards([]);
       setTriggerFetch({ myBoards: true, myAllBoards: true });
   }, []);
 
   useEffect(() => {
-      if (triggerFetch.myBoards && myBoardsResult) {
-          setTriggerFetch((prev) => ({ ...prev, myBoards: false }));
+      if (triggerFetch.myBoards && !!myBoardsResult && !!currentFolder && (searchText === "")) {
+          setBoards(prepareBoardsState(myBoardsResult, currentFolder));
       }
+      setTriggerFetch((prev) => ({ ...prev, myBoards: false }));
   }, [triggerFetch.myBoards, myBoardsResult]);
 
   useEffect(() => {
-      if (triggerFetch.myAllBoards && myAllBoardsResult) {
-          setTriggerFetch((prev) => ({ ...prev, myAllBoards: false }));
+      if (triggerFetch.myAllBoards && !!myAllBoardsResult && !!currentFolder && (searchText !== "")) {
+          //make request
+          setBoards(prepareBoardsState(myAllBoardsResult, currentFolder));
       }
+      setTriggerFetch((prev) => ({ ...prev, myAllBoards: false }));
   }, [triggerFetch.myAllBoards, myAllBoardsResult]);
 
   useEffect(() => {
       getBoards();
   }, [currentFolder]);
 
-  useEffect(() => {
-      if (boardData.length && currentFolder)
-          setBoards(prepareBoardsState(boardData, currentFolder));
-  }, [boardData, currentFolder]);
 
   const value = useMemo<BoardsNavigationContextType>(
       () => ({
           boards,
           setBoards,
+          searchText,
+          setSearchText
       }),
-      [boards, setBoards]
+      [boards, setBoards, searchText, setSearchText]
   );
 
   return (

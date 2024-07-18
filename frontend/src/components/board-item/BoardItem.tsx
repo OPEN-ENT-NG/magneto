@@ -27,7 +27,6 @@ interface BoardItemProps {
     modificationDate: string;
     isPublished: boolean;
   };
-  areBoardsLoading: boolean;
   selectedBoardIds: string[];
   onDragAndDropBoard: (board: any) => void;
   onSelect: (board: any) => void;
@@ -35,7 +34,6 @@ interface BoardItemProps {
 
 export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   board,
-  areBoardsLoading,
   selectedBoardIds,
   onDragAndDropBoard,
   onSelect,
@@ -77,7 +75,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
           type: "board",
           title: "",
         }}
-        isLoading={areBoardsLoading}
+        isLoading={false}
         isSelectable={true}
         isSelected={selectedBoardIds.includes(board.id)}
         onSelect={() => onSelect(board)}

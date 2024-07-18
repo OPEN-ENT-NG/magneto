@@ -1,20 +1,22 @@
-import { t } from "i18next";
-
-import { TriggerFetchState } from "./types";
+import { TriggerFetchBoardState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
-import { Board } from "~/models/board.model";
+import { Board, IBoardItemResponse, IBoardsResponse } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 
 
-export const initialTriggerFetch: TriggerFetchState = {
+export const initialTriggerFetch: TriggerFetchBoardState = {
   myBoards: false,
   myAllBoards: false,
 };
 
 export const prepareBoardsState = (
-  boardData: Board[],
+  myBoardResponse: IBoardsResponse,
   currentFolder: Folder,
 ) => {
+  let boardData = myBoardResponse.all.map((board: IBoardItemResponse) =>
+    new Board().build(board),
+  ); //convert boards to Board[]
+
   if (
     !currentFolder.id ||
     currentFolder.id == FOLDER_TYPE.MY_BOARDS ||

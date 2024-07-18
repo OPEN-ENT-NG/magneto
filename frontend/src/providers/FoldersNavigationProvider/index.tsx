@@ -17,7 +17,6 @@ import {
   FolderObjectState,
   FoldersNavigationContextType,
   FoldersNavigationProviderProps,
-  TriggerFetchState,
 } from "./types";
 import { useInitialCurrentFolder } from "./useInitialCurrentFolder";
 import {
@@ -25,7 +24,6 @@ import {
   prepareFolder,
   prepareFoldersState,
   prepareFolderTitle,
-  initialTriggerFetch,
 } from "./utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
@@ -55,14 +53,13 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   const [folderObject, setFolderObject] =
     useState<FolderObjectState>(initialFolderObject);
   const [folders, setFolders] = useState<Folder[]>([]);
-  const [triggerFetch, setTriggerFetch] =
-    useState<TriggerFetchState>(initialTriggerFetch);
+  const {currentData:myBoardsData} = useGetFoldersQuery(false)
+  const {currentData:deletedBoardsData} = useGetFoldersQuery(true)
 
   const myBoardsRef = useRef<TreeViewHandlers>(null);
   const publicBoardsRef = useRef<TreeViewHandlers>(null);
   const deletedBoardsRef = useRef<TreeViewHandlers>(null);
   const { t } = useTranslation("magneto");
-
   const folderNavigationRefs: FolderNavigationRefs = useMemo(
     () => ({
       [FOLDER_TYPE.MY_BOARDS]: myBoardsRef,
@@ -98,7 +95,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       });
     },
     [currentFolder, folderData, folderNavigationRefs],
-  );
+  );   
 
   const processFolders = useCallback(
     (
@@ -131,48 +128,23 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     [t],
   );
 
-  const { data: myFoldersResult } = useGetFoldersQuery(false, {
-    skip: !triggerFetch.myFolders,
-  });
-
-  const { data: deletedFoldersResult } = useGetFoldersQuery(true, {
-    skip: !triggerFetch.deletedFolders,
-  });
-
-  const getFolders = useCallback(() => {
+  useEffect(() => {
     setFolderData([]);
-    setTriggerFetch({ myFolders: true, deletedFolders: true });
-  }, []);
+    processFolders(
+      myBoardsData,
+      FOLDER_TYPE.MY_BOARDS,
+      "magneto.my.boards",
+    );processFolders(
+      deletedBoardsData,
+      FOLDER_TYPE.DELETED_BOARDS,
+      "magneto.trash",
+    );
+  }, [myBoardsData,deletedBoardsData,currentFolder]);
 
   useEffect(() => {
-    if (triggerFetch.myFolders && myFoldersResult) {
-      processFolders(
-        myFoldersResult,
-        FOLDER_TYPE.MY_BOARDS,
-        "magneto.my.boards",
-      );
-      setTriggerFetch((prev) => ({ ...prev, myFolders: false }));
-    }
-  }, [triggerFetch.myFolders, myFoldersResult, processFolders]);
-
-  useEffect(() => {
-    if (triggerFetch.deletedFolders && deletedFoldersResult) {
-      processFolders(
-        deletedFoldersResult,
-        FOLDER_TYPE.DELETED_BOARDS,
-        "magneto.trash",
-      );
-      setTriggerFetch((prev) => ({ ...prev, deletedFolders: false }));
-    }
-  }, [triggerFetch.deletedFolders, deletedFoldersResult, processFolders]);
-
-  useEffect(() => {
-    getFolders();
-  }, [currentFolder]);
-
-  useEffect(() => {
-    if (folderData.length && currentFolder)
+    if (folderData.length && currentFolder) {
       setFolders(prepareFoldersState(folderData, currentFolder));
+    }
   }, [folderData, currentFolder]);
 
   const value = useMemo<FoldersNavigationContextType>(
@@ -185,7 +157,6 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       setFolderObject,
       folders,
       setFolders,
-      getFolders,
       handleSelect,
       folderNavigationRefs,
     }),
@@ -195,7 +166,6 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       folderObject,
       folders,
       folderNavigationRefs,
-      getFolders,
       handleSelect,
     ],
   );

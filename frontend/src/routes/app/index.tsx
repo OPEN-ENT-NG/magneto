@@ -159,9 +159,9 @@ export const App = () => {
               modalProps={modalProps}
               onSetModalProps={setModalProps}
             />
-            {/* <BoardList
-              boards={boards}
-              setBoards={setBoards}
+            <BoardList
+              // boards={boards}
+              // setBoards={setBoards}
               currentFolder={currentFolder}
               selectedBoardIds={selectedBoardIds}
               selectedBoards={selectedBoards}
@@ -169,7 +169,7 @@ export const App = () => {
               setSelectedBoards={setSelectedBoards}
               searchText={searchText}
               onDragAndDrop={handleDragAndDropBoards}
-            /> */}
+            />
             <ToasterContainer
               isToasterOpen={
                 selectedBoards.length > 0 || selectedFolders.length > 0

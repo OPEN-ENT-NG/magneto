@@ -17,8 +17,8 @@ import {
 } from "~/services/api/boards.service";
 
 type BoardListProps = {
-  boards: Board[];
-  setBoards: (boards: Board[]) => void;
+  // boards: Board[];
+  // setBoards: (boards: Board[]) => void;
   currentFolder: Folder;
   selectedBoardIds: string[];
   selectedBoards: Board[];
@@ -29,8 +29,8 @@ type BoardListProps = {
 };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
-  boards,
-  setBoards,
+  // boards,
+  // setBoards,
   currentFolder,
   selectedBoardIds,
   selectedBoards,

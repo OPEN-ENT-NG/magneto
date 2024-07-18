@@ -6,13 +6,10 @@ export interface BoardsNavigationProviderProps {
   children: ReactNode;
 }
 
-export interface TriggerFetchBoardState {
-  myBoards: boolean;
-  myAllBoards: boolean;
-}
-
 export type BoardsNavigationContextType = {
   boards: Board[];
   setBoards: Dispatch<SetStateAction<Board[]>>;
+  searchText: string;
+  setSearchText: Dispatch<SetStateAction<string>>;
 };
 

@@ -1,6 +1,6 @@
 import { t } from "i18next";
 
-import { FolderObjectState, TriggerFetchState } from "./types";
+import { FolderObjectState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 
@@ -15,10 +15,6 @@ export const initialFolderObject: FolderObjectState = {
   deletedFolderObject: null,
 };
 
-export const initialTriggerFetch: TriggerFetchState = {
-  myFolders: false,
-  deletedFolders: false,
-};
 export const prepareFolderTitle = (folderType: FOLDER_TYPE | "basicFolder") => {
   if (folderType === FOLDER_TYPE.MY_BOARDS) return "magneto.my.boards";
   if (folderType === FOLDER_TYPE.PUBLIC_BOARDS)

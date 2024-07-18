@@ -136,7 +136,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       FOLDER_TYPE.DELETED_BOARDS,
       "magneto.trash",
     );
-  }, [myBoardsData, deletedBoardsData, currentFolder]);
+  }, [myBoardsData, deletedBoardsData]);
 
   useEffect(() => {
     if (folderData.length && currentFolder) {

@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { animated, useSpring } from "@react-spring/web";
 
 import "./FolderList.scss";
 import { FolderItem } from "../folder-item/FolderItem";
-import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
-import { Folder, IFolderResponse } from "~/models/folder.model";
-import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { Folder } from "~/models/folder.model";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type FolderListProps = {
-  currentFolder: Folder;
-  folderIds: string[];
+  selectedFolderIds: string[];
   selectedFolders: Folder[];
-  setFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: Board) => void;
@@ -24,73 +22,28 @@ type FolderListProps = {
 };
 
 export const FolderList: React.FunctionComponent<FolderListProps> = ({
-  currentFolder,
   dragAndDropBoards,
   onDragAndDrop,
   onSetShowModal,
   modalProps,
   onSetModalProps,
   searchText,
-  setFolderIds,
-  folderIds,
+  setSelectedFolderIds,
+  selectedFolderIds,
   setSelectedFolders,
   selectedFolders,
 }) => {
-  const [foldersQuery, setFoldersQuery] = useState<boolean>(false);
-
-  const {
-    data: myFoldersResult,
-    isLoading: getFoldersLoading,
-    error: getFoldersError,
-  } = useGetFoldersQuery(foldersQuery);
-
-  let folderData: Folder[] = [];
-
-  const filterFolderData = (): void => {
-    if (
-      !currentFolder.id ||
-      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
-      currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
-      currentFolder.id == ""
-    ) {
-      folderData = folderData.filter((folder: Folder) => !folder.parentId);
-    } else if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
-      folderData = [];
-    } else if (!!currentFolder && !!currentFolder.id) {
-      folderData = folderData.filter(
-        (folder: Folder) => folder.parentId == currentFolder.id,
-      );
-    } else {
-      console.log("currentFolder undefined, try later or again");
-    }
-  };
-
-  if (getFoldersError) {
-    console.log("error");
-  } else if (getFoldersLoading) {
-    console.log("loading");
-  } else if (myFoldersResult) {
-    folderData = myFoldersResult.map((folder: IFolderResponse) =>
-      new Folder().build(folder),
-    ); // convert folders to Folder[]
-    filterFolderData();
-  }
+  const { folders } = useFoldersNavigation();
 
   const springs = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
   });
 
-  useEffect(() => {
-    setFoldersQuery(
-      currentFolder.id == FOLDER_TYPE.DELETED_BOARDS || !!currentFolder.deleted,
-    );
-  }, [currentFolder]);
-
   const toggleSelect = async (resource: Folder) => {
-    if (folderIds.includes(resource.id)) {
-      setFolderIds(
-        folderIds.filter(
+    if (selectedFolderIds.includes(resource.id)) {
+      setSelectedFolderIds(
+        selectedFolderIds.filter(
           (selectedResource: String) => selectedResource !== resource.id,
         ),
       );
@@ -101,15 +54,15 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
       );
       return;
     }
-    setFolderIds([...folderIds, resource.id]);
+    setSelectedFolderIds([...selectedFolderIds, resource.id]);
     setSelectedFolders([...selectedFolders, resource]);
   };
 
   return (
     <>
-      {folderData?.length ? (
+      {folders?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-          {folderData
+          {folders
             .filter((folder: Folder) => {
               if (searchText === "") {
                 return folder;
@@ -135,9 +88,9 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                       .map((item: Folder) => item.id)
                       .includes(folder.id)}
                     folder={folder}
-                    folders={folderData}
-                    areFoldersLoading={getFoldersLoading}
-                    toggleSelect={toggleSelect}
+                    toggleSelect={() => {
+                      toggleSelect(folder);
+                    }}
                     dragAndDropBoards={dragAndDropBoards}
                     onDragAndDrop={onDragAndDrop}
                     onDisplayModal={onSetShowModal}

@@ -17,8 +17,8 @@ import {
 type props = {
   isOpen: boolean;
   toggle: () => void;
-  boardIds: string[];
-  folderIds: string[];
+  selectedBoardIds: string[];
+  selectedFolderIds: string[];
   isPredelete: boolean;
   reset: () => void;
   hasSharedElement: () => boolean;
@@ -27,8 +27,8 @@ type props = {
 export const DeleteModal: FunctionComponent<props> = ({
   isOpen,
   toggle,
-  boardIds,
-  folderIds,
+  selectedBoardIds,
+  selectedFolderIds,
   isPredelete,
   reset,
   hasSharedElement,
@@ -41,28 +41,28 @@ export const DeleteModal: FunctionComponent<props> = ({
 
   const preDeleteBoardsAndToast = usePredefinedToasts({
     func: preDeleteBoards,
-    parameter: boardIds,
+    parameter: selectedBoardIds,
     successMessage: t("magneto.predelete.elements.confirm"),
     failureMessage: t("magneto.predelete.elements.error"),
   });
 
   const deleteBoardsAndToast = usePredefinedToasts({
     func: deleteBoards,
-    parameter: boardIds,
+    parameter: selectedBoardIds,
     successMessage: t("magneto.delete.elements.confirm"),
     failureMessage: t("magneto.delete.elements.error"),
   });
 
   const preDeleteFoldersAndToast = usePredefinedToasts({
     func: preDeleteFolders,
-    parameter: folderIds,
+    parameter: selectedFolderIds,
     successMessage: t("magneto.predelete.elements.confirm"),
     failureMessage: t("magneto.predelete.elements.error"),
   });
 
   const deleteFoldersAndToast = usePredefinedToasts({
     func: deleteFolders,
-    parameter: folderIds,
+    parameter: selectedFolderIds,
     successMessage: t("magneto.delete.elements.confirm"),
     failureMessage: t("magneto.delete.elements.error"),
   });
@@ -75,29 +75,29 @@ export const DeleteModal: FunctionComponent<props> = ({
   };
 
   const onSubmitPredelete = async (): Promise<void> => {
-    if (boardIds.length > 0) {
+    if (selectedBoardIds.length > 0) {
       preDeleteBoardsAndToast();
       try {
-        if (folderIds.length > 0) {
-          await preDeleteFolders(folderIds); //If we're predeleting folders and boards, only send one notification
+        if (selectedFolderIds.length > 0) {
+          await preDeleteFolders(selectedFolderIds); //If we're predeleting folders and boards, only send one notification
         }
       } catch (error) {
         console.error(error);
       }
-    } else if (folderIds.length > 0) preDeleteFoldersAndToast();
+    } else if (selectedFolderIds.length > 0) preDeleteFoldersAndToast();
   };
 
   const onSubmitDelete = async (): Promise<void> => {
-    if (boardIds.length > 0) {
+    if (selectedBoardIds.length > 0) {
       deleteBoardsAndToast();
       try {
-        if (folderIds.length > 0) {
-          await deleteFolders(folderIds); //If we're predeleting folders and boards, only send one notification
+        if (selectedFolderIds.length > 0) {
+          await deleteFolders(selectedFolderIds); //If we're predeleting folders and boards, only send one notification
         }
       } catch (error) {
         console.error(error);
       }
-    } else if (folderIds.length > 0) deleteFoldersAndToast();
+    } else if (selectedFolderIds.length > 0) deleteFoldersAndToast();
   };
 
   return (

@@ -14,6 +14,7 @@ import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/services/utils/share.utils";
 
 type FolderListProps = {
+  isSelected: boolean;
   folder: Folder;
   toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
@@ -24,6 +25,7 @@ type FolderListProps = {
 };
 
 export const FolderItem: React.FunctionComponent<FolderListProps> = ({
+  isSelected,
   folder,
   dragAndDropBoards,
   onDragAndDrop,
@@ -193,6 +195,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       <div ref={drop} draggable="true" className={isOver ? "drag-over" : ""}>
         <Card
           app={currentApp!}
+          isSelected={isSelected}
           options={{
             type: "folder",
             folderTitle,

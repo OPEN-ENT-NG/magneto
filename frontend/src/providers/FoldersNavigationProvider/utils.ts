@@ -56,3 +56,26 @@ export const prepareFolder = (
       );
   }
 };
+export const prepareFoldersState = (
+  folderData: Folder[],
+  currentFolder: Folder,
+) => {
+  if (
+    !currentFolder.id ||
+    currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+    currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
+    currentFolder.id == ""
+  ) {
+    return folderData.filter((folder: Folder) => !folder.parentId);
+  }
+  if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
+    return [];
+  }
+  if (!!currentFolder && !!currentFolder.id) {
+    return folderData.filter(
+      (folder: Folder) => folder.parentId == currentFolder.id,
+    );
+  }
+  console.log("currentFolder undefined, try later or again");
+  return [];
+};

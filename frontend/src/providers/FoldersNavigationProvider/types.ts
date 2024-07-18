@@ -15,10 +15,6 @@ export interface FolderObjectState {
   deletedFolderObject: FolderTreeNavItem | null;
 }
 
-export interface TriggerFetchState {
-  myFolders: boolean;
-  deletedFolders: boolean;
-}
 export interface FolderNavigationRefs {
   [FOLDER_TYPE.MY_BOARDS]: RefObject<TreeViewHandlers>;
   [FOLDER_TYPE.PUBLIC_BOARDS]: RefObject<TreeViewHandlers>;
@@ -34,7 +30,6 @@ export type FoldersNavigationContextType = {
   setFolderObject: Dispatch<SetStateAction<FolderObjectState>>;
   folders: Folder[];
   setFolders: Dispatch<SetStateAction<Folder[]>>;
-  getFolders: () => void;
   handleSelect: (
     folderId: string,
     folderType: FOLDER_TYPE | "basicFolder",

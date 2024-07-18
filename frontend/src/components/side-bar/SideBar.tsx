@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { SideBarButtons } from "./SideBarButtons";
 import { FOLDER_TYPE } from "../../core/enums/folder-type.enum";
 import { TreeViewContainer } from "../tree-view/TreeViewContainer";
 import { Board } from "~/models/board.model";
-import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type SideBarProps = {
   dragAndDropBoards: Board[];
@@ -25,8 +24,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
   toggleDrawer,
   className,
 }) => {
-  const { getFolders } = useFoldersNavigation();
-
   const reducer = (
     state: { fileList: any[] },
     action: { type: any; dropDepth: any; inDropZone: any; files: any },
@@ -48,10 +45,6 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
     inDropZone: false,
     fileList: [],
   });
-
-  useEffect(() => {
-    getFolders();
-  }, []);
 
   return (
     <>

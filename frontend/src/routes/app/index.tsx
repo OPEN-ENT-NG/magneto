@@ -7,9 +7,9 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useTranslation } from "react-i18next";
 
-import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
+import { EmptyState } from "~/components/empty-state/EmptyState";
 import { FolderList } from "~/components/folder-list/FolderList";
 import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
@@ -40,9 +40,9 @@ export const App = () => {
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
   const { currentFolder } = useFoldersNavigation();
-  const [boardIds, setBoardIds] = useState<string[]>([]);
+  const [selectedBoardIds, setSelectedBoardIds] = useState<string[]>([]);
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
-  const [folderIds, setFolderIds] = useState<string[]>([]);
+  const [selectedFolderIds, setSelectedFolderIds] = useState<string[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
   const [dragAndDropBoards, setDragAndDropBoards] = useState<Board[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -57,14 +57,13 @@ export const App = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
-  const [, setHasEmptyState] = useState<boolean>(false);
-  // let hasEmptyState;
+  const { folders } = useFoldersNavigation();
 
   const resetBoardsAndFolders = () => {
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);
-    setBoardIds([]);
-    setFolderIds([]);
+    setSelectedBoardIds([]);
+    setSelectedFolderIds([]);
     setSelectedBoards([]);
     setSelectedFolders([]);
   };
@@ -72,10 +71,6 @@ export const App = () => {
   useEffect(() => {
     resetBoardsAndFolders();
   }, [currentFolder]);
-
-  useEffect(() => {
-    setHasEmptyState(!boardIds.length && !folderIds.length);
-  }, [boardIds, folderIds]);
 
   const handleDragAndDropBoards = (board: Board) => {
     if (
@@ -145,11 +140,15 @@ export const App = () => {
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}
             />
+
+            {!folders.length ? (
+              <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
+            ) : null}
+
             <FolderList
-              currentFolder={currentFolder}
-              folderIds={folderIds}
+              selectedFolderIds={selectedFolderIds}
               selectedFolders={selectedFolders}
-              setFolderIds={setFolderIds}
+              setSelectedFolderIds={setSelectedFolderIds}
               setSelectedFolders={setSelectedFolders}
               searchText={searchText}
               dragAndDropBoards={dragAndDropBoards}
@@ -158,23 +157,25 @@ export const App = () => {
               modalProps={modalProps}
               onSetModalProps={setModalProps}
             />
-            <BoardList
+            {/* <BoardList
+              boards={boards}
+              setBoards={setBoards}
               currentFolder={currentFolder}
-              boardIds={boardIds}
+              selectedBoardIds={selectedBoardIds}
               selectedBoards={selectedBoards}
-              setBoardIds={setBoardIds}
+              setSelectedBoardIds={setSelectedBoardIds}
               setSelectedBoards={setSelectedBoards}
               searchText={searchText}
               onDragAndDrop={handleDragAndDropBoards}
-            />
+            /> */}
             <ToasterContainer
               isToasterOpen={
                 selectedBoards.length > 0 || selectedFolders.length > 0
               }
               boards={selectedBoards}
               folders={selectedFolders}
-              boardIds={boardIds}
-              folderIds={folderIds}
+              selectedBoardIds={selectedBoardIds}
+              selectedFolderIds={selectedFolderIds}
               currentFolder={currentFolder}
               reset={resetBoardsAndFolders}
             />

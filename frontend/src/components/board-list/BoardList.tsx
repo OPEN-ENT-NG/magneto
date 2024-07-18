@@ -17,26 +17,30 @@ import {
 } from "~/services/api/boards.service";
 
 type BoardListProps = {
+  boards: Board[];
+  setBoards: (boards: Board[]) => void;
   currentFolder: Folder;
-  boardIds: string[];
+  selectedBoardIds: string[];
   selectedBoards: Board[];
-  setBoardIds: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedBoardIds: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
   onDragAndDrop: (board: Board) => void;
   searchText: string;
 };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
+  boards,
+  setBoards,
   currentFolder,
-  boardIds,
+  selectedBoardIds,
   selectedBoards,
-  setBoardIds,
+  setSelectedBoardIds,
   setSelectedBoards,
   onDragAndDrop,
   searchText,
 }) => {
-  let boardData;
-  let allBoardData;
+  let boardData: Board[];
+  let allBoardData: Board[];
   const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
     isPublic: false,
     isShared: true,
@@ -112,9 +116,9 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   }
 
   async function toggleSelect(resource: Board) {
-    if (boardIds.includes(resource.id)) {
-      setBoardIds(
-        boardIds.filter(
+    if (selectedBoardIds.includes(resource.id)) {
+      setSelectedBoardIds(
+        selectedBoardIds.filter(
           (selectedResource: string) => selectedResource !== resource.id,
         ),
       );
@@ -125,7 +129,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
       );
       return;
     }
-    setBoardIds([...boardIds, resource.id]);
+    setSelectedBoardIds([...selectedBoardIds, resource.id]);
     setSelectedBoards([...selectedBoards, resource]);
   }
 
@@ -144,13 +148,15 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
     );
   }
 
-  const boardsToDisplay = searchText !== "" ? allBoardData : boardData;
+  useEffect(() => {
+    setBoards(searchText !== "" ? allBoardData : boardData);
+  }, [searchText]);
 
   return (
     <>
-      {boardsToDisplay?.length ? (
+      {boards?.length ? (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-          {boardsToDisplay
+          {boards
             .filter((board: Board) => {
               if (searchText === "") {
                 return board;
@@ -172,7 +178,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                   <BoardItem
                     board={board}
                     areBoardsLoading={getBoardsLoading}
-                    boardIds={boardIds}
+                    selectedBoardIds={selectedBoardIds}
                     onDragAndDropBoard={onDragAndDrop}
                     onSelect={toggleSelect}
                   />

@@ -56,13 +56,13 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   const { currentData: myAllBoardsResult } =
     useGetAllBoardsQuery(allBoardsQuery);
 
-  useEffect(() => {
+  function manageBoardsQueryParameters() {
     if (
-      !currentFolder.id ||
-      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
-      currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
-      currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
-      currentFolder.id == ""
+        !currentFolder.id ||
+        currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+        currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
+        currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
+        currentFolder.id == ""
     ) {
       setBoardsQuery((prevBoardsQuery: any) => ({
         ...prevBoardsQuery,
@@ -80,6 +80,10 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     } else {
       console.log("currentFolder undefined, try later or again");
     }
+  }
+
+  useEffect(() => {
+    manageBoardsQueryParameters();
   }, [currentFolder]);
 
   useEffect(() => {

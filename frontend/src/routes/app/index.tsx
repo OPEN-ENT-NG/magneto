@@ -144,8 +144,7 @@ export const App = () => {
 
             {!folders.length ? (
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
-            ): null
-            }
+            ) : null}
 
             <FolderList
               selectedFolderIds={selectedFolderIds}
@@ -160,7 +159,6 @@ export const App = () => {
               onSetModalProps={setModalProps}
             />
             <BoardList
-              currentFolder={currentFolder}
               selectedBoardIds={selectedBoardIds}
               selectedBoards={selectedBoards}
               setSelectedBoardIds={setSelectedBoardIds}
@@ -188,7 +186,6 @@ export const App = () => {
               onSubmit={modalProps.onSubmit}
               onCancel={modalProps.onCancel}
             ></MessageModal>
-
           </Grid.Col>
         </Grid>
       </DndProvider>

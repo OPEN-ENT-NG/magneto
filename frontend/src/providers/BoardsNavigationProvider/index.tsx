@@ -7,26 +7,28 @@ import {
   useState,
 } from "react";
 
-import { useTranslation } from "react-i18next";
-
 import {
   BoardsNavigationContextType,
   BoardsNavigationProviderProps,
 } from "./types";
-import {
-  prepareBoardsState,
-} from "./utils";
-import { Board, IBoardsParamsRequest } from "~/models/board.model";
+import { prepareBoardsState } from "./utils";
 import { useFoldersNavigation } from "../FoldersNavigationProvider";
-import { useGetAllBoardsQuery, useGetBoardsQuery } from "~/services/api/boards.service";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { Board, IBoardsParamsRequest } from "~/models/board.model";
+import {
+  useGetAllBoardsQuery,
+  useGetBoardsQuery,
+} from "~/services/api/boards.service";
 
-const BoardsNavigationContext = createContext<BoardsNavigationContextType | null>(null);
+const BoardsNavigationContext =
+  createContext<BoardsNavigationContextType | null>(null);
 
 export const useBoardsNavigation = () => {
   const context = useContext(BoardsNavigationContext);
   if (!context) {
-      throw new Error("useBoardsNavigation must be used within a BoardsNavigationProvider");
+    throw new Error(
+      "useBoardsNavigation must be used within a BoardsNavigationProvider",
+    );
   }
   return context;
 };
@@ -35,7 +37,6 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   children,
 }) => {
   const { currentFolder } = useFoldersNavigation();
-  console.log(currentFolder);
   const [boards, setBoards] = useState<Board[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
@@ -51,9 +52,9 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     sortBy: "modificationDate",
   };
 
-
   const { currentData: myBoardsResult } = useGetBoardsQuery(boardsQuery);
-  const { currentData: myAllBoardsResult } = useGetAllBoardsQuery(allBoardsQuery);
+  const { currentData: myAllBoardsResult } =
+    useGetAllBoardsQuery(allBoardsQuery);
 
   useEffect(() => {
     if (
@@ -82,28 +83,26 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   }, [currentFolder]);
 
   useEffect(() => {
-    console.log(myBoardsResult);
-    console.log(myAllBoardsResult);
-      if (!!myBoardsResult && !!currentFolder && (searchText === "")) {
-        setBoards(prepareBoardsState(myBoardsResult, currentFolder));
-      } else if (!!myAllBoardsResult && !!currentFolder && (searchText !== "")) {
-        setBoards(prepareBoardsState(myAllBoardsResult, currentFolder));
-      }
-  }, [ myBoardsResult, myAllBoardsResult, currentFolder]);
+    if (!!myBoardsResult && !!currentFolder && searchText === "") {
+      setBoards(prepareBoardsState(myBoardsResult));
+    } else if (!!myAllBoardsResult && !!currentFolder && searchText !== "") {
+      setBoards(prepareBoardsState(myAllBoardsResult));
+    }
+  }, [myBoardsResult, myAllBoardsResult, currentFolder]);
 
   const value = useMemo<BoardsNavigationContextType>(
-      () => ({
-          boards,
-          setBoards,
-          searchText,
-          setSearchText
-      }),
-      [boards, setBoards, searchText, setSearchText]
+    () => ({
+      boards,
+      setBoards,
+      searchText,
+      setSearchText,
+    }),
+    [boards, setBoards, searchText, setSearchText],
   );
 
   return (
-      <BoardsNavigationContext.Provider value={value}>
-          {children}
-      </BoardsNavigationContext.Provider>
+    <BoardsNavigationContext.Provider value={value}>
+      {children}
+    </BoardsNavigationContext.Provider>
   );
 };

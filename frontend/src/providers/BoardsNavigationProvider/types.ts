@@ -12,4 +12,3 @@ export type BoardsNavigationContextType = {
   searchText: string;
   setSearchText: Dispatch<SetStateAction<string>>;
 };
-

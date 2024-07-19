@@ -11,11 +11,11 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 
+import { BoardsNavigationProvider } from "./providers/BoardsNavigationProvider";
 import { FoldersNavigationProvider } from "./providers/FoldersNavigationProvider";
 import { router } from "./routes";
 import { setupStore } from "./store";
 import "~/i18n";
-import { BoardsNavigationProvider } from "./providers/BoardsNavigationProvider";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement!);

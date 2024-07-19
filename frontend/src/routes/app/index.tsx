@@ -174,7 +174,6 @@ export const App = () => {
               folders={selectedFolders}
               boardIds={selectedBoardIds}
               folderIds={selectedFolderIds}
-              currentFolder={currentFolder}
               reset={resetBoardsAndFolders}
             />
             <CreateBoard isOpen={isOpen} toggle={toggle} />

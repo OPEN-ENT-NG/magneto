@@ -142,9 +142,9 @@ export const App = () => {
               SVGLeft={<Icon path={mdiFolder} />}
             />
 
-            {(!folders.length) ?
+            {!folders.length ? (
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
-              : null
+            ): null
             }
 
             <FolderList
@@ -160,8 +160,6 @@ export const App = () => {
               onSetModalProps={setModalProps}
             />
             <BoardList
-              // boards={boards}
-              // setBoards={setBoards}
               currentFolder={currentFolder}
               selectedBoardIds={selectedBoardIds}
               selectedBoards={selectedBoards}
@@ -176,8 +174,8 @@ export const App = () => {
               }
               boards={selectedBoards}
               folders={selectedFolders}
-              selectedBoardIds={selectedBoardIds}
-              selectedFolderIds={selectedFolderIds}
+              boardIds={selectedBoardIds}
+              folderIds={selectedFolderIds}
               currentFolder={currentFolder}
               reset={resetBoardsAndFolders}
             />

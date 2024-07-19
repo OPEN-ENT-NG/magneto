@@ -15,6 +15,7 @@ import { FoldersNavigationProvider } from "./providers/FoldersNavigationProvider
 import { router } from "./routes";
 import { setupStore } from "./store";
 import "~/i18n";
+import { BoardsNavigationProvider } from "./providers/BoardsNavigationProvider";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement!);
@@ -53,7 +54,9 @@ root.render(
       >
         <ThemeProvider>
           <FoldersNavigationProvider>
-            <RouterProvider router={router} />
+            <BoardsNavigationProvider>
+              <RouterProvider router={router} />
+            </BoardsNavigationProvider>
           </FoldersNavigationProvider>
         </ThemeProvider>
       </OdeClientProvider>

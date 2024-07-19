@@ -7,6 +7,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useTranslation } from "react-i18next";
 
+import { BoardList } from "~/components/board-list/BoardList";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
 import { EmptyState } from "~/components/empty-state/EmptyState";
@@ -157,26 +158,22 @@ export const App = () => {
               modalProps={modalProps}
               onSetModalProps={setModalProps}
             />
-            {/* <BoardList
-              boards={boards}
-              setBoards={setBoards}
-              currentFolder={currentFolder}
+            <BoardList
               selectedBoardIds={selectedBoardIds}
               selectedBoards={selectedBoards}
               setSelectedBoardIds={setSelectedBoardIds}
               setSelectedBoards={setSelectedBoards}
               searchText={searchText}
               onDragAndDrop={handleDragAndDropBoards}
-            /> */}
+            />
             <ToasterContainer
               isToasterOpen={
                 selectedBoards.length > 0 || selectedFolders.length > 0
               }
               boards={selectedBoards}
               folders={selectedFolders}
-              selectedBoardIds={selectedBoardIds}
-              selectedFolderIds={selectedFolderIds}
-              currentFolder={currentFolder}
+              boardIds={selectedBoardIds}
+              folderIds={selectedFolderIds}
               reset={resetBoardsAndFolders}
             />
             <CreateBoard isOpen={isOpen} toggle={toggle} />

@@ -33,7 +33,6 @@ export interface ToasterContainerProps {
   folders: Folder[];
   boardIds: string[];
   folderIds: string[];
-  currentFolder: Folder;
   reset: () => void;
 }
 export const ToasterContainer = ({
@@ -42,7 +41,6 @@ export const ToasterContainer = ({
   folders,
   boardIds,
   folderIds,
-  currentFolder,
   reset,
 }: ToasterContainerProps) => {
   const { t } = useTranslation("magneto");
@@ -60,7 +58,7 @@ export const ToasterContainer = ({
 
   const [duplicateBoard] = useDuplicateBoardMutation();
 
-  const { folders: allFolders } = useFoldersNavigation();
+  const { folders: allFolders, currentFolder } = useFoldersNavigation();
 
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
     boardIds: boardIds,

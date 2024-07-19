@@ -58,11 +58,11 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
 
   function manageBoardsQueryParameters() {
     if (
-        !currentFolder.id ||
-        currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
-        currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
-        currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
-        currentFolder.id == ""
+      !currentFolder.id ||
+      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+      currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
+      currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
+      currentFolder.id == ""
     ) {
       setBoardsQuery((prevBoardsQuery: any) => ({
         ...prevBoardsQuery,

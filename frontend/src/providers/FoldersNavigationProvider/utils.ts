@@ -63,11 +63,9 @@ export const prepareFoldersState = (
     currentFolder.id == ""
   ) {
     return folderData.filter((folder: Folder) => !folder.parentId);
-  }
-  if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
+  } else if (currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS) {
     return [];
-  }
-  if (!!currentFolder && !!currentFolder.id) {
+  } else if (!!currentFolder && !!currentFolder.id) {
     return folderData.filter(
       (folder: Folder) => folder.parentId == currentFolder.id,
     );

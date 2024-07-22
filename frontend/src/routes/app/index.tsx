@@ -22,9 +22,8 @@ import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import "./index.scss";
-import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import { boardsApi } from "~/services/api/boards.service";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 export interface AppProps {
   _id: string;

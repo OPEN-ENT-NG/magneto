@@ -16,7 +16,6 @@ import { UserRights } from "~/services/utils/share.utils";
 type FolderListProps = {
   isSelected: boolean;
   folder: Folder;
-  toggleSelect: (folder: Folder) => void;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: any) => void;
   onDisplayModal: (show: boolean) => void;
@@ -32,13 +31,12 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   onDisplayModal,
   modalData,
   onSetModalData,
-  toggleSelect,
 }) => {
   const { currentApp, user } = useOdeClient();
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [hasDrop, setHasDrop] = useState<boolean>(false);
-  const { folders, handleSelect } = useFoldersNavigation();
+  const { folders, handleSelect, toggleSelect } = useFoldersNavigation();
 
   const folderTitle = folder.title;
 

@@ -11,4 +11,9 @@ export type BoardsNavigationContextType = {
   setBoards: Dispatch<SetStateAction<Board[]>>;
   searchText: string;
   setSearchText: Dispatch<SetStateAction<string>>;
+  selectedBoardsIds: string[];
+  selectedBoards: Board[];
+  setSelectedBoardsIds: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
+  toggleSelect: (resource: Board) => void;
 };

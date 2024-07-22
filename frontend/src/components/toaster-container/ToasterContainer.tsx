@@ -21,6 +21,7 @@ import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
 import { useRestoreBoardsAndFolders } from "~/hooks/useRestoreBoardsAndFolders";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
@@ -28,21 +29,9 @@ import { useUserRightsStore } from "~/stores";
 import { checkUserRight } from "~/utils/checkUserRight";
 
 export interface ToasterContainerProps {
-  isToasterOpen: boolean;
-  boards: Board[];
-  folders: Folder[];
-  boardIds: string[];
-  folderIds: string[];
   reset: () => void;
 }
-export const ToasterContainer = ({
-  isToasterOpen,
-  boards,
-  folders,
-  boardIds,
-  folderIds,
-  reset,
-}: ToasterContainerProps) => {
+export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   const { t } = useTranslation("magneto");
   const { data: actions } = useActions();
   const canPublish = isActionAvailable("publish", actions);
@@ -55,16 +44,16 @@ export const ToasterContainer = ({
   const [isShareBoard, toggleShareBoard] = useToggle(false);
   const [boardPublicShareModal, toggleBoardPublicShareModal] = useToggle(false);
   const [shareOptions, setShareOptions] = useState();
-
+  const { folders, currentFolder, selectedFolders, selectedFoldersIds } =
+    useFoldersNavigation();
+  const { boards, selectedBoardsIds, selectedBoards } = useBoardsNavigation();
   const [duplicateBoard] = useDuplicateBoardMutation();
 
-  const { folders: allFolders, currentFolder } = useFoldersNavigation();
-
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
-    boardIds: boardIds,
-    folderIds: folderIds,
+    selectedBoardsIds,
+    selectedFoldersIds,
   });
-
+  const isToasterOpen = selectedBoards.length > 0 || selectedFolders.length > 0;
   const transition = useTransition(isToasterOpen, {
     from: { opacity: 0, transform: "translateY(100%)" },
     enter: { opacity: 1, transform: "translateY(0)" },
@@ -82,7 +71,7 @@ export const ToasterContainer = ({
   const isMyBoards = () => {
     return (
       currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
-      allFolders.some(
+      folders.some(
         (folder: Folder) => folder.id === currentFolder.id && !folder.deleted,
       )
     );
@@ -91,7 +80,7 @@ export const ToasterContainer = ({
   const isTrash = () => {
     return (
       currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
-      allFolders.some(
+      folders.some(
         (folder: Folder) => folder.id === currentFolder.id && folder.deleted,
       )
     );
@@ -113,11 +102,11 @@ export const ToasterContainer = ({
   };
 
   const allFoldersMine = () => {
-    if (folders == null) {
+    if (selectedFolders == null) {
       return false;
     }
     return (
-      folders.filter((folder: Folder) => {
+      selectedFolders.filter((folder: Folder) => {
         if (folder.ownerId != userId) return folder;
       }).length == 0
     );
@@ -129,7 +118,7 @@ export const ToasterContainer = ({
 
   const hasDuplicationRight = () => {
     const oneBoardSelectedOnly: boolean =
-      boardIds.length == 1 && folderIds.length == 0;
+      selectedBoardsIds.length == 1 && selectedFoldersIds.length == 0;
     const isOwnedOrPublicOrShared: boolean =
       allBoardsMine() ||
       boards[0].isPublished; /*|| boards[0].myRights.contrib*/
@@ -139,17 +128,21 @@ export const ToasterContainer = ({
   const hasShareRight = () => {
     const oneOwnBoardSelectedOnly: boolean =
       isMyBoards() &&
-      boardIds.length == 1 &&
-      folderIds.length == 0 &&
+      selectedBoardsIds.length == 1 &&
+      selectedFoldersIds.length == 0 &&
       allBoardsMine();
     const oneOwnFolderSelectedOnly: boolean =
-      folderIds.length == 1 && boardIds.length == 0 && allFoldersMine();
+      selectedFoldersIds.length == 1 &&
+      selectedBoardsIds.length == 0 &&
+      allFoldersMine();
     return oneOwnBoardSelectedOnly || oneOwnFolderSelectedOnly;
   };
 
   const hasRenameRight = () => {
     const isMyBoardsAndOneFolderSelectedOnly: boolean =
-      isMyBoards() && folderIds.length == 1 && boardIds.length == 0;
+      isMyBoards() &&
+      selectedFoldersIds.length == 1 &&
+      selectedBoardsIds.length == 0;
     const isFolderOwnerOrSharedWithRights: boolean =
       allBoardsMine() || folderHasShareRight(folders[0], "manager");
 
@@ -181,21 +174,21 @@ export const ToasterContainer = ({
   };
 
   const openShareModal = async () => {
-    if (boardIds.length > 0) {
+    if (selectedBoardsIds.length > 0) {
       const userRights = await checkUserRight(boards[0].rights);
       const { setUserRights } = useUserRightsStore.getState();
       setUserRights(userRights);
       setShareOptions({
         resourceCreatorId: userId,
-        resourceId: boardIds[0],
+        resourceId: selectedBoardsIds[0],
         resourceRights: [boards[0].rights],
       } as any);
       toggleShareBoard();
-    } else if (folderIds.length > 0) {
+    } else if (selectedFoldersIds.length > 0) {
       setShareOptions({
         resourceCreatorId: userId,
-        resourceId: folderIds[0],
-        resourceRights: [folders[0].rights],
+        resourceId: selectedFoldersIds[0],
+        resourceRights: [selectedFolders[0].rights],
       } as any);
       toggleShareFolder();
     }
@@ -211,19 +204,21 @@ export const ToasterContainer = ({
               style={style}
             >
               <ActionBar>
-                {!isTrash() && boardIds.length + folderIds.length == 1 && (
-                  <Button
-                    type="button"
-                    color="primary"
-                    variant="filled"
-                    onClick={function Ga() {}}
-                  >
-                    {t("magneto.open")}
-                  </Button>
-                )}
+                {!isTrash() &&
+                  selectedBoardsIds.length + selectedFoldersIds.length == 1 && (
+                    <Button
+                      type="button"
+                      color="primary"
+                      variant="filled"
+                      onClick={function Ga() {}}
+                    >
+                      {t("magneto.open")}
+                    </Button>
+                  )}
                 {isMyBoards() &&
-                  boardIds.length == 1 &&
-                  folderIds.length == 0 /*&& boards[0].myRights.manager*/ && (
+                  selectedBoardsIds.length == 1 &&
+                  selectedFoldersIds.length ==
+                    0 /*&& boards[0].myRights.manager*/ && (
                     <Button
                       type="button"
                       color="primary"
@@ -239,7 +234,7 @@ export const ToasterContainer = ({
                     color="primary"
                     variant="filled"
                     onClick={() => {
-                      duplicateBoard(boardIds[0]);
+                      duplicateBoard(selectedBoardsIds[0]);
                       reset();
                     }}
                   >
@@ -247,8 +242,8 @@ export const ToasterContainer = ({
                   </Button>
                 )}
                 {isMyBoards() &&
-                  boardIds.length > 0 &&
-                  folderIds.length == 0 &&
+                  selectedBoardsIds.length > 0 &&
+                  selectedFoldersIds.length == 0 &&
                   allBoardsMine() && (
                     <Button
                       type="button"
@@ -281,8 +276,8 @@ export const ToasterContainer = ({
                 )}
                 {!(currentFolder.rights.length > 1) &&
                   isMyBoards() &&
-                  boardIds.length == 1 &&
-                  folderIds.length == 0 &&
+                  selectedBoardsIds.length == 1 &&
+                  selectedFoldersIds.length == 0 &&
                   allBoardsMine() &&
                   canPublish &&
                   !boards[0].isPublished && (
@@ -296,8 +291,8 @@ export const ToasterContainer = ({
                     </Button>
                   )}
                 {isMyBoards() &&
-                  boardIds.length == 1 &&
-                  folderIds.length == 0 &&
+                  selectedBoardsIds.length == 1 &&
+                  selectedFoldersIds.length == 0 &&
                   allBoardsMine() &&
                   canPublish &&
                   boards[0].isPublished && (
@@ -357,8 +352,6 @@ export const ToasterContainer = ({
           <DeleteModal
             isOpen={isMoveDelete}
             toggle={toggleDelete}
-            boardIds={boardIds}
-            folderIds={folderIds}
             isPredelete={currentFolder.id != FOLDER_TYPE.DELETED_BOARDS}
             reset={reset}
             hasSharedElement={hasSharedElement}
@@ -376,12 +369,12 @@ export const ToasterContainer = ({
           />
         </>
       )}
-      {folders != null && (
+      {selectedFolders != null && (
         <>
           <CreateFolder
             isOpen={isCreateFolder}
             toggle={toggleCreateFolder}
-            folderToUpdate={folders[0]}
+            folderToUpdate={selectedFolders[0]}
             reset={reset}
           />
           <ShareModalMagneto

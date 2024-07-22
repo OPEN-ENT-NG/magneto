@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { Button, Modal } from "@edifice-ui/react";
 
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import {
   usePreDeleteBoardsMutation,
   useDeleteBoardsMutation,
@@ -17,8 +19,6 @@ import {
 type props = {
   isOpen: boolean;
   toggle: () => void;
-  selectedBoardIds: string[];
-  selectedFolderIds: string[];
   isPredelete: boolean;
   reset: () => void;
   hasSharedElement: () => boolean;
@@ -27,8 +27,6 @@ type props = {
 export const DeleteModal: FunctionComponent<props> = ({
   isOpen,
   toggle,
-  selectedBoardIds,
-  selectedFolderIds,
   isPredelete,
   reset,
   hasSharedElement,
@@ -38,31 +36,32 @@ export const DeleteModal: FunctionComponent<props> = ({
   const [preDeleteFolders] = usePreDeleteFoldersMutation();
   const [deleteBoards] = useDeleteBoardsMutation();
   const [deleteFolders] = useDeleteFoldersMutation();
-
+  const { selectedFoldersIds } = useFoldersNavigation();
+  const { selectedBoardsIds } = useBoardsNavigation();
   const preDeleteBoardsAndToast = usePredefinedToasts({
     func: preDeleteBoards,
-    parameter: selectedBoardIds,
+    parameter: selectedBoardsIds,
     successMessage: t("magneto.predelete.elements.confirm"),
     failureMessage: t("magneto.predelete.elements.error"),
   });
 
   const deleteBoardsAndToast = usePredefinedToasts({
     func: deleteBoards,
-    parameter: selectedBoardIds,
+    parameter: selectedBoardsIds,
     successMessage: t("magneto.delete.elements.confirm"),
     failureMessage: t("magneto.delete.elements.error"),
   });
 
   const preDeleteFoldersAndToast = usePredefinedToasts({
     func: preDeleteFolders,
-    parameter: selectedFolderIds,
+    parameter: selectedFoldersIds,
     successMessage: t("magneto.predelete.elements.confirm"),
     failureMessage: t("magneto.predelete.elements.error"),
   });
 
   const deleteFoldersAndToast = usePredefinedToasts({
     func: deleteFolders,
-    parameter: selectedFolderIds,
+    parameter: selectedFoldersIds,
     successMessage: t("magneto.delete.elements.confirm"),
     failureMessage: t("magneto.delete.elements.error"),
   });
@@ -75,29 +74,29 @@ export const DeleteModal: FunctionComponent<props> = ({
   };
 
   const onSubmitPredelete = async (): Promise<void> => {
-    if (selectedBoardIds.length > 0) {
+    if (selectedBoardsIds.length > 0) {
       preDeleteBoardsAndToast();
       try {
-        if (selectedFolderIds.length > 0) {
-          await preDeleteFolders(selectedFolderIds); //If we're predeleting folders and boards, only send one notification
+        if (selectedFoldersIds.length > 0) {
+          await preDeleteFolders(selectedFoldersIds); //If we're predeleting folders and boards, only send one notification
         }
       } catch (error) {
         console.error(error);
       }
-    } else if (selectedFolderIds.length > 0) preDeleteFoldersAndToast();
+    } else if (selectedFoldersIds.length > 0) preDeleteFoldersAndToast();
   };
 
   const onSubmitDelete = async (): Promise<void> => {
-    if (selectedBoardIds.length > 0) {
+    if (selectedBoardsIds.length > 0) {
       deleteBoardsAndToast();
       try {
-        if (selectedFolderIds.length > 0) {
-          await deleteFolders(selectedFolderIds); //If we're predeleting folders and boards, only send one notification
+        if (selectedFoldersIds.length > 0) {
+          await deleteFolders(selectedFoldersIds); //If we're predeleting folders and boards, only send one notification
         }
       } catch (error) {
         console.error(error);
       }
-    } else if (selectedFolderIds.length > 0) deleteFoldersAndToast();
+    } else if (selectedFoldersIds.length > 0) deleteFoldersAndToast();
   };
 
   return (

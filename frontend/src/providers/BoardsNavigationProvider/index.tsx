@@ -1,6 +1,7 @@
 import {
   FC,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -38,6 +39,8 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
 }) => {
   const { currentFolder } = useFoldersNavigation();
   const [boards, setBoards] = useState<Board[]>([]);
+  const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
+  const [selectedBoardsIds, setSelectedBoardsIds] = useState<string[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
     isPublic: false,
@@ -45,6 +48,7 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     isDeleted: false,
     sortBy: "modificationDate",
   });
+
   const allBoardsQuery = {
     isPublic: false,
     isShared: true,
@@ -82,6 +86,27 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     }
   }
 
+  const toggleSelect = useCallback(
+    (resource: Board) => {
+      if (selectedBoardsIds.includes(resource.id)) {
+        setSelectedBoardsIds(
+          selectedBoardsIds.filter(
+            (selectedResource: string) => selectedResource !== resource.id,
+          ),
+        );
+        setSelectedBoards(
+          selectedBoards.filter(
+            (selectedResource) => selectedResource.id !== resource.id,
+          ),
+        );
+        return;
+      }
+      setSelectedBoardsIds([...selectedBoardsIds, resource.id]);
+      setSelectedBoards([...selectedBoards, resource]);
+    },
+    [selectedBoards, selectedBoardsIds],
+  );
+
   useEffect(() => {
     manageBoardsQueryParameters();
   }, [currentFolder]);
@@ -96,12 +121,17 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
 
   const value = useMemo<BoardsNavigationContextType>(
     () => ({
+      selectedBoards,
+      setSelectedBoards,
+      selectedBoardsIds,
+      setSelectedBoardsIds,
       boards,
       setBoards,
       searchText,
       setSearchText,
+      toggleSelect,
     }),
-    [boards, setBoards, searchText, setSearchText],
+    [boards, searchText, selectedBoards, selectedBoardsIds, toggleSelect],
   );
 
   return (

@@ -8,19 +8,11 @@ import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 
 type BoardListProps = {
-  selectedBoardIds: string[];
-  selectedBoards: Board[];
-  setSelectedBoardIds: React.Dispatch<React.SetStateAction<string[]>>;
-  setSelectedBoards: React.Dispatch<React.SetStateAction<Board[]>>;
   onDragAndDrop: (board: Board) => void;
   searchText: string;
 };
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
-  selectedBoardIds,
-  selectedBoards,
-  setSelectedBoardIds,
-  setSelectedBoards,
   onDragAndDrop,
   searchText,
 }) => {
@@ -30,24 +22,6 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   });
 
   const { boards } = useBoardsNavigation();
-
-  async function toggleSelect(resource: Board) {
-    if (selectedBoardIds.includes(resource.id)) {
-      setSelectedBoardIds(
-        selectedBoardIds.filter(
-          (selectedResource: string) => selectedResource !== resource.id,
-        ),
-      );
-      setSelectedBoards(
-        selectedBoards.filter(
-          (selectedResource) => selectedResource.id !== resource.id,
-        ),
-      );
-      return;
-    }
-    setSelectedBoardIds([...selectedBoardIds, resource.id]);
-    setSelectedBoards([...selectedBoards, resource]);
-  }
 
   function isInFilter(board: Board) {
     if (
@@ -87,12 +61,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                     ...springs,
                   }}
                 >
-                  <BoardItem
-                    board={board}
-                    selectedBoardIds={selectedBoardIds}
-                    onDragAndDropBoard={onDragAndDrop}
-                    onSelect={toggleSelect}
-                  />
+                  <BoardItem board={board} onDragAndDropBoard={onDragAndDrop} />
                 </animated.li>
               );
             })}

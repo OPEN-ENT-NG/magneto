@@ -15,6 +15,8 @@ import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
 
 import "./BoardItem.scss";
+import { Board } from "~/models/board.model";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 
 interface BoardItemProps {
   board: {
@@ -27,19 +29,16 @@ interface BoardItemProps {
     modificationDate: string;
     isPublished: boolean;
   };
-  selectedBoardIds: string[];
   onDragAndDropBoard: (board: any) => void;
-  onSelect: (board: any) => void;
 }
 
 export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   board,
-  selectedBoardIds,
   onDragAndDropBoard,
-  onSelect,
 }) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation("magneto");
+  const { selectedBoardsIds, toggleSelect } = useBoardsNavigation();
 
   const userId = user ? user?.userId : "";
 
@@ -77,8 +76,8 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
         }}
         isLoading={false}
         isSelectable={true}
-        isSelected={selectedBoardIds.includes(board.id)}
-        onSelect={() => onSelect(board)}
+        isSelected={selectedBoardsIds.includes(board.id)}
+        onSelect={() => toggleSelect(board as Board)}
       >
         <Card.Body flexDirection={"column"}>
           <Card.Image

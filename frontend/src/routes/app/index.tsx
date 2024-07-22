@@ -22,6 +22,7 @@ import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import "./index.scss";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 export interface AppProps {
@@ -59,6 +60,7 @@ export const App = () => {
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
   const { folders } = useFoldersNavigation();
+  const { boards } = useBoardsNavigation();
 
   const resetBoardsAndFolders = () => {
     setSearchText("");
@@ -142,7 +144,7 @@ export const App = () => {
               SVGLeft={<Icon path={mdiFolder} />}
             />
 
-            {!folders.length ? (
+            {!folders.length && !boards.length ? (
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
             ) : null}
 

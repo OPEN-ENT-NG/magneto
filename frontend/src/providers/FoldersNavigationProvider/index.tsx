@@ -53,6 +53,8 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   const [folderObject, setFolderObject] =
     useState<FolderObjectState>(initialFolderObject);
   const [folders, setFolders] = useState<Folder[]>([]);
+  const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
+  const [selectedFoldersIds, setSelectedFoldersIds] = useState<string[]>([]);
   const { currentData: myBoardsData } = useGetFoldersQuery(false);
   const { currentData: deletedBoardsData } = useGetFoldersQuery(true);
 
@@ -94,7 +96,28 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
         return newFolder;
       });
     },
-    [currentFolder, folderData, folderNavigationRefs],
+    [currentFolder.id, folderData, folderNavigationRefs, t],
+  );
+
+  const toggleSelect = useCallback(
+    (resource: Folder) => {
+      if (selectedFoldersIds.includes(resource.id)) {
+        setSelectedFoldersIds(
+          selectedFoldersIds.filter(
+            (selectedResource: String) => selectedResource !== resource.id,
+          ),
+        );
+        setSelectedFolders(
+          selectedFolders.filter(
+            (selectedResource) => selectedResource.id !== resource.id,
+          ),
+        );
+        return;
+      }
+      setSelectedFoldersIds([...selectedFoldersIds, resource.id]);
+      setSelectedFolders([...selectedFolders, resource]);
+    },
+    [selectedFolders, selectedFoldersIds],
   );
 
   const processFolders = useCallback(
@@ -154,6 +177,11 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       setFolderObject,
       folders,
       setFolders,
+      selectedFolders,
+      setSelectedFolders,
+      selectedFoldersIds,
+      setSelectedFoldersIds,
+      toggleSelect,
       handleSelect,
       folderNavigationRefs,
     }),
@@ -162,7 +190,10 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       folderData,
       folderObject,
       folders,
+      selectedFolders,
+      selectedFoldersIds,
       folderNavigationRefs,
+      toggleSelect,
       handleSelect,
     ],
   );

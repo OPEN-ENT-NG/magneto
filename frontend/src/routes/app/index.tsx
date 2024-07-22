@@ -20,7 +20,6 @@ import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
-import { Folder } from "~/models/folder.model";
 import "./index.scss";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
@@ -41,11 +40,10 @@ export const App = () => {
   const { t } = useTranslation("magneto");
   const [isOpen, toggle] = useToggle(false);
   const [searchBarResetter, resetSearchBar] = useState(0);
-  const { currentFolder } = useFoldersNavigation();
-  const [selectedBoardIds, setSelectedBoardIds] = useState<string[]>([]);
-  const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
-  const [selectedFolderIds, setSelectedFolderIds] = useState<string[]>([]);
-  const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
+  const { currentFolder, folders, setSelectedFoldersIds, setSelectedFolders } =
+    useFoldersNavigation();
+  const { boards, selectedBoards, setSelectedBoards, setSelectedBoardsIds } =
+    useBoardsNavigation();
   const [dragAndDropBoards, setDragAndDropBoards] = useState<Board[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalProps, setModalProps] = useState({
@@ -59,14 +57,12 @@ export const App = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
-  const { folders } = useFoldersNavigation();
-  const { boards } = useBoardsNavigation();
 
   const resetBoardsAndFolders = () => {
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);
-    setSelectedBoardIds([]);
-    setSelectedFolderIds([]);
+    setSelectedBoardsIds([]);
+    setSelectedFoldersIds([]);
     setSelectedBoards([]);
     setSelectedFolders([]);
   };
@@ -149,10 +145,6 @@ export const App = () => {
             ) : null}
 
             <FolderList
-              selectedFolderIds={selectedFolderIds}
-              selectedFolders={selectedFolders}
-              setSelectedFolderIds={setSelectedFolderIds}
-              setSelectedFolders={setSelectedFolders}
               searchText={searchText}
               dragAndDropBoards={dragAndDropBoards}
               onDragAndDrop={handleDragAndDropBoards}
@@ -161,23 +153,10 @@ export const App = () => {
               onSetModalProps={setModalProps}
             />
             <BoardList
-              selectedBoardIds={selectedBoardIds}
-              selectedBoards={selectedBoards}
-              setSelectedBoardIds={setSelectedBoardIds}
-              setSelectedBoards={setSelectedBoards}
               searchText={searchText}
               onDragAndDrop={handleDragAndDropBoards}
             />
-            <ToasterContainer
-              isToasterOpen={
-                selectedBoards.length > 0 || selectedFolders.length > 0
-              }
-              boards={selectedBoards}
-              folders={selectedFolders}
-              boardIds={selectedBoardIds}
-              folderIds={selectedFolderIds}
-              reset={resetBoardsAndFolders}
-            />
+            <ToasterContainer reset={resetBoardsAndFolders} />
             <CreateBoard isOpen={isOpen} toggle={toggle} />
             <MessageModal
               isOpen={showModal}

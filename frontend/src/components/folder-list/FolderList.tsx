@@ -9,10 +9,6 @@ import { Folder } from "~/models/folder.model";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
 type FolderListProps = {
-  selectedFolderIds: string[];
-  selectedFolders: Folder[];
-  setSelectedFolderIds: React.Dispatch<React.SetStateAction<string[]>>;
-  setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
   dragAndDropBoards: Board[];
   onDragAndDrop: (board: Board) => void;
   onSetShowModal: (show: boolean) => void;
@@ -28,35 +24,13 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   modalProps,
   onSetModalProps,
   searchText,
-  setSelectedFolderIds,
-  selectedFolderIds,
-  setSelectedFolders,
-  selectedFolders,
 }) => {
-  const { folders } = useFoldersNavigation();
+  const { folders, toggleSelect, selectedFolders } = useFoldersNavigation();
 
   const springs = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
   });
-
-  const toggleSelect = async (resource: Folder) => {
-    if (selectedFolderIds.includes(resource.id)) {
-      setSelectedFolderIds(
-        selectedFolderIds.filter(
-          (selectedResource: String) => selectedResource !== resource.id,
-        ),
-      );
-      setSelectedFolders(
-        selectedFolders.filter(
-          (selectedResource) => selectedResource.id !== resource.id,
-        ),
-      );
-      return;
-    }
-    setSelectedFolderIds([...selectedFolderIds, resource.id]);
-    setSelectedFolders([...selectedFolders, resource]);
-  };
 
   return (
     <>

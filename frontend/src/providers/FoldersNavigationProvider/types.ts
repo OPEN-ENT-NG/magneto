@@ -27,12 +27,17 @@ export type FoldersNavigationContextType = {
   folderData: Folder[];
   setFolderData: Dispatch<SetStateAction<Folder[]>>;
   folderObject: FolderObjectState;
-  setFolderObject: Dispatch<SetStateAction<FolderObjectState>>;
   folders: Folder[];
   setFolders: Dispatch<SetStateAction<Folder[]>>;
+  setFolderObject: Dispatch<SetStateAction<FolderObjectState>>;
+  selectedFoldersIds: string[];
+  setSelectedFoldersIds: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedFolders: Folder[];
+  setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
   handleSelect: (
     folderId: string,
     folderType: FOLDER_TYPE | "basicFolder",
   ) => void;
+  toggleSelect: (resource: Folder) => void;
   folderNavigationRefs: FolderNavigationRefs;
 };

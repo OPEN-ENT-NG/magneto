@@ -18,6 +18,7 @@ import { ShareModalMagneto } from "../share-modal/ShareModalMagneto";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
+import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useRestoreBoardsAndFolders } from "~/hooks/useRestoreBoardsAndFolders";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
@@ -68,14 +69,8 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     return id == userId;
   };
 
-  const isMyBoards = () => {
-    return (
-      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
-      folders.some(
-        (folder: Folder) => folder.id === currentFolder.id && !folder.deleted,
-      )
-    );
-  };
+  const isMyBoards = () =>
+    selectedBoards.every((board) => board.owner.userId === userId);
 
   const isTrash = () => {
     return (
@@ -193,6 +188,12 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
       toggleShareFolder();
     }
   };
+  const duplicateBoardsAndToast = usePredefinedToasts({
+    func: duplicateBoard,
+    parameter: selectedBoardsIds[0],
+    successMessage: t("magneto.duplicate.elements.confirm"),
+    failureMessage: t("magneto.duplicate.elements.error"),
+  });
 
   return (
     <>
@@ -234,7 +235,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     color="primary"
                     variant="filled"
                     onClick={() => {
-                      duplicateBoard(selectedBoardsIds[0]);
+                      duplicateBoardsAndToast();
                       reset();
                     }}
                   >
@@ -366,6 +367,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
             isOpen={boardPublicShareModal}
             toggle={toggleBoardPublicShareModal}
             board={boards[0]}
+            reset={reset}
           />
         </>
       )}

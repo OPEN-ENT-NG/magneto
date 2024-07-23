@@ -64,7 +64,7 @@ export const CreateFolder: FunctionComponent<props> = ({
     if (folderToUpdate != null) {
       setTitle(folderToUpdate.title);
     }
-  }, [folderToUpdate]);
+  }, [folderToUpdate, isOpen]);
 
   return (
     <>
@@ -114,7 +114,7 @@ export const CreateFolder: FunctionComponent<props> = ({
               disabled={title === ""}
               onClick={onSubmit}
             >
-              {t("magneto.create")}
+              {folderToUpdate ? t("magneto.save") : t("magneto.create")}
             </Button>
           </Modal.Footer>
         </Modal>

@@ -11,12 +11,14 @@ type props = {
   isOpen: boolean;
   toggle: () => void;
   board: Board;
+  reset: () => void;
 };
 
 export const BoardPublicShareModal: FunctionComponent<props> = ({
   isOpen,
   toggle,
   board,
+  reset,
 }: props) => {
   const { t } = useTranslation("magneto");
   const [updateBoard] = useUpdateBoardMutation();
@@ -28,6 +30,7 @@ export const BoardPublicShareModal: FunctionComponent<props> = ({
       if (!board.isPublished) updatedBoard.tags = board.tags;
       await updateBoard(updatedBoard.toJSON());
       toggle();
+      reset();
     } catch (error) {
       console.log(error);
     }
@@ -74,7 +77,7 @@ export const BoardPublicShareModal: FunctionComponent<props> = ({
               variant="filled"
               onClick={onSubmit}
             >
-              {t("magneto.create")}
+              {t("magneto.save")}
             </Button>
           </Modal.Footer>
         </Modal>

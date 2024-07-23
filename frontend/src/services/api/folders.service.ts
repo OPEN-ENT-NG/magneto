@@ -43,7 +43,7 @@ export const foldersApi = emptySplitApi.injectEndpoints({
       query: (folderIds: string[]) => ({
         url: "folders",
         method: "DELETE",
-        body: folderIds,
+        body: { folderIds: folderIds },
       }),
       invalidatesTags: ["Folders"],
     }),

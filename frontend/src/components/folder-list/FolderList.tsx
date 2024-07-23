@@ -25,7 +25,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   onSetModalProps,
   searchText,
 }) => {
-  const { folders, toggleSelect, selectedFolders } = useFoldersNavigation();
+  const { folders, selectedFolders } = useFoldersNavigation();
 
   const springs = useSpring({
     from: { opacity: 0 },
@@ -62,9 +62,6 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
                       .map((item: Folder) => item.id)
                       .includes(folder.id)}
                     folder={folder}
-                    toggleSelect={() => {
-                      toggleSelect(folder);
-                    }}
                     dragAndDropBoards={dragAndDropBoards}
                     onDragAndDrop={onDragAndDrop}
                     onDisplayModal={onSetShowModal}

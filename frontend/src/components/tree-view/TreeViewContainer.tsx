@@ -275,7 +275,6 @@ export const TreeViewContainer: React.FunctionComponent<
   };
 
   const resetDragAndDrop = (): void => {
-    handleSelect("", folderType);
     onDragAndDrop(undefined);
   };
 

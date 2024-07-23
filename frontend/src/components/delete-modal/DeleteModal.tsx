@@ -127,9 +127,9 @@ export const DeleteModal: FunctionComponent<props> = ({
           <Modal.Footer>
             <div className="right">
               <Button
-                color="primary"
+                color="tertiary"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 className="footer-button"
                 onClick={toggle}
               >
@@ -142,7 +142,7 @@ export const DeleteModal: FunctionComponent<props> = ({
                 className="footer-button"
                 onClick={onSubmit}
               >
-                {t("magneto.save")}
+                {t("magneto.delete")}
               </Button>
             </div>
           </Modal.Footer>

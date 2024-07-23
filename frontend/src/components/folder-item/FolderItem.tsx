@@ -184,7 +184,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   };
 
   const resetDragAndDrop = (): void => {
-    handleSelect("", "basicFolder");
     onDragAndDrop(undefined);
   };
 

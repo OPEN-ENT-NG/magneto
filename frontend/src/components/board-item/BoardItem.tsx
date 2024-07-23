@@ -116,7 +116,9 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
             <div className="board-about-right-content">
               {!isSameAsUser(board.owner.userId) && (
                 <Tooltip
-                  message={t("magneto.board.tooltip.my.board")}
+                  message={`${t("magneto.board.owner")} : ${
+                    board.owner.displayName
+                  }`}
                   placement="bottom"
                 >
                   <Icon path={mdiAccountCircle} size={1}></Icon>

@@ -95,7 +95,7 @@ export const MoveBoard: FunctionComponent<props> = ({
           id={"create"}
           isOpen={isOpen}
           onModalClose={toggle}
-          size="lg"
+          size="md"
           viewport={false}
         >
           <Modal.Header onModalClose={toggle}>
@@ -115,9 +115,9 @@ export const MoveBoard: FunctionComponent<props> = ({
           <Modal.Footer>
             <div className="right">
               <Button
-                color="primary"
+                color="tertiary"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 className="footer-button"
                 onClick={toggle}
               >

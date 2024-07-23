@@ -47,7 +47,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   const [shareOptions, setShareOptions] = useState();
   const { folders, currentFolder, selectedFolders, selectedFoldersIds } =
     useFoldersNavigation();
-  const { boards, selectedBoardsIds, selectedBoards } = useBoardsNavigation();
+  const { selectedBoardsIds, selectedBoards } = useBoardsNavigation();
   const [duplicateBoard] = useDuplicateBoardMutation();
 
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
@@ -86,11 +86,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   };
 
   const allBoardsMine = () => {
-    if (boards == null) {
+    if (selectedBoards == null) {
       return false;
     }
     return (
-      boards.filter((board: Board) => {
+      selectedBoards.filter((board: Board) => {
         if (board.owner.userId != userId) return board;
       }).length == 0
     );
@@ -108,7 +108,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   };
 
   const hasSharedElement = () => {
-    return !boards.every((board: Board) => board.rights.length <= 1);
+    return !selectedBoards.every((board: Board) => board.rights.length <= 1);
   };
 
   const hasDuplicationRight = () => {
@@ -116,7 +116,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
       selectedBoardsIds.length == 1 && selectedFoldersIds.length == 0;
     const isOwnedOrPublicOrShared: boolean =
       allBoardsMine() ||
-      boards[0].isPublished; /*|| boards[0].myRights.contrib*/
+      selectedBoards[0].isPublished; /*|| boards[0].myRights.contrib*/
     return oneBoardSelectedOnly && isOwnedOrPublicOrShared;
   };
 
@@ -170,13 +170,13 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
 
   const openShareModal = async () => {
     if (selectedBoardsIds.length > 0) {
-      const userRights = await checkUserRight(boards[0].rights);
+      const userRights = await checkUserRight(selectedBoards[0].rights);
       const { setUserRights } = useUserRightsStore.getState();
       setUserRights(userRights);
       setShareOptions({
         resourceCreatorId: userId,
         resourceId: selectedBoardsIds[0],
-        resourceRights: [boards[0].rights],
+        resourceRights: [selectedBoards[0].rights],
       } as any);
       toggleShareBoard();
     } else if (selectedFoldersIds.length > 0) {
@@ -281,7 +281,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                   selectedFoldersIds.length == 0 &&
                   allBoardsMine() &&
                   canPublish &&
-                  !boards[0].isPublished && (
+                  !selectedBoards[0].isPublished && (
                     <Button
                       type="button"
                       color="primary"
@@ -296,7 +296,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                   selectedFoldersIds.length == 0 &&
                   allBoardsMine() &&
                   canPublish &&
-                  boards[0].isPublished && (
+                  selectedBoards[0].isPublished && (
                     <Button
                       type="button"
                       color="primary"
@@ -320,7 +320,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                   </Button>
                 )}
                 {!isPublic() &&
-                  ((allBoardsMine() && boards.length > 0) ||
+                  ((allBoardsMine() && selectedBoards.length > 0) ||
                     (allFoldersMine() && folders.length > 0)) && (
                     <Button
                       type="button"
@@ -336,18 +336,18 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
           )
         );
       })}
-      {boards != null && (
+      {selectedBoards != null && (
         <>
           <CreateBoard
             isOpen={isCreateOpen}
             toggle={toggleCreate}
-            boardToUpdate={boards[0]}
+            boardToUpdate={selectedBoards[0]}
             reset={reset}
           />
           <MoveBoard
             isOpen={isMoveOpen}
             toggle={toggleMove}
-            boards={boards}
+            boards={selectedBoards}
             reset={reset}
           />
           <DeleteModal
@@ -366,7 +366,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
           <BoardPublicShareModal
             isOpen={boardPublicShareModal}
             toggle={toggleBoardPublicShareModal}
-            board={boards[0]}
+            board={selectedBoards[0]}
             reset={reset}
           />
         </>

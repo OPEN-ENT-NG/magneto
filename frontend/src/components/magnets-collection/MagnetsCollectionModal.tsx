@@ -74,7 +74,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     console.log("error");
   } else if (getCardsLoading) {
     console.log("loading");
-  } else {
+  } else if (myCardsResult?.all) {
     cardsData = myCardsResult.all.map((card: ICardItemResponse) =>
       new CardModel().build(card),
     );
@@ -84,7 +84,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     console.log("error");
   } else if (getBoardsLoading) {
     console.log("loading");
-  } else {
+  } else if (myBoardsResult?.all) {
     boardData = myBoardsResult.all.map((board: IBoardItemResponse) =>
       new Board().build(board),
     );
@@ -117,7 +117,8 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
       return cardsData.filter(
         (card: CardModel) =>
           searchText === "" ||
-          card.title.toLowerCase().includes(searchText.toLowerCase()),
+          (card.title &&
+            card.title.toLowerCase().includes(searchText.toLowerCase())),
       ).length ? (
         <div>
           <animated.ul className="grid ps-0 list-unstyled mb-24">
@@ -125,7 +126,10 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
               .filter(
                 (card: CardModel) =>
                   searchText === "" ||
-                  card.title.toLowerCase().includes(searchText.toLowerCase()),
+                  (card.title &&
+                    card.title
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase())),
               )
               .map((card: CardModel) => (
                 <animated.li
@@ -140,13 +144,13 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                     app={currentApp!}
                     options={{
                       type: "board",
-                      title: card.title,
+                      title: card.title || "",
                     }}
                     isLoading={getBoardsLoading}
                     isSelectable={false}
                   >
                     <Card.Body flexDirection="column">
-                      <Card.Title>{card.title}</Card.Title>
+                      <Card.Title>{card.title || ""}</Card.Title>
                       <div className="board-number-magnets">
                         <Icon
                           path={mdiMagnet}
@@ -171,7 +175,8 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
         board.cards.some(
           (card) =>
             searchText === "" ||
-            card.title.toLowerCase().includes(searchText.toLowerCase()),
+            (card.title &&
+              card.title.toLowerCase().includes(searchText.toLowerCase())),
         ),
       ) ? (
         <div>
@@ -181,7 +186,10 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                 {board.cards.some(
                   (card) =>
                     searchText === "" ||
-                    card.title.toLowerCase().includes(searchText.toLowerCase()),
+                    (card.title &&
+                      card.title
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase())),
                 ) && (
                   <div>
                     <div className="parent">
@@ -206,9 +214,10 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                         .filter(
                           (card: CardModel) =>
                             searchText === "" ||
-                            card.title
-                              .toLowerCase()
-                              .includes(searchText.toLowerCase()),
+                            (card.title &&
+                              card.title
+                                .toLowerCase()
+                                .includes(searchText.toLowerCase())),
                         )
                         .map((card: CardModel) => (
                           <animated.li
@@ -223,13 +232,13 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                               app={currentApp!}
                               options={{
                                 type: "board",
-                                title: card.title,
+                                title: card.title || "",
                               }}
                               isLoading={getBoardsLoading}
                               isSelectable={false}
                             >
                               <Card.Body flexDirection={"column"}>
-                                <Card.Title>{card.title}</Card.Title>
+                                <Card.Title>{card.title || ""}</Card.Title>
                                 <div className="board-number-magnets">
                                   <Icon
                                     path={mdiMagnet}

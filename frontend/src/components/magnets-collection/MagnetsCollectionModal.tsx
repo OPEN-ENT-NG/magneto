@@ -114,19 +114,19 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
 
   const magnetsCardsToDisplay = () => {
     if (!switchBoard) {
-      return cardsData.length ? (
+      return cardsData.filter(
+        (card: CardModel) =>
+          searchText === "" ||
+          card.title.toLowerCase().includes(searchText.toLowerCase()),
+      ).length ? (
         <div>
           <animated.ul className="grid ps-0 list-unstyled mb-24">
             {cardsData
-              .filter((card: CardModel) => {
-                if (searchText === "") {
-                  return card;
-                } else if (
-                  card.title.toLowerCase().includes(searchText.toLowerCase())
-                ) {
-                  return card;
-                }
-              })
+              .filter(
+                (card: CardModel) =>
+                  searchText === "" ||
+                  card.title.toLowerCase().includes(searchText.toLowerCase()),
+              )
               .map((card: CardModel) => (
                 <animated.li
                   className="g-col-4 z-1 boardSizing"
@@ -145,15 +145,14 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
                     isLoading={getBoardsLoading}
                     isSelectable={false}
                   >
-                    <Card.Body flexDirection={"column"}>
+                    <Card.Body flexDirection="column">
                       <Card.Title>{card.title}</Card.Title>
-
                       <div className="board-number-magnets">
                         <Icon
                           path={mdiMagnet}
                           size={1}
                           className="med-resource-card-text"
-                        ></Icon>
+                        />
                         <Card.Text className="med-resource-card-text board-text">
                           {card.resourceType} {t("magneto.magnets")}
                         </Card.Text>
@@ -168,109 +167,92 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
         <EmptyState title={t("magneto.cards.empty.text")} />
       );
     } else {
-      return boardsWithCards.map((board: Board) =>
-        board.cards.filter((card: CardModel) => {
-          if (searchText === "") {
-            return card;
-          } else if (
-            card.title.toLowerCase().includes(searchText.toLowerCase())
-          ) {
-            return card;
-          }
-        }).length ? (
-          <div>
-            <ul>
-              {boardsWithCards.map((board: Board) => (
-                <ul>
-                  {board.cards.filter((card: CardModel) => {
-                    if (searchText === "") {
-                      return card;
-                    } else if (
-                      card.title
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase())
-                    ) {
-                      return card;
-                    }
-                  }).length && (
-                    <div>
-                      <div className="parent">
-                        <h2>{board._title}</h2>
-                        <span
-                          onClick={() => {
-                            onDuplicate(board._id);
-                          }}
-                          className="duplicateText"
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              onDuplicate(board._id);
-                            }
-                          }}
-                        >
-                          <FileCopyOutlinedIcon className="copy-icon" />
-                          {" " + t("magneto.cards.collection.board.duplicate")}
-                        </span>
-                      </div>
-                      <animated.ul className="grid ps-0 list-unstyled mb-24">
-                        {board.cards
-                          .filter((card: CardModel) => {
-                            if (searchText === "") {
-                              return card;
-                            } else if (
-                              card.title
-                                .toLowerCase()
-                                .includes(searchText.toLowerCase())
-                            ) {
-                              return card;
-                            }
-                          })
-                          .map((card: CardModel) => (
-                            <animated.li
-                              className="g-col-4 z-1 boardSizing"
-                              key={card.id}
-                              style={{
-                                position: "relative",
-                                ...springs,
-                              }}
-                            >
-                              <Card
-                                app={currentApp!}
-                                options={{
-                                  type: "board",
-                                  title: card.title,
-                                }}
-                                isLoading={getBoardsLoading}
-                                isSelectable={false}
-                              >
-                                <Card.Body flexDirection={"column"}>
-                                  <Card.Title>{card.title}</Card.Title>
-
-                                  <div className="board-number-magnets">
-                                    <Icon
-                                      path={mdiMagnet}
-                                      size={1}
-                                      className="med-resource-card-text"
-                                    ></Icon>
-                                    <Card.Text className="med-resource-card-text board-text">
-                                      {card.resourceType} {t("magneto.magnets")}
-                                    </Card.Text>
-                                  </div>
-                                </Card.Body>
-                              </Card>
-                            </animated.li>
-                          ))}
-                      </animated.ul>
-                    </div>
-                  )}
-                </ul>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <EmptyState title={t("magneto.cards.empty.text")} />
+      return boardsWithCards.some((board) =>
+        board.cards.some(
+          (card) =>
+            searchText === "" ||
+            card.title.toLowerCase().includes(searchText.toLowerCase()),
         ),
+      ) ? (
+        <div>
+          <ul>
+            {boardsWithCards.map((board: Board) => (
+              <li key={board._id}>
+                {board.cards.some(
+                  (card) =>
+                    searchText === "" ||
+                    card.title.toLowerCase().includes(searchText.toLowerCase()),
+                ) && (
+                  <div>
+                    <div className="parent">
+                      <h2>{board._title}</h2>
+                      <span
+                        onClick={() => onDuplicate(board._id)}
+                        className="duplicateText"
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            onDuplicate(board._id);
+                          }
+                        }}
+                      >
+                        <FileCopyOutlinedIcon className="copy-icon" />
+                        {" " + t("magneto.cards.collection.board.duplicate")}
+                      </span>
+                    </div>
+                    <animated.ul className="grid ps-0 list-unstyled mb-24">
+                      {board.cards
+                        .filter(
+                          (card: CardModel) =>
+                            searchText === "" ||
+                            card.title
+                              .toLowerCase()
+                              .includes(searchText.toLowerCase()),
+                        )
+                        .map((card: CardModel) => (
+                          <animated.li
+                            className="g-col-4 z-1 boardSizing"
+                            key={card.id}
+                            style={{
+                              position: "relative",
+                              ...springs,
+                            }}
+                          >
+                            <Card
+                              app={currentApp!}
+                              options={{
+                                type: "board",
+                                title: card.title,
+                              }}
+                              isLoading={getBoardsLoading}
+                              isSelectable={false}
+                            >
+                              <Card.Body flexDirection={"column"}>
+                                <Card.Title>{card.title}</Card.Title>
+                                <div className="board-number-magnets">
+                                  <Icon
+                                    path={mdiMagnet}
+                                    size={1}
+                                    className="med-resource-card-text"
+                                  />
+                                  <Card.Text className="med-resource-card-text board-text">
+                                    {card.resourceType} {t("magneto.magnets")}
+                                  </Card.Text>
+                                </div>
+                              </Card.Body>
+                            </Card>
+                          </animated.li>
+                        ))}
+                    </animated.ul>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <EmptyState title={t("magneto.cards.empty.text")} />
       );
     }
   };

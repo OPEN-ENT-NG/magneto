@@ -111,20 +111,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     toggleSwitchBoard(false);
     toggle();
   };
-  console.log(
-    boardsWithCards.map(
-      (board: Board) =>
-        board.cards.filter((card: CardModel) => {
-          if (searchText === "") {
-            return card;
-          } else if (
-            card.title.toLowerCase().includes(searchText.toLowerCase())
-          ) {
-            return card;
-          }
-        }).length,
-    ),
-  );
 
   const magnetsCardsToDisplay = () => {
     if (!switchBoard) {

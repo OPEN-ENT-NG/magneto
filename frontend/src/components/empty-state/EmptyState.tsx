@@ -1,5 +1,9 @@
-import "./EmptyState.scss";
 import { useTranslation } from "react-i18next";
+
+import { EmptyStateMagneto } from "../SVG/EmptyStateMagneto";
+
+import "./EmptyState.scss";
+
 
 interface EmptyStateProps {
   title: string;
@@ -13,11 +17,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   const { t } = useTranslation();
   return (
     <div className="empty-state">
-      <img
-        src="src/img/empty-state-magneto.svg"
-        alt="empty boards"
-        className="empty-state-img"
-      />
+      <div
+        className="empty-state-svg"
+      >
+        <EmptyStateMagneto />
+      </div>
       <span className="empty-state-text">
         {<p>{t(title)}</p>}
         {description && <p>{t(description)}</p>}

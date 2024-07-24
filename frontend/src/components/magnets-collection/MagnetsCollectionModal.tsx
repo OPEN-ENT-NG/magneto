@@ -124,7 +124,9 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
 
   const magnetsCardsToDisplay = () => {
     if (!switchBoard) {
-      return cardsData.length ? (
+      return (cardsData.filter((card: CardModel) =>
+        searchText === "" || card.title.toLowerCase().includes(searchText.toLowerCase())
+      ).length) ? (
         <div>
           <animated.ul className="grid ps-0 list-unstyled mb-24">
             {cardsData

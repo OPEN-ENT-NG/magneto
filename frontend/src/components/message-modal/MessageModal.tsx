@@ -41,9 +41,9 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
           <Modal.Footer>
             <div className="right">
               <Button
-                color="primary"
+                color="tertiary"
                 type="button"
-                variant="outline"
+                variant="ghost"
                 className="footer-button"
                 onClick={onCancel}
               >

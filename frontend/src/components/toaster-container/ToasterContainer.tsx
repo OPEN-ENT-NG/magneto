@@ -6,8 +6,10 @@ import {
   isActionAvailable,
   useToggle,
   useOdeClient,
+  checkUserRight
 } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
+import { ShareOptions } from "node_modules/@edifice-ui/react/dist/common/ShareModal/ShareModal";
 import { useTranslation } from "react-i18next";
 
 import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
@@ -27,7 +29,6 @@ import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
 import { useUserRightsStore } from "~/stores";
-import { checkUserRight } from "~/utils/checkUserRight";
 
 export interface ToasterContainerProps {
   reset: () => void;
@@ -44,10 +45,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   const [isShareFolder, toggleShareFolder] = useToggle(false);
   const [isShareBoard, toggleShareBoard] = useToggle(false);
   const [boardPublicShareModal, toggleBoardPublicShareModal] = useToggle(false);
-  const [shareOptions, setShareOptions] = useState();
+  const [shareOptions, setShareOptions] = useState<ShareOptions | null>(null);
   const { folders, currentFolder, selectedFolders, selectedFoldersIds } =
     useFoldersNavigation();
   const { selectedBoardsIds, selectedBoards } = useBoardsNavigation();
+  const { setUserRights } = useUserRightsStore.getState();
   const [duplicateBoard] = useDuplicateBoardMutation();
 
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
@@ -169,23 +171,30 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   };
 
   const openShareModal = async () => {
-    if (selectedBoardsIds.length > 0) {
-      const userRights = await checkUserRight(selectedBoards[0].rights);
-      const { setUserRights } = useUserRightsStore.getState();
+    try {
+      const userRights = await (selectedBoardsIds.length
+        ? checkUserRight(selectedBoards[0].rights)
+        : checkUserRight(selectedFolders[0].rights));
+      console.log(userRights);
       setUserRights(userRights);
-      setShareOptions({
-        resourceCreatorId: userId,
-        resourceId: selectedBoardsIds[0],
-        resourceRights: [selectedBoards[0].rights],
-      } as any);
-      toggleShareBoard();
-    } else if (selectedFoldersIds.length > 0) {
-      setShareOptions({
-        resourceCreatorId: userId,
-        resourceId: selectedFoldersIds[0],
-        resourceRights: [selectedFolders[0].rights],
-      } as any);
-      toggleShareFolder();
+
+      if (selectedBoardsIds.length > 0) {
+        setShareOptions({
+          resourceCreatorId: userId,
+          resourceId: selectedBoardsIds[0],
+          resourceRights: selectedBoards[0].rights as string[],
+        });
+        toggleShareBoard();
+      } else if (selectedFoldersIds.length > 0) {
+        setShareOptions({
+          resourceCreatorId: userId,
+          resourceId: selectedFoldersIds[0],
+          resourceRights: selectedFolders[0].rights as string[],
+        });
+        toggleShareFolder();
+      }
+    } catch (error) {
+      console.error('Error checking user rights:', error);
     }
   };
   const duplicateBoardsAndToast = usePredefinedToasts({
@@ -211,7 +220,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={function Ga() { }}
                     >
                       {t("magneto.open")}
                     </Button>
@@ -219,7 +228,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                 {isMyBoards() &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length ==
-                    0 /*&& boards[0].myRights.manager*/ && (
+                  0 /*&& boards[0].myRights.manager*/ && (
                     <Button
                       type="button"
                       color="primary"
@@ -357,12 +366,13 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
             reset={reset}
             hasSharedElement={hasSharedElement}
           />
-          <ShareModalMagneto
-            isOpen={isShareBoard}
-            toggle={toggleShareBoard}
-            shareOptions={shareOptions}
-            resourceType={RESOURCE_BIG_TYPE.BOARD}
-          />
+          {shareOptions &&
+            <ShareModalMagneto
+              isOpen={isShareBoard}
+              toggle={toggleShareBoard}
+              shareOptions={shareOptions}
+              resourceType={RESOURCE_BIG_TYPE.BOARD}
+            />}
           <BoardPublicShareModal
             isOpen={boardPublicShareModal}
             toggle={toggleBoardPublicShareModal}
@@ -379,12 +389,12 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
             folderToUpdate={selectedFolders[0]}
             reset={reset}
           />
-          <ShareModalMagneto
+          {shareOptions && <ShareModalMagneto
             isOpen={isShareFolder}
             toggle={toggleShareFolder}
             shareOptions={shareOptions}
             resourceType={RESOURCE_BIG_TYPE.FOLDER}
-          />
+          />}
         </>
       )}
     </>

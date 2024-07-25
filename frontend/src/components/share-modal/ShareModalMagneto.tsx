@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useEffect } from "react";
 
 import { OdeClientProvider, ShareModal } from "@edifice-ui/react";
+import { RightStringified } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
 import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
@@ -8,7 +9,11 @@ import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
 type props = {
   isOpen: boolean;
   toggle: () => void;
-  shareOptions: any;
+  shareOptions: {
+    resourceId: string;
+    resourceRights: RightStringified[];
+    resourceCreatorId: string;
+  };
   resourceType: RESOURCE_BIG_TYPE;
 };
 
@@ -37,6 +42,7 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
     const intervalId = setInterval(checkTitle, 250);
     return () => clearInterval(intervalId);
   }, []);
+  console.log({ shareOptions, resourceType });
 
   return (
     <>

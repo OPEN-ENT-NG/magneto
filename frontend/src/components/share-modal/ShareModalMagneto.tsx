@@ -43,13 +43,17 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
     return () => clearInterval(intervalId);
   }, []);
   console.log({ shareOptions, resourceType });
-
+  const formatAppPath = (type: string, id: string) =>
+    `/${type}/share/json/${id}`;
   return (
     <>
       {isOpen && (
         <OdeClientProvider
           params={{
-            app: `magneto/${resourceType}`,
+            app: formatAppPath(
+              resourceType.toLowerCase(),
+              shareOptions.resourceId,
+            ),
           }}
         >
           <ShareModal

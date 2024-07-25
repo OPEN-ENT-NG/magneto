@@ -6,7 +6,7 @@ import {
   isActionAvailable,
   useToggle,
   useOdeClient,
-  checkUserRight
+  checkUserRight,
 } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
 import { ShareOptions } from "node_modules/@edifice-ui/react/dist/common/ShareModal/ShareModal";
@@ -194,7 +194,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
         toggleShareFolder();
       }
     } catch (error) {
-      console.error('Error checking user rights:', error);
+      console.error("Error checking user rights:", error);
     }
   };
   const duplicateBoardsAndToast = usePredefinedToasts({
@@ -220,7 +220,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.open")}
                     </Button>
@@ -228,7 +228,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                 {isMyBoards() &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length ==
-                  0 /*&& boards[0].myRights.manager*/ && (
+                    0 /*&& boards[0].myRights.manager*/ && (
                     <Button
                       type="button"
                       color="primary"
@@ -366,13 +366,14 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
             reset={reset}
             hasSharedElement={hasSharedElement}
           />
-          {shareOptions &&
+          {shareOptions && (
             <ShareModalMagneto
               isOpen={isShareBoard}
               toggle={toggleShareBoard}
               shareOptions={shareOptions}
               resourceType={RESOURCE_BIG_TYPE.BOARD}
-            />}
+            />
+          )}
           <BoardPublicShareModal
             isOpen={boardPublicShareModal}
             toggle={toggleBoardPublicShareModal}
@@ -389,12 +390,14 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
             folderToUpdate={selectedFolders[0]}
             reset={reset}
           />
-          {shareOptions && <ShareModalMagneto
-            isOpen={isShareFolder}
-            toggle={toggleShareFolder}
-            shareOptions={shareOptions}
-            resourceType={RESOURCE_BIG_TYPE.FOLDER}
-          />}
+          {shareOptions && (
+            <ShareModalMagneto
+              isOpen={isShareFolder}
+              toggle={toggleShareFolder}
+              shareOptions={shareOptions}
+              resourceType={RESOURCE_BIG_TYPE.FOLDER}
+            />
+          )}
         </>
       )}
     </>

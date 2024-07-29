@@ -23,7 +23,7 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
   shareOptions,
   resourceType,
 }: props) => {
-  const { appCode } = useOdeClient()
+  const { appCode } = useOdeClient();
   const handleShareClose = (): void => {
     toggle();
   };
@@ -38,7 +38,7 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
       {isOpen && (
         <OdeClientProvider
           params={{
-            app: formatAppPath
+            app: formatAppPath,
           }}
         >
           <ShareModal

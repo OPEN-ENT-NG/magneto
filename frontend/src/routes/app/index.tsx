@@ -83,7 +83,7 @@ export const App = () => {
       setDragAndDropBoards([board]);
     }
   };
-  
+
   useEffect(() => {
     const checkTitle = () => {
       if (document.title !== t("magneto.title")) {

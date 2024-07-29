@@ -84,6 +84,16 @@ export const App = () => {
     }
   };
 
+  useEffect(() => {
+    const checkTitle = () => {
+      if (document.title !== t("magneto.title")) {
+        document.title = t("magneto.title");
+      }
+    };
+    const intervalId = setInterval(checkTitle, 250);
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <>
       <Header onClick={toggle} toggleDrawer={toggleDrawer} />

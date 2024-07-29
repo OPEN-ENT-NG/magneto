@@ -83,6 +83,16 @@ export const App = () => {
       setDragAndDropBoards([board]);
     }
   };
+  
+  useEffect(() => {
+    const checkTitle = () => {
+      if (document.title !== t("magneto.title")) {
+        document.title = t("magneto.title");
+      }
+    };
+    const intervalId = setInterval(checkTitle, 250);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <>

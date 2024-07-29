@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useEffect } from "react";
 
 import { OdeClientProvider, ShareModal } from "@edifice-ui/react";
+import { useOdeClient } from "@edifice-ui/react";
 import { RightStringified } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
@@ -24,7 +25,7 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
   resourceType,
 }: props) => {
   const { t } = useTranslation("magneto");
-
+  const { appCode } = useOdeClient()
   const handleShareClose = (): void => {
     toggle();
   };
@@ -42,18 +43,14 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
     const intervalId = setInterval(checkTitle, 250);
     return () => clearInterval(intervalId);
   }, []);
-  console.log({ shareOptions, resourceType });
-  const formatAppPath = (type: string, id: string) =>
-    `/${type}/share/json/${id}`;
+
+  const formatAppPath = `${appCode}/${resourceType}`;
   return (
     <>
       {isOpen && (
         <OdeClientProvider
           params={{
-            app: formatAppPath(
-              resourceType.toLowerCase(),
-              shareOptions.resourceId,
-            ),
+            app: formatAppPath
           }}
         >
           <ShareModal

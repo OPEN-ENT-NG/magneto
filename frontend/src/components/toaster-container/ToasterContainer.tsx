@@ -175,7 +175,6 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
       const userRights = await (selectedBoardsIds.length
         ? checkUserRight(selectedBoards[0].rights)
         : checkUserRight(selectedFolders[0].rights));
-      console.log(userRights);
       setUserRights(userRights);
 
       if (selectedBoardsIds.length > 0) {

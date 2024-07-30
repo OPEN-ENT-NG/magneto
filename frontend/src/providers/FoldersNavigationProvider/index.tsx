@@ -120,46 +120,31 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     [selectedFolders, selectedFoldersIds],
   );
 
-  const processFolders = useCallback(
-    (
-      result: IFolderResponse[] | undefined,
-      folderType: FOLDER_TYPE,
-      title: string,
-    ) => {
-      if (result) {
-        const preparedFolders = result.map((item) => new Folder().build(item));
-        const folderObject = new FolderTreeNavItem({
-          id: folderType,
-          title: t(title),
-          parentId: "",
-          section: true,
-        }).buildFolders(preparedFolders);
-
-        setFolderData((prevFolderData) => [
-          ...prevFolderData,
-          ...preparedFolders,
-        ]);
-
-        setFolderObject((prevFolderObject) => ({
-          ...prevFolderObject,
-          [folderType === FOLDER_TYPE.MY_BOARDS
-            ? "myFolderObject"
-            : "deletedFolderObject"]: folderObject,
-        }));
-      }
-    },
-    [t],
-  );
-
   useEffect(() => {
-    setFolderData([]);
-    processFolders(myBoardsData, FOLDER_TYPE.MY_BOARDS, "magneto.my.boards");
-    processFolders(
-      deletedBoardsData,
-      FOLDER_TYPE.DELETED_BOARDS,
-      "magneto.trash",
-    );
-  }, [myBoardsData, deletedBoardsData]);
+    if (myBoardsData && deletedBoardsData) {
+      const allFolders = [
+        ...myBoardsData.map((item: IFolderResponse) => new Folder().build(item)),
+        ...deletedBoardsData.map((item: IFolderResponse) => new Folder().build(item)),
+      ];
+      setFolderData(allFolders);
+      
+      const myFolderObject = new FolderTreeNavItem({
+        id: FOLDER_TYPE.MY_BOARDS,
+        title: t("magneto.my.boards"),
+        parentId: "",
+        section: true,
+      }).buildFolders(allFolders);
+  
+      const deletedFolderObject = new FolderTreeNavItem({
+        id: FOLDER_TYPE.DELETED_BOARDS,
+        title: t("magneto.trash"),
+        parentId: "",
+        section: true,
+      }).buildFolders(allFolders);
+  
+      setFolderObject({ myFolderObject, deletedFolderObject });
+    }
+  }, [myBoardsData, deletedBoardsData, t]);
 
   useEffect(() => {
     if (folderData.length && currentFolder) {

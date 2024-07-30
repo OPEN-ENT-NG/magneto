@@ -7,8 +7,11 @@
   flex-direction: column;
 
   .board-title {
+    display: inline-block;
+    
     .tooltip {
       overflow: visible !important;
+      display: inline-block !important;
     }
   }
 

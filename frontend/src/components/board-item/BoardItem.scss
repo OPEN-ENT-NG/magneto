@@ -6,6 +6,12 @@
   flex-wrap: wrap !important;
   flex-direction: column;
 
+  .board-title {
+    .tooltip {
+      overflow: visible !important;
+    }
+  }
+
   .board-number-magnets {
     display: flex;
     justify-content: center;

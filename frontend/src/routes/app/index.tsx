@@ -145,10 +145,12 @@ export const App = () => {
                 onChange={(event) => setSearchText(event.target.value)}
               />
             </div>
-            <FolderTitle
+            <div className="folder-title">
+              <FolderTitle
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}
             />
+            </div>
 
             {!folders.length && !boards.length ? (
               <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>

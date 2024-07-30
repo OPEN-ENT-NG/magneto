@@ -85,8 +85,16 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
             imageSrc={board.imageUrl}
             variant="landscape"
           ></Card.Image>
-          <Card.Title className="title">{board.title}</Card.Title>
 
+          <div className="board-title">
+            <Tooltip
+              message={board.title}
+              placement="bottom"
+            >
+              <Card.Title className="title">{board.title}</Card.Title>
+            </Tooltip>
+          </div>
+        
           <div className="board-number-magnets">
             <Icon
               path={mdiMagnet}

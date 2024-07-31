@@ -1,27 +1,16 @@
 .treeview {
-  //temporary if Edifice fixes
-  li[role="treeitem"]:has(> div > ul:empty) .action-container svg {
-    display: none;
-  }
-  .action-container [role="button"][aria-label="foldUnfold"] {
-    font-size: 0;
-    color: transparent;
-
-    &::before,
-    &::after {
-      display: none !important;
-    }
-
-    svg {
-      pointer-events: none;
-    }
-    svg * {
-      font-size: initial;
-      color: initial;
+  li[role="treeitem"] {
+    .action-container {
+      flex-wrap: nowrap;
+      .d-flex {
+        flex-wrap: nowrap;
+      }
     }
   }
-  .drag-over {
-    border: solid #e4e4e4;
-    border-radius: 0.8rem;
+  #listitem_public-boards {
+    flex-wrap: nowrap;
+    .null {
+      margin-left: 1.63rem;
+    }
   }
 }

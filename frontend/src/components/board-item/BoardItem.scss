@@ -2,16 +2,21 @@
   padding: unset !important;
   margin: unset !important;
   display: flex;
-
   flex-wrap: wrap !important;
   flex-direction: column;
 
   .board-title {
-    display: inline-block;
-    
+    width: 100%;
+    div {
+      width: 100%;
+    }
+
     .tooltip {
-      overflow: visible !important;
-      display: inline-block !important;
+      max-width: 100%;
+      width: fit-content;
+      .tooltip-arrow {
+        left: 1rem !important;
+      }
     }
   }
 

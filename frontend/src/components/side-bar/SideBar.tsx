@@ -50,8 +50,7 @@ export const SideBar: React.FunctionComponent<SideBarProps> = ({
     <>
       <aside
         className={
-          "g-col-3 g-col-lg-2 g-col-xl-3 pt-16 pe-16 d-lg-block " +
-          className
+          "g-col-3 g-col-lg-2 g-col-xl-3 pt-16 pe-16 d-lg-block " + className
         }
       >
         <TreeViewContainer

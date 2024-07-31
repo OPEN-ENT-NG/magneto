@@ -87,14 +87,11 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
           ></Card.Image>
 
           <div className="board-title">
-            <Tooltip
-              message={board.title}
-              placement="bottom"
-            >
+            <Tooltip message={board.title} placement="bottom-start">
               <Card.Title className="title">{board.title}</Card.Title>
             </Tooltip>
           </div>
-        
+
           <div className="board-number-magnets">
             <Icon
               path={mdiMagnet}
@@ -133,7 +130,10 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                 </Tooltip>
               )}
               {isSameAsUser(board.owner.userId) && (
-                <Tooltip message={t("magneto.board.tooltip.my.board")} placement="bottom">
+                <Tooltip
+                  message={t("magneto.board.tooltip.my.board")}
+                  placement="bottom"
+                >
                   <Icon path={mdiCrown} size={1}></Icon>
                 </Tooltip>
               )}

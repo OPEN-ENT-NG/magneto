@@ -113,9 +113,9 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
 
   useEffect(() => {
     if (!!myBoardsResult && !!currentFolder && searchText === "") {
-      setBoards(prepareBoardsState(myBoardsResult));
+      setBoards(prepareBoardsState(myBoardsResult, currentFolder.deleted));
     } else if (!!myAllBoardsResult && !!currentFolder && searchText !== "") {
-      setBoards(prepareBoardsState(myAllBoardsResult));
+      setBoards(prepareBoardsState(myAllBoardsResult, false));
     }
   }, [myBoardsResult, myAllBoardsResult, currentFolder]);
 

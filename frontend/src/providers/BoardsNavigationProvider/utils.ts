@@ -4,8 +4,11 @@ import {
   IBoardsResponse,
 } from "~/models/board.model";
 
-export const prepareBoardsState = (myBoardResponse: IBoardsResponse) => {
+export const prepareBoardsState = (
+  myBoardResponse: IBoardsResponse,
+  isDeleted: boolean,
+) => {
   return myBoardResponse.all.map((board: IBoardItemResponse) =>
-    new Board().build(board),
-  ); //convert boards to Board[]
+    new Board().build({ ...board, deleted: isDeleted }),
+  );
 };

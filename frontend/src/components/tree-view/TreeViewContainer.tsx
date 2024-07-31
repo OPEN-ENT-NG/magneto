@@ -286,7 +286,9 @@ export const TreeViewContainer: React.FunctionComponent<
   return (
     <>
       <div
-        className={"drag-drop-zone"}
+        className={`drag-drop-zone ${
+          datas.children.length ? "" : "empty-folder"
+        }`}
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}

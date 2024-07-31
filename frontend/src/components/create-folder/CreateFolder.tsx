@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useEffect, useId, useState } from "react";
+import {
+  FunctionComponent,
+  useEffect,
+  useId,
+  useState,
+  KeyboardEvent,
+} from "react";
 
 import { Button, FormControl, Input, Label, Modal } from "@edifice-ui/react";
 import "./CreateFolder.scss";
@@ -36,6 +42,7 @@ export const CreateFolder: FunctionComponent<props> = ({
   const formId = `createFolder_${useId}`;
 
   const onSubmit = async (): Promise<void> => {
+    if (!title) return;
     try {
       const folder = new Folder();
       folder.title = title;
@@ -52,6 +59,13 @@ export const CreateFolder: FunctionComponent<props> = ({
       resetFields();
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      if (title) e.preventDefault();
+      onSubmit();
     }
   };
 
@@ -94,6 +108,7 @@ export const CreateFolder: FunctionComponent<props> = ({
                   aria-required={true}
                   maxLength={60}
                   onChange={(e) => setTitle(e.target.value)}
+                  onKeyDown={handleInputKeyDown}
                 />
               </FormControl>
             </form>

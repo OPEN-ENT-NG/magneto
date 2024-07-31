@@ -21,7 +21,7 @@ type props = {
   toggle: () => void;
   isPredelete: boolean;
   reset: () => void;
-  hasSharedElement: () => boolean;
+  hasSharedElement: boolean;
 };
 
 export const DeleteModal: FunctionComponent<props> = ({
@@ -116,7 +116,7 @@ export const DeleteModal: FunctionComponent<props> = ({
             {isPredelete ? (
               <>
                 <div>{t("magneto.predelete.elements.message")}</div>
-                {hasSharedElement() && (
+                {hasSharedElement && (
                   <div>{t("magneto.folder.share.predelete.warning")}</div>
                 )}
               </>

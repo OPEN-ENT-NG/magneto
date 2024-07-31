@@ -53,7 +53,7 @@ export class FolderTreeNavItem {
     // this._iconClass = iconClass ? iconClass : "";
     this._ownerId = folder.ownerId ? folder.ownerId : "";
     this._shared = folder.shared ? folder.shared : [];
-    this._section = false;
+    this._section = folder.section || false;
     this._deleted = false;
     this._isPublic = false;
   }

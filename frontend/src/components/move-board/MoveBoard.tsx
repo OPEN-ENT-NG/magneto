@@ -5,7 +5,7 @@ import { Button, Modal, TreeView, useOdeClient } from "@edifice-ui/react";
 
 import { useTranslation } from "react-i18next";
 
-import { getFolderTypeData } from "../tree-view/utils";
+import { useGetFolderTypeData } from "../tree-view/utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
@@ -86,7 +86,7 @@ export const MoveBoard: FunctionComponent<props> = ({
     toggle();
   };
 
-  const datas = getFolderTypeData(FOLDER_TYPE.MY_BOARDS, folderObject);
+  const datas = useGetFolderTypeData(FOLDER_TYPE.MY_BOARDS, folderObject);
 
   return (
     <>

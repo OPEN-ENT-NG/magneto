@@ -1,3 +1,23 @@
+.empty-folder {
+  .treeview {
+    li[role="treeitem"] {
+      .action-container {
+        flex-wrap: nowrap;
+        .d-flex {
+          flex-wrap: nowrap;
+        }
+      }
+    }
+    #listitem_public-boards,
+    #listitem_deleted-boards,
+    #listitem_my-boards {
+      flex-wrap: nowrap;
+      .null {
+        margin-left: 1.63rem;
+      }
+    }
+  }
+}
 .treeview {
   li[role="treeitem"] {
     .action-container {
@@ -5,12 +25,6 @@
       .d-flex {
         flex-wrap: nowrap;
       }
-    }
-  }
-  #listitem_public-boards {
-    flex-wrap: nowrap;
-    .null {
-      margin-left: 1.63rem;
     }
   }
 }

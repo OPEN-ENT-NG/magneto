@@ -159,34 +159,56 @@ export class FolderTreeNavItem {
    * @param folders Folder list
    */
   buildFolders(folders: Array<Folder>): FolderTreeNavItem {
+    const isOrphanedRestored = (folder: Folder): boolean => {
+      if (folder.deleted || !folder.parentId) {
+        return false;
+      }
+      const parentFolder = folders.find((f) => f.id === folder.parentId);
+      return parentFolder ? parentFolder.deleted : false;
+    };
+
     const childrenFolders: Array<Folder> = folders.filter((folder: Folder) => {
-      if (
-        this._id == FOLDER_TYPE.MY_BOARDS ||
-        this._id == FOLDER_TYPE.DELETED_BOARDS
-      ) {
+      if (this._id === FOLDER_TYPE.MY_BOARDS) {
         this.section = true;
-        return !folder.parentId;
+        return (
+          !folder.deleted && (!folder.parentId || isOrphanedRestored(folder))
+        );
+      } else if (this._id === FOLDER_TYPE.DELETED_BOARDS) {
+        this.section = true;
+        return (
+          folder.deleted &&
+          (!folder.parentId ||
+            !folders.find((f) => f.id === folder.parentId)?.deleted)
+        );
       } else {
-        return folder.parentId === this._id;
+        return folder.parentId === this._id && folder.deleted === this.deleted;
       }
     });
 
     const newChildren: Array<FolderTreeNavItem> = [];
 
     childrenFolders.forEach((folder: Folder) => {
-      const childMatch: FolderTreeNavItem = this.children.find(
+      const childMatch: FolderTreeNavItem | undefined = this.children.find(
         (f: FolderTreeNavItem) => f.id === folder.id && f.name === folder.title,
       );
 
       if (childMatch === undefined) {
-        newChildren.push(new FolderTreeNavItem(folder).buildFolders(folders));
+        const newChild = new FolderTreeNavItem({
+          id: folder.id,
+          title: folder.title,
+          parentId: folder.parentId || "",
+          ownerId: folder.ownerId,
+          shared: folder.shared,
+        });
+        newChild.deleted = folder.deleted;
+        newChild.isPublic = folder.isPublic;
+        newChildren.push(newChild.buildFolders(folders));
       } else {
         newChildren.push(childMatch.buildFolders(folders));
       }
     });
 
     this.children = newChildren;
-
     return this;
   }
 }

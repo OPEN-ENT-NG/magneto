@@ -71,77 +71,50 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     return id == userId;
   };
 
-  const isMyBoards = () =>
-    selectedBoards.every((board) => board.owner.userId === userId);
-
-  const isTrash = () => {
-    return (
-      currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
-      folders.some(
-        (folder: Folder) => folder.id === currentFolder.id && folder.deleted,
-      )
-    );
-  };
-
-  const isPublic = () => {
-    return currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS;
-  };
-
-  const allBoardsMine = () => {
-    if (selectedBoards == null) {
-      return false;
-    }
-    return (
-      selectedBoards.filter((board: Board) => {
-        if (board.owner.userId != userId) return board;
-      }).length == 0
-    );
-  };
-
-  const allFoldersMine = () => {
-    if (selectedFolders == null) {
-      return false;
-    }
-    return (
-      selectedFolders.filter((folder: Folder) => {
-        if (folder.ownerId != userId) return folder;
-      }).length == 0
-    );
-  };
-
-  const hasSharedElement = () => {
-    return !selectedBoards.every((board: Board) => board.rights.length <= 1);
-  };
+  const isMyBoards = selectedBoards.every(
+    (board) => board.owner.userId === userId,
+  );
+  const isMyFolders = selectedFolders.every(
+    (folder) => folder.ownerId === userId,
+  );
+  const isTrash =
+    currentFolder.id === FOLDER_TYPE.DELETED_BOARDS ||
+    (selectedBoards.every((board) => board.deleted) &&
+      selectedFolders.every((folder) => folder.deleted));
+  const isPublic = currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS;
+  const hasSharedElement = !selectedBoards.every(
+    (board: Board) => board.rights.length <= 1,
+  );
 
   const hasDuplicationRight = () => {
     const oneBoardSelectedOnly: boolean =
       selectedBoardsIds.length == 1 && selectedFoldersIds.length == 0;
     const isOwnedOrPublicOrShared: boolean =
-      allBoardsMine() ||
+      isMyBoards ||
       selectedBoards[0].isPublished; /*|| boards[0].myRights.contrib*/
     return oneBoardSelectedOnly && isOwnedOrPublicOrShared;
   };
 
   const hasShareRight = () => {
     const oneOwnBoardSelectedOnly: boolean =
-      isMyBoards() &&
+      isMyBoards &&
       selectedBoardsIds.length == 1 &&
       selectedFoldersIds.length == 0 &&
-      allBoardsMine();
+      isMyBoards;
     const oneOwnFolderSelectedOnly: boolean =
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0 &&
-      allFoldersMine();
+      isMyFolders;
     return oneOwnBoardSelectedOnly || oneOwnFolderSelectedOnly;
   };
 
   const hasRenameRight = () => {
     const isMyBoardsAndOneFolderSelectedOnly: boolean =
-      isMyBoards() &&
+      isMyBoards &&
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0;
     const isFolderOwnerOrSharedWithRights: boolean =
-      allBoardsMine() || folderHasShareRight(folders[0], "manager");
+      isMyBoards || folderHasShareRight(folders[0], "manager");
 
     return (
       isMyBoardsAndOneFolderSelectedOnly && isFolderOwnerOrSharedWithRights
@@ -202,6 +175,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     successMessage: t("magneto.duplicate.elements.confirm"),
     failureMessage: t("magneto.duplicate.elements.error"),
   });
+  console.log({ isTrash, selectedBoards, selectedFolders });
 
   return (
     <>
@@ -213,7 +187,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
               style={style}
             >
               <ActionBar>
-                {!isTrash() &&
+                {!isTrash &&
                   selectedBoardsIds.length + selectedFoldersIds.length == 1 && (
                     <Button
                       type="button"
@@ -224,7 +198,8 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       {t("magneto.open")}
                     </Button>
                   )}
-                {isMyBoards() &&
+                {isMyBoards &&
+                  !isTrash &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length ==
                     0 /*&& boards[0].myRights.manager*/ && (
@@ -250,10 +225,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.duplicate")}
                   </Button>
                 )}
-                {isMyBoards() &&
+                {isMyBoards &&
+                  !isTrash &&
                   selectedBoardsIds.length > 0 &&
                   selectedFoldersIds.length == 0 &&
-                  allBoardsMine() && (
+                  isMyBoards && (
                     <Button
                       type="button"
                       color="primary"
@@ -273,7 +249,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.rename")}
                   </Button>
                 )}
-                {hasShareRight() && (
+                {hasShareRight() && !isTrash && (
                   <Button
                     type="button"
                     color="primary"
@@ -284,11 +260,12 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                   </Button>
                 )}
                 {!(currentFolder.rights.length > 1) &&
-                  isMyBoards() &&
+                  isMyBoards &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length == 0 &&
-                  allBoardsMine() &&
+                  isMyBoards &&
                   canPublish &&
+                  !isTrash &&
                   !selectedBoards[0].isPublished && (
                     <Button
                       type="button"
@@ -299,10 +276,10 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       {t("magneto.public.share")}
                     </Button>
                   )}
-                {isMyBoards() &&
+                {isMyBoards &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length == 0 &&
-                  allBoardsMine() &&
+                  isMyBoards &&
                   canPublish &&
                   selectedBoards[0].isPublished && (
                     <Button
@@ -314,7 +291,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       {t("magneto.public.unshare")}
                     </Button>
                   )}
-                {isTrash() && (
+                {isTrash && (
                   <Button
                     type="button"
                     color="primary"
@@ -327,18 +304,16 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.restore")}
                   </Button>
                 )}
-                {!isPublic() &&
-                  ((allBoardsMine() && selectedBoards.length > 0) ||
-                    (allFoldersMine() && folders.length > 0)) && (
-                    <Button
-                      type="button"
-                      color="primary"
-                      variant="filled"
-                      onClick={toggleDelete}
-                    >
-                      {t("magneto.delete")}
-                    </Button>
-                  )}
+                {!isPublic && isMyBoards && isMyFolders && (
+                  <Button
+                    type="button"
+                    color="primary"
+                    variant="filled"
+                    onClick={toggleDelete}
+                  >
+                    {t("magneto.delete")}
+                  </Button>
+                )}
               </ActionBar>
             </animated.div>
           )
@@ -361,7 +336,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
           <DeleteModal
             isOpen={isMoveDelete}
             toggle={toggleDelete}
-            isPredelete={currentFolder.id != FOLDER_TYPE.DELETED_BOARDS}
+            isPredelete={!isTrash}
             reset={reset}
             hasSharedElement={hasSharedElement}
           />

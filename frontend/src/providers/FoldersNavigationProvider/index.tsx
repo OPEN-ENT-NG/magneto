@@ -123,25 +123,29 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   useEffect(() => {
     if (myBoardsData && deletedBoardsData) {
       const allFolders = [
-        ...myBoardsData.map((item: IFolderResponse) => new Folder().build(item)),
-        ...deletedBoardsData.map((item: IFolderResponse) => new Folder().build(item)),
+        ...myBoardsData.map((item: IFolderResponse) =>
+          new Folder().build(item),
+        ),
+        ...deletedBoardsData.map((item: IFolderResponse) =>
+          new Folder().build(item),
+        ),
       ];
       setFolderData(allFolders);
-      
+
       const myFolderObject = new FolderTreeNavItem({
         id: FOLDER_TYPE.MY_BOARDS,
         title: t("magneto.my.boards"),
         parentId: "",
         section: true,
       }).buildFolders(allFolders);
-  
+
       const deletedFolderObject = new FolderTreeNavItem({
         id: FOLDER_TYPE.DELETED_BOARDS,
         title: t("magneto.trash"),
         parentId: "",
         section: true,
       }).buildFolders(allFolders);
-  
+
       setFolderObject({ myFolderObject, deletedFolderObject });
     }
   }, [myBoardsData, deletedBoardsData, t]);

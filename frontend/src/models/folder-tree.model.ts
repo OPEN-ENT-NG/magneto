@@ -163,17 +163,23 @@ export class FolderTreeNavItem {
       if (folder.deleted || !folder.parentId) {
         return false;
       }
-      const parentFolder = folders.find(f => f.id === folder.parentId);
+      const parentFolder = folders.find((f) => f.id === folder.parentId);
       return parentFolder ? parentFolder.deleted : false;
     };
 
     const childrenFolders: Array<Folder> = folders.filter((folder: Folder) => {
       if (this._id === FOLDER_TYPE.MY_BOARDS) {
         this.section = true;
-        return !folder.deleted && (!folder.parentId || isOrphanedRestored(folder));
+        return (
+          !folder.deleted && (!folder.parentId || isOrphanedRestored(folder))
+        );
       } else if (this._id === FOLDER_TYPE.DELETED_BOARDS) {
         this.section = true;
-        return folder.deleted && (!folder.parentId || !folders.find(f => f.id === folder.parentId)?.deleted);
+        return (
+          folder.deleted &&
+          (!folder.parentId ||
+            !folders.find((f) => f.id === folder.parentId)?.deleted)
+        );
       } else {
         return folder.parentId === this._id && folder.deleted === this.deleted;
       }
@@ -183,7 +189,7 @@ export class FolderTreeNavItem {
 
     childrenFolders.forEach((folder: Folder) => {
       const childMatch: FolderTreeNavItem | undefined = this.children.find(
-        (f: FolderTreeNavItem) => f.id === folder.id && f.name === folder.title
+        (f: FolderTreeNavItem) => f.id === folder.id && f.name === folder.title,
       );
 
       if (childMatch === undefined) {

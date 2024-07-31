@@ -55,27 +55,35 @@ export const prepareFolder = (
 
 export const prepareFoldersState = (
   folderData: Folder[],
-  currentFolder: Folder
+  currentFolder: Folder,
 ): Folder[] => {
   const isOrphanedRestored = (folder: Folder): boolean => {
     if (folder.deleted || !folder.parentId) {
       return false;
     }
-    const parentFolder = folderData.find(f => f.id === folder.parentId);
+    const parentFolder = folderData.find((f) => f.id === folder.parentId);
     return parentFolder ? parentFolder.deleted : false;
   };
 
   if (currentFolder.id === FOLDER_TYPE.MY_BOARDS) {
-    return folderData.filter(folder => !folder.deleted && (!folder.parentId || isOrphanedRestored(folder)));
+    return folderData.filter(
+      (folder) =>
+        !folder.deleted && (!folder.parentId || isOrphanedRestored(folder)),
+    );
   } else if (currentFolder.id === FOLDER_TYPE.DELETED_BOARDS) {
-    return folderData.filter(folder => 
-      folder.deleted && (!folder.parentId || !folderData.find(f => f.id === folder.parentId)?.deleted)
+    return folderData.filter(
+      (folder) =>
+        folder.deleted &&
+        (!folder.parentId ||
+          !folderData.find((f) => f.id === folder.parentId)?.deleted),
     );
   } else if (currentFolder.id === FOLDER_TYPE.PUBLIC_BOARDS) {
     return [];
   } else {
-    return folderData.filter(folder => 
-      folder.parentId === currentFolder.id && folder.deleted === currentFolder.deleted
+    return folderData.filter(
+      (folder) =>
+        folder.parentId === currentFolder.id &&
+        folder.deleted === currentFolder.deleted,
     );
   }
 };

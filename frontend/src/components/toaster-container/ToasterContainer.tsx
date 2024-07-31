@@ -71,12 +71,20 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     return id == userId;
   };
 
-  const isMyBoards = selectedBoards.every((board) => board.owner.userId === userId);
-  const isMyFolders = selectedFolders.every((folder) => folder.ownerId === userId);
-  const isTrash = currentFolder.id === FOLDER_TYPE.DELETED_BOARDS || (selectedBoards.every((board) => board.deleted) && selectedFolders.every((folder) => folder.deleted));
+  const isMyBoards = selectedBoards.every(
+    (board) => board.owner.userId === userId,
+  );
+  const isMyFolders = selectedFolders.every(
+    (folder) => folder.ownerId === userId,
+  );
+  const isTrash =
+    currentFolder.id === FOLDER_TYPE.DELETED_BOARDS ||
+    (selectedBoards.every((board) => board.deleted) &&
+      selectedFolders.every((folder) => folder.deleted));
   const isPublic = currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS;
-  const hasSharedElement = !selectedBoards.every((board: Board) => board.rights.length <= 1);
-
+  const hasSharedElement = !selectedBoards.every(
+    (board: Board) => board.rights.length <= 1,
+  );
 
   const hasDuplicationRight = () => {
     const oneBoardSelectedOnly: boolean =
@@ -185,7 +193,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() { }}
+                      onClick={function Ga() {}}
                     >
                       {t("magneto.open")}
                     </Button>
@@ -194,7 +202,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                   !isTrash &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length ==
-                  0 /*&& boards[0].myRights.manager*/ && (
+                    0 /*&& boards[0].myRights.manager*/ && (
                     <Button
                       type="button"
                       color="primary"

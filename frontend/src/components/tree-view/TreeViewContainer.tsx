@@ -4,7 +4,7 @@ import "./TreeViewContent.scss";
 import { TreeView, useOdeClient } from "@edifice-ui/react";
 import { useTranslation } from "react-i18next";
 
-import { getFolderTypeData } from "./utils";
+import { useGetFolderTypeData } from "./utils";
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
@@ -47,14 +47,6 @@ export const TreeViewContainer: React.FunctionComponent<
     folderNavigationRefs,
     currentFolder,
   } = useFoldersNavigation();
-
-  const dataTree = {
-    children: [],
-    id: FOLDER_TYPE.PUBLIC_BOARDS,
-    name: t("magneto.lycee.connecte.boards"),
-    section: true,
-    isPublic: true,
-  };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -282,7 +274,7 @@ export const TreeViewContainer: React.FunctionComponent<
     onSetModalData(modalData);
   }, [modalData]);
 
-  const datas = getFolderTypeData(folderType, folderObject);
+  const datas = useGetFolderTypeData(folderType, folderObject);
 
   useEffect(() => {
     const ref = folderNavigationRefs[folderType];
@@ -302,7 +294,7 @@ export const TreeViewContainer: React.FunctionComponent<
       >
         <TreeView
           ref={folderNavigationRefs[folderType]}
-          data={datas || dataTree}
+          data={datas}
           onTreeItemBlur={() => {}}
           onTreeItemFocus={() => {}}
           onTreeItemFold={() => {}}

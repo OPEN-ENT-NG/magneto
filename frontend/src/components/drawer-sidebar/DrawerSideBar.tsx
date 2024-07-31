@@ -1,7 +1,8 @@
 import React from "react";
 
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import CloseIcon from "@mui/icons-material/Close";
 import Drawer from "@mui/material/Drawer";
+import "./style.scss";
 import IconButton from "@mui/material/IconButton";
 
 import { SideBar } from "../side-bar/SideBar";
@@ -40,9 +41,14 @@ export const DrawerSideBar: React.FunctionComponent<DrawerSideBarProps> = ({
         },
       }}
     >
-      <IconButton onClick={toggleDrawer}>
-        <ChevronLeftIcon />
-      </IconButton>
+      <div className="button-wrapper">
+        <IconButton onClick={toggleDrawer}>
+          <CloseIcon
+            fontSize="large"
+            style={{ color: "var(--edifice-secondary)" }}
+          />
+        </IconButton>
+      </div>
       <SideBar
         className="drawer"
         toggleDrawer={toggleDrawer}

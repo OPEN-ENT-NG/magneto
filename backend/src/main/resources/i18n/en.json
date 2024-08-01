@@ -40,6 +40,7 @@
   "magneto.delete.section": "Supprimer la section",
   "magneto.delete.section.message": "Voulez-vous également supprimer les aimants contenus dans la section ? Si non, ils seront déplacés dans la première section.",
   "magneto.search.placeholder": "Search by title, keywords, description...",
+  "magneto.search.no.result" : "No element matches the search...",
   "magneto.open": "Open",
   "magneto.delete": "Delete",
   "magneto.properties": "Properties",

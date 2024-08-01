@@ -2,6 +2,7 @@ import { css } from "@emotion/react";
 
 export const folderTitleWrapper = (position: "start" | "middle" | "end") => css`
   box-sizing: border-box;
+  margin: 25px 20px 10px 0px;
   width: 100%;
   display: flex;
   justify-content: ${position === "start"

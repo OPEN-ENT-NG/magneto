@@ -8,6 +8,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useTranslation } from "react-i18next";
 
 import { BoardList } from "~/components/board-list/BoardList";
+import { isBoardInFilter } from "~/components/board-list/utils";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { DrawerSideBar } from "~/components/drawer-sidebar/DrawerSideBar";
 import { EmptyState } from "~/components/empty-state/EmptyState";
@@ -21,6 +22,7 @@ import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
 import "./index.scss";
+import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
@@ -94,6 +96,24 @@ export const App = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const isSearchResultEmpty =
+    !folders.filter((folder: Folder) => {
+      if (searchText === "") {
+        return folder;
+      } else if (
+        folder.title.toLowerCase().includes(searchText.toLowerCase())
+      ) {
+        return folder;
+      }
+    }).length &&
+    !boards.filter((board: Board) => {
+      if (searchText === "") {
+        return board;
+      } else if (isBoardInFilter(board, searchText)) {
+        return board;
+      }
+    }).length;
+
   return (
     <>
       <Header onClick={toggle} toggleDrawer={toggleDrawer} />
@@ -149,9 +169,8 @@ export const App = () => {
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}
             />
-
-            {!folders.length && !boards.length ? (
-              <EmptyState title={t("magneto.boards.empty.text")}></EmptyState>
+            {isSearchResultEmpty ? (
+              <EmptyState title={t("magneto.search.no.result")}></EmptyState>
             ) : null}
 
             <FolderList

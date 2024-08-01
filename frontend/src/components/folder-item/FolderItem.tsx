@@ -186,7 +186,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const resetDragAndDrop = (): void => {
     onDragAndDrop(undefined);
   };
-  console.log(folder);
 
   return (
     <>

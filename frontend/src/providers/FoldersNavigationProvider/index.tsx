@@ -13,6 +13,7 @@ import { TreeViewHandlers } from "@edifice-ui/react";
 import { useTranslation } from "react-i18next";
 
 import {
+  BasicFolder,
   FolderNavigationRefs,
   FolderObjectState,
   FoldersNavigationContextType,
@@ -20,6 +21,7 @@ import {
 } from "./types";
 import { useInitialCurrentFolder } from "./useInitialCurrentFolder";
 import {
+  BASIC_FOLDER,
   initialFolderObject,
   prepareFolder,
   prepareFoldersState,
@@ -76,14 +78,14 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
 
   const handleFolderRefs = (
     folderId: string,
-    folderType: FOLDER_TYPE | "basicFolder",
+    folderType: FOLDER_TYPE | BasicFolder,
     folderData: Folder[],
     folderNavigationRefs: FolderNavigationRefs,
   ): void => {
     const determineRefAndId = (
-      folderType: FOLDER_TYPE | "basicFolder",
+      folderType: FOLDER_TYPE | BasicFolder,
     ): [React.RefObject<TreeViewHandlers> | undefined, string] => {
-      if (folderType !== "basicFolder") {
+      if (folderType !== BASIC_FOLDER) {
         return [folderNavigationRefs[folderType as FOLDER_TYPE], folderId];
       }
 
@@ -102,7 +104,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     Object.entries(folderNavigationRefs).forEach(([type, ref]) => {
       if (
         type === folderType ||
-        (folderType === "basicFolder" && ref === targetRef)
+        (folderType === BASIC_FOLDER && ref === targetRef)
       ) {
         ref.current?.select(targetFolderId);
       } else {
@@ -112,7 +114,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   };
 
   const handleSelect = useCallback(
-    (folderId: string, folderType: FOLDER_TYPE | "basicFolder") => {
+    (folderId: string, folderType: FOLDER_TYPE | BasicFolder) => {
       if (currentFolder.id === folderId) return;
 
       setSelectedNodesIds((prevIds) => {

@@ -175,7 +175,6 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     successMessage: t("magneto.duplicate.elements.confirm"),
     failureMessage: t("magneto.duplicate.elements.error"),
   });
-  console.log({ isTrash, selectedBoards, selectedFolders });
 
   return (
     <>

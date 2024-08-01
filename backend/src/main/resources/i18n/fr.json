@@ -77,6 +77,7 @@
     "magneto.create.folder": "Créer un dossier",
     "magneto.create.folder.name": "Nom du dossier",
     "magneto.boards.empty.text": "Il n'y a pas encore de tableau ici...",
+    "magneto.element.empty.text": "Il n'y a pas encore d'élément ici...",
     "magneto.board.manage.ask.image": "Veuillez choisir une image *",
     "magneto.card.time.one.seconds": "1 seconde",
     "magneto.card.time.seconds": "{{0}} secondes",

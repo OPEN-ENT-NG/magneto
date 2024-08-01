@@ -74,6 +74,7 @@
   "magneto.create.folder:": "Create folder",
   "magneto.create.folder.name": "Folder name",
   "magneto.boards.empty.text": "There is no board here yet...",
+  "magneto.element.empty.text": "There is no element here yet...",
   "magneto.board.manage.ask.image": "Please add an image *",
   "magneto.card.time.one.seconds": "1 second",
   "magneto.card.time.seconds": "{{0}} seconds",

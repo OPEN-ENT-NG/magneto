@@ -205,12 +205,12 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           onSelect={() => toggleSelect(folder)}
         >
           <Card.Body>
-            {user?.userId === folder.ownerId ? (
+            {!folder.shared.length ? (
               <Icon path={mdiFolder} size={2} color={"#3BA6CF"} />
             ) : (
               <Icon path={mdiFolderAccount} size={2} color={"#3BA6CF"} />
             )}
-            <Card.Title>{folder.title}</Card.Title>
+            <Card.Title className="folder-title">{folder.title}</Card.Title>
           </Card.Body>
         </Card>
       </div>

@@ -3,6 +3,7 @@ import React from "react";
 import { animated, useSpring } from "@react-spring/web";
 
 import "./BoardList.scss";
+import { isBoardInFilter } from "./utils";
 import { BoardItem } from "~/components/board-item/BoardItem";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
@@ -23,21 +24,6 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
 
   const { boards } = useBoardsNavigation();
 
-  function isInFilter(board: Board) {
-    if (
-      board.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      (board.description != null &&
-        board.description.toLowerCase().includes(searchText.toLowerCase()))
-    )
-      return true;
-    if (board.tags == null || board.tags.length == 0) {
-      return false;
-    }
-    return board.tags.some((tag) =>
-      tag.toLowerCase().includes(searchText.toLowerCase()),
-    );
-  }
-
   return (
     <>
       {boards?.length ? (
@@ -46,7 +32,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
             .filter((board: Board) => {
               if (searchText === "") {
                 return board;
-              } else if (isInFilter(board)) {
+              } else if (isBoardInFilter(board, searchText)) {
                 return board;
               }
             })

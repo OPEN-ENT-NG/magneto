@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./TreeViewContent.scss";
 
 import { TreeView, useOdeClient } from "@edifice-ui/react";
@@ -43,9 +43,13 @@ export const TreeViewContainer: React.FunctionComponent<
   const {
     folderObject,
     folders,
+    folderData,
     handleSelect,
     folderNavigationRefs,
     currentFolder,
+    selectedNodesIds,
+    setSelectedNodesIds,
+    handleFolderRefs,
   } = useFoldersNavigation();
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -276,12 +280,36 @@ export const TreeViewContainer: React.FunctionComponent<
 
   const datas = useGetFolderTypeData(folderType, folderObject);
 
+  const handleTreeItemFold = useCallback(
+    (unfoldId: string) => {
+      setSelectedNodesIds((prevSelectedNodesIds) =>
+        unfoldId in FOLDER_TYPE
+          ? prevSelectedNodesIds.filter((id) => id !== unfoldId)
+          : prevSelectedNodesIds,
+      );
+      handleFolderRefs(
+        currentFolder.id,
+        folderType,
+        folderData,
+        folderNavigationRefs,
+      );
+    },
+    [
+      currentFolder.id,
+      folderData,
+      folderNavigationRefs,
+      folderType,
+      handleFolderRefs,
+      setSelectedNodesIds,
+    ],
+  );
+
   useEffect(() => {
     const ref = folderNavigationRefs[folderType];
     if (ref.current && currentFolder.id) {
       ref.current.select(currentFolder.id);
     }
-  }, [currentFolder, folderType, folderNavigationRefs]);
+  }, [currentFolder, folderType, folderNavigationRefs, handleTreeItemFold]);
 
   return (
     <>
@@ -297,13 +325,11 @@ export const TreeViewContainer: React.FunctionComponent<
         <TreeView
           ref={folderNavigationRefs[folderType]}
           data={datas}
-          onTreeItemBlur={() => {}}
-          onTreeItemFocus={() => {}}
-          onTreeItemFold={() => {}}
           onTreeItemSelect={(item) => {
             handleSelect(item, folderType);
           }}
-          onTreeItemUnfold={() => {}}
+          selectedNodesIds={selectedNodesIds}
+          onTreeItemFold={handleTreeItemFold}
         />
       </div>
     </>

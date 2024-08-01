@@ -34,10 +34,18 @@ export type FoldersNavigationContextType = {
   setSelectedFoldersIds: React.Dispatch<React.SetStateAction<string[]>>;
   selectedFolders: Folder[];
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
+  selectedNodesIds: string[];
+  setSelectedNodesIds: React.Dispatch<React.SetStateAction<string[]>>;
   handleSelect: (
     folderId: string,
     folderType: FOLDER_TYPE | "basicFolder",
   ) => void;
   toggleSelect: (resource: Folder) => void;
   folderNavigationRefs: FolderNavigationRefs;
+  handleFolderRefs: (
+    folderId: string,
+    folderType: FOLDER_TYPE | "basicFolder",
+    folderData: Folder[],
+    folderNavigationRefs: FolderNavigationRefs,
+  ) => void;
 };

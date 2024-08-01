@@ -55,6 +55,9 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
   const [selectedFoldersIds, setSelectedFoldersIds] = useState<string[]>([]);
+  const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([
+    FOLDER_TYPE.MY_BOARDS,
+  ]);
   const { currentData: myBoardsData } = useGetFoldersQuery(false);
   const { currentData: deletedBoardsData } = useGetFoldersQuery(true);
 
@@ -71,9 +74,65 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     [],
   );
 
+  const handleFolderRefs = (
+    folderId: string,
+    folderType: FOLDER_TYPE | "basicFolder",
+    folderData: Folder[],
+    folderNavigationRefs: FolderNavigationRefs,
+  ): void => {
+    const determineRefAndId = (
+      folderType: FOLDER_TYPE | "basicFolder",
+    ): [React.RefObject<TreeViewHandlers> | undefined, string] => {
+      if (folderType !== "basicFolder") {
+        return [folderNavigationRefs[folderType as FOLDER_TYPE], folderId];
+      }
+
+      const parentFolder = folderData.find((folder) => folder.id === folderId);
+      if (!parentFolder) return [undefined, folderId];
+
+      const parentRef = parentFolder.deleted
+        ? folderNavigationRefs[FOLDER_TYPE.DELETED_BOARDS]
+        : folderNavigationRefs[FOLDER_TYPE.MY_BOARDS];
+
+      return [parentRef, parentFolder.id || folderId];
+    };
+
+    const [targetRef, targetFolderId] = determineRefAndId(folderType);
+
+    Object.entries(folderNavigationRefs).forEach(([type, ref]) => {
+      if (
+        type === folderType ||
+        (folderType === "basicFolder" && ref === targetRef)
+      ) {
+        ref.current?.select(targetFolderId);
+      } else {
+        ref.current?.unselectAll();
+      }
+    });
+  };
+
   const handleSelect = useCallback(
     (folderId: string, folderType: FOLDER_TYPE | "basicFolder") => {
       if (currentFolder.id === folderId) return;
+
+      setSelectedNodesIds((prevIds) => {
+        if (
+          prevIds.length === 1 &&
+          prevIds[0] === FOLDER_TYPE.MY_BOARDS &&
+          folderId ===
+            (FOLDER_TYPE.DELETED_BOARDS || FOLDER_TYPE.DELETED_BOARDS)
+        )
+          return [folderId, ""];
+
+        const preparePrevIds = prevIds.reduce((acc: string[], id: string) => {
+          if (id !== "" && !acc.includes(id) && id !== folderId) {
+            return [...acc, id];
+          }
+          return acc;
+        }, []);
+
+        return [...preparePrevIds, folderId, ""];
+      });
 
       setCurrentFolder((prevFolder) => {
         if (prevFolder.id === folderId) return prevFolder;
@@ -84,15 +143,13 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
           t(prepareFolderTitle(folderType)),
         );
 
-        setTimeout(() => {
-          Object.entries(folderNavigationRefs).forEach(([type, ref]) => {
-            if (type === folderType) {
-              ref.current?.select(folderId);
-            } else {
-              ref.current?.unselectAll();
-            }
-          });
-        }, 0);
+        handleFolderRefs(
+          folderId,
+          folderType,
+          folderData,
+          folderNavigationRefs,
+        );
+
         return newFolder;
       });
     },
@@ -173,6 +230,9 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       toggleSelect,
       handleSelect,
       folderNavigationRefs,
+      selectedNodesIds,
+      setSelectedNodesIds,
+      handleFolderRefs,
     }),
     [
       currentFolder,
@@ -181,6 +241,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       folders,
       selectedFolders,
       selectedFoldersIds,
+      selectedNodesIds,
       folderNavigationRefs,
       toggleSelect,
       handleSelect,

@@ -1,8 +1,10 @@
 import { t } from "i18next";
 
-import { FolderObjectState } from "./types";
+import { BasicFolder, FolderObjectState } from "./types";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder, IFolderResponse } from "~/models/folder.model";
+
+export const BASIC_FOLDER: BasicFolder = "basicFolder";
 
 export const initialCurrentFolder = () => {
   const folder = new Folder(FOLDER_TYPE.MY_BOARDS);
@@ -15,12 +17,12 @@ export const initialFolderObject: FolderObjectState = {
   deletedFolderObject: null,
 };
 
-export const prepareFolderTitle = (folderType: FOLDER_TYPE | "basicFolder") => {
+export const prepareFolderTitle = (folderType: FOLDER_TYPE | BasicFolder) => {
   if (folderType === FOLDER_TYPE.MY_BOARDS) return "magneto.my.boards";
   if (folderType === FOLDER_TYPE.PUBLIC_BOARDS)
     return "magneto.lycee.connecte.boards";
   if (folderType === FOLDER_TYPE.DELETED_BOARDS) return "magneto.trash";
-  return "basicFolder";
+  return BASIC_FOLDER;
 };
 
 export const prepareFolder = (

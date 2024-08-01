@@ -6,6 +6,8 @@ import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder } from "~/models/folder.model";
 
+export type BasicFolder = "basicFolder";
+
 export interface FoldersNavigationProviderProps {
   children: ReactNode;
 }
@@ -34,10 +36,18 @@ export type FoldersNavigationContextType = {
   setSelectedFoldersIds: React.Dispatch<React.SetStateAction<string[]>>;
   selectedFolders: Folder[];
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
+  selectedNodesIds: string[];
+  setSelectedNodesIds: React.Dispatch<React.SetStateAction<string[]>>;
   handleSelect: (
     folderId: string,
-    folderType: FOLDER_TYPE | "basicFolder",
+    folderType: FOLDER_TYPE | BasicFolder,
   ) => void;
   toggleSelect: (resource: Folder) => void;
   folderNavigationRefs: FolderNavigationRefs;
+  handleFolderRefs: (
+    folderId: string,
+    folderType: FOLDER_TYPE | BasicFolder,
+    folderData: Folder[],
+    folderNavigationRefs: FolderNavigationRefs,
+  ) => void;
 };

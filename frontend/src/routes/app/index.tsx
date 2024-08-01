@@ -169,10 +169,12 @@ export const App = () => {
               text={currentFolder.title}
               SVGLeft={<Icon path={mdiFolder} />}
             />
-            {isSearchResultEmpty ? (
+            {isSearchResultEmpty && (folders.length || boards.length) ? (
               <EmptyState title={t("magneto.search.no.result")}></EmptyState>
             ) : null}
-
+            {!folders.length && !boards.length ? (
+              <EmptyState title={t("magneto.element.empty.text")}></EmptyState>
+            ) : null}
             <FolderList
               searchText={searchText}
               dragAndDropBoards={dragAndDropBoards}

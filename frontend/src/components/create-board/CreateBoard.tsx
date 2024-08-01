@@ -261,6 +261,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                     <FormControl id="description" className="mb-1-5">
                       <Label>{t("magneto.create.board.description")} :</Label>
                       <TextArea
+                        className="styled-text-area"
                         size="md"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}

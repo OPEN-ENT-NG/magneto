@@ -85,7 +85,12 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
             imageSrc={board.imageUrl}
             variant="landscape"
           ></Card.Image>
-          <Card.Title className="title">{board.title}</Card.Title>
+
+          <div className="board-title">
+            <Tooltip message={board.title} placement="bottom-start">
+              <Card.Title className="title">{board.title}</Card.Title>
+            </Tooltip>
+          </div>
 
           <div className="board-number-magnets">
             <Icon
@@ -125,7 +130,10 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                 </Tooltip>
               )}
               {isSameAsUser(board.owner.userId) && (
-                <Tooltip message={t("magneto.board.owner")} placement="bottom">
+                <Tooltip
+                  message={t("magneto.board.tooltip.my.board")}
+                  placement="bottom"
+                >
                   <Icon path={mdiCrown} size={1}></Icon>
                 </Tooltip>
               )}
@@ -139,7 +147,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
               )}
               {board.isPublished && (
                 <Tooltip
-                  message={t("magneto.board.tooltip.shared.board")}
+                  message={t("magneto.board.tooltip.public.board")}
                   placement="bottom"
                 >
                   <Icon path={mdiEarth} size={1}></Icon>

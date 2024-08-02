@@ -107,9 +107,10 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         );
       } else if (
         userRights.folderOwnerNotShared(dragAndDropInitialFolder) &&
-        userRights.folderOwnerNotShared(folder)
+        userRights.folderOwnerNotShared(folder) &&
+        isOwnerOfSelectedBoards(boards)
       ) {
-        //initial folder owner + not shared, target folder owner + not shared
+        //initial folder owner + not shared, target folder owner + not shared + selected boards are ours
         proceedOnDragAndDrop(boards, folder);
       } else {
         handleNoRightsDragAndDrop();
@@ -138,6 +139,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       ...modalData,
       i18nKey: "magneto.folder.drag.drop.right.error",
       onCancel: () => closeDragAndDropModal(),
+      hasSubmit: false,
     });
     onDisplayModal(true);
   };

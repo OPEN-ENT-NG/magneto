@@ -36,7 +36,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [hasDrop, setHasDrop] = useState<boolean>(false);
-  const { folders, handleSelect, toggleSelect } = useFoldersNavigation();
+  const { folderData, handleSelect, toggleSelect } = useFoldersNavigation();
 
   const folderTitle = folder.title;
 
@@ -65,8 +65,9 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
             title: MAIN_PAGE_TITLE,
             parentId: "",
           })
-        : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
-          new Folder();
+        : folderData.find(
+            (folder: Folder) => folder.id == boards[0].folderId,
+          ) ?? new Folder();
 
       if (
         (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
@@ -189,7 +190,11 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   return (
     <>
-      <div ref={drop} draggable="true" className={isOver ? "drag-over" : ""}>
+      <div
+        ref={drop}
+        draggable="true"
+        className={isOver ? "drag-over" : "no-drag-over"}
+      >
         <Card
           app={currentApp!}
           isSelected={isSelected}

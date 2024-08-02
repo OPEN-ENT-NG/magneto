@@ -1,27 +1,18 @@
 import React, { FunctionComponent, useState } from "react";
 
-import {
-  Card,
-  Modal,
-  SearchBar,
-  useOdeClient,
-  useToggle,
-} from "@edifice-ui/react";
-import { mdiMagnet } from "@mdi/js";
-import Icon from "@mdi/react";
-import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
+import { Modal, SearchBar, useOdeClient, useToggle } from "@edifice-ui/react";
 import { Switch } from "@mui/material";
-import { animated, useSpring } from "@react-spring/web";
+import { useSpring } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
+import { FavoriteViewByBoard } from "./FavoriteViewByBoard.tsx";
+import { FavoriteViewByCard } from "./FavoriteViewByCard.tsx";
 import { CardsFilter } from "../../models/cards-filter.model";
 import { useGetAllCardsCollectionQuery } from "../../services/api/cards.service";
-import { EmptyState } from "../empty-state/EmptyState";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card as CardModel, ICardItemResponse } from "~/models/card.model";
 import "./MagnetsCollectionModal.scss";
 import { useGetBoardsQuery } from "~/services/api/boards.service";
-import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -68,8 +59,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     isFavorite: filter.isFavorite,
   }) || {};
 
-  const [duplicateBoard] = useDuplicateBoardMutation();
-
   if (getCardsError) {
     console.log("error");
   } else if (getCardsLoading) {
@@ -103,167 +92,9 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     to: { opacity: 1 },
   });
 
-  const onDuplicate = async (boardId: string) => {
-    await duplicateBoard(boardId);
-  };
-
   const onLeave = () => {
     toggleSwitchBoard(false);
     toggle();
-  };
-
-  const magnetsCardsToDisplay = () => {
-    if (!switchBoard) {
-      return cardsData.filter(
-        (card: CardModel) =>
-          searchText === "" ||
-          (card.title &&
-            card.title.toLowerCase().includes(searchText.toLowerCase())),
-      ).length ? (
-        <div>
-          <animated.ul className="grid ps-0 list-unstyled mb-24">
-            {cardsData
-              .filter(
-                (card: CardModel) =>
-                  searchText === "" ||
-                  (card.title &&
-                    card.title
-                      .toLowerCase()
-                      .includes(searchText.toLowerCase())),
-              )
-              .map((card: CardModel) => (
-                <animated.li
-                  className="g-col-4 z-1 boardSizing"
-                  key={card.id}
-                  style={{
-                    position: "relative",
-                    ...springs,
-                  }}
-                >
-                  <Card
-                    app={currentApp!}
-                    options={{
-                      type: "board",
-                      title: card.title || "",
-                    }}
-                    isLoading={getBoardsLoading}
-                    isSelectable={false}
-                  >
-                    <Card.Body flexDirection="column">
-                      <Card.Title>{card.title || ""}</Card.Title>
-                      <div className="board-number-magnets">
-                        <Icon
-                          path={mdiMagnet}
-                          size={1}
-                          className="med-resource-card-text"
-                        />
-                        <Card.Text className="med-resource-card-text board-text">
-                          {card.resourceType} {t("magneto.magnets")}
-                        </Card.Text>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </animated.li>
-              ))}
-          </animated.ul>
-        </div>
-      ) : (
-        <EmptyState title={t("magneto.cards.empty.text")} />
-      );
-    } else {
-      return boardsWithCards.some((board) =>
-        board.cards.some(
-          (card) =>
-            searchText === "" ||
-            (card.title &&
-              card.title.toLowerCase().includes(searchText.toLowerCase())),
-        ),
-      ) ? (
-        <div>
-          <ul>
-            {boardsWithCards.map((board: Board) => (
-              <li key={board._id}>
-                {board.cards.some(
-                  (card) =>
-                    searchText === "" ||
-                    (card.title &&
-                      card.title
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase())),
-                ) && (
-                  <div>
-                    <div className="parent">
-                      <h2>{board._title}</h2>
-                      <span
-                        onClick={() => onDuplicate(board._id)}
-                        className="duplicateText"
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            onDuplicate(board._id);
-                          }
-                        }}
-                      >
-                        <FileCopyOutlinedIcon className="copy-icon" />
-                        {" " + t("magneto.cards.collection.board.duplicate")}
-                      </span>
-                    </div>
-                    <animated.ul className="grid ps-0 list-unstyled mb-24">
-                      {board.cards
-                        .filter(
-                          (card: CardModel) =>
-                            searchText === "" ||
-                            (card.title &&
-                              card.title
-                                .toLowerCase()
-                                .includes(searchText.toLowerCase())),
-                        )
-                        .map((card: CardModel) => (
-                          <animated.li
-                            className="g-col-4 z-1 boardSizing"
-                            key={card.id}
-                            style={{
-                              position: "relative",
-                              ...springs,
-                            }}
-                          >
-                            <Card
-                              app={currentApp!}
-                              options={{
-                                type: "board",
-                                title: card.title || "",
-                              }}
-                              isLoading={getBoardsLoading}
-                              isSelectable={false}
-                            >
-                              <Card.Body flexDirection={"column"}>
-                                <Card.Title>{card.title || ""}</Card.Title>
-                                <div className="board-number-magnets">
-                                  <Icon
-                                    path={mdiMagnet}
-                                    size={1}
-                                    className="med-resource-card-text"
-                                  />
-                                  <Card.Text className="med-resource-card-text board-text">
-                                    {card.resourceType} {t("magneto.magnets")}
-                                  </Card.Text>
-                                </div>
-                              </Card.Body>
-                            </Card>
-                          </animated.li>
-                        ))}
-                    </animated.ul>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <EmptyState title={t("magneto.cards.empty.text")} />
-      );
-    }
   };
 
   return (
@@ -300,7 +131,23 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
               />
               {t("magneto.cards.collection.board.view")}
             </div>
-            {magnetsCardsToDisplay()}
+            {switchBoard ? (
+              <FavoriteViewByBoard
+                boardsWithCards={boardsWithCards}
+                searchText={searchText}
+                springs={springs}
+                currentApp={currentApp}
+                getBoardsLoading={getBoardsLoading}
+              />
+            ) : (
+              <FavoriteViewByCard
+                cardsData={cardsData}
+                searchText={searchText}
+                springs={springs}
+                currentApp={currentApp}
+                getBoardsLoading={getBoardsLoading}
+              />
+            )}
           </Modal.Body>
         </Modal>
       )}

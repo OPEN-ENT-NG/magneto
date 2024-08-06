@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
 import {
@@ -30,15 +30,21 @@ interface BoardItemProps {
     isPublished: boolean;
   };
   onDragAndDropBoard: (board: any) => void;
+  isBoardDragged: boolean;
+  setIsBoardDragged: (isDragged: boolean) => void;
 }
 
 export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   board,
   onDragAndDropBoard,
+  isBoardDragged,
+  setIsBoardDragged,
 }) => {
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation("magneto");
-  const { selectedBoardsIds, toggleSelect } = useBoardsNavigation();
+  const { selectedBoardsIds, toggleSelect, selectedBoards } =
+    useBoardsNavigation();
+  const [isDragged, setIsDragged] = useState<boolean>(false);
 
   const userId = user ? user?.userId : "";
 
@@ -57,14 +63,25 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
 
   useEffect(() => {
     onDragAndDropBoard(board);
+    setIsBoardDragged(isDragging);
   }, [isDragging]);
+
+  useEffect(() => {
+    setIsDragged(
+      isBoardDragged &&
+        !!selectedBoards.find(
+          (selectedBoard: Board) =>
+            selectedBoard && selectedBoard._id == board.id,
+        ),
+    );
+  }, [isBoardDragged, selectedBoards]);
 
   return (
     <div
       ref={drag}
       className={`board ${isDragging ? "dragging" : ""}`}
       style={{
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDragging || isDragged ? 0.5 : 1,
         cursor: "move",
       }}
     >

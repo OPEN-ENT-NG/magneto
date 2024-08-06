@@ -198,11 +198,10 @@ public class DefaultShareService implements ShareService {
         query.match(new JsonObject().put(Field._ID, folderId));
         mongoDb.command(query.getAggregate().toString(), MongoDbResult.validResultHandler(resultMongo -> {
             if (resultMongo.isRight()) {
-                JsonObject result = resultMongo.right().getValue()
+                JsonArray firstBatchResult = resultMongo.right().getValue()
                         .getJsonObject(Mongo.CURSOR, new JsonObject())
-                        .getJsonArray(Mongo.FIRSTBATCH, new JsonArray())
-                        .getJsonObject(0);
-                promise.complete(result);
+                        .getJsonArray(Mongo.FIRSTBATCH, new JsonArray());
+                promise.complete(firstBatchResult.isEmpty() ? new JsonObject() : firstBatchResult.getJsonObject(0));
             } else {
                 String message = String.format("[Magneto@%s::getOldDataToUpdate] Failed to update old folder",
                         this.getClass().getSimpleName());

@@ -123,7 +123,7 @@ export const TreeViewContainer: React.FunctionComponent<
             title: MAIN_PAGE_TITLE,
             parentId: "",
           })
-        : folders.find(
+        : folderData.find(
             (folder: Folder) => folder.id == dragAndDropBoard.folderId,
           ) ?? new Folder();
 
@@ -135,6 +135,7 @@ export const TreeViewContainer: React.FunctionComponent<
       ) {
         //not board owner
         handleNoRightsDragAndDrop();
+        removeFolderHighlight(e);
         return;
       } else if (
         (userRights.folderOwnerNotShared(dragAndDropInitialFolder) ||
@@ -170,6 +171,7 @@ export const TreeViewContainer: React.FunctionComponent<
         //initial folder owner + not shared, target folder owner + not shared
         proceedOnDragAndDrop(dragAndDropBoards, targetFolder);
       } else {
+        removeFolderHighlight(e);
         handleNoRightsDragAndDrop();
       }
 

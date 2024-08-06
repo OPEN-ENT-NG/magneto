@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { animated, useSpring } from "@react-spring/web";
 
@@ -23,6 +23,7 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   });
 
   const { boards } = useBoardsNavigation();
+  const [isBoardDragged, setIsBoardDragged] = useState<boolean>(false);
 
   return (
     <>
@@ -47,7 +48,12 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
                     ...springs,
                   }}
                 >
-                  <BoardItem board={board} onDragAndDropBoard={onDragAndDrop} />
+                  <BoardItem
+                    board={board}
+                    onDragAndDropBoard={onDragAndDrop}
+                    isBoardDragged={isBoardDragged}
+                    setIsBoardDragged={setIsBoardDragged}
+                  />
                 </animated.li>
               );
             })}

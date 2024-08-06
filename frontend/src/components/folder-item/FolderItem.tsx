@@ -36,7 +36,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [hasDrop, setHasDrop] = useState<boolean>(false);
-  const { folders, handleSelect, toggleSelect } = useFoldersNavigation();
+  const { folderData, handleSelect, toggleSelect } = useFoldersNavigation();
 
   const folderTitle = folder.title;
 
@@ -65,8 +65,9 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
             title: MAIN_PAGE_TITLE,
             parentId: "",
           })
-        : folders.find((folder: Folder) => folder.id == boards[0].folderId) ??
-          new Folder();
+        : folderData.find(
+            (folder: Folder) => folder.id == boards[0].folderId,
+          ) ?? new Folder();
 
       if (
         (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
@@ -106,9 +107,10 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         );
       } else if (
         userRights.folderOwnerNotShared(dragAndDropInitialFolder) &&
-        userRights.folderOwnerNotShared(folder)
+        userRights.folderOwnerNotShared(folder) &&
+        isOwnerOfSelectedBoards(boards)
       ) {
-        //initial folder owner + not shared, target folder owner + not shared
+        //initial folder owner + not shared, target folder owner + not shared + selected boards are ours
         proceedOnDragAndDrop(boards, folder);
       } else {
         handleNoRightsDragAndDrop();
@@ -137,6 +139,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       ...modalData,
       i18nKey: "magneto.folder.drag.drop.right.error",
       onCancel: () => closeDragAndDropModal(),
+      hasSubmit: false,
     });
     onDisplayModal(true);
   };
@@ -189,7 +192,11 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   return (
     <>
-      <div ref={drop} draggable="true" className={isOver ? "drag-over" : ""}>
+      <div
+        ref={drop}
+        draggable="true"
+        className={isOver ? "drag-over" : "no-drag-over"}
+      >
         <Card
           app={currentApp!}
           isSelected={isSelected}

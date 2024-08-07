@@ -45,6 +45,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   const { selectedBoardsIds, toggleSelect, selectedBoards } =
     useBoardsNavigation();
   const [isDragged, setIsDragged] = useState<boolean>(false);
+  const [hasMounted, setHasMounted] = useState<boolean>(false);
 
   const userId = user ? user?.userId : "";
 
@@ -62,8 +63,12 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   };
 
   useEffect(() => {
-    onDragAndDropBoard(board);
-    setIsBoardDragged(isDragging);
+    if (hasMounted) {
+      onDragAndDropBoard(board);
+      setIsBoardDragged(isDragging);
+    } else {
+      setHasMounted(true);
+    }
   }, [isDragging]);
 
   useEffect(() => {

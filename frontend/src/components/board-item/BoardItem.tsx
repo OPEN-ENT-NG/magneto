@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
 import {
   mdiAccountCircle,
@@ -12,6 +13,7 @@ import { Icon } from "@mdi/react";
 import dayjs from "dayjs";
 import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
+
 import "./BoardItem.scss";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
 import {
   mdiAccountCircle,
@@ -13,7 +12,6 @@ import { Icon } from "@mdi/react";
 import dayjs from "dayjs";
 import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
-
 import "./BoardItem.scss";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
@@ -45,6 +43,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   const { selectedBoardsIds, toggleSelect, selectedBoards } =
     useBoardsNavigation();
   const [isDragged, setIsDragged] = useState<boolean>(false);
+  const [hasMounted, setHasMounted] = useState<boolean>(false);
 
   const userId = user ? user?.userId : "";
 
@@ -62,8 +61,12 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   };
 
   useEffect(() => {
-    onDragAndDropBoard(board);
-    setIsBoardDragged(isDragging);
+    if (hasMounted) {
+      onDragAndDropBoard(board);
+      setIsBoardDragged(isDragging);
+    } else {
+      setHasMounted(true);
+    }
   }, [isDragging]);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 package fr.cgi.magneto.service.impl;
 
-import com.mongodb.QueryBuilder;
+import com.mongodb.client.model.Filters;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.DateHelper;
@@ -23,6 +23,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.bson.conversions.Bson;
 import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
@@ -46,7 +47,7 @@ public class DefaultSectionService implements SectionService {
     @SuppressWarnings("unchecked")
     public Future<List<Section>> get(List<String> sectionIds) {
         Promise<List<Section>> promise = Promise.promise();
-        QueryBuilder matcher = QueryBuilder.start(Field._ID).in(sectionIds);
+        Bson matcher = Filters.eq(Field._ID, sectionIds);
 
         mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validResultsHandler(results -> {
             if (results.isLeft()) {
@@ -64,7 +65,7 @@ public class DefaultSectionService implements SectionService {
     @SuppressWarnings("unchecked")
     public Future<List<Section>> getSectionsByBoardId(String boardId) {
         Promise<List<Section>> promise = Promise.promise();
-        QueryBuilder matcher = QueryBuilder.start(Field.BOARDID).is(boardId);
+        Bson matcher = Filters.eq(Field.BOARDID, boardId);
         mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validResultsHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::getSectionsByBoardId] Failed to get sections", this.getClass().getSimpleName());

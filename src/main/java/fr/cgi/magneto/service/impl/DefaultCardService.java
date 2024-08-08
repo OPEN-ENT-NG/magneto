@@ -1,6 +1,6 @@
 package fr.cgi.magneto.service.impl;
 
-import com.mongodb.QueryBuilder;
+import com.mongodb.client.model.Filters;
 import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
@@ -29,6 +29,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.bson.conversions.Bson;
 import org.entcore.common.mongodb.MongoDbResult;
 import org.entcore.common.user.UserInfos;
 
@@ -402,7 +403,7 @@ public class DefaultCardService implements CardService {
         Promise<List<Card>> promise = Promise.promise();
 
         Pattern datePattern = Pattern.compile("^" + statisticsPayload.getDate());
-        QueryBuilder matcher = QueryBuilder.start(Field.CREATIONDATE).regex(datePattern);
+        Bson matcher = Filters.regex(Field.CREATIONDATE, datePattern);
         mongoDb.find(this.collection, MongoQueryBuilder.build(matcher), MongoDbResult.validResultsHandler(results -> {
             if (results.isLeft()) {
                 String message = String.format("[Magneto@%s::get] Failed to get cards by creation date", this.getClass().getSimpleName());

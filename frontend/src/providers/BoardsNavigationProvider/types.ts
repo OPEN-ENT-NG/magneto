@@ -8,6 +8,7 @@ export interface BoardsNavigationProviderProps {
 
 export type BoardsNavigationContextType = {
   boards: Board[];
+  boardsLoading: boolean;
   setBoards: Dispatch<SetStateAction<Board[]>>;
   searchText: string;
   setSearchText: Dispatch<SetStateAction<string>>;

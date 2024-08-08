@@ -204,7 +204,8 @@ export const TreeViewContainer: React.FunctionComponent<
       } as IFolderResponse);
     } else {
       clickedFolder =
-        folders.find((folder: Folder) => folder.id == folderId) ?? new Folder();
+        folderData.find((folder: Folder) => folder.id == folderId) ??
+        new Folder();
     }
 
     return clickedFolder;
@@ -243,8 +244,10 @@ export const TreeViewContainer: React.FunctionComponent<
       i18nKey: i18nKey,
       param: param,
       hasSubmit: true,
-      onSubmit: () =>
-        dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id),
+      onSubmit: () => {
+        closeDragAndDropModal();
+        dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id);
+      },
       onCancel: () => closeDragAndDropModal(),
     });
     onDisplayModal(true);

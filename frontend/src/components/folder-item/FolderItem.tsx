@@ -190,6 +190,68 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     onDragAndDrop(undefined);
   };
 
+    resetDragAndDrop();
+    dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTargetId);
+  };
+
+  const handleNoRightsDragAndDrop = (): void => {
+    onSetModalData({
+      ...modalData,
+      i18nKey: "magneto.folder.drag.drop.right.error",
+      onCancel: () => closeDragAndDropModal(),
+      hasSubmit: false,
+    });
+    onDisplayModal(true);
+  };
+
+  const confirmSharedFolderDragAndDrop = (
+    dragAndDropBoardsIds: string[],
+    dragAndDropTarget: Folder,
+    i18nKey: string,
+    param: string,
+  ) => {
+    onSetModalData({
+      ...modalData,
+      i18nKey: i18nKey,
+      param: param,
+      hasSubmit: true,
+      onSubmit: () => {
+        closeDragAndDropModal();
+        dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id);
+      },
+      onCancel: () => closeDragAndDropModal(),
+    });
+    onDisplayModal(true);
+  };
+
+  const dragAndDropBoardsCall = (
+    dragAndDropBoardsIds: string[],
+    dragAndDropTargetId: string,
+  ): void => {
+    moveBoardsToFolder({
+      boardIds: dragAndDropBoardsIds,
+      folderId: dragAndDropTargetId,
+    }).catch((e) => {
+      console.log(e);
+    });
+  };
+
+  const isOwnerOfSelectedBoards = (boards: Board[]): boolean => {
+    return boards.every(
+      (board: Board) =>
+        !!board && !!board.owner && board.owner.userId === (user?.userId ?? ""),
+    );
+  };
+
+  const closeDragAndDropModal = (): void => {
+    onDisplayModal(false);
+    resetDragAndDrop();
+  };
+
+  const resetDragAndDrop = (): void => {
+    onDragAndDrop(undefined);
+  };
+
   return (
     <>
       <div

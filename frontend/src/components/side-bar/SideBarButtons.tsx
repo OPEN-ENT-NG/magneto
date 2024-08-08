@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { MagnetsCollectionModal } from "../magnets-collection/MagnetsCollectionModal";
 
+import "./SideBar.scss";
+
 type SideBarButtonsProps = {
   toggleDrawer: () => void;
 };
@@ -29,17 +31,18 @@ export const SideBarButtons: React.FunctionComponent<SideBarButtonsProps> = ({
           color={"secondary"}
           variant={"outline"}
           size={"sm"}
+          className="sideButtons"
           children={t("magneto.create.folder")}
           isLoading={false}
           onClick={toggleCreateFolderOpen}
           leftIcon={<Icon path={mdiFolderPlus} size={1}></Icon>}
         ></Button>
-        <br />
         <Button
           type={"button"}
           color={"secondary"}
           variant={"outline"}
           size={"sm"}
+          className="sideButtons"
           children={"Afficher mes aimants favoris"}
           leftIcon={<Icon path={mdiStar} size={1}></Icon>}
           isLoading={false}

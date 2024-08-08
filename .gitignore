@@ -32,3 +32,6 @@ magneto/src/main/resources/public/font
 /src/main/resources/public/css/
 /yarn.lock
 /src/main/resources/public/mdi/
+.env
+target
+dependency-reduced-pom.xml

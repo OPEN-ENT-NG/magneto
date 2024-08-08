@@ -42,6 +42,7 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [selectedBoardsIds, setSelectedBoardsIds] = useState<string[]>([]);
   const [searchText, setSearchText] = useState<string>("");
+  const [boardsLoading, setBoardsLoading] = useState<boolean>(true);
   const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
     isPublic: false,
     isShared: true,
@@ -56,7 +57,8 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     sortBy: "modificationDate",
   };
 
-  const { currentData: myBoardsResult } = useGetBoardsQuery(boardsQuery);
+  const { currentData: myBoardsResult, isFetching: myBoardsLoading } =
+    useGetBoardsQuery(boardsQuery);
   const { currentData: myAllBoardsResult } =
     useGetAllBoardsQuery(allBoardsQuery);
 
@@ -119,6 +121,10 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     }
   }, [myBoardsResult, myAllBoardsResult, currentFolder]);
 
+  useEffect(() => {
+    setBoardsLoading(myBoardsLoading);
+  }, [myBoardsLoading]);
+
   const value = useMemo<BoardsNavigationContextType>(
     () => ({
       selectedBoards,
@@ -126,12 +132,20 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
       selectedBoardsIds,
       setSelectedBoardsIds,
       boards,
+      boardsLoading,
       setBoards,
       searchText,
       setSearchText,
       toggleSelect,
     }),
-    [boards, searchText, selectedBoards, selectedBoardsIds, toggleSelect],
+    [
+      boards,
+      searchText,
+      selectedBoards,
+      selectedBoardsIds,
+      toggleSelect,
+      boardsLoading,
+    ],
   );
 
   return (

@@ -80,6 +80,7 @@ export const TreeViewContainer: React.FunctionComponent<
       } else {
         targetElement = e.target.closest("li") ?? new HTMLElement();
       }
+      targetElement.classList.add("no-drag-over");
       targetElement.classList.remove("drag-over");
     }
   };
@@ -98,6 +99,7 @@ export const TreeViewContainer: React.FunctionComponent<
         targetElement = e.target.closest("li") ?? new HTMLElement();
       }
       targetElement.classList.add("drag-over");
+      targetElement.classList.remove("no-drag-over");
     }
 
     e.preventDefault();

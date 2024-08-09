@@ -1,6 +1,7 @@
 package fr.cgi.magneto.service.impl;
 
 import com.mongodb.*;
+import com.mongodb.client.model.Filters;
 import fr.cgi.magneto.core.constants.*;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.helper.*;
@@ -11,6 +12,7 @@ import fr.wseduc.mongodb.*;
 import io.vertx.core.*;
 import io.vertx.core.json.*;
 import io.vertx.core.logging.*;
+import org.bson.conversions.Bson;
 import org.entcore.common.mongodb.*;
 
 import java.util.*;
@@ -196,7 +198,7 @@ public class DefaultCommentService implements CommentService {
     private Future<String> getBoardOwnerId(String cardId) {
         Promise<String> promise = Promise.promise();
 
-        QueryBuilder matcher = QueryBuilder.start(Field.CARDIDS).is(cardId);
+        Bson matcher = Filters.eq(Field.CARDIDS, cardId);
 
         mongoDb.findOne(CollectionsConstant.BOARD_COLLECTION, MongoQueryBuilder.build(matcher), MongoDbResult.validResultHandler(result -> {
             if (result.isLeft()) {

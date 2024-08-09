@@ -1,6 +1,6 @@
 package fr.cgi.magneto.service.impl;
 
-import com.mongodb.QueryBuilder;
+import com.mongodb.client.model.Filters;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.bson.conversions.Bson;
 import org.entcore.common.folders.impl.DocumentHelper;
 import org.entcore.common.mongodb.MongoDbConf;
 import org.entcore.common.service.impl.MongoDbRepositoryEvents;
@@ -100,14 +101,15 @@ public class MagnetoRepositoryEvents extends MongoDbRepositoryEvents {
      */
     @Override
     public void exportResources(JsonArray resourcesIds, final boolean exportDocuments, boolean exportSharedResources, String exportId, String userId, JsonArray groups, final String exportPath, final String locale, String host, final Handler<Boolean> handler) {
-        QueryBuilder findByAuthor = QueryBuilder.start(Field.OWNERID).is(userId);
+        Bson findByAuthor = Filters.eq(Field.OWNERID, userId);
         JsonObject query;
 
         if (resourcesIds == null)
             query = MongoQueryBuilder.build(findByAuthor);
         else {
-            QueryBuilder limitToResources = findByAuthor.and(
-                    QueryBuilder.start(Field._ID).in(resourcesIds).get()
+            Bson limitToResources = Filters.and(
+                    findByAuthor,
+                    Filters.in(Field._ID, resourcesIds)
             );
             query = MongoQueryBuilder.build(limitToResources);
         }
@@ -282,9 +284,10 @@ public class MagnetoRepositoryEvents extends MongoDbRepositoryEvents {
         }
 
         //Check for duplicates
-        QueryBuilder lookForExisting = QueryBuilder.start()
-                .and(Field._ID).in(oldIds)
-                .and(Field.OWNERID).is(ownerId);
+        Bson lookForExisting = Filters.and(
+                Filters.in(Field._ID, oldIds),
+                Filters.eq(Field.OWNERID, ownerId)
+        );
 
         mongo.find(collection, MongoQueryBuilder.build(lookForExisting), searchMsg -> {
             JsonObject body = searchMsg.body();

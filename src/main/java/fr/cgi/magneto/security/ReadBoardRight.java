@@ -1,6 +1,6 @@
 package fr.cgi.magneto.security;
 
-import com.mongodb.QueryBuilder;
+import com.mongodb.client.model.Filters;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
@@ -21,6 +21,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.bson.conversions.Bson;
 import org.entcore.common.http.filter.MongoAppFilter;
 import org.entcore.common.http.filter.ResourcesProvider;
 import org.entcore.common.mongodb.MongoDbResult;
@@ -94,7 +95,7 @@ public class ReadBoardRight  implements ResourcesProvider {
 
     private Future<String> getBoardIdByCardId(String cardId, MongoDb mongo) {
         Promise promise = Promise.promise();
-        QueryBuilder matcher = QueryBuilder.start(Field._ID).is(cardId);
+        Bson matcher = Filters.eq(Field._ID, cardId);
 
         mongo.findOne(CollectionsConstant.CARD_COLLECTION, MongoQueryBuilder.build(matcher), MongoDbResult.validResultHandler(result -> {
             if (result.isLeft()) {

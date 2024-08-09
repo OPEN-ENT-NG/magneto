@@ -3,7 +3,6 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.*;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.impl.CompositeFutureImpl;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -17,24 +16,12 @@ public class FutureHelper {
     private FutureHelper() {
     }
 
-    public static Handler<Either<String, JsonArray>> handlerJsonArray(Future<JsonArray> future) {
-        return event -> {
-            if (event.isRight()) {
-                future.complete(event.right().getValue());
-            } else {
-                LOGGER.error(event.left().getValue());
-                future.fail(event.left().getValue());
-            }
-        };
-    }
-
     public static <L, R> Handler<Either<L, R>> handlerEitherPromise(Promise<R> promise) {
         return event -> {
             if (event.isRight()) {
                 promise.complete(event.right().getValue());
             } else {
-                String message = String.format("[Magneto@%s::handlerEitherPromise]: %s",
-                        FutureHelper.class.getSimpleName(), event.left().getValue());
+                String message = String.format("[Magneto@FutureHelper::handlerEitherPromise]: %s", event.left().getValue());
                 LOGGER.error(message);
                 promise.fail(event.left().getValue().toString());
             }
@@ -52,24 +39,13 @@ public class FutureHelper {
         };
     }
 
-    public static Handler<AsyncResult<JsonArray>> handlerAsyncJsonArray(Future<JsonArray> future) {
+    public static Handler<AsyncResult<JsonArray>> handlerAsyncJsonArray(Promise<JsonArray> promise) {
         return event -> {
             if (event.succeeded()) {
-                future.complete(event.result());
+                promise.complete(event.result());
             } else {
                 LOGGER.error(event.cause().getMessage());
-                future.fail(event.cause().getMessage());
-            }
-        };
-    }
-
-    public static Handler<Either<String, JsonObject>> handlerJsonObject(Future<JsonObject> future) {
-        return event -> {
-            if (event.isRight()) {
-                future.complete(event.right().getValue());
-            } else {
-                LOGGER.error(event.left().getValue());
-                future.fail(event.left().getValue());
+                promise.fail(event.cause().getMessage());
             }
         };
     }
@@ -107,11 +83,11 @@ public class FutureHelper {
     }
 
     public static <T> CompositeFuture all(List<Future<T>> futures) {
-        return CompositeFutureImpl.all(futures.toArray(new Future[futures.size()]));
+        return Future.all(futures);
     }
 
     public static <T> CompositeFuture join(List<Future<T>> futures) {
-        return CompositeFutureImpl.join(futures.toArray(new Future[futures.size()]));
+        return Future.join(futures);
     }
 
 }

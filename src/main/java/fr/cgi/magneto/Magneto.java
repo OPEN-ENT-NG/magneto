@@ -6,6 +6,7 @@ import fr.cgi.magneto.core.constants.*;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.impl.MagnetoRepositoryEvents;
 import fr.wseduc.mongodb.MongoDb;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.*;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.http.filter.*;
@@ -22,8 +23,8 @@ public class Magneto extends BaseServer {
 	public static final Integer PAGE_SIZE = 163;
 
     @Override
-    public void start() throws Exception {
-        super.start();
+    public void start(Promise<Void> startPromise) throws Exception {
+        super.start(startPromise);
 
         Storage storage = new StorageFactory(vertx, config).getStorage();
         MagnetoConfig magnetoConfig = new MagnetoConfig(config);
@@ -57,6 +58,8 @@ public class Magneto extends BaseServer {
         shareBoardController.setShareService(new MongoDbShareService(eb, MongoDb.getInstance(),
                 CollectionsConstant.BOARD_COLLECTION, securedActions, null));
         shareBoardController.setCrudService(new MongoDbCrudService(CollectionsConstant.BOARD_COLLECTION));
+        startPromise.tryComplete();
+        startPromise.tryFail("[Magneto@Magneto::start] Failed to start module Magneto.");
 
         // TODO Websocket
         // new RealTimeCollaboration(vertx, magnetoConfig).initRealTime();

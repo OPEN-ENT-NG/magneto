@@ -62,32 +62,6 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   const { currentData: myAllBoardsResult } =
     useGetAllBoardsQuery(allBoardsQuery);
 
-  // function manageBoardsQueryParameters() {
-  //   if (
-  //     !currentFolder.id ||
-  //     currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
-  //     currentFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
-  //     currentFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
-  //     currentFolder.id == ""
-  //   ) {
-  //     setBoardsQuery((prevBoardsQuery: any) => ({
-  //       ...prevBoardsQuery,
-  //       folderId: undefined,
-  //       isPublic: !!currentFolder.isPublic,
-  //       isDeleted: !!currentFolder.deleted,
-  //     }));
-  //   } else if (!!currentFolder && !!currentFolder.id) {
-  //     setBoardsQuery((prevBoardsQuery: any) => ({
-  //       ...prevBoardsQuery,
-  //       folderId: currentFolder.id,
-  //       isPublic: !!currentFolder.isPublic,
-  //       isDeleted: !!currentFolder.deleted,
-  //     }));
-  //   } else {
-  //     console.log("currentFolder undefined, try later or again");
-  //   }
-  // }
-
   const toggleSelect = useCallback(
     (resource: Board) => {
       if (selectedBoardsIds.includes(resource.id)) {

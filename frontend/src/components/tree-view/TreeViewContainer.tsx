@@ -42,7 +42,6 @@ export const TreeViewContainer: React.FunctionComponent<
   const [userRights] = useState<UserRights>(new UserRights(user));
   const {
     folderObject,
-    folders,
     folderData,
     handleSelect,
     folderNavigationRefs,

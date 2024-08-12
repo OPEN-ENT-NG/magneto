@@ -8,7 +8,6 @@ import { BoardItem } from "~/components/board-item/BoardItem";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 
-
 type BoardListProps = {
   onDragAndDrop: (board: Board) => void;
   searchText: string;

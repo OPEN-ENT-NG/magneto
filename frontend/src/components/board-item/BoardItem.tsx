@@ -69,7 +69,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
     } else {
       setHasMounted(true);
     }
-  }, [isDragging]);
+  }, [isDragging, hasMounted, board, onDragAndDropBoard, setIsBoardDragged]);
 
   useEffect(() => {
     setIsDragged(
@@ -79,7 +79,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
             selectedBoard && selectedBoard._id == board.id,
         ),
     );
-  }, [isBoardDragged, selectedBoards]);
+  }, [isBoardDragged, selectedBoards, board.id]);
 
   return (
     <div

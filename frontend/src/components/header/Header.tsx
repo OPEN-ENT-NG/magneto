@@ -5,6 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import { useTranslation } from "react-i18next";
 
 import myimg from "./uni-magneto.png";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 
 interface HeaderProps {
   onClick: () => void;
@@ -13,6 +14,17 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
   const { t } = useTranslation("magneto");
+
+  const { selectedBoards } = useBoardsNavigation();
+
+  const isMyBoards = selectedBoards.every(
+    (board:) => board.owner.userId === userId,
+  )
+
+  const isFolderOwnerOrSharedWithRights: boolean =
+      isMyBoards || folderHasShareRight(folders[0], "manager");
+
+
   return (
     <AppHeader>
       <IconButton

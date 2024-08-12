@@ -118,7 +118,9 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
       isMyBoards || folderHasShareRight(folders[0], "manager");
 
     return (
-      isNotDeletedFolder && isMyBoardsAndOneFolderSelectedOnly && isFolderOwnerOrSharedWithRights
+      isNotDeletedFolder &&
+      isMyBoardsAndOneFolderSelectedOnly &&
+      isFolderOwnerOrSharedWithRights
     );
   };
 

@@ -278,7 +278,7 @@ export const TreeViewContainer: React.FunctionComponent<
 
   useEffect(() => {
     onSetModalData(modalData);
-  }, [modalData, onSetModalData]);
+  }, [modalData]);
 
   const datas = useGetFolderTypeData(folderType, folderObject);
 

@@ -77,7 +77,7 @@ export const App = () => {
 
   useEffect(() => {
     resetBoardsAndFolders();
-  }, [currentFolder, resetBoardsAndFolders]);
+  }, [currentFolder]);
 
   const handleDragAndDropBoards = (board: Board) => {
     if (

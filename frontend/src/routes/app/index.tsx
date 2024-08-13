@@ -77,6 +77,7 @@ export const App = () => {
 
   useEffect(() => {
     resetBoardsAndFolders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFolder]);
 
   const handleDragAndDropBoards = (board: Board) => {

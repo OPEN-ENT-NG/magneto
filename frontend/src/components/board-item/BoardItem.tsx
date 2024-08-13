@@ -69,6 +69,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
     } else {
       setHasMounted(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, hasMounted]);
 
   useEffect(() => {
@@ -79,6 +80,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
             selectedBoard && selectedBoard._id == board.id,
         ),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isBoardDragged, selectedBoards]);
 
   return (

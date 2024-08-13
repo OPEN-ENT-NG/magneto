@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { Loading } from "@edifice-ui/react";
 import { animated, useSpring } from "@react-spring/web";
 
 import "./BoardList.scss";
@@ -7,7 +8,6 @@ import { isBoardInFilter } from "./utils";
 import { BoardItem } from "~/components/board-item/BoardItem";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
-import { Loading } from "@edifice-ui/react";
 
 type BoardListProps = {
   onDragAndDrop: (board: Board) => void;

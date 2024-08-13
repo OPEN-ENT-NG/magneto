@@ -104,8 +104,10 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         i18nKey: i18nKey,
         param: param,
         hasSubmit: true,
-        onSubmit: () =>
-          dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id),
+        onSubmit: () => {
+          closeDragAndDropModal();
+          dragAndDropBoardsCall(dragAndDropBoardsIds, dragAndDropTarget.id);
+        },
         onCancel: () => closeDragAndDropModal(),
       });
       onDisplayModal(true);

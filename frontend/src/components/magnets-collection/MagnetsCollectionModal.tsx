@@ -12,7 +12,7 @@ import { useGetAllCardsCollectionQuery } from "../../services/api/cards.service"
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card as CardModel, ICardItemResponse } from "~/models/card.model";
 import "./MagnetsCollectionModal.scss";
-import { useGetBoardsQuery } from "~/services/api/boards.service";
+import { useGetAllBoardsQuery } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;
@@ -34,7 +34,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
     data: myBoardsResult,
     isLoading: getBoardsLoading,
     error: getBoardsError,
-  } = useGetBoardsQuery({
+  } = useGetAllBoardsQuery({
     isPublic: false,
     isShared: true,
     isDeleted: false,

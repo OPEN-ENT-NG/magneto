@@ -1,7 +1,14 @@
+.no-drag-over {
+  border: solid transparent;
+  border-radius: 0.8rem;
+}
+
 .empty-folder {
   .treeview {
     li[role="treeitem"] {
+      @extend .no-drag-over;
       .action-container {
+        @extend .no-drag-over;
         flex-wrap: nowrap;
         .d-flex {
           flex-wrap: nowrap;
@@ -20,10 +27,16 @@
 }
 .treeview {
   li[role="treeitem"] {
+    @extend .no-drag-over;
     .action-container {
+      @extend .no-drag-over;
       flex-wrap: nowrap;
       .d-flex {
         flex-wrap: nowrap;
+      }
+      .py-8 {
+        padding-top: 0.2rem !important;
+        padding-bottom: 0.2rem !important;
       }
     }
   }

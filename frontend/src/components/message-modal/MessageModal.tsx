@@ -32,6 +32,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
           size="md"
           viewport={false}
         >
+          <Modal.Header onModalClose={onCancel}> </Modal.Header>
           <Modal.Body>
             {!!i18nKey && !!param && param != ""
               ? t(i18nKey, { 0: param })

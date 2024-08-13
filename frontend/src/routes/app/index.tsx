@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
 import { mdiFolder } from "@mdi/js";
@@ -60,17 +60,24 @@ export const App = () => {
   const [drawer, toggleDrawer] = useToggle(false);
   const { width } = useWindowDimensions();
 
-  const resetBoardsAndFolders = () => {
+  const resetBoardsAndFolders = useCallback(() => {
     setSearchText("");
     resetSearchBar(searchBarResetter + 1);
     setSelectedBoardsIds([]);
     setSelectedFoldersIds([]);
     setSelectedBoards([]);
     setSelectedFolders([]);
-  };
+  }, [
+    searchBarResetter,
+    setSelectedBoards,
+    setSelectedBoardsIds,
+    setSelectedFolders,
+    setSelectedFoldersIds,
+  ]);
 
   useEffect(() => {
     resetBoardsAndFolders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFolder]);
 
   const handleDragAndDropBoards = (board: Board) => {
@@ -95,7 +102,7 @@ export const App = () => {
     };
     const intervalId = setInterval(checkTitle, 250);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [t]);
 
   const isSearchResultEmpty =
     !folders.filter((folder: Folder) => {

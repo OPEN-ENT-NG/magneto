@@ -35,7 +35,7 @@ export const FolderList: React.FunctionComponent<FolderListProps> = ({
   return (
     <>
       {folders?.length ? (
-        <animated.ul className="grid ps-0 list-unstyled mb-24">
+        <animated.ul className="grid ps-0 list-unstyled mb-24 left-float">
           {folders
             .filter((folder: Folder) => {
               if (searchText === "") {

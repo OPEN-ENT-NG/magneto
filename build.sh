@@ -19,6 +19,10 @@ mkdir -p ./src/main/resources/view
 mv ./src/main/resources/*.html ./src/main/resources/view
 cp -R ./src/main/resources/notify ./src/main/resources/view/notify
 
+# Copy angular dist @TODO MUST DELETE THIS INSTRUCTION WHEN IN PRODUCTION
+cp -R ./src/main/resources/angular-dist/* ./src/main/resources/public
+mv ./src/main/resources/public/view/magneto.html ./src/main/resources/view
+
 # Build .
 #./build.sh --no-docker clean build
 ./build.sh clean build

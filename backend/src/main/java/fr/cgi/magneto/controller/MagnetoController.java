@@ -10,6 +10,7 @@ import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
+import fr.cgi.magneto.security.ViewRight;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
@@ -43,6 +44,25 @@ public class MagnetoController extends ControllerHelper {
     @ApiDoc("Render view")
     @SecuredAction(Rights.VIEW)
     public void view(HttpServerRequest request) {
+        String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode()) ?
+                String.format(":%s%s", this.magnetoConfig.websocketConfig().port(), this.magnetoConfig.websocketConfig().endpointProxy()) :
+                this.magnetoConfig.websocketConfig().endpointProxy();
+
+        Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
+        Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();
+        JsonObject param = new JsonObject()
+                .put(Field.WEBSOCKETENDPOINT, websocketEndpoint)
+                .put(Field.MAGNETO_UPDATE_FREQUENCY, updateFrequency)
+                .put(Field.MAGNETO_STANDALONE, isStandalone);
+        renderView(request, param, "magneto.html", null);
+        eventStore.createAndStoreEvent(ACCESS.name(), request);
+    }
+
+    @Get("/react")
+    @ApiDoc("Render view")
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void viewReact(HttpServerRequest request) {
         String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode()) ?
                 String.format(":%s%s", this.magnetoConfig.websocketConfig().port(), this.magnetoConfig.websocketConfig().endpointProxy()) :
                 this.magnetoConfig.websocketConfig().endpointProxy();

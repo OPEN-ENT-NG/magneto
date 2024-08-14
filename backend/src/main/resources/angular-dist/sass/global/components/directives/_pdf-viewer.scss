@@ -1,0 +1,42 @@
+.pdf-viewer{
+  &-header {
+    display: flex;
+    margin-bottom: 6px;
+
+    &-pagination-area{
+
+      flex: auto;
+      justify-content: center;
+
+      &-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &-numPage {
+          font-size: 14px;
+        }
+
+        &-input {
+          font-size: 14px;
+          margin: 0;
+          flex: 1;
+          width: 3em;
+        }
+      }
+      &-file-controls{
+        padding: 0 1em;
+      }
+    }
+
+    &-title {
+      color: $magneto-light-grey;
+    }
+  }
+
+  .render {
+    max-width: 100%;
+    max-height: 90%;
+    border: 1px solid $magneto-light-grey;
+  }
+}

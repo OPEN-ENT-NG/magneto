@@ -14,6 +14,7 @@
     .tooltip {
       max-width: 100%;
       width: fit-content;
+      pointer-events: none;
       .tooltip-arrow {
         left: 1rem !important;
       }

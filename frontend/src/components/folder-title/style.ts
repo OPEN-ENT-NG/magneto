@@ -5,6 +5,7 @@ export const folderTitleWrapper = (position: "start" | "middle" | "end") => css`
   margin: 25px 20px 10px 0px;
   width: 100%;
   display: flex;
+  float: left;
   justify-content: ${position === "start"
     ? "flex-start"
     : position === "middle"

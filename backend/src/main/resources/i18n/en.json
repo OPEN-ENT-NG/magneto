@@ -204,5 +204,9 @@
   "magneto.folder.share.drag.out.warning": "Toutes les personnes ayant accès au dossier {{0}} ne pourront plus accéder à cet élément, sauf s'il est partagé directement avec elles.",
   "magneto.confirm": "Confirmer",
   "magneto.folder.share.predelete.warning": "Les utilisateurs à qui vous avez partagé les éléments n'y auront plus accès.",
-  "magneto.folder.drag.drop.right.error": "Vous n'avez pas le droit nécessaire pour déplacer cet élément ici"
+  "magneto.folder.drag.drop.right.error": "Vous n'avez pas le droit nécessaire pour déplacer cet élément ici",
+  "read": "Consulter",
+  "contrib": "Contribuer",
+  "publish": "Publier",
+  "manager": "Gérer"
 }

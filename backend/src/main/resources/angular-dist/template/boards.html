@@ -1,0 +1,264 @@
+<div ng-controller="BoardsController as vm" class="boardsContainer-container">
+    <!--    <card-profile name="'test'" job="'test'"></card-profile>-->
+
+    <!-- Header desktop -->
+    <board-container-header
+            filter="vm.filter"
+            magneto-standalone="vm.magnetoStandalone"
+            on-has-right="vm.hasRight"
+            on-open-create-form="vm.openCreateForm()">
+    </board-container-header>
+
+    <!-- Header mobile -->
+    <div class="boardsContainer-container-header-mobile zero-desktop">
+        <!-- Open navigation mobile -->
+        <i class="magneto-card-settings cell one" ng-click="vm.openSideNavFolders()"></i>
+        <h1 class="cell eight">
+            <i18n>magneto.title</i18n>
+            /
+            <i18n>magneto.my.boards</i18n>
+        </h1>
+        <button ng-if="vm.filter.isMyBoards && vm.hasRight('manage')"
+                class="right-magnet create-button cell three" ng-click="vm.openCreateForm()">
+            <i18n>magneto.create</i18n>
+        </button>
+    </div>
+
+
+    <div class="twelve cell boardsContainer-container-body">
+
+        <!-- Navigation desktop -->
+        <div class="three cell boardsContainer-container-body-nav zero-mobile flex-row f-column">
+            <folder-tree-nav
+                    folder-trees="vm.folderNavTrees"
+                    folder-tree-eventer="vm.folderNavTreeSubject"
+                    on-select-folder="vm.switchFolder"
+                    drag="vm.draggable">
+            </folder-tree-nav>
+            <div class="boardsContainer-container-body-folder-button"
+                 ng-click="vm.displayFolderLightbox = true"
+                 ng-if="vm.filter.isMyBoards">
+                <a class="classic-link" data-ng-if="vm.folderHasCreationRight()">
+                    <i class="magneto-folder-plus"></i>
+                    <i18n>magneto.create.folder</i18n>
+                </a>
+            </div>
+            <div ng-click="vm.openCardCollection()" class="boardsContainer-container-body-folder-button">
+                <a class="classic-link">
+                    <i class="magneto-favorite-active"></i>
+                    <i18n>magneto.show.favorites</i18n>
+                </a>
+            </div>
+        </div>
+
+        <div class="nine cell">
+            <div class="row boardsContainer-container-body-search">
+                <search-bar
+                        search-text="vm.filter.searchText"
+                        on-search="vm.onSearchBoard()">
+                </search-bar>
+            </div>
+
+
+            <div class="list-header row">
+                <!--Folder name-->
+                <div class="folder-name">
+                    <i class="magneto-folder"></i>
+                    <span ng-if="vm.openedFolder == null && vm.filter.isMyBoards">
+                        <i18n>magneto.my.boards</i18n>
+                    </span>
+                    <span ng-if="vm.openedFolder == null && vm.filter.isPublic">
+                        <i18n>magneto.lycee.connecte.boards</i18n>
+                    </span>
+                    <span ng-if="vm.openedFolder == null && vm.filter.isTrash">
+                        <i18n>magneto.trash</i18n>
+                    </span>
+                    <span ng-if="vm.openedFolder != null">[[vm.openedFolder.title]]</span>
+                </div>
+            </div>
+
+            <board-list
+                    ng-if="!vm.isLoading"
+                    boards="vm.boards"
+                    folders="vm.currentFolderChildren"
+                    categories-eventer="vm.boardCategoriesService"
+                    selected-board-ids="vm.selectedBoardIds"
+                    selected-boards-for-sharing="vm.selectedBoards"
+                    selected-folder-ids="vm.selectedFolderIds"
+                    selected-folders-for-sharing="vm.selectedFolders"
+                    on-open="vm.openBoardOrFolder"
+                    drag="vm.draggable">
+            </board-list>
+            <div ng-show="vm.isLoading" class="centered-text">
+                <loader min-height="'250px'"></loader>
+            </div>
+
+            <div class="empty-state"
+                 data-ng-show="!vm.isLoading"
+                 ng-if="vm.boards.length === 0 && vm.currentFolderChildren.length === 0">
+                <img data-ng-src="/magneto/public/img/empty-state-magneto.svg" alt="empty boards">
+                <i18n>magneto.boards.empty.text</i18n>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation mobile -->
+    <div id="sideNavMobile" class="side-nav-mobile zero-desktop">
+        <div class="vertical-spacing row">
+            <a class="closebtn" ng-click="vm.closeSideNavFolders()">&times;</a>
+        </div>
+        <folder-tree-nav
+                folder-trees="vm.folderNavTrees"
+                folder-tree-eventer="vm.folderNavTreeSubject"
+                on-select-folder="vm.switchFolder"
+                drag="vm.draggable">
+        </folder-tree-nav>
+        <div class="side-nav-mobile-folder-button"
+             ng-click="vm.displayFolderLightbox = true"
+             ng-if="vm.filter.isMyBoards">
+            <a class="classic-link" data-ng-if="vm.folderHasCreationRight()">
+                <i class="magneto-folder-plus"></i>
+                <i18n>magneto.create.folder</i18n>
+            </a>
+        </div>
+        <div ng-click="vm.openCardCollection()" class="side-nav-mobile-folder-button">
+            <a class="classic-link">
+                <i class="magneto-favorite-active"></i>
+                <i18n>magneto.show.favorites</i18n>
+            </a>
+        </div>
+    </div>
+
+    <!-- Board deletion modal -->
+    <board-delete-lightbox
+            display="vm.displayDeleteBoardLightbox"
+            on-submit="vm.onFormSubmit"
+            is-predelete="!vm.filter.isTrash"
+            board-ids="vm.selectedBoardIds"
+            folder-ids="vm.selectedFolderIds">
+    </board-delete-lightbox>
+
+    <!-- Board creation modal -->
+    <board-manage-lightbox
+            display="vm.displayBoardLightbox"
+            on-submit="vm.onFormSubmit"
+            is-update="vm.displayUpdateBoardLightbox"
+            form="vm.selectedUpdateBoardForm"
+            folder-id="vm.openedFolder.id">
+    </board-manage-lightbox>
+
+    <!-- Board move model -->
+    <board-move-lightbox
+            folder-trees="vm.folderMoveNavTrees"
+            display="vm.displayMoveBoardLightbox"
+            board-ids="vm.selectedBoardIds"
+            initial-folder="vm.dragAndDropInitialFolder"
+            target-folder="vm.dragAndDropTarget"
+            from-move-lightbox="vm.isFromMoveBoardLightbox">
+    </board-move-lightbox>
+
+    <!-- Folder creation/rename modal -->
+    <folder-manage-lightbox
+            display="vm.displayFolderLightbox"
+            is-update="vm.displayUpdateFolderLightbox"
+            parent-id="vm.openedFolder.id"
+            on-submit="vm.submitFolderForm"
+            form="vm.selectedUpdateFolderForm">
+    </folder-manage-lightbox>
+
+    <!-- Board share modal -->
+    <share-panel-lightbox
+            display="vm.displayShareBoardLightbox"
+            resources="vm.selectedBoards"
+            app-prefix="'magneto/board'"
+            parent-folder="vm.openedFolder">
+    </share-panel-lightbox>
+
+    <!-- Folder share modal -->
+    <share-panel-lightbox
+            display="vm.displayShareFolderLightbox"
+            resources="vm.selectedFolders"
+            app-prefix="'magneto/folder'"
+            parent-folder="vm.openedFolder">
+    </share-panel-lightbox>
+
+    <board-publish-lightbox
+            display="vm.displayPublicShareBoardLightbox"
+            board="vm.selectedBoards[0]"
+            on-submit="vm.onFormSubmit">
+    </board-publish-lightbox>
+
+    <!-- Drag n drop in shared folder warning -->
+    <message-lightbox
+            display="vm.displayEnterSharedFolderWarningLightbox"
+            key="'magneto.folder.share.drag.in.warning'"
+            params="[vm.dragAndDropTarget.title]"
+            disable-submit="false"
+            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget, vm.isFromMoveBoardLightbox)"
+            on-close="vm.resetDragAndDrop()">
+    </message-lightbox>
+
+    <!-- Drag n drop out of shared folder warning -->
+    <message-lightbox
+            display="vm.displayExitSharedFolderWarningLightbox"
+            key="'magneto.folder.share.drag.out.warning'"
+            params="[vm.dragAndDropInitialFolder.title]"
+            disable-submit="false"
+            on-submit="vm.proceedOnDragAndDrop(vm.dragAndDropBoard, vm.dragAndDropTarget, vm.isFromMoveBoardLightbox)"
+            on-close="vm.resetDragAndDrop()">
+    </message-lightbox>
+
+    <!-- Drag n drop in folder no rights error -->
+    <message-lightbox
+            display="vm.displayMoveNoRightInFolderLightbox"
+            key="'magneto.folder.drag.drop.right.error'"
+            params="[]"
+            disable-submit="true"
+            on-submit="vm.resetDragAndDrop()"
+            on-close="vm.resetDragAndDrop()">
+    </message-lightbox>
+
+    <card-collection
+            ng-if="vm.displayCollectionLightbox"
+            display="vm.displayCollectionLightbox"
+            navbar-first-selected="vm.COLLECTION_NAVBAR_VIEWS.FAVORITES"
+            navbar="[vm.COLLECTION_NAVBAR_VIEWS.FAVORITES]"
+            is-home="true"
+            on-submit="vm.onCollectionSubmit">
+    </card-collection>
+
+    <infinite-scroll scrolled="vm.onScroll()"
+                     loading-mode="false"
+                     scroll-eventer="vm.infiniteScrollService">
+    </infinite-scroll>
+
+    <toaster
+            display="vm.selectedBoardIds.length > 0 || vm.selectedFolderIds.length > 0"
+            has-open="!vm.filter.isTrash && (vm.selectedFolderIds.length == 1 || vm.selectedBoardIds.length == 1) && vm.selectedFolderIds.length + vm.selectedBoardIds.length == 1"
+            on-open="vm.openBoardOrFolder"
+            has-properties="vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
+                            && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].myRights.manager"
+            on-properties="vm.openPropertiesForm"
+            has-delete="!vm.filter.isPublic
+                        && ((vm.selectedFolderIds.length > 0  && vm.areSelectedFoldersMine())
+                        || (vm.selectedBoardIds.length > 0 && vm.areSelectedBoardsMine()))"
+            on-delete="vm.openDeleteForm"
+            has-share="((vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
+                        && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard())
+                        || (vm.selectedFolderIds.length == 1 && vm.selectedBoardIds.length == 0 && vm.isOwner(vm.selectedFolderIds[0])))"
+            has-public-share="!vm.openedFolder.shared && (vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
+                        && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard() && !vm.selectedBoards[0].public && vm.hasRight('publish'))"
+            has-public-unshare="vm.filter.isMyBoards && vm.selectedBoardIds.length == 1
+                        && vm.selectedFolderIds.length == 0 && vm.selectedBoards[0].isMyBoard() && vm.selectedBoards[0].public && vm.hasRight('publish')"
+            on-public-share="vm.openPublicShareForm"
+            on-share="vm.openShareForm"
+            has-duplicate="vm.hasDuplicationRight()"
+            on-duplicate="vm.duplicateBoard"
+            has-restore="vm.filter.isTrash"
+            on-restore="vm.restoreBoardsOrFolders"
+            has-move="vm.filter.isMyBoards && vm.selectedFolderIds.length == 0 && vm.selectedBoardIds.length > 0 && vm.isOwnerOfSelectedBoards()"
+            on-move="vm.moveBoards"
+            has-rename="vm.hasRenameRight()"
+            on-rename="vm.openRenameFolderForm">
+    </toaster>
+</div>

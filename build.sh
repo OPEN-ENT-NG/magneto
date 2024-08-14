@@ -50,6 +50,14 @@ install () {
   docker compose run --rm maven mvn $MVN_OPTS clean install -U -DskipTests
 }
 
+# Copy angular dist @TODO MUST DELETE THIS INSTRUCTION WHEN IN PRODUCTION
+cp -R ./src/main/resources/angular-dist/* ./src/main/resources/public
+mv ./src/main/resources/public/view/magneto.html ./src/main/resources/view
+
+# Build .
+#./build.sh --no-docker clean build
+./build.sh clean build
+
 testNode () {
   rm -rf coverage
   rm -rf */build

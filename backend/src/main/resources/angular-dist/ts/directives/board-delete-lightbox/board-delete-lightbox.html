@@ -1,0 +1,38 @@
+<lightbox class="board-delete-lightbox"
+          show="vm.display"
+          on-close="vm.display = false">
+    <section class="head board-delete-lightbox-head">
+        <h3>
+            <i18n>magneto.delete.elements</i18n>
+        </h3>
+    </section>
+
+    <section class="body board-delete-lightbox-body">
+        <div class="row vertical-spacing board-delete-lightbox-body-inputs">
+            <div ng-if="vm.isPredelete">
+                <i18n>magneto.predelete.elements.message</i18n>
+            </div>
+            <div ng-if="vm.isPredelete && vm.hasSharedElement()">
+                <i18n>magneto.folder.share.predelete.warning</i18n>
+            </div>
+            <div ng-if="!vm.isPredelete">
+                <i18n>magneto.delete.elements.message</i18n>
+            </div>
+        </div>
+    </section>
+    <!-- Form submit/cancel buttons -->
+    <section>
+        <div class="row horizontal-spacing">
+            <div class="twelve cell">
+                <button class="right-magnet"
+                        data-ng-click="vm.submitDelete()">
+                    <i18n>magneto.delete</i18n>
+                </button>
+                <button class="right-magnet cancel"
+                        data-ng-click="vm.closeForm()">
+                    <i18n>magneto.cancel</i18n>
+                </button>
+            </div>
+        </div>
+    </section>
+</lightbox>

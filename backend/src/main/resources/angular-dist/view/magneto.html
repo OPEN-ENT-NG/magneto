@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html class="magneto-main">
+
+	<head>
+		<title>{{#i18n}}magneto.title{{/i18n}}</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+		<script src="/assets/js/entcore/ng-app.js?v=1712649545181" type="text/javascript" id="context"></script>
+		<script src="/magneto/public/dist/application.js?v=1712649545181" type="text/javascript"></script>
+
+		<script type="text/ng-template" id="empty"></script>
+		<script>
+			websocketEndpoint = "{{websocketEndpoint}}";
+			magnetoUpdateFrequency = "{{magnetoUpdateFrequency}}";
+			magnetoStandalone = "{{magnetoStandalone}}";
+		</script>
+		<!-- Link to CSS -->
+		<link rel="stylesheet" href="/magneto/public/css/magneto.css?v=1712649545181">
+	</head>
+
+	<body ng-controller="MainController as vm" class="magneto">
+		<portal>
+			<container template="main"></container>
+		</portal>
+	</body>
+
+</html>

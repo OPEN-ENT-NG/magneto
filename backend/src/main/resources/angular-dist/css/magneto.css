@@ -1,0 +1,2434 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap");
+@font-face {
+  font-family: "magneto-mdi";
+  src: url("/magneto/public/mdi/materialdesignicons-webfont.eot");
+  src: url("/magneto/public/mdi/materialdesignicons-webfont.eot") format("embedded-opentype"), url("/magneto/public/mdi/materialdesignicons-webfont.woff2") format("woff2"), url("/magneto/public/mdi/materialdesignicons-webfont.woff2") format("woff"), url("/magneto/public/mdi/materialdesignicons-webfont.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+body.magneto, .sniplet.magneto {
+  /* ----------------------------
+      Spacing
+  ---------------------------- */
+  /* Global */
+  /* Ascenseur */
+}
+body.magneto .loader-container, .sniplet.magneto .loader-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.magneto .loader-container .loader, .sniplet.magneto .loader-container .loader {
+  margin: 50px;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 10px;
+  background: #ffb600;
+  border-radius: 5px;
+  animation: load 1.8s ease-in-out infinite;
+}
+body.magneto .loader-container .loader:before, body.magneto .loader-container .loader:after, .sniplet.magneto .loader-container .loader:before, .sniplet.magneto .loader-container .loader:after {
+  position: absolute;
+  display: block;
+  content: "";
+  animation: load 1.8s ease-in-out infinite;
+  height: 10px;
+  border-radius: 5px;
+}
+body.magneto .loader-container .loader:before, .sniplet.magneto .loader-container .loader:before {
+  top: -20px;
+  left: 10px;
+  width: 40px;
+  background: #e61610;
+}
+body.magneto .loader-container .loader:after, .sniplet.magneto .loader-container .loader:after {
+  bottom: -20px;
+  width: 35px;
+  background: #368daf;
+}
+@keyframes load {
+  0% {
+    transform: translateX(40px);
+  }
+  50% {
+    transform: translateX(-30px);
+  }
+  100% {
+    transform: translateX(40px);
+  }
+}
+body.magneto .boardsContainer-container-header, .sniplet.magneto .boardsContainer-container-header {
+  background: #ffffff;
+  padding: 24px;
+}
+body.magneto .boardsContainer-container-header h1, .sniplet.magneto .boardsContainer-container-header h1 {
+  font-family: "Comfortaa", cursive;
+  color: #ecbe30;
+  margin-bottom: 0;
+}
+body.magneto .boardsContainer-container-header h1 .application-logo, .sniplet.magneto .boardsContainer-container-header h1 .application-logo {
+  width: 36px;
+  margin-right: 10px;
+}
+body.magneto .boardsContainer-container-header-mobile, .sniplet.magneto .boardsContainer-container-header-mobile {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+}
+body.magneto .boardsContainer-container-header-mobile h1, .sniplet.magneto .boardsContainer-container-header-mobile h1 {
+  font-family: "Comfortaa", cursive;
+  color: #ecbe30;
+  margin-bottom: 0;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+}
+body.magneto .boardsContainer-container-header-mobile i, .sniplet.magneto .boardsContainer-container-header-mobile i {
+  margin: 8px;
+  font-size: 24px;
+}
+body.magneto .boardsContainer-container-header-mobile button, .sniplet.magneto .boardsContainer-container-header-mobile button {
+  margin: 8px;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .boardsContainer-container .nine, .sniplet.magneto .boardsContainer-container .nine {
+    width: 100% !important;
+  }
+}
+body.magneto .boardsContainer-container-body, .sniplet.magneto .boardsContainer-container-body {
+  display: flex;
+  border-top: solid 1px #e3f1f7;
+  border-bottom: solid 1px #e3f1f7;
+  background: #ffffff;
+}
+body.magneto .boardsContainer-container-body-nav, .sniplet.magneto .boardsContainer-container-body-nav {
+  min-height: 550px;
+  border-right: solid 1px #e3f1f7;
+  gap: 16px;
+}
+body.magneto .boardsContainer-container-body-search, .sniplet.magneto .boardsContainer-container-body-search {
+  border-bottom: solid 1px #e3f1f7;
+  display: block;
+  padding: 24px;
+}
+body.magneto .boardsContainer-container-body .list-header, .sniplet.magneto .boardsContainer-container-body .list-header {
+  padding: 20px 20px 0 20px;
+}
+body.magneto .boardsContainer-container-body .list-header .folder-name, .sniplet.magneto .boardsContainer-container-body .list-header .folder-name {
+  font-size: 20px;
+}
+body.magneto .boardsContainer-container-body-favorite-button, .sniplet.magneto .boardsContainer-container-body-favorite-button {
+  text-align: center;
+  text-decoration: underline;
+  padding: 16px;
+  margin-top: 8px;
+  background: #F1F1F1;
+}
+body.magneto .boardsContainer-container-body-favorite-button:hover, .sniplet.magneto .boardsContainer-container-body-favorite-button:hover {
+  background: #ff8500;
+  color: #ffffff;
+}
+body.magneto .boardsContainer-container-body-folder-button, .sniplet.magneto .boardsContainer-container-body-folder-button {
+  display: flex;
+  align-self: center;
+}
+body.magneto .boardsContainer-container-body-folder-button a, .sniplet.magneto .boardsContainer-container-body-folder-button a {
+  border: solid #46afe6 1px;
+  border-radius: 5px;
+  background: none !important;
+  padding: 8px 24px;
+  text-align: center;
+}
+body.magneto .boardsContainer-container-body .empty-state, .sniplet.magneto .boardsContainer-container-body .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body.magneto .boardsContainer-container-body .empty-state img, .sniplet.magneto .boardsContainer-container-body .empty-state img {
+  width: 26%;
+}
+body.magneto .boardsContainer-container-body .empty-state i18n, .sniplet.magneto .boardsContainer-container-body .empty-state i18n {
+  padding: 24px;
+}
+body.magneto .boardsContainer-container .side-nav-mobile, .sniplet.magneto .boardsContainer-container .side-nav-mobile {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  background-color: #F0F0F0;
+  overflow-x: hidden;
+  transition: 0.5s;
+  top: 52px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.26);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+body.magneto .boardsContainer-container .side-nav-mobile .vertical-spacing, .sniplet.magneto .boardsContainer-container .side-nav-mobile .vertical-spacing {
+  height: 24px;
+}
+body.magneto .boardsContainer-container .side-nav-mobile .vertical-spacing .closebtn, .sniplet.magneto .boardsContainer-container .side-nav-mobile .vertical-spacing .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+  cursor: pointer;
+}
+body.magneto .boardsContainer-container .side-nav-mobile .folder-tree-nav-item-name i, .sniplet.magneto .boardsContainer-container .side-nav-mobile .folder-tree-nav-item-name i {
+  margin-left: 5px !important;
+}
+body.magneto .boardsContainer-container .side-nav-mobile-folder-button, .sniplet.magneto .boardsContainer-container .side-nav-mobile-folder-button {
+  justify-content: center;
+  display: flex;
+  width: 85%;
+}
+body.magneto .boardsContainer-container .side-nav-mobile-folder-button a, .sniplet.magneto .boardsContainer-container .side-nav-mobile-folder-button a {
+  border: solid #46afe6 1px;
+  border-radius: 5px;
+  background: none !important;
+  padding: 8px 24px;
+  text-align: center;
+}
+body.magneto .header.no-1d, .sniplet.magneto .header.no-1d {
+  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9000;
+  width: 100%;
+}
+body.magneto .boardContainer-container-header, .sniplet.magneto .boardContainer-container-header {
+  background: #ffffff;
+  padding: 16px;
+  padding-left: 48px;
+  z-index: unset;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .boardContainer-container-header-content, .sniplet.magneto .boardContainer-container-header-content {
+  gap: 30px;
+}
+body.magneto .boardContainer-container-header-content-options, .sniplet.magneto .boardContainer-container-header-content-options {
+  gap: 30px;
+}
+@media (max-width: 1024px) {
+  body.magneto .boardContainer-container-header-content-options, .sniplet.magneto .boardContainer-container-header-content-options {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+@media (max-width: 1024px) and (min-width: 800px) {
+  body.magneto .boardContainer-container-header-content-options button, .sniplet.magneto .boardContainer-container-header-content-options button {
+    width: 36%;
+    margin-left: auto;
+  }
+}
+body.magneto .boardContainer-container-header h1, .sniplet.magneto .boardContainer-container-header h1 {
+  font-family: "Comfortaa", cursive;
+  color: #ecbe30;
+  margin-bottom: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+@media (max-width: 1024px) {
+  body.magneto .boardContainer-container-header h1, .sniplet.magneto .boardContainer-container-header h1 {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2 !important;
+    /*! autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /*! autoprefixer: on */
+  }
+}
+body.magneto .boardContainer-container-header h1 .application-logo, .sniplet.magneto .boardContainer-container-header h1 .application-logo {
+  width: 36px;
+  margin-right: 10px;
+}
+body.magneto .boardContainer-container-header-degrade, .sniplet.magneto .boardContainer-container-header-degrade {
+  background: linear-gradient(to top, #FFFFFF 0.9%, transparent);
+  position: absolute;
+  height: 43%;
+}
+@media (max-width: 1024px) {
+  body.magneto .boardContainer-container-header-degrade, .sniplet.magneto .boardContainer-container-header-degrade {
+    height: 33%;
+  }
+}
+body.magneto .boardContainer-container-header-description, .sniplet.magneto .boardContainer-container-header-description {
+  max-height: 66px !important;
+  overflow: hidden !important;
+  white-space: pre-line !important;
+  margin-bottom: 5px !important;
+}
+body.magneto .boardContainer-container-header-title, .sniplet.magneto .boardContainer-container-header-title {
+  flex: 3;
+}
+@media (max-width: 800px) {
+  body.magneto .boardContainer-container-header, .sniplet.magneto .boardContainer-container-header {
+    display: none !important;
+  }
+}
+body.magneto .boardContainer-container-header-mobile, .sniplet.magneto .boardContainer-container-header-mobile {
+  background: #ffffff;
+  padding: 8px 8px 24px 73px;
+  top: -12px;
+  z-index: unset;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .boardContainer-container-header-mobile-title, .sniplet.magneto .boardContainer-container-header-mobile-title {
+  width: 70%;
+}
+body.magneto .boardContainer-container-header-mobile h1, .sniplet.magneto .boardContainer-container-header-mobile h1 {
+  font-size: 16px;
+  font-family: "Comfortaa", cursive;
+  color: #ecbe30;
+  margin-bottom: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .boardContainer-container-header-mobile h1 .application-logo, .sniplet.magneto .boardContainer-container-header-mobile h1 .application-logo {
+  width: 24px;
+  margin-right: 10px;
+}
+body.magneto .boardContainer-container-header-mobile-description, .sniplet.magneto .boardContainer-container-header-mobile-description {
+  overflow: hidden !important;
+  white-space: pre-line !important;
+  height: 20px !important;
+}
+body.magneto .boardContainer-container-header-mobile .create-button, .sniplet.magneto .boardContainer-container-header-mobile .create-button {
+  float: right;
+}
+@media (min-width: 801px) {
+  body.magneto .boardContainer-container-header-mobile, .sniplet.magneto .boardContainer-container-header-mobile {
+    display: none !important;
+  }
+}
+body.magneto .boardContainer-container-body, .sniplet.magneto .boardContainer-container-body {
+  display: flex;
+  border-top: solid 1px #e3f1f7;
+  border-bottom: solid 1px #e3f1f7;
+  background-size: cover;
+  position: absolute;
+}
+body.magneto .boardContainer-container-body.no-background-image, .sniplet.magneto .boardContainer-container-body.no-background-image {
+  background: #f8f9fa;
+}
+@media (max-width: 800px) {
+  body.magneto .boardContainer-container-body, .sniplet.magneto .boardContainer-container-body {
+    top: 88px;
+  }
+}
+body.magneto .boardContainer-container-body-nav, .sniplet.magneto .boardContainer-container-body-nav {
+  width: 60px;
+}
+body.magneto .boardContainer-container-body .cardListMinHeight, .sniplet.magneto .boardContainer-container-body .cardListMinHeight {
+  min-height: 1000px;
+}
+body.magneto .boardContainer-container-body-list, .sniplet.magneto .boardContainer-container-body-list {
+  width: 100%;
+  overflow-x: auto;
+}
+body.magneto .boardContainer-container-body-list .empty-state, .sniplet.magneto .boardContainer-container-body-list .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12%;
+}
+body.magneto .boardContainer-container-body-list .empty-state i18n, .sniplet.magneto .boardContainer-container-body-list .empty-state i18n {
+  padding: 24px;
+}
+body.magneto .boardContainer-container-body-list .empty-state i.magneto-arrow-left, .sniplet.magneto .boardContainer-container-body-list .empty-state i.magneto-arrow-left {
+  font-size: 100px;
+  padding: 24px;
+}
+body.magneto .boardContainer-container-body embedder, .sniplet.magneto .boardContainer-container-body embedder {
+  z-index: 99999;
+}
+body.magneto .boardContainer-read-container, .sniplet.magneto .boardContainer-read-container {
+  display: flex;
+  background: #ffffff;
+  min-height: calc(100vh - 124px);
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media screen and (max-width: 1200px) {
+  body.magneto .boardContainer-read-container, .sniplet.magneto .boardContainer-read-container {
+    width: 85% !important;
+  }
+}
+@media (max-width: 800px) {
+  body.magneto .boardContainer-read-container, .sniplet.magneto .boardContainer-read-container {
+    width: 100% !important;
+  }
+}
+@media screen and (max-width: 950px) {
+  body.magneto .boardContainer-read-container, .sniplet.magneto .boardContainer-read-container {
+    width: 100% !important;
+  }
+}
+body.magneto .boardContainer-read-container .return-button, .sniplet.magneto .boardContainer-read-container .return-button {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  display: flex;
+}
+body.magneto .boardContainer-read-container .nav-right, .sniplet.magneto .boardContainer-read-container .nav-right {
+  font-size: 70px;
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  z-index: 1;
+  color: #000000;
+}
+body.magneto .boardContainer-read-container .nav-right:before, .sniplet.magneto .boardContainer-read-container .nav-right:before {
+  background-color: #ffffff;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+body.magneto .boardContainer-read-container .nav-left, .sniplet.magneto .boardContainer-read-container .nav-left {
+  font-size: 70px;
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  z-index: 1;
+  color: #000000;
+}
+body.magneto .boardContainer-read-container .nav-left:before, .sniplet.magneto .boardContainer-read-container .nav-left:before {
+  background-color: #ffffff;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+body.magneto .boardContainer-read-container .button-icon, .sniplet.magneto .boardContainer-read-container .button-icon {
+  font-size: 24px;
+}
+body.magneto .boardContainer-read-container .nav-container, .sniplet.magneto .boardContainer-read-container .nav-container {
+  background-color: #f1f5f8;
+  width: 60%;
+  border-bottom-right-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+  line-height: 5vh;
+  padding: 16px;
+}
+body.magneto .boardContainer-read-container .section-container, .sniplet.magneto .boardContainer-read-container .section-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+body.magneto .boardContainer-read-container .section-container .file-viewer, .sniplet.magneto .boardContainer-read-container .section-container .file-viewer {
+  margin: 0;
+  flex: 1;
+}
+body.magneto .boardContainer-read-container .section-container .file-viewer .pdf-viewer, .sniplet.magneto .boardContainer-read-container .section-container .file-viewer .pdf-viewer {
+  max-height: calc(80vh - 238px);
+}
+body.magneto .boardContainer-read-container .li-container, .sniplet.magneto .boardContainer-read-container .li-container {
+  position: relative;
+  font-size: 24px;
+  font-weight: bold;
+}
+body.magneto .boardContainer-read-container .truncate, .sniplet.magneto .boardContainer-read-container .truncate {
+  width: 90%;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+  font-size: 14px;
+}
+body.magneto .boardContainer-read-container .truncate:hover, .sniplet.magneto .boardContainer-read-container .truncate:hover {
+  color: #ecbe30 !important;
+}
+body.magneto .boardContainer-read-container .show-section, .sniplet.magneto .boardContainer-read-container .show-section {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+body.magneto .boardContainer-read-container nav ul, .sniplet.magneto .boardContainer-read-container nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+body.magneto .boardDirective-list-item, .sniplet.magneto .boardDirective-list-item {
+  height: 250px;
+  width: 240px;
+  border-radius: 10px;
+  border: solid #ebebeb 1px;
+  box-shadow: none;
+}
+body.magneto .boardDirective-list-item.active, .sniplet.magneto .boardDirective-list-item.active {
+  border: solid #78c5e2 3px !important;
+  background: #bde4f9;
+  border-radius: 13px;
+  margin: -3px;
+}
+body.magneto .boardDirective-list-item.active-image, .sniplet.magneto .boardDirective-list-item.active-image {
+  background: #bde4f9;
+}
+@media (max-width: 800px) {
+  body.magneto .boardDirective-list-item, .sniplet.magneto .boardDirective-list-item {
+    width: 170px;
+  }
+}
+body.magneto .boardDirective-list-item-image, .sniplet.magneto .boardDirective-list-item-image {
+  background: #f4fAfd;
+  border-radius: 10px 10px 0 0;
+  flex: 1;
+  height: 60%;
+}
+body.magneto .boardDirective-list-item-image img, .sniplet.magneto .boardDirective-list-item-image img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+body.magneto .boardDirective-list-item-infos, .sniplet.magneto .boardDirective-list-item-infos {
+  height: 25%;
+  margin: 2% 4% 6% 4%;
+  flex-direction: column;
+}
+body.magneto .boardDirective-list-item-infos-title, .sniplet.magneto .boardDirective-list-item-infos-title {
+  font-size: 16px;
+  font-weight: bold;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .boardDirective-list-item-infos-nb-cards, .sniplet.magneto .boardDirective-list-item-infos-nb-cards {
+  font-size: 13px;
+}
+body.magneto .boardDirective-list-item-infos-nb-cards i.magneto-magnet::before, .sniplet.magneto .boardDirective-list-item-infos-nb-cards i.magneto-magnet::before {
+  color: #ffb600;
+  font-size: 16px;
+}
+body.magneto .boardDirective-list-item-infos-date-icons, .sniplet.magneto .boardDirective-list-item-infos-date-icons {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+body.magneto .boardDirective-list-item-infos-date-icons i::before, .sniplet.magneto .boardDirective-list-item-infos-date-icons i::before {
+  font-size: 16px;
+}
+body.magneto .boardDirective-list, .sniplet.magneto .boardDirective-list {
+  background: #ffffff;
+  padding: 0 20px 20px;
+}
+body.magneto .boardDirective-list-folders, .sniplet.magneto .boardDirective-list-folders {
+  gap: 16px;
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
+body.magneto .boardDirective-list-boards, .sniplet.magneto .boardDirective-list-boards {
+  gap: 16px;
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
+body.magneto .cardDirective-display, .sniplet.magneto .cardDirective-display {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  padding-bottom: 10px !important;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  flex: 1;
+}
+body.magneto .cardDirective-display section.lightbox .content, .sniplet.magneto .cardDirective-display section.lightbox .content {
+  width: 80% !important;
+}
+body.magneto .cardDirective-display-title, .sniplet.magneto .cardDirective-display-title {
+  font-weight: bold;
+  font-size: 30px;
+}
+body.magneto .cardDirective-display-info, .sniplet.magneto .cardDirective-display-info {
+  padding: 10px 0px 10px 0px;
+  font-style: italic;
+  font-size: 0.9em;
+  gap: 5px;
+}
+body.magneto .cardDirective-display-date, .sniplet.magneto .cardDirective-display-date {
+  color: #d6d6d6;
+}
+body.magneto .cardDirective-list-item-options, .sniplet.magneto .cardDirective-list-item-options {
+  transform: translateX(5px) translateY(-26px);
+  z-index: 2;
+}
+body.magneto .cardDirective-list-item-options nav .nav, body.magneto .cardDirective-list-item-options nav .sub-nav, .sniplet.magneto .cardDirective-list-item-options nav .nav, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav {
+  position: absolute;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+}
+body.magneto .cardDirective-list-item-options nav .nav.reposition, body.magneto .cardDirective-list-item-options nav .sub-nav.reposition, .sniplet.magneto .cardDirective-list-item-options nav .nav.reposition, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav.reposition {
+  transform: translateX(-125%) translateY(0%);
+}
+body.magneto .cardDirective-list-item-options nav .nav.longer-reposition, body.magneto .cardDirective-list-item-options nav .sub-nav.longer-reposition, .sniplet.magneto .cardDirective-list-item-options nav .nav.longer-reposition, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav.longer-reposition {
+  transform: translateX(-115%) translateY(0%);
+}
+body.magneto .cardDirective-list-item-options nav .nav a, body.magneto .cardDirective-list-item-options nav .sub-nav a, .sniplet.magneto .cardDirective-list-item-options nav .nav a, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav a {
+  color: #000000 !important;
+  position: relative;
+  display: block;
+}
+body.magneto .cardDirective-list-item-options nav .nav .items, body.magneto .cardDirective-list-item-options nav .sub-nav .items, .sniplet.magneto .cardDirective-list-item-options nav .nav .items, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav .items {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  white-space: nowrap;
+}
+body.magneto .cardDirective-list-item-options nav .nav .items .item, body.magneto .cardDirective-list-item-options nav .sub-nav .items .item, .sniplet.magneto .cardDirective-list-item-options nav .nav .items .item, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav .items .item {
+  display: flex;
+  gap: 5px;
+  color: #000000 !important;
+  padding: 10px 10px 5px 10px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+body.magneto .cardDirective-list-item-options nav .nav .items .item:hover, body.magneto .cardDirective-list-item-options nav .sub-nav .items .item:hover, .sniplet.magneto .cardDirective-list-item-options nav .nav .items .item:hover, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav .items .item:hover {
+  background-origin: padding-box;
+  color: #ffffff !important;
+  background-color: #ff8500;
+}
+body.magneto .cardDirective-list-item-options nav .nav .label-navbar, body.magneto .cardDirective-list-item-options nav .sub-nav .label-navbar, .sniplet.magneto .cardDirective-list-item-options nav .nav .label-navbar, .sniplet.magneto .cardDirective-list-item-options nav .sub-nav .label-navbar {
+  font-size: 12px;
+  display: block;
+}
+body.magneto .cardDirective-preview-image, .sniplet.magneto .cardDirective-preview-image {
+  flex: 1;
+  display: flex;
+}
+body.magneto .cardDirective-preview-image-archive, .sniplet.magneto .cardDirective-preview-image-archive {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body.magneto .cardDirective-preview-image-archive span, .sniplet.magneto .cardDirective-preview-image-archive span {
+  padding: 15px;
+}
+body.magneto .cardDirective-preview-image-icons, .sniplet.magneto .cardDirective-preview-image-icons {
+  height: 30vh;
+  width: 100%;
+  object-fit: contain;
+}
+body.magneto .cardDirective-preview-image iframe, body.magneto .cardDirective-preview-image video, .sniplet.magneto .cardDirective-preview-image iframe, .sniplet.magneto .cardDirective-preview-image video {
+  width: 100%;
+  height: 400px;
+}
+body.magneto .cardDirective-preview-image img, .sniplet.magneto .cardDirective-preview-image img {
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+body.magneto .cardDirective-preview-image-img, .sniplet.magneto .cardDirective-preview-image-img {
+  max-height: 69vh;
+  width: 100%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+body.magneto .cardDirective-preview-image audio, .sniplet.magneto .cardDirective-preview-image audio {
+  width: 100%;
+  margin: auto;
+}
+body.magneto .cardDirective-preview-image .file-viewer, .sniplet.magneto .cardDirective-preview-image .file-viewer {
+  max-height: 90%;
+}
+body.magneto .cardDirective-preview-image .file-viewer .file, .sniplet.magneto .cardDirective-preview-image .file-viewer .file {
+  flex: 1;
+  max-height: fit-content;
+}
+body.magneto .cardDirective-preview-image .file-viewer .file-csv, .sniplet.magneto .cardDirective-preview-image .file-viewer .file-csv {
+  padding: 1px;
+}
+body.magneto .cardDirective-preview-image .file-viewer .file-txt, .sniplet.magneto .cardDirective-preview-image .file-viewer .file-txt {
+  padding-bottom: 1px;
+}
+body.magneto .cardDirective-preview-image .file-viewer .pdf-viewer, .sniplet.magneto .cardDirective-preview-image .file-viewer .pdf-viewer {
+  max-height: 50vh;
+  padding: 0;
+}
+body.magneto .cardDirective-preview-image .file-viewer .pdf-viewer .render, .sniplet.magneto .cardDirective-preview-image .file-viewer .pdf-viewer .render {
+  max-width: 97%;
+  max-height: 90%;
+}
+body.magneto .cardDirective-preview-image .file-viewer .txt-viewer, .sniplet.magneto .cardDirective-preview-image .file-viewer .txt-viewer {
+  max-height: calc(80vh - 255px) !important;
+}
+body.magneto .cardDirective-preview-image .file-viewer .txt, .sniplet.magneto .cardDirective-preview-image .file-viewer .txt {
+  padding-right: 50px;
+}
+body.magneto .cardDirective-preview-image .file-viewer .csv-viewer > .render, .sniplet.magneto .cardDirective-preview-image .file-viewer .csv-viewer > .render {
+  max-height: calc(80vh - 170px);
+}
+body.magneto .cardDirective-preview-image .file-viewer .txt-viewer > .render, .sniplet.magneto .cardDirective-preview-image .file-viewer .txt-viewer > .render {
+  max-height: calc(80vh - 255px);
+}
+body.magneto .cardDirective-preview-image .file-viewer .render, .sniplet.magneto .cardDirective-preview-image .file-viewer .render {
+  max-height: calc(60vh - 170px);
+}
+body.magneto .cardDirective-list-item, .sniplet.magneto .cardDirective-list-item {
+  height: fit-content;
+  width: 230px;
+  border-radius: 10px;
+  padding: 5px 5px 0px 5px;
+  border: solid #ebebeb 1px;
+}
+body.magneto .cardDirective-list-item.active, .sniplet.magneto .cardDirective-list-item.active {
+  border: solid #78c5e2 3px !important;
+  background: #bde4f9;
+  border-radius: 13px;
+  margin: -3px;
+}
+body.magneto .cardDirective-list-item.active-image, .sniplet.magneto .cardDirective-list-item.active-image {
+  background: #bde4f9;
+}
+body.magneto .cardDirective-list-item-zoom-0, .sniplet.magneto .cardDirective-list-item-zoom-0 {
+  width: 120px;
+  height: 120px;
+}
+body.magneto .cardDirective-list-item-zoom-1, .sniplet.magneto .cardDirective-list-item-zoom-1 {
+  width: 168px;
+  height: 168px;
+}
+body.magneto .cardDirective-list-item-zoom-2, .sniplet.magneto .cardDirective-list-item-zoom-2 {
+  width: 216px;
+}
+body.magneto .cardDirective-list-item-zoom-3, .sniplet.magneto .cardDirective-list-item-zoom-3 {
+  width: 264px;
+}
+body.magneto .cardDirective-list-item-zoom-4, .sniplet.magneto .cardDirective-list-item-zoom-4 {
+  width: 312px;
+}
+body.magneto .cardDirective-list-item-zoom-5, .sniplet.magneto .cardDirective-list-item-zoom-5 {
+  width: 360px;
+}
+body.magneto .cardDirective-list-item.draggable, .sniplet.magneto .cardDirective-list-item.draggable {
+  cursor: move;
+}
+@media (max-width: 800px) {
+  body.magneto .cardDirective-list-item, .sniplet.magneto .cardDirective-list-item {
+    width: 170px;
+    height: fit-content;
+  }
+}
+body.magneto .cardDirective-list-item-header, .sniplet.magneto .cardDirective-list-item-header {
+  height: 15%;
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+body.magneto .cardDirective-list-item-header.reduced-format, .sniplet.magneto .cardDirective-list-item-header.reduced-format {
+  height: 20% !important;
+}
+body.magneto .cardDirective-list-item-header.dezoom, .sniplet.magneto .cardDirective-list-item-header.dezoom {
+  height: 25% !important;
+  margin-bottom: 0.5em;
+}
+body.magneto .cardDirective-list-item-header-creation, .sniplet.magneto .cardDirective-list-item-header-creation {
+  margin-left: 8px;
+  display: flex;
+  flex-direction: column;
+}
+body.magneto .cardDirective-list-item-header-creation.dezoom, .sniplet.magneto .cardDirective-list-item-header-creation.dezoom {
+  width: 49%;
+  margin-left: 0;
+}
+body.magneto .cardDirective-list-item-header-creation-user, .sniplet.magneto .cardDirective-list-item-header-creation-user {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .cardDirective-list-item-header-creation-date, .sniplet.magneto .cardDirective-list-item-header-creation-date {
+  color: #d6d6d6;
+  font-size: 12px;
+  line-height: 12px;
+}
+body.magneto .cardDirective-list-item-header-locked, .sniplet.magneto .cardDirective-list-item-header-locked {
+  position: relative;
+  font-size: 20px;
+  display: flex;
+  justify-content: flex-end;
+  height: 3vh;
+}
+body.magneto .cardDirective-list-item-image, .sniplet.magneto .cardDirective-list-item-image {
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+body.magneto .cardDirective-list-item-image .type-icon, .sniplet.magneto .cardDirective-list-item-image .type-icon {
+  height: 13vh;
+  margin: auto;
+  object-fit: contain;
+}
+body.magneto .cardDirective-list-item-flex-row, .sniplet.magneto .cardDirective-list-item-flex-row {
+  display: flex;
+  position: relative;
+  align-items: end;
+  bottom: 0;
+}
+body.magneto .cardDirective-list-item-preview, .sniplet.magneto .cardDirective-list-item-preview {
+  position: relative;
+  height: 18vh;
+}
+body.magneto .cardDirective-list-item-preview-zoom-0, .sniplet.magneto .cardDirective-list-item-preview-zoom-0 {
+  height: 3em;
+  display: flex;
+  flex: 1;
+}
+body.magneto .cardDirective-list-item-preview-zoom-1, .sniplet.magneto .cardDirective-list-item-preview-zoom-1 {
+  height: 6em;
+  display: flex;
+  flex: 1;
+}
+body.magneto .cardDirective-list-item-preview-zoom-2, .sniplet.magneto .cardDirective-list-item-preview-zoom-2 {
+  height: 9em;
+  display: flex;
+  flex: 1;
+}
+body.magneto .cardDirective-list-item-preview-zoom-3, .sniplet.magneto .cardDirective-list-item-preview-zoom-3 {
+  height: 12em;
+  display: flex;
+  flex: 1;
+}
+body.magneto .cardDirective-list-item-preview-zoom-4, .sniplet.magneto .cardDirective-list-item-preview-zoom-4 {
+  height: 15em;
+  display: flex;
+  flex: 1;
+}
+body.magneto .cardDirective-list-item-preview-zoom-5, .sniplet.magneto .cardDirective-list-item-preview-zoom-5 {
+  height: 18em;
+  display: flex;
+  flex: 1;
+}
+body.magneto .cardDirective-list-item-preview-img, .sniplet.magneto .cardDirective-list-item-preview-img {
+  margin-left: auto;
+  margin-right: auto;
+  object-fit: cover;
+  min-height: 64%;
+}
+body.magneto .cardDirective-list-item-preview-image, body.magneto .cardDirective-list-item-preview-file, .sniplet.magneto .cardDirective-list-item-preview-image, .sniplet.magneto .cardDirective-list-item-preview-file {
+  border-radius: 10px;
+}
+body.magneto .cardDirective-list-item-preview-video, .sniplet.magneto .cardDirective-list-item-preview-video {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover !important;
+}
+body.magneto .cardDirective-list-item-preview-video-header, .sniplet.magneto .cardDirective-list-item-preview-video-header {
+  width: 100%;
+  height: 100%;
+}
+body.magneto .cardDirective-list-item-preview audio, .sniplet.magneto .cardDirective-list-item-preview audio {
+  width: 100%;
+  margin: auto;
+}
+body.magneto .cardDirective-list-item-preview-text, .sniplet.magneto .cardDirective-list-item-preview-text {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 999 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+  margin-left: auto;
+  margin-right: auto;
+}
+body.magneto .cardDirective-list-item-type, .sniplet.magneto .cardDirective-list-item-type {
+  background-color: #f8f9fa;
+  border: 5px solid #f8f9fa;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+}
+body.magneto .cardDirective-list-item-type-zoom-0, .sniplet.magneto .cardDirective-list-item-type-zoom-0 {
+  margin-left: -5px;
+  height: 1.5em;
+}
+body.magneto .cardDirective-list-item-type-zoom-1, .sniplet.magneto .cardDirective-list-item-type-zoom-1 {
+  margin-left: -5px;
+  height: 1.5em;
+}
+body.magneto .cardDirective-list-item-type i, .sniplet.magneto .cardDirective-list-item-type i {
+  font-size: 16px;
+}
+body.magneto .cardDirective-list-item-avatar, .sniplet.magneto .cardDirective-list-item-avatar {
+  margin-top: 0;
+  padding: 5px 0;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
+}
+body.magneto .cardDirective-list-item-infos-0, body.magneto .cardDirective-list-item-infos-1, .sniplet.magneto .cardDirective-list-item-infos-0, .sniplet.magneto .cardDirective-list-item-infos-1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  align-content: stretch;
+  align-items: stretch;
+  height: 70%;
+}
+body.magneto .cardDirective-list-item-infos-title, .sniplet.magneto .cardDirective-list-item-infos-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  height: 3vh;
+  white-space: initial;
+}
+body.magneto .cardDirective-list-item-infos-title-ellipsis, .sniplet.magneto .cardDirective-list-item-infos-title-ellipsis {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+  height: 1.5em;
+}
+body.magneto .cardDirective-list-item-infos-title-ellipsis.dezoom-0, .sniplet.magneto .cardDirective-list-item-infos-title-ellipsis.dezoom-0 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+  width: 100%;
+  line-height: 18px;
+  height: auto;
+}
+body.magneto .cardDirective-list-item-infos-title-ellipsis.dezoom-1, .sniplet.magneto .cardDirective-list-item-infos-title-ellipsis.dezoom-1 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 4 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+  line-height: 130%;
+  width: 100%;
+  height: auto;
+}
+body.magneto .cardDirective-list-item-infos-title.reduced-format, .sniplet.magneto .cardDirective-list-item-infos-title.reduced-format {
+  height: 20% !important;
+}
+body.magneto .cardDirective-list-item-infos-footer, .sniplet.magneto .cardDirective-list-item-infos-footer {
+  height: 3vh;
+  flex-direction: row-reverse;
+}
+body.magneto .cardDirective-list-item-infos-footer-caption, .sniplet.magneto .cardDirective-list-item-infos-footer-caption {
+  color: #000000;
+  font-style: italic;
+  font-size: 0.9em;
+  width: 90%;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .cardDirective-list-item-description, .sniplet.magneto .cardDirective-list-item-description {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .cardDirective-list-item-container, .sniplet.magneto .cardDirective-list-item-container {
+  height: 75%;
+  contain: content;
+  display: flex;
+  align-items: center;
+}
+body.magneto .cardDirective-list-item i.magneto-card-settings, .sniplet.magneto .cardDirective-list-item i.magneto-card-settings {
+  font-size: 25px;
+  right: 5px;
+}
+body.magneto .h100, .sniplet.magneto .h100 {
+  height: 100%;
+}
+body.magneto .cardDirective-list, .sniplet.magneto .cardDirective-list {
+  transform-origin: 0 0;
+  display: grid;
+  grid-gap: 10px;
+  column-gap: 14px !important;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-auto-rows: 0;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+body.magneto .cardDirective-list.no-background-image, .sniplet.magneto .cardDirective-list.no-background-image {
+  background: #f8f9fa;
+}
+body.magneto .cardDirective-list-zoom-0, .sniplet.magneto .cardDirective-list-zoom-0 {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+body.magneto .cardDirective-list-zoom-1, .sniplet.magneto .cardDirective-list-zoom-1 {
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+}
+body.magneto .cardDirective-list-zoom-2, .sniplet.magneto .cardDirective-list-zoom-2 {
+  grid-template-columns: repeat(auto-fill, minmax(216px, 1fr));
+}
+body.magneto .cardDirective-list-zoom-3, .sniplet.magneto .cardDirective-list-zoom-3 {
+  grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
+}
+body.magneto .cardDirective-list-zoom-4, .sniplet.magneto .cardDirective-list-zoom-4 {
+  grid-template-columns: repeat(auto-fill, minmax(312px, 1fr));
+}
+body.magneto .cardDirective-list-zoom-5, .sniplet.magneto .cardDirective-list-zoom-5 {
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+}
+body.magneto .cardDirective-list-free, .sniplet.magneto .cardDirective-list-free {
+  min-height: 70vh;
+  justify-content: center;
+}
+body.magneto .cardDirective-list-collection, .sniplet.magneto .cardDirective-list-collection {
+  justify-content: center;
+}
+body.magneto .cardDirective-list-vertical, .sniplet.magneto .cardDirective-list-vertical {
+  justify-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: grid;
+  grid-gap: 10px;
+  grid-auto-rows: 0;
+}
+body.magneto .cardDirective-list-horizontal, .sniplet.magneto .cardDirective-list-horizontal {
+  min-height: 170px;
+  overflow-y: hidden;
+  overflow-x: scroll;
+  flex-wrap: nowrap;
+  padding-bottom: 20px;
+  gap: 10px;
+  grid-template-columns: unset;
+  display: flex;
+}
+@media (min-width: 801px) and (max-width: 1024px) {
+  body.magneto .cardDirective-list-horizontal, .sniplet.magneto .cardDirective-list-horizontal {
+    width: 80vw;
+  }
+}
+body.magneto .cardDirective-list-scrollable, .sniplet.magneto .cardDirective-list-scrollable {
+  overflow-y: scroll;
+  height: 55vh;
+}
+body.magneto .cardDirective-navbar, .sniplet.magneto .cardDirective-navbar {
+  height: 56px;
+  background: #ffffff;
+}
+@media (min-width: 1025px) {
+  body.magneto .cardDirective-navbar, .sniplet.magneto .cardDirective-navbar {
+    text-transform: uppercase;
+  }
+}
+body.magneto .cardDirective-navbar-item, .sniplet.magneto .cardDirective-navbar-item {
+  height: 100%;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 1025px) {
+  body.magneto .cardDirective-navbar-item.selected, .sniplet.magneto .cardDirective-navbar-item.selected {
+    color: #368daf;
+    padding-top: 3px;
+    border-bottom: solid 3px;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 800px) {
+  body.magneto .cardDirective-navbar-item.selected, .sniplet.magneto .cardDirective-navbar-item.selected {
+    background: #67add1;
+    color: #ffffff;
+    border-radius: 28px;
+    text-align: center;
+  }
+}
+@media (min-width: 1025px) {
+  body.magneto .cardDirective-navbar-item:hover, .sniplet.magneto .cardDirective-navbar-item:hover {
+    color: #67add1;
+    padding-top: 3px;
+    border-bottom: solid 3px;
+    box-sizing: border-box;
+  }
+}
+body.magneto .cardDirective-move-lightbox-body, .sniplet.magneto .cardDirective-move-lightbox-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 15px 150px 15px !important;
+}
+body.magneto .cardDirective-move-lightbox-button, .sniplet.magneto .cardDirective-move-lightbox-button {
+  color: #ffffff !important;
+}
+body.magneto .cardDirective-move-lightbox button, .sniplet.magneto .cardDirective-move-lightbox button {
+  color: #000000;
+}
+body.magneto .cardDirective-move-lightbox .multi-combo-root-panel > ul, .sniplet.magneto .cardDirective-move-lightbox .multi-combo-root-panel > ul {
+  max-height: 120px !important;
+}
+body.magneto .cardDirective-duplicate-move-lightbox-body, .sniplet.magneto .cardDirective-duplicate-move-lightbox-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 15px 150px 15px !important;
+}
+body.magneto .cardDirective-duplicate-move-lightbox-button, .sniplet.magneto .cardDirective-duplicate-move-lightbox-button {
+  color: #ffffff !important;
+}
+body.magneto .cardDirective-duplicate-move-lightbox button, .sniplet.magneto .cardDirective-duplicate-move-lightbox button {
+  color: #000000;
+}
+body.magneto .cardDirective-duplicate-move-lightbox .multi-combo-root-panel > ul, .sniplet.magneto .cardDirective-duplicate-move-lightbox .multi-combo-root-panel > ul {
+  max-height: 120px !important;
+}
+body.magneto .sections-listDirective, .sniplet.magneto .sections-listDirective {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: min-content;
+}
+body.magneto .sections-listDirective i.magneto-card-settings, .sniplet.magneto .sections-listDirective i.magneto-card-settings {
+  font-size: 25px;
+  right: 5px;
+}
+body.magneto .sections-listDirective-container-horizontal, .sniplet.magneto .sections-listDirective-container-horizontal {
+  display: flex;
+}
+body.magneto .sections-listDirective-container-vertical, .sniplet.magneto .sections-listDirective-container-vertical {
+  display: flex;
+  overflow: hidden;
+}
+body.magneto .sections-listDirective-container-vertical, .sniplet.magneto .sections-listDirective-container-vertical {
+  flex-shrink: 1;
+  flex-basis: 0;
+}
+body.magneto .sections-listDirective-container-horizontal, .sniplet.magneto .sections-listDirective-container-horizontal {
+  flex-direction: column;
+}
+body.magneto .sections-listDirective-horizontal, .sniplet.magneto .sections-listDirective-horizontal {
+  flex-direction: column;
+}
+body.magneto .sections-listDirective-content, .sniplet.magneto .sections-listDirective-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+body.magneto .sections-listDirective-content-horizontal, .sniplet.magneto .sections-listDirective-content-horizontal {
+  overflow-y: unset;
+  max-width: 93vw;
+  height: 100% !important;
+}
+@media (max-width: 800px) {
+  body.magneto .sections-listDirective-content, .sniplet.magneto .sections-listDirective-content {
+    min-width: 80vw;
+  }
+}
+@media (min-width: 801px) and (max-width: 1024px) {
+  body.magneto .sections-listDirective-content, .sniplet.magneto .sections-listDirective-content {
+    min-width: 50vw;
+  }
+}
+@media (min-width: 1025px) and (max-width: 1224px) {
+  body.magneto .sections-listDirective-content, .sniplet.magneto .sections-listDirective-content {
+    min-width: 33vw;
+  }
+}
+@media (min-width: 1225px) and (max-width: 1536px) {
+  body.magneto .sections-listDirective-content, .sniplet.magneto .sections-listDirective-content {
+    min-width: 25vw;
+  }
+}
+@media (min-width: 1441px) {
+  body.magneto .sections-listDirective-content, .sniplet.magneto .sections-listDirective-content {
+    min-width: 20vw;
+  }
+}
+body.magneto .sections-listDirective-content-container, .sniplet.magneto .sections-listDirective-content-container {
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #fff;
+  border-radius: 50px;
+  display: flex;
+  width: 85%;
+  height: auto;
+  position: relative;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+body.magneto .sections-listDirective-content-container:focus-within, .sniplet.magneto .sections-listDirective-content-container:focus-within {
+  border-bottom: 1px solid #ff8500;
+}
+body.magneto .sections-listDirective-content-title, .sniplet.magneto .sections-listDirective-content-title {
+  width: 85%;
+  align-self: center;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 20px;
+}
+body.magneto .sections-listDirective-content-title.input, .sniplet.magneto .sections-listDirective-content-title.input {
+  outline: none;
+  box-shadow: none;
+  border-bottom: none !important;
+  margin-bottom: 1px !important;
+  margin-top: 0 !important;
+}
+body.magneto .sections-listDirective-content-title-margin, .sniplet.magneto .sections-listDirective-content-title-margin {
+  margin: auto !important;
+  margin-top: 10px !important;
+}
+body.magneto .sections-listDirective-content-title-truncate, .sniplet.magneto .sections-listDirective-content-title-truncate {
+  margin: auto;
+  width: 75%;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .sections-listDirective-content-vertical:not(:first-child), .sniplet.magneto .sections-listDirective-content-vertical:not(:first-child) {
+  border-left: solid 2px rgba(211, 211, 211, 0.5);
+}
+body.magneto .notDraggable-item, .sniplet.magneto .notDraggable-item {
+  cursor: default !important;
+}
+body.magneto .move, .sniplet.magneto .move {
+  cursor: move;
+}
+body.magneto .imove, .sniplet.magneto .imove {
+  cursor: move !important;
+}
+body.magneto .boardDirective-list-folder, .sniplet.magneto .boardDirective-list-folder {
+  height: 60px;
+  width: 335px;
+  display: flex;
+  justify-content: center;
+  border-radius: 10px;
+  border: solid #ebebeb 1px;
+  box-shadow: none;
+}
+body.magneto .boardDirective-list-folder.active, .sniplet.magneto .boardDirective-list-folder.active {
+  border: solid #78c5e2 3px !important;
+  background: #bde4f9;
+  margin: -3px;
+}
+body.magneto .boardDirective-list-folder-infos i.magneto-folder, body.magneto .boardDirective-list-folder-infos i.magneto-folder-share, .sniplet.magneto .boardDirective-list-folder-infos i.magneto-folder, .sniplet.magneto .boardDirective-list-folder-infos i.magneto-folder-share {
+  margin: 14px;
+  font-size: 50px;
+  color: #46afe6;
+}
+body.magneto .boardDirective-list-folder-infos-title, .sniplet.magneto .boardDirective-list-folder-infos-title {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+  align-self: center;
+  font-size: 16px;
+}
+body.magneto .boardDirective-manage-lightbox section.lightbox .content, .sniplet.magneto .boardDirective-manage-lightbox section.lightbox .content {
+  width: 80% !important;
+}
+body.magneto .boardDirective-manage-lightbox-body, .sniplet.magneto .boardDirective-manage-lightbox-body {
+  display: flex;
+}
+body.magneto .boardDirective-manage-lightbox-body-image-select, .sniplet.magneto .boardDirective-manage-lightbox-body-image-select {
+  width: 240px;
+}
+body.magneto .boardDirective-manage-lightbox-body-image-select.small, .sniplet.magneto .boardDirective-manage-lightbox-body-image-select.small {
+  width: 120px !important;
+}
+body.magneto .boardDirective-manage-lightbox-body-image-select image-select img, .sniplet.magneto .boardDirective-manage-lightbox-body-image-select image-select img {
+  max-height: 170px;
+  max-width: 170px;
+  object-fit: contain;
+}
+body.magneto .boardDirective-manage-lightbox-body-image-select-choose, .sniplet.magneto .boardDirective-manage-lightbox-body-image-select-choose {
+  font-size: 15px;
+  color: #e61610;
+}
+body.magneto .boardDirective-manage-lightbox-body-inputs, .sniplet.magneto .boardDirective-manage-lightbox-body-inputs {
+  margin: 0 25px 25px !important;
+  display: flex;
+  flex-direction: column;
+}
+body.magneto .boardDirective-manage-lightbox-body-inputs textarea, .sniplet.magneto .boardDirective-manage-lightbox-body-inputs textarea {
+  resize: none;
+}
+body.magneto .boardDirective-manage-lightbox-body-inputs-options, .sniplet.magneto .boardDirective-manage-lightbox-body-inputs-options {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0 !important;
+}
+body.magneto .boardDirective-manage-lightbox-body-inputs-options h2, .sniplet.magneto .boardDirective-manage-lightbox-body-inputs-options h2 {
+  color: #000000;
+}
+body.magneto .boardDirective-manage-lightbox-body-inputs-options .checkbox, .sniplet.magneto .boardDirective-manage-lightbox-body-inputs-options .checkbox {
+  margin-bottom: 10px;
+}
+body.magneto .boardDirective-manage-lightbox-body-inputs .board-layout-type h2, .sniplet.magneto .boardDirective-manage-lightbox-body-inputs .board-layout-type h2 {
+  color: #000000;
+}
+body.magneto .boardDirective-manage-lightbox-body-layout-container, .sniplet.magneto .boardDirective-manage-lightbox-body-layout-container {
+  display: flex;
+  gap: 30px;
+}
+body.magneto .boardDirective-manage-lightbox .display-icons, .sniplet.magneto .boardDirective-manage-lightbox .display-icons {
+  font-size: 56px !important;
+  vertical-align: middle;
+}
+body.magneto .search-barDirective, .sniplet.magneto .search-barDirective {
+  display: flex;
+  border: solid 1px #46afe6;
+  border-radius: 25px;
+  height: 40px;
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+}
+body.magneto .search-barDirective i.magneto-magnify, .sniplet.magneto .search-barDirective i.magneto-magnify {
+  font-size: 20px;
+  align-self: center;
+  margin-left: 5px;
+  color: #aaaaaa;
+}
+body.magneto .search-barDirective input, .sniplet.magneto .search-barDirective input {
+  width: 100%;
+  height: inherit;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+body.magneto .magnetoDirective-toaster button, .sniplet.magneto .magnetoDirective-toaster button {
+  background: none;
+}
+body.magneto .magnetoDirective-toaster button:hover, .sniplet.magneto .magnetoDirective-toaster button:hover {
+  background: #ffffff;
+}
+body.magneto .folderDirective-tree-nav, .sniplet.magneto .folderDirective-tree-nav {
+  height: auto;
+  padding: 0;
+  margin-right: 0;
+}
+body.magneto .folderDirective-tree-nav ul, .sniplet.magneto .folderDirective-tree-nav ul {
+  border-left: none !important;
+}
+body.magneto .folderDirective-tree-nav-item-name, .sniplet.magneto .folderDirective-tree-nav-item-name {
+  display: flex;
+}
+body.magneto .folderDirective-tree-nav-item-name.selected, .sniplet.magneto .folderDirective-tree-nav-item-name.selected {
+  background-color: #bde4f9;
+  color: #2a9cc8;
+}
+body.magneto .folderDirective-tree-nav-item-name.selected a, .sniplet.magneto .folderDirective-tree-nav-item-name.selected a {
+  color: #2a9cc8;
+}
+body.magneto .folderDirective-tree-nav-item-name i, .sniplet.magneto .folderDirective-tree-nav-item-name i {
+  align-self: center;
+  margin-left: 24px;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .folderDirective-tree-nav-item-name i, .sniplet.magneto .folderDirective-tree-nav-item-name i {
+    margin-left: 0 !important;
+  }
+}
+body.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-down + i, .sniplet.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-down + i {
+  margin-left: 0 !important;
+}
+body.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-right + i, .sniplet.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-right + i {
+  margin-left: 0 !important;
+}
+body.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-right, body.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-down, .sniplet.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-right, .sniplet.magneto .folderDirective-tree-nav-item-name i.magneto-chevron-down {
+  font-size: 24px;
+  margin-left: 0 !important;
+}
+body.magneto .folderDirective-tree-nav-item-name a, .sniplet.magneto .folderDirective-tree-nav-item-name a {
+  color: #5b6472;
+  font-weight: bold;
+  font-size: 14px;
+  padding-left: 12px !important;
+}
+body.magneto .boardDirective-nav nav .nav, body.magneto .boardDirective-nav nav .sub-nav, .sniplet.magneto .boardDirective-nav nav .nav, .sniplet.magneto .boardDirective-nav nav .sub-nav {
+  position: fixed;
+  left: 0;
+  top: 6vh;
+  height: 100%;
+  background-color: #ffffff;
+  width: 70px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+@media (max-width: 800px) and (min-height: 680px) {
+  body.magneto .boardDirective-nav nav .nav, body.magneto .boardDirective-nav nav .sub-nav, .sniplet.magneto .boardDirective-nav nav .nav, .sniplet.magneto .boardDirective-nav nav .sub-nav {
+    top: 50px !important;
+  }
+}
+body.magneto .boardDirective-nav nav .nav a, body.magneto .boardDirective-nav nav .sub-nav a, .sniplet.magneto .boardDirective-nav nav .nav a, .sniplet.magneto .boardDirective-nav nav .sub-nav a {
+  color: #000000 !important;
+  position: relative;
+  display: block;
+  margin: 3px 0;
+}
+body.magneto .boardDirective-nav nav .nav i::after, body.magneto .boardDirective-nav nav .sub-nav i::after, .sniplet.magneto .boardDirective-nav nav .nav i::after, .sniplet.magneto .boardDirective-nav nav .sub-nav i::after {
+  content: " ";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  display: block;
+  background-color: transparent;
+  width: 5px;
+}
+body.magneto .boardDirective-nav nav .nav .items, body.magneto .boardDirective-nav nav .sub-nav .items, .sniplet.magneto .boardDirective-nav nav .nav .items, .sniplet.magneto .boardDirective-nav nav .sub-nav .items {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  margin-top: 27vh;
+  height: 65%;
+  transition: margin-top 0.2s ease-in-out;
+}
+@media screen and (max-height: 680px) {
+  body.magneto .boardDirective-nav nav .nav .items, body.magneto .boardDirective-nav nav .sub-nav .items, .sniplet.magneto .boardDirective-nav nav .nav .items, .sniplet.magneto .boardDirective-nav nav .sub-nav .items {
+    margin-top: 60px;
+  }
+}
+@media (max-width: 800px) and (min-height: 680px) {
+  body.magneto .boardDirective-nav nav .nav .items, body.magneto .boardDirective-nav nav .sub-nav .items, .sniplet.magneto .boardDirective-nav nav .nav .items, .sniplet.magneto .boardDirective-nav nav .sub-nav .items {
+    margin-top: 100px !important;
+  }
+}
+@media (max-width: 1024px) and (min-width: 800px) {
+  body.magneto .boardDirective-nav nav .nav .items, body.magneto .boardDirective-nav nav .sub-nav .items, .sniplet.magneto .boardDirective-nav nav .nav .items, .sniplet.magneto .boardDirective-nav nav .sub-nav .items {
+    margin-top: 13vh !important;
+  }
+}
+body.magneto .boardDirective-nav nav .nav .items .item, body.magneto .boardDirective-nav nav .sub-nav .items .item, .sniplet.magneto .boardDirective-nav nav .nav .items .item, .sniplet.magneto .boardDirective-nav nav .sub-nav .items .item {
+  display: block;
+  color: #000000 !important;
+  padding-top: 5px;
+  margin: 3px 0;
+  text-align: center;
+  font-size: 24px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .boardDirective-nav nav .nav .items .item, body.magneto .boardDirective-nav nav .sub-nav .items .item, .sniplet.magneto .boardDirective-nav nav .nav .items .item, .sniplet.magneto .boardDirective-nav nav .sub-nav .items .item {
+    height: 40px !important;
+    font-size: 20px;
+  }
+}
+body.magneto .boardDirective-nav nav .nav .items .item:hover, body.magneto .boardDirective-nav nav .sub-nav .items .item:hover, .sniplet.magneto .boardDirective-nav nav .nav .items .item:hover, .sniplet.magneto .boardDirective-nav nav .sub-nav .items .item:hover {
+  color: #ecbe30 !important;
+}
+body.magneto .boardDirective-nav nav .nav .items .item i.magneto-settings, body.magneto .boardDirective-nav nav .sub-nav .items .item i.magneto-settings, .sniplet.magneto .boardDirective-nav nav .nav .items .item i.magneto-settings, .sniplet.magneto .boardDirective-nav nav .sub-nav .items .item i.magneto-settings {
+  font-size: 26px;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .boardDirective-nav nav .nav .items .item i.magneto-settings, body.magneto .boardDirective-nav nav .sub-nav .items .item i.magneto-settings, .sniplet.magneto .boardDirective-nav nav .nav .items .item i.magneto-settings, .sniplet.magneto .boardDirective-nav nav .sub-nav .items .item i.magneto-settings {
+    font-size: 16px !important;
+  }
+}
+body.magneto .boardDirective-nav nav .nav .items-divider, body.magneto .boardDirective-nav nav .sub-nav .items-divider, .sniplet.magneto .boardDirective-nav nav .nav .items-divider, .sniplet.magneto .boardDirective-nav nav .sub-nav .items-divider {
+  border-top: 1px #000000;
+  border-top-style: ridge;
+  width: 56px;
+  padding: 0;
+}
+body.magneto .boardDirective-nav nav .nav .label-navbar, body.magneto .boardDirective-nav nav .sub-nav .label-navbar, .sniplet.magneto .boardDirective-nav nav .nav .label-navbar, .sniplet.magneto .boardDirective-nav nav .sub-nav .label-navbar {
+  font-size: 12px;
+  padding: 5px 0;
+  display: block;
+  line-height: 16px;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .boardDirective-nav nav .nav .label-navbar, body.magneto .boardDirective-nav nav .sub-nav .label-navbar, .sniplet.magneto .boardDirective-nav nav .nav .label-navbar, .sniplet.magneto .boardDirective-nav nav .sub-nav .label-navbar {
+    font-size: 10px !important;
+  }
+}
+@media (max-width: 800px) {
+  body.magneto .boardDirective-nav nav .nav, .sniplet.magneto .boardDirective-nav nav .nav {
+    overflow-y: scroll;
+  }
+  body.magneto .boardDirective-nav nav ::-webkit-scrollbar, .sniplet.magneto .boardDirective-nav nav ::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+}
+body.magneto .cardDirective-manage-lightbox section.lightbox .content, .sniplet.magneto .cardDirective-manage-lightbox section.lightbox .content {
+  width: 80% !important;
+}
+body.magneto .cardDirective-manage-lightbox-content > :first-child, .sniplet.magneto .cardDirective-manage-lightbox-content > :first-child {
+  min-height: 60vh;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-resource, .sniplet.magneto .cardDirective-manage-lightbox-content-body-resource {
+  display: flex;
+  justify-content: center;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-resource image-select img, .sniplet.magneto .cardDirective-manage-lightbox-content-body-resource image-select img {
+  max-height: 170px;
+  max-width: 170px;
+  object-fit: contain;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-resource video, .sniplet.magneto .cardDirective-manage-lightbox-content-body-resource video {
+  width: 302px;
+  height: 170px;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-resource-file, .sniplet.magneto .cardDirective-manage-lightbox-content-body-resource-file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-resource-file .embedded-viewer, .sniplet.magneto .cardDirective-manage-lightbox-content-body-resource-file .embedded-viewer {
+  max-width: 60vw;
+  min-width: 38vw;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-resource-link a, .sniplet.magneto .cardDirective-manage-lightbox-content-body-resource-link a {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .cardDirective-manage-lightbox-content-body-resource embedder div.content, .sniplet.magneto .cardDirective-manage-lightbox-content-body-resource embedder div.content {
+  width: 720px !important;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-title, body.magneto .cardDirective-manage-lightbox-content-body-caption, .sniplet.magneto .cardDirective-manage-lightbox-content-body-title, .sniplet.magneto .cardDirective-manage-lightbox-content-body-caption {
+  display: flex;
+  align-items: center;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-title i18n, body.magneto .cardDirective-manage-lightbox-content-body-caption i18n, .sniplet.magneto .cardDirective-manage-lightbox-content-body-title i18n, .sniplet.magneto .cardDirective-manage-lightbox-content-body-caption i18n {
+  font-weight: bold;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-title input, body.magneto .cardDirective-manage-lightbox-content-body-caption input, .sniplet.magneto .cardDirective-manage-lightbox-content-body-title input, .sniplet.magneto .cardDirective-manage-lightbox-content-body-caption input {
+  margin-left: 12px;
+  margin-bottom: 0 !important;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-description-padding, .sniplet.magneto .cardDirective-manage-lightbox-content-body-description-padding {
+  padding-top: 91px !important;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-description i18n, .sniplet.magneto .cardDirective-manage-lightbox-content-body-description i18n {
+  font-weight: bold;
+}
+body.magneto .cardDirective-manage-lightbox-content-body-description .drawing-zone, .sniplet.magneto .cardDirective-manage-lightbox-content-body-description .drawing-zone {
+  overflow-y: scroll;
+  height: 250px;
+}
+body.magneto .cardDirective-manage-lightbox-content-body div.video-preview, .sniplet.magneto .cardDirective-manage-lightbox-content-body div.video-preview {
+  display: flex;
+}
+body.magneto .cardDirective-manage-lightbox-content-body div.video-preview > div.edit-container > i, .sniplet.magneto .cardDirective-manage-lightbox-content-body div.video-preview > div.edit-container > i {
+  position: absolute;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  transition: color 250ms ease;
+  background-color: rgba(0, 0, 0, 0.3);
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  text-align: center;
+  margin-left: 5px;
+}
+body.magneto .cardDirective-manage-lightbox-content-body div.video-preview > div.edit-container > i::before, .sniplet.magneto .cardDirective-manage-lightbox-content-body div.video-preview > div.edit-container > i::before {
+  font-size: 16px;
+  line-height: 24px;
+}
+body.magneto .cardDirective-manage-lightbox-content-body div.video-preview > div.edit-container > i:hover, .sniplet.magneto .cardDirective-manage-lightbox-content-body div.video-preview > div.edit-container > i:hover {
+  color: #ff8500;
+}
+body.magneto .boardDirective-date, .sniplet.magneto .boardDirective-date {
+  background: #bde4f9;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  color: #2a9cc8;
+}
+body.magneto .boardDirective-date i.magneto-check-circle, .sniplet.magneto .boardDirective-date i.magneto-check-circle {
+  color: #2a9cc8;
+}
+body.magneto .cardDirective-collection-lightbox section.lightbox .content, .sniplet.magneto .cardDirective-collection-lightbox section.lightbox .content {
+  width: 80% !important;
+}
+body.magneto .cardDirective-collection-lightbox .empty-state, .sniplet.magneto .cardDirective-collection-lightbox .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body.magneto .cardDirective-collection-lightbox .empty-state img, .sniplet.magneto .cardDirective-collection-lightbox .empty-state img {
+  width: 26%;
+}
+body.magneto .cardDirective-collection-lightbox .empty-state i18n, .sniplet.magneto .cardDirective-collection-lightbox .empty-state i18n {
+  padding: 24px;
+}
+body.magneto .cardDirective-collection-lightbox-board, .sniplet.magneto .cardDirective-collection-lightbox-board {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+body.magneto .cardDirective-collection-lightbox-board-title, .sniplet.magneto .cardDirective-collection-lightbox-board-title {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 45px;
+}
+body.magneto .cardDirective-collection-lightbox-board-cards, .sniplet.magneto .cardDirective-collection-lightbox-board-cards {
+  font-size: 14px;
+  line-height: 45px;
+  text-decoration: underline;
+}
+body.magneto .cardDirective-collection-lightbox-body, .sniplet.magneto .cardDirective-collection-lightbox-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+body.magneto .cardDirective-collection-lightbox-body-options, .sniplet.magneto .cardDirective-collection-lightbox-body-options {
+  display: flex;
+  gap: 16px;
+}
+body.magneto .cardDirective-collection-lightbox .cardDirective-list, .sniplet.magneto .cardDirective-collection-lightbox .cardDirective-list {
+  grid-gap: 11px;
+  grid-auto-rows: auto !important;
+}
+body.magneto .cardDirective-collection-lightbox .cardDirective-list-item-infos, .sniplet.magneto .cardDirective-collection-lightbox .cardDirective-list-item-infos {
+  height: 22vh;
+}
+body.magneto .cardDirective-collection-lightbox .cardDirective-list-item-preview, .sniplet.magneto .cardDirective-collection-lightbox .cardDirective-list-item-preview {
+  height: 14vh;
+}
+body.magneto .cardDirective-item-comments .divider, .sniplet.magneto .cardDirective-item-comments .divider {
+  border-top: 1px #d6d6d6;
+  border-top-style: ridge;
+  padding: 0;
+}
+body.magneto .cardDirective-item-comments-counter, .sniplet.magneto .cardDirective-item-comments-counter {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 16px;
+  color: #555555;
+}
+body.magneto .cardDirective-item-comments-counter i.magneto-comment-outline, .sniplet.magneto .cardDirective-item-comments-counter i.magneto-comment-outline {
+  margin-right: 4px;
+}
+body.magneto .cardDirective-item-comments-content, .sniplet.magneto .cardDirective-item-comments-content {
+  display: flex;
+}
+body.magneto .cardDirective-item-comments-last, .sniplet.magneto .cardDirective-item-comments-last {
+  margin-bottom: 24px;
+}
+body.magneto .cardDirective-item-comments-last .card-comment-content, .sniplet.magneto .cardDirective-item-comments-last .card-comment-content {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .cardDirective-comment:hover i.magneto-card-settings, .sniplet.magneto .cardDirective-comment:hover i.magneto-card-settings {
+  opacity: 1;
+}
+body.magneto .cardDirective-comment-infos, .sniplet.magneto .cardDirective-comment-infos {
+  display: flex;
+}
+body.magneto .cardDirective-comment-infos-header, .sniplet.magneto .cardDirective-comment-infos-header {
+  display: flex;
+}
+body.magneto .cardDirective-comment-infos-header .card-list-item-options, .sniplet.magneto .cardDirective-comment-infos-header .card-list-item-options {
+  transform: inherit !important;
+}
+body.magneto .cardDirective-comment-infos-header-user, .sniplet.magneto .cardDirective-comment-infos-header-user {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+body.magneto .cardDirective-comment-infos-header-user-avatar, .sniplet.magneto .cardDirective-comment-infos-header-user-avatar {
+  margin-right: 8px;
+  margin-top: 0;
+  padding: 5px 0;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0);
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
+}
+body.magneto .cardDirective-comment-infos-header-user-infos, .sniplet.magneto .cardDirective-comment-infos-header-user-infos {
+  display: flex;
+  flex-direction: column;
+}
+body.magneto .cardDirective-comment-infos-header-user-infos-name, .sniplet.magneto .cardDirective-comment-infos-header-user-infos-name {
+  font-weight: bold;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+body.magneto .cardDirective-comment-infos-header-user-infos-date, .sniplet.magneto .cardDirective-comment-infos-header-user-infos-date {
+  color: #d6d6d6;
+  font-size: 12px;
+  line-height: 12px;
+}
+body.magneto .cardDirective-comment-infos-header i.magneto-card-settings, .sniplet.magneto .cardDirective-comment-infos-header i.magneto-card-settings {
+  opacity: 0;
+  font-size: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+body.magneto .cardDirective-comment-infos-header i.magneto-card-settings:hover, .sniplet.magneto .cardDirective-comment-infos-header i.magneto-card-settings:hover {
+  cursor: pointer;
+}
+body.magneto .cardDirective-comment-content, .sniplet.magneto .cardDirective-comment-content {
+  line-height: 18px;
+  margin-left: 40px;
+  white-space: initial !important;
+}
+body.magneto .magnetoDirective-comments-panel, .sniplet.magneto .magnetoDirective-comments-panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+}
+body.magneto .magnetoDirective-comments-panel.opened, .sniplet.magneto .magnetoDirective-comments-panel.opened {
+  width: 320px;
+  height: 80%;
+}
+body.magneto .magnetoDirective-comments-panel.opened .magneto-comments-panel-button, .sniplet.magneto .magnetoDirective-comments-panel.opened .magneto-comments-panel-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+}
+body.magneto .magnetoDirective-comments-panel-button, .sniplet.magneto .magnetoDirective-comments-panel-button {
+  font-size: 20px;
+}
+body.magneto .magnetoDirective-comments-panel-list, .sniplet.magneto .magnetoDirective-comments-panel-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+body.magneto .magnetoDirective-comments-panel-list-header, .sniplet.magneto .magnetoDirective-comments-panel-list-header {
+  display: flex;
+  justify-content: space-between;
+}
+body.magneto .magnetoDirective-comments-panel-list-header i.magneto-close, .sniplet.magneto .magnetoDirective-comments-panel-list-header i.magneto-close {
+  font-size: 24px;
+  padding: 4px;
+}
+body.magneto .magnetoDirective-comments-panel-list-header-title, .sniplet.magneto .magnetoDirective-comments-panel-list-header-title {
+  font-size: 20px;
+  padding: 8px;
+}
+body.magneto .magnetoDirective-comments-panel-list-items, .sniplet.magneto .magnetoDirective-comments-panel-list-items {
+  max-height: 80%;
+  overflow-y: auto !important;
+}
+body.magneto .magnetoDirective-comments-panel-list-items-item, .sniplet.magneto .magnetoDirective-comments-panel-list-items-item {
+  padding: 8px;
+  margin: 8px;
+}
+body.magneto .magnetoDirective-comments-panel-list .comment-input, .sniplet.magneto .magnetoDirective-comments-panel-list .comment-input {
+  bottom: 0;
+  position: absolute;
+}
+body.magneto .boardDirective-description-lightbox, .sniplet.magneto .boardDirective-description-lightbox {
+  overflow: unset !important;
+}
+body.magneto .boardDirective-description-lightbox-content, .sniplet.magneto .boardDirective-description-lightbox-content {
+  display: flex;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  padding: 1px 15px !important;
+}
+body.magneto .boardDirective-description-lightbox-content section.lightbox .content, .sniplet.magneto .boardDirective-description-lightbox-content section.lightbox .content {
+  width: 70% !important;
+}
+body.magneto .boardDirective-description-lightbox-content-body, .sniplet.magneto .boardDirective-description-lightbox-content-body {
+  margin-top: -2em !important;
+  white-space: pre-line !important;
+}
+body.magneto .boardDirective-description-lightbox scrollbar-lightbox, .sniplet.magneto .boardDirective-description-lightbox scrollbar-lightbox {
+  overflow-y: auto;
+}
+body.magneto .boardDirective-description-lightbox no-scroll, .sniplet.magneto .boardDirective-description-lightbox no-scroll {
+  overflow-y: hidden;
+}
+body.magneto .favoriteDirective-button, .sniplet.magneto .favoriteDirective-button {
+  display: flex;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.magneto .favoriteDirective-button i::before, .sniplet.magneto .favoriteDirective-button i::before {
+  font-size: 16px;
+}
+body.magneto .pdf-viewer-header, .sniplet.magneto .pdf-viewer-header {
+  display: flex;
+  margin-bottom: 6px;
+}
+body.magneto .pdf-viewer-header-pagination-area, .sniplet.magneto .pdf-viewer-header-pagination-area {
+  flex: auto;
+  justify-content: center;
+}
+body.magneto .pdf-viewer-header-pagination-area-pagination, .sniplet.magneto .pdf-viewer-header-pagination-area-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+body.magneto .pdf-viewer-header-pagination-area-pagination-numPage, .sniplet.magneto .pdf-viewer-header-pagination-area-pagination-numPage {
+  font-size: 14px;
+}
+body.magneto .pdf-viewer-header-pagination-area-pagination-input, .sniplet.magneto .pdf-viewer-header-pagination-area-pagination-input {
+  font-size: 14px;
+  margin: 0;
+  flex: 1;
+  width: 3em;
+}
+body.magneto .pdf-viewer-header-pagination-area-file-controls, .sniplet.magneto .pdf-viewer-header-pagination-area-file-controls {
+  padding: 0 1em;
+}
+body.magneto .pdf-viewer-header-title, .sniplet.magneto .pdf-viewer-header-title {
+  color: #d6d6d6;
+}
+body.magneto .pdf-viewer .render, .sniplet.magneto .pdf-viewer .render {
+  max-width: 100%;
+  max-height: 90%;
+  border: 1px solid #d6d6d6;
+}
+body.magneto .zoom, .sniplet.magneto .zoom {
+  background-color: #aaaaaa;
+  opacity: 75%;
+  display: flex;
+  color: #ffffff;
+  position: fixed;
+  border-radius: 32px;
+  padding: 8px;
+  right: 45%;
+  bottom: 1em;
+  z-index: 2;
+}
+body.magneto .zoom-plus, .sniplet.magneto .zoom-plus {
+  font-size: 32px;
+  padding-left: 1em;
+  margin-top: 3px;
+}
+body.magneto .zoom-plus-disabled, .sniplet.magneto .zoom-plus-disabled {
+  color: #d6d6d6;
+}
+body.magneto .zoom-minus, .sniplet.magneto .zoom-minus {
+  padding-right: 1em;
+  font-size: 32px;
+  margin-top: 3px;
+}
+body.magneto .zoom-minus-disabled, .sniplet.magneto .zoom-minus-disabled {
+  color: #d6d6d6;
+}
+body.magneto .zoom-label, .sniplet.magneto .zoom-label {
+  margin: 0 1em;
+}
+body.magneto .zoom-line1, .sniplet.magneto .zoom-line1 {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  width: 40px;
+  height: 1px;
+  background-color: #ffffff;
+}
+body.magneto .zoom-line2, .sniplet.magneto .zoom-line2 {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 62%;
+  width: 40px;
+  height: 1px;
+  background-color: #ffffff;
+}
+body.magneto .file-viewer, .sniplet.magneto .file-viewer {
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+}
+body.magneto .file-viewer .controls__navbar, .sniplet.magneto .file-viewer .controls__navbar {
+  display: flex;
+  width: 100%;
+  padding: 0;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .file-viewer .controls__navbar, .sniplet.magneto .file-viewer .controls__navbar {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+body.magneto .file-viewer-navbar-buttons, .sniplet.magneto .file-viewer-navbar-buttons {
+  height: 100%;
+  padding-right: 15px;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .file-viewer-navbar-buttons, .sniplet.magneto .file-viewer-navbar-buttons {
+    padding-bottom: 5px;
+  }
+}
+body.magneto .file-viewer-navbar-header, .sniplet.magneto .file-viewer-navbar-header {
+  padding: 15px;
+  min-width: 0;
+}
+@media (min-width: 800px) and (max-width: 875px) {
+  body.magneto .file-viewer-navbar-header, .sniplet.magneto .file-viewer-navbar-header {
+    width: 50% !important;
+  }
+}
+body.magneto .file-viewer-file-name-ellipsis, .sniplet.magneto .file-viewer-file-name-ellipsis {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1 !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+  padding-right: 1vw;
+  word-break: break-all;
+}
+body.magneto .file-viewer button, .sniplet.magneto .file-viewer button {
+  border: none;
+  box-shadow: none;
+  color: #ff8500 !important;
+  background: #ebebeb !important;
+}
+body.magneto .file-viewer .file, .sniplet.magneto .file-viewer .file {
+  max-height: fit-content;
+  overflow: hidden;
+}
+body.magneto .file-viewer .file-txt, .sniplet.magneto .file-viewer .file-txt {
+  overflow: auto;
+}
+body.magneto .file-viewer .file-csv, .sniplet.magneto .file-viewer .file-csv {
+  overflow: auto;
+}
+body.magneto .file-viewer .pdf-viewer, .sniplet.magneto .file-viewer .pdf-viewer {
+  max-height: 32vh;
+  max-width: 97%;
+  padding: 1%;
+  overflow: auto;
+}
+body.magneto .file-viewer .pdf-viewer .render, .sniplet.magneto .file-viewer .pdf-viewer .render {
+  max-height: 90%;
+}
+body.magneto .file-viewer .csv-viewer > .render, .sniplet.magneto .file-viewer .csv-viewer > .render {
+  max-height: 30vh;
+}
+body.magneto .file-viewer .csv-viewer > .render table, .sniplet.magneto .file-viewer .csv-viewer > .render table {
+  width: 100%;
+}
+body.magneto .file-viewer .render, .sniplet.magneto .file-viewer .render {
+  max-height: 30vh;
+}
+body.magneto .file-viewer .render pre, .sniplet.magneto .file-viewer .render pre {
+  max-height: inherit;
+}
+body.magneto .csv-viewer .pagination__area, .sniplet.magneto .csv-viewer .pagination__area {
+  position: sticky;
+  right: 0;
+  margin-top: 0;
+}
+body.magneto .csv-viewer .render, .sniplet.magneto .csv-viewer .render {
+  max-height: 28vh;
+}
+@media screen and (max-width: 800px) {
+  body.magneto .csv-viewer .render, .sniplet.magneto .csv-viewer .render {
+    max-height: 25vh !important;
+  }
+}
+body.magneto .width100, .sniplet.magneto .width100 {
+  max-width: 100%;
+}
+body.magneto .sharePanel-warning, .sniplet.magneto .sharePanel-warning {
+  text-align: center;
+  font-style: italic;
+  padding-bottom: 3%;
+}
+body.magneto .sharePanel-warning-restrict, .sniplet.magneto .sharePanel-warning-restrict {
+  color: #e61610;
+}
+body.magneto switch .switch, .sniplet.magneto switch .switch {
+  cursor: pointer;
+}
+body.magneto switch .switch .tick, .sniplet.magneto switch .switch .tick {
+  width: 40px;
+  height: 12px;
+  display: block;
+  border-radius: 10px;
+  background: #8c939e;
+  position: relative;
+  overflow: visible;
+  margin: 5px;
+}
+body.magneto switch .switch .tick:before, .sniplet.magneto switch .switch .tick:before {
+  content: " ";
+  width: 20px;
+  height: 20px !important;
+  left: 0;
+  display: block;
+  background: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: -4px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.26);
+  margin-right: 0;
+  margin-top: 0 !important;
+  border: none !important;
+}
+body.magneto switch .switch input[type=checkbox]:checked + .tick, .sniplet.magneto switch .switch input[type=checkbox]:checked + .tick {
+  background: #84d5ff;
+}
+body.magneto switch .switch input[type=checkbox]:checked + .tick:before, .sniplet.magneto switch .switch input[type=checkbox]:checked + .tick:before {
+  left: 20px;
+  background: #1a9ee4;
+}
+body.magneto switch .switch input[type=checkbox]:disabled + .tick, .sniplet.magneto switch .switch input[type=checkbox]:disabled + .tick {
+  background: #aaaaaa;
+}
+body.magneto switch .switch input[type=checkbox]:disabled + .tick:before, .sniplet.magneto switch .switch input[type=checkbox]:disabled + .tick:before {
+  background: #aaaaaa;
+}
+body.magneto switch .switch input[type=checkbox]:disabled:checked + .tick, .sniplet.magneto switch .switch input[type=checkbox]:disabled:checked + .tick {
+  background: #d3eefd;
+}
+body.magneto switch .switch input[type=checkbox]:disabled:checked + .tick:before, .sniplet.magneto switch .switch input[type=checkbox]:disabled:checked + .tick:before {
+  background: #d3eefd;
+}
+body.magneto button, body.magneto a.button, .sniplet.magneto button, .sniplet.magneto a.button {
+  color: #ffffff;
+}
+body.magneto button:disabled, body.magneto a.button:disabled, .sniplet.magneto button:disabled, .sniplet.magneto a.button:disabled {
+  background: #555555;
+}
+body.magneto button.cancel, body.magneto a.button.cancel, .sniplet.magneto button.cancel, .sniplet.magneto a.button.cancel {
+  background: #aaaaaa;
+  color: #ffffff;
+}
+body.magneto i.magneto-magnet::before, .sniplet.magneto i.magneto-magnet::before {
+  font-family: "magneto-mdi";
+  content: "\f0347";
+}
+body.magneto i.magneto-calendar::before, .sniplet.magneto i.magneto-calendar::before {
+  font-family: "magneto-mdi";
+  content: "\f00ee";
+}
+body.magneto i.magneto-sort-alphabetical::before, .sniplet.magneto i.magneto-sort-alphabetical::before {
+  font-family: "magneto-mdi";
+  content: "\f04bb";
+}
+body.magneto i.magneto-filter::before, .sniplet.magneto i.magneto-filter::before {
+  font-family: "magneto-mdi";
+  content: "\f0232";
+}
+body.magneto i.magneto-view-list::before, .sniplet.magneto i.magneto-view-list::before {
+  font-family: "magneto-mdi";
+  content: "\f0572";
+}
+body.magneto i.magneto-view-module::before, .sniplet.magneto i.magneto-view-module::before {
+  font-family: "magneto-mdi";
+  content: "\f0573";
+}
+body.magneto i.magneto-folder::before, .sniplet.magneto i.magneto-folder::before {
+  font-family: "magneto-mdi";
+  content: "\f024b";
+}
+body.magneto i.magneto-folder-plus::before, .sniplet.magneto i.magneto-folder-plus::before {
+  font-family: "magneto-mdi";
+  content: "\f0257";
+}
+body.magneto i.magneto-check-decagram::before, .sniplet.magneto i.magneto-check-decagram::before {
+  font-family: "magneto-mdi";
+  content: "\f0791";
+}
+body.magneto i.magneto-share-variant::before, .sniplet.magneto i.magneto-share-variant::before {
+  font-family: "magneto-mdi";
+  content: "\f0497";
+}
+body.magneto i.magneto-delete-forever::before, .sniplet.magneto i.magneto-delete-forever::before {
+  font-family: "magneto-mdi";
+  content: "\f05e8";
+}
+body.magneto i.magneto-chevron-right::before, .sniplet.magneto i.magneto-chevron-right::before {
+  font-family: "magneto-mdi";
+  content: "\f0142";
+}
+body.magneto i.magneto-chevron-left::before, .sniplet.magneto i.magneto-chevron-left::before {
+  font-family: "magneto-mdi";
+  content: "\f0141";
+}
+body.magneto i.magneto-chevron-down::before, .sniplet.magneto i.magneto-chevron-down::before {
+  font-family: "magneto-mdi";
+  content: "\f0140";
+}
+body.magneto i.magneto-chevron-up::before, .sniplet.magneto i.magneto-chevron-up::before {
+  font-family: "magneto-mdi";
+  content: "\f0143";
+}
+body.magneto i.magneto-magnify::before, .sniplet.magneto i.magneto-magnify::before {
+  font-family: "magneto-mdi";
+  content: "\f0349";
+}
+body.magneto i.magneto-folder-open::before, .sniplet.magneto i.magneto-folder-open::before {
+  font-family: "magneto-mdi";
+  content: "\f0770";
+}
+body.magneto i.magneto-card-settings::before, .sniplet.magneto i.magneto-card-settings::before {
+  font-family: "magneto-mdi";
+  content: "\f01d9";
+}
+body.magneto i.magneto-text::before, .sniplet.magneto i.magneto-text::before {
+  font-family: "magneto-mdi";
+  content: "\f027f";
+  transform: scaleX(-1);
+}
+body.magneto i.magneto-image::before, .sniplet.magneto i.magneto-image::before {
+  font-family: "magneto-mdi";
+  content: "\f02e9";
+}
+body.magneto i.magneto-video::before, .sniplet.magneto i.magneto-video::before {
+  font-family: "magneto-mdi";
+  content: "\f040c";
+}
+body.magneto i.magneto-file::before, .sniplet.magneto i.magneto-file::before {
+  font-family: "magneto-mdi";
+  content: "\f0222";
+}
+body.magneto i.magneto-link::before, .sniplet.magneto i.magneto-link::before {
+  font-family: "magneto-mdi";
+  content: "\f0337";
+}
+body.magneto i.magneto-card::before, .sniplet.magneto i.magneto-card::before {
+  font-family: "magneto-mdi";
+  content: "\f196c";
+}
+body.magneto i.magneto-audio::before, .sniplet.magneto i.magneto-audio::before {
+  font-family: "magneto-mdi";
+  content: "\f0387";
+}
+body.magneto i.magneto-settings::before, .sniplet.magneto i.magneto-settings::before {
+  font-family: "magneto-mdi";
+  content: "\f0493";
+}
+body.magneto i.magneto-edit::before, .sniplet.magneto i.magneto-edit::before {
+  font-family: "magneto-mdi";
+  content: "\f03eb";
+}
+body.magneto i.magneto-duplicate::before, .sniplet.magneto i.magneto-duplicate::before {
+  font-family: "magneto-mdi";
+  content: "\f1032";
+}
+body.magneto i.magneto-hide::before, .sniplet.magneto i.magneto-hide::before {
+  font-family: "magneto-mdi";
+  content: "\f0209";
+}
+body.magneto i.magneto-show::before, .sniplet.magneto i.magneto-show::before {
+  font-family: "magneto-mdi";
+  content: "\f0208";
+}
+body.magneto i.magneto-delete::before, .sniplet.magneto i.magneto-delete::before {
+  font-family: "magneto-mdi";
+  content: "\f01b4";
+}
+body.magneto i.magneto-arrow-left::before, .sniplet.magneto i.magneto-arrow-left::before {
+  font-family: "magneto-mdi";
+  content: "\f030d";
+}
+body.magneto i.magneto-check-circle::before, .sniplet.magneto i.magneto-check-circle::before {
+  font-family: "magneto-mdi";
+  content: "\f05e0";
+}
+body.magneto i.magneto-crown::before, .sniplet.magneto i.magneto-crown::before {
+  font-family: "magneto-mdi";
+  content: "\f01a5";
+}
+body.magneto i.magneto-earth::before, .sniplet.magneto i.magneto-earth::before {
+  font-family: "magneto-mdi";
+  content: "\f01e7";
+}
+body.magneto i.magneto-card-preview::before, .sniplet.magneto i.magneto-card-preview::before {
+  font-family: "magneto-mdi";
+  content: "\f0e82";
+}
+body.magneto i.magneto-card-move::before, .sniplet.magneto i.magneto-card-move::before {
+  font-family: "magneto-mdi";
+  content: "\f1682";
+}
+body.magneto i.magneto-display-free::before, .sniplet.magneto i.magneto-display-free::before {
+  font-family: "magneto-mdi";
+  content: "\f148e";
+}
+body.magneto i.magneto-display-vertical::before, .sniplet.magneto i.magneto-display-vertical::before {
+  font-family: "magneto-mdi";
+  content: "\f1491";
+}
+body.magneto i.magneto-display-horizontal::before, .sniplet.magneto i.magneto-display-horizontal::before {
+  font-family: "magneto-mdi";
+  content: "\f1490";
+}
+body.magneto i.magneto-play::before, .sniplet.magneto i.magneto-play::before {
+  font-family: "magneto-mdi";
+  content: "\f040a";
+}
+body.magneto i.magneto-lock::before, .sniplet.magneto i.magneto-lock::before {
+  font-family: "magneto-mdi";
+  content: "\f033e";
+}
+body.magneto i.magneto-unlock::before, .sniplet.magneto i.magneto-unlock::before {
+  font-family: "magneto-mdi";
+  content: "\f033f";
+}
+body.magneto i.magneto-user::before, .sniplet.magneto i.magneto-user::before {
+  font-family: "magneto-mdi";
+  content: "\f0009";
+}
+body.magneto i.magneto-comment-outline::before, .sniplet.magneto i.magneto-comment-outline::before {
+  font-family: "magneto-mdi";
+  content: "\f0182";
+}
+body.magneto i.magneto-close::before, .sniplet.magneto i.magneto-close::before {
+  font-family: "magneto-mdi";
+  content: "\f0156";
+}
+body.magneto i.magneto-favorite-outline::before, .sniplet.magneto i.magneto-favorite-outline::before {
+  font-family: "magneto-mdi";
+  content: "\f04d2";
+}
+body.magneto i.magneto-favorite-active::before, .sniplet.magneto i.magneto-favorite-active::before {
+  font-family: "magneto-mdi";
+  content: "\f04ce";
+}
+body.magneto i.magneto-board::before, .sniplet.magneto i.magneto-board::before {
+  font-family: "magneto-mdi";
+  content: "\f04eb";
+}
+body.magneto i.magneto-plus::before, .sniplet.magneto i.magneto-plus::before {
+  font-family: "magneto-mdi";
+  content: "\f0415";
+}
+body.magneto i.magneto-minus::before, .sniplet.magneto i.magneto-minus::before {
+  font-family: "magneto-mdi";
+  content: "\f0374";
+}
+body.magneto i.magneto-folder-share::before, .sniplet.magneto i.magneto-folder-share::before {
+  font-family: "magneto-mdi";
+  content: "\f024c";
+}
+body.magneto .toasts, .sniplet.magneto .toasts {
+  position: fixed;
+  top: 74px;
+  right: 25px;
+  width: 350px;
+  z-index: 999999;
+  box-sizing: border-box;
+}
+body.magneto .toasts .toast-content, .sniplet.magneto .toasts .toast-content {
+  margin-bottom: 10px;
+  position: relative;
+  opacity: 0;
+  margin-top: 40px;
+  box-sizing: border-box;
+  font-size: 16px !important;
+  border-left: none !important;
+  height: 0 !important;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+body.magneto .toasts .toast-content .content, .sniplet.magneto .toasts .toast-content .content {
+  padding: 15px 10px;
+  line-height: 28px;
+}
+body.magneto .toasts .toast-content .content:before, .sniplet.magneto .toasts .toast-content .content:before {
+  font-family: "generic-icons";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: none;
+  font-weight: normal !important;
+  margin-right: 10px;
+}
+body.magneto .toasts .toast-content.show, .sniplet.magneto .toasts .toast-content.show {
+  margin-top: 10px !important;
+  opacity: 1;
+  height: auto !important;
+  overflow: auto !important;
+}
+body.magneto .toasts .toast-content.confirm, .sniplet.magneto .toasts .toast-content.confirm {
+  color: #1b2e0b;
+  background-color: #bfe79e;
+}
+body.magneto .toasts .toast-content.confirm .content:before, .sniplet.magneto .toasts .toast-content.confirm .content:before {
+  content: "\e871";
+}
+body.magneto .toasts .toast-content.confirm .timer, .sniplet.magneto .toasts .toast-content.confirm .timer {
+  background-color: #4b801f;
+}
+body.magneto .toasts .toast-content.info, .sniplet.magneto .toasts .toast-content.info {
+  color: #0e4b6b;
+  background-color: #cde9f8;
+}
+body.magneto .toasts .toast-content.info .content:before, .sniplet.magneto .toasts .toast-content.info .content:before {
+  content: "\e84b";
+}
+body.magneto .toasts .toast-content.info .timer, .sniplet.magneto .toasts .toast-content.info .timer {
+  background-color: #1b8ac5;
+}
+body.magneto .toasts .toast-content.warning, .sniplet.magneto .toasts .toast-content.warning {
+  color: #3f0604;
+  background-color: #f89a97;
+}
+body.magneto .toasts .toast-content.warning .content:before, .sniplet.magneto .toasts .toast-content.warning .content:before {
+  content: "\e903";
+}
+body.magneto .toasts .toast-content.warning .timer, .sniplet.magneto .toasts .toast-content.warning .timer {
+  background-color: #9e0f0b;
+}
+body.magneto .toasts .toast-content.info .content:before, body.magneto .toasts .toast-content.warning .content:before, .sniplet.magneto .toasts .toast-content.info .content:before, .sniplet.magneto .toasts .toast-content.warning .content:before {
+  font-size: 20px !important;
+}
+body.magneto .toasts .toast-content .timer, .sniplet.magneto .toasts .toast-content .timer {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  transition-timing-function: linear;
+  transition-property: all;
+  transition-duration: 3s;
+}
+body.magneto .toasts .toast-content .timer.animation, .sniplet.magneto .toasts .toast-content .timer.animation {
+  width: 0;
+  border-bottom-right-radius: 0;
+}
+body.magneto .lightbox, .sniplet.magneto .lightbox {
+  z-index: 100030;
+  height: auto;
+}
+body.magneto .lightbox .content, .sniplet.magneto .lightbox .content {
+  padding-top: 0;
+  overflow-y: scroll !important;
+}
+@media (max-width: 800px) {
+  body.magneto .lightbox .content, .sniplet.magneto .lightbox .content {
+    width: 80% !important;
+  }
+}
+body.magneto .lightbox section.head, .sniplet.magneto .lightbox section.head {
+  padding: 1px 15px !important;
+  border-radius: 5px 5px 0 0;
+}
+body.magneto .lightbox section.body, .sniplet.magneto .lightbox section.body {
+  padding: 8px 20px;
+}
+body.magneto .scrollbar, .sniplet.magneto .scrollbar {
+  /* Mozilla firefox */
+  scrollbar-color: #aaa transparent;
+  scrollbar-width: thin;
+}
+body.magneto .scrollbar::-webkit-scrollbar, .sniplet.magneto .scrollbar::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+body.magneto .scrollbar::-webkit-scrollbar-thumb, .sniplet.magneto .scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(227, 228, 229, 0.9);
+  border-radius: 8px;
+}
+body.magneto section.main, .sniplet.magneto section.main {
+  top: 56px !important;
+}
+@media screen and (max-height: 1024px) {
+  body.magneto section.main, .sniplet.magneto section.main {
+    padding-bottom: 0 !important;
+  }
+}
+body.magneto section.main #directory + div.cell, .sniplet.magneto section.main #directory + div.cell {
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.21);
+}
+body.magneto h1, .sniplet.magneto h1 {
+  font-size: 28px;
+  line-height: 40px;
+  color: #67add1;
+  font-weight: bold;
+}
+body.magneto h2, .sniplet.magneto h2 {
+  font-size: 20px;
+  line-height: 40px;
+  font-weight: bold;
+}

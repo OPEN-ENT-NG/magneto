@@ -1,0 +1,52 @@
+.zoom{
+  background-color: $magneto-grey;
+  opacity: 75%;
+  display: flex;
+  color: $magneto-white;
+  position: fixed;
+  border-radius: 32px;
+  padding: 8px;
+  right: 45%;
+  bottom: 1em;
+  z-index: 2;
+
+  &-plus{
+    font-size: 32px;
+    padding-left: 1em;
+    margin-top: 3px;
+    &-disabled{
+      color: $magneto-light-grey;
+    }
+  }
+  &-minus{
+    padding-right: 1em;
+    font-size: 32px;
+    margin-top: 3px;
+    &-disabled{
+      color: $magneto-light-grey;
+    }
+  }
+  &-label{
+    margin: 0 1em ;
+  }
+
+  &-line1 {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 20%;
+    width: 40px;
+    height: 1px;
+    background-color: #ffffff;
+  }
+
+  &-line2 {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 62%;
+    width: 40px;
+    height: 1px;
+    background-color: #ffffff;
+  }
+}

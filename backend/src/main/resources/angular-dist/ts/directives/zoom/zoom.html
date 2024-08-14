@@ -1,0 +1,17 @@
+<div class="zoom">
+
+    <div class="zoom-minus" ng-click="vm.zoomOut()" ng-disabled="vm.zoomLevel === vm.zoomMin"
+         ng-class="{'zoom-minus-disabled' : vm.zoomLevel === vm.zoomMin}">
+        <i class="magneto-minus" ></i>
+    </div>
+    <div class="zoom-line1"></div>
+    <div class="zoom-label" ng-click="vm.resetZoom()">
+        <i18n>magneto.zoom</i18n>
+    </div>
+    <div class="zoom-line2"></div>
+    <div class="zoom-plus" ng-click="vm.zoomIn()" ng-disabled="vm.zoomLevel === vm.zoomMax"
+         ng-class="{'zoom-plus-disabled' : vm.zoomLevel === vm.zoomMax}">
+        <i class="magneto-plus"></i>
+ </div>
+
+</div>

@@ -1,0 +1,53 @@
+<div ng-controller="BoardReadController as vm" class="boardContainer-read-container">
+    <!-- Header -->
+    <button class="return-button create-button" ng-click="vm.goToBoard()">
+        <i class="magneto-chevron-left button-icon"></i>
+        <span><i18n>magneto.return</i18n></span>
+    </button>
+
+    <div class="section-container">
+        <nav ng-if="!vm.board.isLayoutFree()" class="nav-container">
+            <ul>
+                <li class="li-container" ng-click="vm.openSection()">
+                    <span>[[vm.section.title]] </span>
+                    <div>
+                        <i ng-if="!vm.filter.showSection"
+                           class="magneto-chevron-down show-section"></i>
+                        <i  ng-if="vm.filter.showSection"
+                            class="magneto-chevron-up show-section"></i>
+                    </div>
+                <li ng-show="vm.filter.showSection">
+                    <ul>
+                        <li ng-repeat="section in vm.board.sections | filter: vm.sectionFilter"
+                            ng-click="vm.changeSection(section)"
+                            class="truncate">[[section.title]]
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Card display -->
+        <card-display
+                card="vm.card"
+                board="vm.board"
+               >
+        </card-display>
+
+        <!-- Comments panel -->
+        <comments-panel
+                ng-if="vm.card.id !== undefined && vm.changePageSubject !== undefined && vm.board.canComment"
+                card-id="vm.card.id"
+                board-owner="vm.board.owner">
+        </comments-panel>
+    </div>
+
+
+    <!-- Navigation icons -->
+    <div class="button-previous">
+        <i class="magneto-chevron-left nav-left" ng-if="vm.filter.page > 0" ng-click="vm.previousPage()"></i>
+    </div>
+    <div class="button-next">
+        <i class="magneto-chevron-right nav-right" ng-if="!vm.isLastPage() && !vm.isLoading" ng-click="vm.nextPage()"></i>
+    </div>
+</div>

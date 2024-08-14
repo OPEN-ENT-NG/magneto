@@ -1,0 +1,20 @@
+.cardDirective-duplicate-move-lightbox {
+  &-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px 15px 150px 15px !important;
+  }
+
+  &-button {
+    color: $magneto-white !important;
+  }
+
+  button {
+    color: $magneto-black;
+  }
+
+  .multi-combo-root-panel>ul {
+    max-height: 120px !important;
+  }
+}

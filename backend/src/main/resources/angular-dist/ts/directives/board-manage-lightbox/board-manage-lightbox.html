@@ -1,0 +1,82 @@
+<lightbox class="boardDirective-manage-lightbox"
+          show="vm.display"
+          on-close="vm.closeForm()">
+    <section class="head boardDirective-manage-lightbox-head">
+        <h3 ng-if="!vm.isUpdate">
+            <i18n>magneto.create.board</i18n>
+        </h3>
+        <h3 ng-if="vm.isUpdate">
+            <i18n>magneto.board.properties</i18n>
+        </h3>
+    </section>
+    <section class="body boardDirective-manage-lightbox-body">
+        <div class="flex-row f-column">
+            <image-select ng-model="vm.form.imageUrl"
+                          default="/img/illustrations/collaborativeeditor-default.png"
+                          class="cell boardDirective-manage-lightbox-body-image-select">
+            </image-select>
+            <span ng-if="!vm.form.imageUrl"
+                  class="boardDirective-manage-lightbox-body-image-select-choose">
+                <i18n>magneto.board.manage.ask.image</i18n>
+            </span>
+        </div>
+
+        <div class="row vertical-spacing boardDirective-manage-lightbox-body-inputs">
+            <div>
+                <i18n>magneto.create.board.title</i18n>
+                *&nbsp;:
+                <input type="text" data-ng-model="vm.form.title" class="twelve cell">
+            </div>
+            <div>
+                <i18n>magneto.create.board.description</i18n>&nbsp;:
+                <textarea ng-model="vm.form.description" class="twelve cell"></textarea>
+            </div>
+
+            <div class="boardDirective-manage-lightbox-body-inputs-options" ng-if="vm.hasRight('comment') || vm.hasRight('favorites')">
+                <h2><i18n>magneto.create.board.options</i18n></h2>
+                <label class="checkbox" ng-if="vm.hasRight('comment')">
+                    <input type="checkbox" ng-model="vm.form.canComment">
+                    <span><i18n><span>magneto.create.board.options.comment</span></i18n></span>
+                </label>
+                <label class="checkbox" ng-if="vm.hasRight('favorites')">
+                    <input type="checkbox" ng-model="vm.form.displayNbFavorites">
+                    <span><i18n><span>magneto.create.board.options.display.favorites</span></i18n></span>
+                </label>
+            </div>
+
+            <board-layout-type
+                    board="vm.form">
+            </board-layout-type>
+
+            <board-keywords-input
+                    board="vm.form">
+            </board-keywords-input>
+
+            <div class="flex-row f-column">
+                <i18n>magneto.board.background.title</i18n>
+
+                <image-select ng-model="vm.form.backgroundUrl"
+                              default="/img/illustrations/collaborativeeditor-default.png"
+                              class="cell boardDirective-manage-lightbox-body-image-select small">
+                </image-select>
+                <span class="italic-text"><i18n>magneto.board.background.warning</i18n></span>
+            </div>
+        </div>
+    </section>
+    <!-- Form submit/cancel buttons -->
+    <section>
+        <div class="row horizontal-spacing">
+            <div class="twelve cell">
+                <button class="right-magnet"
+                        data-ng-click="vm.submitBoard()"
+                        data-ng-disabled="!vm.isFormValid()">
+                    <i18n>magneto.save</i18n>
+                </button>
+                <button class="right-magnet cancel"
+                        data-ng-click="vm.closeForm()">
+                    <i18n>magneto.cancel</i18n>
+                </button>
+            </div>
+        </div>
+    </section>
+</lightbox>

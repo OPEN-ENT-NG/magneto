@@ -1,0 +1,167 @@
+.header.no-1d {
+  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9000;
+  width: 100%;
+}
+
+.boardContainer-container {
+  &-header {
+    background: $magneto-white;
+    padding: $spacing-M;
+    padding-left: $spacing-XM;
+    z-index: unset;
+
+    &-content {
+      gap: 30px;
+
+      &-options {
+        gap: 30px;
+        @media (max-width: $magneto-screen-tablet) {
+          flex-direction: column;
+          gap: 15px;
+        }
+        @media (max-width: $magneto-screen-tablet) and (min-width: $magneto-screen-mobile){
+          button {
+            width: 36%;
+            margin-left: auto;
+          }
+        }
+      }
+    }
+
+    @include noTextOverflow(1);
+    h1 {
+      font-family: $magneto-font-secondary;
+      color: $magneto-yellow-ochre;
+      margin-bottom: 0;
+      @include noTextOverflow(1);
+
+      @media (max-width: $magneto-screen-tablet) {
+        @include noTextOverflow(2);
+      }
+
+      .application-logo {
+        width: 36px;
+        margin-right: $spacing-XLXS;
+      }
+    }
+
+    &-date {
+    }
+
+    &-degrade {
+      background: linear-gradient(to top, #FFFFFF 0.9%,transparent);
+      position: absolute;
+      height: 43%;
+      @media (max-width: $magneto-screen-tablet) {
+        height: 33%;
+      }
+    }
+
+    &-description {
+      max-height: 66px !important;
+      overflow: hidden !important;
+      white-space: pre-line !important;
+      margin-bottom: 5px !important;
+    }
+
+    &-title {
+      flex: 3;
+    }
+
+    @media (max-width: $magneto-screen-mobile) {
+      display: none !important;
+    }
+  }
+
+  &-header-mobile {
+    background: $magneto-white;
+    padding: $spacing-LXS $spacing-LXS $spacing-L 73px;
+    top: -12px;
+    z-index: unset;
+    @include noTextOverflow(1);
+
+    &-title {
+      width: 70%;
+    }
+
+    h1 {
+      font-size: $spacing-M;
+      font-family: $magneto-font-secondary;
+      color: $magneto-yellow-ochre;
+      margin-bottom: 0;
+      @include noTextOverflow(1);
+
+      .application-logo {
+        width: 24px;
+        margin-right: $spacing-XLXS;
+      }
+    }
+
+    &-description {
+      overflow: hidden !important;
+      white-space: pre-line !important;
+      height: 20px !important;
+    }
+
+    .create-button {
+      float: right;
+    }
+
+    @media (min-width: 801px) {
+      display: none !important;
+    }
+  }
+
+  &-body {
+    display: flex;
+    border-top: solid 1px $magneto-white-blue;
+    border-bottom: solid 1px $magneto-white-blue;
+    background-size: cover;
+    &.no-background-image {
+      background: $magneto-lighter-light-grey;
+    }
+    position: absolute;
+
+    @include mobile {
+      top: 88px;
+    }
+
+    &-nav {
+      width: 60px;
+    }
+
+    .cardListMinHeight {
+      min-height: 1000px;
+    }
+
+    &-list {
+      width: 100%;
+      overflow-x: auto;
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12%;
+
+        i18n {
+          padding: $spacing-L;
+        }
+
+        i.magneto-arrow-left {
+          font-size: 100px;
+          padding: $spacing-L;
+        }
+
+      }
+    }
+
+    embedder {
+      z-index: 99999;
+    }
+  }
+}

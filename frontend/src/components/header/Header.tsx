@@ -1,11 +1,14 @@
-import { AppHeader, Button } from "@edifice-ui/react";
+import { AppHeader, Button, useOdeClient } from "@edifice-ui/react";
 import "./Header.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import { useTranslation } from "react-i18next";
 
 import myimg from "./uni-magneto.png";
-import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+import { folderHasShareRights } from "~/utils/share.utils";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { useEffect, useState } from "react";
 
 interface HeaderProps {
   onClick: () => void;
@@ -14,16 +17,14 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
   const { t } = useTranslation("magneto");
-
-  const { selectedBoards } = useBoardsNavigation();
-
-  const isMyBoards = selectedBoards.every(
-    (board:) => board.owner.userId === userId,
-  )
-
-  const isFolderOwnerOrSharedWithRights: boolean =
-      isMyBoards || folderHasShareRight(folders[0], "manager");
-
+  const { user } = useOdeClient();
+  const { currentFolder } = useFoldersNavigation();
+  const [isFolderOwnerOrSharedWithRights, setIsFolderOwnerOrSharedWithRights] = useState<boolean>(false);
+  
+  useEffect(() => {
+    setIsFolderOwnerOrSharedWithRights(currentFolder.id == FOLDER_TYPE.MY_BOARDS || currentFolder.ownerId === user?.userId || folderHasShareRights(currentFolder, "publish", user));
+  }, [currentFolder]);
+  
 
   return (
     <AppHeader>
@@ -40,17 +41,18 @@ const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
         <img src={myimg} alt="Logo" className="logo" />
         <span className="header-text">{t("magneto.header.my.boards")}</span>
       </div>
-      <Button
+      {isFolderOwnerOrSharedWithRights && <Button
         color="primary"
         type="button"
         variant="filled"
         onClick={onClick}
         className="button"
       >
-        Créer un tableau
-      </Button>
+        {t("magneto.create.board")}
+      </Button>}
     </AppHeader>
   );
 };
 
 export default Header;
+

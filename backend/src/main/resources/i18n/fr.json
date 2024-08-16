@@ -209,8 +209,15 @@
     "magneto.confirm": "Confirmer",
     "magneto.folder.share.predelete.warning": "Les utilisateurs à qui vous avez partagé les éléments n'y auront plus accès.",
     "magneto.folder.drag.drop.right.error": "Vous n'avez pas le droit nécessaire pour déplacer cet élément ici",
-    "read": "Lecture",
-    "contrib": "Réutilisation",
-    "publish": "Écriture",
-    "manager": "Gestion"
+    "magneto.explorer.search.adml.hint": "Saisissez 3 lettres pour démarrer la recherche",
+    "magneto.share.title": "Partager avec...",
+    "magneto.explorer.modal.share.usersWithAccess": "Utilisateurs ayant accès",
+    "magneto.explorer.modal.share.avatar.shared.alt": "Avatar de l'élément partagé",
+    "magneto.explorer.modal.share.search.placeholder": "nom d’utilisateurs, groupes, favoris",
+    "magneto.explorer.modal.share.avatar.me.alt": "Mon avatar",
+    "magneto.share.me": "Moi",
+    "magneto.show": "Voir",
+    "magneto.share.save.sharebookmark": "Enregistrer comme favori de partage",
+    "magneto.explorer.modal.share.search": "Rechercher des utilisateurs",
+    "magneto.explorer.cancel": "Annuler"
 }

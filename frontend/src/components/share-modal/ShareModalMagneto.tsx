@@ -1,10 +1,11 @@
 import { FunctionComponent } from "react";
 
-import { OdeClientProvider, ShareModal } from "@edifice-ui/react";
+import { OdeClientProvider } from "@edifice-ui/react";
 import { useOdeClient } from "@edifice-ui/react";
 import { RightStringified } from "edifice-ts-client";
 
 import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
+import { ShareModal } from "~/common/ShareModal";
 
 type props = {
   isOpen: boolean;

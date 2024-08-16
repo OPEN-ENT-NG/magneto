@@ -205,8 +205,8 @@
   "magneto.confirm": "Confirmer",
   "magneto.folder.share.predelete.warning": "Les utilisateurs à qui vous avez partagé les éléments n'y auront plus accès.",
   "magneto.folder.drag.drop.right.error": "Vous n'avez pas le droit nécessaire pour déplacer cet élément ici",
-  "read": "Consulter",
-  "contrib": "Contribuer",
-  "publish": "Publier",
-  "manager": "Gérer"
+  "read": "Lecture",
+  "contrib": "Réutilisation",
+  "publish": "Écriture",
+  "manager": "Gestion"
 }

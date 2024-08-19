@@ -70,7 +70,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
       setHasMounted(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDragging, hasMounted]);
+  }, [isDragging]);
 
   useEffect(() => {
     setIsDragged(

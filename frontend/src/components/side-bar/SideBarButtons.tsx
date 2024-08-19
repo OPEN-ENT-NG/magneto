@@ -10,7 +10,7 @@ import { MagnetsCollectionModal } from "../magnets-collection/MagnetsCollectionM
 import "./SideBar.scss";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import { UserRights } from "~/services/utils/share.utils";
+import { UserRights } from "~/utils/share.utils";
 
 type SideBarButtonsProps = {
   toggleDrawer: () => void;

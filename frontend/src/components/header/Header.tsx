@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import myimg from "./uni-magneto.png";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import { UserRights } from "~/services/utils/share.utils";
+import { UserRights } from "~/utils/share.utils";
 
 interface HeaderProps {
   onClick: () => void;

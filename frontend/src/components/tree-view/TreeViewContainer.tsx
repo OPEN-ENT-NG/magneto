@@ -10,7 +10,7 @@ import { Board } from "~/models/board.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
-import { UserRights } from "~/services/utils/share.utils";
+import { UserRights } from "~/utils/share.utils";
 
 type TreeViewContainerProps = {
   folderType: FOLDER_TYPE;

@@ -71,9 +71,15 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     return id == userId;
   };
 
-  const isMyBoards = selectedBoards.every(
-    (board) => board.owner.userId === userId,
-  );
+  const isMyBoards = () => {
+    return (
+      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+      folders.some(
+        (folder: Folder) => folder.id === currentFolder.id && !folder.deleted,
+      )
+    );
+  };
+
   const isMyFolders = selectedFolders.every(
     (folder) => folder.ownerId === userId,
   );
@@ -90,17 +96,16 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     const oneBoardSelectedOnly: boolean =
       selectedBoardsIds.length == 1 && selectedFoldersIds.length == 0;
     const isOwnedOrPublicOrShared: boolean =
-      isMyBoards ||
+      isMyBoards() ||
       selectedBoards[0].isPublished; /*|| boards[0].myRights.contrib*/
     return oneBoardSelectedOnly && isOwnedOrPublicOrShared;
   };
 
   const hasShareRight = () => {
     const oneOwnBoardSelectedOnly: boolean =
-      isMyBoards &&
+      isMyBoards() &&
       selectedBoardsIds.length == 1 &&
-      selectedFoldersIds.length == 0 &&
-      isMyBoards;
+      selectedFoldersIds.length == 0;
     const oneOwnFolderSelectedOnly: boolean =
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0 &&
@@ -111,11 +116,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   const hasRenameRight = () => {
     const isNotDeletedFolder = !currentFolder.deleted;
     const isMyBoardsAndOneFolderSelectedOnly: boolean =
-      isMyBoards &&
+      isMyBoards() &&
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0;
     const isFolderOwnerOrSharedWithRights: boolean =
-      isMyBoards || folderHasShareRight(folders[0], "manager");
+      isMyBoards() || folderHasShareRight(folders[0], "manager");
 
     return (
       isNotDeletedFolder &&
@@ -200,7 +205,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       {t("magneto.open")}
                     </Button>
                   )}
-                {isMyBoards &&
+                {isMyBoards() &&
                   !isTrash &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length ==
@@ -227,11 +232,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.duplicate")}
                   </Button>
                 )}
-                {isMyBoards &&
+                {isMyBoards() &&
                   !isTrash &&
                   selectedBoardsIds.length > 0 &&
                   selectedFoldersIds.length == 0 &&
-                  isMyBoards && (
+                  isMyBoards() && (
                     <Button
                       type="button"
                       color="primary"
@@ -262,10 +267,10 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                   </Button>
                 )}
                 {!(currentFolder.rights.length > 1) &&
-                  isMyBoards &&
+                  isMyBoards() &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length == 0 &&
-                  isMyBoards &&
+                  isMyBoards() &&
                   canPublish &&
                   !isTrash &&
                   !selectedBoards[0].isPublished && (
@@ -278,10 +283,10 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       {t("magneto.public.share")}
                     </Button>
                   )}
-                {isMyBoards &&
+                {isMyBoards() &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length == 0 &&
-                  isMyBoards &&
+                  isMyBoards() &&
                   canPublish &&
                   selectedBoards[0].isPublished && (
                     <Button
@@ -306,7 +311,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.restore")}
                   </Button>
                 )}
-                {!isPublic && isMyBoards && isMyFolders && (
+                {!isPublic && isMyBoards() && isMyFolders && (
                   <Button
                     type="button"
                     color="primary"

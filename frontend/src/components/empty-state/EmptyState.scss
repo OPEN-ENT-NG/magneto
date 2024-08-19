@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  float: left;
+  width: 100%;
 
   .empty-state-svg {
     width: 26% !important;

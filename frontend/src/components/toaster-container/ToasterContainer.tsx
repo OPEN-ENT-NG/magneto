@@ -80,9 +80,9 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     );
   };
 
-  const isMyFolders = selectedFolders.every(
-    (folder) => folder.ownerId === userId,
-  );
+  const isMyFolders = () => {
+    return selectedFolders.every((folder) => folder.ownerId === userId);
+  };
   const isTrash =
     currentFolder.id === FOLDER_TYPE.DELETED_BOARDS ||
     (selectedBoards.every((board) => board.deleted) &&
@@ -109,7 +109,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     const oneOwnFolderSelectedOnly: boolean =
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0 &&
-      isMyFolders;
+      isMyFolders();
     return oneOwnBoardSelectedOnly || oneOwnFolderSelectedOnly;
   };
 
@@ -120,7 +120,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0;
     const isFolderOwnerOrSharedWithRights: boolean =
-      isMyBoards() || folderHasShareRight(folders[0], "manager");
+      isMyFolders() || folderHasShareRight(folders[0], "manager");
 
     return (
       isNotDeletedFolder &&
@@ -311,7 +311,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.restore")}
                   </Button>
                 )}
-                {!isPublic && isMyBoards() && isMyFolders && (
+                {!isPublic && isMyBoards() && isMyFolders() && (
                   <Button
                     type="button"
                     color="primary"

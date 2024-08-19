@@ -1,4 +1,5 @@
 import { Bookmark, Close, RafterDown } from "@edifice-ui/icons";
+import { Avatar, Button, Checkbox, IconButton } from "@edifice-ui/react";
 import {
   ShareRight,
   ShareRightAction,
@@ -9,7 +10,6 @@ import { useTranslation } from "react-i18next";
 
 import { hasRight } from "./utils/hasRight";
 import { showShareRightLine } from "./utils/showShareRightLine";
-import { Avatar, Button, Checkbox, IconButton } from "@edifice-ui/react";
 
 export const ShareBookmarkLine = ({
   shareRights,

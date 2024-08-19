@@ -1,5 +1,6 @@
 import { useEffect, useReducer } from "react";
 
+import { useOdeClient, useUser, useToast } from "@edifice-ui/react";
 import {
   odeServices,
   PutShareResponse,
@@ -11,7 +12,6 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { ShareOptions, ShareResourceMutation } from "../ShareModal";
-import { useOdeClient, useUser, useToast } from "@edifice-ui/react";
 
 interface UseShareResourceModalProps {
   /**

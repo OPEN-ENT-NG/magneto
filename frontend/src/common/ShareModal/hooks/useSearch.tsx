@@ -1,7 +1,12 @@
 import { ChangeEvent, Dispatch, useEffect, useReducer } from "react";
 
 import { Bookmark } from "@edifice-ui/icons";
-
+import {
+  OptionListItemType,
+  useDebounce,
+  useIsAdml,
+  useOdeClient,
+} from "@edifice-ui/react";
 import {
   ShareRight,
   ShareRightAction,
@@ -11,10 +16,8 @@ import {
 } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
-
-import { ShareOptions } from "../ShareModal";
 import { ShareAction } from "./useShare";
-import { OptionListItemType, useDebounce, useIsAdml, useOdeClient } from "@edifice-ui/react";
+import { ShareOptions } from "../ShareModal";
 
 type State = {
   searchInputValue: string;

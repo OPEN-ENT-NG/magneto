@@ -1,7 +1,17 @@
 import { ReactNode, useState } from "react";
 
 import { Bookmark, InfoCircle, RafterDown } from "@edifice-ui/icons";
-
+import {
+  Modal,
+  Heading,
+  LoadingScreen,
+  VisuallyHidden,
+  Avatar,
+  Checkbox,
+  Button,
+  Tooltip,
+  Combobox,
+} from "@edifice-ui/react";
 import { UseMutationResult } from "@tanstack/react-query";
 import {
   ID,
@@ -12,13 +22,11 @@ import {
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
-
-import { ShareBookmark } from "./ShareBookmark";
-import { ShareBookmarkLine } from "./ShareBookmarkLine";
 import { useSearch } from "./hooks/useSearch";
 import useShare from "./hooks/useShare";
 import { useShareBookmark } from "./hooks/useShareBookmark";
-import { Modal, Heading, LoadingScreen, VisuallyHidden, Avatar, Checkbox, Button, Tooltip, Combobox } from "@edifice-ui/react";
+import { ShareBookmark } from "./ShareBookmark";
+import { ShareBookmarkLine } from "./ShareBookmarkLine";
 
 export type ShareOptions = {
   resourceId: ID;
@@ -119,7 +127,7 @@ export default function ShareResourceModal({
     toggleBookmarkInput,
   } = useShareBookmark({ shareRights, shareDispatch });
 
-  const { t } = useTranslation('magneto');
+  const { t } = useTranslation("magneto");
 
   const searchPlaceholder = showSearchAdmlHint()
     ? t("magneto.explorer.search.adml.hint")
@@ -127,7 +135,9 @@ export default function ShareResourceModal({
 
   return createPortal(
     <Modal id="share_modal" size="lg" isOpen={isOpen} onModalClose={onCancel}>
-      <Modal.Header onModalClose={onCancel}>{t("magneto.share.title")}</Modal.Header>
+      <Modal.Header onModalClose={onCancel}>
+        {t("magneto.share.title")}
+      </Modal.Header>
       <Modal.Body>
         <Heading headingStyle="h4" level="h3" className="mb-16">
           {t("magneto.explorer.modal.share.usersWithAccess")}
@@ -237,9 +247,7 @@ export default function ShareResourceModal({
         >
           <div className="me-8">{t("magneto.explorer.modal.share.search")}</div>
           <Tooltip
-            message={
-              "Vos favoris de partage s’affichent en priorité dans votre liste lorsque vous recherchez un groupe ou une personne, vous pouvez les retrouver dans l’annuaire."
-            }
+            message={t("magneto.share.heading.tooltip.message")}
             placement="top"
           >
             <InfoCircle className="c-pointer" height="18" />

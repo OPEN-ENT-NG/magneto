@@ -73,10 +73,6 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
 
   const userId = user ? user?.userId : "";
 
-  const isSameAsUser = (id: string) => {
-    return id == userId;
-  };
-
   const isMyBoards = () => {
     return (
       currentFolder.id == FOLDER_TYPE.MY_BOARDS ||

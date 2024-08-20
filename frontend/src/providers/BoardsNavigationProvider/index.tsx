@@ -8,6 +8,9 @@ import {
   useState,
 } from "react";
 
+import { checkUserRight } from "@edifice-ui/react";
+import { RightRole } from "edifice-ts-client";
+
 import {
   BoardsNavigationContextType,
   BoardsNavigationProviderProps,
@@ -20,8 +23,6 @@ import {
   useGetAllBoardsQuery,
   useGetBoardsQuery,
 } from "~/services/api/boards.service";
-import { RightRole } from "edifice-ts-client";
-import { checkUserRight } from "@edifice-ui/react";
 
 const BoardsNavigationContext =
   createContext<BoardsNavigationContextType | null>(null);

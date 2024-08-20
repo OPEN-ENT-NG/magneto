@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { checkUserRight, TreeViewHandlers } from "@edifice-ui/react";
+import { RightRole } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -31,7 +32,6 @@ import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
-import { RightRole } from "edifice-ts-client";
 
 const FoldersNavigationContext =
   createContext<FoldersNavigationContextType | null>(null);

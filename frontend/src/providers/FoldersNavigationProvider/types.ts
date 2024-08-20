@@ -1,11 +1,11 @@
 import { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 
 import { TreeViewHandlers } from "@edifice-ui/react";
+import { RightRole } from "edifice-ts-client";
 
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder } from "~/models/folder.model";
-import { RightRole } from "edifice-ts-client";
 
 export type BasicFolder = "basicFolder";
 

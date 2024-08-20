@@ -5,6 +5,7 @@ import { TreeViewHandlers } from "@edifice-ui/react";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder } from "~/models/folder.model";
+import { RightRole } from "edifice-ts-client";
 
 export type BasicFolder = "basicFolder";
 
@@ -38,6 +39,8 @@ export type FoldersNavigationContextType = {
   setSelectedFolders: React.Dispatch<React.SetStateAction<Folder[]>>;
   selectedNodesIds: string[];
   setSelectedNodesIds: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedFolderRights: Record<RightRole, boolean> | null;
+  setSelectedFolderRights: React.Dispatch<Record<RightRole, boolean> | null>;
   handleSelect: (
     folderId: string,
     folderType: FOLDER_TYPE | BasicFolder,

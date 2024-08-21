@@ -67,36 +67,16 @@ export const TreeViewContainer: React.FunctionComponent<
   };
 
   const removeFolderHighlight = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let targetElement: HTMLElement;
-    if (e.target.closest("li")?.id) {
-      if (
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.MY_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.PUBLIC_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.DELETED_BOARDS
-      ) {
-        targetElement =
-          e.target.closest(".action-container") ?? new HTMLElement();
-      } else {
-        targetElement = e.target.closest("li") ?? new HTMLElement();
-      }
+    const targetElement = e.target.closest(".action-container");
+    if (targetElement) {
       targetElement.classList.add("no-drag-over");
       targetElement.classList.remove("drag-over");
     }
   };
 
   const handleDragOver = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let targetElement: HTMLElement;
-    if (e.target.closest("li")?.id) {
-      if (
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.MY_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.PUBLIC_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.DELETED_BOARDS
-      ) {
-        targetElement =
-          e.target.closest(".action-container") ?? new HTMLElement();
-      } else {
-        targetElement = e.target.closest("li") ?? new HTMLElement();
-      }
+    const targetElement = e.target.closest(".action-container");
+    if (targetElement) {
       targetElement.classList.add("drag-over");
       targetElement.classList.remove("no-drag-over");
     }

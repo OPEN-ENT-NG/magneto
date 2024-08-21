@@ -84,13 +84,13 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
 
   const allBoardsMine = () => {
     return (
-      selectedBoards != null &&
+      selectedBoards !== null &&
       selectedBoards.every((board) => board.owner.userId === userId)
     );
   };
-  const isMyFolders = () => {
+  const areFoldersMine = () => {
     return (
-      selectedBoards != null &&
+      selectedBoards !== null &&
       selectedFolders.every((folder) => folder.ownerId === userId)
     );
   };
@@ -106,11 +106,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   const hasDuplicationRight = () => {
     if (selectedBoardsIds.length != 1 || selectedFoldersIds.length != 0)
       return false;
-    const tutu =
+    return (
       selectedBoards[0].owner.userId === userId ||
       selectedBoards[0].isPublished ||
-      (selectedBoardRights != null && selectedBoardRights.contrib);
-    return tutu;
+      (selectedBoardRights != null && selectedBoardRights.contrib)
+    );
   };
 
   const hasShareRight = () => {
@@ -122,7 +122,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
     const oneOwnFolderSelectedOnly: boolean =
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0 &&
-      isMyFolders();
+      areFoldersMine();
     return oneOwnBoardSelectedOnly || oneOwnFolderSelectedOnly;
   };
 
@@ -132,7 +132,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0;
     const isFolderOwnerOrSharedWithRights: boolean =
-      isMyFolders() ||
+      areFoldersMine() ||
       (selectedFolderRights != null && selectedFolderRights.manager);
 
     return (
@@ -300,7 +300,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.restore")}
                   </Button>
                 )}
-                {!isPublic && allBoardsMine() && isMyFolders() && (
+                {!isPublic && allBoardsMine() && areFoldersMine() && (
                   <Button
                     type="button"
                     color="primary"

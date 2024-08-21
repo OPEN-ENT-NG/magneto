@@ -8,6 +8,9 @@ import {
   useState,
 } from "react";
 
+import { checkUserRight } from "@edifice-ui/react";
+import { RightRole } from "edifice-ts-client";
+
 import {
   BoardsNavigationContextType,
   BoardsNavigationProviderProps,
@@ -41,6 +44,10 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   const [boards, setBoards] = useState<Board[]>([]);
   const [selectedBoards, setSelectedBoards] = useState<Board[]>([]);
   const [selectedBoardsIds, setSelectedBoardsIds] = useState<string[]>([]);
+  const [selectedBoardRights, setSelectedBoardRights] = useState<Record<
+    RightRole,
+    boolean
+  > | null>(null);
   const [searchText, setSearchText] = useState<string>("");
   const [boardsLoading, setBoardsLoading] = useState<boolean>(true);
   const [boardsQuery, setBoardsQuery] = useState<IBoardsParamsRequest>({
@@ -62,6 +69,10 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   const { currentData: myAllBoardsResult } =
     useGetAllBoardsQuery(allBoardsQuery);
 
+  const updateRights = async () => {
+    setSelectedBoardRights(await checkUserRight(selectedBoards[0].rights));
+  };
+
   const toggleSelect = useCallback(
     (resource: Board) => {
       if (selectedBoardsIds.includes(resource.id)) {
@@ -82,6 +93,11 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     },
     [selectedBoards, selectedBoardsIds],
   );
+
+  useEffect(() => {
+    if (selectedBoards.length === 1) updateRights();
+    else setSelectedBoardRights(null);
+  }, [selectedBoards]);
 
   useEffect(() => {
     const manageBoardsQueryParameters = () => {
@@ -137,6 +153,8 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
       searchText,
       setSearchText,
       toggleSelect,
+      selectedBoardRights,
+      setSelectedBoardRights,
     }),
     [
       boards,
@@ -145,6 +163,7 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
       selectedBoardsIds,
       toggleSelect,
       boardsLoading,
+      selectedBoardRights,
     ],
   );
 

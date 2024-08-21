@@ -46,9 +46,15 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   const [isShareBoard, toggleShareBoard] = useToggle(false);
   const [boardPublicShareModal, toggleBoardPublicShareModal] = useToggle(false);
   const [shareOptions, setShareOptions] = useState<ShareOptions | null>(null);
-  const { folders, currentFolder, selectedFolders, selectedFoldersIds } =
-    useFoldersNavigation();
-  const { selectedBoardsIds, selectedBoards } = useBoardsNavigation();
+  const {
+    folderData,
+    currentFolder,
+    selectedFolders,
+    selectedFoldersIds,
+    selectedFolderRights,
+  } = useFoldersNavigation();
+  const { selectedBoardsIds, selectedBoards, selectedBoardRights } =
+    useBoardsNavigation();
   const { setUserRights } = useUserRightsStore.getState();
   const [duplicateBoard] = useDuplicateBoardMutation();
 
@@ -67,16 +73,27 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
 
   const userId = user ? user?.userId : "";
 
-  const isSameAsUser = (id: string) => {
-    return id == userId;
+  const isMyBoards = () => {
+    return (
+      currentFolder.id == FOLDER_TYPE.MY_BOARDS ||
+      folderData.some(
+        (folder: Folder) => folder.id === currentFolder.id && !folder.deleted,
+      )
+    );
   };
 
-  const isMyBoards = selectedBoards.every(
-    (board) => board.owner.userId === userId,
-  );
-  const isMyFolders = selectedFolders.every(
-    (folder) => folder.ownerId === userId,
-  );
+  const allBoardsMine = () => {
+    return (
+      selectedBoards !== null &&
+      selectedBoards.every((board) => board.owner.userId === userId)
+    );
+  };
+  const areFoldersMine = () => {
+    return (
+      selectedBoards !== null &&
+      selectedFolders.every((folder) => folder.ownerId === userId)
+    );
+  };
   const isTrash =
     currentFolder.id === FOLDER_TYPE.DELETED_BOARDS ||
     (selectedBoards.every((board) => board.deleted) &&
@@ -87,63 +104,40 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
   );
 
   const hasDuplicationRight = () => {
-    const oneBoardSelectedOnly: boolean =
-      selectedBoardsIds.length == 1 && selectedFoldersIds.length == 0;
-    const isOwnedOrPublicOrShared: boolean =
-      isMyBoards ||
-      selectedBoards[0].isPublished; /*|| boards[0].myRights.contrib*/
-    return oneBoardSelectedOnly && isOwnedOrPublicOrShared;
+    if (selectedBoardsIds.length != 1 || selectedFoldersIds.length != 0)
+      return false;
+    return (
+      selectedBoards[0].owner.userId === userId ||
+      selectedBoards[0].isPublished ||
+      (selectedBoardRights != null && selectedBoardRights.contrib)
+    );
   };
 
   const hasShareRight = () => {
     const oneOwnBoardSelectedOnly: boolean =
-      isMyBoards &&
+      isMyBoards() &&
       selectedBoardsIds.length == 1 &&
       selectedFoldersIds.length == 0 &&
-      isMyBoards;
+      allBoardsMine();
     const oneOwnFolderSelectedOnly: boolean =
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0 &&
-      isMyFolders;
+      areFoldersMine();
     return oneOwnBoardSelectedOnly || oneOwnFolderSelectedOnly;
   };
 
   const hasRenameRight = () => {
-    const isNotDeletedFolder = !currentFolder.deleted;
     const isMyBoardsAndOneFolderSelectedOnly: boolean =
-      isMyBoards &&
+      isMyBoards() &&
       selectedFoldersIds.length == 1 &&
       selectedBoardsIds.length == 0;
     const isFolderOwnerOrSharedWithRights: boolean =
-      isMyBoards || folderHasShareRight(folders[0], "manager");
+      areFoldersMine() ||
+      (selectedFolderRights != null && selectedFolderRights.manager);
 
     return (
-      isNotDeletedFolder &&
-      isMyBoardsAndOneFolderSelectedOnly &&
-      isFolderOwnerOrSharedWithRights
+      isMyBoardsAndOneFolderSelectedOnly && isFolderOwnerOrSharedWithRights
     );
-  };
-
-  const folderHasShareRight = (folder: Folder, right: string) => {
-    const shareRight: string = right;
-    if (!folder || !folder.shared) return false;
-
-    folder.shared.forEach((shareItem: any) => {
-      const hasIndividualShareRight: boolean =
-        !!shareItem.userId &&
-        isSameAsUser(shareItem.userId) &&
-        shareItem[shareRight] == true;
-
-      const hasGroupShareRight: boolean =
-        !!shareItem.groupId &&
-        !!user?.groupsIds.find((groupId: string) => {
-          shareItem.groupId == groupId && shareItem[shareRight] == true;
-        });
-
-      if (hasIndividualShareRight || hasGroupShareRight) return true;
-    });
-
-    return false;
   };
 
   const openShareModal = async () => {
@@ -200,11 +194,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       {t("magneto.open")}
                     </Button>
                   )}
-                {isMyBoards &&
-                  !isTrash &&
+                {isMyBoards() &&
                   selectedBoardsIds.length == 1 &&
-                  selectedFoldersIds.length ==
-                    0 /*&& boards[0].myRights.manager*/ && (
+                  selectedFoldersIds.length == 0 &&
+                  selectedBoardRights != null &&
+                  selectedBoardRights.manager && (
                     <Button
                       type="button"
                       color="primary"
@@ -227,11 +221,11 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.duplicate")}
                   </Button>
                 )}
-                {isMyBoards &&
+                {isMyBoards() &&
                   !isTrash &&
                   selectedBoardsIds.length > 0 &&
                   selectedFoldersIds.length == 0 &&
-                  isMyBoards && (
+                  allBoardsMine() && (
                     <Button
                       type="button"
                       color="primary"
@@ -262,10 +256,10 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                   </Button>
                 )}
                 {!(currentFolder.rights.length > 1) &&
-                  isMyBoards &&
+                  isMyBoards() &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length == 0 &&
-                  isMyBoards &&
+                  allBoardsMine() &&
                   canPublish &&
                   !isTrash &&
                   !selectedBoards[0].isPublished && (
@@ -278,10 +272,10 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                       {t("magneto.public.share")}
                     </Button>
                   )}
-                {isMyBoards &&
+                {isMyBoards() &&
                   selectedBoardsIds.length == 1 &&
                   selectedFoldersIds.length == 0 &&
-                  isMyBoards &&
+                  allBoardsMine() &&
                   canPublish &&
                   selectedBoards[0].isPublished && (
                     <Button
@@ -306,7 +300,7 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
                     {t("magneto.restore")}
                   </Button>
                 )}
-                {!isPublic && isMyBoards && isMyFolders && (
+                {!isPublic && allBoardsMine() && areFoldersMine() && (
                   <Button
                     type="button"
                     color="primary"

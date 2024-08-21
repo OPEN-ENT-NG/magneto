@@ -9,7 +9,8 @@ import {
   useState,
 } from "react";
 
-import { TreeViewHandlers } from "@edifice-ui/react";
+import { checkUserRight, TreeViewHandlers } from "@edifice-ui/react";
+import { RightRole } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -57,6 +58,10 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<Folder[]>([]);
   const [selectedFoldersIds, setSelectedFoldersIds] = useState<string[]>([]);
+  const [selectedFolderRights, setSelectedFolderRights] = useState<Record<
+    RightRole,
+    boolean
+  > | null>(null);
   const [selectedNodesIds, setSelectedNodesIds] = useState<string[]>([
     FOLDER_TYPE.MY_BOARDS,
   ]);
@@ -158,6 +163,10 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     [currentFolder.id, folderData, folderNavigationRefs, t],
   );
 
+  const updateRights = async () => {
+    setSelectedFolderRights(await checkUserRight(selectedFolders[0].rights));
+  };
+
   const toggleSelect = useCallback(
     (resource: Folder) => {
       if (selectedFoldersIds.includes(resource.id)) {
@@ -178,6 +187,11 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     },
     [selectedFolders, selectedFoldersIds],
   );
+
+  useEffect(() => {
+    if (selectedFolders.length === 1) updateRights();
+    else setSelectedFolderRights(null);
+  }, [selectedFolders]);
 
   useEffect(() => {
     if (myBoardsData && deletedBoardsData) {
@@ -235,6 +249,8 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       selectedNodesIds,
       setSelectedNodesIds,
       handleFolderRefs,
+      selectedFolderRights,
+      setSelectedFolderRights,
     }),
     [
       currentFolder,
@@ -247,6 +263,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       folderNavigationRefs,
       toggleSelect,
       handleSelect,
+      selectedFolderRights,
     ],
   );
 

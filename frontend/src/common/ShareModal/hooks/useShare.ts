@@ -234,23 +234,6 @@ export default function useShare({
 
       const shares = [...state.shareRights.rights];
 
-      if (myRights.length > 0) {
-        const actions: ShareRightAction[] = myRights.map((right) => {
-          return {
-            displayName: right,
-            id: right,
-          } as ShareRightAction;
-        });
-        shares.push({
-          actions,
-          avatarUrl: "",
-          directoryUrl: "",
-          displayName: user!.username,
-          id: user!.userId,
-          type: "user",
-        });
-      }
-
       // shared
       if (shareResource) {
         const result = await shareResource.mutateAsync({

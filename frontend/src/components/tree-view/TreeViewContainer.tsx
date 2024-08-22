@@ -5,6 +5,7 @@ import { TreeView, useOdeClient } from "@edifice-ui/react";
 import { useTranslation } from "react-i18next";
 
 import { useGetFolderTypeData } from "./utils";
+import { DRAG_AND_DROP_TYPE } from "~/core/enums/drag-and-drop-type.enum";
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
@@ -67,38 +68,18 @@ export const TreeViewContainer: React.FunctionComponent<
   };
 
   const removeFolderHighlight = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let targetElement: HTMLElement;
-    if (e.target.closest("li")?.id) {
-      if (
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.MY_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.PUBLIC_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.DELETED_BOARDS
-      ) {
-        targetElement =
-          e.target.closest(".action-container") ?? new HTMLElement();
-      } else {
-        targetElement = e.target.closest("li") ?? new HTMLElement();
-      }
-      targetElement.classList.add("no-drag-over");
-      targetElement.classList.remove("drag-over");
+    const targetElement = e.target.closest(".action-container");
+    if (targetElement) {
+      targetElement.classList.add(DRAG_AND_DROP_TYPE.NO_DRAG_OVER);
+      targetElement.classList.remove(DRAG_AND_DROP_TYPE.DRAG_OVER);
     }
   };
 
   const handleDragOver = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let targetElement: HTMLElement;
-    if (e.target.closest("li")?.id) {
-      if (
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.MY_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.PUBLIC_BOARDS ||
-        e.target.closest("li")?.id.split("_")[1] == FOLDER_TYPE.DELETED_BOARDS
-      ) {
-        targetElement =
-          e.target.closest(".action-container") ?? new HTMLElement();
-      } else {
-        targetElement = e.target.closest("li") ?? new HTMLElement();
-      }
-      targetElement.classList.add("drag-over");
-      targetElement.classList.remove("no-drag-over");
+    const targetElement = e.target.closest(".action-container");
+    if (targetElement) {
+      targetElement.classList.add(DRAG_AND_DROP_TYPE.DRAG_OVER);
+      targetElement.classList.remove(DRAG_AND_DROP_TYPE.NO_DRAG_OVER);
     }
 
     e.preventDefault();

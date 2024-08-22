@@ -5,13 +5,13 @@ import { TreeView, useOdeClient } from "@edifice-ui/react";
 import { useTranslation } from "react-i18next";
 
 import { useGetFolderTypeData } from "./utils";
+import { DRAG_AND_DROP_TYPE } from "~/core/enums/drag-and-drop-type.enum";
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/utils/share.utils";
-import { DRAG_AND_DROP_TYPE } from "~/core/enums/drag-and-drop-type.enum";
 
 type TreeViewContainerProps = {
   folderType: FOLDER_TYPE;

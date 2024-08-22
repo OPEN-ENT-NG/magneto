@@ -1,4 +1,5 @@
 import { useEffect, useReducer } from "react";
+import { useDispatch } from "react-redux";
 
 import { useOdeClient, useUser, useToast } from "@edifice-ui/react";
 import {
@@ -10,6 +11,8 @@ import {
   type ShareRightWithVisibles,
 } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
+import { boardsApi } from "~/services/api/boards.service.ts";
+import { foldersApi } from "~/services/api/folders.service.ts";
 
 import { ShareOptions, ShareResourceMutation } from "../ShareModal";
 
@@ -87,6 +90,8 @@ export default function useShare({
   const { t } = useTranslation();
 
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const dispatchRTK = useDispatch();
 
   useEffect(() => {
     if (!resourceId) return;
@@ -269,6 +274,8 @@ export default function useShare({
         type: "isSharing",
         payload: false,
       });
+      dispatchRTK(boardsApi.util.invalidateTags(["Boards"]));
+      dispatchRTK(foldersApi.util.invalidateTags(["Folders"]));
     }
   };
 

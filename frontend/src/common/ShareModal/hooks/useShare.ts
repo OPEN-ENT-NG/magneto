@@ -1,5 +1,4 @@
 import { useEffect, useReducer } from "react";
-import { useDispatch } from "react-redux";
 
 import { useOdeClient, useUser, useToast } from "@edifice-ui/react";
 import {
@@ -11,10 +10,11 @@ import {
   type ShareRightWithVisibles,
 } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
-import { boardsApi } from "~/services/api/boards.service.ts";
-import { foldersApi } from "~/services/api/folders.service.ts";
+import { useDispatch } from "react-redux";
 
 import { ShareOptions, ShareResourceMutation } from "../ShareModal";
+import { boardsApi } from "~/services/api/boards.service.ts";
+import { foldersApi } from "~/services/api/folders.service.ts";
 
 interface UseShareResourceModalProps {
   /**

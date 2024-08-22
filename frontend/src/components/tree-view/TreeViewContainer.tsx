@@ -11,6 +11,7 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/utils/share.utils";
+import { DRAG_AND_DROP_TYPE } from "~/core/enums/drag-and-drop-type.enum";
 
 type TreeViewContainerProps = {
   folderType: FOLDER_TYPE;
@@ -69,16 +70,16 @@ export const TreeViewContainer: React.FunctionComponent<
   const removeFolderHighlight = (e: React.ChangeEvent<HTMLInputElement>) => {
     const targetElement = e.target.closest(".action-container");
     if (targetElement) {
-      targetElement.classList.add("no-drag-over");
-      targetElement.classList.remove("drag-over");
+      targetElement.classList.add(DRAG_AND_DROP_TYPE.NO_DRAG_OVER);
+      targetElement.classList.remove(DRAG_AND_DROP_TYPE.DRAG_OVER);
     }
   };
 
   const handleDragOver = (e: React.ChangeEvent<HTMLInputElement>) => {
     const targetElement = e.target.closest(".action-container");
     if (targetElement) {
-      targetElement.classList.add("drag-over");
-      targetElement.classList.remove("no-drag-over");
+      targetElement.classList.add(DRAG_AND_DROP_TYPE.DRAG_OVER);
+      targetElement.classList.remove(DRAG_AND_DROP_TYPE.NO_DRAG_OVER);
     }
 
     e.preventDefault();

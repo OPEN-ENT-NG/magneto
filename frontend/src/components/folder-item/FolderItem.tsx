@@ -12,6 +12,7 @@ import { Folder } from "~/models/folder.model";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { UserRights } from "~/utils/share.utils";
+import { DRAG_AND_DROP_TYPE } from "~/core/enums/drag-and-drop-type.enum";
 
 type FolderListProps = {
   isSelected: boolean;
@@ -223,7 +224,11 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       <div
         ref={drop}
         draggable="true"
-        className={isOver ? "drag-over" : "no-drag-over"}
+        className={
+          isOver
+            ? DRAG_AND_DROP_TYPE.DRAG_OVER
+            : DRAG_AND_DROP_TYPE.NO_DRAG_OVER
+        }
       >
         <Card
           app={currentApp!}

@@ -6,6 +6,7 @@ import { mdiFolder, mdiFolderAccount } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useDrop } from "react-dnd";
 
+import { DRAG_AND_DROP_TYPE } from "~/core/enums/drag-and-drop-type.enum";
 import { FOLDER_TYPE, MAIN_PAGE_TITLE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
@@ -223,7 +224,11 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       <div
         ref={drop}
         draggable="true"
-        className={isOver ? "drag-over" : "no-drag-over"}
+        className={
+          isOver
+            ? DRAG_AND_DROP_TYPE.DRAG_OVER
+            : DRAG_AND_DROP_TYPE.NO_DRAG_OVER
+        }
       >
         <Card
           app={currentApp!}

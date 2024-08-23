@@ -10,18 +10,17 @@ import {
   type ShareRightWithVisibles,
 } from "edifice-ts-client";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 
 import { ShareOptions, ShareResourceMutation } from "../ShareModal";
+import { boardsApi } from "~/services/api/boards.service.ts";
+import { foldersApi } from "~/services/api/folders.service.ts";
 
 interface UseShareResourceModalProps {
   /**
    * Resource ID (assetId)
    */
   resourceId: ShareOptions["resourceId"];
-  /**
-   * Resource Rights (based on the new rights array)
-   */
-  resourceRights: ShareOptions["resourceRights"];
   /**
    * Resource Creator Id: Id of the user who created the resource
    */
@@ -74,7 +73,6 @@ function reducer(state: State, action: ShareAction) {
 
 export default function useShare({
   resourceId,
-  resourceRights,
   resourceCreatorId,
   shareResource,
   setIsLoading,
@@ -87,6 +85,8 @@ export default function useShare({
   const { t } = useTranslation();
 
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const dispatchRTK = useDispatch();
 
   useEffect(() => {
     if (!resourceId) return;
@@ -220,31 +220,7 @@ export default function useShare({
     });
 
     try {
-      //TODO move this logic into services
-      // add my rights if needed (because visible api does not return my rights)
-      const myRights = resourceRights
-        .filter((right) => user && right.includes(`user:${user.userId}`))
-        .map((right) => right.split(":")[2])
-        .filter((right) => !!right);
-
       const shares = [...state.shareRights.rights];
-
-      if (myRights.length > 0) {
-        const actions: ShareRightAction[] = myRights.map((right) => {
-          return {
-            displayName: right,
-            id: right,
-          } as ShareRightAction;
-        });
-        shares.push({
-          actions,
-          avatarUrl: "",
-          directoryUrl: "",
-          displayName: user!.username,
-          id: user!.userId,
-          type: "user",
-        });
-      }
 
       // shared
       if (shareResource) {
@@ -269,6 +245,8 @@ export default function useShare({
         type: "isSharing",
         payload: false,
       });
+      dispatchRTK(boardsApi.util.invalidateTags(["Boards"]));
+      dispatchRTK(foldersApi.util.invalidateTags(["Folders"]));
     }
   };
 

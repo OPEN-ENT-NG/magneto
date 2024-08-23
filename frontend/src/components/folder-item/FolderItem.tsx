@@ -124,10 +124,10 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   const isOwnerOfSelectedBoards = useCallback(
     (boards: Board[]): boolean => {
-      return boards.filter(
-        (board: Board) =>
-          board?.owner?.userId === user?.userId,
-      ).length == boards.length;
+      return (
+        boards.filter((board: Board) => board?.owner?.userId === user?.userId)
+          .length == boards.length
+      );
     },
     [user?.userId],
   );

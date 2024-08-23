@@ -145,7 +145,7 @@ export const MoveBoard: FunctionComponent<props> = ({
   const handleMoveRights = () => {
     if (selectedBoards.length) {
       const destinationFolder = getFolderData(selectedFolderId);
-      
+
       if (
         (!!selectedBoards[0] && !isOwnerOfSelectedBoards()) ||
         destinationFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||

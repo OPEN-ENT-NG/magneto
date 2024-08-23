@@ -195,7 +195,7 @@ export const App = () => {
               searchText={searchText}
               onDragAndDrop={handleDragAndDropBoards}
             />
-            <ToasterContainer 
+            <ToasterContainer
               reset={resetBoardsAndFolders}
               onSetShowModal={setShowModal}
               modalProps={modalProps}

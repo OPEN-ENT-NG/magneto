@@ -37,7 +37,7 @@ export interface ToasterContainerProps {
   onSetModalProps: (modalProps: any) => void;
 }
 
-export const ToasterContainer = ({ 
+export const ToasterContainer = ({
   reset,
   onSetShowModal,
   modalProps,

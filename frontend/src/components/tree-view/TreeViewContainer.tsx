@@ -135,7 +135,7 @@ export const TreeViewContainer: React.FunctionComponent<
         );
       } else if (
         userRights.folderOwnerAndSharedOrShareRights(
-          dragAndDropInitialFolder
+          dragAndDropInitialFolder,
         ) &&
         userRights.folderOwnerNotShared(targetFolder)
       ) {
@@ -246,10 +246,11 @@ export const TreeViewContainer: React.FunctionComponent<
   };
 
   const isOwnerOfSelectedBoards = (): boolean => {
-    return dragAndDropBoards.filter(
-      (board: Board) =>
-        board?.owner?.userId === user?.userId,
-    ).length == dragAndDropBoards.length;
+    return (
+      dragAndDropBoards.filter(
+        (board: Board) => board?.owner?.userId === user?.userId,
+      ).length == dragAndDropBoards.length
+    );
   };
 
   const closeDragAndDropModal = (): void => {

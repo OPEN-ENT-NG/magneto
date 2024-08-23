@@ -157,7 +157,6 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       ) {
         //not board owner
         handleNoRightsDragAndDrop();
-        return;
       } else if (
         (userRights.folderOwnerNotShared(dragAndDropInitialFolder) ||
           userRights.folderOwnerAndSharedOrShareRights(

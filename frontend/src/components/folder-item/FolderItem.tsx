@@ -61,14 +61,14 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     [moveBoardsToFolder],
   );
 
-  const resetDragAndDrop = useCallback((): void => {
+  const resetDragAndDrop = (): void => {
     onDragAndDrop(undefined);
-  }, [onDragAndDrop]);
+  };
 
-  const closeDragAndDropModal = useCallback((): void => {
+  const closeDragAndDropModal = (): void => {
     onDisplayModal(false);
     resetDragAndDrop();
-  }, [onDisplayModal, resetDragAndDrop]);
+  };
 
   const proceedOnDragAndDrop = useCallback(
     async (dragAndDropBoards: Board[], dragAndDropTarget: Folder) => {
@@ -83,7 +83,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     [dragAndDropBoardsCall, resetDragAndDrop],
   );
 
-  const handleNoRightsDragAndDrop = useCallback((): void => {
+  const handleNoRightsDragAndDrop = (): void => {
     onSetModalData({
       ...modalData,
       i18nKey: "magneto.folder.drag.drop.right.error",
@@ -91,10 +91,9 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       hasSubmit: false,
     });
     onDisplayModal(true);
-  }, [closeDragAndDropModal, modalData, onDisplayModal, onSetModalData]);
+  };
 
-  const confirmSharedFolderDragAndDrop = useCallback(
-    (
+  const confirmSharedFolderDragAndDrop = (
       dragAndDropBoardsIds: string[],
       dragAndDropTarget: Folder,
       i18nKey: string,
@@ -112,30 +111,19 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         onCancel: () => closeDragAndDropModal(),
       });
       onDisplayModal(true);
-    },
-    [
-      closeDragAndDropModal,
-      dragAndDropBoardsCall,
-      modalData,
-      onDisplayModal,
-      onSetModalData,
-    ],
-  );
+    };
 
-  const isOwnerOfSelectedBoards = useCallback(
-    (boards: Board[]): boolean => {
-      return boards.every(
+  const isOwnerOfSelectedBoards = useCallback((boards: Board[]): boolean => {
+      return boards.filter(
         (board: Board) =>
-          !!board &&
-          !!board.owner &&
-          board.owner.userId === (user?.userId ?? ""),
-      );
-    },
-    [user?.userId],
-  );
+          (board?.owner?.userId) === (user?.userId ?? "")
+      ).length == boards.length;
+  },
+  [user?.userId],
+);
 
-  const handleDragAndDropRights = useCallback(() => {
-    const boards = dragAndDropBoards;
+const handleDragAndDropRights = () => {
+  const boards = dragAndDropBoards;
     if (hasDrop && !!boards.length) {
       const dragAndDropBoardsIds: string[] = boards.map(
         (board: Board) => board._id,
@@ -152,7 +140,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           ) ?? new Folder();
 
       if (
-        (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
+        (!!boards[0] && !isOwnerOfSelectedBoards(boards)) ||
         folder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
         folder.id == FOLDER_TYPE.DELETED_BOARDS ||
         !!folder.deleted
@@ -201,20 +189,8 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       onDragAndDrop(undefined);
       setHasDrop(false);
     }
-  }, [
-    confirmSharedFolderDragAndDrop,
-    dragAndDropBoards,
-    folder,
-    folderData,
-    handleNoRightsDragAndDrop,
-    hasDrop,
-    isOwnerOfSelectedBoards,
-    onDragAndDrop,
-    proceedOnDragAndDrop,
-    user?.userId,
-    userRights,
-  ]);
-
+  };
+  
   useEffect(() => {
     handleDragAndDropRights();
   }, [hasDrop, handleDragAndDropRights]);

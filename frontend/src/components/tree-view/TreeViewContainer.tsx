@@ -110,7 +110,7 @@ export const TreeViewContainer: React.FunctionComponent<
           ) ?? new Folder();
 
       if (
-        (!dragAndDropBoards[0] && isOwnerOfSelectedBoards()) ||
+        (!!dragAndDropBoards[0] && !isOwnerOfSelectedBoards()) ||
         targetFolderId == FOLDER_TYPE.PUBLIC_BOARDS ||
         targetFolderId == FOLDER_TYPE.DELETED_BOARDS ||
         !!targetFolder.deleted
@@ -246,10 +246,10 @@ export const TreeViewContainer: React.FunctionComponent<
   };
 
   const isOwnerOfSelectedBoards = (): boolean => {
-    return dragAndDropBoards.every(
+    return dragAndDropBoards.filter(
       (board: Board) =>
-        !!board && !!board.owner && board.owner.userId === user?.userId,
-    );
+        board?.owner?.userId === user?.userId,
+    ).length == dragAndDropBoards.length;
   };
 
   const closeDragAndDropModal = (): void => {

@@ -61,14 +61,14 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     [moveBoardsToFolder],
   );
 
-  const resetDragAndDrop = (): void => {
+  const resetDragAndDrop = useCallback((): void => {
     onDragAndDrop(undefined);
-  };
+  }, [onDragAndDrop]);
 
-  const closeDragAndDropModal = (): void => {
+  const closeDragAndDropModal = useCallback((): void => {
     onDisplayModal(false);
     resetDragAndDrop();
-  };
+  }, [onDisplayModal, resetDragAndDrop]);
 
   const proceedOnDragAndDrop = useCallback(
     async (dragAndDropBoards: Board[], dragAndDropTarget: Folder) => {
@@ -83,7 +83,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
     [dragAndDropBoardsCall, resetDragAndDrop],
   );
 
-  const handleNoRightsDragAndDrop = (): void => {
+  const handleNoRightsDragAndDrop = useCallback((): void => {
     onSetModalData({
       ...modalData,
       i18nKey: "magneto.folder.drag.drop.right.error",
@@ -91,9 +91,10 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
       hasSubmit: false,
     });
     onDisplayModal(true);
-  };
+  }, [closeDragAndDropModal, modalData, onDisplayModal, onSetModalData]);
 
-  const confirmSharedFolderDragAndDrop = (
+  const confirmSharedFolderDragAndDrop = useCallback(
+    (
       dragAndDropBoardsIds: string[],
       dragAndDropTarget: Folder,
       i18nKey: string,
@@ -111,19 +112,30 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         onCancel: () => closeDragAndDropModal(),
       });
       onDisplayModal(true);
-    };
+    },
+    [
+      closeDragAndDropModal,
+      dragAndDropBoardsCall,
+      modalData,
+      onDisplayModal,
+      onSetModalData,
+    ],
+  );
 
-  const isOwnerOfSelectedBoards = useCallback((boards: Board[]): boolean => {
-      return boards.filter(
+  const isOwnerOfSelectedBoards = useCallback(
+    (boards: Board[]): boolean => {
+      return boards.every(
         (board: Board) =>
-          (board?.owner?.userId) === (user?.userId ?? "")
-      ).length == boards.length;
-  },
-  [user?.userId],
-);
+          !!board &&
+          !!board.owner &&
+          board.owner.userId === (user?.userId ?? ""),
+      );
+    },
+    [user?.userId],
+  );
 
-const handleDragAndDropRights = () => {
-  const boards = dragAndDropBoards;
+  const handleDragAndDropRights = useCallback(() => {
+    const boards = dragAndDropBoards;
     if (hasDrop && !!boards.length) {
       const dragAndDropBoardsIds: string[] = boards.map(
         (board: Board) => board._id,
@@ -140,7 +152,7 @@ const handleDragAndDropRights = () => {
           ) ?? new Folder();
 
       if (
-        (!!boards[0] && !isOwnerOfSelectedBoards(boards)) ||
+        (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
         folder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
         folder.id == FOLDER_TYPE.DELETED_BOARDS ||
         !!folder.deleted
@@ -189,8 +201,20 @@ const handleDragAndDropRights = () => {
       onDragAndDrop(undefined);
       setHasDrop(false);
     }
-  };
-  
+  }, [
+    confirmSharedFolderDragAndDrop,
+    dragAndDropBoards,
+    folder,
+    folderData,
+    handleNoRightsDragAndDrop,
+    hasDrop,
+    isOwnerOfSelectedBoards,
+    onDragAndDrop,
+    proceedOnDragAndDrop,
+    user?.userId,
+    userRights,
+  ]);
+
   useEffect(() => {
     handleDragAndDropRights();
   }, [hasDrop, handleDragAndDropRights]);

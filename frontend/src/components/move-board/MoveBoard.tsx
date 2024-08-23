@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useState } from "react";
 
 // eslint-disable-next-line
 import { Button, Modal, TreeView, useOdeClient } from "@edifice-ui/react";
@@ -8,13 +8,11 @@ import { useTranslation } from "react-i18next";
 import { useGetFolderTypeData } from "../tree-view/utils";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Board } from "~/models/board.model";
-import { FolderTreeNavItem } from "~/models/folder-tree.model";
 import { Folder, IFolderResponse } from "~/models/folder.model";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
-import { useGetFoldersQuery } from "~/services/api/folders.service";
 import { UserRights } from "~/utils/share.utils";
-import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 
 type props = {
   isOpen: boolean;
@@ -38,7 +36,7 @@ export const MoveBoard: FunctionComponent<props> = ({
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [moveBoards] = useMoveBoardsMutation();
   const [selectedFolderId, setSelectedFolderId] = useState<string>("");
-  const { currentFolder, folders, folderObject, folderNavigationRefs } =
+  const { currentFolder, folderData, folderObject, folderNavigationRefs } =
     useFoldersNavigation();
   const { selectedBoards, selectedBoardsIds } = useBoardsNavigation();
 
@@ -50,27 +48,33 @@ export const MoveBoard: FunctionComponent<props> = ({
     isPublic: false,
   };
 
-  const {
-    data: myFoldersResult,
-    isLoading: getFoldersLoading,
-    error: getFoldersError,
-  } = useGetFoldersQuery(false);
+  const getFolderData = (folderId: string): Folder => {
+    let clickedFolder;
+    if (folderId == FOLDER_TYPE.MY_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.my.boards"),
+      } as IFolderResponse);
+    } else if (folderId == FOLDER_TYPE.PUBLIC_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.lycee.connecte.boards"),
+        isPublic: true,
+      } as IFolderResponse);
+    } else if (folderId == FOLDER_TYPE.DELETED_BOARDS) {
+      clickedFolder = new Folder().build({
+        _id: folderId,
+        title: t("magneto.trash"),
+        deleted: true,
+      } as IFolderResponse);
+    } else {
+      clickedFolder =
+        folderData.find((folder: Folder) => folder.id == folderId) ??
+        new Folder();
+    }
 
-  let myFolders: Folder[] = [];
-  let myFoldersObject: FolderTreeNavItem | undefined = undefined;
-
-  if (!getFoldersError && !getFoldersLoading) {
-    myFolders = myFoldersResult.map((folder: IFolderResponse) =>
-      new Folder().build(folder),
-    ); //convert folders to Folder[]
-
-    myFoldersObject = new FolderTreeNavItem({
-      id: FOLDER_TYPE.MY_BOARDS,
-      title: t("magneto.my.boards"),
-      parentId: "",
-      section: true,
-    }).buildFolders(myFolders);
-  }
+    return clickedFolder;
+  };
 
   const moveBoardsCall = (
     dragAndDropBoardsIds: string[],
@@ -88,9 +92,7 @@ export const MoveBoard: FunctionComponent<props> = ({
     onDisplayModal(false);
   };
 
-  const proceedOnMove = async (
-    targetFolder: Folder,
-  ) => {
+  const proceedOnMove = async (targetFolder: Folder) => {
     const targetFolderId: string = targetFolder.id;
 
     moveBoards({
@@ -134,17 +136,16 @@ export const MoveBoard: FunctionComponent<props> = ({
 
   const isOwnerOfSelectedBoards = (): boolean => {
     return (
-      selectedBoards.filter((board: Board) => board?.owner?.userId === user?.userId)
-        .length == selectedBoards.length
+      selectedBoards.filter(
+        (board: Board) => board?.owner?.userId === user?.userId,
+      ).length == selectedBoards.length
     );
   };
 
   const handleMoveRights = () => {
-    if (!!selectedBoards.length) {
-      const destinationFolder =
-        folders.find((folder: Folder) => folder.id == selectedFolderId) ??
-        new Folder();
-
+    if (selectedBoards.length) {
+      const destinationFolder = getFolderData(selectedFolderId);
+      
       if (
         (!!selectedBoards[0] && !isOwnerOfSelectedBoards()) ||
         destinationFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
@@ -210,7 +211,7 @@ export const MoveBoard: FunctionComponent<props> = ({
             <h2>{t("magneto.board.move")}</h2>
           </Modal.Header>
           <Modal.Body>
-            {myFoldersObject && (
+            {(datas || dataTree) && (
               <TreeView
                 ref={folderNavigationRefs[FOLDER_TYPE.MY_BOARDS]}
                 data={datas || dataTree}

@@ -195,7 +195,12 @@ export const App = () => {
               searchText={searchText}
               onDragAndDrop={handleDragAndDropBoards}
             />
-            <ToasterContainer reset={resetBoardsAndFolders} />
+            <ToasterContainer 
+              reset={resetBoardsAndFolders}
+              onSetShowModal={setShowModal}
+              modalProps={modalProps}
+              onSetModalProps={setModalProps}
+            />
             <CreateBoard isOpen={isOpen} toggle={toggle} />
             <MessageModal
               isOpen={showModal}

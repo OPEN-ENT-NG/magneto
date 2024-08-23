@@ -135,7 +135,7 @@ export const TreeViewContainer: React.FunctionComponent<
         );
       } else if (
         userRights.folderOwnerAndSharedOrShareRights(
-          dragAndDropInitialFolder,
+          dragAndDropInitialFolder
         ) &&
         userRights.folderOwnerNotShared(targetFolder)
       ) {

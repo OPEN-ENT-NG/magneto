@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useCallback, useState } from "react";
 
 // eslint-disable-next-line
 import { Button, Modal, TreeView, useOdeClient } from "@edifice-ui/react";
@@ -13,32 +13,34 @@ import { Folder, IFolderResponse } from "~/models/folder.model";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useMoveBoardsMutation } from "~/services/api/boards.service";
 import { useGetFoldersQuery } from "~/services/api/folders.service";
+import { UserRights } from "~/utils/share.utils";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 
 type props = {
   isOpen: boolean;
   toggle: () => void;
-  boards: Board[];
   reset: () => void;
+  onDisplayModal: (show: boolean) => void;
+  modalData: any;
+  onSetModalData: (modalData: any) => void;
 };
 
 export const MoveBoard: FunctionComponent<props> = ({
   isOpen,
   toggle,
-  boards,
   reset,
+  onDisplayModal,
+  modalData,
+  onSetModalData,
 }: props) => {
   const { t } = useTranslation("magneto");
+  const { user } = useOdeClient();
+  const [userRights] = useState<UserRights>(new UserRights(user));
   const [moveBoards] = useMoveBoardsMutation();
   const [selectedFolderId, setSelectedFolderId] = useState<string>("");
-  const { folderObject, folderNavigationRefs } = useFoldersNavigation();
-
-  const { user } = useOdeClient();
-
-  const userId = user ? user?.userId : "";
-
-  const isSameAsUser = (id: string) => {
-    return id == userId;
-  };
+  const { currentFolder, folders, folderObject, folderNavigationRefs } =
+    useFoldersNavigation();
+  const { selectedBoards, selectedBoardsIds } = useBoardsNavigation();
 
   const dataTree = {
     children: [],
@@ -70,20 +72,126 @@ export const MoveBoard: FunctionComponent<props> = ({
     }).buildFolders(myFolders);
   }
 
-  const onSubmit = (): void => {
-    const boardIds: string[] = boards
-      .filter((board) => {
-        return isSameAsUser(board.owner.userId);
-      })
-      .map((myBoard) => {
-        return myBoard.id;
-      });
+  const moveBoardsCall = (
+    dragAndDropBoardsIds: string[],
+    dragAndDropTargetId: string,
+  ): void => {
     moveBoards({
-      boardIds: boardIds,
-      folderId: selectedFolderId,
+      boardIds: dragAndDropBoardsIds,
+      folderId: dragAndDropTargetId,
+    }).catch((e) => {
+      console.log(e);
     });
-    reset();
+  };
+
+  const closeMoveRightsModal = (): void => {
+    onDisplayModal(false);
+  };
+
+  const proceedOnMove = async (
+    targetFolder: Folder,
+  ) => {
+    const targetFolderId: string = targetFolder.id;
+
+    moveBoards({
+      boardIds: selectedBoardsIds,
+      folderId: targetFolderId,
+    }).catch((e) => {
+      console.log(e);
+    });
+  };
+
+  const handleNoMoveRights = (): void => {
+    onSetModalData({
+      ...modalData,
+      i18nKey: "magneto.folder.drag.drop.right.error",
+      onCancel: () => closeMoveRightsModal(),
+      hasSubmit: false,
+    });
     toggle();
+    onDisplayModal(true);
+  };
+
+  const confirmSharedFolderMove = (
+    targetFolder: Folder,
+    i18nKey: string,
+    param: string,
+  ) => {
+    onSetModalData({
+      ...modalData,
+      i18nKey: i18nKey,
+      param: param,
+      hasSubmit: true,
+      onSubmit: () => {
+        closeMoveRightsModal();
+        moveBoardsCall(selectedBoardsIds, targetFolder.id);
+      },
+      onCancel: () => closeMoveRightsModal(),
+    });
+    toggle();
+    onDisplayModal(true);
+  };
+
+  const isOwnerOfSelectedBoards = (): boolean => {
+    return (
+      selectedBoards.filter((board: Board) => board?.owner?.userId === user?.userId)
+        .length == selectedBoards.length
+    );
+  };
+
+  const handleMoveRights = () => {
+    if (!!selectedBoards.length) {
+      const destinationFolder =
+        folders.find((folder: Folder) => folder.id == selectedFolderId) ??
+        new Folder();
+
+      if (
+        (!!selectedBoards[0] && !isOwnerOfSelectedBoards()) ||
+        destinationFolder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
+        destinationFolder.id == FOLDER_TYPE.DELETED_BOARDS ||
+        !!destinationFolder.deleted
+      ) {
+        //not board owner
+        handleNoMoveRights();
+      } else if (
+        (userRights.folderOwnerNotShared(currentFolder) ||
+          userRights.folderOwnerAndSharedOrShareRights(currentFolder)) &&
+        userRights.folderOwnerAndSharedOrShareRights(destinationFolder)
+      ) {
+        //initial folder owner + not shared or has right + shared, target folder has right + shared
+        confirmSharedFolderMove(
+          destinationFolder,
+          "magneto.folder.share.drag.in.warning",
+          destinationFolder.title,
+        );
+      } else if (
+        userRights.folderOwnerAndSharedOrShareRights(currentFolder) &&
+        userRights.folderOwnerNotShared(destinationFolder)
+      ) {
+        //initial folder has right + shared, target folder owner + not shared
+        confirmSharedFolderMove(
+          destinationFolder,
+          "magneto.folder.share.drag.out.warning",
+          currentFolder.title,
+        );
+      } else if (
+        userRights.folderOwnerNotShared(currentFolder) &&
+        userRights.folderOwnerNotShared(destinationFolder) &&
+        isOwnerOfSelectedBoards()
+      ) {
+        //initial folder owner + not shared, target folder owner + not shared + selected boards are ours
+        proceedOnMove(destinationFolder);
+        toggle();
+      } else {
+        handleNoMoveRights();
+      }
+
+      reset();
+    }
+  };
+
+  const onSubmit = (): void => {
+    handleMoveRights();
   };
 
   const datas = useGetFolderTypeData(FOLDER_TYPE.MY_BOARDS, folderObject);

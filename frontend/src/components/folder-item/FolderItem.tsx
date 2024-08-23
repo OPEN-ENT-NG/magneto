@@ -124,11 +124,9 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
 
   const isOwnerOfSelectedBoards = useCallback(
     (boards: Board[]): boolean => {
-      return boards.every(
-        (board: Board) =>
-          !!board &&
-          !!board.owner &&
-          board.owner.userId === (user?.userId ?? ""),
+      return (
+        boards.filter((board: Board) => board?.owner?.userId === user?.userId)
+          .length == boards.length
       );
     },
     [user?.userId],
@@ -152,14 +150,13 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
           ) ?? new Folder();
 
       if (
-        (!boards[0] && isOwnerOfSelectedBoards(boards)) ||
+        (!!boards[0] && !isOwnerOfSelectedBoards(boards)) ||
         folder.id == FOLDER_TYPE.PUBLIC_BOARDS ||
         folder.id == FOLDER_TYPE.DELETED_BOARDS ||
         !!folder.deleted
       ) {
         //not board owner
         handleNoRightsDragAndDrop();
-        return;
       } else if (
         (userRights.folderOwnerNotShared(dragAndDropInitialFolder) ||
           userRights.folderOwnerAndSharedOrShareRights(

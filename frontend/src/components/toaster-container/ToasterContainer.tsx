@@ -32,8 +32,17 @@ import { useUserRightsStore } from "~/stores";
 
 export interface ToasterContainerProps {
   reset: () => void;
+  onSetShowModal: (show: boolean) => void;
+  modalProps: any;
+  onSetModalProps: (modalProps: any) => void;
 }
-export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
+
+export const ToasterContainer = ({
+  reset,
+  onSetShowModal,
+  modalProps,
+  onSetModalProps,
+}: ToasterContainerProps) => {
   const { t } = useTranslation("magneto");
   const { data: actions } = useActions();
   const canPublish = isActionAvailable("publish", actions);
@@ -326,8 +335,10 @@ export const ToasterContainer = ({ reset }: ToasterContainerProps) => {
           <MoveBoard
             isOpen={isMoveOpen}
             toggle={toggleMove}
-            boards={selectedBoards}
             reset={reset}
+            onDisplayModal={onSetShowModal}
+            modalData={modalProps}
+            onSetModalData={onSetModalProps}
           />
           <DeleteModal
             isOpen={isMoveDelete}

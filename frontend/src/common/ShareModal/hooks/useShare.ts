@@ -22,10 +22,6 @@ interface UseShareResourceModalProps {
    */
   resourceId: ShareOptions["resourceId"];
   /**
-   * Resource Rights (based on the new rights array)
-   */
-  resourceRights: ShareOptions["resourceRights"];
-  /**
    * Resource Creator Id: Id of the user who created the resource
    */
   resourceCreatorId: ShareOptions["resourceCreatorId"];
@@ -77,7 +73,6 @@ function reducer(state: State, action: ShareAction) {
 
 export default function useShare({
   resourceId,
-  resourceRights,
   resourceCreatorId,
   shareResource,
   setIsLoading,
@@ -225,13 +220,6 @@ export default function useShare({
     });
 
     try {
-      //TODO move this logic into services
-      // add my rights if needed (because visible api does not return my rights)
-      const myRights = resourceRights
-        .filter((right) => user && right.includes(`user:${user.userId}`))
-        .map((right) => right.split(":")[2])
-        .filter((right) => !!right);
-
       const shares = [...state.shareRights.rights];
 
       // shared

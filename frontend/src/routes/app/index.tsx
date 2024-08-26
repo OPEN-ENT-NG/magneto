@@ -145,13 +145,15 @@ export const App = () => {
               padding: ".8rem",
             }}
           >
-            <SideBar
-              dragAndDropBoards={dragAndDropBoards}
-              onDragAndDrop={handleDragAndDropBoards}
-              onSetShowModal={setShowModal}
-              modalProps={modalProps}
-              onSetModalProps={setModalProps}
-            />
+            {!drawer ? (
+              <SideBar
+                dragAndDropBoards={dragAndDropBoards}
+                onDragAndDrop={handleDragAndDropBoards}
+                onSetShowModal={setShowModal}
+                modalProps={modalProps}
+                onSetModalProps={setModalProps}
+              />
+            ) : null}
           </Grid.Col>
 
           <Grid.Col

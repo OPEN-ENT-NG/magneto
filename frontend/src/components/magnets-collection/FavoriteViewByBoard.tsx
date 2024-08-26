@@ -33,7 +33,7 @@ export const FavoriteViewByBoard: FunctionComponent<
   const { t } = useTranslation("magneto");
   const [duplicateBoard] = useDuplicateBoardMutation();
 
-  const duplicateBoardsToast = usePredefinedToasts({
+  const duplicateBoardsAndToast = usePredefinedToasts({
     func: duplicateBoard,
     successMessage: t("magneto.duplicate.elements.confirm"),
     failureMessage: t("magneto.duplicate.elements.error"),
@@ -59,13 +59,13 @@ export const FavoriteViewByBoard: FunctionComponent<
                 <div className="parent">
                   <h2>{board._title}</h2>
                   <span
-                    onClick={() => duplicateBoardsToast(board._id)}
+                    onClick={() => duplicateBoardsAndToast(board._id)}
                     className="duplicateText"
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
-                        duplicateBoardsToast(board._id);
+                        duplicateBoardsAndToast(board._id);
                       }
                     }}
                   >

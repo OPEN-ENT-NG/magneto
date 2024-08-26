@@ -178,7 +178,6 @@ export const ToasterContainer = ({
   };
   const duplicateBoardsAndToast = usePredefinedToasts({
     func: duplicateBoard,
-    parameter: selectedBoardsIds[0],
     successMessage: t("magneto.duplicate.elements.confirm"),
     failureMessage: t("magneto.duplicate.elements.error"),
   });
@@ -231,7 +230,7 @@ export const ToasterContainer = ({
                     color="primary"
                     variant="filled"
                     onClick={() => {
-                      duplicateBoardsAndToast();
+                      duplicateBoardsAndToast(selectedBoardsIds[0]);
                       reset();
                     }}
                   >

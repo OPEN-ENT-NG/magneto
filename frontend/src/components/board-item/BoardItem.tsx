@@ -15,9 +15,9 @@ import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
 
 import "./BoardItem.scss";
+import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
-import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 
 interface BoardItemProps {
   board: {

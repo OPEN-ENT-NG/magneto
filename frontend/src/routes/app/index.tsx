@@ -135,7 +135,7 @@ export const App = () => {
           modalProps={modalProps}
           onSetModalProps={setModalProps}
         />
-        <Grid>
+        <Grid className="main-grid">
           <Grid.Col
             lg={width < 1280 ? "2" : "3"} //Since number of columns reduce by 4 at 1280px but doesnt take in account our md columns configuration until 1024px, we're manually changing it
             md="2"

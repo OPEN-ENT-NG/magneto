@@ -11,6 +11,7 @@ import { EmptyState } from "../empty-state/EmptyState";
 import { Board } from "~/models/board.model";
 import { Card as CardModel } from "~/models/card.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
+import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 
 type FavoriteViewByBoardProps = {
   boardsWithCards: Board[];
@@ -32,9 +33,16 @@ export const FavoriteViewByBoard: FunctionComponent<
   const { t } = useTranslation("magneto");
   const [duplicateBoard] = useDuplicateBoardMutation();
 
-  const onDuplicate = async (boardId: string) => {
-    await duplicateBoard(boardId);
-  };
+  const displayDuplicateBoardsToast = (boardId: string) => {
+      const duplicateBoardsToast = usePredefinedToasts({
+      func: duplicateBoard,
+      parameter: boardId,
+      successMessage: t("magneto.duplicate.elements.confirm"),
+      failureMessage: t("magneto.duplicate.elements.error"),
+    });
+    duplicateBoardsToast();
+  }
+  
 
   // Filtrer les tableaux qui ont au moins une carte
   const filteredBoardsWithCards = boardsWithCards.filter(
@@ -56,13 +64,13 @@ export const FavoriteViewByBoard: FunctionComponent<
                 <div className="parent">
                   <h2>{board._title}</h2>
                   <span
-                    onClick={() => onDuplicate(board._id)}
+                    onClick={() => displayDuplicateBoardsToast(board._id)}
                     className="duplicateText"
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
-                        onDuplicate(board._id);
+                        displayDuplicateBoardsToast(board._id);
                       }
                     }}
                   >

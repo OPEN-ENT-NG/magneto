@@ -8,6 +8,7 @@ import { animated } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
 import { EmptyState } from "../empty-state/EmptyState";
+import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board } from "~/models/board.model";
 import { Card as CardModel } from "~/models/card.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
@@ -32,9 +33,11 @@ export const FavoriteViewByBoard: FunctionComponent<
   const { t } = useTranslation("magneto");
   const [duplicateBoard] = useDuplicateBoardMutation();
 
-  const onDuplicate = async (boardId: string) => {
-    await duplicateBoard(boardId);
-  };
+  const duplicateBoardsAndToast = usePredefinedToasts({
+    func: duplicateBoard,
+    successMessage: t("magneto.duplicate.elements.confirm"),
+    failureMessage: t("magneto.duplicate.elements.error"),
+  });
 
   // Filtrer les tableaux qui ont au moins une carte
   const filteredBoardsWithCards = boardsWithCards.filter(
@@ -56,13 +59,13 @@ export const FavoriteViewByBoard: FunctionComponent<
                 <div className="parent">
                   <h2>{board._title}</h2>
                   <span
-                    onClick={() => onDuplicate(board._id)}
+                    onClick={() => duplicateBoardsAndToast(board._id)}
                     className="duplicateText"
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
-                        onDuplicate(board._id);
+                        duplicateBoardsAndToast(board._id);
                       }
                     }}
                   >

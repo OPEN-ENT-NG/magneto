@@ -40,28 +40,24 @@ export const DeleteModal: FunctionComponent<props> = ({
   const { selectedBoardsIds } = useBoardsNavigation();
   const preDeleteBoardsAndToast = usePredefinedToasts({
     func: preDeleteBoards,
-    parameter: selectedBoardsIds,
     successMessage: t("magneto.predelete.elements.confirm"),
     failureMessage: t("magneto.predelete.elements.error"),
   });
 
   const deleteBoardsAndToast = usePredefinedToasts({
     func: deleteBoards,
-    parameter: selectedBoardsIds,
     successMessage: t("magneto.delete.elements.confirm"),
     failureMessage: t("magneto.delete.elements.error"),
   });
 
   const preDeleteFoldersAndToast = usePredefinedToasts({
     func: preDeleteFolders,
-    parameter: selectedFoldersIds,
     successMessage: t("magneto.predelete.elements.confirm"),
     failureMessage: t("magneto.predelete.elements.error"),
   });
 
   const deleteFoldersAndToast = usePredefinedToasts({
     func: deleteFolders,
-    parameter: selectedFoldersIds,
     successMessage: t("magneto.delete.elements.confirm"),
     failureMessage: t("magneto.delete.elements.error"),
   });
@@ -75,7 +71,7 @@ export const DeleteModal: FunctionComponent<props> = ({
 
   const onSubmitPredelete = async (): Promise<void> => {
     if (selectedBoardsIds.length > 0) {
-      preDeleteBoardsAndToast();
+      preDeleteBoardsAndToast(selectedBoardsIds);
       try {
         if (selectedFoldersIds.length > 0) {
           await preDeleteFolders(selectedFoldersIds); //If we're predeleting folders and boards, only send one notification
@@ -83,12 +79,13 @@ export const DeleteModal: FunctionComponent<props> = ({
       } catch (error) {
         console.error(error);
       }
-    } else if (selectedFoldersIds.length > 0) preDeleteFoldersAndToast();
+    } else if (selectedFoldersIds.length > 0)
+      preDeleteFoldersAndToast(selectedFoldersIds);
   };
 
   const onSubmitDelete = async (): Promise<void> => {
     if (selectedBoardsIds.length > 0) {
-      deleteBoardsAndToast();
+      deleteBoardsAndToast(selectedBoardsIds);
       try {
         if (selectedFoldersIds.length > 0) {
           await deleteFolders(selectedFoldersIds); //If we're predeleting folders and boards, only send one notification
@@ -96,7 +93,8 @@ export const DeleteModal: FunctionComponent<props> = ({
       } catch (error) {
         console.error(error);
       }
-    } else if (selectedFoldersIds.length > 0) deleteFoldersAndToast();
+    } else if (selectedFoldersIds.length > 0)
+      deleteFoldersAndToast(selectedFoldersIds);
   };
 
   return (

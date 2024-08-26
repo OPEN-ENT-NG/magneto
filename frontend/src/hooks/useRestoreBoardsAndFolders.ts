@@ -19,24 +19,22 @@ export const useRestoreBoardsAndFolders = ({
 
   const restorePreDeleteBoardsToast = usePredefinedToasts({
     func: restorePreDeleteBoards,
-    parameter: selectedBoardsIds,
     successMessage: t("magneto.restore.elements.confirm"),
     failureMessage: t("magneto.restore.elements.error"),
   });
 
   const restorePreDeleteFoldersToast = usePredefinedToasts({
     func: restorePreDeleteFolders,
-    parameter: selectedFoldersIds,
     successMessage: t("magneto.restore.elements.confirm"),
     failureMessage: t("magneto.restore.elements.error"),
   });
 
   const restoreBoardsAndFolders = async () => {
     if (selectedBoardsIds.length > 0) {
-      await restorePreDeleteBoardsToast();
+      await restorePreDeleteBoardsToast(selectedBoardsIds);
     }
     if (selectedFoldersIds.length > 0) {
-      await restorePreDeleteFoldersToast();
+      await restorePreDeleteFoldersToast(selectedFoldersIds);
     }
   };
 

@@ -15,6 +15,7 @@ import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
 
 import "./BoardItem.scss";
+import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 
@@ -24,6 +25,8 @@ interface BoardItemProps {
     title: string;
     imageUrl: string;
     nbCards: number;
+    nbCardsSections: number;
+    layoutType: LAYOUT_TYPE;
     shared: any;
     owner: any;
     modificationDate: string;
@@ -123,7 +126,10 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
               className="med-resource-card-text"
             ></Icon>
             <Card.Text className="med-resource-card-text board-text">
-              {board.nbCards} {t("magneto.magnets")}
+              {board.layoutType == LAYOUT_TYPE.FREE
+                ? board.nbCards
+                : board.nbCardsSections}{" "}
+              {t("magneto.magnets")}
             </Card.Text>
           </div>
 

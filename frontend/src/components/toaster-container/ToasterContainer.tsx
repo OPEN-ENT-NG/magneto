@@ -61,6 +61,7 @@ export const ToasterContainer = ({
     selectedFolders,
     selectedFoldersIds,
     selectedFolderRights,
+    handleSelect,
   } = useFoldersNavigation();
   const { selectedBoardsIds, selectedBoards, selectedBoardRights } =
     useBoardsNavigation();
@@ -198,7 +199,14 @@ export const ToasterContainer = ({
                       type="button"
                       color="primary"
                       variant="filled"
-                      onClick={function Ga() {}}
+                      onClick={() => {
+                        selectedBoardsIds.length == 1 //if we selected a board, open it (TODO), else open the folder
+                          ? undefined
+                          : handleSelect(
+                              selectedFoldersIds[0],
+                              FOLDER_TYPE.MY_BOARDS, //the button being there only if not in trash, and no folders being in "Public boards", the folder has to be in "My boards"
+                            );
+                      }}
                     >
                       {t("magneto.open")}
                     </Button>

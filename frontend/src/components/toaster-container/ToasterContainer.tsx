@@ -29,6 +29,7 @@ import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
 import { useUserRightsStore } from "~/stores";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 export interface ToasterContainerProps {
   reset: () => void;
@@ -82,6 +83,8 @@ export const ToasterContainer = ({
   const { user } = useOdeClient();
 
   const userId = user ? user?.userId : "";
+
+  const navigate = useNavigate();
 
   const isMyBoards = () => {
     return (
@@ -203,7 +206,7 @@ export const ToasterContainer = ({
                           variant="filled"
                           onClick={() => {
                             selectedBoardsIds.length == 1 //if we selected a board, open it (TODO), else open the folder
-                              ? undefined
+                              ? navigate(`/board/${selectedBoardsIds[0]}/view`)
                               : handleSelect(
                                   selectedFoldersIds[0],
                                   FOLDER_TYPE.MY_BOARDS, //the button being there only if not in trash, and no folders being in "Public boards", the folder has to be in "My boards"

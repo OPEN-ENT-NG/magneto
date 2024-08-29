@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 
 import { useOdeClient, useUser, useToast } from "@edifice-ui/react";
 import {
@@ -99,7 +99,6 @@ export default function useShare({
       odeServices.share().getRightsForResource(appCode, resourceId),
     ]);
 
-    console.log("shareRights: ", shareRights);
     dispatch({
       type: "init",
       payload: {
@@ -110,38 +109,11 @@ export default function useShare({
   };
 
   useEffect(() => {
-    console.log("HERE");
     if (!resourceId) return;
     odeServices.cache().clearCache();
-    console.log("LALALALA");
 
     fetchRights();
     setIsLoading(false);
-    console.log("On a fetch youhou");
-
-    /*async () => {
-      try {
-        console.log("incoming");
-        const [shareRightActions, shareRights] = await Promise.all([
-          odeServices.share().getActionsForApp(appCode),
-          odeServices.share().getRightsForResource(appCode, resourceId),
-        ]);
-
-        console.log("shareRights: ", shareRights);
-        dispatch({
-          type: "init",
-          payload: {
-            shareRightActions,
-            shareRights,
-          },
-        });
-        setIsLoading(false);
-        console.log("finito");
-      } catch (error) {
-        console.log("ERROR LA");
-        console.error(error);
-      }
-    };*/
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

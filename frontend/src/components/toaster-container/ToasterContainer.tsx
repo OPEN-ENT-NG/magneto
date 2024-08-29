@@ -158,7 +158,6 @@ export const ToasterContainer = ({
       setUserRights(userRights);
 
       if (selectedBoardsIds.length > 0) {
-        console.log("here", selectedBoards[0].rights);
         setShareOptions({
           resourceCreatorId: userId,
           resourceId: selectedBoardsIds[0],

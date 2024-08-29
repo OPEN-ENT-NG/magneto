@@ -11,6 +11,7 @@ import {
   Button,
   Tooltip,
   Combobox,
+  useOdeClient,
 } from "@edifice-ui/react";
 import { UseMutationResult } from "@tanstack/react-query";
 import {
@@ -27,6 +28,11 @@ import useShare from "./hooks/useShare";
 import { useShareBookmark } from "./hooks/useShareBookmark";
 import { ShareBookmark } from "./ShareBookmark";
 import { ShareBookmarkLine } from "./ShareBookmarkLine";
+import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
+import { Folder } from "~/models/folder.model";
+import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
+import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+import "./ShareModal.scss";
 
 export type ShareOptions = {
   resourceId: ID;
@@ -127,11 +133,38 @@ export default function ShareResourceModal({
     toggleBookmarkInput,
   } = useShareBookmark({ shareRights, shareDispatch });
 
+  const { selectedBoards } = useBoardsNavigation();
+
+  const { selectedFolders, folderData } = useFoldersNavigation();
+
+  const { appCode } = useOdeClient();
+
   const { t } = useTranslation("magneto");
 
   const searchPlaceholder = showSearchAdmlHint()
     ? t("magneto.explorer.search.adml.hint")
     : t("magneto.explorer.modal.share.search.placeholder");
+
+  const parentFolder: Folder =
+    appCode === "magneto/board"
+      ? folderData.find(
+          (folder: Folder) => folder.id === selectedBoards[0].folderId,
+        ) ?? new Folder()
+      : folderData.find(
+          (folder: Folder) => folder.id === selectedFolders[0].parentId,
+        ) ?? new Folder();
+
+  const parentFolderIsShared = () => {
+    const isMyBoards: boolean =
+      parentFolder?.id === FOLDER_TYPE.MY_BOARDS ||
+      folderData.some((f: Folder) => f.id === parentFolder?.id);
+    const isNotMainPage: boolean =
+      parentFolder != null && parentFolder.id !== FOLDER_TYPE.MY_BOARDS;
+    const parentFolderIsShared: boolean =
+      !!parentFolder && !!parentFolder.rights && parentFolder.rights.length > 1;
+
+    return isMyBoards && isNotMainPage && parentFolderIsShared;
+  };
 
   return createPortal(
     <Modal id="share_modal" size="lg" isOpen={isOpen} onModalClose={onCancel}>
@@ -268,6 +301,21 @@ export default function ShareResourceModal({
           </div>
         </div>
         {children}
+        <div className="sharePanel-warning">
+          {appCode === "magneto/board" &&
+            !parentFolderIsShared() &&
+            t("magneto.board.share.warning")}
+          {appCode === "magneto/folder" &&
+            !parentFolderIsShared() &&
+            !!selectedFolders[0].rights &&
+            selectedFolders[0].rights.length > 1 &&
+            t("magneto.folder.share.warning")}
+          {parentFolderIsShared() && (
+            <div className="red">
+              {t("magneto.share.warning", { 0: parentFolder.title })}
+            </div>
+          )}
+        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button

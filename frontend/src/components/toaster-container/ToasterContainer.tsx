@@ -193,144 +193,144 @@ export const ToasterContainer = ({
             >
               <ActionBar>
                 {selectedBoardsIds.length + selectedFoldersIds.length > 0 && (
-                    <>
+                  <>
                     {!isTrash &&
-                        selectedBoardsIds.length + selectedFoldersIds.length == 1 && (
-                          <Button
-                            type="button"
-                            color="primary"
-                            variant="filled"
-                            onClick={() => {
-                              selectedBoardsIds.length == 1 //if we selected a board, open it (TODO), else open the folder
-                                ? undefined
-                                : handleSelect(
-                                    selectedFoldersIds[0],
-                                    FOLDER_TYPE.MY_BOARDS, //the button being there only if not in trash, and no folders being in "Public boards", the folder has to be in "My boards"
-                                  );
-                            }}
-                          >
-                            {t("magneto.open")}
-                          </Button>
-                        )}
-                      {isMyBoards() &&
-                        selectedBoardsIds.length == 1 &&
-                        selectedFoldersIds.length == 0 &&
-                        selectedBoardRights != null &&
-                        selectedBoardRights.manager && (
-                          <Button
-                            type="button"
-                            color="primary"
-                            variant="filled"
-                            onClick={toggleCreate}
-                          >
-                            {t("magneto.properties")}
-                          </Button>
-                        )}
-                      {hasDuplicationRight() && (
+                      selectedBoardsIds.length + selectedFoldersIds.length ==
+                        1 && (
                         <Button
                           type="button"
                           color="primary"
                           variant="filled"
                           onClick={() => {
-                            duplicateBoardsAndToast(selectedBoardsIds[0]);
-                            reset();
+                            selectedBoardsIds.length == 1 //if we selected a board, open it (TODO), else open the folder
+                              ? undefined
+                              : handleSelect(
+                                  selectedFoldersIds[0],
+                                  FOLDER_TYPE.MY_BOARDS, //the button being there only if not in trash, and no folders being in "Public boards", the folder has to be in "My boards"
+                                );
                           }}
                         >
-                          {t("magneto.duplicate")}
+                          {t("magneto.open")}
                         </Button>
                       )}
-                      {isMyBoards() &&
-                        !isTrash &&
-                        selectedBoardsIds.length > 0 &&
-                        selectedFoldersIds.length == 0 &&
-                        allBoardsMine() && (
-                          <Button
-                            type="button"
-                            color="primary"
-                            variant="filled"
-                            onClick={toggleMove}
-                          >
-                            {t("magneto.move")}
-                          </Button>
-                        )}
-                      {hasRenameRight() && (
+                    {isMyBoards() &&
+                      selectedBoardsIds.length == 1 &&
+                      selectedFoldersIds.length == 0 &&
+                      selectedBoardRights != null &&
+                      selectedBoardRights.manager && (
                         <Button
                           type="button"
                           color="primary"
                           variant="filled"
-                          onClick={toggleCreateFolder}
+                          onClick={toggleCreate}
                         >
-                          {t("magneto.rename")}
+                          {t("magneto.properties")}
                         </Button>
                       )}
-                      {hasShareRight() && !isTrash && (
+                    {hasDuplicationRight() && (
+                      <Button
+                        type="button"
+                        color="primary"
+                        variant="filled"
+                        onClick={() => {
+                          duplicateBoardsAndToast(selectedBoardsIds[0]);
+                          reset();
+                        }}
+                      >
+                        {t("magneto.duplicate")}
+                      </Button>
+                    )}
+                    {isMyBoards() &&
+                      !isTrash &&
+                      selectedBoardsIds.length > 0 &&
+                      selectedFoldersIds.length == 0 &&
+                      allBoardsMine() && (
                         <Button
                           type="button"
                           color="primary"
                           variant="filled"
-                          onClick={openShareModal}
+                          onClick={toggleMove}
                         >
-                          {t("magneto.share")}
+                          {t("magneto.move")}
                         </Button>
                       )}
-                      {!(currentFolder.rights.length > 1) &&
-                        isMyBoards() &&
-                        selectedBoardsIds.length == 1 &&
-                        selectedFoldersIds.length == 0 &&
-                        allBoardsMine() &&
-                        canPublish &&
-                        !isTrash &&
-                        !selectedBoards[0].isPublished && (
-                          <Button
-                            type="button"
-                            color="primary"
-                            variant="filled"
-                            onClick={toggleBoardPublicShareModal}
-                          >
-                            {t("magneto.public.share")}
-                          </Button>
-                        )}
-                      {isMyBoards() &&
-                        selectedBoardsIds.length == 1 &&
-                        selectedFoldersIds.length == 0 &&
-                        allBoardsMine() &&
-                        canPublish &&
-                        selectedBoards[0].isPublished && (
-                          <Button
-                            type="button"
-                            color="primary"
-                            variant="filled"
-                            onClick={toggleBoardPublicShareModal}
-                          >
-                            {t("magneto.public.unshare")}
-                          </Button>
-                        )}
-                      {isTrash && (
+                    {hasRenameRight() && (
+                      <Button
+                        type="button"
+                        color="primary"
+                        variant="filled"
+                        onClick={toggleCreateFolder}
+                      >
+                        {t("magneto.rename")}
+                      </Button>
+                    )}
+                    {hasShareRight() && !isTrash && (
+                      <Button
+                        type="button"
+                        color="primary"
+                        variant="filled"
+                        onClick={openShareModal}
+                      >
+                        {t("magneto.share")}
+                      </Button>
+                    )}
+                    {!(currentFolder.rights.length > 1) &&
+                      isMyBoards() &&
+                      selectedBoardsIds.length == 1 &&
+                      selectedFoldersIds.length == 0 &&
+                      allBoardsMine() &&
+                      canPublish &&
+                      !isTrash &&
+                      !selectedBoards[0].isPublished && (
                         <Button
                           type="button"
                           color="primary"
                           variant="filled"
-                          onClick={() => {
-                            restoreBoardsAndFolders();
-                            reset();
-                          }}
+                          onClick={toggleBoardPublicShareModal}
                         >
-                          {t("magneto.restore")}
+                          {t("magneto.public.share")}
                         </Button>
                       )}
-                      {!isPublic && allBoardsMine() && areFoldersMine() && (
+                    {isMyBoards() &&
+                      selectedBoardsIds.length == 1 &&
+                      selectedFoldersIds.length == 0 &&
+                      allBoardsMine() &&
+                      canPublish &&
+                      selectedBoards[0].isPublished && (
                         <Button
                           type="button"
                           color="primary"
                           variant="filled"
-                          onClick={toggleDelete}
+                          onClick={toggleBoardPublicShareModal}
                         >
-                          {t("magneto.delete")}
+                          {t("magneto.public.unshare")}
                         </Button>
                       )}
-                    </>
+                    {isTrash && (
+                      <Button
+                        type="button"
+                        color="primary"
+                        variant="filled"
+                        onClick={() => {
+                          restoreBoardsAndFolders();
+                          reset();
+                        }}
+                      >
+                        {t("magneto.restore")}
+                      </Button>
+                    )}
+                    {!isPublic && allBoardsMine() && areFoldersMine() && (
+                      <Button
+                        type="button"
+                        color="primary"
+                        variant="filled"
+                        onClick={toggleDelete}
+                      >
+                        {t("magneto.delete")}
+                      </Button>
+                    )}
+                  </>
                 )}
-                
               </ActionBar>
             </animated.div>
           )

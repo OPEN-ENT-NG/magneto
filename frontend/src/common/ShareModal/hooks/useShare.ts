@@ -95,6 +95,7 @@ export default function useShare({
 
   useEffect(() => {
     if (!resourceId) return;
+    odeServices.cache().clearCache();
 
     (async () => {
       try {

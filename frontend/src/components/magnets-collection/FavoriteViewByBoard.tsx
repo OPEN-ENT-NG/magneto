@@ -41,7 +41,13 @@ export const FavoriteViewByBoard: FunctionComponent<
 
   // Filtrer les tableaux qui ont au moins une carte
   const filteredBoardsWithCards = boardsWithCards.filter(
-    (board) => board.cards.length > 0,
+    (board) =>
+      board.cards.filter(
+        (card: CardModel) =>
+          searchText === "" ||
+          (card.title &&
+            card.title.toLowerCase().includes(searchText.toLowerCase())),
+      ).length > 0,
   );
 
   return filteredBoardsWithCards.length ? (
@@ -49,77 +55,70 @@ export const FavoriteViewByBoard: FunctionComponent<
       <ul>
         {filteredBoardsWithCards.map((board: Board) => (
           <li key={board._id}>
-            {board.cards.some(
-              (card) =>
-                searchText === "" ||
-                (card.title &&
-                  card.title.toLowerCase().includes(searchText.toLowerCase())),
-            ) && (
-              <div>
-                <div className="parent">
-                  <h2>{board._title}</h2>
-                  <span
-                    onClick={() => duplicateBoardsAndToast(board._id)}
-                    className="duplicateText"
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        duplicateBoardsAndToast(board._id);
-                      }
-                    }}
-                  >
-                    <FileCopyOutlinedIcon className="copy-icon" />
-                    {" " + t("magneto.cards.collection.board.duplicate")}
-                  </span>
-                </div>
-                <animated.ul className="grid ps-0 list-unstyled mb-24">
-                  {board.cards
-                    .filter(
-                      (card: CardModel) =>
-                        searchText === "" ||
-                        (card.title &&
-                          card.title
-                            .toLowerCase()
-                            .includes(searchText.toLowerCase())),
-                    )
-                    .map((card: CardModel) => (
-                      <animated.li
-                        className="g-col-4 z-1 boardSizing"
-                        key={card.id}
-                        style={{
-                          position: "relative",
-                          ...springs,
-                        }}
-                      >
-                        <Card
-                          app={currentApp!}
-                          options={{
-                            type: "board",
-                            title: card.title || "",
-                          }}
-                          isLoading={getBoardsLoading}
-                          isSelectable={false}
-                        >
-                          <Card.Body flexDirection={"column"}>
-                            <Card.Title>{card.title || ""}</Card.Title>
-                            <div className="board-number-magnets">
-                              <Icon
-                                path={mdiMagnet}
-                                size={1}
-                                className="med-resource-card-text"
-                              />
-                              <Card.Text className="med-resource-card-text board-text">
-                                {card.resourceType} {t("magneto.magnets")}
-                              </Card.Text>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      </animated.li>
-                    ))}
-                </animated.ul>
+            <div>
+              <div className="parent">
+                <h2>{board._title}</h2>
+                <span
+                  onClick={() => duplicateBoardsAndToast(board._id)}
+                  className="duplicateText"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      duplicateBoardsAndToast(board._id);
+                    }
+                  }}
+                >
+                  <FileCopyOutlinedIcon className="copy-icon" />
+                  {" " + t("magneto.cards.collection.board.duplicate")}
+                </span>
               </div>
-            )}
+              <animated.ul className="grid ps-0 list-unstyled mb-24">
+                {board.cards
+                  .filter(
+                    (card: CardModel) =>
+                      searchText === "" ||
+                      (card.title &&
+                        card.title
+                          .toLowerCase()
+                          .includes(searchText.toLowerCase())),
+                  )
+                  .map((card: CardModel) => (
+                    <animated.li
+                      className="g-col-4 z-1 boardSizing"
+                      key={card.id}
+                      style={{
+                        position: "relative",
+                        ...springs,
+                      }}
+                    >
+                      <Card
+                        app={currentApp!}
+                        options={{
+                          type: "board",
+                          title: card.title || "",
+                        }}
+                        isLoading={getBoardsLoading}
+                        isSelectable={false}
+                      >
+                        <Card.Body flexDirection={"column"}>
+                          <Card.Title>{card.title || ""}</Card.Title>
+                          <div className="board-number-magnets">
+                            <Icon
+                              path={mdiMagnet}
+                              size={1}
+                              className="med-resource-card-text"
+                            />
+                            <Card.Text className="med-resource-card-text board-text">
+                              {card.resourceType} {t("magneto.magnets")}
+                            </Card.Text>
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    </animated.li>
+                  ))}
+              </animated.ul>
+            </div>
           </li>
         ))}
       </ul>

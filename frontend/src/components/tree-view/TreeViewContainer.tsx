@@ -209,6 +209,7 @@ export const TreeViewContainer: React.FunctionComponent<
       ...modalData,
       i18nKey: "magneto.folder.drag.drop.right.error",
       onCancel: () => closeDragAndDropModal(),
+      hasSubmit: false,
     });
     onDisplayModal(true);
   };

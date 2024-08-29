@@ -93,29 +93,33 @@ export default function useShare({
 
   const dispatchRTK = useDispatch();
 
-  const fetchRights = async () => {
-    const [shareRightActions, shareRights] = await Promise.all([
-      odeServices.share().getActionsForApp(appCode),
-      odeServices.share().getRightsForResource(appCode, resourceId),
-    ]);
-
-    dispatch({
-      type: "init",
-      payload: {
-        shareRightActions,
-        shareRights,
-      },
-    });
-  };
-
   useEffect(() => {
     if (!resourceId) return;
     odeServices.cache().clearCache();
 
-    fetchRights();
-    setIsLoading(false);
+    (async () => {
+      try {
+        const [shareRightActions, shareRights] = await Promise.all([
+          odeServices.share().getActionsForApp(appCode),
+          odeServices.share().getRightsForResource(appCode, resourceId),
+        ]);
+
+        dispatch({
+          type: "init",
+          payload: {
+            shareRightActions,
+            shareRights,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      {
+        setIsLoading(false);
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [resourceId]);
 
   const toggleRight = (
     shareRight: ShareRight,

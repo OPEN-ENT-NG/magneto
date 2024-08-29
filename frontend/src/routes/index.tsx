@@ -38,7 +38,7 @@ const routes = [
         },
       },
       {
-        path: "board/{id}/view",
+        path: "board/:id/view",
         async lazy() {
           const { App } = await import("./board");
           return {
@@ -47,7 +47,7 @@ const routes = [
         },
       },
       {
-        path: "board/{id}/reading",
+        path: "board/:id/reading",
         async lazy() {
           const { App } = await import("./read");
           return {

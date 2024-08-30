@@ -25,6 +25,7 @@ import "./index.scss";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+import { SideMenu } from "~/components/side-menu/SideMenu";
 
 export interface AppProps {
   _id: string;
@@ -135,6 +136,7 @@ export const App = () => {
           modalProps={modalProps}
           onSetModalProps={setModalProps}
         />
+        <SideMenu />
         <Grid className="main-grid">
           <Grid.Col
             lg={width < 1280 ? "2" : "3"} //Since number of columns reduce by 4 at 1280px but doesnt take in account our md columns configuration until 1024px, we're manually changing it

@@ -1,0 +1,26 @@
+@import "../../styles/_colors.scss";
+
+.side-menu-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 100%;
+  color: $magneto-black;
+
+  &:hover {
+    color: $magneto-yellow-ochre !important;
+  }
+
+  &-text {
+    font-size: 13px;
+  }
+
+  &-img {
+    svg {
+      width: 2rem;
+      height: 3rem;
+    }
+  }
+}

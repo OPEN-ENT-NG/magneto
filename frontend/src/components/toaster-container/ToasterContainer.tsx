@@ -11,6 +11,7 @@ import {
 import { useTransition, animated } from "@react-spring/web";
 import { ShareOptions } from "node_modules/@edifice-ui/react/dist/common/ShareModal/ShareModal";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
 import { CreateFolder } from "../create-folder/CreateFolder";
@@ -29,7 +30,6 @@ import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
 import { useUserRightsStore } from "~/stores";
-import { useNavigate, useNavigation } from "react-router-dom";
 
 export interface ToasterContainerProps {
   reset: () => void;
@@ -205,7 +205,7 @@ export const ToasterContainer = ({
                           color="primary"
                           variant="filled"
                           onClick={() => {
-                            selectedBoardsIds.length == 1 //if we selected a board, open it (TODO), else open the folder
+                            selectedBoardsIds.length == 1 //if we selected a board, open it, else open the folder
                               ? navigate(`/board/${selectedBoardsIds[0]}/view`)
                               : handleSelect(
                                   selectedFoldersIds[0],

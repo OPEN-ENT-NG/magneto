@@ -17,6 +17,7 @@ import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
 import { MessageModal } from "~/components/message-modal/MessageModal";
 import { SideBar } from "~/components/side-bar/SideBar";
+import { SideMenuContainer } from "~/components/side-menu-container/SideMenuContainer";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
@@ -25,8 +26,6 @@ import "./index.scss";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import { SideMenu } from "~/components/side-menu/SideMenu";
-import { SideMenuContainer } from "~/components/side-menu-container/SideMenuContainer";
 
 export interface AppProps {
   _id: string;

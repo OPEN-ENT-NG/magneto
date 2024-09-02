@@ -8,6 +8,7 @@
   cursor: pointer;
   width: 100%;
   color: $magneto-black;
+  margin-bottom: 2vh;
 
   &:hover {
     color: $magneto-yellow-ochre !important;
@@ -21,6 +22,7 @@
     svg {
       width: 2rem;
       height: 3rem;
+      margin-bottom: unset !important;
     }
   }
 }

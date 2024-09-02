@@ -7,6 +7,16 @@ import {
   SideMenuDividerProp,
 } from "~/models/side-menu.model";
 
+type SideMenuIconProp = {
+  name: string;
+  icon: React.ReactNode;
+  action: () => void;
+};
+
+type SideMenuDividerProp = {
+  divider: boolean;
+};
+
 type SideMenuProps = {
   sideMenuData: (SideMenuIconProp | SideMenuDividerProp)[];
 };

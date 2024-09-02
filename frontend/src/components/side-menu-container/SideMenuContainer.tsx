@@ -69,7 +69,7 @@ export const SideMenuContainer: React.FC = () => {
       },
     },
     {
-      name: "side-menu-divider",
+      divider: true,
     },
     {
       icon: <Icon path={mdiCog} size={1.5} />,

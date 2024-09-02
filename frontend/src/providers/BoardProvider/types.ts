@@ -15,7 +15,7 @@ export type BoardContextType = {
 export type Section = {
   id: string;
   title: string;
-  cardIds: Array<string>;
+  cardIds: string[];
   boardId: string;
   page: number;
   cards: Card[];

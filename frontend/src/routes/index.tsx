@@ -60,5 +60,5 @@ const routes = [
 ];
 
 export const router = createBrowserRouter(routes, {
-  basename: import.meta.env.PROD ? "/magneto" : "/",
+  basename: import.meta.env.PROD ? "/magneto/react" : "/",
 });

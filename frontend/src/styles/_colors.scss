@@ -4,7 +4,7 @@ $magneto-white: #ffffff;
 $magneto-lighter-light-grey: #f8f9fa;
 $magneto-lighter-grey: #ebebeb;
 $magneto-light-grey: #d6d6d6;
-$magneto-grey-blue: #f4fAfd;
+$magneto-grey-blue: #f4fafd;
 $magneto-white-blue: #e3f1f7;
 $magneto-black: #000000;
 $magneto-grey: #aaaaaa;
@@ -35,7 +35,10 @@ $magneto-primary: #46afe6 !default;
 $magneto-primary-darkest: saturate(darken($magneto-primary, 40%), 10%) !default;
 $magneto-primary-dark: saturate(darken($magneto-primary, 9%), 3%) !default;
 $magneto-primary-light: saturate(lighten($magneto-primary, 17%), 85%) !default;
-$magneto-primary-lighter: desaturate(lighten($magneto-primary-light, 15%), 10%) !default;
+$magneto-primary-lighter: desaturate(
+  lighten($magneto-primary-light, 15%),
+  10%
+) !default;
 
 // COLOR PALETTE : SHADOW
 $magneto-shadow-light: rgba(0, 0, 0, 0.1) !default;
@@ -43,16 +46,13 @@ $magneto-shadow: rgba(0, 0, 0, 0.26) !default;
 $magneto-shadow-dark: rgba(0, 0, 0, 0.4) !default;
 $magneto-shadow-darker: rgba(0, 0, 0, 0.6) !default;
 
-$magneto-font-secondary: 'Comfortaa', cursive;
+$magneto-font-secondary: "Comfortaa", cursive;
 
 $magneto-height-navbar: 680px;
 $magneto-screen-mobile: 800px;
 $magneto-screen-tablet: 1024px;
 $magneto-screen-small-desktop: 1224px;
 $magneto-screen-medium-desktop: 1536px;
-
-
-
 
 @mixin mobile {
   @media (max-width: $magneto-screen-mobile) {
@@ -89,7 +89,6 @@ $magneto-screen-medium-desktop: 1536px;
     @content;
   }
 }
-
 
 @mixin paddingX($size) {
   padding-left: $size;
@@ -140,7 +139,7 @@ $magneto-screen-medium-desktop: 1536px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: none;
-  font-weight: normal!important;
+  font-weight: normal !important;
 }
 
 /* ----------------------------

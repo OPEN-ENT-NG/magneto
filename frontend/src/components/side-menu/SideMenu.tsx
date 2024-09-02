@@ -1,25 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 
 import "./SideMenu.scss";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
-import HomeIcon from "@mui/icons-material/Home";
-import LaptopIcon from "@mui/icons-material/Laptop";
-import SchoolIcon from "@mui/icons-material/School";
-import StarIcon from "@mui/icons-material/Star";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 import { SidemenuIcon } from "../sidemenu-icon/SideMenuIcon";
-import {
-  mdiBookmarkBoxMultiple,
-  mdiCog,
-  mdiFileMultiple,
-  mdiFormatSize,
-  mdiImage,
-  mdiLink,
-  mdiMusicNote,
-  mdiPlayCircle,
-} from "@mdi/js";
-import Icon from "@mdi/react";
 
 type SideMenuProps = {
   sideMenuData: Array<{

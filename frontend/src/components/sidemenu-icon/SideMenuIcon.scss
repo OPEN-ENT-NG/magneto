@@ -8,13 +8,14 @@
   cursor: pointer;
   width: 100%;
   color: $magneto-black;
+  margin-bottom: 2vh;
 
   &:hover {
     color: $magneto-yellow-ochre !important;
   }
 
   &-text {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   &-img {

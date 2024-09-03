@@ -13,12 +13,12 @@ import { Icon } from "@mdi/react";
 import dayjs from "dayjs";
 import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
-
+import { useNavigate } from "react-router-dom";
 import "./BoardItem.scss";
+
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
-import { useNavigate } from "react-router-dom";
 
 interface BoardItemProps {
   board: {

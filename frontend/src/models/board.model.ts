@@ -1,10 +1,10 @@
 //import { Behaviours, model, Shareable } from "entcore";
 
 import { Card } from "./card.model";
-import { Section } from "./section.model";
 import { FOLDER_TYPE } from "../core/enums/folder-type.enum";
 import {} from "edifice-ts-client";
 import { LAYOUT_TYPE } from "../core/enums/layout-type.enum";
+import { Section } from "~/providers/BoardProvider/types";
 
 export interface IBoardItemResponse {
   _id: string;
@@ -13,7 +13,7 @@ export interface IBoardItemResponse {
   imageUrl: string;
   backgroundUrl: string;
   cardIds: Array<string>;
-  sections: Array<Section>;
+  sections: Section[];
   tags: Array<string>;
   nbCards: number;
   nbCardsSections: number;
@@ -419,7 +419,7 @@ export class Board /*implements Shareable*/ {
     return this._cardIds;
   }
 
-  get sections(): Array<Section> {
+  get sections(): Section[] {
     return this._sections;
   }
 
@@ -427,7 +427,7 @@ export class Board /*implements Shareable*/ {
     return this._sections.map((section) => section.id);
   }
 
-  set sections(value: Array<Section>) {
+  set sections(value: Section[]) {
     this._sections = value;
   }
 

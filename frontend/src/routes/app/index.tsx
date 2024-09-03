@@ -26,6 +26,7 @@ import "./index.scss";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+import { ZoomComponent } from "~/components/zoom-component/ZoomComponent";
 
 export interface AppProps {
   _id: string;
@@ -216,6 +217,11 @@ export const App = () => {
             ></MessageModal>
           </Grid.Col>
         </Grid>
+        <ZoomComponent
+          opacity={"75%"}
+          zoomMaxLevel={5}
+          zoomInitLevel={3}
+        />
       </DndProvider>
     </>
   );

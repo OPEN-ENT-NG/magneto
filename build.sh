@@ -21,7 +21,7 @@ esac
 
 init(){
   me=`id -u`:`id -g`
-  echo"DEFAULT_DOCKER_USER=$me"> .env
+  echo "DEFAULT_DOCKER_USER=$me"> .env
 }
 
 clean () {

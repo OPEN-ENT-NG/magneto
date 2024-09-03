@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createHashRouter } from "react-router-dom";
 
 import Root from "~/app/root";
 import ErrorPage from "~/components/page-error";
@@ -19,8 +19,15 @@ const routes = [
           };
         },
       },
+    ],
+  },
+  {
+    path: "/info",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    children: [
       {
-        path: "info",
+        index: true,
         async lazy() {
           const { App } = await import("./info");
           return {
@@ -28,8 +35,15 @@ const routes = [
           };
         },
       },
+    ],
+  },
+  {
+    path: "/user",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    children: [
       {
-        path: "user",
+        index: true,
         async lazy() {
           const { App } = await import("./user");
           return {
@@ -39,8 +53,31 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/board/:id",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "view",
+        async lazy() {
+          const { App } = await import("./board");
+          return {
+            Component: App,
+          };
+        },
+      },
+      {
+        path: "read",
+        async lazy() {
+          const { App } = await import("./read");
+          return {
+            Component: App,
+          };
+        },
+      },
+    ],
+  },
 ];
 
-export const router = createBrowserRouter(routes, {
-  basename: import.meta.env.PROD ? "/magneto" : "/",
-});
+export const router = createHashRouter(routes);

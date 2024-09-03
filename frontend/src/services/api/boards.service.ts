@@ -29,6 +29,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       },
       providesTags: ["Boards"],
     }),
+    getBoardsByIds: builder.query({
+      query: (ids: string[]) => ({
+        url: "boards",
+        method: "POST",
+        body: { boardIds: ids },
+      }),
+      providesTags: ["Boards"],
+    }),
     getAllBoards: builder.query({
       query: (params: IBoardsParamsRequest) => {
         let urlParams: string =
@@ -117,6 +125,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
 export const {
   useGetBoardsQuery,
   useGetAllBoardsQuery,
+  useGetBoardsByIdsQuery,
   useCreateBoardMutation,
   useUpdateBoardMutation,
   useDuplicateBoardMutation,

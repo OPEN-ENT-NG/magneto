@@ -11,6 +11,7 @@ import {
 import { useTransition, animated } from "@react-spring/web";
 import { ShareOptions } from "node_modules/@edifice-ui/react/dist/common/ShareModal/ShareModal";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
 import { CreateFolder } from "../create-folder/CreateFolder";
@@ -82,6 +83,8 @@ export const ToasterContainer = ({
   const { user } = useOdeClient();
 
   const userId = user ? user?.userId : "";
+
+  const navigate = useNavigate();
 
   const isMyBoards = () => {
     return (
@@ -202,8 +205,8 @@ export const ToasterContainer = ({
                           color="primary"
                           variant="filled"
                           onClick={() => {
-                            selectedBoardsIds.length == 1 //if we selected a board, open it (TODO), else open the folder
-                              ? undefined
+                            selectedBoardsIds.length == 1 //if we selected a board, open it, else open the folder
+                              ? navigate(`/board/${selectedBoardsIds[0]}/view`)
                               : handleSelect(
                                   selectedFoldersIds[0],
                                   FOLDER_TYPE.MY_BOARDS, //the button being there only if not in trash, and no folders being in "Public boards", the folder has to be in "My boards"

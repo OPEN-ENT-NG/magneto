@@ -13,8 +13,9 @@ import { Icon } from "@mdi/react";
 import dayjs from "dayjs";
 import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
-
+import { useNavigate } from "react-router-dom";
 import "./BoardItem.scss";
+
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
@@ -49,6 +50,8 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
     useBoardsNavigation();
   const [isDragged, setIsDragged] = useState<boolean>(false);
   const [hasMounted, setHasMounted] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const userId = user ? user?.userId : "";
 
@@ -105,6 +108,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
         isSelectable={true}
         isSelected={selectedBoardsIds.includes(board.id)}
         onSelect={() => toggleSelect(board as Board)}
+        onClick={() => navigate(`/board/${board.id}/view`)}
       >
         <Card.Body flexDirection={"column"}>
           <Card.Image

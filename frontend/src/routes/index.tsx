@@ -47,7 +47,7 @@ const routes = [
         },
       },
       {
-        path: "board/:id/reading",
+        path: "board/:id/read",
         async lazy() {
           const { App } = await import("./read");
           return {

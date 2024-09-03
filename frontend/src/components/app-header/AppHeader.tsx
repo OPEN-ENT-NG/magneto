@@ -24,7 +24,7 @@ const AppHeader = forwardRef(
     { children, render, isFullscreen = false, ...restProps }: AppHeaderProps,
     ref: Ref<HTMLDivElement>,
   ) => {
-    const classes = clsx("d-flex flex-wrap p-24 gap-8 bg-white flex-c", {
+    const classes = clsx("d-flex flex-wrap p-24 gap-8 bg-white", {
       "justify-content-between": render,
       "mx-n16": !isFullscreen,
       "z-3 top-0 start-0 end-0": isFullscreen,

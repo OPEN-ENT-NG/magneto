@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   mdiBookmarkBoxMultiple,
   mdiCog,
@@ -10,59 +8,75 @@ import {
   mdiMusicNote,
   mdiPlayCircle,
 } from "@mdi/js";
+import { t } from "i18next";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
+import React from "react";
 
-import { SideMenu } from "../side-menu/SideMenu";
+type SideMenuIconProp = {
+  name: string;
+  icon: React.ReactNode;
+  action: () => void;
+};
 
-export const SideMenuContainer: React.FC = () => {
+type SideMenuDividerProp = {
+  divider: boolean;
+};
+
+export const useSideMenuData = (): (
+  | SideMenuIconProp
+  | SideMenuDividerProp
+)[] => {
   const { t } = useTranslation("magneto");
 
-  const sideMenuData = [
+  return [
     {
-      icon: <Icon path={mdiFormatSize} size={1.5} />,
+      icon: React.createElement(Icon, { path: mdiFormatSize, size: 1.5 }),
       name: t("magneto.card.type.text"),
       action: () => {
         console.log("text");
       },
     },
     {
-      icon: <Icon path={mdiImage} size={1.5} />,
+      icon: React.createElement(Icon, { path: mdiImage, size: 1.5 }),
       name: t("magneto.card.type.image"),
       action: () => {
         console.log("image");
       },
     },
     {
-      icon: <Icon path={mdiPlayCircle} size={1.5} />,
+      icon: React.createElement(Icon, { path: mdiPlayCircle, size: 1.5 }),
       name: t("magneto.card.type.video"),
       action: () => {
         console.log("video");
       },
     },
     {
-      icon: <Icon path={mdiMusicNote} size={1.5} />,
+      icon: React.createElement(Icon, { path: mdiMusicNote, size: 1.5 }),
       name: t("magneto.card.type.audio"),
       action: () => {
         console.log("audio");
       },
     },
     {
-      icon: <Icon path={mdiFileMultiple} size={1.5} />,
+      icon: React.createElement(Icon, { path: mdiFileMultiple, size: 1.5 }),
       name: t("magneto.card.type.file"),
       action: () => {
         console.log("document");
       },
     },
     {
-      icon: <Icon path={mdiLink} size={1.5} />,
+      icon: React.createElement(Icon, { path: mdiLink, size: 1.5 }),
       name: t("magneto.card.type.link"),
       action: () => {
         console.log("link");
       },
     },
     {
-      icon: <Icon path={mdiBookmarkBoxMultiple} size={1.5} />,
+      icon: React.createElement(Icon, {
+        path: mdiBookmarkBoxMultiple,
+        size: 1.5,
+      }),
       name: t("magneto.card.type.card"),
       action: () => {
         console.log("magnet");
@@ -72,13 +86,11 @@ export const SideMenuContainer: React.FC = () => {
       divider: true,
     },
     {
-      icon: <Icon path={mdiCog} size={1.5} />,
+      icon: React.createElement(Icon, { path: mdiCog, size: 1.5 }),
       name: "",
       action: () => {
         console.log("parameters");
       },
     },
   ];
-
-  return <SideMenu sideMenuData={sideMenuData} />;
 };

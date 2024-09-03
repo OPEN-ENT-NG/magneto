@@ -2,16 +2,10 @@ import { FC, useRef } from "react";
 
 import "./SideMenu.scss";
 import { SidemenuIcon } from "../sidemenu-icon/SideMenuIcon";
-
-type SideMenuIconProp = {
-  name: string;
-  icon: React.ReactNode;
-  action: () => void;
-};
-
-type SideMenuDividerProp = {
-  divider: boolean;
-};
+import {
+  SideMenuIconProp,
+  SideMenuDividerProp,
+} from "~/models/side-menu.model";
 
 type SideMenuProps = {
   sideMenuData: (SideMenuIconProp | SideMenuDividerProp)[];

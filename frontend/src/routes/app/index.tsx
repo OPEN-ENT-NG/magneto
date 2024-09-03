@@ -17,7 +17,6 @@ import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
 import { MessageModal } from "~/components/message-modal/MessageModal";
 import { SideBar } from "~/components/side-bar/SideBar";
-import { SideMenuContainer } from "~/components/side-menu-container/SideMenuContainer";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";

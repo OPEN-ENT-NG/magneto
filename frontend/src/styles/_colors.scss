@@ -1,0 +1,159 @@
+$magneto-yellow: #ffb600;
+$magneto-yellow-ochre: #ecbe30;
+$magneto-white: #ffffff;
+$magneto-lighter-light-grey: #f8f9fa;
+$magneto-lighter-grey: #ebebeb;
+$magneto-light-grey: #d6d6d6;
+$magneto-grey-blue: #f4fafd;
+$magneto-white-blue: #e3f1f7;
+$magneto-black: #000000;
+$magneto-grey: #aaaaaa;
+$magneto-dark-light-grey: #8c939e;
+$magneto-dark-grey: #5b6472;
+$magneto-black-light: #555555;
+$magneto-dark-blue: #368daf;
+$magneto-blue: #67add1;
+$magneto-sky-blue: #2a9cc8;
+$magneto-light-sky-blue: #4bafd5;
+$magneto-light-blue: #78c5e2;
+$magneto-lighter-blue: #bde4f9;
+$magneto-cyan: #46afe6;
+$magneto-orange: #ff8500;
+$magneto-red: #e61610;
+$magneto-green: #6fbe2e;
+$magneto-pink: #ff61c0;
+$magneto-purple: #a348c0;
+$magneto-indigo: #4f2691;
+
+$magneto-warning-color: $magneto-red;
+$magneto-warning-color-hover: darken($magneto-warning-color, 35%);
+$magneto-forewarn-color: $magneto-orange;
+$magneto-valid-color: $magneto-green;
+$magneto-disabled-color: $magneto-grey;
+
+$magneto-primary: #46afe6 !default;
+$magneto-primary-darkest: saturate(darken($magneto-primary, 40%), 10%) !default;
+$magneto-primary-dark: saturate(darken($magneto-primary, 9%), 3%) !default;
+$magneto-primary-light: saturate(lighten($magneto-primary, 17%), 85%) !default;
+$magneto-primary-lighter: desaturate(
+  lighten($magneto-primary-light, 15%),
+  10%
+) !default;
+
+// COLOR PALETTE : SHADOW
+$magneto-shadow-light: rgba(0, 0, 0, 0.1) !default;
+$magneto-shadow: rgba(0, 0, 0, 0.26) !default;
+$magneto-shadow-dark: rgba(0, 0, 0, 0.4) !default;
+$magneto-shadow-darker: rgba(0, 0, 0, 0.6) !default;
+
+$magneto-font-secondary: "Comfortaa", cursive;
+
+$magneto-height-navbar: 680px;
+$magneto-screen-mobile: 800px;
+$magneto-screen-tablet: 1024px;
+$magneto-screen-small-desktop: 1224px;
+$magneto-screen-medium-desktop: 1536px;
+
+@mixin mobile {
+  @media (max-width: $magneto-screen-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 801px) and (max-width: $magneto-screen-tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1025px) {
+    @content;
+  }
+}
+
+@mixin small-desktop {
+  @media (min-width: 1025px) and (max-width: $magneto-screen-small-desktop) {
+    @content;
+  }
+}
+
+@mixin medium-desktop {
+  @media (min-width: 1225px) and (max-width: $magneto-screen-medium-desktop) {
+    @content;
+  }
+}
+
+@mixin large-desktop {
+  @media (min-width: 1441px) {
+    @content;
+  }
+}
+
+@mixin paddingX($size) {
+  padding-left: $size;
+  padding-right: $size;
+}
+
+@mixin paddingY($size) {
+  padding-bottom: $size;
+  padding-top: $size;
+}
+
+@mixin marginX($size) {
+  margin-left: $size;
+  margin-right: $size;
+}
+
+@mixin marginY($size) {
+  margin-bottom: $size;
+  margin-top: $size;
+}
+
+@mixin lightboxWidth($width) {
+  section.lightbox {
+    .content {
+      width: $width !important;
+    }
+  }
+}
+
+@mixin noTextOverflow($nbLines) {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: $nbLines !important;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /*! autoprefixer: on */
+}
+
+@mixin navbarBorderBottom($size) {
+  padding-top: $size;
+  border-bottom: solid $size;
+  box-sizing: border-box;
+}
+
+@mixin fonticon {
+  font-family: "generic-icons";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: none;
+  font-weight: normal !important;
+}
+
+/* ----------------------------
+    Spacing
+---------------------------- */
+$spacing-XXL: 68px;
+$spacing-XML: 60px;
+$spacing-XM: 48px;
+$spacing-XL: 42px;
+$spacing-LL: 30px;
+$spacing-L: 24px;
+$spacing-M: 16px;
+$spacing-S: 12px;
+$spacing-XLXS: 10px;
+$spacing-LXS: 8px;
+$spacing-6: 6px;
+$spacing-XXS: 4px;

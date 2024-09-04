@@ -14,7 +14,7 @@
     bottom: 1em;
     z-index: 2;
     display: inline-flex;
-    width: 18%;
+    width: auto;
     justify-content: space-evenly;
 
     &-plus{
@@ -43,7 +43,7 @@
       height: 1px;
       background-color: #ffffff;
       display: inline-flex;
-      margin-top: 7%;
+      margin-top: 1.5rem;
     }
   
     &-line2 {
@@ -51,7 +51,7 @@
       width: 40px;
       height: 1px;
       background-color: #ffffff;
-      margin-top: 7%;
+      margin-top: 1.5rem;
 
     }
   }

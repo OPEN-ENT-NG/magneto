@@ -68,7 +68,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       zoomOut,
       resetZoom,
     }),
-    [board],
+    [board, zoomLevel],
   );
 
   return (

@@ -26,7 +26,6 @@ export const BoardView: FC = () => {
           zoomIn={zoomIn}
           zoomOut={zoomOut}
           resetZoom={resetZoom}
-          zoomComponentName={t("magneto.zoom")}
         />
       </div>
     </>

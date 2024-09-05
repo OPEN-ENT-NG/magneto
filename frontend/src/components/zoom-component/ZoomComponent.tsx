@@ -6,32 +6,31 @@ import { mdiMinus, mdiPlus } from "@mdi/js";
 import "./ZoomComponent.scss";
 
 interface ZoomComponentProps {
-  opacity: string;
+  opacity?: string;
   zoomLevel: number;
   zoomMaxLevel: number; //e.g. if zoomLevels is 3, there will be 4 zoom values accessible : 0, 1, 2, 3
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
-  zoomComponentName: string;
+  label?: string;
 }
 
 export const ZoomComponent: FC<ZoomComponentProps> = ({
-  opacity,
+  opacity = "100%",
   zoomLevel,
   zoomMaxLevel,
   zoomIn,
   zoomOut,
   resetZoom,
-  zoomComponentName,
+  label = "Zoom",
 }: ZoomComponentProps) => {
-  const { t } = useTranslation("magneto");
 
   useEffect(() => {
     console.log(zoomLevel);
   }, [zoomLevel]);
 
   return (
-    <div className={`zoom ${!!opacity ? opacity : ""}`}>
+    <div className={`zoom`} style={{'opacity': `var(${opacity})`}}>
       <div
         role="button"
         className={`zoom-minus ${zoomLevel === 0 ? "zoom-minus-disabled" : ""}`}
@@ -42,7 +41,7 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
       </div>
       <div className="zoom-line1"></div>
       <div className="zoom-label" role="button" onClick={resetZoom}>
-        {zoomComponentName}
+        {label}
       </div>
       <div className="zoom-line2"></div>
       <div

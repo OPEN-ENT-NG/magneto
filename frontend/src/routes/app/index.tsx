@@ -17,7 +17,6 @@ import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
 import { MessageModal } from "~/components/message-modal/MessageModal";
 import { SideBar } from "~/components/side-bar/SideBar";
-import { SideMenuContainer } from "~/components/side-menu-container/SideMenuContainer";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
@@ -26,6 +25,7 @@ import "./index.scss";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+// import { ZoomComponent } from "~/components/zoom-component/ZoomComponent";
 
 export interface AppProps {
   _id: string;
@@ -136,7 +136,6 @@ export const App = () => {
           modalProps={modalProps}
           onSetModalProps={setModalProps}
         />
-        <SideMenuContainer />
         <Grid className="main-grid">
           <Grid.Col
             lg={width < 1280 ? "2" : "3"} //Since number of columns reduce by 4 at 1280px but doesnt take in account our md columns configuration until 1024px, we're manually changing it
@@ -214,6 +213,16 @@ export const App = () => {
               onSubmit={modalProps.onSubmit}
               onCancel={modalProps.onCancel}
             ></MessageModal>
+            {/* <div style={{'align-self': 'center','bottom': '1em','position': 'fixed', 'z-index': '10000000000'}}>
+              <ZoomComponent
+                opacity={"75%"}
+                zoomLevel={3}
+                zoomMaxLevel={5}
+                zoomIn={() => {}}
+                zoomOut={() => {}}
+                resetZoom={() => {}}
+              />
+            </div> */}
           </Grid.Col>
         </Grid>
       </DndProvider>

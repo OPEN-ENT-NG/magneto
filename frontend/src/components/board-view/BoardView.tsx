@@ -17,7 +17,7 @@ export const BoardView: FC = () => {
 
       <div className="zoom-container">
         <ZoomComponent
-          opacity={"75%"}
+          opacity={0.75}
           zoomLevel={zoomLevel}
           zoomMaxLevel={5}
           zoomIn={zoomIn}

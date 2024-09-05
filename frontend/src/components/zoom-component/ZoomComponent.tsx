@@ -5,7 +5,7 @@ import Icon from "@mdi/react";
 import "./ZoomComponent.scss";
 
 interface ZoomComponentProps {
-  opacity?: string;
+  opacity?: number;
   zoomLevel: number;
   zoomMaxLevel: number; //e.g. if zoomLevels is 3, there will be 4 zoom values accessible : 0, 1, 2, 3
   zoomIn: () => void;
@@ -15,7 +15,7 @@ interface ZoomComponentProps {
 }
 
 export const ZoomComponent: FC<ZoomComponentProps> = ({
-  opacity = "100%",
+  opacity = 1,
   zoomLevel,
   zoomMaxLevel,
   zoomIn,
@@ -28,7 +28,7 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   }, [zoomLevel]);
 
   return (
-    <div className={`zoom`} style={{ opacity: `var(${opacity})` }}>
+    <div className={`zoom`} style={{ opacity: opacity}}>
       <div
         role="button"
         className={`zoom-minus ${zoomLevel === 0 ? "zoom-minus-disabled" : ""}`}

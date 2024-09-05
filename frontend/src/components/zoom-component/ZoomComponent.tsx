@@ -1,8 +1,7 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 
-import { useTranslation } from "react-i18next";
-import Icon from "@mdi/react";
 import { mdiMinus, mdiPlus } from "@mdi/js";
+import Icon from "@mdi/react";
 import "./ZoomComponent.scss";
 
 interface ZoomComponentProps {
@@ -24,23 +23,30 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   resetZoom,
   label = "Zoom",
 }: ZoomComponentProps) => {
-
   useEffect(() => {
     console.log(zoomLevel);
   }, [zoomLevel]);
 
   return (
-    <div className={`zoom`} style={{'opacity': `var(${opacity})`}}>
+    <div className={`zoom`} style={{ opacity: `var(${opacity})` }}>
       <div
         role="button"
         className={`zoom-minus ${zoomLevel === 0 ? "zoom-minus-disabled" : ""}`}
         onClick={zoomOut}
+        onKeyDown={() => {}}
+        tabIndex={0}
       >
         <Icon path={mdiMinus} size={2} />
         <i className="magneto-minus"></i>
       </div>
       <div className="zoom-line1"></div>
-      <div className="zoom-label" role="button" onClick={resetZoom}>
+      <div
+        className="zoom-label"
+        role="button"
+        onClick={resetZoom}
+        onKeyDown={() => {}}
+        tabIndex={0}
+      >
         {label}
       </div>
       <div className="zoom-line2"></div>
@@ -50,6 +56,8 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
           zoomLevel === zoomMaxLevel ? "zoom-plus-disabled" : ""
         }`}
         onClick={zoomIn}
+        onKeyDown={() => {}}
+        tabIndex={0}
       >
         <Icon path={mdiPlus} size={2} />
       </div>

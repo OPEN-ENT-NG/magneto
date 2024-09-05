@@ -29,7 +29,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [board, setBoard] = useState<Board>(new Board());
   const [zoomLevel, setZoomLevel] = useState<number>(3);
 
-
   const { id = "" } = useParams();
 
   const { currentData: myBoardResult } = useGetBoardsByIdsQuery([id]);

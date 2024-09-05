@@ -25,7 +25,6 @@ import "./index.scss";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-// import { ZoomComponent } from "~/components/zoom-component/ZoomComponent";
 
 export interface AppProps {
   _id: string;
@@ -213,16 +212,6 @@ export const App = () => {
               onSubmit={modalProps.onSubmit}
               onCancel={modalProps.onCancel}
             ></MessageModal>
-            {/* <div style={{'align-self': 'center','bottom': '1em','position': 'fixed', 'z-index': '10000000000'}}>
-              <ZoomComponent
-                opacity={"75%"}
-                zoomLevel={3}
-                zoomMaxLevel={5}
-                zoomIn={() => {}}
-                zoomOut={() => {}}
-                resetZoom={() => {}}
-              />
-            </div> */}
           </Grid.Col>
         </Grid>
       </DndProvider>

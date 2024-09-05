@@ -69,7 +69,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     }),
     [board, zoomLevel],
   );
-  console.log(board);
 
   return (
     <BoardContext.Provider value={value}>{children}</BoardContext.Provider>

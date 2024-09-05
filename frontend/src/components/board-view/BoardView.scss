@@ -1,5 +1,32 @@
+@import "../../styles/_colors.scss";
+
 .zoom-container {
   align-self: center;
   bottom: 1em;
   position: fixed;
+}
+
+main.container-fluid:has(.board-body) {
+ padding: unset !important;
+ width: 100%;
+ margin-left: 8.1rem;
+}
+
+.board-body {
+  display: flex;
+  border-top: solid 1px $magneto-white-blue;
+  border-bottom: solid 1px $magneto-white-blue;
+  background-size: cover;
+  width: 100%;
+
+  .no-background-image {
+    background: $magneto-lighter-light-grey;
+    width: 100%;
+    min-height: 100rem;
+  }
+
+  .background-image {
+    width: 100%;
+  }
+  
 }

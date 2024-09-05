@@ -9,11 +9,19 @@ import { useBoard } from "~/providers/BoardProvider";
 
 export const BoardView: FC = () => {
   const sideMenuData = useSideMenuData();
-  const { zoomLevel, zoomIn, zoomOut, resetZoom } = useBoard();
+  const { board, zoomLevel, zoomIn, zoomOut, resetZoom } = useBoard();
 
   return (
     <>
       <SideMenu sideMenuData={sideMenuData} />
+
+      <div className="board-body">
+        {!!board.backgroundUrl ? (
+          <img src={board.backgroundUrl} alt="backgroundImage" className="background-image"></img>
+        ) : (
+          <div className="no-background-image">oui</div>
+        )}
+      </div>
 
       <div className="zoom-container">
         <ZoomComponent

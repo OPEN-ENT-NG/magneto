@@ -28,7 +28,7 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   }, [zoomLevel]);
 
   return (
-    <div className={`zoom`} style={{ opacity: opacity}}>
+    <div className={`zoom`} style={{ opacity: opacity }}>
       <div
         role="button"
         className={`zoom-minus ${zoomLevel === 0 ? "zoom-minus-disabled" : ""}`}

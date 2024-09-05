@@ -7,8 +7,8 @@ import ReactHtmlParser, {
   Transform,
 } from "react-html-parser";
 
-import { MagnetContentTextProps } from "./types";
 import { textWrapperStyle } from "./style";
+import { MagnetContentTextProps } from "./types";
 
 export const MagnetContentText: FC<MagnetContentTextProps> = ({ text }) => {
   const cleanHtml = DOMPurify.sanitize(text);

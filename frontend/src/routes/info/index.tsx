@@ -1,235 +1,53 @@
-import { Box } from "@mui/material";
+import {
+  Box,
+  Button,
+  CardActions,
+  CardContent,
+  Typography,
+} from "@mui/material";
+import MaterialCard from "@mui/material/Card";
+import { Link } from "react-router-dom";
 
-import { MagnetContentContainer } from "~/components/magnet-content-container/MagnetContentContainer";
-import { Card } from "~/models/card.model";
-const magnetArray: Card[] = [
-  {
-    title: "dailymotion",
-    resourceId: "",
-    resourceType: "video",
-    resourceUrl: "//www.dailymotion.com/embed/video/x8oy3q6",
-    description: "",
-    creationDate: "2024-09-04 12:01:33",
-    modificationDate: "2024-09-04 12:01:33",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: null,
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: null,
-    lastModifierName: null,
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "0ed3e2f6-a2e2-4775-8de3-670644a57d3e",
-  },
-  {
-    title: "Peertube",
-    resourceId: "",
-    resourceType: "video",
-    resourceUrl:
-      "https://tube-arts-lettres-sciences-humaines.apps.education.fr/videos/embed/21baee81-c46d-4848-aec5-9391f23b4654",
-    description: "",
-    creationDate: "2024-09-04 11:59:55",
-    modificationDate: "2024-09-04 11:59:55",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: null,
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: null,
-    lastModifierName: null,
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "aa50b3a3-00bd-48ab-a7d8-31d75d4c3161",
-  },
-  {
-    title: "FF 14 LINK",
-    resourceId: "",
-    resourceType: "link",
-    resourceUrl: "https://fr.wikipedia.org/wiki/Final_Fantasy_XIV",
-    description: "",
-    creationDate: "2024-09-04 11:33:21",
-    modificationDate: "2024-09-04 11:33:21",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: null,
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: null,
-    lastModifierName: null,
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "5251a556-5454-4670-b54f-5f4865f1b423",
-  },
-  {
-    title: "Vimeo",
-    resourceId: "",
-    resourceType: "video",
-    resourceUrl: "https://player.vimeo.com/video/1005006396",
-    description: "",
-    creationDate: "2024-09-04 11:32:08",
-    modificationDate: "2024-09-04 11:32:08",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: null,
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: null,
-    lastModifierName: null,
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "dbe9ce9d-8ab6-47a9-8893-796e44475777",
-  },
-  {
-    title: "Youtube",
-    resourceId: "",
-    resourceType: "video",
-    resourceUrl: "https://www.youtube.com/embed/iK6OYSWStks?rel=0",
-    description: "",
-    creationDate: "2024-09-04 11:30:36",
-    modificationDate: "2024-09-04 11:30:36",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: null,
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: null,
-    lastModifierName: null,
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "f9e4be1a-5a77-4072-84f4-38a5f46907db",
-  },
-  {
-    title: "Test TEXT",
-    resourceId: "",
-    resourceType: "text",
-    resourceUrl: null,
-    description:
-      '<div><span style="font-weight: bold;">​TEST OK OK OK</span></div><div><span style="font-size: initial; font-weight: normal;">​TEST OK OK OK</span><span style="font-size: initial;">​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK​TEST OK OK OK</span></div><div><span style="font-size: initial; font-style: italic;">​</span><span style="font-size: initial;">​</span><span style="font-size: initial;">​TEST OK OK OK</span><span style="font-size: initial;">​</span><span style="font-size: initial;">​TEST OK OK OK</span><span style="font-size: initial;">​</span><span style="font-size: initial;">​TEST OK OK OK</span><span style="font-size: initial;">​</span><span style="font-size: initial;">​TEST OK OK OK</span><span style="font-size: initial;">​</span><span style="font-size: initial;">​TEST OK OK OK</span></div>',
-    creationDate: "2024-09-04 12:09:16",
-    modificationDate: "2024-09-04 12:09:16",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: null,
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: null,
-    lastModifierName: null,
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "1df4936a-b3ba-4345-adbf-6319dc623d11",
-  },
-  {
-    title: "image test",
-    resourceId: "1b83e03a-e5a0-4bec-a709-b5988d16f724",
-    resourceType: "image",
-    resourceUrl: "/workspace/document/1b83e03a-e5a0-4bec-a709-b5988d16f724",
-    description: "<div>ouééééé</div>",
-    creationDate: "2024-09-04 13:13:09",
-    modificationDate: "2024-09-04 13:13:20",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: {
-      name: "file",
-      filename: "Hattori_Selected.webp",
-      contentType: "image/webp",
-      contentTransferEncoding: "7bit",
-      charset: "UTF-8",
-      size: 28424,
-      extension: "webp",
-    },
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    lastModifierName: "AKGUC Yaprak",
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "bfa11f33-23f8-4776-b3ed-0ac6d4901513",
-  },
-  {
-    title: "Test",
-    resourceId: "5dc70d1c-9d01-4a71-8bbd-51542cc180e4",
-    resourceType: "audio",
-    resourceUrl: null,
-    description: "",
-    creationDate: "2024-09-04 14:44:41",
-    modificationDate: "2024-09-04 14:44:41",
-    caption: "",
-    parentId: null,
-    boardId: "8d17943f-55dd-440d-8530-962b824a0161",
-    boardTitle: null,
-    metadata: {
-      name: "file",
-      filename: "hiphop-simple-beat-2-160669.mp3",
-      contentType: "audio/mpeg",
-      contentTransferEncoding: "7bit",
-      charset: "UTF-8",
-      size: 3329462,
-      extension: "mp3",
-    },
-    lastComment: null,
-    nbOfComments: 0,
-    nbOfFavorites: 0,
-    favoriteList: [],
-    lastModifierId: null,
-    lastModifierName: null,
-    locked: false,
-    liked: false,
-    ownerName: "AKGUC Yaprak",
-    ownerId: "45e2896f-7571-4703-b1e8-145e26441b80",
-    id: "d5b6087a-dcce-4267-b978-fbdf95898783",
-  },
-];
+const bull = (
+  <Box
+    component="span"
+    sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
+  >
+    •
+  </Box>
+);
+
 export const App = () => {
   return (
-    <Box sx={{ display: "flex", gap: "2rem", flexWrap: "wrap" }}>
-      {magnetArray.map((item) => (
-        <Box key={item.id} sx={{ width: "30rem", height: "20rem" }}>
-          <MagnetContentContainer magnet={item} />
-        </Box>
-      ))}
-    </Box>
+    <>
+      <div>coucou je suis info</div>
+
+      <MaterialCard sx={{ minWidth: 275 }}>
+        <CardContent>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            Word of the Day
+          </Typography>
+          <Typography variant="h5" component="div">
+            be{bull}nev{bull}o{bull}lent
+          </Typography>
+          <Typography sx={{ mb: 1.5 }} color="text.secondary">
+            adjective
+          </Typography>
+          <Typography variant="body2">
+            well meaning and kindly.
+            <br />
+            {'"a benevolent smile"'}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <Button size="small">Learn More</Button>
+        </CardActions>
+      </MaterialCard>
+      <Link to={`/user`}>click to access user </Link>
+      <Link to={`/info`}>click to access info </Link>
+      <Link to={`/board/{id}/view`}>click to access board </Link>
+      <Link to={`/board/{id}/reading`}>click to access read </Link>
+      <Link to={`/`}>click to access /</Link>
+    </>
   );
 };

@@ -11,4 +11,3 @@ export const imgStyle = {
   objectFit: "contain",
   objectPosition: "center",
 };
-

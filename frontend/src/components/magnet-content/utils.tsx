@@ -2,7 +2,6 @@ import { MagnetContentAudio } from "../magnet-content-audio/MagnetContentAudio";
 import { MagnetContentImageDisplay } from "../magnet-content-image-display/MagnetContentImageDisplay";
 import { MagnetContentSvgDisplay } from "../magnet-content-svg-display/MagnetContentSvgDisplay";
 import { MagnetContentText } from "../magnet-content-text/magnetContentText";
-import { EXTENSION_TYPE } from "~/core/enums/extension-type.enum";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 
@@ -21,6 +20,8 @@ export const onClick = (magnet: Card) => {
       return null;
     case RESOURCE_TYPE.AUDIO:
       return null;
+    case RESOURCE_TYPE.FILE:
+      return null;
   }
 };
 
@@ -30,7 +31,7 @@ export const displayContentByType = (magnet: Card) => {
     case RESOURCE_TYPE.VIDEO:
       return <MagnetContentImageDisplay url={magnet.resourceUrl} />;
     case RESOURCE_TYPE.LINK:
-      return <MagnetContentSvgDisplay extension={EXTENSION_TYPE.LINK} />;
+      return <MagnetContentSvgDisplay extension="link" />;
     case RESOURCE_TYPE.TEXT:
       return <MagnetContentText text={magnet.description} />;
     case RESOURCE_TYPE.IMAGE:
@@ -43,10 +44,6 @@ export const displayContentByType = (magnet: Card) => {
         />
       );
     case RESOURCE_TYPE.FILE:
-      return (
-        <MagnetContentSvgDisplay
-          extension={magnet.metadata.contentType.split("/")[1] as EXTENSION_TYPE}
-        />
-      );
+      return <MagnetContentSvgDisplay extension={magnet.metadata.extension} />;
   }
 };

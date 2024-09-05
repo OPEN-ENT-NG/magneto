@@ -1,7 +1,10 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 import { FC } from "react";
-import { MagnetContentAudioProps } from "./types";
+
 import { Box } from "@mui/material";
+
 import { audioWrapperStyle } from "./style";
+import { MagnetContentAudioProps } from "./types";
 import { RootsConst } from "~/core/constants/roots.const";
 
 export const MagnetContentAudio: FC<MagnetContentAudioProps> = ({

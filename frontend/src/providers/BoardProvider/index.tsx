@@ -27,6 +27,7 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [board, setBoard] = useState<Board>(new Board());
+  const [zoomLevel, setZoomLevel] = useState<number>(3);
 
   const { id = "" } = useParams();
 
@@ -44,12 +45,29 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     }
   }, [myBoardResult, mySectionsResult]);
 
+  const zoomIn = (): void => {
+    if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
+  };
+
+  const zoomOut = (): void => {
+    if (zoomLevel > 0) setZoomLevel(zoomLevel - 1);
+  };
+
+  const resetZoom = (): void => {
+    setZoomLevel(3);
+  };
+
   const value = useMemo<BoardContextType>(
     () => ({
       board,
       setBoard,
+      zoomLevel,
+      setZoomLevel,
+      zoomIn,
+      zoomOut,
+      resetZoom,
     }),
-    [board],
+    [board, zoomLevel],
   );
 
   return (

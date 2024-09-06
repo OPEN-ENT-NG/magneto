@@ -7,6 +7,9 @@ import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useTranslation } from "react-i18next";
+import { mdiKeyboardBackspace } from "@mdi/js";
+import Icon from "@mdi/react";
+
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -29,7 +32,12 @@ export const BoardView: FC = () => {
           <div className="no-background-image"></div>
         )}
         {(board.nbCards ?? 0) + (board.nbCardsSections ?? 0) === 0 && (
-          <div> coucou </div>
+          <div className="cards-empty-state">
+            <div className="card-empty-state-message">
+              {t("magneto.add.content.from.menu")}
+            </div>
+            <Icon path={mdiKeyboardBackspace} size={7} />
+          </div>
         )}
       </div>
 

@@ -7,7 +7,7 @@ import "./HeaderView.scss";
 import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { toastStyle } from "./style";
+import { leftWrapperStyle, toastStyle, wrapperBoxStyle } from "./style";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const HeaderView: FC = () => {
@@ -21,26 +21,9 @@ export const HeaderView: FC = () => {
 
   return (
     <AppHeader>
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxSizing: "border-box",
-          padding: "0 1rem 1rem 1rem",
-        }}
-      >
+      <Box sx={wrapperBoxStyle}>
         {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            boxSizing: "border-box",
-            gap: "3.5rem",
-          }}
-        >
+        <Box sx={leftWrapperStyle}>
           <Box sx={toastStyle}>
             <Icon path={mdiCheckCircle} size={1} />
             <span>

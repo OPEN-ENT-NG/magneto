@@ -23,9 +23,6 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   resetZoom,
   label = "Zoom",
 }: ZoomComponentProps) => {
-  useEffect(() => {
-    console.log(zoomLevel);
-  }, [zoomLevel]);
 
   return (
     <div className={`zoom`} style={{ opacity: opacity }}>

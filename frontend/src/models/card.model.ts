@@ -76,6 +76,7 @@ export interface IMetadata {
   contentTransferEncoding: string;
   charset: string;
   size: number;
+  extension: string;
 }
 
 export class CardForm {
@@ -295,6 +296,7 @@ export class Card {
       contentTransferEncoding: "",
       charset: "",
       size: -1,
+      extension: "",
     };
     this._nbOfComments = -1;
     this._lastComment = new CardComment();

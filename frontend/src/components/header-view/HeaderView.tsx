@@ -8,7 +8,6 @@ import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { leftWrapperStyle, toastStyle, wrapperBoxStyle } from "./style";
-import { toastStyle } from "./style";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const HeaderView: FC = () => {

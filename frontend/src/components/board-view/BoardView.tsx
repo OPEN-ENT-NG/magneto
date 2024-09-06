@@ -2,14 +2,14 @@ import { FC } from "react";
 
 import "./BoardView.scss";
 
+import { mdiKeyboardBackspace } from "@mdi/js";
+import Icon from "@mdi/react";
+import { useTranslation } from "react-i18next";
+
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
-import { useTranslation } from "react-i18next";
-import { mdiKeyboardBackspace } from "@mdi/js";
-import Icon from "@mdi/react";
-
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -22,7 +22,7 @@ export const BoardView: FC = () => {
       <SideMenu sideMenuData={sideMenuData} />
 
       <div className="board-body">
-        {!!board.backgroundUrl ? (
+        {board.backgroundUrl ? (
           <img
             src={board.backgroundUrl}
             alt="backgroundImage"

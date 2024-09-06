@@ -7,9 +7,9 @@
 }
 
 main.container-fluid:has(.board-body) {
- padding: unset !important;
- width: 100%;
- margin-left: 8.1rem;
+  padding: unset !important;
+  width: 100%;
+  margin-left: 8.1rem;
 }
 
 .board-body {
@@ -39,9 +39,5 @@ main.container-fluid:has(.board-body) {
     &-message {
       padding: $spacing-L;
     }
-
-
-  
   }
-  
 }

@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import "./HeaderView.scss"
+import "./HeaderView.scss";
 
 import { AppHeader, Breadcrumb, Button, useOdeClient } from "@edifice-ui/react";
 import { mdiCheckCircle } from "@mdi/js";

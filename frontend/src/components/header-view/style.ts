@@ -16,6 +16,7 @@ export const wrapperBoxStyle = {
   alignItems: "center",
   boxSizing: "border-box",
   padding: "0 1rem",
+  marginTop: "67px",
 };
 
 export const leftWrapperStyle = {

@@ -15,7 +15,7 @@ export const wrapperBoxStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   boxSizing: "border-box",
-  padding: "0 1rem 1rem 1rem",
+  padding: "0 1rem",
 };
 
 export const leftWrapperStyle = {

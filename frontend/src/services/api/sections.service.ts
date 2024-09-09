@@ -7,7 +7,7 @@ export const sectionsApi = emptySplitApi.injectEndpoints({
       query: (boardId: string) => {
         return `sections/${boardId}`;
       },
-      providesTags: ["Sections"],
+      providesTags: (result, error, arg) => [{ type: "Sections", id: arg }],
     }),
   }),
 });

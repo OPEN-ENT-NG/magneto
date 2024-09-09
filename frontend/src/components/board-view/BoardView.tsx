@@ -10,11 +10,22 @@ import { useBoard } from "~/providers/BoardProvider";
 export const BoardView: FC = () => {
   const sideMenuData = useSideMenuData();
   const { zoomLevel, zoomIn, zoomOut, resetZoom } = useBoard();
+  const { board } = useBoard();
 
   return (
     <>
       <SideMenu sideMenuData={sideMenuData} />
-
+      <div>
+        {board.sections[0]?.cards?.map((card) => {
+          return (
+            <SidemenuIcon
+              action={menuIcon.action}
+              icon={menuIcon.icon}
+              name={menuIcon.name}
+            />
+          );
+        })}
+      </div>
       <div className="zoom-container">
         <ZoomComponent
           opacity={0.75}

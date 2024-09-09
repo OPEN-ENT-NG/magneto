@@ -24,5 +24,6 @@ export const UlWrapper = styled("ul")(() => {
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
+    marginLeft: "15px",
   };
 });

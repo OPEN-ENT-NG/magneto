@@ -6,10 +6,16 @@
   position: fixed;
 }
 
+header.header:has(+ main.container-fluid) {
+  position: fixed;
+  width: 100%;
+}
+
 main.container-fluid:has(.board-body) {
   padding: unset !important;
   width: 100%;
   margin-left: 8.1rem;
+  max-width: 93%;
 }
 
 .board-body {
@@ -34,7 +40,8 @@ main.container-fluid:has(.board-body) {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 13% 36%;
+    padding: 12.5% 36%;
+    color: $magneto-dark-grey;
 
     &-message {
       padding: $spacing-L;

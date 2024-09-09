@@ -16,7 +16,6 @@ export const HeaderView: FC = () => {
   const { board } = useBoard();
   const { currentApp } = useOdeClient();
   const { t } = useTranslation("magneto");
-  console.log(board);
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
   const onClick = () => console.log("read clicked");

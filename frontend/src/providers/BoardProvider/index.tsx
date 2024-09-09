@@ -14,6 +14,8 @@ import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board } from "~/models/board.model";
 import { useGetBoardsByIdsQuery } from "~/services/api/boards.service";
 import { useGetSectionsByBoardQuery } from "~/services/api/sections.service";
+import { Card } from "~/models/card.model";
+import { useGetAllCardsByBoardQuery } from "~/services/api/cards.service";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -27,6 +29,7 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [board, setBoard] = useState<Board>(new Board());
+  const [cards, setCards] = useState<Card[]>([]);
   const [zoomLevel, setZoomLevel] = useState<number>(3);
 
   const { id = "" } = useParams();
@@ -35,15 +38,23 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
 
   const { currentData: mySectionsResult } = useGetSectionsByBoardQuery(id);
 
+  const { currentData: myCardsResult } = useGetAllCardsByBoardQuery({
+    page: 0,
+    boardId: id,
+    fromStartPage: true
+  });
+
   useEffect(() => {
-    if (!!myBoardResult && !!mySectionsResult) {
+    if (!!myBoardResult && (!!mySectionsResult?.all.length || !!myCardsResult?.all.length)) {
       const boardResult = new Board().build(myBoardResult.all[0]);
-      if (boardResult.layoutType != LAYOUT_TYPE.FREE) {
+      if (!!mySectionsResult?.all.length) {
         boardResult.sections = mySectionsResult.all;
+      } else if (!!myCardsResult.all.length ) {
+        boardResult.cards = myCardsResult.all;
       }
       setBoard(boardResult);
     }
-  }, [myBoardResult, mySectionsResult]);
+  }, [myBoardResult, mySectionsResult, myCardsResult]);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);

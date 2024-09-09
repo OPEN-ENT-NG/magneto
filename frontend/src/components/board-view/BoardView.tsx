@@ -10,12 +10,27 @@ import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
+import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
+import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
 
   const sideMenuData = useSideMenuData();
   const { board, zoomLevel, zoomIn, zoomOut, resetZoom } = useBoard();
+
+  const getBoardLayout = () => {
+    switch(board.layoutType) {
+       case LAYOUT_TYPE.FREE:
+        return <CardsFreeLayout />;
+      case LAYOUT_TYPE.HORIZONTAL:
+        return <div>HORIZONTAL</div>;
+      case LAYOUT_TYPE.VERTICAL:
+        return <div>VERTICAL</div>;
+      default:
+        return <></>;
+    }
+  }
 
   return (
     <>
@@ -39,6 +54,14 @@ export const BoardView: FC = () => {
             <Icon path={mdiKeyboardBackspace} size={7} />
           </div>
         )}
+
+        {(!!board.cardIds?.length || !!board.sections?.length) && (
+          <div className="board-layout">
+            {getBoardLayout()}
+          </div>
+        )}
+
+        
       </div>
 
       <div className="zoom-container">

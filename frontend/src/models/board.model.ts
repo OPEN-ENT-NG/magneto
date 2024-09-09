@@ -424,7 +424,7 @@ export class Board /*implements Shareable*/ {
   }
 
   get sectionsIds(): Array<string> {
-    return this._sections.map((section) => section.id);
+    return this._sections.map((section) => section._id);
   }
 
   set sections(value: Section[]) {
@@ -503,7 +503,7 @@ export class Board /*implements Shareable*/ {
 
   sortSections(value: Array<string>) {
     return this._sections.sort(
-      (a, b) => value.indexOf(a.id) - value.indexOf(b.id),
+      (a, b) => value.indexOf(a._id) - value.indexOf(b._id),
     );
   }
 

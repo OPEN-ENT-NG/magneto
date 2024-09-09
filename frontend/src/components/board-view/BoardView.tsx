@@ -31,7 +31,7 @@ export const BoardView: FC = () => {
         ) : (
           <div className="no-background-image"></div>
         )}
-        {(board.nbCards ?? 0) + (board.nbCardsSections ?? 0) === 0 && (
+        {(!board.cardIds?.length && !board.sections?.length) && (
           <div className="cards-empty-state">
             <div className="card-empty-state-message">
               {t("magneto.add.content.from.menu")}

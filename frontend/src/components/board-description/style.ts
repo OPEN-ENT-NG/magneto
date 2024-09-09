@@ -6,7 +6,7 @@ export const StyledTypography = styled(Typography)<StyledTypographyProps>(
   ({ isOverflowing }) => ({
     maxWidth: "100%",
     overflow: "hidden",
-    whiteSpace: "normal",
+    whiteSpace: "pre-wrap",
     wordWrap: "break-word",
     overflowWrap: "break-word",
     maxHeight: "7rem",
@@ -23,13 +23,14 @@ export const StyledTypography = styled(Typography)<StyledTypographyProps>(
 
 export const buttonStyle = {
   alignSelf: "flex-start",
-  mt: 1,
-  color: "#E50037",
+  color: "#2A9CC8",
   fontSize: "1.2rem",
   fontWeight: "bolder",
   fontFamily: "roboto",
+  padding: 0,
   "&:hover": {
-    backgroundColor: "rgba(229, 0, 55, 0.1)",
+    color: "#FF8500",
+    backgroundColor: "transparent",
   },
 };
 

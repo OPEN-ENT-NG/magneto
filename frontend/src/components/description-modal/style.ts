@@ -21,7 +21,7 @@ export const headerStyle = {
 };
 
 export const titleStyle = {
-  color: "#E50037",
+  color: "#2A9CC8",
   fontWeight: "bold",
 };
 
@@ -72,7 +72,7 @@ export const contentContainerStyle = {
 
 export const descriptionStyle = {
   fontSize: "1.4rem",
-  whiteSpace: "normal",
+  whiteSpace: "pre-wrap",
   wordWrap: "break-word",
   overflowWrap: "break-word",
 };

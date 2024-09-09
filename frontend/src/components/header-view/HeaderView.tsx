@@ -10,13 +10,13 @@ import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { leftWrapperStyle, toastStyle, wrapperBoxStyle } from "./style";
+import { BoardDescription } from "../board-description/BoardDescription";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const HeaderView: FC = () => {
   const { board } = useBoard();
   const { currentApp } = useOdeClient();
   const { t } = useTranslation("magneto");
-  console.log(board);
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
   const onClick = () => console.log("read clicked");
@@ -46,6 +46,7 @@ export const HeaderView: FC = () => {
           </Button>
         </Box>
       </Box>
+      {!!board.description && <BoardDescription />}
     </AppHeader>
   );
 };

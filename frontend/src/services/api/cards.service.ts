@@ -7,6 +7,13 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       query: (params: ICardsParamsRequest) =>
         `cards/collection?boardId=${params.boardId}&searchText=${params.searchText}&sortBy=${params.sortBy}&isPublic=${params.isPublic}&isFavorite=${params.isFavorite}&isShared=${params.isShared}&page=${params.page}`,
     }),
+    getAllCardsByBoard: builder.query({
+      query: (params: ICardsParamsRequest) => {
+        let pageParams: string = params.page !== null && params.page !== undefined ? `?page=${params.page}` : '';
+        let fromStartPage: string = params.fromStartPage !== null && params.fromStartPage !== undefined ? `&fromStartPage=${params.fromStartPage}` : '';
+        return `cards/${params.boardId}${pageParams}${fromStartPage}`
+      }
+    }),
     getCardsBySection: builder.query<ICardsResponse, string>({
       query: (sectionId: string) => {
         return `cards/section/${sectionId}`;
@@ -21,7 +28,7 @@ export const cardsApi = emptySplitApi.injectEndpoints({
 });
 
 export const {
-  useGetAllCardsCollectionQuery,
+  useGetAllCardsCollectionQuery, useGetAllCardsByBoardQuery,
   useLazyGetCardsBySectionQuery,
   useLazyGetAllCardsByBoardIdQuery,
 } = cardsApi;

@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 
 import { mdiMinus, mdiPlus } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -23,10 +23,6 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   resetZoom,
   label = "Zoom",
 }: ZoomComponentProps) => {
-  useEffect(() => {
-    console.log(zoomLevel);
-  }, [zoomLevel]);
-
   return (
     <div className={`zoom`} style={{ opacity: opacity }}>
       <div

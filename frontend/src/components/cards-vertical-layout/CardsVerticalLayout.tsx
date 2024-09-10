@@ -6,6 +6,7 @@ import {
   SectionWrapper,
   MagnetWrapper,
   sectionNameWrapperStyle,
+  mainWrapperProps,
 } from "./style";
 import { MagnetContent } from "../magnet-content/MagnetContent";
 import { SectionName } from "../section-name/SectionName";
@@ -17,28 +18,22 @@ export const CardsVerticalLayout: FC = () => {
   if (!board.sections?.length) return null;
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        background: "transparent",
-        zIndex: "1",
-        overflowX: "scroll",
-        overflowY: "hidden",
-      }}
-    >
+    <Box sx={mainWrapperProps}>
       {board.sections.map((section) => (
         <SectionWrapper key={section._id} sectionNumber={board.sections.length}>
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={section} />
           </Box>
           <MagnetWrapper sectionNumber={board.sections.length}>
-            {section.cards.map((card) => (
-              <Box key={card.id} sx={{ width: "20rem", height: "15rem" }}>
-                <MagnetContent magnet={card} />
-              </Box>
-            ))}
+            {section.cards.map(
+              (
+                card, //sera remplacé par la card
+              ) => (
+                <Box key={card.id} sx={{ width: "20rem", height: "15rem" }}>
+                  <MagnetContent magnet={card} />
+                </Box>
+              ),
+            )}
           </MagnetWrapper>
         </SectionWrapper>
       ))}

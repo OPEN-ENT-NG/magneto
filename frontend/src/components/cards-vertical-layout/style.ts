@@ -1,6 +1,6 @@
 import { styled } from "@mui/material";
 
-import { SectionWrapperStyle } from "./types";
+import { MagnetWrapperProps, SectionWrapperProps } from "./types";
 
 const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
   if (sectionNumber === 1) return "50%";
@@ -8,8 +8,17 @@ const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
   if (sectionNumber > 2) return "25%";
   return "";
 };
+export const mainWrapperProps = {
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  background: "transparent",
+  zIndex: "1",
+  overflowX: "scroll",
+  overflowY: "hidden",
+};
 
-export const SectionWrapper = styled("div")<SectionWrapperStyle>(({
+export const SectionWrapper = styled("div")<SectionWrapperProps>(({
   sectionNumber,
   isLast = false,
 }) => {
@@ -35,7 +44,7 @@ export const sectionNameWrapperStyle = {
   flexShrink: 0,
 };
 
-export const MagnetWrapper = styled("div")<{ sectionNumber: number }>(
+export const MagnetWrapper = styled("div")<MagnetWrapperProps>(
   ({ sectionNumber }) => ({
     display: "flex",
     flexWrap: sectionNumber > 2 ? "nowrap" : "wrap",

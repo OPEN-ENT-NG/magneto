@@ -26,6 +26,7 @@ export const BoardView: FC = () => {
       "--header-height",
       `${headerHeight}px`,
     );
+    console.log(headerHeight);
   }, [headerHeight]);
 
   const displayLayout = () => {
@@ -46,7 +47,7 @@ export const BoardView: FC = () => {
       <SideMenu sideMenuData={sideMenuData} />
       <div
         className="board-body"
-        style={{ height: `calc(84.5vh - ${headerHeight}px)` }}
+        style={{ height: `calc(100vh - ${headerHeight}px)` }}
       >
         {displayLayout()}
         {board.backgroundUrl ? (

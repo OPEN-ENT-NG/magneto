@@ -9,13 +9,20 @@ export const toastStyle = {
   color: "#2a9cc8",
 };
 
+export const mainWrapperStyle = {
+  padding: "0 2rem",
+  width: "100%",
+  gap: "1rem",
+  display: "flex",
+  flexDirection: "column",
+};
+
 export const wrapperBoxStyle = {
   width: "100%",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   boxSizing: "border-box",
-  padding: "0 1rem",
   marginTop: "67px",
 };
 

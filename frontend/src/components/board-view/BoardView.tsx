@@ -6,9 +6,11 @@ import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
+import { BoardBodyWrapper, BoardViewWrapper } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
+import { HeaderView } from "../header-view/HeaderView";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
@@ -43,12 +45,10 @@ export const BoardView: FC = () => {
   };
 
   return (
-    <>
+    <BoardViewWrapper layout={board.layoutType}>
+      <HeaderView />
       <SideMenu sideMenuData={sideMenuData} />
-      <div
-        className="board-body"
-        style={{ height: `calc(100vh - ${headerHeight}px)` }}
-      >
+      <BoardBodyWrapper layout={board.layoutType} headerHeight={headerHeight}>
         {displayLayout()}
         {board.backgroundUrl ? (
           <img
@@ -67,7 +67,7 @@ export const BoardView: FC = () => {
             <Icon path={mdiKeyboardBackspace} size={7} />
           </div>
         )}
-      </div>
+      </BoardBodyWrapper>
 
       <div className="zoom-container">
         <ZoomComponent
@@ -79,6 +79,6 @@ export const BoardView: FC = () => {
           resetZoom={resetZoom}
         />
       </div>
-    </>
+    </BoardViewWrapper>
   );
 };

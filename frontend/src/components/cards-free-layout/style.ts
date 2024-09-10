@@ -6,18 +6,6 @@ export const mainWrapperProps = {
   display: "flex",
   background: "transparent",
   zIndex: "1",
-  overflowY: "scroll",
-  overflowX: "hidden",
-};
-
-export const cardBoxStyle = {
-  width: "269px",
-  height: "264px",
-  backgroundColor: "white",
-  margin: "15px",
-
-  display: "flex",
-  position: "relative",
 };
 
 export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
@@ -59,7 +47,7 @@ export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
 });
 
 export const LiWrapper = styled("li")<{ isLast: boolean }>(({ isLast }) => {
-  return isLast ? { marginBottom: "15%" } : {};
+  return isLast ? { marginBottom: "30%" } : {};
 });
 
 export const UlWrapper = styled("ul")(() => {

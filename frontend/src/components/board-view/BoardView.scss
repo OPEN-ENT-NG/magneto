@@ -12,54 +12,45 @@ header.header:has(+ main.container-fluid) {
   width: 100%;
 }
 
-main.container-fluid:has(.board-body) {
+main.container-fluid {
   padding: unset !important;
   width: 100%;
   margin-left: 8.1rem;
   max-width: 93%;
 }
 
-.board-body {
-  position: relative;
-  display: flex;
-  border-top: solid 1px $magneto-white-blue;
-  border-bottom: solid 1px $magneto-white-blue;
-  background-size: cover;
+.no-background-image {
+  position: absolute;
+  background: $magneto-lighter-light-grey;
   width: 100%;
-  height: calc(100vh - var(--header-height, 0px));
+  min-height: 100rem;
+}
 
-  .no-background-image {
-    position: absolute;
-    background: $magneto-lighter-light-grey;
-    width: 100%;
-    min-height: 100rem;
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0 !important;
+}
+
+.cards-empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: $magneto-dark-grey;
+  text-align: center;
+  width: max-content;
+  max-width: 80%;
+
+  &-message {
+    padding: $spacing-L;
   }
-
-  .background-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0 !important;
-  }
-
-  .cards-empty-state {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: $magneto-dark-grey;
-    text-align: center;
-    width: max-content;
-    max-width: 80%;
-
-    &-message {
-      padding: $spacing-L;
-    }
-  }
+  // }
 }

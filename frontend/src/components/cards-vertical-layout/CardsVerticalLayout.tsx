@@ -11,6 +11,7 @@ import {
 import { MagnetContent } from "../magnet-content/MagnetContent";
 import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
+import { BoardMagnet } from "../board-magnet/BoardMagnet";
 
 export const CardsVerticalLayout: FC = () => {
   const { board } = useBoard();
@@ -29,9 +30,10 @@ export const CardsVerticalLayout: FC = () => {
               (
                 card, //sera remplacé par la card
               ) => (
-                <Box key={card.id} sx={{ width: "15rem", height: "10rem" }}>
+                <BoardMagnet magnet={card} />
+                /*<Box key={card.id} sx={{ width: "15rem", height: "10rem" }}>
                   <MagnetContent magnet={card} />
-                </Box>
+                </Box>*/
               ),
             )}
           </Box>

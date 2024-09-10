@@ -18,11 +18,9 @@ export const CardsFreeLayout: FC = () => {
       {board?.cards ? (
         <UlWrapper className="grid ps-0 list-unstyled mb-24 left-float">
           {board.cards
-            .map((card: Card) => {
+            .map((card: Card, index: number) => {
               return (                
-                <LiWrapper isFirst={false}>
-
-                
+                <LiWrapper isLast={index === board.cards.length -1}>
                   <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
                     {card.title} {/* will be replaced by card later */}
                   </CardBoxStyle>

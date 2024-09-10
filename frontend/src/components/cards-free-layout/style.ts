@@ -62,8 +62,8 @@ export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
   return { ...cardSize, ...cardProperties };
 });
 
-export const LiWrapper = styled("li")<{ isFirst: boolean }>(({ isFirst }) => {
-  return isFirst ? { marginLeft: "30px" } : {};
+export const LiWrapper = styled("li")<{ isLast: boolean }>(({ isLast }) => {
+  return isLast ? { marginBottom: "15%" } : {};
 });
 
 export const UlWrapper = styled("ul")(() => {

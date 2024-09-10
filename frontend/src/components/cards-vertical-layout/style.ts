@@ -1,6 +1,6 @@
 import { styled } from "@mui/material";
 
-import { MagnetWrapperProps, SectionWrapperProps } from "./types";
+import { SectionWrapperProps } from "./types";
 
 const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
   if (sectionNumber === 1) return "50%";
@@ -44,23 +44,18 @@ export const sectionNameWrapperStyle = {
   flexShrink: 0,
 };
 
-export const MagnetWrapper = styled("div")<MagnetWrapperProps>(
-  ({ sectionNumber }) => ({
-    display: "flex",
-    flexWrap: sectionNumber > 2 ? "nowrap" : "wrap",
-    flexDirection: sectionNumber > 2 ? "column" : "row",
-    alignItems: sectionNumber > 2 ? "center" : "flex-start",
-    justifyContent: "center",
-    gap: "1rem",
-    overflowY: "auto",
-    flexGrow: 1,
-    width: "100%",
-    "&::-webkit-scrollbar": {
-      width: "0.4rem",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "rgba(0,0,0,.3)",
-      borderRadius: "0.2rem",
-    },
-  }),
-);
+export const MagnetWrapperStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "1rem",
+  overflowY: "auto",
+  flexGrow: 1,
+  width: "100%",
+  "&::-webkit-scrollbar": {
+    width: "0.4rem",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "rgba(0,0,0,.3)",
+    borderRadius: "0.2rem",
+  },
+};

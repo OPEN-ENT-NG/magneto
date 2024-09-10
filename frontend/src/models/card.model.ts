@@ -512,9 +512,12 @@ export class Cards {
   // all: Array<Card>;
   page: number;
   pageCount: number;
+  all: Card[];
 
   constructor(data: ICardsResponse) {
-    // this.all = data.all.map((card: ICardItemResponse) => new Card().build(card));
+    this.all = data.all.map((card: ICardItemResponse) =>
+      new Card().build(card),
+    );
     this.page = data.page;
     this.pageCount = data.pageCount;
   }

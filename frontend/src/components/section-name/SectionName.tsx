@@ -67,13 +67,15 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         onKeyDown={handleKeyDown}
         fullWidth
       />
-      <IconButton
-        size="large"
-        sx={iconButtonStyle}
-        onClick={handleToggleDropdown}
-      >
-        <MoreVertIcon sx={iconStyle} />
-      </IconButton>
+      {section && (
+        <IconButton
+          size="large"
+          sx={iconButtonStyle}
+          onClick={handleToggleDropdown}
+        >
+          <MoreVertIcon sx={iconStyle} />
+        </IconButton>
+      )}
       {isOpen && (
         <DropDownList
           items={dropDownItemList}

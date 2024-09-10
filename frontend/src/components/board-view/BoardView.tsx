@@ -7,13 +7,13 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { useHeaderHeight } from "./useHeaderHeight";
+import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
-import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -67,8 +67,6 @@ export const BoardView: FC = () => {
             <Icon path={mdiKeyboardBackspace} size={7} />
           </div>
         )}
-
-        
       </div>
 
       <div className="zoom-container">

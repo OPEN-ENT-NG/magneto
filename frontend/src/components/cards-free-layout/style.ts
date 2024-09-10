@@ -10,7 +10,6 @@ export const mainWrapperProps = {
   overflowX: "hidden",
 };
 
-
 export const cardBoxStyle = {
   width: "269px",
   height: "264px",
@@ -19,11 +18,6 @@ export const cardBoxStyle = {
 
   display: "flex",
   position: "relative",
-  // justifyContent: "center",
-  // alignItems: "center",
-  // boxSizing: "border-box",
-  // padding: "0 1rem",
-  // marginTop: "67px",
 };
 
 export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
@@ -31,14 +25,16 @@ export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
 }) => {
   let cardSize = { width: "269px", height: "264px", margin: "15px" };
 
-  let cardProperties = {
+  const cardProperties = {
     backgroundColor: "white",
 
     display: "flex",
     position: "relative",
   };
 
-  switch (zoomLevel) { //will be replaced by card size later --> card margins etc
+  switch (
+    zoomLevel //will be replaced by card size later --> card margins etc
+  ) {
     case 0:
       cardSize = { width: "125px", height: "130px", margin: "2px" };
       break;

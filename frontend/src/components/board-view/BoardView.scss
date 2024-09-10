@@ -62,10 +62,4 @@ main.container-fluid:has(.board-body) {
       padding: $spacing-L;
     }
   }
-
-  .board-layout {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-  }
 }

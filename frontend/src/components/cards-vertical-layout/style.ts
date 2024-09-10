@@ -5,9 +5,11 @@ import { SectionWrapperProps } from "./types";
 const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
   if (sectionNumber === 1) return "50%";
   if (sectionNumber === 2) return "33%";
-  if (sectionNumber > 2) return "25%";
+  if (sectionNumber === 3) return "25%";
+  if (sectionNumber > 3) return "22%";
   return "";
 };
+
 export const mainWrapperProps = {
   width: "100%",
   height: "100%",
@@ -28,7 +30,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     flexDirection: "column",
     gap: "2rem",
     padding: "1rem",
-    minWidth: "25%",
+    minWidth: "22%",
     width: prepareWidth(sectionNumber),
     borderRight: !isLast ? "1px solid #aaa" : "",
     height: "100%",
@@ -47,6 +49,7 @@ export const sectionNameWrapperStyle = {
 export const MagnetWrapperStyle = {
   display: "flex",
   flexWrap: "wrap",
+  justifyContent: "center",
   gap: "1rem",
   overflowY: "auto",
   flexGrow: 1,

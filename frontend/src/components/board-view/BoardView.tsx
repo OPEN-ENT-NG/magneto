@@ -27,8 +27,9 @@ export const BoardView: FC = () => {
       `${headerHeight}px`,
     );
   }, [headerHeight]);
-  const displayLayout = (layoutType: LAYOUT_TYPE) => {
-    switch (layoutType) {
+
+  const displayLayout = () => {
+    switch (board.layoutType) {
       case LAYOUT_TYPE.FREE:
         return null; //freelayout quand il sera up
       case LAYOUT_TYPE.VERTICAL:
@@ -39,6 +40,7 @@ export const BoardView: FC = () => {
         return null; //freelayout quand il sera up
     }
   };
+
   return (
     <>
       <SideMenu sideMenuData={sideMenuData} />
@@ -46,7 +48,7 @@ export const BoardView: FC = () => {
         className="board-body"
         style={{ height: `calc(84.5vh - ${headerHeight}px)` }}
       >
-        {displayLayout(board.layoutType)}
+        {displayLayout()}
         {board.backgroundUrl ? (
           <img
             src={board.backgroundUrl}

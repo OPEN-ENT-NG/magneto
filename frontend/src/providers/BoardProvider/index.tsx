@@ -12,7 +12,12 @@ import { useParams } from "react-router-dom";
 import { BoardContextType, BoardProviderProps } from "./types";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board } from "~/models/board.model";
+import { Cards } from "~/models/card.model";
 import { useGetBoardsByIdsQuery } from "~/services/api/boards.service";
+import {
+  useLazyGetAllCardsByBoardIdQuery,
+  useLazyGetCardsBySectionQuery,
+} from "~/services/api/cards.service";
 import { useGetSectionsByBoardQuery } from "~/services/api/sections.service";
 
 const BoardContext = createContext<BoardContextType | null>(null);
@@ -32,18 +37,49 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const { id = "" } = useParams();
 
   const { currentData: myBoardResult } = useGetBoardsByIdsQuery([id]);
-
   const { currentData: mySectionsResult } = useGetSectionsByBoardQuery(id);
+  const [triggerGetCards] = useLazyGetCardsBySectionQuery();
+  const [triggerGetAllCards] = useLazyGetAllCardsByBoardIdQuery();
 
   useEffect(() => {
-    if (!!myBoardResult && !!mySectionsResult) {
-      const boardResult = new Board().build(myBoardResult.all[0]);
-      if (boardResult.layoutType != LAYOUT_TYPE.FREE) {
-        boardResult.sections = mySectionsResult.all;
+    const fetchCardData = async () => {
+      if (
+        myBoardResult &&
+        mySectionsResult &&
+        myBoardResult.all[0].layoutType !== LAYOUT_TYPE.FREE
+      ) {
+        const newBoard = new Board().build(myBoardResult.all[0]);
+        newBoard.sections = mySectionsResult.all;
+
+        const cardPromises = newBoard.sections.map((section) =>
+          triggerGetCards(section._id).unwrap(),
+        );
+        try {
+          const cardsResults = await Promise.all(cardPromises);
+          newBoard.sections = newBoard.sections.map((section, index) => ({
+            ...section,
+            cards: new Cards(cardsResults[index]).all,
+          }));
+          return setBoard(newBoard);
+        } catch (error) {
+          return console.error("Failed to fetch cards:", error);
+        }
       }
-      setBoard(boardResult);
-    }
-  }, [myBoardResult, mySectionsResult]);
+      if (myBoardResult) {
+        try {
+          const newBoard = new Board().build(myBoardResult.all[0]);
+          const allCardsResult = await triggerGetAllCards(id).unwrap();
+          const allCards = new Cards(allCardsResult).all;
+          newBoard.cards = allCards;
+          return setBoard(newBoard);
+        } catch (error) {
+          return console.error("Failed to fetch all cards for board:", error);
+        }
+      }
+    };
+
+    fetchCardData();
+  }, [myBoardResult, mySectionsResult, triggerGetCards, triggerGetAllCards]);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);

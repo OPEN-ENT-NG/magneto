@@ -26,7 +26,6 @@ export const BoardView: FC = () => {
       "--header-height",
       `${headerHeight}px`,
     );
-    console.log(headerHeight);
   }, [headerHeight]);
 
   const displayLayout = () => {

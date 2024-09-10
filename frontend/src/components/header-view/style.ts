@@ -10,7 +10,7 @@ export const toastStyle = {
 };
 
 export const mainWrapperStyle = {
-  padding: "0 2rem",
+  padding: "1rem 2rem",
   width: "100%",
   gap: "1rem",
   display: "flex",

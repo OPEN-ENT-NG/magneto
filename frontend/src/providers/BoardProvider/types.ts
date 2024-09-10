@@ -9,7 +9,6 @@ export interface BoardProviderProps {
 
 export type BoardContextType = {
   board: Board;
-  setBoard: Dispatch<SetStateAction<Board>>;
   zoomLevel: number;
   setZoomLevel: Dispatch<SetStateAction<number>>;
   zoomIn: () => void;

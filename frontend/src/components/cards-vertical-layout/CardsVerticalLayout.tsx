@@ -4,9 +4,9 @@ import { Box } from "@mui/material";
 
 import {
   SectionWrapper,
-  MagnetWrapper,
   sectionNameWrapperStyle,
   mainWrapperProps,
+  MagnetWrapperStyle,
 } from "./style";
 import { MagnetContent } from "../magnet-content/MagnetContent";
 import { SectionName } from "../section-name/SectionName";
@@ -24,17 +24,17 @@ export const CardsVerticalLayout: FC = () => {
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={section} />
           </Box>
-          <MagnetWrapper sectionNumber={board.sections.length}>
+          <Box sx={MagnetWrapperStyle}>
             {section.cards.map(
               (
                 card, //sera remplacé par la card
               ) => (
-                <Box key={card.id} sx={{ width: "20rem", height: "15rem" }}>
+                <Box key={card.id} sx={{ width: "15rem", height: "10rem" }}>
                   <MagnetContent magnet={card} />
                 </Box>
               ),
             )}
-          </MagnetWrapper>
+          </Box>
         </SectionWrapper>
       ))}
       <SectionWrapper sectionNumber={board.sections.length} isLast={true}>

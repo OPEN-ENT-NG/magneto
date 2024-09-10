@@ -26,7 +26,7 @@ export const HeaderView: FC = () => {
   const onClick = () => console.log("read clicked");
 
   return (
-    <AppHeader>
+    <AppHeader className="header-view">
       <Box sx={mainWrapperStyle}>
         <Box sx={wrapperBoxStyle}>
           {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}

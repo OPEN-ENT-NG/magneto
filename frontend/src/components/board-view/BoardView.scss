@@ -49,7 +49,7 @@ main.container-fluid:has(.board-body) {
   }
 
   .board-layout {
-    position: fixed;
+    position: absolute;
     display: flex;
     flex-direction: column;
   }

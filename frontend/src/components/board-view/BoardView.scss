@@ -2,8 +2,9 @@
 
 .zoom-container {
   align-self: center;
-  bottom: 1em;
+  bottom: 3rem;
   position: fixed;
+  z-index: 2;
 }
 
 header.header:has(+ main.container-fluid) {
@@ -19,29 +20,43 @@ main.container-fluid:has(.board-body) {
 }
 
 .board-body {
+  position: relative;
   display: flex;
   border-top: solid 1px $magneto-white-blue;
   border-bottom: solid 1px $magneto-white-blue;
   background-size: cover;
   width: 100%;
+  height: calc(100vh - var(--header-height, 0px));
 
   .no-background-image {
+    position: absolute;
     background: $magneto-lighter-light-grey;
     width: 100%;
     min-height: 100rem;
   }
 
   .background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0 !important;
   }
 
   .cards-empty-state {
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 12.5% 36%;
     color: $magneto-dark-grey;
+    text-align: center;
+    width: max-content;
+    max-width: 80%;
 
     &-message {
       padding: $spacing-L;

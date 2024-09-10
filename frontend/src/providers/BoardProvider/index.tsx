@@ -38,6 +38,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
 
   const { currentData: myBoardResult } = useGetBoardsByIdsQuery([id]);
   const { currentData: mySectionsResult } = useGetSectionsByBoardQuery(id);
+
   const [triggerGetCards] = useLazyGetCardsBySectionQuery();
   const [triggerGetAllCards] = useLazyGetAllCardsByBoardIdQuery();
 

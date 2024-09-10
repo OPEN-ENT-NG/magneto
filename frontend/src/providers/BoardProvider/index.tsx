@@ -85,13 +85,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
           return console.error("Failed to fetch all cards for board:", error);
         }
       }
-
-      if (!!myBoardResult && (!!myCardsResult?.all.length) {
-        const boardResult = new Board().build(myBoardResult.all[0]);
-        
-        boardResult.cards = myCardsResult.all;
-        setBoard(boardResult);
-      }
     };
 
     fetchCardData();

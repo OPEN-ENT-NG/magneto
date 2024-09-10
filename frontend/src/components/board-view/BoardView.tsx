@@ -13,7 +13,6 @@ import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
-import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 
 export const BoardView: FC = () => {
@@ -33,28 +32,15 @@ export const BoardView: FC = () => {
   const displayLayout = () => {
     switch (board.layoutType) {
       case LAYOUT_TYPE.FREE:
-        return null; //freelayout quand il sera up
+        return <CardsFreeLayout />;
       case LAYOUT_TYPE.VERTICAL:
         return <CardsVerticalLayout />;
       case LAYOUT_TYPE.HORIZONTAL:
         return null; //horizontallayout quand il sera up
       default:
-        return null; //freelayout quand il sera up
+        return <CardsFreeLayout />;
     }
   };
-
-  const getBoardLayout = () => {
-    switch(board.layoutType) {
-       case LAYOUT_TYPE.FREE:
-        return <CardsFreeLayout />;
-      case LAYOUT_TYPE.HORIZONTAL:
-        return <div>HORIZONTAL</div>;
-      case LAYOUT_TYPE.VERTICAL:
-        return <div>VERTICAL</div>;
-      default:
-        return <></>;
-    }
-  }
 
   return (
     <>
@@ -79,12 +65,6 @@ export const BoardView: FC = () => {
               {t("magneto.add.content.from.menu")}
             </div>
             <Icon path={mdiKeyboardBackspace} size={7} />
-          </div>
-        )}
-
-        {(!!board.cardIds?.length || !!board.sections?.length) && (
-          <div className="board-layout">
-            {getBoardLayout()}
           </div>
         )}
 

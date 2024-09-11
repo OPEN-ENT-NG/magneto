@@ -7,13 +7,13 @@ import {
   sectionNameWrapperStyle,
   mainWrapperProps,
   MagnetWrapperStyle,
+  CardBoxStyle,
 } from "./style";
-import { MagnetContent } from "../magnet-content/MagnetContent";
 import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsHorizontalLayout: FC = () => {
-  const { board } = useBoard();
+  const { board, zoomLevel } = useBoard();
 
   if (!board.sections?.length) return null;
 
@@ -29,9 +29,9 @@ export const CardsHorizontalLayout: FC = () => {
               (
                 card, //sera remplacé par la card
               ) => (
-                <Box key={card.id} sx={{ width: "15rem", height: "10rem" }}>
-                  <MagnetContent magnet={card} />
-                </Box>
+                <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
+                  {card.title} {/* will be replaced by card later */}
+                </CardBoxStyle>
               ),
             )}
           </Box>

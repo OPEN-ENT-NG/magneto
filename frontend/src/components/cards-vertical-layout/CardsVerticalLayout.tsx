@@ -22,7 +22,7 @@ export const CardsVerticalLayout: FC = () => {
       {board.sections.map((section) => (
         <SectionWrapper key={section._id} sectionNumber={board.sections.length}>
           <Box sx={sectionNameWrapperStyle}>
-            <SectionName section={section} boardId={board.id} />
+            <SectionName section={section} />
           </Box>
           <Box sx={MagnetWrapperStyle}>
             {section.cards.map(
@@ -39,7 +39,7 @@ export const CardsVerticalLayout: FC = () => {
       ))}
       <SectionWrapper sectionNumber={board.sections.length} isLast={true}>
         <Box sx={sectionNameWrapperStyle}>
-          <SectionName section={null} boardId={board.id} />
+          <SectionName section={null} />
         </Box>
       </SectionWrapper>
     </Box>

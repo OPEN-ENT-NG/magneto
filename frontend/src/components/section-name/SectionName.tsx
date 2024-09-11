@@ -12,22 +12,18 @@ import { Box, InputBase, IconButton } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { boxStyle, iconButtonStyle, iconStyle, inputStyle } from "./style";
+import { SectionNameProps } from "./types";
 import { useDropdown } from "./useDropDown";
 import { useCreateSectionDropDownItems } from "./utils";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
-import { Section } from "~/providers/BoardProvider/types";
+import { useBoard } from "~/providers/BoardProvider";
 import {
   useCreateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
 
-interface SectionNameProps {
-  section: Section | null;
-  boardId: string;
-}
-
-export const SectionName: FC<SectionNameProps> = ({ section, boardId }) => {
+export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const { t } = useTranslation("magneto");
   const dropDownItemList = useCreateSectionDropDownItems();
@@ -36,6 +32,9 @@ export const SectionName: FC<SectionNameProps> = ({ section, boardId }) => {
   const [updateSection] = useUpdateSectionMutation();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputWrapperRef = useRef<HTMLDivElement>(null);
+  const {
+    board: { id: boardId },
+  } = useBoard();
 
   useEffect(() => {
     if (section?._id) {

@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { CardBoxStyle, LiWrapper, UlWrapper, mainWrapperProps } from "./style";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
+import { BoardMagnet } from "../board-magnet/BoardMagnet";
 
 export const CardsFreeLayout: FC = () => {
   const { board, zoomLevel } = useBoard();
@@ -17,7 +18,7 @@ export const CardsFreeLayout: FC = () => {
             return (
               <LiWrapper isLast={index === board.cards.length - 1}>
                 <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
-                  {card.title} {/* will be replaced by card later */}
+                  <BoardMagnet magnet={card} />
                 </CardBoxStyle>
               </LiWrapper>
             );

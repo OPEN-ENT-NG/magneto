@@ -1,6 +1,6 @@
 //import { Behaviours, model, Shareable } from "entcore";
 
-import { Card } from "./card.model";
+import { Card, ICardItemResponse } from "./card.model";
 import { FOLDER_TYPE } from "../core/enums/folder-type.enum";
 import {} from "edifice-ts-client";
 import { LAYOUT_TYPE } from "../core/enums/layout-type.enum";
@@ -29,6 +29,7 @@ export interface IBoardItemResponse {
   canComment: boolean;
   displayNbFavorites: boolean;
   rights: any[];
+  cards: Card[];
 }
 
 export interface IBoardsResponse {
@@ -61,6 +62,14 @@ export interface IBoardPayload {
   layoutType?: LAYOUT_TYPE;
   canComment?: boolean;
   displayNbFavorites?: boolean;
+}
+
+export interface SectionPayload {
+  id?: string;
+  title?: string;
+  cardIds?: string[];
+  boardId: string;
+  displayed?: boolean;
 }
 
 export interface ISection {
@@ -388,6 +397,21 @@ export class Board /*implements Shareable*/ {
     this._isPublished = data.public;
     this.owner = { userId: data.ownerId, displayName: data.ownerName };
     this.shared = data.shared;
+    this._cards = data.cards
+      ? data.cards.map((cardData) =>
+          new Card().build(cardData as unknown as ICardItemResponse),
+        )
+      : [];
+    this._sections = data.sections
+      ? data.sections.map((sectionData: Section) => ({
+          ...sectionData,
+          cards: sectionData.cards
+            ? sectionData.cards.map((cardData) =>
+                new Card().build(cardData as unknown as ICardItemResponse),
+              )
+            : [],
+        }))
+      : [];
     this.rights = data.rights;
     this._deleted = data.deleted;
     this._canComment = data.canComment;

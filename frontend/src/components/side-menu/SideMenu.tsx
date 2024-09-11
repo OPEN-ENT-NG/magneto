@@ -18,11 +18,14 @@ export const SideMenu: FC<SideMenuProps> = ({ sideMenuData }) => {
     <div className={`side-menu open`} ref={sidemenuRef}>
       <div className="icons-container">
         {sideMenuData.map(
-          (menuIcon: SideMenuIconProp | SideMenuDividerProp) => {
+          (menuIcon: SideMenuIconProp | SideMenuDividerProp, index) => {
             return "divider" in menuIcon ? (
-              <>{menuIcon.divider && <hr className="items-divider"></hr>}</>
+              <div key={`divider-${Date.now() + index}`}>
+                {menuIcon.divider && <hr className="items-divider"></hr>}
+              </div>
             ) : (
               <SidemenuIcon
+                key={menuIcon.name}
                 action={menuIcon.action}
                 icon={menuIcon.icon}
                 name={menuIcon.name}

@@ -1,9 +1,12 @@
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import {
+  FetchBaseQueryError,
+  FetchBaseQueryMeta,
+} from "@reduxjs/toolkit/query";
 
 import { emptySplitApi } from "./empltySplitApi.service";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
-import { Board, IBoardItemResponse } from "~/models/board.model";
-import { Cards, ICardsResponse } from "~/models/card.model";
+import { IBoardItemResponse } from "~/models/board.model";
+import { ICardsResponse } from "~/models/card.model";
 import { Section } from "~/providers/BoardProvider/types";
 
 interface BoardsResponse {
@@ -14,18 +17,21 @@ interface SectionsResponse {
   all: Section[];
 }
 
-export const boardApi = emptySplitApi.injectEndpoints({
+export const boardDataApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
-    getBoardData: builder.query<Board, string>({
+    getBoardData: builder.query<unknown, string>({
       async queryFn(boardId, _queryApi, _extraOptions, fetchWithBQ) {
         const boardResult = (await fetchWithBQ({
           url: "boards",
           method: "POST",
           body: { boardIds: [boardId] },
-        })) as { data: BoardsResponse; error?: FetchBaseQueryError };
+        })) as {
+          error?: undefined;
+          data: BoardsResponse;
+          meta?: FetchBaseQueryMeta | undefined;
+        };
         if (boardResult.error) return { error: boardResult.error };
         const boardData = boardResult.data.all[0];
-        const newBoard = new Board().build(boardData);
 
         if (boardData.layoutType !== LAYOUT_TYPE.FREE) {
           const sectionsResult = (await fetchWithBQ(`sections/${boardId}`)) as {
@@ -33,26 +39,40 @@ export const boardApi = emptySplitApi.injectEndpoints({
             error?: FetchBaseQueryError;
           };
           if (sectionsResult.error) return { error: sectionsResult.error };
-          newBoard.sections = sectionsResult.data.all;
 
-          const cardPromises = newBoard.sections.map((section) =>
+          const cardPromises = sectionsResult.data.all.map((section) =>
             fetchWithBQ(`cards/section/${section._id}`),
           );
           const cardsResults = await Promise.all(cardPromises);
-          newBoard.sections = newBoard.sections.map((section, index) => ({
-            ...section,
-            cards: new Cards(cardsResults[index].data as ICardsResponse).all,
-          }));
+
+          const sectionsWithCards = sectionsResult.data.all.map(
+            (section, index) => ({
+              ...section,
+              cards: (cardsResults[index].data as ICardsResponse).all,
+            }),
+          );
+
+          return {
+            data: {
+              ...boardData,
+              sections: sectionsWithCards,
+            },
+          };
         } else {
           const allCardsResult = await fetchWithBQ(`cards/${boardId}`);
           if (allCardsResult.error) return { error: allCardsResult.error };
-          newBoard.cards = new Cards(allCardsResult.data as ICardsResponse).all;
+
+          return {
+            data: {
+              ...boardData,
+              cards: (allCardsResult.data as ICardsResponse).all,
+            },
+          };
         }
-        return { data: newBoard };
       },
       providesTags: ["BoardData"],
     }),
   }),
 });
 
-export const { useGetBoardDataQuery } = boardApi;
+export const { useGetBoardDataQuery } = boardDataApi;

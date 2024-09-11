@@ -37,23 +37,22 @@ export const BoardBodyWrapper = styled("div")<{
     borderBottom: "solid 1px $magneto-white-blue",
     backgroundSize: "cover",
     width: "100%",
-    minHeight: "100vh"
   };
 
   let layoutStyle;
 
   switch (layout) {
     case "free":
-      layoutStyle = { height: `100%` };
+      layoutStyle = { height: `100%`, minHeight: `100vh` };
       break;
     case "vertical":
-      layoutStyle = { height: `calc(100vh - ${headerHeight}px)` };
+      layoutStyle = { height: `calc(100vh - ${headerHeight}px)`, minHeight: `unset` };
       break;
     case "horizontal":
-      layoutStyle = { height: `calc(100vh - ${headerHeight}px)`,  minHeight: `unset` }; 
+      layoutStyle = { height: `calc(100vh - ${headerHeight}px)`, minHeight: `100vh` }; 
       break;
     default:
-      layoutStyle = { height: `100%` };
+      layoutStyle = { height: `100%`, minHeight: `100vh`  };
       break;
   }
   return { ...layoutStyle, ...boardStyle };

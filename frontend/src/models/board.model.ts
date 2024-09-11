@@ -63,6 +63,14 @@ export interface IBoardPayload {
   displayNbFavorites?: boolean;
 }
 
+export interface SectionPayload {
+  id?: string;
+  title?: string;
+  cardIds?: string[];
+  boardId: string;
+  displayed?: boolean;
+}
+
 export interface ISection {
   title: string;
   cardIds?: Array<string>;

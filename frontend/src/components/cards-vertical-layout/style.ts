@@ -50,6 +50,7 @@ export const MagnetWrapperStyle = {
   display: "flex",
   flexWrap: "wrap",
   justifyContent: "center",
+  alignContent: "flex-start",
   gap: "1rem",
   overflowY: "auto",
   flexGrow: 1,

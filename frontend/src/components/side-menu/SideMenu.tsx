@@ -20,9 +20,12 @@ export const SideMenu: FC<SideMenuProps> = ({ sideMenuData }) => {
         {sideMenuData.map(
           (menuIcon: SideMenuIconProp | SideMenuDividerProp, index) => {
             return "divider" in menuIcon ? (
-              <div key={`divider-${Date.now() + index}`}>
-                {menuIcon.divider && <hr className="items-divider"></hr>}
-              </div>
+              menuIcon.divider && (
+                <hr
+                  key={`divider-${Date.now() + index}`}
+                  className="items-divider"
+                ></hr>
+              )
             ) : (
               <SidemenuIcon
                 key={menuIcon.name}

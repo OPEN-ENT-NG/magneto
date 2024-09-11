@@ -12,21 +12,29 @@ import { Box, InputBase, IconButton } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { boxStyle, iconButtonStyle, iconStyle, inputStyle } from "./style";
+import { SectionNameProps } from "./types";
 import { useDropdown } from "./useDropDown";
 import { useCreateSectionDropDownItems } from "./utils";
 import { DropDownList } from "../drop-down-list/DropDownList";
-import { Section } from "~/providers/BoardProvider/types";
-
-interface SectionNameProps {
-  section: Section | null;
-}
+import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
+import { useBoard } from "~/providers/BoardProvider";
+import {
+  useCreateSectionMutation,
+  useUpdateSectionMutation,
+} from "~/services/api/sections.service";
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const { t } = useTranslation("magneto");
   const dropDownItemList = useCreateSectionDropDownItems();
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
+  const [createSection] = useCreateSectionMutation();
+  const [updateSection] = useUpdateSectionMutation();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputWrapperRef = useRef<HTMLDivElement>(null);
+  const {
+    board: { id: boardId },
+  } = useBoard();
 
   useEffect(() => {
     if (section?._id) {
@@ -38,13 +46,41 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     setInputValue(event.target.value);
   };
 
-  const handleBlur = () => {
-    console.log("Input blurred:", inputValue);
+  const updateSectionAndToast = usePredefinedToasts({
+    func: updateSection,
+    successMessage: t("magneto.update.section.confirm"),
+    failureMessage: t("magneto.update.section.error"),
+  });
+
+  const createSectionAndToast = usePredefinedToasts({
+    func: createSection,
+    successMessage: t("magneto.create.section.confirm"),
+    failureMessage: t("magneto.create.section.error"),
+  });
+
+  const handleKeyDownAndBlur = async () => {
+    if (section) {
+      return updateSectionAndToast({
+        boardId,
+        id: section?._id,
+        title: inputValue,
+      });
+    }
+    try {
+      await createSectionAndToast({
+        boardId,
+        title: inputValue,
+      });
+      setInputValue("");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      console.log("Enter pressed:", inputValue);
+      const inputElement = inputWrapperRef.current?.querySelector("input");
+      inputElement?.blur();
     }
   };
 
@@ -61,10 +97,11 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       <InputBase
         sx={inputStyle}
         value={inputValue}
-        placeholder={t("magneto.section.insert.title")}
+        placeholder={section ? "" : t("magneto.section.insert.title")}
         onChange={handleInputChange}
-        onBlur={handleBlur}
+        onBlur={handleKeyDownAndBlur}
         onKeyDown={handleKeyDown}
+        ref={inputWrapperRef}
         fullWidth
       />
       {section && (

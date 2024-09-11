@@ -1,24 +1,10 @@
-import {
-  FC,
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, createContext, useContext, useMemo, useState } from "react";
 
 import { useParams } from "react-router-dom";
 
 import { BoardContextType, BoardProviderProps } from "./types";
-import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
-import { Board } from "~/models/board.model";
-import { Cards } from "~/models/card.model";
-import { useGetBoardsByIdsQuery } from "~/services/api/boards.service";
-import {
-  useLazyGetAllCardsByBoardIdQuery,
-  useLazyGetCardsBySectionQuery,
-} from "~/services/api/cards.service";
-import { useGetSectionsByBoardQuery } from "~/services/api/sections.service";
+import { Board, IBoardItemResponse } from "~/models/board.model";
+import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -31,56 +17,10 @@ export const useBoard = () => {
 };
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
-  const [board, setBoard] = useState<Board>(new Board());
   const [zoomLevel, setZoomLevel] = useState<number>(3);
 
   const { id = "" } = useParams();
-
-  const { currentData: myBoardResult } = useGetBoardsByIdsQuery([id]);
-  const { currentData: mySectionsResult } = useGetSectionsByBoardQuery(id);
-
-  const [triggerGetCards] = useLazyGetCardsBySectionQuery();
-  const [triggerGetAllCards] = useLazyGetAllCardsByBoardIdQuery();
-
-  useEffect(() => {
-    const fetchCardData = async () => {
-      if (
-        myBoardResult &&
-        mySectionsResult &&
-        myBoardResult.all[0].layoutType !== LAYOUT_TYPE.FREE
-      ) {
-        const newBoard = new Board().build(myBoardResult.all[0]);
-        newBoard.sections = mySectionsResult.all;
-
-        const cardPromises = newBoard.sections.map((section) =>
-          triggerGetCards(section._id).unwrap(),
-        );
-        try {
-          const cardsResults = await Promise.all(cardPromises);
-          newBoard.sections = newBoard.sections.map((section, index) => ({
-            ...section,
-            cards: new Cards(cardsResults[index]).all,
-          }));
-          return setBoard(newBoard);
-        } catch (error) {
-          return console.error("Failed to fetch cards:", error);
-        }
-      }
-      if (myBoardResult) {
-        try {
-          const newBoard = new Board().build(myBoardResult.all[0]);
-          const allCardsResult = await triggerGetAllCards(id).unwrap();
-          const allCards = new Cards(allCardsResult).all;
-          newBoard.cards = allCards;
-          return setBoard(newBoard);
-        } catch (error) {
-          return console.error("Failed to fetch all cards for board:", error);
-        }
-      }
-    };
-
-    fetchCardData();
-  }, [myBoardResult, mySectionsResult, triggerGetCards, triggerGetAllCards]);
+  const { data: boardData } = useGetBoardDataQuery(id);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -94,10 +34,14 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     setZoomLevel(3);
   };
 
+  const board = boardData
+    ? new Board().build(boardData as IBoardItemResponse)
+    : new Board();
+  console.log(board);
+
   const value = useMemo<BoardContextType>(
     () => ({
       board,
-      setBoard,
       zoomLevel,
       setZoomLevel,
       zoomIn,

@@ -37,6 +37,7 @@ export const BoardBodyWrapper = styled("div")<{
     borderBottom: "solid 1px $magneto-white-blue",
     backgroundSize: "cover",
     width: "100%",
+    minHeight: "100vh"
   };
 
   let layoutStyle;
@@ -49,7 +50,7 @@ export const BoardBodyWrapper = styled("div")<{
       layoutStyle = { height: `calc(100vh - ${headerHeight}px)` };
       break;
     case "horizontal":
-      layoutStyle = {}; //changed in horizontal section dev
+      layoutStyle = { height: `calc(100vh - ${headerHeight}px)`,  minHeight: `unset` }; 
       break;
     default:
       layoutStyle = { height: `100%` };

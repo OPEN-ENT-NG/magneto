@@ -16,8 +16,6 @@ export const mainWrapperProps = {
   display: "flex",
   background: "transparent",
   zIndex: "1",
-  overflowX: "scroll",
-  overflowY: "hidden",
 };
 
 export const SectionWrapper = styled("div")<SectionWrapperProps>(({

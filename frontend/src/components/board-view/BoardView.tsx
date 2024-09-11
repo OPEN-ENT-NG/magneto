@@ -16,6 +16,7 @@ import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
+import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -38,7 +39,7 @@ export const BoardView: FC = () => {
       case LAYOUT_TYPE.VERTICAL:
         return <CardsVerticalLayout />;
       case LAYOUT_TYPE.HORIZONTAL:
-        return null; //horizontallayout quand il sera up
+        return <CardsHorizontalLayout />;
       default:
         return <CardsFreeLayout />;
     }

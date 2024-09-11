@@ -43,7 +43,7 @@ export const BoardBodyWrapper = styled("div")<{
 
   switch (layout) {
     case "free":
-      layoutStyle = { height: `calc(120vh - ${headerHeight}px)` };
+      layoutStyle = { height: `100%` };
       break;
     case "vertical":
       layoutStyle = { height: `calc(100vh - ${headerHeight}px)` };
@@ -52,7 +52,7 @@ export const BoardBodyWrapper = styled("div")<{
       layoutStyle = {}; //changed in horizontal section dev
       break;
     default:
-      layoutStyle = { height: `calc(100vh - ${headerHeight}px)` };
+      layoutStyle = { height: `100%` };
       break;
   }
   return { ...layoutStyle, ...boardStyle };

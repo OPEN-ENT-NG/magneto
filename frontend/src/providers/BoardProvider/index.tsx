@@ -37,6 +37,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const board = boardData
     ? new Board().build(boardData as IBoardItemResponse)
     : new Board();
+  console.log(board);
 
   const value = useMemo<BoardContextType>(
     () => ({

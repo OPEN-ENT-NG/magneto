@@ -29,6 +29,7 @@ export interface IBoardItemResponse {
   canComment: boolean;
   displayNbFavorites: boolean;
   rights: any[];
+  cards: Card[];
 }
 
 export interface IBoardsResponse {
@@ -396,6 +397,7 @@ export class Board /*implements Shareable*/ {
     this._isPublished = data.public;
     this.owner = { userId: data.ownerId, displayName: data.ownerName };
     this.shared = data.shared;
+    this._cards = data.cards;
     this.rights = data.rights;
     this._deleted = data.deleted;
     this._canComment = data.canComment;

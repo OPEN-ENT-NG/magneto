@@ -61,7 +61,6 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
         } else {
           const allCardsResult = await fetchWithBQ(`cards/${boardId}`);
           if (allCardsResult.error) return { error: allCardsResult.error };
-
           return {
             data: {
               ...boardData,

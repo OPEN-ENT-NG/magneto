@@ -10,9 +10,9 @@ import {
 import { useParams } from "react-router-dom";
 
 import { BoardContextType, BoardProviderProps } from "./types";
+import { fetchZoomPreference, updateZoomPreference } from "./utils";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
-import { fetchZoomPreference } from "./utils";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -45,9 +45,18 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     ? new Board().build(boardData as IBoardItemResponse)
     : new Board();
 
+  const prepareZoom = async () => {
+    const zoom = await fetchZoomPreference();
+    setZoomLevel(zoom);
+  };
+
   useEffect(() => {
-    fetchZoomPreference();
+    prepareZoom();
   }, []);
+
+  useEffect(() => {
+    updateZoomPreference(zoomLevel);
+  }, [zoomLevel]);
 
   const value = useMemo<BoardContextType>(
     () => ({

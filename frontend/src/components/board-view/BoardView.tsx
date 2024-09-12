@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { BoardBodyWrapper, BoardViewWrapper } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
+import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
 import { HeaderView } from "../header-view/HeaderView";
 import { SideMenu } from "../side-menu/SideMenu";
@@ -16,7 +17,6 @@ import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
-import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");

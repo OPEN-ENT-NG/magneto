@@ -7,12 +7,11 @@ import {
   sectionNameWrapperStyle,
   mainWrapperProps,
   CardBoxStyle,
-  LiWrapper,
   UlWrapper,
 } from "./style";
 import { SectionName } from "../section-name/SectionName";
-import { useBoard } from "~/providers/BoardProvider";
 import { Card } from "~/models/card.model";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsHorizontalLayout: FC = () => {
   const { board, zoomLevel } = useBoard();
@@ -23,23 +22,22 @@ export const CardsHorizontalLayout: FC = () => {
 
   return (
     <Box sx={mainWrapperProps}>
-      {board.sections.map((section, index: number) => (
+      {board.sections.map((section) => (
         <SectionWrapper noCards={section.cards.length === 0} key={section._id}>
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={section} />
           </Box>
           <UlWrapper className="grid ps-0 list-unstyled left-float">
-            {section.cards.map((card: Card, index: number) => {
-            return (
-              <li>
-                <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
-                  {card.title} {/* will be replaced by card later */}
-                </CardBoxStyle>
-              </li>
-            );
-          })}
+            {section.cards.map((card: Card) => {
+              return (
+                <li>
+                  <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
+                    {card.title} {/* will be replaced by card later */}
+                  </CardBoxStyle>
+                </li>
+              );
+            })}
           </UlWrapper>
-    
         </SectionWrapper>
       ))}
       <SectionWrapper isLast={true}>

@@ -2,8 +2,6 @@ import { styled } from "@mui/material";
 
 import { SectionWrapperProps, UlWrapperProps } from "./types";
 
-
-
 export const mainWrapperProps = {
   width: "100%",
   height: "100%",
@@ -51,7 +49,7 @@ export const sectionNameWrapperStyle = {
 };
 
 export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
-    return {
+  return {
     display: "inline-grid",
     flexDirection: "row",
     flexWrap: "wrap",
@@ -60,12 +58,12 @@ export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
     overflowX: "auto",
     direction: "ltr",
     "&::-webkit-scrollbar": {
-        height: "0.8rem",
-      },
+      height: "0.8rem",
+    },
     "&::-webkit-scrollbar-thumb": {
-        backgroundColor: "rgba(170,170,170,1)",
-        borderRadius: "0.3rem",
-      },
+      backgroundColor: "rgba(170,170,170,1)",
+      borderRadius: "0.3rem",
+    },
   };
 });
 

@@ -1,4 +1,4 @@
 export interface SectionWrapperProps {
-  sectionNumber: number;
+  noCards?: boolean;
   isLast?: boolean;
 }

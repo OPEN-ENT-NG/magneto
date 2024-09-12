@@ -54,10 +54,10 @@ export const MagnetWrapperStyle = {
   flexGrow: 1,
   width: "100%",
   "&::-webkit-scrollbar": {
-    width: "0.4rem",
+    width: "0.8rem",
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "rgba(0,0,0,.3)",
-    borderRadius: "0.2rem",
+    backgroundColor: "rgba(170,170,170,1)",
+    borderRadius: "0.3rem",
   },
 };

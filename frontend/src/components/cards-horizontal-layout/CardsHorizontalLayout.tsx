@@ -18,8 +18,6 @@ export const CardsHorizontalLayout: FC = () => {
 
   if (!board.sections?.length) return null;
 
-  console.log(board.sections);
-
   return (
     <Box sx={mainWrapperProps}>
       {board.sections.map((section) => (
@@ -30,8 +28,8 @@ export const CardsHorizontalLayout: FC = () => {
           <UlWrapper className="grid ps-0 list-unstyled left-float">
             {section.cards.map((card: Card) => {
               return (
-                <li>
-                  <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
+                <li key={card.id} >
+                  <CardBoxStyle zoomLevel={zoomLevel}>
                     {card.title} {/* will be replaced by card later */}
                   </CardBoxStyle>
                 </li>

@@ -17,9 +17,7 @@ export const CardsFreeLayout: FC = () => {
           {board.cards.map((card: Card, index: number) => {
             return (
               <LiWrapper isLast={index === board.cards.length - 1}>
-                <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
-                  <BoardMagnet magnet={card} />
-                </CardBoxStyle>
+                <BoardMagnet magnet={card} />
               </LiWrapper>
             );
           })}

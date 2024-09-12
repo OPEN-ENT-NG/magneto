@@ -18,7 +18,7 @@ import { MagnetContent } from "../magnet-content/MagnetContent";
 const StyledCardHeader = styled(CardHeader, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",
 })<{ zoomLevel: number }>(({ theme, zoomLevel }) => ({
-  padding: "5px",
+  padding: "0.5rem",
   paddingBottom: "0.1rem",
   "& .MuiCardHeader-content": {
     overflow: "hidden",
@@ -31,47 +31,54 @@ const StyledCardHeader = styled(CardHeader, {
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
-    fontSize: "14px",
+    fontSize: "1.4rem",
   },
   "& .MuiCardHeader-subheader": {
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
-    fontSize: "14px",
+    fontSize: "1.4rem",
   },
   "& .MuiCardHeader-avatar": {
-    marginRight: 8,
+    marginRight: "0.8rem",
     marginLeft: 0,
-    marginTop: -5,
+    marginTop: "-0.5rem",
   },
   "& .MuiCardHeader-action": {
-    marginLeft: 8,
-    marginRight: -4,
+    marginLeft: 0,
+    marginRight: "-0.4rem",
     marginTop: 0,
   },
 }));
 
 const StyledIconButton = styled(IconButton)({
   padding: 0,
-  width: "30px",
-  height: "30px",
+  width: "3rem",
+  height: "3rem",
   "& .MuiSvgIcon-root": {
-    fontSize: "24px",
+    fontSize: "2.4rem",
   },
 });
 
 export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
-  const { board, zoomLevel } = useBoard();
+  const { zoomLevel } = useBoard();
   const { user, avatar } = useUser();
 
   return (
-    <Card sx={{ width: "100%", height: "100%" }}>
+    <Card
+      sx={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <StyledCardHeader
         zoomLevel={zoomLevel}
         avatar={
           <Avatar
             aria-label="recipe"
-            sx={{ width: "30px", height: "30px", padding: 0 }}
+            sx={{ width: "3rem", height: "3rem", padding: 0 }}
             src={avatar}
           />
         }
@@ -85,49 +92,49 @@ export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
       />
       <CardContent
         sx={{
-          height: "60%",
+          flex: 1,
+          overflow: "hidden",
+          paddingLeft: "0.6rem",
+          pr: "0.6rem",
           paddingTop: 0,
-          paddingBottom: "1.5rem",
-          paddingLeft: "6px",
-          paddingRight: "6px",
+          paddingBottom: 0,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {zoomLevel < 2 ? (
-          <Typography
-            sx={{
-              fontSize: "16px",
-              fontWeight: "bold",
+        <Typography
+          sx={{
+            fontSize: "1.6rem",
+            fontWeight: "bold",
+            marginBottom: "0.5rem",
+            lineHeight: "1.8rem",
+            ...(zoomLevel < 2 && {
               display: "-webkit-box",
               overflow: "hidden",
               textOverflow: "ellipsis",
               WebkitLineClamp: zoomLevel === 0 ? "3" : "4",
               WebkitBoxOrient: "vertical",
-              width: "100%",
-              lineHeight: "18px",
-              height: "auto",
-            }}
-          >
-            {magnet.title}
-          </Typography>
-        ) : (
-          <Typography
-            noWrap
-            sx={{
-              fontSize: "16px",
-              fontWeight: "bold",
-              paddingBottom: "1.5rem",
-            }}
-          >
-            {magnet.title}
-          </Typography>
-        )}
-        {zoomLevel > 1 && <MagnetContent magnet={magnet} />}
-      </CardContent>
-      <CardActions disableSpacing sx={{ display: "flex" }}>
-        <IconButton
-          aria-label="add to favorites"
-          sx={{ flexGrow: 1, justifyContent: "flex-end" }}
+            }),
+            ...(zoomLevel >= 2 && {
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }),
+          }}
         >
+          {magnet.title}
+        </Typography>
+        {zoomLevel > 1 && (
+          <div style={{ flex: 1, overflow: "hidden" }}>
+            <MagnetContent magnet={magnet} />
+          </div>
+        )}
+      </CardContent>
+      <CardActions
+        disableSpacing
+        sx={{ justifyContent: "flex-end", padding: 0 }}
+      >
+        <IconButton aria-label="add to favorites" size="small">
           <FavoriteIcon />
         </IconButton>
       </CardActions>

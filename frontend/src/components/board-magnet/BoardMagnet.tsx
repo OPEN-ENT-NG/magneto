@@ -117,6 +117,7 @@ export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
   const { user, avatar } = useUser();
 
   const bottomDisplay = () => {
+    //TODO : TypographyStyled avec les props d'angular
     switch (magnet.resourceType) {
       case RESOURCE_TYPE.VIDEO:
         return (
@@ -158,7 +159,7 @@ export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
         return (
           <>
             <Icon path={mdiFileMultiple} size={1} />
-            Fichier //TODO : TypographyStyled avec les props d'angular
+            Fichier
           </>
         );
     }

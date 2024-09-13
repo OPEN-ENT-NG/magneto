@@ -8,10 +8,9 @@ import {
   mainWrapperProps,
   MagnetWrapperStyle,
 } from "./style";
-import { MagnetContent } from "../magnet-content/MagnetContent";
+import { BoardMagnet } from "../board-magnet/BoardMagnet";
 import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
-import { BoardMagnet } from "../board-magnet/BoardMagnet";
 
 export const CardsVerticalLayout: FC = () => {
   const { board } = useBoard();

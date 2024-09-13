@@ -1,14 +1,12 @@
-import IconButton from "@mui/material/IconButton";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useBoard } from "~/providers/BoardProvider";
-import { useUser } from "@edifice-ui/react";
 import { FC } from "react";
-import { BoardMagnetProps } from "./types";
-import { MagnetContent } from "../magnet-content/MagnetContent";
+
+import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
-import { useElapsedTime } from "~/hooks/useElapsedTime";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Tooltip } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+
 import {
   StyledTypography,
   StyledCard,
@@ -20,7 +18,11 @@ import {
   StyledContentTitleTypography,
   StyledCardActions,
 } from "./style";
+import { BoardMagnetProps } from "./types";
 import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
+import { MagnetContent } from "../magnet-content/MagnetContent";
+import { useElapsedTime } from "~/hooks/useElapsedTime";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
   const { zoomLevel } = useBoard();
@@ -68,7 +70,7 @@ export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
           </div>
         )}
       </StyledCardContent>
-      <StyledCardActions disableSpacing>
+      <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
         <StyledTypography>
           <Icon path={icon} size={1} />
           {type}

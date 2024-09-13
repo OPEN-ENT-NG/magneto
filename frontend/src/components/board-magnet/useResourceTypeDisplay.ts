@@ -6,6 +6,7 @@ import {
   mdiMusicNote,
   mdiPlayCircle,
 } from "@mdi/js";
+
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 
 export const useResourceTypeDisplay = (resourceType: string) => {

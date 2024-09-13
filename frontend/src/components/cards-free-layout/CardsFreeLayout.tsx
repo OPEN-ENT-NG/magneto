@@ -2,13 +2,13 @@ import { FC } from "react";
 
 import { Box } from "@mui/material";
 
-import { CardBoxStyle, LiWrapper, UlWrapper, mainWrapperProps } from "./style";
+import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
+import { BoardMagnet } from "../board-magnet/BoardMagnet";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
-import { BoardMagnet } from "../board-magnet/BoardMagnet";
 
 export const CardsFreeLayout: FC = () => {
-  const { board, zoomLevel } = useBoard();
+  const { board } = useBoard();
 
   return (
     <Box sx={mainWrapperProps}>

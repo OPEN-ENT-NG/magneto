@@ -6,9 +6,6 @@ import {
   CardHeader,
   IconButton,
   styled,
-  Tooltip,
-  tooltipClasses,
-  TooltipProps,
   Typography,
 } from "@mui/material";
 
@@ -99,18 +96,18 @@ export const StyledCardHeader = styled(CardHeader, {
     marginLeft: 0,
     marginRight: "-0.4rem",
     marginTop: 0,
-    pt: 0,
-    pb: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
 }));
 
 export const StyledCardContent = styled(CardContent)({
   flex: 1,
   overflow: "hidden",
-  pl: "0.6rem",
-  pr: "0.6rem",
+  paddingLeft: "0.6rem",
+  paddingRight: "0.6rem",
   paddingTop: 0,
-  paddingBottom: "1rem",
+  paddingBottom: 0,
   display: "flex",
   flexDirection: "column",
 });
@@ -142,7 +139,6 @@ export const StyledContentTitleTypography = styled(Typography, {
 })<{ zoomLevel: number }>(({ zoomLevel }) => ({
   fontSize: "1.6rem",
   fontWeight: "bold",
-  paddingBottom: "1rem",
   lineHeight: "1.8rem",
   overflowWrap: "break-word",
   ...(zoomLevel < 2 && {
@@ -151,19 +147,23 @@ export const StyledContentTitleTypography = styled(Typography, {
     textOverflow: "ellipsis",
     WebkitLineClamp: zoomLevel === 0 ? "3" : "4",
     WebkitBoxOrient: "vertical",
+    paddingBottom: 0,
   }),
   ...(zoomLevel >= 2 && {
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
+    paddingBottom: "1rem",
   }),
 }));
 
-export const StyledCardActions = styled(CardActions)({
+export const StyledCardActions = styled(CardActions, {
+  shouldForwardProp: (prop) => prop !== "zoomLevel",
+})<{ zoomLevel: number }>(({ zoomLevel }) => ({
   justifyContent: "space-between",
-  pr: "0.4rem",
-  pb: 0,
-  pt: 0,
-  pl: 0,
+  paddingRight: "0.4rem",
+  paddingBottom: 0,
+  paddingTop: zoomLevel < 2 ? 0 : "1rem",
+  paddingLeft: 0,
   alignItems: "center",
-});
+}));

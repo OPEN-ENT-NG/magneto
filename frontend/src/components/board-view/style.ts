@@ -52,7 +52,7 @@ export const BoardBodyWrapper = styled("div")<{
       };
       break;
     case "horizontal":
-      layoutStyle = { height: `100%`, minHeight: `100vh` };
+      layoutStyle = { height: `100%`, minHeight: `calc(100vh - ${headerHeight}px)` };
       break;
     default:
       layoutStyle = { height: `100%`, minHeight: `100vh` };

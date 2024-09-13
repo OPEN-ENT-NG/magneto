@@ -20,7 +20,6 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: "2rem",
     padding: "1rem 1rem 0 0",
     minWidth: "100%",
     width: "100%",
@@ -50,11 +49,12 @@ export const sectionNameWrapperStyle = {
 
 export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
   return {
-    display: "inline-grid",
+    display: "inline-flex",
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     marginBottom: "unset",
     marginLeft: "15px",
+    paddingTop: "unset !important",
     overflowX: "auto",
     direction: "ltr",
     "&::-webkit-scrollbar": {
@@ -70,35 +70,28 @@ export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
 export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
   zoomLevel,
 }) => {
-  let cardSize = { width: "269px", height: "264px", margin: "15px" };
-
-//   const cardProperties = {
-//     backgroundColor: "white",
-//     zIndex: "10000000000000",
-//     display: "inline-block",
-//     position: "relative",
-//   };
+  let cardSize = { margin: "0 0 15px 0" };
 
   switch (
     zoomLevel //will be replaced by card size later --> card margins etc
   ) {
     case 0:
-      cardSize = { width: "125px", height: "130px", margin: "2px" };
+      cardSize = { margin: "2px" };
       break;
     case 1:
-      cardSize = { width: "183px", height: "180px", margin: "5px" };
+      cardSize = { margin: "5px" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "223px", margin: "10px" };
+      cardSize = {margin: "10px" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "264px", margin: "15px" };
+      cardSize = { margin: "0 0 15px 0" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "310px", margin: "5px" };
+      cardSize = { margin: "5px" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "350px", margin: "15px" };
+      cardSize = { margin: "15px" };
       break;
   }
 

@@ -22,10 +22,8 @@ import { BoardCardProps } from "./types";
 import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
 import { CardContent } from "../card-content/CardContent";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
-import { useBoard } from "~/providers/BoardProvider";
 
-export const BoardCard: FC<BoardCardProps> = ({ card }) => {
-  const { zoomLevel } = useBoard();
+export const BoardCard: FC<BoardCardProps> = ({ card, zoomLevel }) => {
   const { user, avatar } = useUser();
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);

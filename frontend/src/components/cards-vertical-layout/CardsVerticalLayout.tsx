@@ -6,9 +6,9 @@ import {
   SectionWrapper,
   sectionNameWrapperStyle,
   mainWrapperProps,
-  MagnetWrapperStyle,
+  CardWrapperStyle,
 } from "./style";
-import { BoardMagnet } from "../board-magnet/BoardMagnet";
+import { BoardCard } from "../board-card/BoardCard";
 import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
 
@@ -24,9 +24,9 @@ export const CardsVerticalLayout: FC = () => {
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={section} />
           </Box>
-          <Box sx={MagnetWrapperStyle}>
+          <Box sx={CardWrapperStyle}>
             {section.cards.map((card) => (
-              <BoardMagnet magnet={card} />
+              <BoardCard card={card} />
             ))}
           </Box>
         </SectionWrapper>

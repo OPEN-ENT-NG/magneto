@@ -3,7 +3,7 @@ import { FC } from "react";
 import { Box } from "@mui/material";
 
 import { svgWrapperStyle } from "./style";
-import { MagnetContentSvgDisplayProps } from "./types";
+import { CardContentSvgDisplayProps } from "./types";
 import { AudioIcon } from "../SVG/AudioIcon";
 import { DefaultIcon } from "../SVG/DefaultIcon";
 import { DefaultLinkIcon } from "../SVG/DefaultLinkIcon";
@@ -14,7 +14,7 @@ import { TextIcon } from "../SVG/TextIcon";
 import { VideoIcon } from "../SVG/VideoIcon";
 import { EXTENSION_FORMAT } from "~/core/constants/extension-format.const";
 
-export const MagnetContentSvgDisplay: FC<MagnetContentSvgDisplayProps> = ({
+export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
 }) => {
   const getSvgByExtension = (extension: string): React.ReactElement => {

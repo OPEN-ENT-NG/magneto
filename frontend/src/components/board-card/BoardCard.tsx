@@ -18,17 +18,17 @@ import {
   StyledContentTitleTypography,
   StyledCardActions,
 } from "./style";
-import { BoardMagnetProps } from "./types";
+import { BoardCardProps } from "./types";
 import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
-import { MagnetContent } from "../magnet-content/MagnetContent";
+import { CardContent } from "../card-content/CardContent";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useBoard } from "~/providers/BoardProvider";
 
-export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
+export const BoardCard: FC<BoardCardProps> = ({ card }) => {
   const { zoomLevel } = useBoard();
   const { user, avatar } = useUser();
-  const { icon, type } = useResourceTypeDisplay(magnet.resourceType);
-  const time = useElapsedTime(magnet.modificationDate);
+  const { icon, type } = useResourceTypeDisplay(card.resourceType);
+  const time = useElapsedTime(card.modificationDate);
 
   return (
     <StyledCard zoomLevel={zoomLevel}>
@@ -62,11 +62,11 @@ export const BoardMagnet: FC<BoardMagnetProps> = ({ magnet }) => {
       />
       <StyledCardContent>
         <StyledContentTitleTypography zoomLevel={zoomLevel}>
-          {magnet.title}
+          {card.title}
         </StyledContentTitleTypography>
         {zoomLevel > 1 && (
           <div style={{ flex: 1, overflow: "hidden" }}>
-            <MagnetContent magnet={magnet} />
+            <CardContent card={card} />
           </div>
         )}
       </StyledCardContent>

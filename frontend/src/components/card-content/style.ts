@@ -1,4 +1,4 @@
-export const magnetContentWrapperStyle = {
+export const cardContentWrapperStyle = {
   width: "100%",
   height: "100%",
   cursor: "pointer",

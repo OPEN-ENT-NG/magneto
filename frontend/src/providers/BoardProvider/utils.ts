@@ -26,22 +26,15 @@ const convertZoomLevelToPreference = (level: number): number => {
   return 55 + level * 15;
 };
 
-export const fetchZoomPreference = async () => {
+const getPreference: (name: string) => Promise<number> = async (name) => {
   try {
-    const response = await fetch("userbook/preference/magneto");
-
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const preferenceObj = JSON.parse(data.preference);
-    const zoomPreference = preferenceObj.zoomPreferences;
-    const zoomLevel = convertPreferenceToZoomLevel(zoomPreference);
-    return zoomLevel;
+    const result: { zoomPreferences: number } = await odeServices
+      .conf()
+      .getPreference(name);
+    return result.zoomPreferences;
   } catch (error) {
-    console.error("zoom request Error", error);
-    return 3;
+    console.error("An error occurred:", error);
+    throw error;
   }
 };
 
@@ -53,6 +46,17 @@ const savePreference = async (
     .conf()
     .savePreference("magneto", JSON.stringify({ [key]: value }));
   return result;
+};
+
+export const fetchZoomPreference = async () => {
+  try {
+    const zoomPreferences = await getPreference("magneto");
+    const zoomLevel = convertPreferenceToZoomLevel(zoomPreferences);
+    return zoomLevel;
+  } catch (error) {
+    console.error("zoom request Error", error);
+    return 3;
+  }
 };
 
 export const updateZoomPreference = async (newZoomLevel: number) => {

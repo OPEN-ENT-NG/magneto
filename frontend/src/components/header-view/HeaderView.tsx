@@ -16,6 +16,7 @@ import {
 } from "./style";
 import { BoardDescription } from "../board-description/BoardDescription";
 import { useBoard } from "~/providers/BoardProvider";
+import { Section } from "~/providers/BoardProvider/types";
 
 export const HeaderView: FC = () => {
   const { board } = useBoard();
@@ -24,6 +25,13 @@ export const HeaderView: FC = () => {
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
   const onClick = () => console.log("read clicked");
+
+  const boardHasCards = (): boolean => {
+    return (
+      !!board.cardIds?.length ||
+      !!board.sections?.find((section: Section) => !!section.cardIds.length)
+    );
+  };
 
   return (
     <AppHeader className="header-view">
@@ -40,15 +48,17 @@ export const HeaderView: FC = () => {
                 })}
               </span>
             </Box>
-            <Button
-              color="primary"
-              type="button"
-              variant="filled"
-              onClick={onClick}
-              className="button"
-            >
-              {t("magneto.read")}
-            </Button>
+            {boardHasCards() && (
+              <Button
+                color="primary"
+                type="button"
+                variant="filled"
+                onClick={onClick}
+                className="button"
+              >
+                {t("magneto.read")}
+              </Button>
+            )}
           </Box>
         </Box>
         {!!board.description && <BoardDescription />}

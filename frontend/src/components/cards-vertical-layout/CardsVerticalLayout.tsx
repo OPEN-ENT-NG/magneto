@@ -26,16 +26,9 @@ export const CardsVerticalLayout: FC = () => {
             <SectionName section={section} />
           </Box>
           <Box sx={MagnetWrapperStyle}>
-            {section.cards.map(
-              (
-                card, //sera remplacé par la card
-              ) => (
-                <BoardMagnet magnet={card} />
-                /*<Box key={card.id} sx={{ width: "15rem", height: "10rem" }}>
-                  <MagnetContent magnet={card} />
-                </Box>*/
-              ),
-            )}
+            {section.cards.map((card) => (
+              <BoardMagnet magnet={card} />
+            ))}
           </Box>
         </SectionWrapper>
       ))}

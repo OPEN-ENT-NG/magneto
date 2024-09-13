@@ -26,9 +26,12 @@ export const HeaderView: FC = () => {
   const modificationHour = board.modificationDate.split(" ")[1];
   const onClick = () => console.log("read clicked");
 
-  const boardHasCards = () :boolean => {
-    return (!!board.cardIds?.length || !!board.sections?.find((section: Section) => !!section.cardIds.length));
-  }
+  const boardHasCards = (): boolean => {
+    return (
+      !!board.cardIds?.length ||
+      !!board.sections?.find((section: Section) => !!section.cardIds.length)
+    );
+  };
 
   return (
     <AppHeader className="header-view">
@@ -45,15 +48,17 @@ export const HeaderView: FC = () => {
                 })}
               </span>
             </Box>
-            {boardHasCards() && <Button
-              color="primary"
-              type="button"
-              variant="filled"
-              onClick={onClick}
-              className="button"
-            >
-              {t("magneto.read")}
-            </Button>}
+            {boardHasCards() && (
+              <Button
+                color="primary"
+                type="button"
+                variant="filled"
+                onClick={onClick}
+                className="button"
+              >
+                {t("magneto.read")}
+              </Button>
+            )}
           </Box>
         </Box>
         {!!board.description && <BoardDescription />}

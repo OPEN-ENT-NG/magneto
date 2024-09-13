@@ -16,6 +16,16 @@ export const mainWrapperProps = {
   display: "flex",
   background: "transparent",
   zIndex: "1",
+  overflowX: "auto",
+  "&::-webkit-scrollbar": {
+    height: "1.6rem",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "rgba(170,170,170,1)",
+    borderRadius: "0.6rem",
+    border: "0.4rem solid transparent",
+    backgroundClip: "padding-box",
+  },
 };
 
 export const SectionWrapper = styled("div")<SectionWrapperProps>(({
@@ -51,6 +61,7 @@ export const CardWrapperStyle = {
   alignContent: "flex-start",
   gap: "1rem",
   overflowY: "auto",
+  overflowX: "hidden",
   flexGrow: 1,
   width: "100%",
   "&::-webkit-scrollbar": {

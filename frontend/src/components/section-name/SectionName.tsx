@@ -64,6 +64,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         boardId,
         id: section?._id,
         title: inputValue,
+        cardIds: section.cardIds,
       });
     }
     try {

@@ -12,9 +12,7 @@ import {
 const handleCardSize = (zoomLevel: number) => {
   let cardSize = { width: "269px", height: "264px", margin: "15px" };
 
-  switch (
-    zoomLevel //will be replaced by card size later --> card margins etc
-  ) {
+  switch (zoomLevel) {
     case 0:
       cardSize = { width: "132px", height: "130px", margin: "2px" };
       break;
@@ -40,10 +38,12 @@ const handleCardSize = (zoomLevel: number) => {
 export const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",
 })<{ zoomLevel: number }>(({ zoomLevel }) => ({
+  overflow: "visible",
   display: "flex",
   position: "relative",
   flexDirection: "column",
   boxSizing: "border-box",
+  borderRadius: "1rem",
   width: handleCardSize(zoomLevel).width,
   height: handleCardSize(zoomLevel).height,
   margin: handleCardSize(zoomLevel).margin,
@@ -167,3 +167,9 @@ export const StyledCardActions = styled(CardActions, {
   paddingLeft: 0,
   alignItems: "center",
 }));
+
+export const cardContentWrapper = {
+  flex: 1,
+  overflow: "hidden",
+  borderRadius: "1rem",
+};

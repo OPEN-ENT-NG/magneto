@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { BoardBodyWrapper, BoardViewWrapper } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
+import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
 import { HeaderView } from "../header-view/HeaderView";
 import { SideMenu } from "../side-menu/SideMenu";
@@ -38,7 +39,7 @@ export const BoardView: FC = () => {
       case LAYOUT_TYPE.VERTICAL:
         return <CardsVerticalLayout />;
       case LAYOUT_TYPE.HORIZONTAL:
-        return null; //horizontallayout quand il sera up
+        return <CardsHorizontalLayout />;
       default:
         return <CardsFreeLayout />;
     }

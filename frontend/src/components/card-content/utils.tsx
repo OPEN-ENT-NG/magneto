@@ -1,0 +1,49 @@
+import { CardContentAudio } from "../card-content-audio/CardContentAudio";
+import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
+import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
+import { CardContentText } from "../card-content-text/cardContentText";
+import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
+import { Card } from "~/models/card.model";
+
+export const redirect = (url: string) => {
+  window.open(url, "_blank", "noopener,noreferrer");
+};
+export const onClick = (card: Card) => {
+  const cardType = card.resourceType as RESOURCE_TYPE;
+  switch (cardType) {
+    case RESOURCE_TYPE.VIDEO:
+    case RESOURCE_TYPE.LINK:
+      return redirect(card.resourceUrl);
+    case RESOURCE_TYPE.TEXT:
+      return null;
+    case RESOURCE_TYPE.IMAGE:
+      return null;
+    case RESOURCE_TYPE.AUDIO:
+      return null;
+    case RESOURCE_TYPE.FILE:
+      return null;
+  }
+};
+
+export const displayContentByType = (card: Card) => {
+  const cardType = card.resourceType as RESOURCE_TYPE;
+  switch (cardType) {
+    case RESOURCE_TYPE.VIDEO:
+      return <CardContentImageDisplay url={card.resourceUrl} />;
+    case RESOURCE_TYPE.LINK:
+      return <CardContentSvgDisplay extension="link" />;
+    case RESOURCE_TYPE.TEXT:
+      return <CardContentText text={card.description} />;
+    case RESOURCE_TYPE.IMAGE:
+      return <CardContentImageDisplay defaultImageSrc={card.resourceUrl} />;
+    case RESOURCE_TYPE.AUDIO:
+      return (
+        <CardContentAudio
+          ressourceId={card.resourceId}
+          type={card.metadata.contentType}
+        />
+      );
+    case RESOURCE_TYPE.FILE:
+      return <CardContentSvgDisplay extension={card.metadata.extension} />;
+  }
+};

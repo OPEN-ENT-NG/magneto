@@ -24,7 +24,7 @@ export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
     zoomLevel //will be replaced by card size later --> card margins etc
   ) {
     case 0:
-      cardSize = { width: "125px", height: "130px", margin: "2px" };
+      cardSize = { width: "132px", height: "127px", margin: "2px" };
       break;
     case 1:
       cardSize = { width: "183px", height: "180px", margin: "5px" };

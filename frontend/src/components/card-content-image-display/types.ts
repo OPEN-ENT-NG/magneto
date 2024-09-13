@@ -1,4 +1,4 @@
-export interface MagnetContentImageDisplayProps {
+export interface CardContentImageDisplayProps {
   url?: string;
   defaultImageSrc?: string;
 }

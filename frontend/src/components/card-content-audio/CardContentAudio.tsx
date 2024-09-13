@@ -4,10 +4,10 @@ import { FC } from "react";
 import { Box } from "@mui/material";
 
 import { audioWrapperStyle } from "./style";
-import { MagnetContentAudioProps } from "./types";
+import { CardContentAudioProps } from "./types";
 import { RootsConst } from "~/core/constants/roots.const";
 
-export const MagnetContentAudio: FC<MagnetContentAudioProps> = ({
+export const CardContentAudio: FC<CardContentAudioProps> = ({
   ressourceId,
   type,
 }) => {

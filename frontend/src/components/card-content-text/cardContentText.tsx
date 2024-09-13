@@ -8,9 +8,9 @@ import ReactHtmlParser, {
 } from "react-html-parser";
 
 import { textWrapperStyle } from "./style";
-import { MagnetContentTextProps } from "./types";
+import { CardContentTextProps } from "./types";
 
-export const MagnetContentText: FC<MagnetContentTextProps> = ({ text }) => {
+export const CardContentText: FC<CardContentTextProps> = ({ text }) => {
   const cleanHtml = DOMPurify.sanitize(text);
 
   const transform: Transform = (node, index) => {

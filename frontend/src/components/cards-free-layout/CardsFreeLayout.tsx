@@ -2,12 +2,13 @@ import { FC } from "react";
 
 import { Box } from "@mui/material";
 
-import { CardBoxStyle, LiWrapper, UlWrapper, mainWrapperProps } from "./style";
+import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
+import { BoardCard } from "../board-card/BoardCard";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsFreeLayout: FC = () => {
-  const { board, zoomLevel } = useBoard();
+  const { board } = useBoard();
 
   return (
     <Box sx={mainWrapperProps}>
@@ -16,9 +17,7 @@ export const CardsFreeLayout: FC = () => {
           {board.cards.map((card: Card, index: number) => {
             return (
               <LiWrapper isLast={index === board.cards.length - 1}>
-                <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
-                  {card.title} {/* will be replaced by card later */}
-                </CardBoxStyle>
+                <BoardCard card={card} />
               </LiWrapper>
             );
           })}

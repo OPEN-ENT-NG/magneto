@@ -44,7 +44,7 @@ export const sectionNameWrapperStyle = {
   flexShrink: 0,
 };
 
-export const MagnetWrapperStyle = {
+export const CardWrapperStyle = {
   display: "flex",
   flexWrap: "wrap",
   justifyContent: "center",

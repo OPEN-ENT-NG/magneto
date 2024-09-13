@@ -3,10 +3,10 @@ import { useState, useEffect, FC } from "react";
 import { CardMedia } from "@mui/material";
 
 import { imgStyle, videoImgStyle } from "./style";
-import { MagnetContentImageDisplayProps } from "./types";
+import { CardContentImageDisplayProps } from "./types";
 import { getVideoThumbnailUrl } from "./utils";
 
-export const MagnetContentImageDisplay: FC<MagnetContentImageDisplayProps> = ({
+export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
   url = "",
   defaultImageSrc = "",
 }) => {

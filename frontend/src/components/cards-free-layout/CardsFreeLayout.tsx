@@ -8,7 +8,7 @@ import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsFreeLayout: FC = () => {
-  const { board } = useBoard();
+  const { board, zoomLevel } = useBoard();
 
   return (
     <Box sx={mainWrapperProps}>
@@ -17,7 +17,7 @@ export const CardsFreeLayout: FC = () => {
           {board.cards.map((card: Card, index: number) => {
             return (
               <LiWrapper isLast={index === board.cards.length - 1}>
-                <BoardCard card={card} />
+                <BoardCard card={card} zoomLevel={zoomLevel} />
               </LiWrapper>
             );
           })}

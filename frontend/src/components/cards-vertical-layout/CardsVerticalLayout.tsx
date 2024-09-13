@@ -13,7 +13,7 @@ import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsVerticalLayout: FC = () => {
-  const { board } = useBoard();
+  const { board, zoomLevel } = useBoard();
 
   if (!board.sections?.length) return null;
 
@@ -26,7 +26,7 @@ export const CardsVerticalLayout: FC = () => {
           </Box>
           <Box sx={CardWrapperStyle}>
             {section.cards.map((card) => (
-              <BoardCard card={card} />
+              <BoardCard card={card} zoomLevel={zoomLevel} />
             ))}
           </Box>
         </SectionWrapper>

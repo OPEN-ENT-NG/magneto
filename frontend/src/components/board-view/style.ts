@@ -52,7 +52,7 @@ export const BoardBodyWrapper = styled("div")<{
       };
       break;
     case "horizontal":
-      layoutStyle = {}; //changed in horizontal section dev
+      layoutStyle = { height: `100%`, minHeight: `100vh` };
       break;
     default:
       layoutStyle = { height: `100%`, minHeight: `100vh` };

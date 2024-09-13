@@ -12,6 +12,7 @@ import {
 import { SectionName } from "../section-name/SectionName";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
+import { BoardCard } from "../board-card/BoardCard";
 
 export const CardsHorizontalLayout: FC = () => {
   const { board, zoomLevel } = useBoard();
@@ -30,7 +31,7 @@ export const CardsHorizontalLayout: FC = () => {
               return (
                 <li key={card.id}>
                   <CardBoxStyle zoomLevel={zoomLevel}>
-                    {card.title} {/* will be replaced by card later */}
+                    <BoardCard card={card} />
                   </CardBoxStyle>
                 </li>
               );

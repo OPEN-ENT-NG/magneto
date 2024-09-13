@@ -72,12 +72,12 @@ export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
 }) => {
   let cardSize = { width: "269px", height: "264px", margin: "15px" };
 
-  const cardProperties = {
-    backgroundColor: "white",
-    zIndex: "10000000000000",
-    display: "inline-block",
-    position: "relative",
-  };
+//   const cardProperties = {
+//     backgroundColor: "white",
+//     zIndex: "10000000000000",
+//     display: "inline-block",
+//     position: "relative",
+//   };
 
   switch (
     zoomLevel //will be replaced by card size later --> card margins etc
@@ -102,5 +102,5 @@ export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
       break;
   }
 
-  return { ...cardSize, ...cardProperties };
+  return { ...cardSize };
 });

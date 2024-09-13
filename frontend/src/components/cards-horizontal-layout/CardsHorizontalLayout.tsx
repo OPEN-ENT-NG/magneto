@@ -28,7 +28,7 @@ export const CardsHorizontalLayout: FC = () => {
           <UlWrapper className="grid ps-0 list-unstyled left-float">
             {section.cards.map((card: Card) => {
               return (
-                <li key={card.id} >
+                <li key={card.id}>
                   <CardBoxStyle zoomLevel={zoomLevel}>
                     {card.title} {/* will be replaced by card later */}
                   </CardBoxStyle>

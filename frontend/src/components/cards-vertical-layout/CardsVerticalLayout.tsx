@@ -28,7 +28,12 @@ export const CardsVerticalLayout: FC = () => {
           <Box sx={CardsWrapperStyle}>
             {section.cards.map((card) => (
               <CardWrapper key={card.id} zoomLevel={zoomLevel}>
-                <BoardCard card={card} />
+                <BoardCard
+                card={card}
+                zoomLevel={zoomLevel}
+                canComment={board.canComment}
+                key={card.id}
+              />
               </CardWrapper>
             ))}
           </Box>

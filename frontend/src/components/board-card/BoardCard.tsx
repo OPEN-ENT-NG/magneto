@@ -20,10 +20,15 @@ import {
 } from "./style";
 import { BoardCardProps } from "./types";
 import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
+import { CardComment } from "../card-comment/CardComment";
 import { CardContent } from "../card-content/CardContent";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 
-export const BoardCard: FC<BoardCardProps> = ({ card, zoomLevel }) => {
+export const BoardCard: FC<BoardCardProps> = ({
+  card,
+  zoomLevel,
+  canComment = false,
+}) => {
   const { user, avatar } = useUser();
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
@@ -77,6 +82,21 @@ export const BoardCard: FC<BoardCardProps> = ({ card, zoomLevel }) => {
           <StarBorderIcon />
         </IconButton>
       </StyledCardActions>
+      {isOpen && (
+        <DropDownList
+          items={dropDownItemList}
+          onClose={() => toggleDropdown(null)}
+        />
+      )}
+      {canComment && zoomLevel > 1 && (
+        <CardComment
+          commentData={{
+            cardComment: card.lastComment,
+            nbOfComment: card.nbOfComments,
+            cardId: card.id,
+          }}
+        />
+      )}
     </StyledCard>
   );
 };

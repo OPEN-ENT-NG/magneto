@@ -8,6 +8,10 @@ export const menuStyle = {
     border: "1px solid #e0e0e0",
     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
     outline: "none !important",
+    "& .MuiList-root": {
+      paddingTop: 0,
+      paddingBottom: 0,
+    },
     "&:focus": {
       outline: "none !important",
       border: "none !important",

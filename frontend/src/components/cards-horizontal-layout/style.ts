@@ -69,32 +69,30 @@ export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
 export const CardBoxStyle = styled("li")<{ zoomLevel: number }>(({
   zoomLevel,
 }) => {
-  let cardSize = { margin: "0 1.5rem 2rem 0" };
-
-  console.log(zoomLevel);
+  let cardMargin = { margin: "0 1.5rem 2rem 0" };
 
   switch (
     zoomLevel
   ) {
     case 0:
-      cardSize = { margin: "0 1.5rem 3rem 0" };
+      cardMargin = { margin: "0 1.5rem 3rem 0" };
       break;
     case 1:
-      cardSize = { margin: "0 1.5rem 2rem 0" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 2:
-      cardSize = {margin: "0 1.5rem 2rem 0" };
+      cardMargin = {margin: "0 1.5rem 2rem 0" };
       break;
     case 3:
-      cardSize = { margin: "0 1.5rem 2rem 0" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 4:
-      cardSize = { margin: "0 1.5rem 2rem 0" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 5:
-      cardSize = { margin: "0 1.5rem 2rem 0" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
   }
 
-  return { ...cardSize };
+  return { ...cardMargin };
 });

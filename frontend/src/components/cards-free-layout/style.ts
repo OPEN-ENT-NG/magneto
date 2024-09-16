@@ -8,15 +8,13 @@ export const mainWrapperProps = {
   zIndex: "1",
 };
 
-export const CardBoxStyle = styled("div")<{}>(({ zoomLevel }) => {});
-
 export const LiWrapper = styled("li")<{ isLast: boolean; zoomLevel: number }>(({
   isLast,
   zoomLevel,
 }) => {
-  let lastCardBottomMargin = isLast ? { marginBottom: "30%" } : {};
+  let lastCardBottomMargin = isLast ? { marginBottom: "30%"} : {};
 
-  let cardSize = { margin: "15px" };
+  let cardMargin = { margin: "0 5rem 1.5rem 1rem" };
 
   const cardProperties = {
     display: "flex",
@@ -25,27 +23,26 @@ export const LiWrapper = styled("li")<{ isLast: boolean; zoomLevel: number }>(({
 
   switch (zoomLevel) {
     case 0:
-      cardSize = { margin: "0 2rem 0 1rem" };
+      cardMargin = { margin: "0 1rem 1.5rem 0" };
       break;
     case 1:
-      cardSize = { margin: "0 2rem 0 1rem" };
+      cardMargin = { margin: "0 1rem 1.5rem 0" };
       break;
     case 2:
-      cardSize = { margin: "0 2rem 0 1rem" };
+      cardMargin = { margin: "0 3.5rem 1.5rem 1rem" };
       break;
     case 3:
-      cardSize = { margin: "0 2rem 0 1rem" };
+      cardMargin = { margin: "0 5rem 1.5rem 1rem" };
       break;
     case 4:
-      cardSize = { margin: "0 2rem 0 1rem" };
+      cardMargin = { margin: "0 1.15rem 1.5rem 0" };
       break;
     case 5:
-      cardSize = { margin: "0 2rem 0 1rem" };
+      cardMargin = { margin: "0 5rem 1.5rem 1rem" };
       break;
   }
 
-  return { ...cardSize, ...cardProperties, ...lastCardBottomMargin };
-  // return {  };
+  return { ...cardMargin, ...cardProperties, ...lastCardBottomMargin };
 });
 
 export const UlWrapper = styled("ul")(() => {
@@ -53,8 +50,8 @@ export const UlWrapper = styled("ul")(() => {
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    marginLeft: "5rem",
+    marginLeft: "4.5rem",
     gap: "unset",
-    // justifyContent: "space-evenly",
+    justifyContent: "space-evenly flex-start",
   };
 });

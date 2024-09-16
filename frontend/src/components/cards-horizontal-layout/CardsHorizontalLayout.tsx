@@ -30,7 +30,12 @@ export const CardsHorizontalLayout: FC = () => {
             {section.cards.map((card: Card) => {
               return (
                 <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
-                  <BoardCard card={card} />
+                  <BoardCard
+                    card={card}
+                    zoomLevel={zoomLevel}
+                    canComment={board.canComment}
+                    key={card.id}
+                  />
                 </CardBoxStyle>
               );
             })}

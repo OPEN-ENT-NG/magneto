@@ -57,7 +57,7 @@ export const commentTextStyle = {
   fontSize: "1.5rem",
   lineHeight: "1rem",
   boxSizing: "border-box",
-  padding: "2rem 0",
+  padding: "1.2rem 0",
 };
 
 export const inputContainerStyle = {

@@ -21,7 +21,12 @@ export const CardsFreeLayout: FC = () => {
                 isLast={index === board.cards.length - 1}
                 zoomLevel={zoomLevel}
               >
-                <BoardCard card={card} />
+                <BoardCard
+                  card={card}
+                  zoomLevel={zoomLevel}
+                  canComment={board.canComment}
+                  key={card.id}
+                />
               </LiWrapper>
             );
           })}

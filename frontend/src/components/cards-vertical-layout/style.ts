@@ -62,37 +62,36 @@ export const CardsWrapperStyle = {
     borderRadius: "0.3rem",
   },
 };
+const prepareCardSize = (zoomLevel: number) => {
+  switch (zoomLevel) {
+    case 0:
+      return { margin: "0 0.5rem 1.5rem 2rem" };
+
+    case 1:
+      return { margin: "0 auto 1.5rem" };
+
+    case 2:
+      return { margin: "0 auto 1.5rem" };
+
+    case 3:
+      return { margin: "0 auto 1.5rem" };
+
+    case 4:
+      return { margin: "0 0.25rem 1.5rem 0.25rem" };
+
+    case 5:
+      return { margin: "0 auto 1.5rem " };
+    default:
+      return { margin: "0 5rem 1.5rem 1rem" };
+  }
+};
 
 export const CardWrapper = styled("div")<{ zoomLevel: number }>(({
   zoomLevel,
 }) => {
-  let cardSize = { margin: "0 5rem 1.5rem 1rem" };
-
-  const cardProperties = {
+  return {
+    ...prepareCardSize(zoomLevel),
     display: "flex",
     position: "relative",
   };
-
-  switch (zoomLevel) {
-    case 0:
-      cardSize = { margin: "0 0.5rem 1.5rem 2rem" };
-      break;
-    case 1:
-      cardSize = { margin: "0 auto 1.5rem" };
-      break;
-    case 2:
-      cardSize = { margin: "0 auto 1.5rem" };
-      break;
-    case 3:
-      cardSize = { margin: "0 auto 1.5rem" };
-      break;
-    case 4:
-      cardSize = { margin: "0 0.25rem 1.5rem 0.25rem" };
-      break;
-    case 5:
-      cardSize = { margin: "0 auto 1.5rem " };
-      break;
-  }
-
-  return { ...cardSize, ...cardProperties };
 });

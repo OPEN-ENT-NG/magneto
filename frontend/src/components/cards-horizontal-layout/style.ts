@@ -1,6 +1,6 @@
 import { styled } from "@mui/material";
 
-import { SectionWrapperProps, UlWrapperProps } from "./types";
+import { SectionWrapperProps } from "./types";
 
 export const mainWrapperProps = {
   width: "100%",
@@ -15,7 +15,14 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
   noCards = false,
   isLast = false,
 }) => {
-  const sectionWrapperProperties = {
+  let marginBottomProperties = {};
+  if (isLast) {
+    marginBottomProperties = { marginBottom: "15%" };
+  } else if (noCards) {
+    marginBottomProperties = { marginBottom: "15%" };
+  }
+
+  return {
     boxSizing: "border-box",
     display: "flex",
     flexDirection: "row",
@@ -26,16 +33,8 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     height: "100%",
     overflow: "hidden",
     alignSelf: "center",
+    ...marginBottomProperties,
   };
-
-  let marginBottomProperties = {};
-  if (isLast) {
-    marginBottomProperties = { marginBottom: "15%" };
-  } else if (noCards) {
-    marginBottomProperties = { marginBottom: "15%" };
-  }
-
-  return { ...sectionWrapperProperties, ...marginBottomProperties };
 });
 
 export const sectionNameWrapperStyle = {
@@ -46,7 +45,7 @@ export const sectionNameWrapperStyle = {
   flexShrink: 0,
 };
 
-export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
+export const UlWrapper = styled("ul")(() => {
   return {
     display: "inline-flex",
     flexDirection: "row",

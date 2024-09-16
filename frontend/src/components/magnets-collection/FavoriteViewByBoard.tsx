@@ -1,7 +1,6 @@
 import { FunctionComponent } from "react";
 
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
-import { animated } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
 import { BoardCard } from "../board-card/BoardCard";
@@ -10,6 +9,8 @@ import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board } from "~/models/board.model";
 import { Card as CardModel } from "~/models/card.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
+import { UlWrapperFavorite } from "./style";
+import { LiWrapper } from "../cards-free-layout/style";
 
 type FavoriteViewByBoardProps = {
   boardsWithCards: Board[];
@@ -21,7 +22,7 @@ type FavoriteViewByBoardProps = {
 
 export const FavoriteViewByBoard: FunctionComponent<
   FavoriteViewByBoardProps
-> = ({ boardsWithCards, searchText, springs }: FavoriteViewByBoardProps) => {
+> = ({ boardsWithCards, searchText }: FavoriteViewByBoardProps) => {
   const { t } = useTranslation("magneto");
   const [duplicateBoard] = useDuplicateBoardMutation();
 
@@ -65,7 +66,7 @@ export const FavoriteViewByBoard: FunctionComponent<
                   {" " + t("magneto.cards.collection.board.duplicate")}
                 </span>
               </div>
-              <animated.ul className="grid ps-0 list-unstyled mb-24">
+              <UlWrapperFavorite>
                 {board.cards
                   .filter(
                     (card: CardModel) =>
@@ -76,18 +77,11 @@ export const FavoriteViewByBoard: FunctionComponent<
                           .includes(searchText.toLowerCase())),
                   )
                   .map((card: CardModel) => (
-                    <animated.li
-                      className="g-col-4 z-1 boardSizing"
-                      key={card.id}
-                      style={{
-                        position: "relative",
-                        ...springs,
-                      }}
-                    >
-                      <BoardCard card={card} zoomLevel={2}></BoardCard>
-                    </animated.li>
+                    <LiWrapper>
+                      <BoardCard card={card} zoomLevel={2} />
+                    </LiWrapper>
                   ))}
-              </animated.ul>
+              </UlWrapperFavorite>
             </div>
           </li>
         ))}

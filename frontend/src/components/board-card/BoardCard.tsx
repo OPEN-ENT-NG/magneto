@@ -101,10 +101,13 @@ export const BoardCard: FC<BoardCardProps> = ({
           <StarBorderIcon />
         </IconButton>
       </StyledCardActions>
-      {isOpen && (
+      {isOpen && dropdownRef.current && (
         <DropDownList
           items={dropDownItemList}
           onClose={() => toggleDropdown(null)}
+          open={isOpen}
+          anchorEl={dropdownRef.current}
+          position="right-top"
         />
       )}
       {canComment && zoomLevel > 1 && (

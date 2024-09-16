@@ -7,6 +7,7 @@ import {
   FC,
 } from "react";
 
+import { useToast } from "@edifice-ui/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Box, InputBase, IconButton } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -25,6 +26,7 @@ import {
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
+  const toast = useToast();
   const { t } = useTranslation("magneto");
   const dropDownItemList = useCreateSectionDropDownItems();
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
@@ -59,11 +61,16 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   });
 
   const handleKeyDownAndBlur = async () => {
+    if (!inputValue) {
+      setInputValue(section?.title ?? "");
+      return toast.warning(t("magneto.change.section.empty.title"));
+    }
     if (section) {
       return updateSectionAndToast({
         boardId,
         id: section?._id,
         title: inputValue,
+        cardIds: section.cardIds,
       });
     }
     try {
@@ -113,10 +120,12 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
           <MoreVertIcon sx={iconStyle} />
         </IconButton>
       )}
-      {isOpen && (
+      {isOpen && dropdownRef.current && (
         <DropDownList
           items={dropDownItemList}
           onClose={() => toggleDropdown(null)}
+          open={isOpen}
+          anchorEl={dropdownRef.current}
         />
       )}
     </Box>

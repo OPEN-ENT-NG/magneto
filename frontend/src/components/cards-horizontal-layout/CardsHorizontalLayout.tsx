@@ -9,6 +9,7 @@ import {
   CardBoxStyle,
   UlWrapper,
 } from "./style";
+import { BoardCard } from "../board-card/BoardCard";
 import { SectionName } from "../section-name/SectionName";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
@@ -28,11 +29,9 @@ export const CardsHorizontalLayout: FC = () => {
           <UlWrapper className="grid ps-0 list-unstyled left-float">
             {section.cards.map((card: Card) => {
               return (
-                <li key={card.id}>
-                  <CardBoxStyle zoomLevel={zoomLevel}>
-                    {card.title} {/* will be replaced by card later */}
-                  </CardBoxStyle>
-                </li>
+                <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
+                  <BoardCard card={card} />
+                </CardBoxStyle>
               );
             })}
           </UlWrapper>

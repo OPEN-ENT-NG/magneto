@@ -16,8 +16,12 @@ export const CardsFreeLayout: FC = () => {
         <UlWrapper className="grid ps-0 list-unstyled mb-24 left-float">
           {board.cards.map((card: Card, index: number) => {
             return (
-              <LiWrapper isLast={index === board.cards.length - 1}>
-                <BoardCard card={card} zoomLevel={zoomLevel} />
+              <LiWrapper
+                key={card.id}
+                isLast={index === board.cards.length - 1}
+                zoomLevel={zoomLevel}
+              >
+                <BoardCard card={card} />
               </LiWrapper>
             );
           })}

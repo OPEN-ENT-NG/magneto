@@ -6,7 +6,8 @@ import {
   SectionWrapper,
   sectionNameWrapperStyle,
   mainWrapperProps,
-  CardWrapperStyle,
+  CardsWrapperStyle,
+  CardWrapper,
 } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { SectionName } from "../section-name/SectionName";
@@ -24,9 +25,11 @@ export const CardsVerticalLayout: FC = () => {
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={section} />
           </Box>
-          <Box sx={CardWrapperStyle}>
+          <Box sx={CardsWrapperStyle}>
             {section.cards.map((card) => (
-              <BoardCard card={card} zoomLevel={zoomLevel} />
+              <CardWrapper key={card.id} zoomLevel={zoomLevel}>
+                <BoardCard card={card} />
+              </CardWrapper>
             ))}
           </Box>
         </SectionWrapper>

@@ -13,4 +13,4 @@ export const commentApi = emptySplitApi.injectEndpoints({
   }),
 });
 
-export const {useAddCommentMutation} = commentApi;
+export const { useAddCommentMutation } = commentApi;

@@ -107,7 +107,7 @@ export const BoardCard: FC<BoardCardProps> = ({
           onClose={() => toggleDropdown(null)}
         />
       )}
-        {canComment && zoomLevel > 1 && (
+      {canComment && zoomLevel > 1 && (
         <CardComment
           commentData={{
             cardComment: card.lastComment,

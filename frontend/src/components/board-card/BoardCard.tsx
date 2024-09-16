@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 
 import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
@@ -19,22 +19,46 @@ import {
   StyledCardActions,
 } from "./style";
 import { BoardCardProps } from "./types";
+import { useCardDropDownItems } from "./useCardDropDownItems";
 import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
+import { CardComment } from "../card-comment/CardComment";
 import { CardContent } from "../card-content/CardContent";
+import { DropDownList } from "../drop-down-list/DropDownList";
+import { useDropdown } from "../section-name/useDropDown";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 
-export const BoardCard: FC<BoardCardProps> = ({ card, zoomLevel }) => {
+export const BoardCard: FC<BoardCardProps> = ({
+  card,
+  zoomLevel,
+  canComment = false,
+}) => {
   const { user, avatar } = useUser();
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
+  const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
+  const dropDownItemList = useCardDropDownItems();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const isOpen = openDropdownId === card.id;
+  const handleToggleDropdown = () => {
+    if (card.id) {
+      toggleDropdown(card.id);
+    }
+  };
+
+  useEffect(() => {
+    registerDropdown(card.id, dropdownRef.current);
+  }, [card.id, registerDropdown]);
 
   return (
-    <StyledCard zoomLevel={zoomLevel}>
+    <StyledCard zoomLevel={zoomLevel} ref={dropdownRef}>
       <StyledCardHeader
         zoomLevel={zoomLevel}
         avatar={<StyledAvatar aria-label="recipe" src={avatar} />}
         action={
-          <StyledIconButton aria-label="settings">
+          <StyledIconButton
+            aria-label="settings"
+            onClick={handleToggleDropdown}
+          >
             <MoreVertIcon />
           </StyledIconButton>
         }
@@ -77,6 +101,21 @@ export const BoardCard: FC<BoardCardProps> = ({ card, zoomLevel }) => {
           <StarBorderIcon />
         </IconButton>
       </StyledCardActions>
+      {isOpen && (
+        <DropDownList
+          items={dropDownItemList}
+          onClose={() => toggleDropdown(null)}
+        />
+      )}
+      {canComment && zoomLevel > 1 && (
+        <CardComment
+          commentData={{
+            cardComment: card.lastComment,
+            nbOfComment: card.nbOfComments,
+            cardId: card.id,
+          }}
+        />
+      )}
     </StyledCard>
   );
 };

@@ -16,33 +16,33 @@ export const LiWrapper = styled("li")<{ isLast: boolean; zoomLevel: number }>(({
 
   let cardMargin = { margin: "0 5rem 1.5rem 1rem" };
 
-  const cardProperties = {
-    display: "flex",
-    position: "relative",
-  };
-
   switch (zoomLevel) {
     case 0:
-      cardMargin = { margin: "0 1rem 1.5rem 0" };
+      cardMargin = { margin: "1rem 1rem 1.5rem 0" };
       break;
     case 1:
-      cardMargin = { margin: "0 1rem 1.5rem 0" };
+      cardMargin = { margin: "1rem 1rem 1.5rem 0" };
       break;
     case 2:
-      cardMargin = { margin: "0 3.5rem 1.5rem 1rem" };
+      cardMargin = { margin: "1rem 3.5rem 1.5rem 1rem" };
       break;
     case 3:
-      cardMargin = { margin: "0 5rem 1.5rem 1rem" };
+      cardMargin = { margin: "1rem 5rem 1.5rem 1rem" };
       break;
     case 4:
-      cardMargin = { margin: "0 1.15rem 1.5rem 0" };
+      cardMargin = { margin: "1rem 1.15rem 1.5rem 0" };
       break;
     case 5:
-      cardMargin = { margin: "0 5rem 1.5rem 1rem" };
+      cardMargin = { margin: "1rem 5rem 1.5rem 1rem" };
       break;
   }
 
-  return { ...cardMargin, ...cardProperties, ...lastCardBottomMargin };
+  return {
+    display: "flex",
+    position: "relative",
+    ...cardMargin,
+    ...lastCardBottomMargin,
+  };
 });
 
 export const UlWrapper = styled("ul")(() => {

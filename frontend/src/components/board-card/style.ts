@@ -42,6 +42,7 @@ export const StyledCard = styled(Card, {
   position: "relative",
   flexDirection: "column",
   boxSizing: "border-box",
+  overflow: "visible",
   width: handleCardSize(zoomLevel).width,
   height: handleCardSize(zoomLevel).height,
 }));

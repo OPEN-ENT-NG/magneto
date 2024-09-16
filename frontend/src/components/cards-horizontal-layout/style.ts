@@ -20,14 +20,12 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: "2rem",
     padding: "1rem 1rem 0 0",
     minWidth: "100%",
     width: "100%",
     height: "100%",
     overflow: "hidden",
     alignSelf: "center",
-    marginBottom: isLast ? "15%" : "",
   };
 
   let marginBottomProperties = {};
@@ -50,13 +48,14 @@ export const sectionNameWrapperStyle = {
 
 export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
   return {
-    display: "inline-grid",
+    display: "inline-flex",
     flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: "unset",
-    marginLeft: "15px",
+    flexWrap: "nowrap",
+    margin: "1.5rem 0 0 2.5rem",
+    paddingTop: "unset !important",
     overflowX: "auto",
     direction: "ltr",
+    gap: "unset",
     "&::-webkit-scrollbar": {
       height: "0.8rem",
     },
@@ -67,40 +66,31 @@ export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
   };
 });
 
-export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
+export const CardBoxStyle = styled("li")<{ zoomLevel: number }>(({
   zoomLevel,
 }) => {
-  let cardSize = { width: "269px", height: "264px", margin: "15px" };
+  let cardMargin = { margin: "0 1.5rem 2rem 0" };
 
-  const cardProperties = {
-    backgroundColor: "white",
-    zIndex: "10000000000000",
-    display: "inline-block",
-    position: "relative",
-  };
-
-  switch (
-    zoomLevel //will be replaced by card size later --> card margins etc
-  ) {
+  switch (zoomLevel) {
     case 0:
-      cardSize = { width: "125px", height: "130px", margin: "2px" };
+      cardMargin = { margin: "0 1.5rem 3rem 0" };
       break;
     case 1:
-      cardSize = { width: "183px", height: "180px", margin: "5px" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "223px", margin: "10px" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "264px", margin: "15px" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "310px", margin: "5px" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "350px", margin: "15px" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
   }
 
-  return { ...cardSize, ...cardProperties };
+  return { ...cardMargin };
 });

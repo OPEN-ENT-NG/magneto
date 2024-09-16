@@ -8,46 +8,41 @@ export const mainWrapperProps = {
   zIndex: "1",
 };
 
-export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
+export const LiWrapper = styled("li")<{ isLast: boolean; zoomLevel: number }>(({
+  isLast,
   zoomLevel,
 }) => {
-  let cardSize = { width: "269px", height: "264px", margin: "15px" };
+  const lastCardBottomMargin = isLast ? { marginBottom: "30%" } : {};
+
+  let cardMargin = { margin: "0 5rem 1.5rem 1rem" };
 
   const cardProperties = {
-    backgroundColor: "white",
-
     display: "flex",
     position: "relative",
   };
 
-  switch (
-    zoomLevel //will be replaced by card size later --> card margins etc
-  ) {
+  switch (zoomLevel) {
     case 0:
-      cardSize = { width: "132px", height: "127px", margin: "2px" };
+      cardMargin = { margin: "0 1rem 1.5rem 0" };
       break;
     case 1:
-      cardSize = { width: "183px", height: "180px", margin: "5px" };
+      cardMargin = { margin: "0 1rem 1.5rem 0" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "223px", margin: "10px" };
+      cardMargin = { margin: "0 3.5rem 1.5rem 1rem" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "264px", margin: "15px" };
+      cardMargin = { margin: "0 5rem 1.5rem 1rem" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "310px", margin: "5px" };
+      cardMargin = { margin: "0 1.15rem 1.5rem 0" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "350px", margin: "15px" };
+      cardMargin = { margin: "0 5rem 1.5rem 1rem" };
       break;
   }
 
-  return { ...cardSize, ...cardProperties };
-});
-
-export const LiWrapper = styled("li")<{ isLast: boolean }>(({ isLast }) => {
-  return isLast ? { marginBottom: "30%" } : {};
+  return { ...cardMargin, ...cardProperties, ...lastCardBottomMargin };
 });
 
 export const UlWrapper = styled("ul")(() => {
@@ -55,6 +50,8 @@ export const UlWrapper = styled("ul")(() => {
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    marginLeft: "15px",
+    marginLeft: "4.5rem",
+    gap: "unset",
+    justifyContent: "space-evenly flex-start",
   };
 });

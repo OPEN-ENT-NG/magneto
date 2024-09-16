@@ -12,7 +12,7 @@ export const LiWrapper = styled("li")<{ isLast: boolean; zoomLevel: number }>(({
   isLast,
   zoomLevel,
 }) => {
-  let lastCardBottomMargin = isLast ? { marginBottom: "30%"} : {};
+  const lastCardBottomMargin = isLast ? { marginBottom: "30%" } : {};
 
   let cardMargin = { margin: "0 5rem 1.5rem 1rem" };
 

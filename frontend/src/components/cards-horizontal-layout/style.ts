@@ -71,9 +71,7 @@ export const CardBoxStyle = styled("li")<{ zoomLevel: number }>(({
 }) => {
   let cardMargin = { margin: "0 1.5rem 2rem 0" };
 
-  switch (
-    zoomLevel
-  ) {
+  switch (zoomLevel) {
     case 0:
       cardMargin = { margin: "0 1.5rem 3rem 0" };
       break;
@@ -81,7 +79,7 @@ export const CardBoxStyle = styled("li")<{ zoomLevel: number }>(({
       cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 2:
-      cardMargin = {margin: "0 1.5rem 2rem 0" };
+      cardMargin = { margin: "0 1.5rem 2rem 0" };
       break;
     case 3:
       cardMargin = { margin: "0 1.5rem 2rem 0" };

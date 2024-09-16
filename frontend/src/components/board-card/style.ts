@@ -12,9 +12,7 @@ import {
 const handleCardSize = (zoomLevel: number) => {
   let cardSize = { width: "269px", height: "264px" };
 
-  switch (
-    zoomLevel
-  ) {
+  switch (zoomLevel) {
     case 0:
       cardSize = { width: "132px", height: "130px" };
       break;

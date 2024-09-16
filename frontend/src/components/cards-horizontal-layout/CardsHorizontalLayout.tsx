@@ -9,10 +9,10 @@ import {
   CardBoxStyle,
   UlWrapper,
 } from "./style";
+import { BoardCard } from "../board-card/BoardCard";
 import { SectionName } from "../section-name/SectionName";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
-import { BoardCard } from "../board-card/BoardCard";
 
 export const CardsHorizontalLayout: FC = () => {
   const { board, zoomLevel } = useBoard();

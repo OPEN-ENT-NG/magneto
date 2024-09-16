@@ -10,28 +10,28 @@ import {
 } from "@mui/material";
 
 const handleCardSize = (zoomLevel: number) => {
-  let cardSize = { width: "269px", height: "264px", margin: "15px" };
+  let cardSize = { width: "269px", height: "264px" };
 
   switch (
-    zoomLevel //will be replaced by card size later --> card margins etc
+    zoomLevel
   ) {
     case 0:
-      cardSize = { width: "132px", height: "130px", margin: "2px" };
+      cardSize = { width: "132px", height: "130px" };
       break;
     case 1:
-      cardSize = { width: "183px", height: "180px", margin: "5px" };
+      cardSize = { width: "183px", height: "180px" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "223px", margin: "10px" };
+      cardSize = { width: "228px", height: "223px" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "264px", margin: "15px" };
+      cardSize = { width: "269px", height: "264px" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "310px", margin: "5px" };
+      cardSize = { width: "330px", height: "310px" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "350px", margin: "15px" };
+      cardSize = { width: "371px", height: "350px" };
       break;
   }
   return cardSize;
@@ -46,7 +46,6 @@ export const StyledCard = styled(Card, {
   boxSizing: "border-box",
   width: handleCardSize(zoomLevel).width,
   height: handleCardSize(zoomLevel).height,
-  margin: handleCardSize(zoomLevel).margin,
 }));
 
 export const StyledTypography = styled(Typography)({

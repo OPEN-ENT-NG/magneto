@@ -26,7 +26,6 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     height: "100%",
     overflow: "hidden",
     alignSelf: "center",
-    marginBottom: isLast ? "15%" : "",
   };
 
   let marginBottomProperties = {};
@@ -52,11 +51,11 @@ export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
     display: "inline-flex",
     flexDirection: "row",
     flexWrap: "nowrap",
-    marginBottom: "unset",
-    marginLeft: "15px",
+    margin: "1.5rem 0 0 2.5rem",
     paddingTop: "unset !important",
     overflowX: "auto",
     direction: "ltr",
+    gap: "unset",
     "&::-webkit-scrollbar": {
       height: "0.8rem",
     },
@@ -67,31 +66,33 @@ export const UlWrapper = styled("ul")<UlWrapperProps>(() => {
   };
 });
 
-export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
+export const CardBoxStyle = styled("li")<{ zoomLevel: number }>(({
   zoomLevel,
 }) => {
-  let cardSize = { margin: "0 0 15px 0" };
+  let cardSize = { margin: "0 1.5rem 2rem 0" };
+
+  console.log(zoomLevel);
 
   switch (
-    zoomLevel //will be replaced by card size later --> card margins etc
+    zoomLevel
   ) {
     case 0:
-      cardSize = { margin: "2px" };
+      cardSize = { margin: "0 1.5rem 3rem 0" };
       break;
     case 1:
-      cardSize = { margin: "5px" };
+      cardSize = { margin: "0 1.5rem 2rem 0" };
       break;
     case 2:
-      cardSize = {margin: "10px" };
+      cardSize = {margin: "0 1.5rem 2rem 0" };
       break;
     case 3:
-      cardSize = { margin: "0 0 15px 0" };
+      cardSize = { margin: "0 1.5rem 2rem 0" };
       break;
     case 4:
-      cardSize = { margin: "5px" };
+      cardSize = { margin: "0 1.5rem 2rem 0" };
       break;
     case 5:
-      cardSize = { margin: "15px" };
+      cardSize = { margin: "0 1.5rem 2rem 0" };
       break;
   }
 

@@ -8,46 +8,44 @@ export const mainWrapperProps = {
   zIndex: "1",
 };
 
-export const CardBoxStyle = styled("div")<{ zoomLevel: number }>(({
+export const CardBoxStyle = styled("div")<{}>(({ zoomLevel }) => {});
+
+export const LiWrapper = styled("li")<{ isLast: boolean; zoomLevel: number }>(({
+  isLast,
   zoomLevel,
 }) => {
-  let cardSize = { width: "269px", height: "264px", margin: "15px" };
+  let lastCardBottomMargin = isLast ? { marginBottom: "30%" } : {};
+
+  let cardSize = { margin: "15px" };
 
   const cardProperties = {
-    backgroundColor: "white",
-
     display: "flex",
     position: "relative",
   };
 
-  switch (
-    zoomLevel //will be replaced by card size later --> card margins etc
-  ) {
+  switch (zoomLevel) {
     case 0:
-      cardSize = { width: "132px", height: "127px", margin: "2px" };
+      cardSize = { margin: "0 2rem 0 1rem" };
       break;
     case 1:
-      cardSize = { width: "183px", height: "180px", margin: "5px" };
+      cardSize = { margin: "0 2rem 0 1rem" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "223px", margin: "10px" };
+      cardSize = { margin: "0 2rem 0 1rem" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "264px", margin: "15px" };
+      cardSize = { margin: "0 2rem 0 1rem" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "310px", margin: "5px" };
+      cardSize = { margin: "0 2rem 0 1rem" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "350px", margin: "15px" };
+      cardSize = { margin: "0 2rem 0 1rem" };
       break;
   }
 
-  return { ...cardSize, ...cardProperties };
-});
-
-export const LiWrapper = styled("li")<{ isLast: boolean }>(({ isLast }) => {
-  return isLast ? { marginBottom: "30%" } : {};
+  return { ...cardSize, ...cardProperties, ...lastCardBottomMargin };
+  // return {  };
 });
 
 export const UlWrapper = styled("ul")(() => {
@@ -55,6 +53,8 @@ export const UlWrapper = styled("ul")(() => {
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    marginLeft: "15px",
+    marginLeft: "5rem",
+    gap: "unset",
+    // justifyContent: "space-evenly",
   };
 });

@@ -58,7 +58,7 @@ export const sectionNameWrapperStyle = {
 export const CardsWrapperStyle = {
   display: "flex",
   flexWrap: "wrap",
-  justifyContent: "space-evenly flex-start",
+  justifyContent: "flex-start",
   alignContent: "flex-start",
   gap: "1rem",
   overflowY: "auto",
@@ -72,6 +72,7 @@ export const CardsWrapperStyle = {
     borderRadius: "0.3rem",
   },
 };
+
 const prepareCardSize = (zoomLevel: number) => {
   switch (zoomLevel) {
     case 0:

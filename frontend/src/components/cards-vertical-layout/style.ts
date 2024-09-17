@@ -38,7 +38,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     display: "flex",
     flexDirection: "column",
     gap: "2rem",
-    padding: "1rem",
+    padding: "1rem 2rem 1rem 2rem",
     minWidth: "405px",
     width: prepareWidth(sectionNumber),
     borderRight: !isLast ? "1px solid #aaa" : "",
@@ -65,7 +65,7 @@ export const CardsWrapper = styled("div")<{ zoomLevel: number }>(({
     })`,
     gap: "1.5rem",
     display: "grid",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
     flexWrap: "wrap",
     alignContent: "flex-start",
     overflowY: "auto",
@@ -82,37 +82,7 @@ export const CardsWrapper = styled("div")<{ zoomLevel: number }>(({
   };
 });
 
-const prepareCardSize = (zoomLevel: number) => {
-  switch (zoomLevel) {
-    case 0:
-      return { margin: "0 0.5rem 1.5rem 2rem" };
-
-    case 1:
-      return { margin: "0 auto 1.5rem" };
-
-    case 2:
-      return { margin: "0 auto 1.5rem" };
-
-    case 3:
-      return { margin: "0 auto 1.5rem" };
-
-    case 4:
-      return { margin: "0 0.25rem 1.5rem 0.25rem" };
-
-    case 5:
-      return { margin: "0 auto 1.5rem " };
-
-    default:
-      return { margin: "0 5rem 1.5rem 1rem" };
-  }
-};
-
-export const CardWrapper = styled("div")<{ zoomLevel: number }>(({
-  zoomLevel,
-}) => {
-  return {
-    ...prepareCardSize(zoomLevel),
-    display: "flex",
-    position: "relative",
-  };
+export const CardWrapper = styled("div")({
+  display: "flex",
+  position: "relative",
 });

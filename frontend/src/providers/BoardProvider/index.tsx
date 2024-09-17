@@ -27,7 +27,7 @@ export const useBoard = () => {
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const { id = "" } = useParams();
-  const { data: boardData } = useGetBoardDataQuery(id);
+  const { data: boardData, isLoading } = useGetBoardDataQuery(id);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -66,6 +66,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       zoomIn,
       zoomOut,
       resetZoom,
+      isLoading,
     }),
     [board, zoomLevel],
   );

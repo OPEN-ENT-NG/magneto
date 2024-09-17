@@ -14,6 +14,7 @@ export type BoardContextType = {
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
+  isLoading: boolean;
 };
 
 export type Section = {

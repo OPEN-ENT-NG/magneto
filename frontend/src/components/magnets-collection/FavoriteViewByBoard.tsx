@@ -1,9 +1,9 @@
 import { FunctionComponent } from "react";
 
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
-import { animated } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
+import { StyledGridBox } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
@@ -21,8 +21,9 @@ type FavoriteViewByBoardProps = {
 
 export const FavoriteViewByBoard: FunctionComponent<
   FavoriteViewByBoardProps
-> = ({ boardsWithCards, searchText, springs }: FavoriteViewByBoardProps) => {
+> = ({ boardsWithCards, searchText }: FavoriteViewByBoardProps) => {
   const { t } = useTranslation("magneto");
+  const zoomLevel = 2;
   const [duplicateBoard] = useDuplicateBoardMutation();
 
   const duplicateBoardsAndToast = usePredefinedToasts({
@@ -65,7 +66,7 @@ export const FavoriteViewByBoard: FunctionComponent<
                   {" " + t("magneto.cards.collection.board.duplicate")}
                 </span>
               </div>
-              <animated.ul className="grid ps-0 list-unstyled mb-24">
+              <StyledGridBox zoomLevel={zoomLevel}>
                 {board.cards
                   .filter(
                     (card: CardModel) =>
@@ -76,18 +77,13 @@ export const FavoriteViewByBoard: FunctionComponent<
                           .includes(searchText.toLowerCase())),
                   )
                   .map((card: CardModel) => (
-                    <animated.li
-                      className="g-col-4 z-1 boardSizing"
+                    <BoardCard
                       key={card.id}
-                      style={{
-                        position: "relative",
-                        ...springs,
-                      }}
-                    >
-                      <BoardCard card={card} zoomLevel={2}></BoardCard>
-                    </animated.li>
+                      card={card}
+                      zoomLevel={zoomLevel}
+                    />
                   ))}
-              </animated.ul>
+              </StyledGridBox>
             </div>
           </li>
         ))}

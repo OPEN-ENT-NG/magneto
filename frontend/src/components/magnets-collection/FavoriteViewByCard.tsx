@@ -1,13 +1,9 @@
 import { FunctionComponent } from "react";
-
 import { useTranslation } from "react-i18next";
-
 import { BoardCard } from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { Card, Card as CardModel } from "~/models/card.model";
-import { LiWrapper } from "../cards-free-layout/style";
-import { UlWrapperFavorite } from "./style";
-import { Box } from "@mui/material";
+import { StyledGridBox } from "./style";
 
 type FavoriteViewByCardProps = {
   cardsData: CardModel[];
@@ -22,6 +18,7 @@ export const FavoriteViewByCard: FunctionComponent<FavoriteViewByCardProps> = ({
   searchText,
 }: FavoriteViewByCardProps) => {
   const { t } = useTranslation("magneto");
+  const zoomLevel = 2;
 
   const filteredCards = cardsData.filter(
     (card: CardModel) =>
@@ -31,13 +28,11 @@ export const FavoriteViewByCard: FunctionComponent<FavoriteViewByCardProps> = ({
   );
 
   return filteredCards.length ? (
-    <UlWrapperFavorite>
+    <StyledGridBox zoomLevel={zoomLevel}>
       {filteredCards.map((card: Card) => (
-        <LiWrapper>
-          <BoardCard card={card} zoomLevel={2} />
-        </LiWrapper>
+        <BoardCard key={card.id} card={card} zoomLevel={zoomLevel} />
       ))}
-    </UlWrapperFavorite>
+    </StyledGridBox>
   ) : (
     <EmptyState title={t("magneto.cards.empty.text")} />
   );

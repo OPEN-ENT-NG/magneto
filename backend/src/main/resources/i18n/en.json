@@ -22,6 +22,7 @@
   "magneto.create.section.confirm": "La section a été créee avec succès.",
   "magneto.update.section.error": "Une erreur est survenue lors de la modification de la section sélectionnée.",
   "magneto.update.section.confirm": "La section sélectionnée a été modifiée avec succès.",
+  "magneto.change.section.empty.title": "Vous ne pouvez pas créer de section sans titre",
   "magneto.create.folder": "Create folder",
   "magneto.trash": "Trash",
   "magneto.lycee.connecte.boards": "Platform boards",

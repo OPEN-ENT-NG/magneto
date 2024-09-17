@@ -10,6 +10,7 @@ import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board } from "~/models/board.model";
 import { Card as CardModel } from "~/models/card.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
+import { StyledGridBox } from "./style";
 
 type FavoriteViewByBoardProps = {
   boardsWithCards: Board[];
@@ -23,6 +24,7 @@ export const FavoriteViewByBoard: FunctionComponent<
   FavoriteViewByBoardProps
 > = ({ boardsWithCards, searchText, springs }: FavoriteViewByBoardProps) => {
   const { t } = useTranslation("magneto");
+  const zoomLevel = 2;
   const [duplicateBoard] = useDuplicateBoardMutation();
 
   const duplicateBoardsAndToast = usePredefinedToasts({
@@ -65,7 +67,7 @@ export const FavoriteViewByBoard: FunctionComponent<
                   {" " + t("magneto.cards.collection.board.duplicate")}
                 </span>
               </div>
-              <animated.ul className="grid ps-0 list-unstyled mb-24">
+              <StyledGridBox zoomLevel={zoomLevel}>
                 {board.cards
                   .filter(
                     (card: CardModel) =>
@@ -76,18 +78,13 @@ export const FavoriteViewByBoard: FunctionComponent<
                           .includes(searchText.toLowerCase())),
                   )
                   .map((card: CardModel) => (
-                    <animated.li
-                      className="g-col-4 z-1 boardSizing"
+                    <BoardCard
                       key={card.id}
-                      style={{
-                        position: "relative",
-                        ...springs,
-                      }}
-                    >
-                      <BoardCard card={card} zoomLevel={2}></BoardCard>
-                    </animated.li>
+                      card={card}
+                      zoomLevel={zoomLevel}
+                    />
                   ))}
-              </animated.ul>
+              </StyledGridBox>
             </div>
           </li>
         ))}

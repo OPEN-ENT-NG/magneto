@@ -1,11 +1,9 @@
 import { FunctionComponent } from "react";
-
-import { animated } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
-
 import { BoardCard } from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
-import { Card as CardModel } from "~/models/card.model";
+import { Card, Card as CardModel } from "~/models/card.model";
+import { StyledGridBox } from "./style";
 
 type FavoriteViewByCardProps = {
   cardsData: CardModel[];
@@ -18,9 +16,9 @@ type FavoriteViewByCardProps = {
 export const FavoriteViewByCard: FunctionComponent<FavoriteViewByCardProps> = ({
   cardsData,
   searchText,
-  springs,
 }: FavoriteViewByCardProps) => {
   const { t } = useTranslation("magneto");
+  const zoomLevel = 2;
 
   const filteredCards = cardsData.filter(
     (card: CardModel) =>
@@ -30,22 +28,11 @@ export const FavoriteViewByCard: FunctionComponent<FavoriteViewByCardProps> = ({
   );
 
   return filteredCards.length ? (
-    <div>
-      <animated.ul className="grid ps-0 list-unstyled mb-24">
-        {filteredCards.map((card: CardModel) => (
-          <animated.li
-            className="g-col-4 z-1 boardSizing"
-            key={card.id}
-            style={{
-              position: "relative",
-              ...springs,
-            }}
-          >
-            <BoardCard card={card} zoomLevel={2}></BoardCard>
-          </animated.li>
-        ))}
-      </animated.ul>
-    </div>
+    <StyledGridBox zoomLevel={zoomLevel}>
+      {filteredCards.map((card: Card) => (
+        <BoardCard key={card.id} card={card} zoomLevel={zoomLevel} />
+      ))}
+    </StyledGridBox>
   ) : (
     <EmptyState title={t("magneto.cards.empty.text")} />
   );

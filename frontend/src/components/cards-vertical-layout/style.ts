@@ -16,6 +16,16 @@ export const mainWrapperProps = {
   display: "flex",
   background: "transparent",
   zIndex: "1",
+  overflowX: "auto",
+  "&::-webkit-scrollbar": {
+    height: "1.6rem",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "rgba(170,170,170,1)",
+    borderRadius: "0.6rem",
+    border: "0.4rem solid transparent",
+    backgroundClip: "padding-box",
+  },
 };
 
 export const SectionWrapper = styled("div")<SectionWrapperProps>(({
@@ -28,7 +38,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     flexDirection: "column",
     gap: "2rem",
     padding: "1rem",
-    minWidth: "22%",
+    minWidth: "405px",
     width: prepareWidth(sectionNumber),
     borderRight: !isLast ? "1px solid #aaa" : "",
     height: "100%",

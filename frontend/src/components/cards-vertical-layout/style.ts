@@ -1,6 +1,7 @@
 import { styled } from "@mui/material";
 
 import { SectionWrapperProps } from "./types";
+import { handleCardSize } from "../board-card/style";
 
 const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
   if (sectionNumber === 1) return "50%";
@@ -55,23 +56,32 @@ export const sectionNameWrapperStyle = {
   alignSelf: "center",
 };
 
-export const CardsWrapperStyle = {
-  display: "flex",
-  flexWrap: "wrap",
-  justifyContent: "space-evenly flex-start",
-  alignContent: "flex-start",
-  gap: "1rem",
-  overflowY: "auto",
-  flexGrow: 1,
-  width: "100%",
-  "&::-webkit-scrollbar": {
-    width: "0.8rem",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "rgba(170,170,170,1)",
-    borderRadius: "0.3rem",
-  },
-};
+export const CardsWrapper = styled("div")<{ zoomLevel: number }>(({
+  zoomLevel,
+}) => {
+  return {
+    gridTemplateColumns: `repeat(auto-fill, ${
+      handleCardSize(zoomLevel).width
+    })`,
+    gap: "1.5rem",
+    display: "grid",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    alignContent: "flex-start",
+    overflowY: "auto",
+    flexGrow: 1,
+    width: "100%",
+    "&::-webkit-scrollbar": {
+      width: "0.8rem",
+      height: "0.8rem",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "rgba(170,170,170,1)",
+      borderRadius: "0.3rem",
+    },
+  };
+});
+
 const prepareCardSize = (zoomLevel: number) => {
   switch (zoomLevel) {
     case 0:
@@ -91,6 +101,7 @@ const prepareCardSize = (zoomLevel: number) => {
 
     case 5:
       return { margin: "0 auto 1.5rem " };
+
     default:
       return { margin: "0 5rem 1.5rem 1rem" };
   }

@@ -4,7 +4,7 @@ import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import { Tooltip } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 
 import {
@@ -17,6 +17,7 @@ import {
   StyledCardContent,
   StyledContentTitleTypography,
   StyledCardActions,
+  cardContentWrapperStyle,
 } from "./style";
 import { BoardCardProps } from "./types";
 import { useCardDropDownItems } from "./useCardDropDownItems";
@@ -87,9 +88,9 @@ export const BoardCard: FC<BoardCardProps> = ({
           {card.title}
         </StyledContentTitleTypography>
         {zoomLevel > 1 && (
-          <div style={{ flex: 1, overflow: "hidden" }}>
+          <Box sx={cardContentWrapperStyle}>
             <CardContent card={card} />
-          </div>
+          </Box>
         )}
       </StyledCardContent>
       <StyledCardActions zoomLevel={zoomLevel} disableSpacing>

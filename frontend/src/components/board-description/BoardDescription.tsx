@@ -51,7 +51,7 @@ export const BoardDescription: FC = () => {
           open={isOpen}
           onClose={toggleIsOpen}
           description={description}
-          title={`Magnéto / ${title}`}
+          title={title}
         />
       )}
     </Box>

@@ -66,6 +66,7 @@ export const CardsWrapperStyle = {
   width: "100%",
   "&::-webkit-scrollbar": {
     width: "0.8rem",
+    height: "0.8rem",
   },
   "&::-webkit-scrollbar-thumb": {
     backgroundColor: "rgba(170,170,170,1)",
@@ -92,6 +93,7 @@ const prepareCardSize = (zoomLevel: number) => {
 
     case 5:
       return { margin: "0 auto 1.5rem " };
+
     default:
       return { margin: "0 5rem 1.5rem 1rem" };
   }

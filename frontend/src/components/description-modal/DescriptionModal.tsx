@@ -9,7 +9,6 @@ import {
   headerStyle,
   titleStyle,
   closeButtonStyle,
-  subtitleStyle,
   contentContainerStyle,
   descriptionStyle,
 } from "./style";
@@ -21,7 +20,6 @@ export const DescriptionModal: FC<DescriptionModalProps> = ({
   title,
   description,
 }) => {
-  const { t } = useTranslation("magneto");
 
   return (
     <Modal
@@ -48,9 +46,6 @@ export const DescriptionModal: FC<DescriptionModalProps> = ({
             <CloseIcon fontSize="inherit" />
           </IconButton>
         </Box>
-        <Typography variant="h6" sx={subtitleStyle}>
-          {t("magneto.board.description")}
-        </Typography>
         <Box sx={contentContainerStyle}>
           <Typography id="modal-description" sx={descriptionStyle}>
             {description}

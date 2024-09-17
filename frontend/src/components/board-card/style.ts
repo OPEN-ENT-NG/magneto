@@ -9,8 +9,8 @@ import {
   Typography,
 } from "@mui/material";
 
-export const handleCardSize = (zoomLevel: number) => {
-  let cardSize = { width: "269px", height: "264px" };
+const handleCardSize = (zoomLevel: number) => {
+  let cardSize = { width: "269px", height: "fit-content" };
 
   switch (zoomLevel) {
     case 0:
@@ -20,16 +20,16 @@ export const handleCardSize = (zoomLevel: number) => {
       cardSize = { width: "183px", height: "180px" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "223px" };
+      cardSize = { width: "228px", height: "fit-content" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "264px" };
+      cardSize = { width: "269px", height: "fit-content" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "310px" };
+      cardSize = { width: "330px", height: "fit-content" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "350px" };
+      cardSize = { width: "371px", height: "fit-content" };
       break;
   }
   return cardSize;

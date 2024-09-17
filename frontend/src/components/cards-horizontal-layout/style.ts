@@ -57,6 +57,7 @@ export const UlWrapper = styled("ul")(() => {
     gap: "unset",
     "&::-webkit-scrollbar": {
       height: "0.8rem",
+      width: "0.8rem",
     },
     "&::-webkit-scrollbar-thumb": {
       backgroundColor: "rgba(170,170,170,1)",

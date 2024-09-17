@@ -4,7 +4,7 @@ import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import { Tooltip } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 
 import {
@@ -87,9 +87,16 @@ export const BoardCard: FC<BoardCardProps> = ({
           {card.title}
         </StyledContentTitleTypography>
         {zoomLevel > 1 && (
-          <div style={{ flex: 1, overflow: "hidden" }}>
+          <Box
+            sx={{
+              flex: 1,
+              overflow: "hidden",
+              width: "100%",
+              aspectRatio: "16 / 9",
+            }}
+          >
             <CardContent card={card} />
-          </div>
+          </Box>
         )}
       </StyledCardContent>
       <StyledCardActions zoomLevel={zoomLevel} disableSpacing>

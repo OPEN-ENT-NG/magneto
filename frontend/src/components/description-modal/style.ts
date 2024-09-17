@@ -8,37 +8,38 @@ export const modalContainerStyle = {
   maxHeight: "calc(100vh - 4rem)",
   bgcolor: "background.paper",
   boxShadow: 24,
-  borderRadius: 1,
+  borderRadius: "1.6rem",
   display: "flex",
   flexDirection: "column",
+  padding: "3.2rem 5.2rem 3.2rem 5.2rem",
 };
 
 export const headerStyle = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  p: "1rem 1.5rem",
 };
 
 export const titleStyle = {
-  color: "#2A9CC8",
   fontWeight: "bold",
+  fontFamily: "Comfortaa",
+  fontSize: "2.6rem",
 };
 
 export const closeButtonStyle = {
-  fontSize: "2rem",
-};
-
-export const subtitleStyle = {
-  fontWeight: "bold",
-  fontSize: "1.6rem",
-  p: "1rem 1.5rem",
+  fontSize: "2.5rem",
+  borderRadius: "0.8rem",
+  position: "absolute",
+  top: "1.5rem",
+  right: "1.5rem",
+  color: "#4a4a4a",
+  opacity: 1,
 };
 
 export const contentContainerStyle = {
   flex: 1,
+  marginTop: "1.4rem !important",
   overflowY: "auto",
-  p: "1rem 1.5rem",
   "&::-webkit-scrollbar": {
     width: "6px",
     height: "6px",

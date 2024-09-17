@@ -17,12 +17,14 @@ import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
+import { LoadingScreen } from "@edifice-ui/react";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
 
   const sideMenuData = useSideMenuData();
-  const { board, zoomLevel, zoomIn, zoomOut, resetZoom } = useBoard();
+  const { board, zoomLevel, zoomIn, zoomOut, resetZoom, isLoading } =
+    useBoard();
   const headerHeight = useHeaderHeight();
 
   useEffect(() => {
@@ -45,7 +47,9 @@ export const BoardView: FC = () => {
     }
   };
 
-  return (
+  return isLoading ? (
+    <LoadingScreen position={false} />
+  ) : (
     <BoardViewWrapper layout={board.layoutType}>
       <HeaderView />
       <SideMenu sideMenuData={sideMenuData} />

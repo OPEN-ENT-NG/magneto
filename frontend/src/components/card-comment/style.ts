@@ -2,6 +2,7 @@ export const avatarStyle = {
   width: "3rem",
   height: "3rem",
   padding: 0,
+  flexShrink: 0,
 };
 
 export const containerStyle = {
@@ -34,9 +35,11 @@ export const commentContentContainerStyle = {
 };
 
 export const commentTextContainerStyle = {
+  flex: 1,
   display: "flex",
   flexDirection: "column",
   gap: ".5rem",
+  minWidth: 0,
 };
 
 export const userNameStyle = {
@@ -55,9 +58,12 @@ export const timeStyle = {
 export const commentTextStyle = {
   color: "#5b6472",
   fontSize: "1.5rem",
-  lineHeight: "1rem",
+  lineHeight: "1.2",
   boxSizing: "border-box",
   padding: "1.2rem 0",
+  overflowWrap: "break-word",
+  wordBreak: "break-word",
+  hyphens: "auto",
 };
 
 export const inputContainerStyle = {

@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const handleCardSize = (zoomLevel: number) => {
+export const handleCardSize = (zoomLevel: number) => {
   let cardSize = { width: "269px", height: "fit-content" };
 
   switch (zoomLevel) {
@@ -156,6 +156,14 @@ export const StyledContentTitleTypography = styled(Typography, {
     paddingBottom: "1rem",
   }),
 }));
+
+export const cardContentWrapperStyle = {
+  flex: 1,
+  overflow: "hidden",
+  width: "100%",
+  aspectRatio: "16 / 9",
+  borderRadius: "1rem"
+};
 
 export const StyledCardActions = styled(CardActions, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",

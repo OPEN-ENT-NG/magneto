@@ -17,6 +17,7 @@ import {
   StyledCardContent,
   StyledContentTitleTypography,
   StyledCardActions,
+  cardContentWrapperStyle,
 } from "./style";
 import { BoardCardProps } from "./types";
 import { useCardDropDownItems } from "./useCardDropDownItems";
@@ -87,14 +88,7 @@ export const BoardCard: FC<BoardCardProps> = ({
           {card.title}
         </StyledContentTitleTypography>
         {zoomLevel > 1 && (
-          <Box
-            sx={{
-              flex: 1,
-              overflow: "hidden",
-              width: "100%",
-              aspectRatio: "16 / 9",
-            }}
-          >
+          <Box sx={cardContentWrapperStyle}>
             <CardContent card={card} />
           </Box>
         )}

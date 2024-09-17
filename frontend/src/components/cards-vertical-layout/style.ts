@@ -1,6 +1,7 @@
 import { styled } from "@mui/material";
 
 import { SectionWrapperProps } from "./types";
+import { handleCardSize } from "../board-card/style";
 
 const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
   if (sectionNumber === 1) return "50%";
@@ -55,50 +56,13 @@ export const sectionNameWrapperStyle = {
   alignSelf: "center",
 };
 
-export const CardsWrapperStyle = (zoomLevel: number) => {
-  // display: "flex",
-  // flexWrap: "wrap",
-  // justifyContent: "flex-start",
-  // alignContent: "flex-start",
-  // gap: "1rem",
-  // overflowY: "auto",
-  // flexGrow: 1,
-  // width: "100%",
-  // "&::-webkit-scrollbar": {
-  //   width: "0.8rem",
-  //   height: "0.8rem",
-  // },
-  // "&::-webkit-scrollbar-thumb": {
-  //   backgroundColor: "rgba(170,170,170,1)",
-  //   borderRadius: "0.3rem",
-  // },
-
-  let gap = { gap: "3rem" };
-
-  switch (zoomLevel) {
-    case 0:
-      gap = { gap: "3rem" };
-      break;
-    case 1:
-      gap = { gap: "3rem" };
-      break;
-    case 2:
-      gap = { gap: "3rem" };
-      break;
-    case 3:
-      gap = { gap: "3rem" };
-      break;
-    case 4:
-      gap = { gap: "3rem" };
-      break;
-    case 5:
-      gap = { gap: "3rem" };
-      break;
-  }
-
+export const CardsWrapper = styled("div")<{ zoomLevel: number }>(({
+  zoomLevel,
+}) => {
   return {
+    gridTemplateColumns: `repeat(auto-fill, ${handleCardSize(zoomLevel).width})`, 
+    gap: "1.5rem",
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, 228px)",
     justifyContent: "center",
     flexWrap: "wrap",
     alignContent: "flex-start",
@@ -113,9 +77,8 @@ export const CardsWrapperStyle = (zoomLevel: number) => {
       backgroundColor: "rgba(170,170,170,1)",
       borderRadius: "0.3rem",
     },
-    ...gap,
   };
-};
+});
 
 const prepareCardSize = (zoomLevel: number) => {
   switch (zoomLevel) {

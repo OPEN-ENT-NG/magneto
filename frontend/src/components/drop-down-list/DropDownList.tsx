@@ -38,6 +38,7 @@ export const DropDownList: FC<DropDownListProps> = ({
       anchorOrigin={getAnchorOrigin(position)}
       transformOrigin={getTransformOrigin(position, menuOffset)}
       sx={menuStyle}
+      disableScrollLock
     >
       {items.map((item, index) => (
         <Fragment key={`option-${Date.now() + index}`}>

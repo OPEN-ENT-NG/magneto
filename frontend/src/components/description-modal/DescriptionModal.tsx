@@ -2,14 +2,12 @@ import { FC } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
 
 import {
   modalContainerStyle,
   headerStyle,
   titleStyle,
   closeButtonStyle,
-  subtitleStyle,
   contentContainerStyle,
   descriptionStyle,
 } from "./style";
@@ -21,8 +19,6 @@ export const DescriptionModal: FC<DescriptionModalProps> = ({
   title,
   description,
 }) => {
-  const { t } = useTranslation("magneto");
-
   return (
     <Modal
       open={open}
@@ -48,9 +44,6 @@ export const DescriptionModal: FC<DescriptionModalProps> = ({
             <CloseIcon fontSize="inherit" />
           </IconButton>
         </Box>
-        <Typography variant="h6" sx={subtitleStyle}>
-          {t("magneto.board.description")}
-        </Typography>
         <Box sx={contentContainerStyle}>
           <Typography id="modal-description" sx={descriptionStyle}>
             {description}

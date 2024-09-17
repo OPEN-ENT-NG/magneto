@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 
 export const handleCardSize = (zoomLevel: number) => {
-  let cardSize = { width: "269px", height: "264px" };
+  let cardSize = { width: "269px", height: "fit-content" };
 
   switch (zoomLevel) {
     case 0:
@@ -20,16 +20,16 @@ export const handleCardSize = (zoomLevel: number) => {
       cardSize = { width: "183px", height: "180px" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "223px" };
+      cardSize = { width: "228px", height: "fit-content" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "264px" };
+      cardSize = { width: "269px", height: "fit-content" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "310px" };
+      cardSize = { width: "330px", height: "fit-content" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "350px" };
+      cardSize = { width: "371px", height: "fit-content" };
       break;
   }
   return cardSize;
@@ -43,6 +43,8 @@ export const StyledCard = styled(Card, {
   flexDirection: "column",
   boxSizing: "border-box",
   overflow: "visible",
+  borderRadius: "10px",
+  boxShadow: "0 1px 3px rgba(0,0,0,.1)",
   width: handleCardSize(zoomLevel).width,
   height: handleCardSize(zoomLevel).height,
 }));
@@ -154,6 +156,14 @@ export const StyledContentTitleTypography = styled(Typography, {
     paddingBottom: "1rem",
   }),
 }));
+
+export const cardContentWrapperStyle = {
+  flex: 1,
+  overflow: "hidden",
+  width: "100%",
+  aspectRatio: "16 / 9",
+  borderRadius: "1rem",
+};
 
 export const StyledCardActions = styled(CardActions, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",

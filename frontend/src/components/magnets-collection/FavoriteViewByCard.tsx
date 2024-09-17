@@ -1,9 +1,11 @@
 import { FunctionComponent } from "react";
+
 import { useTranslation } from "react-i18next";
+
+import { StyledGridBox } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { Card, Card as CardModel } from "~/models/card.model";
-import { StyledGridBox } from "./style";
 
 type FavoriteViewByCardProps = {
   cardsData: CardModel[];

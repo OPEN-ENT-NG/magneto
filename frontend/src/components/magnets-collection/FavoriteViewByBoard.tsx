@@ -1,16 +1,15 @@
 import { FunctionComponent } from "react";
 
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
-import { animated } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
+import { StyledGridBox } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board } from "~/models/board.model";
 import { Card as CardModel } from "~/models/card.model";
 import { useDuplicateBoardMutation } from "~/services/api/boards.service";
-import { StyledGridBox } from "./style";
 
 type FavoriteViewByBoardProps = {
   boardsWithCards: Board[];
@@ -22,7 +21,7 @@ type FavoriteViewByBoardProps = {
 
 export const FavoriteViewByBoard: FunctionComponent<
   FavoriteViewByBoardProps
-> = ({ boardsWithCards, searchText, springs }: FavoriteViewByBoardProps) => {
+> = ({ boardsWithCards, searchText }: FavoriteViewByBoardProps) => {
   const { t } = useTranslation("magneto");
   const zoomLevel = 2;
   const [duplicateBoard] = useDuplicateBoardMutation();

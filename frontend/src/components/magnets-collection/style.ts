@@ -1,4 +1,5 @@
 import { Box, styled } from "@mui/material";
+
 import { handleCardSize } from "../board-card/style";
 
 export const StyledGridBox = styled(Box, {

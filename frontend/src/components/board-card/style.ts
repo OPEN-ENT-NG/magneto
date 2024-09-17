@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const handleCardSize = (zoomLevel: number) => {
+export const handleCardSize = (zoomLevel: number) => {
   let cardSize = { width: "269px", height: "264px" };
 
   switch (zoomLevel) {

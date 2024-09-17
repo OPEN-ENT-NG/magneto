@@ -36,7 +36,7 @@ export const DropDownList: FC<DropDownListProps> = ({
       open={open}
       onClose={onClose}
       anchorOrigin={getAnchorOrigin(position)}
-      transformOrigin={getTransformOrigin(position,menuOffset)}
+      transformOrigin={getTransformOrigin(position, menuOffset)}
       sx={menuStyle}
     >
       {items.map((item, index) => (

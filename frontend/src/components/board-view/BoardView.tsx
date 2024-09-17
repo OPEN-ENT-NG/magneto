@@ -2,6 +2,7 @@ import { FC, useEffect } from "react";
 
 import "./BoardView.scss";
 
+import { LoadingScreen } from "@edifice-ui/react";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
@@ -22,7 +23,8 @@ export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
 
   const sideMenuData = useSideMenuData();
-  const { board, zoomLevel, zoomIn, zoomOut, resetZoom } = useBoard();
+  const { board, zoomLevel, zoomIn, zoomOut, resetZoom, isLoading } =
+    useBoard();
   const headerHeight = useHeaderHeight();
 
   useEffect(() => {
@@ -45,7 +47,9 @@ export const BoardView: FC = () => {
     }
   };
 
-  return (
+  return isLoading ? (
+    <LoadingScreen position={false} />
+  ) : (
     <BoardViewWrapper layout={board.layoutType}>
       <HeaderView />
       <SideMenu sideMenuData={sideMenuData} />

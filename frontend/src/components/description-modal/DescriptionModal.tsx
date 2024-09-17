@@ -2,7 +2,6 @@ import { FC } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
 
 import {
   modalContainerStyle,
@@ -20,7 +19,6 @@ export const DescriptionModal: FC<DescriptionModalProps> = ({
   title,
   description,
 }) => {
-
   return (
     <Modal
       open={open}

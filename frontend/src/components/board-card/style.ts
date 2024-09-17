@@ -162,7 +162,7 @@ export const cardContentWrapperStyle = {
   overflow: "hidden",
   width: "100%",
   aspectRatio: "16 / 9",
-  borderRadius: "1rem"
+  borderRadius: "1rem",
 };
 
 export const StyledCardActions = styled(CardActions, {

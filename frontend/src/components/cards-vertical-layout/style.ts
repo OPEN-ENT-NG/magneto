@@ -60,7 +60,9 @@ export const CardsWrapper = styled("div")<{ zoomLevel: number }>(({
   zoomLevel,
 }) => {
   return {
-    gridTemplateColumns: `repeat(auto-fill, ${handleCardSize(zoomLevel).width})`, 
+    gridTemplateColumns: `repeat(auto-fill, ${
+      handleCardSize(zoomLevel).width
+    })`,
     gap: "1.5rem",
     display: "grid",
     justifyContent: "center",

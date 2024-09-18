@@ -88,9 +88,9 @@ export const BoardCard: FC<BoardCardProps> = ({
           {card.title || <span>&nbsp;</span>}
         </StyledContentTitleTypography>
         {zoomLevel > 1 && (
-          <Box sx={cardContentWrapperStyle}>
+          <CardContentWrapper resourceType={card.resourceType}>
             <CardContent card={card} />
-          </Box>
+          </CardContentWrapper>
         )}
       </StyledCardContent>
       <StyledCardActions zoomLevel={zoomLevel} disableSpacing>

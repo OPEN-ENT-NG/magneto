@@ -1,6 +1,7 @@
 import { FC } from "react";
 
 import { Tooltip as TooltipMUI } from "@mui/material";
+
 import { TooltipProps } from "./types";
 
 export const Tooltip: FC<TooltipProps> = ({ children, title, placement }) => {

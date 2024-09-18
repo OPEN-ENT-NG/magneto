@@ -26,8 +26,8 @@ import { CardComment } from "../card-comment/CardComment";
 import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../section-name/useDropDown";
-import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { Tooltip } from "../tooltip/Tooltip";
+import { useElapsedTime } from "~/hooks/useElapsedTime";
 
 export const BoardCard: FC<BoardCardProps> = ({
   card,

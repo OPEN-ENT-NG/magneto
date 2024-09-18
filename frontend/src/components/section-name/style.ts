@@ -18,7 +18,8 @@ export const inputStyle = {
     fontSize: "2rem",
     color: "#5b6472",
     lineHeight: "1.5rem",
-    padding: "0.5rem 0",
+    padding: ".5rem 0 .5rem 1.5rem",
+    boxSizing: "border-box",
   },
 };
 

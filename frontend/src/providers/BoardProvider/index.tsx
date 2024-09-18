@@ -57,6 +57,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   useEffect(() => {
     updateZoomPreference(zoomLevel);
   }, [zoomLevel]);
+  console.log(board);
 
   const value = useMemo<BoardContextType>(
     () => ({

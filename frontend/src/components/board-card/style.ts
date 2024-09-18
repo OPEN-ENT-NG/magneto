@@ -8,6 +8,7 @@ import {
   styled,
   Typography,
 } from "@mui/material";
+
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 
 export const handleCardSize = (zoomLevel: number) => {
@@ -184,17 +185,17 @@ export const StyledContentTitleTypography = styled(Typography, {
   }),
 }));
 
-export const CardContentWrapperStyle = styled("div")<{ resourceType: string }>(
-  ({ resourceType }) => {
-    return {
-      flex: 1,
-      overflow: "hidden",
-      width: "100%",
-      aspectRatio: "16 / 9",
-      borderRadius: resourceType == RESOURCE_TYPE.TEXT ? "1rem" : "unset",
-    };
-  },
-);
+export const CardContentWrapper = styled("div")<{ resourceType: string }>(({
+  resourceType,
+}) => {
+  return {
+    flex: 1,
+    overflow: "hidden",
+    width: "100%",
+    aspectRatio: "16 / 9",
+    borderRadius: resourceType == RESOURCE_TYPE.TEXT ? "1rem" : "unset",
+  };
+});
 
 export const StyledCardActions = styled(CardActions, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",

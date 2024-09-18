@@ -4,7 +4,7 @@ import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import { Box, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 
 import {
@@ -17,7 +17,7 @@ import {
   StyledCardContent,
   StyledContentTitleTypography,
   StyledCardActions,
-  cardContentWrapperStyle,
+  CardContentWrapper,
 } from "./style";
 import { BoardCardProps } from "./types";
 import { useCardDropDownItems } from "./useCardDropDownItems";

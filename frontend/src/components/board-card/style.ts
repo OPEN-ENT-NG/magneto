@@ -193,7 +193,7 @@ export const CardContentWrapper = styled("div")<{ resourceType: string }>(({
     overflow: "hidden",
     width: "100%",
     aspectRatio: "16 / 9",
-    borderRadius: resourceType == RESOURCE_TYPE.TEXT ? "1rem" : "unset",
+    borderRadius: resourceType !== RESOURCE_TYPE.TEXT ? "1rem" : "unset",
   };
 });
 

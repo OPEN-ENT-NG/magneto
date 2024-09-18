@@ -4,7 +4,6 @@ import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import { Tooltip } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 
 import {
@@ -17,6 +16,7 @@ import {
   StyledCardContent,
   StyledContentTitleTypography,
   StyledCardActions,
+  StyledLegendTypography,
   CardContentWrapper,
 } from "./style";
 import { BoardCardProps } from "./types";
@@ -26,6 +26,7 @@ import { CardComment } from "../card-comment/CardComment";
 import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../section-name/useDropDown";
+import { Tooltip } from "../tooltip/Tooltip";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 
 export const BoardCard: FC<BoardCardProps> = ({
@@ -53,7 +54,6 @@ export const BoardCard: FC<BoardCardProps> = ({
   return (
     <StyledCard zoomLevel={zoomLevel} ref={dropdownRef}>
       <StyledCardHeader
-        zoomLevel={zoomLevel}
         avatar={<StyledAvatar aria-label="recipe" src={avatar} />}
         action={
           <StyledIconButton
@@ -65,20 +65,7 @@ export const BoardCard: FC<BoardCardProps> = ({
         }
         title={user?.username}
         subheader={
-          <Tooltip
-            title={time.tooltip}
-            placement="bottom"
-            TransitionProps={{
-              style: { marginTop: "-0.5rem" },
-            }}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  fontSize: "1.4rem",
-                },
-              },
-            }}
-          >
+          <Tooltip title={time.tooltip} placement="bottom-start">
             <StyledTypographySubheader>{time.label}</StyledTypographySubheader>
           </Tooltip>
         }
@@ -98,6 +85,11 @@ export const BoardCard: FC<BoardCardProps> = ({
           <Icon path={icon} size={1} />
           {type}
         </StyledTypography>
+        {zoomLevel > 1 && (
+          <Tooltip title={card.caption}>
+            <StyledLegendTypography>{card.caption}</StyledLegendTypography>
+          </Tooltip>
+        )}
         <IconButton aria-label="add to favorites" size="small">
           <StarBorderIcon />
         </IconButton>

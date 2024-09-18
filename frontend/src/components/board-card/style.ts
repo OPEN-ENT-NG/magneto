@@ -63,19 +63,15 @@ export const StyledTypography = styled(Typography)({
   left: 0,
   zIndex: 1,
   fontSize: "14px",
+  marginRight: "1rem",
 });
 
-export const StyledCardHeader = styled(CardHeader, {
-  shouldForwardProp: (prop) => prop !== "zoomLevel",
-})<{ zoomLevel: number }>(({ zoomLevel }) => ({
+export const StyledCardHeader = styled(CardHeader)({
   padding: "0.5rem",
   paddingBottom: "0.1rem",
   "& .MuiCardHeader-content": {
     overflow: "hidden",
     flex: "1 1 auto",
-    ...(zoomLevel > 1 && {
-      textAlign: "center",
-    }),
   },
   "& .MuiCardHeader-title": {
     whiteSpace: "nowrap",
@@ -101,7 +97,7 @@ export const StyledCardHeader = styled(CardHeader, {
     paddingTop: 0,
     paddingBottom: 0,
   },
-}));
+});
 
 const handleStyledCardContentHeight = (zoomLevel: number) => {
   switch (zoomLevel) {
@@ -207,3 +203,13 @@ export const StyledCardActions = styled(CardActions, {
   paddingLeft: 0,
   alignItems: "center",
 }));
+
+export const StyledLegendTypography = styled(Typography)({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  fontSize: "1.3rem",
+  fontStyle: "italic",
+  display: "-webkit-box",
+  WebkitLineClamp: "1",
+  WebkitBoxOrient: "vertical",
+});

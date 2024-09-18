@@ -5,8 +5,7 @@ export const menuStyle = {
     paddingBottom: "0",
     backgroundColor: "white",
     color: "black",
-    border: "1px solid #e0e0e0",
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
     outline: "none !important",
     "& .MuiList-root": {
       paddingTop: 0,
@@ -14,8 +13,7 @@ export const menuStyle = {
     },
     "&:focus": {
       outline: "none !important",
-      border: "none !important",
-      boxShadow: "none !important",
+      boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
     },
     "&::before, &::after": {
       display: "none !important",

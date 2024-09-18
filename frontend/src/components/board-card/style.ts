@@ -10,26 +10,26 @@ import {
 } from "@mui/material";
 
 export const handleCardSize = (zoomLevel: number) => {
-  let cardSize = { width: "269px", height: "fit-content" };
+  let cardSize = { width: "269px", height: "fit-content", minHeight: "264px" };
 
   switch (zoomLevel) {
     case 0:
-      cardSize = { width: "132px", height: "130px" };
+      cardSize = { width: "132px", height: "130px", minHeight: "130px" };
       break;
     case 1:
-      cardSize = { width: "183px", height: "180px" };
+      cardSize = { width: "183px", height: "180px", minHeight: "180px" };
       break;
     case 2:
-      cardSize = { width: "228px", height: "fit-content" };
+      cardSize = { width: "228px", height: "fit-content", minHeight: "223px" };
       break;
     case 3:
-      cardSize = { width: "269px", height: "fit-content" };
+      cardSize = { width: "269px", height: "fit-content", minHeight: "264px" };
       break;
     case 4:
-      cardSize = { width: "330px", height: "fit-content" };
+      cardSize = { width: "330px", height: "fit-content", minHeight: "310px" };
       break;
     case 5:
-      cardSize = { width: "371px", height: "fit-content" };
+      cardSize = { width: "371px", height: "fit-content", minHeight: "350px" };
       break;
   }
   return cardSize;
@@ -101,7 +101,33 @@ export const StyledCardHeader = styled(CardHeader, {
   },
 }));
 
+const handleStyledCardContentHeight = (zoomLevel: number) => {
+  switch (zoomLevel) {
+    case 0:
+      return { minHeight: "230px" };
+
+    case 1:
+      return { minHeight: "230px" };
+
+    case 2:
+      return { minHeight: "230px" };
+
+    case 3:
+      return { minHeight: "230px" };
+
+    case 4:
+      return { minHeight: "230px" };
+
+    case 5:
+      return { minHeight: "207px" };
+
+    default:
+      return { minHeight: "230px" };
+  }
+};
+
 export const StyledCardContent = styled(CardContent)({
+  ...handleStyledCardContentHeight,
   flex: 1,
   overflow: "hidden",
   paddingLeft: "0.6rem",

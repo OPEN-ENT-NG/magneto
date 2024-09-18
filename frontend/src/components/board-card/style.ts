@@ -209,4 +209,7 @@ export const StyledLegendTypography = styled(Typography)({
   textOverflow: "ellipsis",
   fontSize: "1.3rem",
   fontStyle: "italic",
+  display: "-webkit-box",
+  WebkitLineClamp: "1",
+  WebkitBoxOrient: "vertical",
 });

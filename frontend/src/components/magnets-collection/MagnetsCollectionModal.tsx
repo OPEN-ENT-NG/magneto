@@ -93,7 +93,6 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   });
 
   const onLeave = () => {
-    toggleSwitchBoard(false);
     toggle();
   };
 
@@ -125,7 +124,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
             </div>
             <div>
               <Switch
-                value={switchBoard}
+                checked={switchBoard}
                 onChange={toggleSwitchBoard}
                 className="switchFav"
               />

@@ -23,6 +23,7 @@ import { CardCommentProps } from "./types";
 import { getAvatarUrl } from "./utils";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useAddCommentMutation } from "~/services/api/comment.service";
+import useDirectory from "~/hooks/useDirectory";
 
 export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
   const [inputValue, setInputValue] = useState<string>("");
@@ -33,6 +34,7 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
   const { cardComment, nbOfComment, cardId } = commentData;
 
   const time = useElapsedTime(cardComment.modificationDate);
+  const { getAvatarURL } = useDirectory();
 
   const getOwnerAvatar = async (ownerId: string) => {
     const avatar = await getAvatarUrl(ownerId);
@@ -68,7 +70,10 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
             </Typography>
           </Box>
           <Box sx={commentContentContainerStyle}>
-            <Avatar sx={avatarStyle} src={ownerAvatar}></Avatar>
+            <Avatar
+              sx={avatarStyle}
+              src={getAvatarURL(cardComment.ownerId, "user")}
+            ></Avatar>
             <Box sx={commentTextContainerStyle}>
               <Typography sx={userNameStyle}>
                 {cardComment.ownerName}

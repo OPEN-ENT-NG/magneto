@@ -66,7 +66,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: params,
       }),
-      invalidatesTags: ["Boards"],
+      invalidatesTags: ["Boards", "BoardData"],
     }),
     duplicateBoard: builder.mutation({
       query: (boardId: string) => ({

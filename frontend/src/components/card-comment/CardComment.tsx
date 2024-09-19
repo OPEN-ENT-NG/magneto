@@ -20,6 +20,7 @@ import {
   userNameStyle,
 } from "./style";
 import { CardCommentProps } from "./types";
+import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useAddCommentMutation } from "~/services/api/comment.service";
 
@@ -27,10 +28,11 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [addComment] = useAddCommentMutation();
   const { t } = useTranslation("magneto");
-  const { user, avatar } = useUser();
+  const { avatar } = useUser();
   const { cardComment, nbOfComment, cardId } = commentData;
 
   const time = useElapsedTime(cardComment.modificationDate);
+  const { getAvatarURL } = useDirectory();
 
   const handleSubmit = async (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && inputValue && cardId) {
@@ -57,10 +59,13 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
             </Typography>
           </Box>
           <Box sx={commentContentContainerStyle}>
-            <Avatar sx={avatarStyle} src={avatar}></Avatar>
+            <Avatar
+              sx={avatarStyle}
+              src={getAvatarURL(cardComment.ownerId, "user")}
+            ></Avatar>
             <Box sx={commentTextContainerStyle}>
               <Typography sx={userNameStyle}>
-                {`${user?.firstName} ${user?.lastName}`}
+                {cardComment.ownerName}
               </Typography>
               <Typography sx={timeStyle}>{time?.label}</Typography>
               <Typography sx={commentTextStyle}>

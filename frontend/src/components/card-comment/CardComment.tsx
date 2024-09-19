@@ -1,4 +1,4 @@
-import { FC, useState, KeyboardEvent, useEffect } from "react";
+import { FC, useState, KeyboardEvent } from "react";
 
 import { useUser } from "@edifice-ui/react";
 import { mdiCommentOutline } from "@mdi/js";
@@ -20,14 +20,12 @@ import {
   userNameStyle,
 } from "./style";
 import { CardCommentProps } from "./types";
-import { getAvatarUrl } from "./utils";
+import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useAddCommentMutation } from "~/services/api/comment.service";
-import useDirectory from "~/hooks/useDirectory";
 
 export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
   const [inputValue, setInputValue] = useState<string>("");
-  const [ownerAvatar, setOwnerAvatar] = useState<string>("");
   const [addComment] = useAddCommentMutation();
   const { t } = useTranslation("magneto");
   const { avatar } = useUser();
@@ -35,15 +33,6 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
 
   const time = useElapsedTime(cardComment.modificationDate);
   const { getAvatarURL } = useDirectory();
-
-  const getOwnerAvatar = async (ownerId: string) => {
-    const avatar = await getAvatarUrl(ownerId);
-    if (avatar) return setOwnerAvatar(avatar);
-  };
-
-  useEffect(() => {
-    if (cardComment.ownerId) getOwnerAvatar(cardComment.ownerId);
-  }, [cardComment.ownerId]);
 
   const handleSubmit = async (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && inputValue && cardId) {

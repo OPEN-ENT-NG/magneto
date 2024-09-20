@@ -23,8 +23,15 @@ export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
 
   const sideMenuData = useSideMenuData();
-  const { board, zoomLevel, zoomIn, zoomOut, resetZoom, isLoading } =
-    useBoard();
+  const {
+    board,
+    zoomLevel,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+    isLoading,
+    boardRights,
+  } = useBoard();
   const headerHeight = useHeaderHeight();
 
   useEffect(() => {

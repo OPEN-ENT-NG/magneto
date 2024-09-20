@@ -13,6 +13,8 @@ import { BoardContextType, BoardProviderProps } from "./types";
 import { fetchZoomPreference, updateZoomPreference } from "./utils";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
+import { RightRole } from "edifice-ts-client";
+import { checkUserRight } from "@edifice-ui/react";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -28,6 +30,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const { id = "" } = useParams();
   const { data: boardData, isLoading } = useGetBoardDataQuery(id);
+  const [boardRights, setBoardRights] = useState<Record<
+    RightRole,
+    boolean
+  > | null>(null);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -50,6 +56,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     setZoomLevel(zoom);
   };
 
+  const updateRights = async (rights: any) => {
+    setBoardRights(await checkUserRight(rights));
+  };
+
   useEffect(() => {
     prepareZoom();
   }, []);
@@ -57,6 +67,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   useEffect(() => {
     updateZoomPreference(zoomLevel);
   }, [zoomLevel]);
+
+  useEffect(() => {
+    if (boardData) updateRights(boardData.rights);
+  }, [boardData]);
 
   const value = useMemo<BoardContextType>(
     () => ({
@@ -67,8 +81,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       zoomOut,
       resetZoom,
       isLoading,
+      boardRights,
     }),
-    [board, zoomLevel],
+    [board, zoomLevel, boardRights],
   );
 
   return (

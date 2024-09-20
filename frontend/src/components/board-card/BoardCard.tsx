@@ -1,6 +1,5 @@
 import { FC, useEffect, useRef } from "react";
 
-import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -27,6 +26,7 @@ import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../section-name/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
+import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 
 export const BoardCard: FC<BoardCardProps> = ({
@@ -34,13 +34,13 @@ export const BoardCard: FC<BoardCardProps> = ({
   zoomLevel,
   canComment = false,
 }) => {
-  const { user, avatar } = useUser();
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
   const dropDownItemList = useCardDropDownItems();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOpen = openDropdownId === card.id;
+  const { getAvatarURL } = useDirectory();
   const handleToggleDropdown = () => {
     if (card.id) {
       toggleDropdown(card.id);
@@ -54,7 +54,12 @@ export const BoardCard: FC<BoardCardProps> = ({
   return (
     <StyledCard zoomLevel={zoomLevel} ref={dropdownRef}>
       <StyledCardHeader
-        avatar={<StyledAvatar aria-label="recipe" src={avatar} />}
+        avatar={
+          <StyledAvatar
+            aria-label="recipe"
+            src={getAvatarURL(card.ownerId, "user")}
+          />
+        }
         action={
           <StyledIconButton
             aria-label="settings"
@@ -63,7 +68,7 @@ export const BoardCard: FC<BoardCardProps> = ({
             <MoreVertIcon />
           </StyledIconButton>
         }
-        title={user?.username}
+        title={card.ownerName}
         subheader={
           <Tooltip title={time.tooltip} placement="bottom-start">
             <StyledTypographySubheader>{time.label}</StyledTypographySubheader>

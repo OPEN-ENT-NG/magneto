@@ -7,14 +7,14 @@ import {
   useState,
 } from "react";
 
+import { checkUserRight } from "@edifice-ui/react";
+import { RightRole } from "edifice-ts-client";
 import { useParams } from "react-router-dom";
 
 import { BoardContextType, BoardProviderProps } from "./types";
 import { fetchZoomPreference, updateZoomPreference } from "./utils";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
-import { RightRole } from "edifice-ts-client";
-import { checkUserRight } from "@edifice-ui/react";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 

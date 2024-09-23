@@ -69,8 +69,8 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   }, [zoomLevel]);
 
   useEffect(() => {
-    if (boardData) updateRights(boardData.rights);
-  }, [boardData]);
+    if (board) updateRights(board.rights);
+  }, [board]);
 
   const value = useMemo<BoardContextType>(
     () => ({

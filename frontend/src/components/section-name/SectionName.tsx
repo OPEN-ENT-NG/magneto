@@ -113,7 +113,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         disabled={!boardRights?.contrib}
         fullWidth
       />
-      {section && (
+      {section && boardRights?.contrib && (
         <IconButton
           size="large"
           sx={iconButtonStyle}

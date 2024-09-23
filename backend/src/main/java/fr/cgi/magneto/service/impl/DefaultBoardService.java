@@ -410,8 +410,6 @@ public class DefaultBoardService implements BoardService {
                         .map(JsonObject.class::cast)
                         .map(this::addNormalizedShares)
                         .collect(Collectors.toList());
-                System.out.println(boardList);
-                System.out.println(ModelHelper.toList(new JsonArray(boardList), Board.class));
                 promise.complete(ModelHelper.toList(new JsonArray(boardList), Board.class));
             }
         }));

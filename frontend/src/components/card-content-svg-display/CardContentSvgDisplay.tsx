@@ -2,7 +2,7 @@ import { FC } from "react";
 
 import { Box } from "@mui/material";
 
-import { svgWrapperStyle } from "./style";
+import { StyledAppIcon, svgWrapperStyle } from "./style";
 import { CardContentSvgDisplayProps } from "./types";
 import { AudioIcon } from "../SVG/AudioIcon";
 import { DefaultIcon } from "../SVG/DefaultIcon";
@@ -42,10 +42,9 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            height: "100%",
           }}
         >
-          <AppIcon
+          <StyledAppIcon
             app={{
               address: `/${appName}`,
               icon: `${appName}-large`,
@@ -55,7 +54,6 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
               displayName: "",
               isExternal: false,
             }}
-            size="160"
           />
         </Box>
       );

@@ -13,15 +13,52 @@ import { SheetIcon } from "../SVG/SheetIcon";
 import { TextIcon } from "../SVG/TextIcon";
 import { VideoIcon } from "../SVG/VideoIcon";
 import { EXTENSION_FORMAT } from "~/core/constants/extension-format.const";
+import { AppIcon } from "@edifice-ui/react";
 
 export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
+  url,
 }) => {
   const getSvgByExtension = (extension: string): React.ReactElement => {
     const lowerExt = extension.toLowerCase();
 
+    const extractFirstSegment = (url: string) => {
+      const cleanUrl = url.startsWith("/") ? url.slice(1) : url;
+      const segments = cleanUrl.split("/");
+      return segments[0].split(/[#?]/)[0];
+    };
+
+    const capFirstLetter = (string: string) => {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
     if (lowerExt === "link") {
-      return <DefaultLinkIcon />;
+      const appName = extractFirstSegment(url);
+      console.log(appName);
+      return (
+        <Box
+          sx={{
+            ...svgWrapperStyle,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <AppIcon
+            app={{
+              address: `/${appName}`,
+              icon: `${appName}-large`,
+              name: `${capFirstLetter(appName)}`,
+              scope: [],
+              display: false,
+              displayName: "",
+              isExternal: false,
+            }}
+            size="160"
+          />
+        </Box>
+      );
     }
 
     const [format] =

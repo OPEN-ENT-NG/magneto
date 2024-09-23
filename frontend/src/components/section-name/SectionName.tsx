@@ -36,6 +36,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const inputWrapperRef = useRef<HTMLDivElement>(null);
   const {
     board: { id: boardId },
+    boardRights,
   } = useBoard();
 
   useEffect(() => {
@@ -109,6 +110,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         onBlur={handleKeyDownAndBlur}
         onKeyDown={handleKeyDown}
         ref={inputWrapperRef}
+        disabled={!boardRights?.contrib}
         fullWidth
       />
       {section && (

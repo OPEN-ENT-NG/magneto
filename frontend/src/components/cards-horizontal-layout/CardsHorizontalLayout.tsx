@@ -15,7 +15,7 @@ import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsHorizontalLayout: FC = () => {
-  const { board, zoomLevel } = useBoard();
+  const { board, zoomLevel, boardRights } = useBoard();
 
   if (!board.sections?.length) return null;
 
@@ -42,11 +42,13 @@ export const CardsHorizontalLayout: FC = () => {
           </UlWrapper>
         </SectionWrapper>
       ))}
-      <SectionWrapper isLast={true}>
-        <Box sx={sectionNameWrapperStyle}>
-          <SectionName section={null} />
-        </Box>
-      </SectionWrapper>
+      {boardRights?.contrib && (
+        <SectionWrapper isLast={true}>
+          <Box sx={sectionNameWrapperStyle}>
+            <SectionName section={null} />
+          </Box>
+        </SectionWrapper>
+      )}
     </Box>
   );
 };

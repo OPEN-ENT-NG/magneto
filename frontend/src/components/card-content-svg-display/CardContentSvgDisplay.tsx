@@ -1,6 +1,8 @@
 import { FC } from "react";
-import { Box } from "@mui/material";
-import { StyledAppIcon, svgWrapperStyle } from "./style";
+
+import { useOdeClient, useOdeIcons } from "@edifice-ui/react";
+
+import { StyledAppIcon, StyledBoxSvg } from "./style";
 import { CardContentSvgDisplayProps } from "./types";
 import { AudioIcon } from "../SVG/AudioIcon";
 import { DefaultIcon } from "../SVG/DefaultIcon";
@@ -12,7 +14,6 @@ import { TextIcon } from "../SVG/TextIcon";
 import { VideoIcon } from "../SVG/VideoIcon";
 import { EXTENSION_FORMAT } from "~/core/constants/extension-format.const";
 import { useBoard } from "~/providers/BoardProvider";
-import { useOdeClient, useOdeIcons } from "@edifice-ui/react";
 
 export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
@@ -39,15 +40,8 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
       const appName = extractFirstSegment(url);
       const icon = getIconCode(appName);
       return (
-        <Box
-          sx={{
-            ...svgWrapperStyle,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {!!svgDoc.getElementById(icon) ? (
+        <>
+          {svgDoc.getElementById(icon) ? (
             <StyledAppIcon
               app={{
                 address: `/${appName}`,
@@ -64,7 +58,7 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
           ) : (
             <DefaultLinkIcon />
           )}
-        </Box>
+        </>
       );
     }
 
@@ -91,5 +85,5 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
     }
   };
 
-  return <Box sx={svgWrapperStyle}>{getSvgByExtension(extension)}</Box>;
+  return <StyledBoxSvg>{getSvgByExtension(extension)}</StyledBoxSvg>;
 };

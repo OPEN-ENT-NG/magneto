@@ -1,7 +1,5 @@
 import { FC } from "react";
-
 import { Box } from "@mui/material";
-
 import { StyledAppIcon, svgWrapperStyle } from "./style";
 import { CardContentSvgDisplayProps } from "./types";
 import { AudioIcon } from "../SVG/AudioIcon";
@@ -13,12 +11,17 @@ import { SheetIcon } from "../SVG/SheetIcon";
 import { TextIcon } from "../SVG/TextIcon";
 import { VideoIcon } from "../SVG/VideoIcon";
 import { EXTENSION_FORMAT } from "~/core/constants/extension-format.const";
-import { AppIcon } from "@edifice-ui/react";
+import { useBoard } from "~/providers/BoardProvider";
+import { useOdeClient, useOdeIcons } from "@edifice-ui/react";
 
 export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
   url,
 }) => {
+  const { svgDoc } = useBoard();
+  const { getIconCode } = useOdeIcons();
+  const { currentApp } = useOdeClient();
+
   const getSvgByExtension = (extension: string): React.ReactElement => {
     const lowerExt = extension.toLowerCase();
 
@@ -34,7 +37,7 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
 
     if (lowerExt === "link") {
       const appName = extractFirstSegment(url);
-      console.log(appName);
+      const icon = getIconCode(appName);
       return (
         <Box
           sx={{
@@ -44,17 +47,23 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
             alignItems: "center",
           }}
         >
-          <StyledAppIcon
-            app={{
-              address: `/${appName}`,
-              icon: `${appName}-large`,
-              name: `${capFirstLetter(appName)}`,
-              scope: [],
-              display: false,
-              displayName: "",
-              isExternal: false,
-            }}
-          />
+          {!!svgDoc.getElementById(icon) ? (
+            <StyledAppIcon
+              app={{
+                address: `/${appName}`,
+                icon: `${appName}-large`,
+                name: `${capFirstLetter(appName)}`,
+                scope: [],
+                display: false,
+                displayName: "",
+                isExternal: false,
+              }}
+            />
+          ) : icon === "magneto" ? (
+            <StyledAppIcon app={currentApp} />
+          ) : (
+            <DefaultLinkIcon />
+          )}
         </Box>
       );
     }

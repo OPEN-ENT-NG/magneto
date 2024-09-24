@@ -15,6 +15,7 @@ import { BoardContextType, BoardProviderProps } from "./types";
 import { fetchZoomPreference, updateZoomPreference } from "./utils";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
+import { usePaths } from "@edifice-ui/react";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -28,12 +29,30 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(3);
+  const [svgDoc, setSvgDoc] = useState<Document>(new Document());
   const { id = "" } = useParams();
+  const [, iconPath] = usePaths();
   const { data: boardData, isLoading } = useGetBoardDataQuery(id);
   const [boardRights, setBoardRights] = useState<Record<
     RightRole,
     boolean
   > | null>(null);
+
+  const fetchSvgDoc = async () => {
+    try {
+      const response = await fetch(`${iconPath}/apps.svg`);
+      const svgText = await response.text();
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+      setSvgDoc(svgDoc);
+    } catch (error) {
+      console.error("Erreur lors du fetch du SVG:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSvgDoc();
+  }, [iconPath]);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -83,8 +102,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       resetZoom,
       isLoading,
       boardRights,
+      svgDoc,
     }),
-    [board, zoomLevel, boardRights],
+    [board, zoomLevel, svgDoc, isLoading, boardRights],
   );
 
   return (

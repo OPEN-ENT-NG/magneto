@@ -1,5 +1,7 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
+import { RightRole } from "edifice-ts-client";
+
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 
@@ -15,6 +17,7 @@ export type BoardContextType = {
   zoomOut: () => void;
   resetZoom: () => void;
   isLoading: boolean;
+  boardRights: Record<RightRole, boolean> | null;
 };
 
 export type Section = {

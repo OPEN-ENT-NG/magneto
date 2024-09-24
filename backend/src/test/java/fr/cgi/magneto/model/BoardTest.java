@@ -29,6 +29,7 @@ public class BoardTest {
             .put("ownerName", "ownerName")
             .put("shared", new JsonArray())
             .put("tags", new JsonArray())
+            .put("rights", new JsonArray())
             .put("displayNbFavorites", false);
 
     @Test

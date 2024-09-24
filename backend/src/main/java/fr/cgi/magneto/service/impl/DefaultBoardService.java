@@ -405,7 +405,13 @@ public class DefaultBoardService implements BoardService {
                 JsonArray result = either.right().getValue()
                         .getJsonObject(Field.CURSOR, new JsonObject())
                         .getJsonArray(Field.FIRSTBATCH, new JsonArray());
-                promise.complete(ModelHelper.toList(result, Board.class));
+
+                List<JsonObject> boardList = result.stream()
+                        .filter(JsonObject.class::isInstance)
+                        .map(JsonObject.class::cast)
+                        .map(this::addNormalizedShares)
+                        .collect(Collectors.toList());
+                promise.complete(ModelHelper.toList(new JsonArray(boardList), Board.class));
             }
         }));
 

@@ -14,20 +14,27 @@ import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsVerticalLayout: FC = () => {
-  const { board, zoomLevel } = useBoard();
+  const { board, zoomLevel, boardRights } = useBoard();
 
   if (!board.sections?.length) return null;
 
   return (
     <Box sx={mainWrapperProps}>
       {board.sections.map((section) => (
-        <SectionWrapper key={section._id} sectionNumber={board.sections.length}>
+        <SectionWrapper
+          key={section._id}
+          sectionNumber={
+            boardRights?.contrib
+              ? board.sections.length + 1
+              : board.sections.length
+          }
+        >
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={section} />
           </Box>
           <CardsWrapper zoomLevel={zoomLevel}>
             {section.cards.map((card) => (
-              <CardWrapper key={card.id} zoomLevel={zoomLevel}>
+              <CardWrapper key={card.id}>
                 <BoardCard
                   card={card}
                   zoomLevel={zoomLevel}
@@ -39,11 +46,13 @@ export const CardsVerticalLayout: FC = () => {
           </CardsWrapper>
         </SectionWrapper>
       ))}
-      <SectionWrapper sectionNumber={board.sections.length} isLast={true}>
-        <Box sx={sectionNameWrapperStyle}>
-          <SectionName section={null} />
-        </Box>
-      </SectionWrapper>
+      {boardRights?.contrib && (
+        <SectionWrapper sectionNumber={board.sections.length} isLast={true}>
+          <Box sx={sectionNameWrapperStyle}>
+            <SectionName section={null} />
+          </Box>
+        </SectionWrapper>
+      )}
     </Box>
   );
 };

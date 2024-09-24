@@ -8,8 +8,8 @@ import {
 } from "react";
 
 import { checkUserRight } from "@edifice-ui/react";
-import { RightRole } from "edifice-ts-client";
 import { usePaths } from "@edifice-ui/react";
+import { RightRole } from "edifice-ts-client";
 import { useParams } from "react-router-dom";
 
 import { BoardContextType, BoardProviderProps } from "./types";

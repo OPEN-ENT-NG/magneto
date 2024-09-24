@@ -4,10 +4,11 @@ import { SectionWrapperProps } from "./types";
 import { handleCardSize } from "../board-card/style";
 
 const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
-  if (sectionNumber === 1) return "50%";
-  if (sectionNumber === 2) return "33%";
-  if (sectionNumber === 3) return "25%";
-  if (sectionNumber > 3) return "22%";
+  if (sectionNumber === 1) return "100%";
+  if (sectionNumber === 2) return "50%";
+  if (sectionNumber === 3) return "33%";
+  if (sectionNumber === 4) return "25%";
+  if (sectionNumber > 4) return "22%";
   return "";
 };
 

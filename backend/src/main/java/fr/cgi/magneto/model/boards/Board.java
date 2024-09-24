@@ -36,6 +36,7 @@ public class Board implements Model<Board> {
     private Boolean displayNbFavorites;
     private int nbCards;
     private int nbCardsSections;
+    private JsonArray rights;
 
 
     @SuppressWarnings("unchecked")
@@ -70,6 +71,7 @@ public class Board implements Model<Board> {
         }
         if (board.containsKey(Field.NBCARDSSECTIONS))
             this.nbCardsSections = board.getInteger(Field.NBCARDSSECTIONS);
+        this.rights = board.getJsonArray(Field.RIGHTS, new JsonArray());
 
     }
 
@@ -294,6 +296,14 @@ public class Board implements Model<Board> {
         this.nbCardsSections = nbCardsSections;
     }
 
+    public void setRights(JsonArray rights) {
+        this.rights = rights;
+    }
+
+    public JsonArray getRights() {
+        return this.rights;
+    }
+
     public Board reset() {
         this.setId(null);
         this.setPublic(false);
@@ -324,7 +334,8 @@ public class Board implements Model<Board> {
                 .put(Field.LAYOUTTYPE, this.getLayoutType())
                 .put(Field.CANCOMMENT, this.canComment())
                 .put(Field.DISPLAY_NB_FAVORITES, this.displayNbFavorites())
-                .put(Field.TAGS, this.tags());
+                .put(Field.TAGS, this.tags())
+                .put(Field.RIGHTS, this.getRights());
     }
 
     @Override

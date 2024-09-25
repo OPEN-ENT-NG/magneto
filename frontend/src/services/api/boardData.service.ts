@@ -41,7 +41,7 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
           if (sectionsResult.error) return { error: sectionsResult.error };
 
           const cardPromises = sectionsResult.data.all.map((section) =>
-            fetchWithBQ(`cards/section/${section._id}`),
+            fetchWithBQ(`cards/section/${section._id}?page=0`),
           );
           const cardsResults = await Promise.all(cardPromises);
 

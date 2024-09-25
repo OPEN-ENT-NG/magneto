@@ -14,7 +14,7 @@ import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsVerticalLayout: FC = () => {
-  const { board, zoomLevel, boardRights } = useBoard();
+  const { board, zoomLevel, hasEditRights } = useBoard();
 
   if (!board.sections?.length) return null;
 
@@ -24,9 +24,7 @@ export const CardsVerticalLayout: FC = () => {
         <SectionWrapper
           key={section._id}
           sectionNumber={
-            boardRights?.contrib
-              ? board.sections.length + 1
-              : board.sections.length
+            hasEditRights() ? board.sections.length + 1 : board.sections.length
           }
         >
           <Box sx={sectionNameWrapperStyle}>
@@ -47,7 +45,7 @@ export const CardsVerticalLayout: FC = () => {
           </CardsWrapper>
         </SectionWrapper>
       ))}
-      {boardRights?.contrib && (
+      {hasEditRights() && (
         <SectionWrapper sectionNumber={board.sections.length} isLast={true}>
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={null} />

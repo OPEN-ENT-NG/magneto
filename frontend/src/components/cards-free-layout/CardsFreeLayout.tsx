@@ -25,6 +25,7 @@ export const CardsFreeLayout: FC = () => {
                   card={card}
                   zoomLevel={zoomLevel}
                   canComment={board.canComment}
+                  displayNbFavorites={board.displayNbFavorites}
                   key={card.id}
                 />
               </LiWrapper>

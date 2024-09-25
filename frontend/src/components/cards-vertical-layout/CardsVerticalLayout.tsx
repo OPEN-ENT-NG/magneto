@@ -39,6 +39,7 @@ export const CardsVerticalLayout: FC = () => {
                   card={card}
                   zoomLevel={zoomLevel}
                   canComment={board.canComment}
+                  displayNbFavorites={board.displayNbFavorites}
                   key={card.id}
                 />
               </CardWrapper>

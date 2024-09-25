@@ -21,11 +21,11 @@ export const StyledTypography = styled(Typography, {
 }));
 
 export const buttonStyle = {
+  minWidth: 0,
   alignSelf: "flex-start",
   color: "#2A9CC8",
   fontSize: "1.2rem",
   fontWeight: "bolder",
-  fontFamily: "roboto",
   padding: 0,
   "&:hover": {
     color: "#FF8500",

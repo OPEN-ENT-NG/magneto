@@ -2,7 +2,7 @@ import { FC, useEffect } from "react";
 
 import "./BoardView.scss";
 
-import { LoadingScreen } from "@edifice-ui/react";
+import { LoadingScreen, useOdeClient } from "@edifice-ui/react";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
@@ -30,7 +30,7 @@ export const BoardView: FC = () => {
     zoomOut,
     resetZoom,
     isLoading,
-    boardRights,
+    hasEditRights,
   } = useBoard();
   const headerHeight = useHeaderHeight();
 
@@ -54,12 +54,14 @@ export const BoardView: FC = () => {
     }
   };
 
+
+
   return isLoading ? (
     <LoadingScreen position={false} />
   ) : (
     <BoardViewWrapper layout={board.layoutType}>
       <HeaderView />
-      {boardRights?.contrib && <SideMenu sideMenuData={sideMenuData} />}
+      {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}
       <BoardBodyWrapper layout={board.layoutType} headerHeight={headerHeight}>
         {displayLayout()}
         {board.backgroundUrl ? (

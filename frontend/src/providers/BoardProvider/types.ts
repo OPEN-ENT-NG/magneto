@@ -19,6 +19,7 @@ export type BoardContextType = {
   isLoading: boolean;
   svgDoc: Document;
   boardRights: Record<RightRole, boolean> | null;
+  hasEditRights: () => boolean;
 };
 
 export type Section = {

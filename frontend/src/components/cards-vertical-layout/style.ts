@@ -40,7 +40,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     flexDirection: "column",
     gap: "2rem",
     padding: "1rem 2rem 1rem 2rem",
-    minWidth: "405px",
+    minWidth: "420px",
     width: prepareWidth(sectionNumber),
     borderRight: !isLast ? "1px solid #aaa" : "",
     height: "100%",

@@ -24,7 +24,7 @@ export const menuStyle = {
 
 export const menuItemStyle = {
   paddingLeft: ".2rem",
-  paddingRight: ".4rem",
+  paddingRight: "1.4rem",
   "&:hover": {
     backgroundColor: "#ff8500",
     color: "white",

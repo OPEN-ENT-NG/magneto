@@ -46,7 +46,7 @@ export const CardsVerticalLayout: FC = () => {
         </SectionWrapper>
       ))}
       {hasEditRights() && (
-        <SectionWrapper sectionNumber={board.sections.length} isLast={true}>
+        <SectionWrapper sectionNumber={board.sections.length + 1} isLast={true}>
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={null} />
           </Box>

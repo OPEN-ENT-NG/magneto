@@ -1,8 +1,8 @@
 import { FC } from "react";
 
-import { Box } from "@mui/material";
+import { useOdeClient, useOdeIcons } from "@edifice-ui/react";
 
-import { svgWrapperStyle } from "./style";
+import { StyledAppIcon, StyledBoxSvg } from "./style";
 import { CardContentSvgDisplayProps } from "./types";
 import { AudioIcon } from "../SVG/AudioIcon";
 import { DefaultIcon } from "../SVG/DefaultIcon";
@@ -13,15 +13,53 @@ import { SheetIcon } from "../SVG/SheetIcon";
 import { TextIcon } from "../SVG/TextIcon";
 import { VideoIcon } from "../SVG/VideoIcon";
 import { EXTENSION_FORMAT } from "~/core/constants/extension-format.const";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
+  url,
 }) => {
+  const { svgDoc } = useBoard();
+  const { getIconCode } = useOdeIcons();
+  const { currentApp } = useOdeClient();
+
   const getSvgByExtension = (extension: string): React.ReactElement => {
     const lowerExt = extension.toLowerCase();
 
+    const extractFirstSegment = (url: string) => {
+      const cleanUrl = url.startsWith("/") ? url.slice(1) : url;
+      const segments = cleanUrl.split("/");
+      return segments[0].split(/[#?]/)[0];
+    };
+
+    const capFirstLetter = (string: string) => {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
     if (lowerExt === "link") {
-      return <DefaultLinkIcon />;
+      const appName = extractFirstSegment(url);
+      const icon = getIconCode(appName);
+      return (
+        <>
+          {svgDoc.getElementById(icon) ? (
+            <StyledAppIcon
+              app={{
+                address: `/${appName}`,
+                icon: `${appName}-large`,
+                name: `${capFirstLetter(appName)}`,
+                scope: [],
+                display: false,
+                displayName: "",
+                isExternal: false,
+              }}
+            />
+          ) : icon === "magneto" ? (
+            <StyledAppIcon app={currentApp} />
+          ) : (
+            <DefaultLinkIcon />
+          )}
+        </>
+      );
     }
 
     const [format] =
@@ -47,5 +85,5 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
     }
   };
 
-  return <Box sx={svgWrapperStyle}>{getSvgByExtension(extension)}</Box>;
+  return <StyledBoxSvg>{getSvgByExtension(extension)}</StyledBoxSvg>;
 };

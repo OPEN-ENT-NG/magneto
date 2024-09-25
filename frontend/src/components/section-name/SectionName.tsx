@@ -36,7 +36,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const inputWrapperRef = useRef<HTMLDivElement>(null);
   const {
     board: { id: boardId },
-    boardRights,
+    hasEditRights,
   } = useBoard();
 
   useEffect(() => {
@@ -110,10 +110,10 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         onBlur={handleKeyDownAndBlur}
         onKeyDown={handleKeyDown}
         ref={inputWrapperRef}
-        disabled={!boardRights?.contrib}
+        disabled={!hasEditRights()}
         fullWidth
       />
-      {section && boardRights?.contrib && (
+      {section && hasEditRights() && (
         <IconButton
           size="large"
           sx={iconButtonStyle}

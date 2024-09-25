@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { checkUserRight } from "@edifice-ui/react";
+import { checkUserRight, useOdeClient } from "@edifice-ui/react";
 import { usePaths } from "@edifice-ui/react";
 import { RightRole } from "edifice-ts-client";
 import { useParams } from "react-router-dom";
@@ -37,6 +37,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     RightRole,
     boolean
   > | null>(null);
+  const { user } = useOdeClient();
 
   const fetchSvgDoc = async () => {
     try {
@@ -92,6 +93,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       updateRights(new Board().build(boardData as IBoardItemResponse).rights);
   }, [boardData]);
 
+  const hasEditRights = (): boolean => {
+    return board.owner.userId === user?.userId || !!boardRights?.contrib;
+  };
+
   const value = useMemo<BoardContextType>(
     () => ({
       board,
@@ -103,6 +108,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isLoading,
       boardRights,
       svgDoc,
+      hasEditRights,
     }),
     [board, zoomLevel, svgDoc, isLoading, boardRights],
   );

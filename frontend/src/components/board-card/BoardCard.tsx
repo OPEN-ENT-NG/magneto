@@ -30,17 +30,16 @@ import { useDropdown } from "../section-name/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
-import { useBoard } from "~/providers/BoardProvider";
 
 export const BoardCard: FC<BoardCardProps> = ({
   card,
   zoomLevel,
   canComment = false,
+  displayNbFavorites = false,
 }) => {
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
-  const { board } = useBoard();
   const dropDownItemList = useCardDropDownItems();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOpen = openDropdownId === card.id;
@@ -100,7 +99,7 @@ export const BoardCard: FC<BoardCardProps> = ({
           </Tooltip>
         )}
         <StyledBox>
-          {board.displayNbFavorites && (
+          {displayNbFavorites && (
             <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>
           )}
           <BottomIconButton aria-label="add to favorites" size="small">

@@ -4,4 +4,5 @@ export interface BoardCardProps {
   card: Card;
   zoomLevel: number;
   canComment?: boolean;
+  displayNbFavorites?: boolean;
 }

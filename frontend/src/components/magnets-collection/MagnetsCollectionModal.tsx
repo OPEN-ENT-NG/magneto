@@ -13,6 +13,7 @@ import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card as CardModel, ICardItemResponse } from "~/models/card.model";
 import "./MagnetsCollectionModal.scss";
 import { useGetAllBoardsQuery } from "~/services/api/boards.service";
+import { SVGProvider } from "~/providers/SVGProvider/index.tsx";
 
 type props = {
   isOpen: boolean;
@@ -130,23 +131,25 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
               />
               {t("magneto.cards.collection.board.view")}
             </div>
-            {switchBoard ? (
-              <FavoriteViewByBoard
-                boardsWithCards={boardsWithCards}
-                searchText={searchText}
-                springs={springs}
-                currentApp={currentApp}
-                getBoardsLoading={getBoardsLoading}
-              />
-            ) : (
-              <FavoriteViewByCard
-                cardsData={cardsData}
-                searchText={searchText}
-                springs={springs}
-                currentApp={currentApp}
-                getBoardsLoading={getBoardsLoading}
-              />
-            )}
+            <SVGProvider>
+              {switchBoard ? (
+                <FavoriteViewByBoard
+                  boardsWithCards={boardsWithCards}
+                  searchText={searchText}
+                  springs={springs}
+                  currentApp={currentApp}
+                  getBoardsLoading={getBoardsLoading}
+                />
+              ) : (
+                <FavoriteViewByCard
+                  cardsData={cardsData}
+                  searchText={searchText}
+                  springs={springs}
+                  currentApp={currentApp}
+                  getBoardsLoading={getBoardsLoading}
+                />
+              )}
+            </SVGProvider>
           </Modal.Body>
         </Modal>
       )}

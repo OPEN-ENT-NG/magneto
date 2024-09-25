@@ -31,7 +31,7 @@ export const displayContentByType = (card: Card) => {
     case RESOURCE_TYPE.VIDEO:
       return <CardContentImageDisplay url={card.resourceUrl} />;
     case RESOURCE_TYPE.LINK:
-      return <CardContentSvgDisplay extension="link" />;
+      return <CardContentSvgDisplay url={card.resourceUrl} extension="link" />;
     case RESOURCE_TYPE.TEXT:
       return <CardContentText text={card.description} />;
     case RESOURCE_TYPE.IMAGE:

@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Card,
   CardActions,
   CardContent,
@@ -212,4 +213,17 @@ export const StyledLegendTypography = styled(Typography)({
   display: "-webkit-box",
   WebkitLineClamp: "1",
   WebkitBoxOrient: "vertical",
+});
+
+export const StyledBox = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+});
+
+export const Simple14Typography = styled(Typography)({
+  fontSize: "1.4rem",
+});
+
+export const BottomIconButton = styled(IconButton)({
+  paddingLeft: "0.2rem",
 });

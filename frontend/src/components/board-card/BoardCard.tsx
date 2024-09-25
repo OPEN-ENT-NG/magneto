@@ -3,7 +3,6 @@ import { FC, useEffect, useRef } from "react";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import IconButton from "@mui/material/IconButton";
 
 import {
   StyledTypography,
@@ -17,6 +16,9 @@ import {
   StyledCardActions,
   StyledLegendTypography,
   CardContentWrapper,
+  StyledBox,
+  Simple14Typography,
+  BottomIconButton,
 } from "./style";
 import { BoardCardProps } from "./types";
 import { useCardDropDownItems } from "./useCardDropDownItems";
@@ -28,6 +30,7 @@ import { useDropdown } from "../section-name/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const BoardCard: FC<BoardCardProps> = ({
   card,
@@ -37,6 +40,7 @@ export const BoardCard: FC<BoardCardProps> = ({
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
+  const { board } = useBoard();
   const dropDownItemList = useCardDropDownItems();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOpen = openDropdownId === card.id;
@@ -95,9 +99,14 @@ export const BoardCard: FC<BoardCardProps> = ({
             <StyledLegendTypography>{card.caption}</StyledLegendTypography>
           </Tooltip>
         )}
-        <IconButton aria-label="add to favorites" size="small">
-          <StarBorderIcon />
-        </IconButton>
+        <StyledBox>
+          {board.displayNbFavorites && (
+            <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>
+          )}
+          <BottomIconButton aria-label="add to favorites" size="small">
+            <StarBorderIcon />
+          </BottomIconButton>
+        </StyledBox>
       </StyledCardActions>
       {isOpen && dropdownRef.current && (
         <DropDownList

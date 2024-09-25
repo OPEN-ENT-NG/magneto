@@ -39,7 +39,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   > | null>(null);
   const { user } = useOdeClient();
 
-
   const fetchSvgDoc = async () => {
     try {
       const response = await fetch(`${iconPath}/apps.svg`);
@@ -95,8 +94,8 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   }, [boardData]);
 
   const hasEditRights = (): boolean => {
-    return (board.owner.userId === user?.userId || !!boardRights?.contrib);
-  }
+    return board.owner.userId === user?.userId || !!boardRights?.contrib;
+  };
 
   const value = useMemo<BoardContextType>(
     () => ({
@@ -109,7 +108,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isLoading,
       boardRights,
       svgDoc,
-      hasEditRights
+      hasEditRights,
     }),
     [board, zoomLevel, svgDoc, isLoading, boardRights],
   );

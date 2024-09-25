@@ -2,7 +2,7 @@ import { FC, useEffect } from "react";
 
 import "./BoardView.scss";
 
-import { LoadingScreen, useOdeClient } from "@edifice-ui/react";
+import { LoadingScreen } from "@edifice-ui/react";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
@@ -53,8 +53,6 @@ export const BoardView: FC = () => {
         return <CardsFreeLayout />;
     }
   };
-
-
 
   return isLoading ? (
     <LoadingScreen position={false} />

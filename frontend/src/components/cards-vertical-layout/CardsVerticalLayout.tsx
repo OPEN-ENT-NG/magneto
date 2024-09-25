@@ -24,9 +24,7 @@ export const CardsVerticalLayout: FC = () => {
         <SectionWrapper
           key={section._id}
           sectionNumber={
-            hasEditRights()
-              ? board.sections.length + 1
-              : board.sections.length
+            hasEditRights() ? board.sections.length + 1 : board.sections.length
           }
         >
           <Box sx={sectionNameWrapperStyle}>

@@ -12,8 +12,8 @@ import { useGetAllCardsCollectionQuery } from "../../services/api/cards.service"
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card as CardModel, ICardItemResponse } from "~/models/card.model";
 import "./MagnetsCollectionModal.scss";
-import { useGetAllBoardsQuery } from "~/services/api/boards.service";
 import { SVGProvider } from "~/providers/SVGProvider/index.tsx";
+import { useGetAllBoardsQuery } from "~/services/api/boards.service";
 
 type props = {
   isOpen: boolean;

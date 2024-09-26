@@ -8,7 +8,6 @@ import {
 } from "react";
 
 import { checkUserRight, useOdeClient } from "@edifice-ui/react";
-import { usePaths } from "@edifice-ui/react";
 import { RightRole } from "edifice-ts-client";
 import { useParams } from "react-router-dom";
 
@@ -29,31 +28,13 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(3);
-  const [svgDoc, setSvgDoc] = useState<Document>(new Document());
   const { id = "" } = useParams();
-  const [, iconPath] = usePaths();
   const { data: boardData, isLoading } = useGetBoardDataQuery(id);
   const [boardRights, setBoardRights] = useState<Record<
     RightRole,
     boolean
   > | null>(null);
   const { user } = useOdeClient();
-
-  const fetchSvgDoc = async () => {
-    try {
-      const response = await fetch(`${iconPath}/apps.svg`);
-      const svgText = await response.text();
-      const parser = new DOMParser();
-      const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
-      setSvgDoc(svgDoc);
-    } catch (error) {
-      console.error("Erreur lors du fetch du SVG:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchSvgDoc();
-  }, [iconPath]);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -107,10 +88,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       resetZoom,
       isLoading,
       boardRights,
-      svgDoc,
       hasEditRights,
     }),
-    [board, zoomLevel, svgDoc, isLoading, boardRights],
+    [board, zoomLevel, isLoading, boardRights],
   );
 
   return (

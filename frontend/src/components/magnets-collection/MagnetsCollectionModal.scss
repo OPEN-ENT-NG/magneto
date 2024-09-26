@@ -78,7 +78,6 @@ ul.grid {
   display: flex;
   gap: 10px;
   align-items: baseline;
-  padding-top: 5rem;
 }
 
 .duplicateText {
@@ -94,4 +93,9 @@ ul.grid {
 
 ul {
   list-style-type: none;
+}
+
+.magnet-board {
+  padding-bottom: 2rem;
+  padding-top: 2rem;
 }

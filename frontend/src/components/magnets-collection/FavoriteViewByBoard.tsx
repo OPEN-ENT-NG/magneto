@@ -48,7 +48,7 @@ export const FavoriteViewByBoard: FunctionComponent<
       <ul>
         {filteredBoardsWithCards.map((board: Board) => (
           <li key={board._id}>
-            <div>
+            <div className="magnet-board">
               <div className="parent">
                 <h2>{board._title}</h2>
                 <span

@@ -17,7 +17,6 @@ export type BoardContextType = {
   zoomOut: () => void;
   resetZoom: () => void;
   isLoading: boolean;
-  svgDoc: Document;
   boardRights: Record<RightRole, boolean> | null;
   hasEditRights: () => boolean;
 };

@@ -19,6 +19,7 @@ import {
   StyledBox,
   Simple14Typography,
   BottomIconButton,
+  StyledTypographyContainer,
 } from "./style";
 import { BoardCardProps } from "./types";
 import { useCardDropDownItems } from "./useCardDropDownItems";
@@ -89,15 +90,17 @@ export const BoardCard: FC<BoardCardProps> = ({
         )}
       </StyledCardContent>
       <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
-        <StyledTypography>
-          <Icon path={icon} size={1} />
-          {type}
-        </StyledTypography>
-        {zoomLevel > 1 && (
-          <Tooltip title={card.caption}>
-            <StyledLegendTypography>{card.caption}</StyledLegendTypography>
-          </Tooltip>
-        )}
+        <StyledTypographyContainer>
+          <StyledTypography>
+            <Icon path={icon} size={1} />
+            {type}
+          </StyledTypography>
+          {zoomLevel > 1 && (
+            <Tooltip title={card.caption}>
+              <StyledLegendTypography>{card.caption}</StyledLegendTypography>
+            </Tooltip>
+          )}
+        </StyledTypographyContainer>
         <StyledBox>
           {displayNbFavorites && (
             <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>

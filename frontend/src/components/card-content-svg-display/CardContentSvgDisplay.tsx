@@ -13,13 +13,13 @@ import { SheetIcon } from "../SVG/SheetIcon";
 import { TextIcon } from "../SVG/TextIcon";
 import { VideoIcon } from "../SVG/VideoIcon";
 import { EXTENSION_FORMAT } from "~/core/constants/extension-format.const";
-import { useBoard } from "~/providers/BoardProvider";
+import { useSVG } from "~/providers/SVGProvider";
 
 export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
   url,
 }) => {
-  const { svgDoc } = useBoard();
+  const { svgDoc } = useSVG();
   const { getIconCode } = useOdeIcons();
   const { currentApp } = useOdeClient();
 

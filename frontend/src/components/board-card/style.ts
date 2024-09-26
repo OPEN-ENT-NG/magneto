@@ -52,21 +52,6 @@ export const StyledCard = styled(Card, {
   height: handleCardSize(zoomLevel).height,
 }));
 
-export const StyledTypography = styled(Typography)({
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem",
-  backgroundColor: "#f8f9fa",
-  border: "3px solid #f8f9fa",
-  borderTopRightRadius: "10px",
-  borderBottomLeftRadius: "10px",
-  bottom: 0,
-  left: 0,
-  zIndex: 1,
-  fontSize: "14px",
-  marginRight: "1rem",
-});
-
 export const StyledCardHeader = styled(CardHeader)({
   padding: "0.5rem",
   paddingBottom: "0.1rem",
@@ -194,6 +179,34 @@ export const CardContentWrapper = styled("div")<{ resourceType: string }>(({
   };
 });
 
+export const StyledTypographyContainer = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  flexGrow: 1,
+  overflow: "hidden",
+});
+
+export const StyledTypography = styled(Typography)({
+  display: "flex",
+  alignItems: "center",
+  gap: "0.5rem",
+  backgroundColor: "#f8f9fa",
+  border: "3px solid #f8f9fa",
+  borderTopRightRadius: "10px",
+  borderBottomLeftRadius: "10px",
+  fontSize: "14px",
+  flexShrink: 0,
+});
+
+export const StyledLegendTypography = styled(Typography)({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  fontSize: "1.3rem",
+  fontStyle: "italic",
+  whiteSpace: "nowrap",
+  marginLeft: "1rem",
+});
+
 export const StyledCardActions = styled(CardActions, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",
 })<{ zoomLevel: number }>(({ zoomLevel }) => ({
@@ -201,19 +214,9 @@ export const StyledCardActions = styled(CardActions, {
   paddingRight: "0.4rem",
   paddingBottom: 0,
   paddingTop: zoomLevel < 2 ? 0 : "1rem",
-  paddingLeft: 0,
+  paddingLeft: "0.6rem",
   alignItems: "center",
 }));
-
-export const StyledLegendTypography = styled(Typography)({
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  fontSize: "1.3rem",
-  fontStyle: "italic",
-  display: "-webkit-box",
-  WebkitLineClamp: "1",
-  WebkitBoxOrient: "vertical",
-});
 
 export const StyledBox = styled(Box)({
   display: "flex",

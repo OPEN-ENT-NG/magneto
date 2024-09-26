@@ -40,7 +40,7 @@ public class MagnetoController extends ControllerHelper {
         renderJson(request, config);
     }
 
-    @Get("")
+    @Get("/angularJS")
     @ApiDoc("Render view")
     @SecuredAction(Rights.VIEW)
     public void view(HttpServerRequest request) {
@@ -58,7 +58,7 @@ public class MagnetoController extends ControllerHelper {
         eventStore.createAndStoreEvent(ACCESS.name(), request);
     }
 
-    @Get("/react")
+    @Get("")
     @ApiDoc("Render view")
     @ResourceFilter(ViewRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)

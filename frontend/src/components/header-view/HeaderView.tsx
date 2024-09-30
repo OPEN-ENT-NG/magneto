@@ -26,11 +26,6 @@ export const HeaderView: FC = () => {
   const modificationHour = board.modificationDate.split(" ")[1];
   const onClick = () => console.log("read clicked");
 
-  const currentAppConsole = () => {
-    console.log(currentApp);
-    return true;
-  };
-
   const boardHasCards = (): boolean => {
     return (
       !!board.cardIds?.length ||
@@ -42,9 +37,7 @@ export const HeaderView: FC = () => {
     <AppHeader className="header-view">
       <Box sx={mainWrapperStyle}>
         <Box sx={wrapperBoxStyle}>
-          {currentAppConsole() && currentApp && (
-            <Breadcrumb app={currentApp} name={board?.title} />
-          )}
+          {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
           <Box sx={leftWrapperStyle}>
             <Box sx={toastStyle}>
               <Icon path={mdiCheckCircle} size={1} />

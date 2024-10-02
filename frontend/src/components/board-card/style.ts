@@ -212,10 +212,10 @@ export const StyledCardActions = styled(CardActions, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",
 })<{ zoomLevel: number }>(({ zoomLevel }) => ({
   justifyContent: "space-between",
+  padding: "0",
   paddingRight: "0.4rem",
   paddingBottom: 0,
   paddingTop: zoomLevel < 2 ? 0 : "1rem",
-  paddingLeft: "0.6rem",
   alignItems: "center",
 }));
 

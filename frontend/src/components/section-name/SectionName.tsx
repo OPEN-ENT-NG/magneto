@@ -14,9 +14,9 @@ import { useTranslation } from "react-i18next";
 
 import { boxStyle, iconButtonStyle, iconStyle, inputStyle } from "./style";
 import { SectionNameProps } from "./types";
-import { useDropdown } from "./useDropDown";
-import { useCreateSectionDropDownItems } from "./utils";
+import { useCreateSectionDropDownItems } from "./useCreateSectionDropDownItems";
 import { DropDownList } from "../drop-down-list/DropDownList";
+import { useDropdown } from "../drop-down-list/useDropDown";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoard } from "~/providers/BoardProvider";
 import {
@@ -28,8 +28,8 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const toast = useToast();
   const { t } = useTranslation("magneto");
-  const dropDownItemList = useCreateSectionDropDownItems();
-  const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
+  const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
+    useDropdown();
   const [createSection] = useCreateSectionMutation();
   const [updateSection] = useUpdateSectionMutation();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     board: { id: boardId },
     hasEditRights,
   } = useBoard();
-
+  const dropDownItemList = useCreateSectionDropDownItems(section);
   useEffect(() => {
     if (section?._id) {
       registerDropdown(section._id, dropdownRef.current);
@@ -125,7 +125,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       {isOpen && dropdownRef.current && (
         <DropDownList
           items={dropDownItemList}
-          onClose={() => toggleDropdown(null)}
+          onClose={closeDropdown}
           open={isOpen}
           anchorEl={dropdownRef.current}
         />

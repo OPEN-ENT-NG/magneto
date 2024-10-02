@@ -26,6 +26,16 @@ export const sectionsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["Sections", "BoardData"],
     }),
+    duplicateSection: builder.mutation<SectionPayload, Partial<SectionPayload>>(
+      {
+        query: (sectionData) => ({
+          url: "section/duplicate",
+          method: "POST",
+          body: sectionData,
+        }),
+        invalidatesTags: ["Sections", "BoardData"],
+      },
+    ),
   }),
 });
 
@@ -33,4 +43,5 @@ export const {
   useGetSectionsByBoardQuery,
   useCreateSectionMutation,
   useUpdateSectionMutation,
+  useDuplicateSectionMutation,
 } = sectionsApi;

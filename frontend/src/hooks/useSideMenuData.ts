@@ -13,12 +13,12 @@ import {
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import {
   SideMenuIconProp,
   SideMenuDividerProp,
 } from "~/models/side-menu.model";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 
 export const useSideMenuData = (): (
   | SideMenuIconProp

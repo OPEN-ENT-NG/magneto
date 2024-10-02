@@ -17,12 +17,14 @@ import {
   SideMenuIconProp,
   SideMenuDividerProp,
 } from "~/models/side-menu.model";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const useSideMenuData = (): (
   | SideMenuIconProp
   | SideMenuDividerProp
 )[] => {
   const { t } = useTranslation("magneto");
+  const { handleClickMedia } = useMediaLibrary();
 
   return [
     {
@@ -35,37 +37,27 @@ export const useSideMenuData = (): (
     {
       icon: createElement(Icon, { path: mdiImage, size: 1.5 }),
       name: t("magneto.card.type.image"),
-      action: () => {
-        console.log("image");
-      },
+      action: () => handleClickMedia("image"),
     },
     {
       icon: createElement(Icon, { path: mdiPlayCircle, size: 1.5 }),
       name: t("magneto.card.type.video"),
-      action: () => {
-        console.log("video");
-      },
+      action: () => handleClickMedia("video"),
     },
     {
       icon: createElement(Icon, { path: mdiMusicNote, size: 1.5 }),
       name: t("magneto.card.type.audio"),
-      action: () => {
-        console.log("audio");
-      },
+      action: () => handleClickMedia("audio"),
     },
     {
       icon: createElement(Icon, { path: mdiFileMultiple, size: 1.5 }),
       name: t("magneto.card.type.file"),
-      action: () => {
-        console.log("document");
-      },
+      action: () => handleClickMedia("attachment"),
     },
     {
       icon: createElement(Icon, { path: mdiLink, size: 1.5 }),
       name: t("magneto.card.type.link"),
-      action: () => {
-        console.log("link");
-      },
+      action: () => handleClickMedia("hyperlink"),
     },
     {
       icon: createElement(Icon, {

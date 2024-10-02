@@ -6,26 +6,15 @@ import {
   MediaLibraryType,
   TabsItemProps,
 } from "@edifice-ui/react";
-import { RightRole, WorkspaceElement } from "edifice-ts-client";
+import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaProps } from "~/components/create-magnet/type";
-import { Board } from "~/models/board.model";
-import { Card } from "~/models/card.model";
 
-export interface BoardProviderProps {
+export interface MediaLibraryProviderProps {
   children: ReactNode;
 }
 
-export type BoardContextType = {
-  board: Board;
-  zoomLevel: number;
-  setZoomLevel: Dispatch<SetStateAction<number>>;
-  zoomIn: () => void;
-  zoomOut: () => void;
-  resetZoom: () => void;
-  isLoading: boolean;
-  boardRights: Record<RightRole, boolean> | null;
-  hasEditRights: () => boolean;
+export type MediaLibraryContextType = {
   mediaLibraryRef: RefObject<MediaLibraryRef>;
   libraryMedia: any;
   mediaLibraryHandlers: {
@@ -40,18 +29,4 @@ export type BoardContextType = {
   media: MediaProps | null;
   setMedia: Dispatch<SetStateAction<MediaProps | null>>;
   handleClickMedia: (type: MediaLibraryType) => void;
-};
-
-export type Section = {
-  _id: string;
-  title: string;
-  cardIds: string[];
-  boardId: string;
-  page: number;
-  cards: Card[];
-  displayed?: boolean;
-};
-
-export type Sections = {
-  all: Section[];
 };

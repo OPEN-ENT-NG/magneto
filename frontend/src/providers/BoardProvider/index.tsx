@@ -1,6 +1,7 @@
 import {
   FC,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -15,6 +16,7 @@ import { BoardContextType, BoardProviderProps } from "./types";
 import { fetchZoomPreference, updateZoomPreference } from "./utils";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
+import { update } from "immutability-helper";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -35,6 +37,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     boolean
   > | null>(null);
   const { user } = useOdeClient();
+  const [board, setBoard] = useState<Board>(boardData
+    ? new Board().build(boardData as IBoardItemResponse)
+    : new Board());
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -47,10 +52,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const resetZoom = (): void => {
     setZoomLevel(3);
   };
-
-  const board = boardData
-    ? new Board().build(boardData as IBoardItemResponse)
-    : new Board();
 
   const prepareZoom = async () => {
     const zoom = await fetchZoomPreference();

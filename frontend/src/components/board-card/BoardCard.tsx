@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useCallback, useEffect, useRef } from "react";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -39,6 +39,8 @@ export const BoardCard: FC<BoardCardProps> = ({
   zoomLevel,
   canComment = false,
   displayNbFavorites = false,
+  cardIndex,
+  sectionIndex,
 }) => {
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);

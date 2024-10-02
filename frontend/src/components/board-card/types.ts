@@ -5,4 +5,6 @@ export interface BoardCardProps {
   zoomLevel: number;
   canComment?: boolean;
   displayNbFavorites?: boolean;
+  cardIndex: number;
+  sectionIndex?: number
 }

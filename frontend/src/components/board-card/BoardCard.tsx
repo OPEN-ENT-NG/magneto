@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useCallback, useEffect, useRef } from "react";
 
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -31,13 +31,15 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
-import { useDrag } from "react-dnd";
+import { useDrag, useDrop, XYCoord } from "react-dnd";
 
 export const BoardCard: FC<BoardCardProps> = ({
   card,
   zoomLevel,
   canComment = false,
   displayNbFavorites = false,
+  cardIndex,
+  sectionIndex,
 }) => {
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
@@ -52,22 +54,84 @@ export const BoardCard: FC<BoardCardProps> = ({
     }
   };
 
+  const ref = useRef<HTMLDivElement>(null);
+
   const [{ isDragging }, drag] = useDrag({
     type: "card",
-    item: { card },
+    item: { card, cardIndex, sectionIndex },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
+  });
+
+  const [{ isOver }, drop] = useDrop({
+    accept: "card",
+    // drop: () => setHasDrop(true),
+    drop: () => console.log("drop"),
+    collect: (monitor: any) => ({
+      isOver: !!monitor.isOver(),
+    }),
+    hover(item: any, monitor: any) {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = item.cardIndex
+      const hoverIndex = cardIndex;
+
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+
+      // Determine rectangle on screen
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+
+      // Get vertical middle
+      const hoverMiddleX =
+        (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
+
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+
+      // Get pixels to the top
+      const hoverClientX = (clientOffset as XYCoord).x - hoverBoundingRect.left;
+
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+
+      // Dragging downwards
+      if (dragIndex < hoverIndex && hoverClientX < hoverMiddleX) {
+        return;
+      }
+
+      // Dragging upwards
+      if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
+        return;
+      }
+
+      // Time to actually perform the action
+      // moveCard(dragIndex, hoverIndex)
+      console.log("moved", item.card.id, dragIndex, item.sectionIndex, hoverIndex, sectionIndex);
+
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      item.cardIndex = hoverIndex;
+    },
   });
 
   useEffect(() => {
     registerDropdown(card.id, dropdownRef.current);
   }, [card.id, registerDropdown]);
 
+  drag(drop(ref));
+
   return (
     <div
-      ref={drag}
-      className={`${isDragging ? "dragging" : ""}`}
+      ref={ref}
+      // className={`${isDragging ? "dragging" : ""}`}
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: "move",

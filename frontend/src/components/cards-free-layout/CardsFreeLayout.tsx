@@ -27,6 +27,7 @@ export const CardsFreeLayout: FC = () => {
                   canComment={board.canComment}
                   displayNbFavorites={board.displayNbFavorites}
                   key={card.id}
+                  cardIndex={index}
                 />
               </LiWrapper>
             );

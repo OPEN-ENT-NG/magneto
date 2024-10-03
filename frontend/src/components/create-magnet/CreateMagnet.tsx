@@ -14,7 +14,6 @@ export const CreateMagnet: FC = () => {
 
   useEffect(() => {
     if (libraryMedia) setIsOpen(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libraryMedia]);
 
   return (

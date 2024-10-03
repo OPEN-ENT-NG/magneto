@@ -15,8 +15,8 @@ import {
 import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
-import { MediaProps } from "~/components/create-magnet/type";
 import { useMediaLibrary as useMediaLibraryEdifice } from "@edifice-ui/react";
+import { MediaProps } from "~/components/board-view/types";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);
 
@@ -90,7 +90,6 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
 
   useEffect(() => {
     updateLibraryMedia();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libraryMedia]);
 
   const value = useMemo<MediaLibraryContextType>(

@@ -2,7 +2,7 @@ import { FC, useEffect } from "react";
 
 import "./BoardView.scss";
 
-import { LoadingScreen, MediaLibraryType } from "@edifice-ui/react";
+import { LoadingScreen } from "@edifice-ui/react";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
@@ -19,15 +19,6 @@ import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
-
-export interface MediaProps {
-  id: string;
-  name: string;
-  application: string;
-  type: MediaLibraryType;
-  url: string;
-  targetUrl?: string;
-}
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");

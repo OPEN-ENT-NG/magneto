@@ -1,6 +1,7 @@
-import { FC, Fragment } from "react";
+import { FC } from "react";
 
 import {
+  Box,
   Divider,
   ListItemIcon,
   ListItemText,
@@ -14,7 +15,7 @@ import {
   menuItemStyle,
   menuStyle,
 } from "./style";
-import { DropDownListProps } from "./types";
+import { DropDownListItem, DropDownListProps } from "./types";
 import { getAnchorOrigin, getTransformOrigin } from "./utils";
 
 export const DropDownList: FC<DropDownListProps> = ({
@@ -25,11 +26,10 @@ export const DropDownList: FC<DropDownListProps> = ({
   position = "bottom-right",
   menuOffset = 8,
 }) => {
-  const handleItemClick = (itemOnClick: () => void) => {
-    itemOnClick();
+  const handleItemClick = (item: DropDownListItem) => {
+    item.OnClick();
     onClose();
   };
-
   return (
     <Menu
       anchorEl={anchorEl}
@@ -41,16 +41,13 @@ export const DropDownList: FC<DropDownListProps> = ({
       disableScrollLock
     >
       {items.map((item, index) => (
-        <Fragment key={`option-${Date.now() + index}`}>
+        <Box key={`option-${Date.now() + index}`}>
           {item.divider && <Divider />}
-          <MenuItem
-            onClick={() => handleItemClick(item.OnClick)}
-            sx={menuItemStyle}
-          >
+          <MenuItem onClick={() => handleItemClick(item)} sx={menuItemStyle}>
             <ListItemIcon sx={listItemIconStyle}>{item.primary}</ListItemIcon>
             <ListItemText primary={item.secondary} sx={listItemTextStyle} />
           </MenuItem>
-        </Fragment>
+        </Box>
       ))}
     </Menu>
   );

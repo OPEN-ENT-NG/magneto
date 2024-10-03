@@ -8,15 +8,18 @@ import {
 } from "react";
 
 import { useToast } from "@edifice-ui/react";
+import { mdiEyeOff } from "@mdi/js";
+import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Box, InputBase, IconButton } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { boxStyle, iconButtonStyle, iconStyle, inputStyle } from "./style";
 import { SectionNameProps } from "./types";
-import { useDropdown } from "./useDropDown";
-import { useCreateSectionDropDownItems } from "./utils";
+import { useCreateSectionDropDownItems } from "./useCreateSectionDropDownItems";
+import { DeleteSectionModal } from "../delete-section-modal/DeleteSectionModal";
 import { DropDownList } from "../drop-down-list/DropDownList";
+import { useDropdown } from "../drop-down-list/useDropDown";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoard } from "~/providers/BoardProvider";
 import {
@@ -26,10 +29,11 @@ import {
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const toast = useToast();
   const { t } = useTranslation("magneto");
-  const dropDownItemList = useCreateSectionDropDownItems();
-  const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
+  const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
+    useDropdown();
   const [createSection] = useCreateSectionMutation();
   const [updateSection] = useUpdateSectionMutation();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,7 +42,10 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     board: { id: boardId },
     hasEditRights,
   } = useBoard();
-
+  const dropDownItemList = useCreateSectionDropDownItems(
+    section,
+    setIsDeleteModalOpen,
+  );
   useEffect(() => {
     if (section?._id) {
       registerDropdown(section._id, dropdownRef.current);
@@ -102,6 +109,11 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
 
   return (
     <Box sx={boxStyle} ref={dropdownRef}>
+      {section?.displayed === false && (
+        <Box sx={{ width: "1.5rem" }}>
+          <Icon path={mdiEyeOff} size={"inherit"} />
+        </Box>
+      )}
       <InputBase
         sx={inputStyle}
         value={inputValue}
@@ -125,9 +137,16 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       {isOpen && dropdownRef.current && (
         <DropDownList
           items={dropDownItemList}
-          onClose={() => toggleDropdown(null)}
+          onClose={closeDropdown}
           open={isOpen}
           anchorEl={dropdownRef.current}
+        />
+      )}
+      {isDeleteModalOpen && section && (
+        <DeleteSectionModal
+          section={section}
+          open={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
         />
       )}
     </Box>

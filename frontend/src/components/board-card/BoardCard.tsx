@@ -27,7 +27,7 @@ import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
 import { CardComment } from "../card-comment/CardComment";
 import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
-import { useDropdown } from "../section-name/useDropDown";
+import { useDropdown } from "../drop-down-list/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";

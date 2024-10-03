@@ -8,3 +8,7 @@ export interface MediaProps {
   url: string;
   targetUrl?: string;
 }
+
+export interface IsModalOpenState {
+  magnet: boolean;
+}

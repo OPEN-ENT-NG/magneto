@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import { createElement, Dispatch, SetStateAction } from "react";
 
 import {
   mdiBookmarkBoxMultiple,
@@ -23,13 +23,15 @@ import {
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
-export const useSideMenuData = (): (
-  | SideMenuIconProp
-  | SideMenuDividerProp
-)[] => {
+export const useSideMenuData = (
+  setIsModalOpen: Dispatch<SetStateAction<IsModalOpenState>>,
+): (SideMenuIconProp | SideMenuDividerProp)[] => {
   const { t } = useTranslation("magneto");
   const { handleClickMedia, handleClickMenu } = useMediaLibrary();
   const { toggleBoardModals } = useBoard();
+
+  const openModal = (modalType: keyof IsModalOpenState) =>
+    setIsModalOpen((prevState) => ({ ...prevState, [modalType]: true }));
 
   return [
     {

@@ -322,25 +322,25 @@ export class BoardForm {
 
 export class Board /*implements Shareable*/ {
   public _id: string;
-  public title: string;
-  public imageUrl: string;
-  public backgroundUrl: string;
-  public description: string;
-  public cardIds: Array<string>;
-  public sections: Array<Section>;
-  public tags: Array<string>;
-  public layoutType: LAYOUT_TYPE;
-  public tagsTextInput: string;
-  public nbCards: number;
-  public nbCardsSections: number;
-  public modificationDate: string;
-  public creationDate: string;
-  public folderId: string;
-  public isPublished: boolean;
-  public deleted: boolean;
-  public canComment: boolean;
-  public displayNbFavorites: boolean;
-  public cards: Card[];
+  public _title: string = " ";
+  private _imageUrl: string;
+  private _backgroundUrl: string;
+  private _description: string;
+  private _cardIds: Array<string>;
+  private _sections: Array<Section>;
+  private _tags: Array<string>;
+  private _layoutType: LAYOUT_TYPE;
+  private _tagsTextInput: string;
+  private _nbCards: number;
+  private _nbCardsSections: number;
+  private _modificationDate: string;
+  private _creationDate: string;
+  private _folderId: string;
+  private _isPublished: boolean;
+  private _deleted: boolean;
+  private _canComment: boolean;
+  private _displayNbFavorites: boolean;
+  private _cards: Card[];
 
   // Share resource properties
   public shared: any[];
@@ -350,62 +350,62 @@ export class Board /*implements Shareable*/ {
 
   constructor() {
     this._id = "";
-    this.title = "";
-    this.imageUrl = "";
-    this.backgroundUrl = "";
-    this.description = "";
-    this.cardIds = [];
-    this.sections = [];
-    this.layoutType = LAYOUT_TYPE.FREE;
-    this.tags = [];
-    this.tagsTextInput = "";
-    this.nbCards = 0;
-    this.nbCardsSections = 0;
-    this.modificationDate = "";
-    this.creationDate = "";
-    this.folderId = "";
-    this.isPublished = false;
+    this._title = "";
+    this._imageUrl = "";
+    this._backgroundUrl = "";
+    this._description = "";
+    this._cardIds = [];
+    this._sections = [];
+    this._layoutType = LAYOUT_TYPE.FREE;
+    this._tags = [];
+    this._tagsTextInput = "";
+    this._nbCards = 0;
+    this._nbCardsSections = 0;
+    this._modificationDate = "";
+    this._creationDate = "";
+    this._folderId = "";
+    this._isPublished = false;
     this.owner = { userId: "", displayName: "" };
     this.shared = [];
     this.rights = [];
-    this.deleted = false;
-    this.canComment = false;
-    this.displayNbFavorites = false;
-    this.cards = [];
+    this._deleted = false;
+    this._canComment = false;
+    this._displayNbFavorites = false;
+    this._cards = [];
     return this;
   }
 
   build(data: IBoardItemResponse): Board {
     this._id = data._id;
-    this.title = data.title;
-    this.imageUrl = data.imageUrl;
-    this.backgroundUrl = data.backgroundUrl;
-    this.description = data.description;
-    this.cardIds = data.cardIds;
-    this.sections = data.sections;
-    this.layoutType = data.layoutType;
-    this.tags = data.tags;
-    this.tagsTextInput = data.tags
+    this._title = data.title;
+    this._imageUrl = data.imageUrl;
+    this._backgroundUrl = data.backgroundUrl;
+    this._description = data.description;
+    this._cardIds = data.cardIds;
+    this._sections = data.sections;
+    this._layoutType = data.layoutType;
+    this._tags = data.tags;
+    this._tagsTextInput = data.tags
       ? data.tags
           .map((tag: string) => "#" + tag)
           .toString()
           .replace(/,/g, " ")
       : "";
 
-    this.nbCards = data.nbCards;
-    this.nbCardsSections = data.nbCardsSections;
-    this.modificationDate = data.modificationDate;
-    this.creationDate = data.creationDate;
-    this.folderId = data.folderId;
-    this.isPublished = data.public;
+    this._nbCards = data.nbCards;
+    this._nbCardsSections = data.nbCardsSections;
+    this._modificationDate = data.modificationDate;
+    this._creationDate = data.creationDate;
+    this._folderId = data.folderId;
+    this._isPublished = data.public;
     this.owner = { userId: data.ownerId, displayName: data.ownerName };
     this.shared = data.shared;
-    this.cards = data.cards
+    this._cards = data.cards
       ? data.cards.map((cardData) =>
           new Card().build(cardData as unknown as ICardItemResponse),
         )
       : [];
-    this.sections = data.sections
+    this._sections = data.sections
       ? data.sections.map((sectionData: Section) => ({
           ...sectionData,
           cards: sectionData.cards
@@ -416,19 +416,111 @@ export class Board /*implements Shareable*/ {
         }))
       : [];
     this.rights = data.rights;
-    this.deleted = data.deleted;
-    this.canComment = data.canComment;
-    this.displayNbFavorites = data.displayNbFavorites;
+    this._deleted = data.deleted;
+    this._canComment = data.canComment;
+    this._displayNbFavorites = data.displayNbFavorites;
     return this;
   }
 
+  get id(): string {
+    return this._id;
+  }
+
+  get title(): string {
+    return this._title;
+  }
+
+  get description(): string {
+    return this._description;
+  }
+
+  get imageUrl(): string {
+    return this._imageUrl;
+  }
+
+  get backgroundUrl(): string {
+    return this._backgroundUrl;
+  }
+
+  get cardIds(): Array<string> {
+    return this._cardIds;
+  }
+
+  get sections(): Section[] {
+    return this._sections;
+  }
+
   get sectionsIds(): Array<string> {
-    return this.sections.map((section) => section._id);
+    return this._sections.map((section) => section._id);
+  }
+
+  set sections(value: Section[]) {
+    this._sections = value;
+  }
+
+  get nbCards(): number {
+    return this._nbCards;
+  }
+
+  get nbCardsSections(): number {
+    return this._nbCardsSections;
+  }
+
+  get modificationDate(): string {
+    return this._modificationDate;
+  }
+
+  get creationDate(): string {
+    return this._creationDate;
+  }
+
+  get folderId(): string {
+    return this._folderId;
+  }
+
+  get isPublished(): boolean {
+    return this._isPublished;
+  }
+
+  set isPublished(value: boolean) {
+    this._isPublished = value;
+  }
+
+  get deleted(): boolean {
+    return this._deleted;
+  }
+
+  set folderId(value: string) {
+    this._folderId = value;
+  }
+
+  get layoutType(): LAYOUT_TYPE {
+    return this._layoutType;
+  }
+
+  set layoutType(value: LAYOUT_TYPE) {
+    this._layoutType = value;
+  }
+
+  get tags(): Array<string> {
+    return this._tags;
+  }
+
+  get tagsTextInput(): string {
+    return this._tagsTextInput;
+  }
+
+  set tagsTextInput(value: string) {
+    this._tagsTextInput = value;
+  }
+
+  set tags(value: Array<string>) {
+    this._tags = value;
   }
 
   hasCardsSection(): boolean {
-    return this.sections
-      ? this.sections.some((section) => section.cards.length > 0)
+    return this._sections
+      ? this._sections.some((section) => section.cards.length > 0)
       : false;
   }
 
@@ -437,7 +529,7 @@ export class Board /*implements Shareable*/ {
   // }
 
   sortSections(value: Array<string>) {
-    return this.sections.sort(
+    return this._sections.sort(
       (a, b) => value.indexOf(a._id) - value.indexOf(b._id),
     );
   }
@@ -456,6 +548,30 @@ export class Board /*implements Shareable*/ {
 
   isLayoutVertical(): boolean {
     return this.layoutType == LAYOUT_TYPE.VERTICAL;
+  }
+
+  get canComment(): boolean {
+    return this._canComment;
+  }
+
+  set canComment(value: boolean) {
+    this._canComment = value;
+  }
+
+  get displayNbFavorites(): boolean {
+    return this._displayNbFavorites;
+  }
+
+  set displayNbFavorites(value: boolean) {
+    this._displayNbFavorites = value;
+  }
+
+  get cards(): Card[] {
+    return this._cards;
+  }
+
+  set cards(value: Card[]) {
+    this._cards = value;
   }
 }
 

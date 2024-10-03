@@ -118,7 +118,6 @@ export default function useShare({
         setIsLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resourceId]);
 
   const toggleRight = (

@@ -1,5 +1,6 @@
 import { FC, useCallback, useEffect, useRef } from "react";
 
+// import { DndContext } from "@dnd-kit/core";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -77,7 +78,7 @@ export const BoardCard: FC<BoardCardProps> = ({
       if (!ref.current) {
         return;
       }
-      const dragIndex = item.cardIndex
+      const dragIndex = item.cardIndex;
       const hoverIndex = cardIndex;
 
       // Don't replace items with themselves
@@ -114,8 +115,21 @@ export const BoardCard: FC<BoardCardProps> = ({
 
       // Time to actually perform the action
       // moveCard(dragIndex, hoverIndex)
-      console.log("moved", item.card.id, dragIndex, item.sectionIndex, hoverIndex, sectionIndex);
-      moveCardsHover(item.card.id, dragIndex, hoverIndex, item.sectionIndex, sectionIndex);
+      console.log(
+        "moved",
+        item.card.id,
+        dragIndex,
+        item.sectionIndex,
+        hoverIndex,
+        sectionIndex,
+      );
+      moveCardsHover(
+        item.card.id,
+        dragIndex,
+        hoverIndex,
+        item.sectionIndex,
+        sectionIndex,
+      );
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
@@ -132,89 +146,93 @@ export const BoardCard: FC<BoardCardProps> = ({
   drag(drop(ref));
 
   return (
-    <div
-      ref={ref}
-      // className={`${isDragging ? "dragging" : ""}`}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-        cursor: "move",
-      }}
-    >
-      <StyledCard zoomLevel={zoomLevel} ref={dropdownRef}>
-        <StyledCardHeader
-          avatar={
-            <StyledAvatar
-              aria-label="recipe"
-              src={getAvatarURL(card.ownerId, "user")}
-            />
-          }
-          action={
-            <StyledIconButton
-              aria-label="settings"
-              onClick={handleToggleDropdown}
-            >
-              <MoreVertIcon />
-            </StyledIconButton>
-          }
-          title={card.ownerName}
-          subheader={
-            <Tooltip title={time.tooltip} placement="bottom-start">
-              <StyledTypographySubheader>
-                {time.label}
-              </StyledTypographySubheader>
-            </Tooltip>
-          }
-        />
-        <StyledCardContent>
-          <StyledContentTitleTypography zoomLevel={zoomLevel}>
-            {card.title || <span>&nbsp;</span>}
-          </StyledContentTitleTypography>
-          {zoomLevel > 1 && (
-            <CardContentWrapper resourceType={card.resourceType}>
-              <CardContent card={card} />
-            </CardContentWrapper>
-          )}
-        </StyledCardContent>
-        <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
-          <StyledTypographyContainer>
-            <StyledTypography>
-              <Icon path={icon} size={1} />
-              {type}
-            </StyledTypography>
-            {zoomLevel > 1 && (
-              <Tooltip title={card.caption}>
-                <StyledLegendTypography>{card.caption}</StyledLegendTypography>
+    // <DndContext>
+      <div
+        ref={ref}
+        // className={`${isDragging ? "dragging" : ""}`}
+        style={{
+          opacity: isDragging ? 0.5 : 1,
+          cursor: "move",
+        }}
+      >
+        <StyledCard zoomLevel={zoomLevel} ref={dropdownRef}>
+          <StyledCardHeader
+            avatar={
+              <StyledAvatar
+                aria-label="recipe"
+                src={getAvatarURL(card.ownerId, "user")}
+              />
+            }
+            action={
+              <StyledIconButton
+                aria-label="settings"
+                onClick={handleToggleDropdown}
+              >
+                <MoreVertIcon />
+              </StyledIconButton>
+            }
+            title={card.ownerName}
+            subheader={
+              <Tooltip title={time.tooltip} placement="bottom-start">
+                <StyledTypographySubheader>
+                  {time.label}
+                </StyledTypographySubheader>
               </Tooltip>
-            )}
-          </StyledTypographyContainer>
-          <StyledBox>
-            {displayNbFavorites && (
-              <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>
-            )}
-            <BottomIconButton aria-label="add to favorites" size="small">
-              <StarBorderIcon />
-            </BottomIconButton>
-          </StyledBox>
-        </StyledCardActions>
-        {isOpen && dropdownRef.current && (
-          <DropDownList
-            items={dropDownItemList}
-            onClose={() => toggleDropdown(null)}
-            open={isOpen}
-            anchorEl={dropdownRef.current}
-            position="right-top"
+            }
           />
-        )}
-        {canComment && zoomLevel > 1 && (
-          <CardComment
-            commentData={{
-              cardComment: card.lastComment,
-              nbOfComment: card.nbOfComments,
-              cardId: card.id,
-            }}
-          />
-        )}
-      </StyledCard>
-    </div>
+          <StyledCardContent>
+            <StyledContentTitleTypography zoomLevel={zoomLevel}>
+              {card.title || <span>&nbsp;</span>}
+            </StyledContentTitleTypography>
+            {zoomLevel > 1 && (
+              <CardContentWrapper resourceType={card.resourceType}>
+                <CardContent card={card} />
+              </CardContentWrapper>
+            )}
+          </StyledCardContent>
+          <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
+            <StyledTypographyContainer>
+              <StyledTypography>
+                <Icon path={icon} size={1} />
+                {type}
+              </StyledTypography>
+              {zoomLevel > 1 && (
+                <Tooltip title={card.caption}>
+                  <StyledLegendTypography>
+                    {card.caption}
+                  </StyledLegendTypography>
+                </Tooltip>
+              )}
+            </StyledTypographyContainer>
+            <StyledBox>
+              {displayNbFavorites && (
+                <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>
+              )}
+              <BottomIconButton aria-label="add to favorites" size="small">
+                <StarBorderIcon />
+              </BottomIconButton>
+            </StyledBox>
+          </StyledCardActions>
+          {isOpen && dropdownRef.current && (
+            <DropDownList
+              items={dropDownItemList}
+              onClose={() => toggleDropdown(null)}
+              open={isOpen}
+              anchorEl={dropdownRef.current}
+              position="right-top"
+            />
+          )}
+          {canComment && zoomLevel > 1 && (
+            <CardComment
+              commentData={{
+                cardComment: card.lastComment,
+                nbOfComment: card.nbOfComments,
+                cardId: card.id,
+              }}
+            />
+          )}
+        </StyledCard>
+      </div>
+    // </DndContext>
   );
 };

@@ -12,10 +12,10 @@ import {
   InternalLinkTabResult,
   MediaLibraryType,
 } from "@edifice-ui/react";
+import { useMediaLibrary as useMediaLibraryEdifice } from "@edifice-ui/react";
 import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
-import { useMediaLibrary as useMediaLibraryEdifice } from "@edifice-ui/react";
 import { MediaProps } from "~/components/board-view/types";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);

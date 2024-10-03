@@ -7,6 +7,7 @@ import {
   TabsItemProps,
 } from "@edifice-ui/react";
 import { WorkspaceElement } from "edifice-ts-client";
+
 import { MediaProps } from "~/components/board-view/types";
 
 export interface MediaLibraryProviderProps {

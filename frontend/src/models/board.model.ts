@@ -70,6 +70,7 @@ export interface SectionPayload {
   cardIds?: string[];
   boardId: string;
   displayed?: boolean;
+  sectionIds?: string[];
 }
 
 export interface ISection {

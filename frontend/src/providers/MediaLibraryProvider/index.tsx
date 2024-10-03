@@ -16,7 +16,7 @@ import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { MediaProps } from "~/components/create-magnet/type";
-import { useMediaLibrary as useMediaLibraryEdifice } from "~/hooks/useMediaLibrary";
+import { useMediaLibrary as useMediaLibraryEdifice } from "@edifice-ui/react";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);
 

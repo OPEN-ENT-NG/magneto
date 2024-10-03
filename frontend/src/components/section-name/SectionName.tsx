@@ -106,7 +106,6 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   };
 
   const isOpen = openDropdownId === section?._id;
-  console.log(section?.displayed);
 
   return (
     <Box sx={boxStyle} ref={dropdownRef}>

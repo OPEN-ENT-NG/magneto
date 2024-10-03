@@ -41,9 +41,7 @@ export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
     setInputValue(event.target.value === "true");
   };
   const handleSubmit = async () => {
-    const payload = inputValue
-      ? { boardId, sectionIds: [id], deleteCards: true }
-      : { boardId, sectionIds: [id], deleteCards: false };
+    const payload = { boardId, sectionIds: [id], deleteCards: inputValue };
     try {
       await deleteSection(payload);
       toast.success(t("magneto.delete.section.confirm"));

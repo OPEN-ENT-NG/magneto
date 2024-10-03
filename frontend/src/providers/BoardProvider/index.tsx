@@ -75,7 +75,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   }, [boardData]);
 
   const hasEditRights = (): boolean => {
-    return board.owner.userId === user?.userId || !!boardRights?.contrib;
+    return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
 
   const value = useMemo<BoardContextType>(

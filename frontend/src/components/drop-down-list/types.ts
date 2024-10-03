@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-
 export type DropDownListItem = {
   primary: ReactNode;
   secondary: ReactNode;

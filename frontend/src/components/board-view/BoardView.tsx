@@ -12,6 +12,7 @@ import { useHeaderHeight } from "./useHeaderHeight";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
+import { CreateMagnet } from "../create-magnet/CreateMagnet";
 import { HeaderView } from "../header-view/HeaderView";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
@@ -80,6 +81,8 @@ export const BoardView: FC = () => {
           </div>
         )}
       </BoardBodyWrapper>
+
+      <CreateMagnet />
 
       <div className="zoom-container">
         <ZoomComponent

@@ -36,6 +36,14 @@ export const sectionsApi = emptySplitApi.injectEndpoints({
         invalidatesTags: ["Sections", "BoardData"],
       },
     ),
+    deleteSection: builder.mutation<SectionPayload, Partial<SectionPayload>>({
+      query: (sectionData) => ({
+        url: "sections",
+        method: "DELETE",
+        body: sectionData,
+      }),
+      invalidatesTags: ["Sections", "BoardData"],
+    }),
   }),
 });
 
@@ -44,4 +52,5 @@ export const {
   useCreateSectionMutation,
   useUpdateSectionMutation,
   useDuplicateSectionMutation,
+  useDeleteSectionMutation,
 } = sectionsApi;

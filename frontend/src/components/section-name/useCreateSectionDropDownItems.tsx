@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 import { useToast } from "@edifice-ui/react";
 import { mdiEyeOff, mdiFileMultipleOutline, mdiDelete, mdiEye } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -12,7 +14,8 @@ import {
 
 export const useCreateSectionDropDownItems: (
   section: Section | null | undefined,
-) => DropDownListItem[] = (section) => {
+  setToggleModal: Dispatch<SetStateAction<boolean>>,
+) => DropDownListItem[] = (section, setToggleModal) => {
   const { t } = useTranslation("magneto");
   const toast = useToast();
   const [duplicate] = useDuplicateSectionMutation();
@@ -52,6 +55,11 @@ export const useCreateSectionDropDownItems: (
       console.error(err);
     }
   };
+
+  const toggleModal = () => {
+    setToggleModal(true);
+  };
+
   const displayItem = displayed
     ? {
         primary: <Icon path={mdiEyeOff} size={"inherit"} />,
@@ -73,7 +81,7 @@ export const useCreateSectionDropDownItems: (
     {
       primary: <Icon path={mdiDelete} size={"inherit"} />,
       secondary: t("magneto.delete"),
-      OnClick: () => null,
+      OnClick: toggleModal,
     },
   ];
 };

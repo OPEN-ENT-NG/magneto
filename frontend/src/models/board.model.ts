@@ -321,24 +321,24 @@ export class BoardForm {
 export class Board /*implements Shareable*/ {
   public _id: string;
   public _title: string = " ";
-  private _imageUrl: string;
-  private _backgroundUrl: string;
-  private _description: string;
-  private _cardIds: Array<string>;
-  private _sections: Array<Section>;
-  private _tags: Array<string>;
-  private _layoutType: LAYOUT_TYPE;
-  private _tagsTextInput: string;
-  private _nbCards: number;
-  private _nbCardsSections: number;
-  private _modificationDate: string;
-  private _creationDate: string;
-  private _folderId: string;
-  private _isPublished: boolean;
-  private _deleted: boolean;
-  private _canComment: boolean;
-  private _displayNbFavorites: boolean;
-  private _cards: Card[];
+  public _imageUrl: string;
+  public _backgroundUrl: string;
+  public _description: string;
+  public _cardIds: Array<string>;
+  public _sections: Array<Section>;
+  public _tags: Array<string>;
+  public _layoutType: LAYOUT_TYPE;
+  public _tagsTextInput: string;
+  public _nbCards: number;
+  public _nbCardsSections: number;
+  public _modificationDate: string;
+  public _creationDate: string;
+  public _folderId: string;
+  public _isPublished: boolean;
+  public _deleted: boolean;
+  public _canComment: boolean;
+  public _displayNbFavorites: boolean;
+  public _cards: Card[];
 
   // Share resource properties
   public shared: any[];

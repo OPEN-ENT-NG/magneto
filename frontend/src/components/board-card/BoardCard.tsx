@@ -32,6 +32,7 @@ import { Tooltip } from "../tooltip/Tooltip";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const BoardCard: FC<BoardCardProps> = ({
   card,
@@ -41,6 +42,7 @@ export const BoardCard: FC<BoardCardProps> = ({
   cardIndex,
   sectionIndex,
 }) => {
+  const { moveCardsHover } = useBoard();
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
@@ -113,6 +115,7 @@ export const BoardCard: FC<BoardCardProps> = ({
       // Time to actually perform the action
       // moveCard(dragIndex, hoverIndex)
       console.log("moved", item.card.id, dragIndex, item.sectionIndex, hoverIndex, sectionIndex);
+      moveCardsHover(item.card.id, dragIndex, hoverIndex, item.sectionIndex, sectionIndex);
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,

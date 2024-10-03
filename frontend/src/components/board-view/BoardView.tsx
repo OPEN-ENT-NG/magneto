@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 
 import "./BoardView.scss";
 
@@ -8,7 +8,9 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { BoardBodyWrapper, BoardViewWrapper } from "./style";
+import { IsModalOpenState } from "./types";
 import { useHeaderHeight } from "./useHeaderHeight";
+import { initialIsModalOpenState } from "./utils";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
@@ -24,8 +26,10 @@ import { useBoard } from "~/providers/BoardProvider";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
-
-  const sideMenuData = useSideMenuData();
+  const [isModalOpen, setIsModalOpen] = useState<IsModalOpenState>(
+    initialIsModalOpenState,
+  );
+  const sideMenuData = useSideMenuData(setIsModalOpen);
   const {
     board,
     zoomLevel,

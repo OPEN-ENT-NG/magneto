@@ -59,91 +59,92 @@ export const BoardCard: FC<BoardCardProps> = ({
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const [{ isDragging }, drag] = useDrag({
-    type: "card",
-    item: { card, cardIndex, sectionIndex },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  });
+  // const [{ isDragging }, drag] = useDrag({
+  //   type: "card",
+  //   item: { card, cardIndex, sectionIndex },
+  //   collect: (monitor) => ({
+  //     isDragging: !!monitor.isDragging(),
+  //   }),
+  // });
 
-  const [{ isOver }, drop] = useDrop({
-    accept: "card",
-    // drop: () => setHasDrop(true),
-    drop: () => console.log("drop"),
-    collect: (monitor: any) => ({
-      isOver: !!monitor.isOver(),
-    }),
-    hover(item: any, monitor: any) {
-      if (!ref.current) {
-        return;
-      }
-      const dragIndex = item.cardIndex;
-      const hoverIndex = cardIndex;
+  // const [{ isOver }, drop] = useDrop({
+  //   accept: "card",
+  //   // drop: () => setHasDrop(true),
+  //   drop: () => console.log("drop"),
+  //   collect: (monitor: any) => ({
+  //     isOver: !!monitor.isOver(),
+  //   }),
+  //   hover(item: any, monitor: any) {
+  //     if (!ref.current) {
+  //       return;
+  //     }
+  //     const dragIndex = item.cardIndex;
+  //     const hoverIndex = cardIndex;
 
-      // Don't replace items with themselves
-      if (dragIndex === hoverIndex) {
-        return;
-      }
+  //     // Don't replace items with themselves
+  //     if (dragIndex === hoverIndex) {
+  //       return;
+  //     }
 
-      // Determine rectangle on screen
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+  //     // Determine rectangle on screen
+  //     const hoverBoundingRect = ref.current?.getBoundingClientRect();
 
-      // Get vertical middle
-      const hoverMiddleX =
-        (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
+  //     // Get vertical middle
+  //     const hoverMiddleX =
+  //       (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
 
-      // Determine mouse position
-      const clientOffset = monitor.getClientOffset();
+  //     // Determine mouse position
+  //     const clientOffset = monitor.getClientOffset();
 
-      // Get pixels to the top
-      const hoverClientX = (clientOffset as XYCoord).x - hoverBoundingRect.left;
+  //     // Get pixels to the top
+  //     const hoverClientX = (clientOffset as XYCoord).x - hoverBoundingRect.left;
 
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
+  //     // Only perform the move when the mouse has crossed half of the items height
+  //     // When dragging downwards, only move when the cursor is below 50%
+  //     // When dragging upwards, only move when the cursor is above 50%
 
-      // Dragging downwards
-      if (dragIndex < hoverIndex && hoverClientX < hoverMiddleX) {
-        return;
-      }
+  //     // Dragging downwards
+  //     if (dragIndex < hoverIndex && hoverClientX < hoverMiddleX) {
+  //       return;
+  //     }
 
-      // Dragging upwards
-      if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
-        return;
-      }
+  //     // Dragging upwards
+  //     if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
+  //       return;
+  //     }
 
-      // Time to actually perform the action
-      // moveCard(dragIndex, hoverIndex)
-      console.log(
-        "moved",
-        item.card.id,
-        dragIndex,
-        item.sectionIndex,
-        hoverIndex,
-        sectionIndex,
-      );
-      moveCardsHover(
-        item.card.id,
-        dragIndex,
-        hoverIndex,
-        item.sectionIndex,
-        sectionIndex,
-      );
+  //     // Time to actually perform the action
+  //     // moveCard(dragIndex, hoverIndex)
+  //     console.log(
+  //       "moved",
+  //       item.card.id,
+  //       dragIndex,
+  //       item.sectionIndex,
+  //       hoverIndex,
+  //       sectionIndex,
+  //     );
+  //     // todo call move
+  //     // moveCardsHover(
+  //     //   item.card.id,
+  //     //   dragIndex,
+  //     //   hoverIndex,
+  //     //   item.sectionIndex,
+  //     //   sectionIndex,
+  //     // );
 
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      item.cardIndex = hoverIndex;
-    },
-  });
+  //     // Note: we're mutating the monitor item here!
+  //     // Generally it's better to avoid mutations,
+  //     // but it's good here for the sake of performance
+  //     // to avoid expensive index searches.
+  //     item.cardIndex = hoverIndex;
+  //   },
+  // });
 
   useEffect(() => {
     registerDropdown(card.id, dropdownRef.current);
   }, [card.id, registerDropdown]);
 
-  drag(drop(ref));
+  // drag(drop(ref));
 
   return (
     // <DndContext>

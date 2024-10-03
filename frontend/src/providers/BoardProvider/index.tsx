@@ -38,11 +38,11 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     boolean
   > | null>(null);
   const { user } = useOdeClient();
-  const [board, setBoard] = useState<Board>(
-    boardData
-      ? new Board().build(boardData as IBoardItemResponse)
-      : new Board(),
-  );
+  // const [board, setBoard] = useState<Board>(
+  //   boardData
+  //     ? new Board().build(boardData as IBoardItemResponse)
+  //     : new Board(),
+  // );
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -55,6 +55,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const resetZoom = (): void => {
     setZoomLevel(3);
   };
+
+  let board = boardData
+  ? new Board().build(boardData as IBoardItemResponse)
+  : new Board();
 
   const prepareZoom = async () => {
     const zoom = await fetchZoomPreference();
@@ -108,7 +112,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       // case free layout
       clonedBoard.cardIds.splice(draggedCardIndex, 1);
       clonedBoard.cardIds.splice(hoverIndex, 0, dndCardId);
-      setBoard(clonedBoard);
+      // setBoard(clonedBoard);
     } else if (dragSectionIndex !== undefined  && dropSectionIndex !== undefined && dragSectionIndex === dropSectionIndex) {
       // case d&d in same section
       clonedBoard.sections[dragSectionIndex].cardIds.splice(
@@ -120,7 +124,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
         0,
         dndCardId,
       );
-      setBoard(clonedBoard);
+      // setBoard(clonedBoard);
     } else if (dragSectionIndex !== undefined  && dropSectionIndex !== undefined) {
       // case d&d in section != card initial section
       clonedBoard.sections[dragSectionIndex].cardIds.splice(
@@ -132,7 +136,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
         0,
         dndCardId,
       );
-      setBoard(clonedBoard);
+      // setBoard(clonedBoard);
     } else {
       console.error("Target section is not defined")
     }

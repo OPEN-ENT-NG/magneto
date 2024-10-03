@@ -96,7 +96,6 @@ export const useSearch = ({
 
   useEffect(() => {
     search(debouncedSearchInputValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchInputValue]);
 
   const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {

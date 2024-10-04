@@ -43,7 +43,8 @@ export const BoardCard: FC<BoardCardProps> = ({
   cardIndex,
   sectionIndex,
 }) => {
-  const { moveCardsHover } = useBoard();
+  // const { moveCardsHover } = useBoard();
+
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
@@ -57,8 +58,7 @@ export const BoardCard: FC<BoardCardProps> = ({
     }
   };
 
-  const ref = useRef<HTMLDivElement>(null);
-
+  // const ref = useRef<HTMLDivElement>(null);
   // const [{ isDragging }, drag] = useDrag({
   //   type: "card",
   //   item: { card, cardIndex, sectionIndex },
@@ -149,12 +149,9 @@ export const BoardCard: FC<BoardCardProps> = ({
   return (
     // <DndContext>
       <div
-        ref={ref}
-        // className={`${isDragging ? "dragging" : ""}`}
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-          cursor: "move",
-        }}
+        // ref={setNodeRef}
+        // // className={`${isDragging ? "dragging" : ""}`}
+        // style={style}
       >
         <StyledCard zoomLevel={zoomLevel} ref={dropdownRef}>
           <StyledCardHeader

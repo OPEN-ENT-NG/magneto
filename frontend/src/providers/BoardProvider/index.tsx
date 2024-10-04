@@ -80,7 +80,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   useEffect(() => {
     if (boardData && !isLoading) {
       updateRights(new Board().build(boardData as IBoardItemResponse).rights);
-      setBoard(new Board().build(boardData as IBoardItemResponse));
+      // setBoard(new Board().build(boardData as IBoardItemResponse));
     }
   }, [boardData]);
 

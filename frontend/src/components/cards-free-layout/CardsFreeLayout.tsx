@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useRef, useState } from "react";
 
 import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
 import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
@@ -8,6 +8,9 @@ import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
 import { useBoard } from "~/providers/BoardProvider";
+import { Announcements, closestCenter, DndContext, KeyboardCoordinateGetter, KeyboardSensor, MouseSensor, TouchSensor, UniqueIdentifier, useSensor, useSensors } from "@dnd-kit/core";
+import { createRange } from "../dnd-components/utilities";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 export const CardsFreeLayout: FC = () => {
   const { board, zoomLevel } = useBoard();

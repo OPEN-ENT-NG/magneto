@@ -1,4 +1,3 @@
-// import { DndContext } from "@dnd-kit/core";
 import { BoardView } from "~/components/board-view/BoardView";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { MediaLibraryProvider } from "~/providers/MediaLibraryProvider";

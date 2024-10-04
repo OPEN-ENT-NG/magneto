@@ -42,7 +42,8 @@ export const BoardCard: FC<BoardCardProps> = ({
   cardIndex,
   sectionIndex,
 }) => {
-  const { moveCardsHover } = useBoard();
+  // const { moveCardsHover } = useBoard();
+
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();

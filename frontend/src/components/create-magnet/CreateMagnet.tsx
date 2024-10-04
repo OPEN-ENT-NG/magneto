@@ -23,6 +23,7 @@ import {
 } from "./style";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import {
+  Button,
   FormControl,
   Input,
   Label,
@@ -30,7 +31,16 @@ import {
   TextArea,
   useOdeClient,
 } from "@edifice-ui/react";
+import { Editor, EditorRef } from "@edifice-ui/editor";
 import { useTranslation } from "react-i18next";
+
+export const modalFooterStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  width: "100%",
+  gap: "1rem",
+};
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -95,22 +105,30 @@ export const CreateMagnet: FC = () => {
               style={{ marginBottom: "3rem" }}
             >
               <Label>{t("magneto.create.board.description")} :</Label>
-              <TextArea
-                className="styled-text-area"
-                size="md"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
+              <Editor
+                id="postContent"
+                ref={editorRef}
+                content=""
+                mode="edit"
+                visibility={
+                  blog?.visibility === "PUBLIC" ? "public" : "protected"
+                }
+                onContentChange={handleContentChange}
+              ></Editor>
             </FormControl>
-            <FormControlMUI variant="outlined" sx={{ m: 1, minWidth: 120 }}>
+            <FormControlMUI
+              variant="outlined"
+              sx={{ minWidth: 200, marginBottom: "1rem" }}
+            >
               <InputLabel
                 id="demo-simple-select-outlined-label"
                 shrink={true}
                 sx={{
                   background: "white",
-                  padding: "0.5rem 4px",
+                  padding: "0.2rem 4px",
                   marginLeft: "-4px",
                   transform: "translate(14px, -9px) scale(0.75)",
+                  fontSize: "1.7rem",
                 }}
               >
                 Section
@@ -122,6 +140,7 @@ export const CreateMagnet: FC = () => {
                 onChange={handleChange}
                 label="Section"
                 notched
+                size="medium"
                 sx={{
                   "& .MuiOutlinedInput-notchedOutline": {
                     "& legend": {
@@ -130,9 +149,11 @@ export const CreateMagnet: FC = () => {
                     },
                   },
                   "& .MuiSelect-select": {
-                    paddingTop: "16px",
-                    paddingBottom: "16px",
+                    paddingTop: "25px",
+                    paddingBottom: "20px",
+                    fontSize: "1.7rem",
                   },
+                  height: "60px",
                 }}
               >
                 <MenuItem value={"Section 1"}>Section 1</MenuItem>
@@ -140,6 +161,28 @@ export const CreateMagnet: FC = () => {
                 <MenuItem value={"Section 3"}>Section 3</MenuItem>
               </Select>
             </FormControlMUI>
+          </Box>
+          <Box sx={modalFooterStyle}>
+            <Button
+              style={{ marginLeft: "0" }}
+              color="tertiary"
+              variant="filled"
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="button"
+            >
+              {t("magneto.cancel")}
+            </Button>
+            <Button
+              style={{ marginLeft: "0" }}
+              color="primary"
+              type="button"
+              variant="filled"
+              onClick={() => setIsOpen(false)}
+              className="button"
+            >
+              {t("magneto.save")}
+            </Button>
           </Box>
         </Box>
       </Modal>

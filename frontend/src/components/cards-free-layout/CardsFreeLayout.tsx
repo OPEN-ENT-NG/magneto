@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { FC, useCallback, useRef, useState } from "react";
 
 import { Box } from "@mui/material";
 
@@ -6,126 +6,157 @@ import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
-import { Announcements, closestCenter, DndContext, KeyboardCoordinateGetter, KeyboardSensor, MouseSensor, TouchSensor, UniqueIdentifier, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  Active,
+  Announcements,
+  closestCenter,
+  CollisionDetection,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardCoordinateGetter,
+  KeyboardSensor,
+  MeasuringConfiguration,
+  Modifiers,
+  MouseSensor,
+  PointerActivationConstraint,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { createRange } from "../dnd-components/utilities";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import {
+  AnimateLayoutChanges,
+  arrayMove,
+  NewIndexGetter,
+  rectSortingStrategy,
+  horizontalListSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  SortingStrategy,
+} from "@dnd-kit/sortable";
+import { createPortal } from "react-dom";
 
-export const CardsFreeLayout: FC = () => {
+export interface Props {
+  activationConstraint?: PointerActivationConstraint;
+  animateLayoutChanges?: AnimateLayoutChanges;
+  adjustScale?: boolean;
+  collisionDetection?: CollisionDetection;
+  coordinateGetter?: KeyboardCoordinateGetter;
+  Container?: any; // To-do: Fix me
+  getNewIndex?: NewIndexGetter;
+  handle?: boolean;
+  itemCount?: number;
+  items?: string[];
+  measuring?: MeasuringConfiguration;
+  modifiers?: Modifiers;
+  renderItem?: any;
+  removable?: boolean;
+  reorderItems?: typeof arrayMove;
+  strategy?: SortingStrategy;
+  style?: React.CSSProperties;
+  useDragOverlay?: boolean;
+  getItemStyles?(args: {
+    id: string;
+    index: number;
+    isSorting: boolean;
+    isDragOverlay: boolean;
+    overIndex: number;
+    isDragging: boolean;
+  }): React.CSSProperties;
+  wrapperStyle?(args: {
+    active: Pick<Active, "id"> | null;
+    index: number;
+    isDragging: boolean;
+    id: string;
+  }): React.CSSProperties;
+  isDisabled?(id: string): boolean;
+}
+
+export const CardsFreeLayout: FC<Props> = () => {
   const { board, zoomLevel } = useBoard();
-  const getPosition = (id: UniqueIdentifier) => getIndex(id) + 1;
-  // const [items, setItems] = useState<UniqueIdentifier[]>(
-  //   () =>
-  //     board.cards ??
-  //     createRange<UniqueIdentifier>(board.cards.map((card: Card) => card._id).length, (index) => index + 1)
-  // );
-  const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
-    useSensor(KeyboardSensor, {
-      // Disable smooth scrolling in Cypress automated tests
-      scrollBehavior: 'Cypress' in window ? 'auto' : undefined,
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+  // const getPosition = (id: string) => getIndex(id) + 1;
+  // const getIndex = (id: string) => board.cardIds.indexOf(id);
+
+  const [items, setItems] = useState<string[]>(
+    () =>
+      board.cardIds ??
+      createRange<string>(board.cards.length, (index) => index + 1),
   );
-  const getIndex = (id: UniqueIdentifier) => board.cardIds.indexOf(id);
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const activeIndex = activeId ? getIndex(activeId) : -1;
-  const isFirstAnnouncement = useRef(true);
+  const [activeItem, setActiveItem] = useState<Card | null>(null);
+  const sensors = useSensors(useSensor(MouseSensor));
 
-  const announcements: Announcements = {
-    onDragStart({active: {id}}) {
-      return `Picked up sortable item ${String(
-        id
-      )}. Sortable item ${id} is in position ${getPosition(id)} of ${
-        board.cardIds.length
-      }`;
-    },
-    onDragOver({active, over}) {
-      // In this specific use-case, the picked up item's `id` is always the same as the first `over` id.
-      // The first `onDragOver` event therefore doesn't need to be announced, because it is called
-      // immediately after the `onDragStart` announcement and is redundant.
-      if (isFirstAnnouncement.current === true) {
-        isFirstAnnouncement.current = false;
-        return;
-      }
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveItem(
+      board.cards.find(
+        (card: Card) => card._id == event.active.id.toString(),
+      ) ?? null,
+    );
+  }, []);
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
 
-      if (over) {
-        return `Sortable item ${
-          active.id
-        } was moved into position ${getPosition(over.id)} of ${board.cardIds.length}`;
-      }
+    if (active.id !== over?.id) {
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id.toString());
+        const newIndex = items.indexOf(over!.id.toString());
 
-      return;
-    },
-    onDragEnd({active, over}) {
-      if (over) {
-        return `Sortable item ${
-          active.id
-        } was dropped at position ${getPosition(over.id)} of ${board.cardIds.length}`;
-      }
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
 
-      return;
-    },
-    onDragCancel({active: {id}}) {
-      return `Sorting was cancelled. Sortable item ${id} was dropped and returned to position ${getPosition(
-        id
-      )} of ${board.cardIds.length}.`;
-    },
-  };
+    setActiveItem(null);
+  }, []);
+  const handleDragCancel = useCallback(() => {
+    setActiveItem(null);
+  }, []);
 
   return (
     <DndContext
-      // accessibility={{
-      //   announcements,
-      // }}
       sensors={sensors}
       collisionDetection={closestCenter}
-      // onDragStart={({ active }) => {
-      //   if (!active) {
-      //     return;
-      //   }
-
-      //   setActiveId(active.id);
-      // }}
-      onDragEnd={({ over }) => {
-        // setActiveId(null);
-
-        if (over) {
-          // const overIndex = getIndex(over.id);
-          // if (activeIndex !== overIndex) {
-          //   setItems((board.cardIds) => arrayMove(board.cardIds, activeIndex, overIndex));
-          // }
-          console.log("dropped");
-        }
-      }}
-      // onDragCancel={() => setActiveId(null)}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
     >
-      <SortableContext items={board.cardIds}>
-      <Box sx={mainWrapperProps}>
-        {board?.cards ? (
-          <UlWrapper className="grid ps-0 list-unstyled mb-24 left-float">
-            {board.cards.map((card: Card, index: number) => {
-              return (
-                <LiWrapper
-                  key={card.id}
-                  isLast={index === board.cards.length - 1}
-                  zoomLevel={zoomLevel}
-                >
-                  <BoardCard
-                    card={card}
+      <SortableContext items={board.cardIds} strategy={rectSortingStrategy}>
+        <Box sx={mainWrapperProps}>
+          {board?.cards ? (
+            <UlWrapper className="grid ps-0 list-unstyled mb-24 left-float">
+              {board.cards.map((card: Card, index: number) => {
+                return (
+                  <LiWrapper
+                    isLast={index === board.cards.length - 1}
                     zoomLevel={zoomLevel}
-                    canComment={board.canComment}
-                    displayNbFavorites={board.displayNbFavorites}
-                    key={card.id}
-                    cardIndex={index}
-                  />
-                </LiWrapper>
-              );
-            })}
-          </UlWrapper>
-        ) : null}
-      </Box>
+                  >
+                    <BoardCard
+                      card={card}
+                      zoomLevel={zoomLevel}
+                      canComment={board.canComment}
+                      displayNbFavorites={board.displayNbFavorites}
+                      key={card}
+                      id={card}
+                      cardIndex={index}
+                    />
+                  </LiWrapper>
+                );
+              })}
+            </UlWrapper>
+          ) : null}
+        </Box>
       </SortableContext>
+      <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
+        {activeItem ? (
+          <BoardCard
+            card={activeItem}
+            zoomLevel={zoomLevel}
+            canComment={board.canComment}
+            displayNbFavorites={board.displayNbFavorites}
+            isDragging
+          />
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 };

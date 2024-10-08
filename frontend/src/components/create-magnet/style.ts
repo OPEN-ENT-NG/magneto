@@ -3,7 +3,7 @@ export const modalContainerStyle = {
   top: "2rem",
   left: "50%",
   transform: "translateX(-50%)",
-  width: "80rem",
+  width: "160rem",
   maxWidth: "90%",
   maxHeight: "calc(100vh - 4rem)",
   bgcolor: "background.paper",
@@ -11,7 +11,7 @@ export const modalContainerStyle = {
   borderRadius: "1.6rem",
   display: "flex",
   flexDirection: "column",
-  padding: "3.2rem 5.2rem 3.2rem 5.2rem",
+  padding: "3.2rem 1rem 3.2rem 5.2rem",
 };
 
 export const headerStyle = {
@@ -40,6 +40,7 @@ export const contentContainerStyle = {
   flex: 1,
   marginTop: "1.4rem !important",
   overflowY: "auto",
+  paddingRight: "4.2rem",
   "&::-webkit-scrollbar": {
     width: "6px",
     height: "6px",
@@ -66,6 +67,9 @@ export const contentContainerStyle = {
   },
   "&::-webkit-scrollbar-corner": {
     background: "transparent",
+  },
+  "& .post-content-editor .ProseMirror[contenteditable='true']": {
+    minHeight: "180px",
   },
   scrollbarWidth: "thin",
   scrollbarColor: "#888 transparent",

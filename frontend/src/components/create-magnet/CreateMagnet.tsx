@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -19,7 +19,6 @@ import {
   titleStyle,
   closeButtonStyle,
   contentContainerStyle,
-  descriptionStyle,
 } from "./style";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import {
@@ -33,6 +32,10 @@ import {
 } from "@edifice-ui/react";
 import { Editor, EditorRef } from "@edifice-ui/editor";
 import { useTranslation } from "react-i18next";
+import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
+import { getFileExtension } from "~/hooks/useGetExtension";
+import { Section } from "~/providers/BoardProvider/types";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const modalFooterStyle = {
   display: "flex",
@@ -42,25 +45,61 @@ export const modalFooterStyle = {
   gap: "1rem",
 };
 
+const svgContainerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  width: "100%",
+  height: "200px", // Ajustez cette valeur selon vos besoins
+  marginBottom: "1rem",
+};
+
+const svgStyle = {
+  width: "20%",
+  height: "auto",
+  maxHeight: "100%",
+};
+
+const editorStyle = {
+  "& .ProseMirror[contenteditable='true']": {
+    minHeight: "180px",
+  },
+};
+
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
 
   const [isOpen, setIsOpen] = useState(false);
+  const { board } = useBoard();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [section, setSection] = useState("Section 1");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setSection(event.target.value as string);
-  };
+  const [section, setSection] = useState<Section>(board.sections[0]);
+  const [summaryContent, setSummaryContent] = useState<string>("");
+  const editorRef = useRef<EditorRef>(null);
 
   const { mediaLibraryRef, libraryMedia, mediaLibraryHandlers, media } =
     useMediaLibrary();
 
+  const handleSectionChange = (event: SelectChangeEvent<string>) => {
+    const sectionTitle = event.target.value;
+    const selectedSection = board.sections.find(
+      (s) => s.title === sectionTitle,
+    );
+    if (selectedSection) {
+      setSection(selectedSection);
+    }
+  };
+
   useEffect(() => {
     if (libraryMedia) setIsOpen(true);
+    console.log(media);
+    console.log(libraryMedia);
   }, [libraryMedia]);
+
+  useEffect(() => {
+    console.log(editorRef.current?.getContent("html") as string);
+  }, [editorRef]);
 
   return (
     <>
@@ -89,6 +128,15 @@ export const CreateMagnet: FC = () => {
             </IconButton>
           </Box>
           <Box sx={contentContainerStyle}>
+            {media && (
+              <Box sx={svgContainerStyle}>
+                <Box sx={svgStyle}>
+                  <CardContentSvgDisplay
+                    extension={getFileExtension(media?.name)}
+                  />
+                </Box>
+              </Box>
+            )}
             <FormControl id="title" className="mb-0-5">
               <Label>Titre</Label>
               <Input
@@ -105,20 +153,19 @@ export const CreateMagnet: FC = () => {
               style={{ marginBottom: "3rem" }}
             >
               <Label>{t("magneto.create.board.description")} :</Label>
-              <Editor
-                id="postContent"
-                ref={editorRef}
-                content=""
-                mode="edit"
-                visibility={
-                  blog?.visibility === "PUBLIC" ? "public" : "protected"
-                }
-                onContentChange={handleContentChange}
-              ></Editor>
+
+              <Box sx={editorStyle}>
+                <Editor
+                  id="postContent"
+                  content={summaryContent}
+                  mode="edit"
+                  ref={editorRef}
+                />
+              </Box>
             </FormControl>
             <FormControlMUI
               variant="outlined"
-              sx={{ minWidth: 200, marginBottom: "1rem" }}
+              sx={{ minWidth: 200, marginBottom: "1rem", width: "100%" }}
             >
               <InputLabel
                 id="demo-simple-select-outlined-label"
@@ -136,8 +183,8 @@ export const CreateMagnet: FC = () => {
               <Select
                 labelId="demo-simple-select-outlined-label"
                 id="demo-simple-select-outlined"
-                value={section}
-                onChange={handleChange}
+                value={section.title}
+                onChange={handleSectionChange}
                 label="Section"
                 notched
                 size="medium"
@@ -149,40 +196,60 @@ export const CreateMagnet: FC = () => {
                     },
                   },
                   "& .MuiSelect-select": {
-                    paddingTop: "25px",
-                    paddingBottom: "20px",
+                    paddingTop: "10px",
+                    paddingBottom: "0px",
                     fontSize: "1.7rem",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   },
-                  height: "60px",
+                  height: "4rem",
+                  width: "100%",
                 }}
               >
-                <MenuItem value={"Section 1"}>Section 1</MenuItem>
-                <MenuItem value={"Section 2"}>Section 2</MenuItem>
-                <MenuItem value={"Section 3"}>Section 3</MenuItem>
+                {board.sections.map((s: Section) => (
+                  <MenuItem key={s.title} value={s.title}>
+                    <Box
+                      sx={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        fontSize: "1.7rem",
+                        width: "145rem",
+                        maxWidth: "100%",
+                      }}
+                    >
+                      {s.title}
+                    </Box>
+                  </MenuItem>
+                ))}
               </Select>
             </FormControlMUI>
-          </Box>
-          <Box sx={modalFooterStyle}>
-            <Button
-              style={{ marginLeft: "0" }}
-              color="tertiary"
-              variant="filled"
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="button"
-            >
-              {t("magneto.cancel")}
-            </Button>
-            <Button
-              style={{ marginLeft: "0" }}
-              color="primary"
-              type="button"
-              variant="filled"
-              onClick={() => setIsOpen(false)}
-              className="button"
-            >
-              {t("magneto.save")}
-            </Button>
+
+            <Box sx={modalFooterStyle}>
+              <Button
+                style={{ marginLeft: "0" }}
+                color="tertiary"
+                variant="filled"
+                type="button"
+                onClick={() =>
+                  console.log(editorRef.current?.getContent("html"))
+                }
+                className="button"
+              >
+                {t("magneto.cancel")}
+              </Button>
+              <Button
+                style={{ marginLeft: "0" }}
+                color="primary"
+                type="button"
+                variant="filled"
+                onClick={() => setIsOpen(false)}
+                className="button"
+              >
+                {t("magneto.save")}
+              </Button>
+            </Box>
           </Box>
         </Box>
       </Modal>

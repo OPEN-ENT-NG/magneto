@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef } from "react";
+import { CSSProperties, FC, useCallback, useEffect, useRef } from "react";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -39,8 +39,8 @@ export const BoardCard: FC<BoardCardProps> = ({
   zoomLevel,
   canComment = false,
   displayNbFavorites = false,
-  cardIndex,
-  sectionIndex,
+  // cardIndex,
+  // sectionIndex,
 }) => {
   // const { moveCardsHover } = useBoard();
 

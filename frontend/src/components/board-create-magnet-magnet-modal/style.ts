@@ -2,14 +2,15 @@ import { FormControlLabel, styled } from "@mui/material";
 
 export const modalContainerStyle = {
   position: "absolute",
-  top: "40%",
+  top: "50%",
   left: "50%",
-  transform: "translateX(-50%)",
-  width: "70rem",
+  transform: "translate(-50%, -50%)",
+  width: "100rem",
   bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: "1.6rem",
   display: "flex",
+  maxHeight: "90vh",
   flexDirection: "column",
   padding: "3.2rem 5.2rem 3.2rem 5.2rem",
 };
@@ -18,12 +19,13 @@ export const headerStyle = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  marginBottom: "1rem",
 };
 
 export const titleStyle = {
   fontWeight: "bold",
   fontFamily: "Comfortaa",
-  fontSize: "2.6rem",
+  fontSize: "1.8rem",
 };
 
 export const closeButtonStyle = {
@@ -40,37 +42,17 @@ export const contentContainerStyle = {
   flex: 1,
   display: "flex",
   flexDirection: "column",
+  gap: "1rem",
   marginTop: "1.4rem !important",
   overflowY: "auto",
   "&::-webkit-scrollbar": {
-    width: "6px",
-    height: "6px",
-  },
-  "&::-webkit-scrollbar-button": {
-    width: "0px",
-    height: "0px",
+    width: "0.8rem",
+    height: "0.8rem",
   },
   "&::-webkit-scrollbar-thumb": {
-    background: "#888",
-    border: "0px none #ffffff",
-    borderRadius: "50px",
+    backgroundColor: "rgba(170,170,170,1)",
+    borderRadius: "0.3rem",
   },
-  "&::-webkit-scrollbar-thumb:hover": {
-    background: "#555",
-  },
-  "&::-webkit-scrollbar-thumb:active": {
-    background: "#555",
-  },
-  "&::-webkit-scrollbar-track": {
-    background: "transparent",
-    border: "0px none #ffffff",
-    borderRadius: "50px",
-  },
-  "&::-webkit-scrollbar-corner": {
-    background: "transparent",
-  },
-  scrollbarWidth: "thin",
-  scrollbarColor: "#888 transparent",
 };
 
 export const descriptionStyle = {
@@ -88,12 +70,35 @@ export const modalFooterStyle = {
   gap: "1rem",
 };
 
-export const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
-  marginLeft: 0,
-  marginRight: 0,
+export const formGroupStyle = { flexDirection: "row", gap: ".5rem" };
+
+export const StyledFormControlLabel = styled(FormControlLabel)(() => ({
   "& .MuiFormControlLabel-label": {
-    marginLeft: theme.spacing(1),
     fontSize: "1.5rem",
-    fontWeight: 500,
+    color: "#4a4a4a",
+    fontFamily: "Roboto, sans-serif",
   },
 }));
+
+export const boardTitleStyle = {
+  fontSize: "2.6rem",
+  fontFamily: "Comfortaa, cursive",
+  color: "black",
+  fontWeight: "700",
+};
+
+export const boardTitleWrapperStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "1rem",
+  marginBottom: "1.5rem",
+};
+
+export const boardTitleButton = { color: "black", textDecoration: "underline" };
+
+export const listStyle = {
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+};

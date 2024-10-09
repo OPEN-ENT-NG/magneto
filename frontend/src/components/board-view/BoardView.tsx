@@ -11,6 +11,7 @@ import { BoardBodyWrapper, BoardViewWrapper } from "./style";
 import { IsModalOpenState } from "./types";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { initialIsModalOpenState } from "./utils";
+import { BoardCreateMagnetMagnetModal } from "../board-create-magnet-magnet-modal/BoardCreateMagnetMagnetModal";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";

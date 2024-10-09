@@ -71,34 +71,38 @@ export const useRenderContent = (inputValue: InputValueState) => {
     myCardsResult?.all?.map((card: ICardItemResponse) =>
       new Card().build(card),
     ) || [];
-  console.log({ inputValue, cardsData, boardsWithCards });
-
+  const isOneMagnetInBoards = boardsWithCards.some(
+    (item: Board) => !!item.cards.length,
+  );
   if (isByBoards) {
-    return boardsWithCards.length ? (
+    return isOneMagnetInBoards ? (
       <List sx={listStyle}>
-        {boardsWithCards.map((board: Board) => (
-          <ListItem key={board._id}>
-            <Box width={"100%"}>
-              <Box sx={boardTitleWrapperStyle}>
-                <Typography sx={boardTitleStyle}>{board._title}</Typography>
-                <Button
-                  sx={boardTitleButton}
-                  startIcon={<FileCopyOutlinedIcon />}
-                  onClick={() => duplicateBoardsAndToast(board._id)}
-                >
-                  {t("magneto.cards.collection.board.duplicate")}
-                </Button>
-              </Box>
-              <Grid container spacing={2}>
-                {board.cards.map((card) => (
-                  <Grid item key={card.id}>
-                    <BoardCard card={card} zoomLevel={zoomLevel} />
+        {boardsWithCards.map(
+          (board: Board) =>
+            !!board.cards.length && (
+              <ListItem key={board._id}>
+                <Box width={"100%"}>
+                  <Box sx={boardTitleWrapperStyle}>
+                    <Typography sx={boardTitleStyle}>{board._title}</Typography>
+                    <Button
+                      sx={boardTitleButton}
+                      startIcon={<FileCopyOutlinedIcon />}
+                      onClick={() => duplicateBoardsAndToast(board._id)}
+                    >
+                      {t("magneto.cards.collection.board.duplicate")}
+                    </Button>
+                  </Box>
+                  <Grid container spacing={2} width="fit-content">
+                    {board.cards.map((card) => (
+                      <Grid item key={card.id}>
+                        <BoardCard card={card} zoomLevel={zoomLevel} />
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </ListItem>
-        ))}
+                </Box>
+              </ListItem>
+            ),
+        )}
       </List>
     ) : (
       <EmptyState title={t("magneto.cards.empty.text")} />

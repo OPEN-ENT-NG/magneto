@@ -1,4 +1,13 @@
-export interface BoardCreateMagnetMagnetModal {
+import { CURRENTTAB_STATE } from "../tab-list/types";
+
+export interface BoardCreateMagnetMagnetModalProps {
   open: boolean;
   onClose: () => void;
+}
+
+export interface InputValueState {
+  search: string;
+  currentTab: CURRENTTAB_STATE;
+  isByBoards: boolean;
+  isByFavorite: boolean;
 }

@@ -10,7 +10,6 @@ import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
 import { useBoard } from "~/providers/BoardProvider";
 import {
   Active,
-  Announcements,
   closestCenter,
   CollisionDetection,
   DndContext,
@@ -18,7 +17,6 @@ import {
   DragOverlay,
   DragStartEvent,
   KeyboardCoordinateGetter,
-  KeyboardSensor,
   MeasuringConfiguration,
   Modifiers,
   MouseSensor,
@@ -38,9 +36,11 @@ import {
   sortableKeyboardCoordinates,
   SortingStrategy,
 } from "@dnd-kit/sortable";
-import { createPortal } from "react-dom";
+import { useUpdateBoardMutation } from "~/services/api/boards.service";
+import { BoardForm } from "~/models/board.model";
 
 export interface Props {
+  //todo externalize
   activationConstraint?: PointerActivationConstraint;
   animateLayoutChanges?: AnimateLayoutChanges;
   adjustScale?: boolean;

@@ -129,6 +129,8 @@ export class BoardForm {
     this.layoutType = board.layoutType;
     this.canComment = board.canComment;
     this.displayNbFavorites = board.displayNbFavorites;
+    this.cardIds = board.cardIds;
+    this._sectionIds = board.sectionsIds;
     return this;
   }
 

@@ -32,7 +32,6 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
-import { useBoard } from "~/providers/BoardProvider";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 

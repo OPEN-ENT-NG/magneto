@@ -38,11 +38,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     boolean
   > | null>(null);
   const { user } = useOdeClient();
-  // const [board, setBoard] = useState<Board>(
-  //   boardData
-  //     ? new Board().build(boardData as IBoardItemResponse)
-  //     : new Board(),
-  // );
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -97,7 +92,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isLoading,
       boardRights,
       hasEditRights,
-      moveCardsHover,
     }),
     [board, zoomLevel, isLoading, boardRights],
   );

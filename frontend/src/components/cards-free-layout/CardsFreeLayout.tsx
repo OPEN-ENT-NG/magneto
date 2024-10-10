@@ -5,7 +5,7 @@ import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { Box } from "@mui/material";
 
 import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
-import { useFreeLayoutCardDnG } from "./useFreeLayoutCardDnG";
+import { useFreeLayoutCardDnG } from "./useFreeLayoutCardDnD";
 import { BoardCard } from "../board-card/BoardCard";
 import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
 import { useBoard } from "~/providers/BoardProvider";

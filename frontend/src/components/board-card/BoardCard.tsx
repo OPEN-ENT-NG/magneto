@@ -39,10 +39,7 @@ export const BoardCard: FC<BoardCardProps> = ({
   zoomLevel,
   canComment = false,
   displayNbFavorites = false,
-  // cardIndex,
-  // sectionIndex,
 }) => {
-  // const { moveCardsHover } = useBoard();
 
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);

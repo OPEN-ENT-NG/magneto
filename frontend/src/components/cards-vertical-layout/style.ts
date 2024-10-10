@@ -39,7 +39,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     display: "flex",
     flexDirection: "column",
     gap: "2rem",
-    padding: "1rem 0.1rem 1rem 2rem",
+    padding: "1rem 0.1rem 1rem 0",
     minWidth: "420px",
     width: prepareWidth(sectionNumber),
     borderRight: !isLast ? "1px solid #aaa" : "",
@@ -52,7 +52,7 @@ export const sectionNameWrapperStyle = {
   display: "flex",
   alignItems: "center",
   width: "100%",
-  padding: "0.5rem 1.5rem 0.5rem 0",
+  padding: "0.5rem 1.5rem 0.5rem 2rem",
   flexShrink: 0,
   alignSelf: "center",
 };

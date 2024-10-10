@@ -36,6 +36,8 @@ import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSv
 import { getFileExtension } from "~/hooks/useGetExtension";
 import { Section } from "~/providers/BoardProvider/types";
 import { useBoard } from "~/providers/BoardProvider";
+import { Edit } from "@edifice-ui/icons";
+import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 
 export const modalFooterStyle = {
   display: "flex",
@@ -47,17 +49,24 @@ export const modalFooterStyle = {
 
 const svgContainerStyle = {
   display: "flex",
+  flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
   width: "100%",
-  height: "200px", // Ajustez cette valeur selon vos besoins
+  height: "14rem",
   marginBottom: "1rem",
 };
 
 const svgStyle = {
-  width: "20%",
-  height: "auto",
-  maxHeight: "100%",
+  height: "12rem",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const mediaNameStyle = {
+  textAlign: "center",
+  fontSize: "1.6rem",
 };
 
 const editorStyle = {
@@ -73,9 +82,9 @@ export const CreateMagnet: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { board } = useBoard();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [legend, setLegend] = useState("");
   const [section, setSection] = useState<Section>(board.sections[0]);
-  const [summaryContent, setSummaryContent] = useState<string>("");
+  const [summaryContent] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
 
   const { mediaLibraryRef, libraryMedia, mediaLibraryHandlers, media } =
@@ -93,13 +102,11 @@ export const CreateMagnet: FC = () => {
 
   useEffect(() => {
     if (libraryMedia) setIsOpen(true);
-    console.log(media);
-    console.log(libraryMedia);
   }, [libraryMedia]);
 
   useEffect(() => {
-    console.log(editorRef.current?.getContent("html") as string);
-  }, [editorRef]);
+    if (media) setTitle(media.name.split(".").slice(0, -1).join("."));
+  }, [media]);
 
   return (
     <>
@@ -108,6 +115,7 @@ export const CreateMagnet: FC = () => {
         onClose={() => setIsOpen(false)}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
+        style={{ zIndex: 1000 }}
       >
         <Box sx={modalContainerStyle}>
           <Box sx={headerStyle}>
@@ -129,13 +137,10 @@ export const CreateMagnet: FC = () => {
           </Box>
           <Box sx={contentContainerStyle}>
             {media && (
-              <Box sx={svgContainerStyle}>
-                <Box sx={svgStyle}>
-                  <CardContentSvgDisplay
-                    extension={getFileExtension(media?.name)}
-                  />
-                </Box>
-              </Box>
+              <FilePickerWorkspace
+                setIsOpen={setIsOpen}
+                addButtonLabel={"Change file"}
+              />
             )}
             <FormControl id="title" className="mb-0-5">
               <Label>Titre</Label>
@@ -145,6 +150,16 @@ export const CreateMagnet: FC = () => {
                 size="md"
                 type="text"
                 onChange={(e) => setTitle(e.target.value)}
+              />
+            </FormControl>
+            <FormControl id="legend" className="mb-0-5">
+              <Label>Légende</Label>
+              <Input
+                value={legend}
+                placeholder="Légende"
+                size="md"
+                type="text"
+                onChange={(e) => setLegend(e.target.value)}
               />
             </FormControl>
             <FormControl
@@ -232,10 +247,8 @@ export const CreateMagnet: FC = () => {
                 color="tertiary"
                 variant="filled"
                 type="button"
-                onClick={() =>
-                  console.log(editorRef.current?.getContent("html"))
-                }
                 className="button"
+                onClick={() => setIsOpen(false)}
               >
                 {t("magneto.cancel")}
               </Button>
@@ -244,7 +257,9 @@ export const CreateMagnet: FC = () => {
                 color="primary"
                 type="button"
                 variant="filled"
-                onClick={() => setIsOpen(false)}
+                onClick={() =>
+                  console.log(editorRef.current?.getContent("html"))
+                }
                 className="button"
               >
                 {t("magneto.save")}
@@ -253,13 +268,15 @@ export const CreateMagnet: FC = () => {
           </Box>
         </Box>
       </Modal>
-      <MediaLibrary
-        appCode={appCode}
-        ref={mediaLibraryRef}
-        multiple={false}
-        visibility="protected"
-        {...mediaLibraryHandlers}
-      />
+      <Box sx={{ position: "fixed", zIndex: 1100 }}>
+        <MediaLibrary
+          appCode={appCode}
+          ref={mediaLibraryRef}
+          multiple={false}
+          visibility="protected"
+          {...mediaLibraryHandlers}
+        />
+      </Box>
     </>
   );
 };

@@ -1,82 +1,16 @@
-import { FC, useCallback, useRef, useState } from "react";
+import { FC } from "react";
 
 import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
 import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { Box } from "@mui/material";
 
 import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
+import { useFreeLayoutCardDnG } from "./useFreeLayoutCardDnG";
 import { BoardCard } from "../board-card/BoardCard";
 import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
 import { useBoard } from "~/providers/BoardProvider";
-import {
-  Active,
-  closestCenter,
-  CollisionDetection,
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  KeyboardCoordinateGetter,
-  MeasuringConfiguration,
-  Modifiers,
-  MouseSensor,
-  PointerActivationConstraint,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { createRange } from "../dnd-components/utilities";
-import {
-  AnimateLayoutChanges,
-  arrayMove,
-  NewIndexGetter,
-  rectSortingStrategy,
-  horizontalListSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  SortingStrategy,
-} from "@dnd-kit/sortable";
-import { useUpdateBoardMutation } from "~/services/api/boards.service";
-import { BoardForm } from "~/models/board.model";
 
-export interface Props {
-  //todo externalize
-  activationConstraint?: PointerActivationConstraint;
-  animateLayoutChanges?: AnimateLayoutChanges;
-  adjustScale?: boolean;
-  collisionDetection?: CollisionDetection;
-  coordinateGetter?: KeyboardCoordinateGetter;
-  Container?: any; // To-do: Fix me
-  getNewIndex?: NewIndexGetter;
-  handle?: boolean;
-  itemCount?: number;
-  items?: string[];
-  measuring?: MeasuringConfiguration;
-  modifiers?: Modifiers;
-  renderItem?: any;
-  removable?: boolean;
-  reorderItems?: typeof arrayMove;
-  strategy?: SortingStrategy;
-  style?: React.CSSProperties;
-  useDragOverlay?: boolean;
-  getItemStyles?(args: {
-    id: string;
-    index: number;
-    isSorting: boolean;
-    isDragOverlay: boolean;
-    overIndex: number;
-    isDragging: boolean;
-  }): React.CSSProperties;
-  wrapperStyle?(args: {
-    active: Pick<Active, "id"> | null;
-    index: number;
-    isDragging: boolean;
-    id: string;
-  }): React.CSSProperties;
-  isDisabled?(id: string): boolean;
-}
-
-export const CardsFreeLayout: FC<Props> = () => {
+export const CardsFreeLayout: FC = () => {
   const { board, zoomLevel } = useBoard();
   const {
     updatedIds,

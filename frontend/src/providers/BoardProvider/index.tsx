@@ -38,11 +38,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     boolean
   > | null>(null);
   const { user } = useOdeClient();
-  // const [board, setBoard] = useState<Board>(
-  //   boardData
-  //     ? new Board().build(boardData as IBoardItemResponse)
-  //     : new Board(),
-  // );
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -80,71 +75,12 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   useEffect(() => {
     if (boardData && !isLoading) {
       updateRights(new Board().build(boardData as IBoardItemResponse).rights);
-      // setBoard(new Board().build(boardData as IBoardItemResponse));
     }
   }, [boardData]);
 
   const hasEditRights = (): boolean => {
     return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
-
-  //   const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
-  //     const dragCard = board.sections[0].cardIds[dragIndex];
-      // setBoard(update(board.cardIds, {
-      //     $splice: [
-      //         [dragIndex, 1],
-      //         [hoverIndex, 0, dragCard],
-      //     ],
-      // }));
-  // }, [cards]);
-
-  const moveCardsHover = (
-    dndCardId: string,
-    draggedCardIndex: number,
-    hoverIndex: number,
-    dragSectionIndex?: number,
-    dropSectionIndex?: number,
-  ): void => {
-    console.log(board);
-    // let clonedBoard: Board = structuredClone(board);
-    let clonedBoard: Board = board;
-    if (board.layoutType === LAYOUT_TYPE.FREE) {
-      // case free layout
-      clonedBoard.cardIds.splice(draggedCardIndex, 1);
-      clonedBoard.cardIds.splice(hoverIndex, 0, dndCardId);
-      // setBoard(clonedBoard);
-    } else if (dragSectionIndex !== undefined  && dropSectionIndex !== undefined && dragSectionIndex === dropSectionIndex) {
-      // case d&d in same section
-      clonedBoard.sections[dragSectionIndex].cardIds.splice(
-        draggedCardIndex,
-        1,
-      );
-      clonedBoard.sections[dragSectionIndex].cardIds.splice(
-        hoverIndex,
-        0,
-        dndCardId,
-      );
-      // setBoard(clonedBoard);
-    } else if (dragSectionIndex !== undefined  && dropSectionIndex !== undefined) {
-      // case d&d in section != card initial section
-      clonedBoard.sections[dragSectionIndex].cardIds.splice(
-        draggedCardIndex,
-        1,
-      );
-      clonedBoard.sections[dropSectionIndex].cardIds.splice(
-        hoverIndex,
-        0,
-        dndCardId,
-      );
-      // setBoard(clonedBoard);
-    } else {
-      console.error("Target section is not defined")
-    }
-    //todo call to update board
-    // setBoard(clonedBoard);
-    console.log(board);
-  };
-
   const value = useMemo<BoardContextType>(
     () => ({
       board,
@@ -156,7 +92,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isLoading,
       boardRights,
       hasEditRights,
-      moveCardsHover,
     }),
     [board, zoomLevel, isLoading, boardRights],
   );

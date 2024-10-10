@@ -19,13 +19,6 @@ export type BoardContextType = {
   isLoading: boolean;
   boardRights: Record<RightRole, boolean> | null;
   hasEditRights: () => boolean;
-  moveCardsHover: (
-    dndCardId: string,
-    draggedCardIndex: number,
-    hoverIndex: number,
-    dragSectionIndex?: number,
-    dropSectionIndex?: number,
-  ) => void;
 };
 
 export type Section = {

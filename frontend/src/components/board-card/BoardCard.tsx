@@ -1,5 +1,7 @@
 import { FC, useEffect, useRef } from "react";
 
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -40,7 +42,8 @@ export const BoardCard: FC<BoardCardProps> = ({
 }) => {
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
-  const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
+  const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
+    useDropdown();
   const dropDownItemList = useCardDropDownItems();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOpen = openDropdownId === card.id;
@@ -55,9 +58,40 @@ export const BoardCard: FC<BoardCardProps> = ({
     registerDropdown(card.id, dropdownRef.current);
   }, [card.id, registerDropdown]);
 
+  const {
+    isDragging,
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: card.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition: transition || undefined,
+  };
+
+  useEffect(() => {
+    registerDropdown(card.id, dropdownRef.current);
+  }, [card.id, registerDropdown]);
+
+  useEffect(() => {
+    if (isDragging) return closeDropdown();
+  }, [isDragging]);
+
   return (
-    <StyledCard zoomLevel={zoomLevel} ref={dropdownRef}>
+    <StyledCard
+      data-dropdown-open={isOpen ? "true" : "false"}
+      zoomLevel={zoomLevel}
+      isDragging={isDragging}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
       <StyledCardHeader
+        ref={dropdownRef}
         avatar={
           <StyledAvatar
             aria-label="recipe"

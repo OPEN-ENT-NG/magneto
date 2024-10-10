@@ -21,13 +21,13 @@ export const CardsHorizontalLayout: FC = () => {
 
   return (
     <Box sx={mainWrapperProps}>
-      {board.sections.map((section) => (
+      {board.sections.map((section, sectionIndex) => (
         <SectionWrapper noCards={section.cards.length === 0} key={section._id}>
           <Box sx={sectionNameWrapperStyle}>
             <SectionName section={section} />
           </Box>
           <UlWrapper className="grid ps-0 list-unstyled left-float">
-            {section.cards.map((card: Card) => {
+            {section.cards.map((card: Card, cardIndex) => {
               return (
                 <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
                   <BoardCard
@@ -36,6 +36,8 @@ export const CardsHorizontalLayout: FC = () => {
                     canComment={board.canComment}
                     displayNbFavorites={board.displayNbFavorites}
                     key={card.id}
+                    cardIndex={cardIndex}
+                    sectionIndex={sectionIndex}
                   />
                 </CardBoxStyle>
               );

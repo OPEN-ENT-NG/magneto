@@ -1,6 +1,7 @@
-import { CSSProperties, FC, useCallback, useEffect, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
 
-// import { DndContext } from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -32,8 +33,6 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 export const BoardCard: FC<BoardCardProps> = ({
   card,
@@ -41,7 +40,6 @@ export const BoardCard: FC<BoardCardProps> = ({
   canComment = false,
   displayNbFavorites = false,
 }) => {
-
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
@@ -54,6 +52,10 @@ export const BoardCard: FC<BoardCardProps> = ({
       toggleDropdown(card.id);
     }
   };
+
+  useEffect(() => {
+    registerDropdown(card.id, dropdownRef.current);
+  }, [card.id, registerDropdown]);
 
   const {
     isDragging,

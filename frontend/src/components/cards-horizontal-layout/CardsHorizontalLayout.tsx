@@ -35,9 +35,10 @@ export const CardsHorizontalLayout: FC = () => {
                     zoomLevel={zoomLevel}
                     canComment={board.canComment}
                     displayNbFavorites={board.displayNbFavorites}
-                    key={card.id} 
+                    key={card.id}
                     cardIndex={cardIndex}
-                    sectionIndex={sectionIndex}                  />
+                    sectionIndex={sectionIndex}
+                  />
                 </CardBoxStyle>
               );
             })}

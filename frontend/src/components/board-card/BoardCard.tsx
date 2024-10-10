@@ -1,4 +1,4 @@
-import { CSSProperties, FC, useCallback, useEffect, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -40,7 +40,6 @@ export const BoardCard: FC<BoardCardProps> = ({
   canComment = false,
   displayNbFavorites = false,
 }) => {
-
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from "react";
 
 import {
   DragEndEvent,
@@ -9,11 +9,11 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 
-import { Board } from '~/models/board.model';
-import { Card } from '~/models/card.model';
-import { useUpdateBoardMutation } from '~/services/api/boards.service';
+import { Board } from "~/models/board.model";
+import { Card } from "~/models/card.model";
+import { useUpdateBoardMutation } from "~/services/api/boards.service";
 
-export const useFreeLayoutCardDnD = (board:Board) => {
+export const useFreeLayoutCardDnD = (board: Board) => {
   const [updatedIds, setUpdatedIds] = useState<string[]>(board.cardIds);
   const [activeItem, setActiveItem] = useState<Card | null>(null);
   const [updateBoard] = useUpdateBoardMutation();

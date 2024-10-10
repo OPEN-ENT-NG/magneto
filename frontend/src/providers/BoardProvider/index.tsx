@@ -1,7 +1,6 @@
 import {
   FC,
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -16,8 +15,6 @@ import { BoardContextType, BoardProviderProps } from "./types";
 import { fetchZoomPreference, updateZoomPreference } from "./utils";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
-import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
-// import { update } from "immutability-helper";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -51,9 +48,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     setZoomLevel(3);
   };
 
-  let board = boardData
-  ? new Board().build(boardData as IBoardItemResponse)
-  : new Board();
+  const board = boardData
+    ? new Board().build(boardData as IBoardItemResponse)
+    : new Board();
 
   const prepareZoom = async () => {
     const zoom = await fetchZoomPreference();

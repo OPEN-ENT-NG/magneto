@@ -61,10 +61,19 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
         } else {
           const allCardsResult = await fetchWithBQ(`cards/${boardId}`);
           if (allCardsResult.error) return { error: allCardsResult.error };
+          const cardMap = new Map(
+            (allCardsResult.data as ICardsResponse).all.map((card) => [
+              card.id,
+              card,
+            ]),
+          );
+          const sortedCards = boardData.cardIds
+            .map((id) => cardMap.get(id))
+            .filter((card) => card !== undefined);
           return {
             data: {
               ...boardData,
-              cards: (allCardsResult.data as ICardsResponse).all,
+              cards: sortedCards,
             },
           };
         }

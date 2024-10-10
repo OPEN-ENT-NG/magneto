@@ -70,14 +70,14 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   }, [zoomLevel]);
 
   useEffect(() => {
-    if (boardData)
+    if (boardData && !isLoading) {
       updateRights(new Board().build(boardData as IBoardItemResponse).rights);
+    }
   }, [boardData]);
 
   const hasEditRights = (): boolean => {
     return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
-
   const value = useMemo<BoardContextType>(
     () => ({
       board,

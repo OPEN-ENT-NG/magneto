@@ -29,7 +29,9 @@ export const HeaderView: FC = () => {
   const boardHasCards = (): boolean => {
     return (
       !!board.cardIds?.length ||
-      !!board.sections?.find((section: Section) => !!section.cardIds.length)
+      !!(board.sections ?? []).find(
+        (section: Section) => !!section.cardIds.length,
+      )
     );
   };
 

@@ -3,7 +3,8 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import {
   DragEndEvent,
   DragStartEvent,
-  MouseSensor,
+  PointerSensor,
+  PointerSensorOptions,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -13,12 +14,44 @@ import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useUpdateBoardMutation } from "~/services/api/boards.service";
 
-export const useFreeLayoutCardDnD = (board: Board) => {
+export class CustomPointerSensor extends PointerSensor {
+    static activators = [
+      {
+        eventName: 'onPointerDown' as const,
+        handler: (event: React.PointerEvent, { onActivation }: PointerSensorOptions): boolean => {
+          if (!(event.target instanceof Element)) {
+            return false;
+          }
+  
+          // Vérifier si un menu déroulant est ouvert
+          const dropdownOpen = document.querySelector('[data-dropdown-open="true"]');
+          if (dropdownOpen) {
+            return false;
+          }
+  
+          const shouldActivate = !event.isPrimary || event.button === 0;
+          if (shouldActivate) {
+            onActivation?.({ event: event.nativeEvent });
+          }
+  
+          return shouldActivate;
+        },
+      },
+    ];
+  }
+
+export const useFreeLayoutCardDnG = (board: Board) => {
   const [updatedIds, setUpdatedIds] = useState<string[]>(board.cardIds);
   const [activeItem, setActiveItem] = useState<Card | null>(null);
   const [updateBoard] = useUpdateBoardMutation();
 
-  const sensors = useSensors(useSensor(MouseSensor));
+  const sensors = useSensors(
+    useSensor(CustomPointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
 
   useEffect(() => {
     setUpdatedIds(board.cardIds);

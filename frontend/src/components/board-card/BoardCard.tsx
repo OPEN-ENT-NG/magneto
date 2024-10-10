@@ -42,7 +42,8 @@ export const BoardCard: FC<BoardCardProps> = ({
 }) => {
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
-  const { openDropdownId, registerDropdown, toggleDropdown } = useDropdown();
+  const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
+    useDropdown();
   const dropDownItemList = useCardDropDownItems();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOpen = openDropdownId === card.id;
@@ -71,8 +72,17 @@ export const BoardCard: FC<BoardCardProps> = ({
     transition: transition || undefined,
   };
 
+  useEffect(() => {
+    registerDropdown(card.id, dropdownRef.current);
+  }, [card.id, registerDropdown]);
+
+  useEffect(() => {
+    if (isDragging) return closeDropdown();
+  }, [isDragging]);
+
   return (
     <StyledCard
+      data-dropdown-open={isOpen ? "true" : "false"}
       zoomLevel={zoomLevel}
       isDragging={isDragging}
       ref={setNodeRef}
@@ -81,6 +91,7 @@ export const BoardCard: FC<BoardCardProps> = ({
       {...listeners}
     >
       <StyledCardHeader
+        ref={dropdownRef}
         avatar={
           <StyledAvatar
             aria-label="recipe"

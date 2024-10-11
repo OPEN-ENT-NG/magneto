@@ -65,7 +65,7 @@ export const useCardSectionDnD = (board: Board) => {
           cardIds: newActiveCardIds,
         }).unwrap();
       } catch (error) {
-        console.error("Échec de la création de la nouvelle section :", error);
+        console.error("Failed to update section:", error);
       }
     },
     [board._id, createSection, updateSection, t],
@@ -91,7 +91,7 @@ export const useCardSectionDnD = (board: Board) => {
           cardIds: newCardIds,
         }).unwrap();
       } catch (error) {
-        console.error("Échec de la mise à jour de la section :", error);
+        console.error("Failed to update section:", error);
       }
     },
     [board._id, updateSection],
@@ -128,7 +128,7 @@ export const useCardSectionDnD = (board: Board) => {
           cardIds: newOverCardIds,
         }).unwrap();
       } catch (error) {
-        console.error("Échec de la mise à jour des sections :", error);
+        console.error("Failed to update section:", error);
       }
     },
     [board._id, updateSection],

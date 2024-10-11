@@ -1,6 +1,6 @@
 import { styled } from "@mui/material";
 
-import { SectionWrapperProps } from "./types";
+import { SectionWrapperProps } from "../droppable-section/types";
 
 export const mainWrapperProps = {
   width: "100%",
@@ -9,40 +9,6 @@ export const mainWrapperProps = {
   flexDirection: "column",
   background: "transparent",
   zIndex: "1",
-};
-
-export const SectionWrapper = styled("div")<SectionWrapperProps>(({
-  noCards = false,
-  isLast = false,
-}) => {
-  let marginBottomProperties = {};
-  if (isLast) {
-    marginBottomProperties = { marginBottom: "15%" };
-  } else if (noCards) {
-    marginBottomProperties = { marginBottom: "15%" };
-  }
-
-  return {
-    boxSizing: "border-box",
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    padding: "1rem 1rem 0 0",
-    minWidth: "100%",
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-    alignSelf: "center",
-    ...marginBottomProperties,
-  };
-});
-
-export const sectionNameWrapperStyle = {
-  display: "flex",
-  alignSelf: "center",
-  width: "93%",
-  padding: "0.5rem 0 0.5rem 7%",
-  flexShrink: 0,
 };
 
 export const UlWrapper = styled("ul")(() => {
@@ -94,3 +60,37 @@ export const CardBoxStyle = styled("li")<{ zoomLevel: number }>(({
 
   return { ...cardMargin };
 });
+
+export const SectionWrapper = styled("div")<SectionWrapperProps>(({
+  noCards = false,
+  isLast = false,
+}) => {
+  let paddingBottomProperties = {};
+  if (isLast) {
+    paddingBottomProperties = { paddingBottom: "15%" };
+  } else if (noCards) {
+    paddingBottomProperties = { paddingBottom: "15%" };
+  }
+
+  return {
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: "1rem 1rem 0 0",
+    minWidth: "100%",
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+    alignSelf: "center",
+    ...paddingBottomProperties,
+  };
+});
+
+export const sectionNameWrapperStyle = {
+  display: "flex",
+  alignSelf: "center",
+  width: "93%",
+  padding: "0.5rem 0 0.5rem 7%",
+  flexShrink: 0,
+};

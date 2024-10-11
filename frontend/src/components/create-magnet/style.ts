@@ -81,3 +81,17 @@ export const descriptionStyle = {
   wordWrap: "break-word",
   overflowWrap: "break-word",
 };
+
+export const modalFooterStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  width: "100%",
+  gap: "1rem",
+};
+
+export const editorStyle = {
+  "& .ProseMirror[contenteditable='true']": {
+    minHeight: "180px",
+  },
+};

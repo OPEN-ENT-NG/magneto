@@ -19,6 +19,8 @@ import {
   titleStyle,
   closeButtonStyle,
   contentContainerStyle,
+  editorStyle,
+  modalFooterStyle,
 } from "./style";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import {
@@ -27,68 +29,35 @@ import {
   Input,
   Label,
   MediaLibrary,
-  TextArea,
   useOdeClient,
 } from "@edifice-ui/react";
 import { Editor, EditorRef } from "@edifice-ui/editor";
 import { useTranslation } from "react-i18next";
-import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
-import { getFileExtension } from "~/hooks/useGetExtension";
 import { Section } from "~/providers/BoardProvider/types";
 import { useBoard } from "~/providers/BoardProvider";
-import { Edit } from "@edifice-ui/icons";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
-
-export const modalFooterStyle = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  width: "100%",
-  gap: "1rem",
-};
-
-const svgContainerStyle = {
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  width: "100%",
-  height: "14rem",
-  marginBottom: "1rem",
-};
-
-const svgStyle = {
-  height: "12rem",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const mediaNameStyle = {
-  textAlign: "center",
-  fontSize: "1.6rem",
-};
-
-const editorStyle = {
-  "& .ProseMirror[contenteditable='true']": {
-    minHeight: "180px",
-  },
-};
+import { CardPayload } from "./types";
+import { useCreateCardMutation } from "~/services/api/cards.service";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
-
-  const [isOpen, setIsOpen] = useState(false);
   const { board } = useBoard();
   const [title, setTitle] = useState("");
-  const [legend, setLegend] = useState("");
+  const [caption, setCaption] = useState("");
   const [section, setSection] = useState<Section>(board.sections[0]);
-  const [summaryContent] = useState<string>("");
+  const [description] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
+  const [createCard] = useCreateCardMutation();
 
-  const { mediaLibraryRef, libraryMedia, mediaLibraryHandlers, media } =
-    useMediaLibrary();
+  const {
+    mediaLibraryRef,
+    mediaLibraryHandlers,
+    media,
+    isCreateMagnetOpen,
+    onClose,
+    magnetType,
+  } = useMediaLibrary();
 
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
     const sectionTitle = event.target.value;
@@ -100,19 +69,40 @@ export const CreateMagnet: FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (libraryMedia) setIsOpen(true);
-  }, [libraryMedia]);
+  const onCloseModal = () => {
+    setTitle("");
+    setCaption("");
+    setSection(board.sections[0]);
+    onClose();
+  };
+
+  const onUpload = async () => {
+    const payload: CardPayload = {
+      boardId: board._id,
+      caption: caption,
+      description: editorRef.current?.getContent("html") as string,
+      locked: false,
+      resourceId: media?.id || "",
+      resourceType: magnetType || media?.type || "",
+      resourceUrl: media?.url || null,
+      sectionId: section._id,
+      title: title,
+    };
+    await createCard(payload);
+    onCloseModal();
+  };
 
   useEffect(() => {
-    if (media) setTitle(media.name.split(".").slice(0, -1).join("."));
+    if (media?.name) {
+      setTitle(media.name.split(".").slice(0, -1).join("."));
+    }
   }, [media]);
 
   return (
     <>
       <Modal
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
+        open={isCreateMagnetOpen}
+        onClose={() => onCloseModal()}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
         style={{ zIndex: 1000 }}
@@ -125,10 +115,10 @@ export const CreateMagnet: FC = () => {
               component="h2"
               sx={titleStyle}
             >
-              Nouvel aimant
+              {t("magneto.new.card")}
             </Typography>
             <IconButton
-              onClick={() => setIsOpen(false)}
+              onClick={() => onCloseModal()}
               aria-label="close"
               sx={closeButtonStyle}
             >
@@ -136,30 +126,25 @@ export const CreateMagnet: FC = () => {
             </IconButton>
           </Box>
           <Box sx={contentContainerStyle}>
-            {media && (
-              <FilePickerWorkspace
-                setIsOpen={setIsOpen}
-                addButtonLabel={"Change file"}
-              />
-            )}
+            {media && <FilePickerWorkspace addButtonLabel={"Change file"} />}
             <FormControl id="title" className="mb-0-5">
-              <Label>Titre</Label>
+              <Label>{t("magneto.card.title")}</Label>
               <Input
                 value={title}
-                placeholder="Titre"
+                placeholder={t("magneto.card.title")}
                 size="md"
                 type="text"
                 onChange={(e) => setTitle(e.target.value)}
               />
             </FormControl>
-            <FormControl id="legend" className="mb-0-5">
-              <Label>Légende</Label>
+            <FormControl id="caption" className="mb-0-5">
+              <Label>{t("magneto.card.caption")}</Label>
               <Input
-                value={legend}
-                placeholder="Légende"
+                value={caption}
+                placeholder={t("magneto.card.caption")}
                 size="md"
                 type="text"
-                onChange={(e) => setLegend(e.target.value)}
+                onChange={(e) => setCaption(e.target.value)}
               />
             </FormControl>
             <FormControl
@@ -172,7 +157,7 @@ export const CreateMagnet: FC = () => {
               <Box sx={editorStyle}>
                 <Editor
                   id="postContent"
-                  content={summaryContent}
+                  content={description}
                   mode="edit"
                   ref={editorRef}
                 />
@@ -193,19 +178,19 @@ export const CreateMagnet: FC = () => {
                   fontSize: "1.7rem",
                 }}
               >
-                Section
+                {t("magneto.card.section")}
               </InputLabel>
               <Select
                 labelId="demo-simple-select-outlined-label"
                 id="demo-simple-select-outlined"
                 value={section.title}
                 onChange={handleSectionChange}
-                label="Section"
+                label={t("magneto.card.section")}
                 notched
                 size="medium"
                 sx={{
                   "& .MuiOutlinedInput-notchedOutline": {
-                    "& legend": {
+                    "& caption": {
                       width: "0px",
                       paddingTop: "0rem",
                     },
@@ -248,7 +233,7 @@ export const CreateMagnet: FC = () => {
                 variant="filled"
                 type="button"
                 className="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => onCloseModal()}
               >
                 {t("magneto.cancel")}
               </Button>
@@ -257,9 +242,7 @@ export const CreateMagnet: FC = () => {
                 color="primary"
                 type="button"
                 variant="filled"
-                onClick={() =>
-                  console.log(editorRef.current?.getContent("html"))
-                }
+                onClick={() => onUpload()}
                 className="button"
               >
                 {t("magneto.save")}

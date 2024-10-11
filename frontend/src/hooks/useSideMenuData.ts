@@ -25,13 +25,13 @@ export const useSideMenuData = (): (
   | SideMenuDividerProp
 )[] => {
   const { t } = useTranslation("magneto");
-  const { handleClickMedia } = useMediaLibrary();
+  const { handleClickMedia, handleClickMenu } = useMediaLibrary();
 
   return [
     {
       icon: createElement(Icon, { path: mdiFormatSize, size: 1.5 }),
       name: t("magneto.card.type.text"),
-      action: () => console.log("text"),
+      action: () => handleClickMenu("text"),
     },
     {
       icon: createElement(Icon, { path: mdiImage, size: 1.5 }),
@@ -65,7 +65,7 @@ export const useSideMenuData = (): (
       }),
       name: t("magneto.card.type.card"),
       action: () => {
-        console.log("magnet");
+        handleClickMenu("card");
       },
     },
     {

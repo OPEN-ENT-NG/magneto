@@ -29,4 +29,11 @@ export type MediaLibraryContextType = {
   media: MediaProps | null;
   setMedia: Dispatch<SetStateAction<MediaProps | null>>;
   handleClickMedia: (type: MediaLibraryType) => void;
+  isCreateMagnetOpen: boolean;
+  setIsCreateMagnetOpen: Dispatch<SetStateAction<boolean>>;
+  magnetType: MenuNotMediaType | null;
+  handleClickMenu: (type: MenuNotMediaType) => void;
+  onClose: () => void;
 };
+
+export type MenuNotMediaType = "text" | "card";

@@ -40,7 +40,7 @@ export const handleCardSize = (zoomLevel: number) => {
 
 export const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",
-})<{ zoomLevel: number; isDragging: boolean }>(({ zoomLevel, isDragging }) => ({
+})<{ zoomLevel: number; isDragging: boolean }>(({ zoomLevel = 3, isDragging = false }) => ({
   display: "flex",
   position: "relative",
   flexDirection: "column",

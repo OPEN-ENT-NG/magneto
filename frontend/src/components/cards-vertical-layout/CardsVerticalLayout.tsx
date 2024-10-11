@@ -14,7 +14,6 @@ import {
 import { BoardCard } from "../board-card/BoardCard";
 import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
-import { createRange } from "../dnd-components/utilities";
 import { unstable_batchedUpdates } from "react-dom";
 
 interface Props {

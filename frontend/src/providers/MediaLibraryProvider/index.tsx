@@ -48,7 +48,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
 
   const [media, setMedia] = useState<MediaProps | null>(null);
   const [isCreateMagnetOpen, setIsCreateMagnetOpen] = useState(false);
-  const [magnetType, setMagnetType] = useState<MenuNotMediaType | null>("text");
+  const [magnetType, setMagnetType] = useState<MenuNotMediaType | null>(null);
 
   const handleClickMedia = (type: MediaLibraryType) => {
     setMedia({ ...(media as MediaProps), type });

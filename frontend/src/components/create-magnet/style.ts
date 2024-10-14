@@ -95,3 +95,58 @@ export const editorStyle = {
     minHeight: "180px",
   },
 };
+
+export const formControlStyle = {
+  marginBottom: "3rem",
+};
+
+export const formControlMUIStyle = {
+  minWidth: 200,
+  marginBottom: "1rem",
+  width: "100%",
+};
+
+export const inputLabelStyle = {
+  background: "white",
+  padding: "0.2rem 4px",
+  marginLeft: "-4px",
+  transform: "translate(14px, -9px) scale(0.75)",
+  fontSize: "1.7rem",
+};
+
+export const selectStyle = {
+  "& .MuiOutlinedInput-notchedOutline": {
+    "& caption": {
+      width: "0px",
+      paddingTop: "0rem",
+    },
+  },
+  "& .MuiSelect-select": {
+    paddingTop: "10px",
+    paddingBottom: "0px",
+    fontSize: "1.7rem",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  height: "4rem",
+  width: "100%",
+};
+
+export const menuItemStyle = {
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  fontSize: "1.7rem",
+  width: "145rem",
+  maxWidth: "100%",
+};
+
+export const footerButtonStyle = {
+  marginLeft: "0",
+};
+
+export const mediaLibraryStyle = {
+  position: "fixed",
+  zIndex: 1100,
+};

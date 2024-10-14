@@ -21,6 +21,13 @@ import {
   contentContainerStyle,
   editorStyle,
   modalFooterStyle,
+  formControlStyle,
+  formControlMUIStyle,
+  inputLabelStyle,
+  selectStyle,
+  mediaLibraryStyle,
+  footerButtonStyle,
+  menuItemStyle,
 } from "./style";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import {
@@ -43,11 +50,13 @@ export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { board } = useBoard();
+
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
   const [section, setSection] = useState<Section>(board.sections[0]);
   const [description] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
+
   const [createCard] = useCreateCardMutation();
 
   const {
@@ -98,6 +107,14 @@ export const CreateMagnet: FC = () => {
     }
   }, [media]);
 
+  const displayFilePickerWorkspace = () => {
+    return media && magnetType !== "text";
+  };
+
+  const displayCaption = () => {
+    return magnetType !== "text";
+  };
+
   return (
     <>
       <Modal
@@ -126,8 +143,10 @@ export const CreateMagnet: FC = () => {
             </IconButton>
           </Box>
           <Box sx={contentContainerStyle}>
-            {media && <FilePickerWorkspace addButtonLabel={"Change file"} />}
-            <FormControl id="title" className="mb-0-5">
+            {displayFilePickerWorkspace() && (
+              <FilePickerWorkspace addButtonLabel={"Change file"} />
+            )}
+            <FormControl id="title">
               <Label>{t("magneto.card.title")}</Label>
               <Input
                 value={title}
@@ -137,21 +156,19 @@ export const CreateMagnet: FC = () => {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </FormControl>
-            <FormControl id="caption" className="mb-0-5">
-              <Label>{t("magneto.card.caption")}</Label>
-              <Input
-                value={caption}
-                placeholder={t("magneto.card.caption")}
-                size="md"
-                type="text"
-                onChange={(e) => setCaption(e.target.value)}
-              />
-            </FormControl>
-            <FormControl
-              id="description"
-              className="mb-1-5"
-              style={{ marginBottom: "3rem" }}
-            >
+            {displayCaption() && (
+              <FormControl id="caption">
+                <Label>{t("magneto.card.caption")}</Label>
+                <Input
+                  value={caption}
+                  placeholder={t("magneto.card.caption")}
+                  size="md"
+                  type="text"
+                  onChange={(e) => setCaption(e.target.value)}
+                />
+              </FormControl>
+            )}
+            <FormControl id="description" style={formControlStyle}>
               <Label>{t("magneto.create.board.description")} :</Label>
 
               <Box sx={editorStyle}>
@@ -163,64 +180,23 @@ export const CreateMagnet: FC = () => {
                 />
               </Box>
             </FormControl>
-            <FormControlMUI
-              variant="outlined"
-              sx={{ minWidth: 200, marginBottom: "1rem", width: "100%" }}
-            >
-              <InputLabel
-                id="demo-simple-select-outlined-label"
-                shrink={true}
-                sx={{
-                  background: "white",
-                  padding: "0.2rem 4px",
-                  marginLeft: "-4px",
-                  transform: "translate(14px, -9px) scale(0.75)",
-                  fontSize: "1.7rem",
-                }}
-              >
+            <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
+              <InputLabel id="input-section" shrink={true} sx={inputLabelStyle}>
                 {t("magneto.card.section")}
               </InputLabel>
               <Select
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
+                labelId="select-section"
+                id="select-section"
                 value={section.title}
                 onChange={handleSectionChange}
                 label={t("magneto.card.section")}
                 notched
                 size="medium"
-                sx={{
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    "& caption": {
-                      width: "0px",
-                      paddingTop: "0rem",
-                    },
-                  },
-                  "& .MuiSelect-select": {
-                    paddingTop: "10px",
-                    paddingBottom: "0px",
-                    fontSize: "1.7rem",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  },
-                  height: "4rem",
-                  width: "100%",
-                }}
+                sx={selectStyle}
               >
                 {board.sections.map((s: Section) => (
                   <MenuItem key={s.title} value={s.title}>
-                    <Box
-                      sx={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        fontSize: "1.7rem",
-                        width: "145rem",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      {s.title}
-                    </Box>
+                    <Box sx={menuItemStyle}>{s.title}</Box>
                   </MenuItem>
                 ))}
               </Select>
@@ -228,22 +204,20 @@ export const CreateMagnet: FC = () => {
 
             <Box sx={modalFooterStyle}>
               <Button
-                style={{ marginLeft: "0" }}
+                style={footerButtonStyle}
                 color="tertiary"
                 variant="filled"
                 type="button"
-                className="button"
                 onClick={() => onCloseModal()}
               >
                 {t("magneto.cancel")}
               </Button>
               <Button
-                style={{ marginLeft: "0" }}
+                style={footerButtonStyle}
                 color="primary"
                 type="button"
                 variant="filled"
                 onClick={() => onUpload()}
-                className="button"
               >
                 {t("magneto.save")}
               </Button>
@@ -251,7 +225,7 @@ export const CreateMagnet: FC = () => {
           </Box>
         </Box>
       </Modal>
-      <Box sx={{ position: "fixed", zIndex: 1100 }}>
+      <Box sx={mediaLibraryStyle}>
         <MediaLibrary
           appCode={appCode}
           ref={mediaLibraryRef}

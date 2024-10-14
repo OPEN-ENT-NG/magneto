@@ -20,6 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
 import { useSectionsDnD } from "~/hooks/dnd-hooks/useSectionsDnD";
+import { Card } from "~/models/card.model";
 
 export const CardsVerticalLayout: FC = () => {
   const { board, zoomLevel, hasEditRights } = useBoard();
@@ -48,7 +49,7 @@ export const CardsVerticalLayout: FC = () => {
         strategy={horizontalListSortingStrategy}
       >
         <Box sx={mainWrapperProps}>
-          {board.sectionsIds.map((sectionId) => {
+          {updatedIds.map((sectionId: string) => {
             const section = sectionMap[sectionId];
 
             const {
@@ -65,7 +66,8 @@ export const CardsVerticalLayout: FC = () => {
               transition: transition || undefined,
             };
 
-            return (<SectionWrapper
+            return (
+            <SectionWrapper
               key={sectionId}
               sectionNumber={
                 hasEditRights()
@@ -75,14 +77,15 @@ export const CardsVerticalLayout: FC = () => {
               isDragging={isDragging}
               ref={setNodeRef}
               style={style}
-              {...attributes}
-              {...listeners}
+
             >
-              <Box sx={sectionNameWrapperStyle}>
+              <Box sx={sectionNameWrapperStyle}               
+              {...attributes}
+              {...listeners} >
                 <SectionName section={section} />
               </Box>
               <CardsWrapper zoomLevel={zoomLevel}>
-                {section.cards.map((card) => (
+                {section.cards.map((card: Card) => (
                   <CardWrapper key={card.id}>
                     <BoardCard
                       card={card}
@@ -96,11 +99,11 @@ export const CardsVerticalLayout: FC = () => {
               </CardsWrapper>
             </SectionWrapper>);
           })}
+          {/* new section */}
           {hasEditRights() && (
             <SectionWrapper
               sectionNumber={board.sections.length + 1}
-              isLast={true}
-            >
+              isLast={true} >
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={null} />
               </Box>

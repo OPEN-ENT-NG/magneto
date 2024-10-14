@@ -84,6 +84,7 @@ export const useSectionsDnD = (board: Board) => {
   const handleDragCancel = useCallback(() => {
     setActiveItem(null);
   }, []);
+ 
 
   return {
     updatedIds,

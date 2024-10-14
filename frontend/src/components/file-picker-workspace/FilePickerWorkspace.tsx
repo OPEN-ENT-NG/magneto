@@ -1,10 +1,7 @@
 import { Edit } from "@edifice-ui/icons";
 import { IconButton } from "@edifice-ui/react";
 import { Box, Typography } from "@mui/material";
-import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
-import { getFileExtension } from "~/hooks/useGetExtension";
-import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+
 import {
   svgContainerStyle,
   svgStyle,
@@ -12,6 +9,10 @@ import {
   iconButtonStyle,
   mediaNameStyle,
 } from "./style";
+import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import { getFileExtension } from "~/hooks/useGetExtension";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export interface FilePickerWorkspaceProps {
   addButtonLabel: string;

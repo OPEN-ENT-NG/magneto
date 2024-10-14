@@ -1,5 +1,14 @@
 import { FC, useEffect, useRef, useState } from "react";
 
+import { Editor, EditorRef } from "@edifice-ui/editor";
+import {
+  Button,
+  FormControl,
+  Input,
+  Label,
+  MediaLibrary,
+  useOdeClient,
+} from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -12,6 +21,7 @@ import {
   Typography,
   FormControl as FormControlMUI,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   modalContainerStyle,
@@ -29,21 +39,11 @@ import {
   footerButtonStyle,
   menuItemStyle,
 } from "./style";
-import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import {
-  Button,
-  FormControl,
-  Input,
-  Label,
-  MediaLibrary,
-  useOdeClient,
-} from "@edifice-ui/react";
-import { Editor, EditorRef } from "@edifice-ui/editor";
-import { useTranslation } from "react-i18next";
-import { Section } from "~/providers/BoardProvider/types";
-import { useBoard } from "~/providers/BoardProvider";
-import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { CardPayload } from "./types";
+import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
+import { useBoard } from "~/providers/BoardProvider";
+import { Section } from "~/providers/BoardProvider/types";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
 
 export const CreateMagnet: FC = () => {

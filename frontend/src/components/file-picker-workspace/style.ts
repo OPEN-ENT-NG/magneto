@@ -14,6 +14,7 @@ export const svgStyle = {
   justifyContent: "center",
   alignItems: "center",
   position: "relative",
+  overflow: "hidden",
 };
 
 export const mediaNameStyle = {
@@ -27,15 +28,21 @@ export const mediaNameStyle = {
 
 export const imageInputActions = {
   position: "absolute",
-  top: "0",
-  right: "-0.5rem",
+  top: "-0.8rem",
+  right: "-0.8rem",
   display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   backgroundColor: "var(--edifice-white)",
   borderRadius: "0.8rem",
+  width: "4rem",
+  height: "4rem",
+  overflow: "hidden",
 };
 
 export const iconButtonStyle = {
-  "--edifice-btn-padding-x": "0.8rem",
-  "--edifice-btn-padding-y": "0.8rem",
+  padding: 0,
+  minWidth: "auto",
+  width: "3.2rem",
+  height: "3.2rem",
 } as React.CSSProperties;

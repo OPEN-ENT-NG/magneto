@@ -19,6 +19,7 @@ import {
   SideMenuDividerProp,
 } from "~/models/side-menu.model";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 
 export const useSideMenuData = (): (
   | SideMenuIconProp
@@ -31,7 +32,7 @@ export const useSideMenuData = (): (
     {
       icon: createElement(Icon, { path: mdiFormatSize, size: 1.5 }),
       name: t("magneto.card.type.text"),
-      action: () => handleClickMenu("text"),
+      action: () => handleClickMenu(MENU_NOT_MEDIA_TYPE.TEXT),
     },
     {
       icon: createElement(Icon, { path: mdiImage, size: 1.5 }),
@@ -65,7 +66,7 @@ export const useSideMenuData = (): (
       }),
       name: t("magneto.card.type.card"),
       action: () => {
-        handleClickMenu("card");
+        handleClickMenu(MENU_NOT_MEDIA_TYPE.CARD);
       },
     },
     {

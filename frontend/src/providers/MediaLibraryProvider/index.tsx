@@ -14,13 +14,10 @@ import {
 } from "@edifice-ui/react";
 import { WorkspaceElement } from "edifice-ts-client";
 
-import {
-  MediaLibraryContextType,
-  MediaLibraryProviderProps,
-  MenuNotMediaType,
-} from "./types";
+import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { MediaProps } from "~/components/board-view/types";
 import { useMediaLibrary as useMediaLibraryHook } from "~/hooks/useMediaLibrary";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);
 
@@ -48,14 +45,16 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
 
   const [media, setMedia] = useState<MediaProps | null>(null);
   const [isCreateMagnetOpen, setIsCreateMagnetOpen] = useState(false);
-  const [magnetType, setMagnetType] = useState<MenuNotMediaType | null>(null);
+  const [magnetType, setMagnetType] = useState<MENU_NOT_MEDIA_TYPE | null>(
+    null,
+  );
 
   const handleClickMedia = (type: MediaLibraryType) => {
     setMedia({ ...(media as MediaProps), type });
     mediaLibraryRef.current?.show(type);
   };
 
-  const handleClickMenu = (type: MenuNotMediaType) => {
+  const handleClickMenu = (type: MENU_NOT_MEDIA_TYPE) => {
     setIsCreateMagnetOpen(true);
     setMagnetType(type);
   };
@@ -93,7 +92,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       } else {
         const medialIb = libraryMedia as WorkspaceElement;
         setMedia({
-          type: (media as MediaProps).type,
+          type: (media as MediaProps)?.type ?? "",
           id: medialIb?._id || "",
           name: medialIb?.name || "",
           application: "",

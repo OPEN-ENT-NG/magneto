@@ -6,6 +6,6 @@ export interface CardPayload {
   resourceId: string;
   resourceType: string;
   resourceUrl: string | null;
-  sectionId: string;
+  sectionId?: string;
   title: string;
 }

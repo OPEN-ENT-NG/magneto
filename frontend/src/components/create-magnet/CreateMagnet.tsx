@@ -45,6 +45,7 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
+import { convertMediaTypeToResourceType } from "./utils";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -53,7 +54,9 @@ export const CreateMagnet: FC = () => {
 
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
-  const [section, setSection] = useState<Section>(board.sections[0]);
+  const [section, setSection] = useState<Section | null>(
+    board.sections[0] ?? null,
+  );
   const [description] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
 
@@ -71,7 +74,7 @@ export const CreateMagnet: FC = () => {
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
     const sectionTitle = event.target.value;
     const selectedSection = board.sections.find(
-      (s) => s.title === sectionTitle,
+      (sectionSelected) => sectionSelected.title === sectionTitle,
     );
     if (selectedSection) {
       setSection(selectedSection);
@@ -81,7 +84,7 @@ export const CreateMagnet: FC = () => {
   const onCloseModal = () => {
     setTitle("");
     setCaption("");
-    setSection(board.sections[0]);
+    if (section !== null) setSection(board.sections[0]);
     onClose();
   };
 
@@ -91,11 +94,11 @@ export const CreateMagnet: FC = () => {
       caption: caption,
       description: editorRef.current?.getContent("html") as string,
       locked: false,
-      resourceId: media?.id || "",
-      resourceType: magnetType || media?.type || "",
-      resourceUrl: media?.url || null,
-      sectionId: section._id,
+      resourceId: media?.id ?? "",
+      resourceType: magnetType ?? convertMediaTypeToResourceType(media?.type),
+      resourceUrl: media?.url ?? null,
       title: title,
+      ...(section?._id ? { sectionId: section._id } : {}),
     };
     await createCard(payload);
     onCloseModal();
@@ -107,13 +110,9 @@ export const CreateMagnet: FC = () => {
     }
   }, [media]);
 
-  const displayFilePickerWorkspace = () => {
-    return media && magnetType !== "text";
-  };
+  const magnetTypeHasFilePickerWorkspace = media && magnetType !== "text";
 
-  const displayCaption = () => {
-    return magnetType !== "text";
-  };
+  const magnetTypeHasCaption = magnetType !== "text";
 
   return (
     <>
@@ -143,7 +142,7 @@ export const CreateMagnet: FC = () => {
             </IconButton>
           </Box>
           <Box sx={contentContainerStyle}>
-            {displayFilePickerWorkspace() && (
+            {magnetTypeHasFilePickerWorkspace && (
               <FilePickerWorkspace addButtonLabel={"Change file"} />
             )}
             <FormControl id="title">
@@ -156,7 +155,7 @@ export const CreateMagnet: FC = () => {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </FormControl>
-            {displayCaption() && (
+            {magnetTypeHasCaption && (
               <FormControl id="caption">
                 <Label>{t("magneto.card.caption")}</Label>
                 <Input
@@ -180,27 +179,33 @@ export const CreateMagnet: FC = () => {
                 />
               </Box>
             </FormControl>
-            <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
-              <InputLabel id="input-section" shrink={true} sx={inputLabelStyle}>
-                {t("magneto.card.section")}
-              </InputLabel>
-              <Select
-                labelId="select-section"
-                id="select-section"
-                value={section.title}
-                onChange={handleSectionChange}
-                label={t("magneto.card.section")}
-                notched
-                size="medium"
-                sx={selectStyle}
-              >
-                {board.sections.map((s: Section) => (
-                  <MenuItem key={s.title} value={s.title}>
-                    <Box sx={menuItemStyle}>{s.title}</Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControlMUI>
+            {section !== null && (
+              <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
+                <InputLabel
+                  id="input-section"
+                  shrink={true}
+                  sx={inputLabelStyle}
+                >
+                  {t("magneto.card.section")}
+                </InputLabel>
+                <Select
+                  labelId="select-section"
+                  id="select-section"
+                  value={section.title}
+                  onChange={handleSectionChange}
+                  label={t("magneto.card.section")}
+                  notched
+                  size="medium"
+                  sx={selectStyle}
+                >
+                  {board.sections.map((s: Section) => (
+                    <MenuItem key={s.title} value={s.title}>
+                      <Box sx={menuItemStyle}>{s.title}</Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControlMUI>
+            )}
 
             <Box sx={modalFooterStyle}>
               <Button

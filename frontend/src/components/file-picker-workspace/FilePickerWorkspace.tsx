@@ -11,7 +11,7 @@ import {
 } from "./style";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
-import { getFileExtension } from "~/hooks/useGetExtension";
+import { getFileExtension } from "~/components/file-picker-workspace/utils";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export interface FilePickerWorkspaceProps {
@@ -24,32 +24,30 @@ export const FilePickerWorkspace = ({
   const { media, handleClickMedia } = useMediaLibrary();
 
   return (
-    <div style={{ width: "100%" }}>
-      <Box>
-        <Box sx={svgContainerStyle}>
-          <Box sx={svgStyle}>
-            <CardContentSvgDisplay
-              extension={getFileExtension(media?.name || "")}
+    <Box sx={{ width: "100%" }}>
+      <Box sx={svgContainerStyle}>
+        <Box sx={svgStyle}>
+          <CardContentSvgDisplay
+            extension={getFileExtension(media?.name ?? "")}
+          />
+          <Box sx={imageInputActions}>
+            <IconButton
+              aria-label={addButtonLabel}
+              color="tertiary"
+              icon={<Edit />}
+              onClick={() => {
+                handleClickMedia(MEDIA_LIBRARY_TYPE.ATTACHMENT);
+              }}
+              type="button"
+              variant="ghost"
+              style={iconButtonStyle}
             />
-            <Box sx={imageInputActions}>
-              <IconButton
-                aria-label={addButtonLabel}
-                color="tertiary"
-                icon={<Edit />}
-                onClick={() => {
-                  handleClickMedia(MEDIA_LIBRARY_TYPE.ATTACHMENT);
-                }}
-                type="button"
-                variant="ghost"
-                style={iconButtonStyle}
-              />
-            </Box>
           </Box>
-          <Typography id="media-name" sx={mediaNameStyle}>
-            {media?.name}
-          </Typography>
         </Box>
+        <Typography id="media-name" sx={mediaNameStyle}>
+          {media?.name}
+        </Typography>
       </Box>
-    </div>
+    </Box>
   );
 };

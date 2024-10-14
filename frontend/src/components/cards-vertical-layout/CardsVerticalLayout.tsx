@@ -21,6 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
 import { useSectionsDnD } from "~/hooks/dnd-hooks/useSectionsDnD";
 import { Card } from "~/models/card.model";
+import { DndSection } from "../dnd-section/DndSection";
 
 export const CardsVerticalLayout: FC = () => {
   const { board, zoomLevel, hasEditRights } = useBoard();
@@ -52,36 +53,22 @@ export const CardsVerticalLayout: FC = () => {
           {updatedIds.map((sectionId: string) => {
             const section = sectionMap[sectionId];
 
-            const {
-              isDragging,
-              attributes,
-              listeners,
-              setNodeRef,
-              transform,
-              transition,
-            } = useSortable({ id: section._id });
-
-            const style = {
-              transform: CSS.Transform.toString(transform),
-              transition: transition || undefined,
-            };
-
+            
             return (
-            <SectionWrapper
-              key={sectionId}
-              sectionNumber={
-                hasEditRights()
-                  ? board.sections.length + 1
-                  : board.sections.length
-              }
-              isDragging={isDragging}
-              ref={setNodeRef}
-              style={style}
-
-            >
+              <DndSection
+                key={section._id}
+                id={section._id}
+                noCards={!section.cards.length}
+                sectionType ={ "vertical"}
+                dndType={"sortable"}
+                sectionNumber={
+                  hasEditRights()
+                    ? board.sections.length + 1
+                    : board.sections.length
+                }
+              >
               <Box sx={sectionNameWrapperStyle}               
-              {...attributes}
-              {...listeners} >
+>
                 <SectionName section={section} />
               </Box>
               <CardsWrapper zoomLevel={zoomLevel}>
@@ -97,7 +84,7 @@ export const CardsVerticalLayout: FC = () => {
                   </CardWrapper>
                 ))}
               </CardsWrapper>
-            </SectionWrapper>);
+            </DndSection>);
           })}
           {/* new section */}
           {hasEditRights() && (

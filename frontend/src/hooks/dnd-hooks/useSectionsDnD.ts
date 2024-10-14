@@ -28,9 +28,12 @@ export const useSectionsDnD = (board: Board) => {
 
   useEffect(() => {
     setUpdatedIds(board.sectionsIds);
+    console.log("updated id");
   }, [board.sectionsIds]);
 
   const sectionMap = useMemo(() => {
+    console.log("section map");
+
     return board.sections.reduce(
       (acc, section) => {
         acc[section._id] = section;
@@ -42,6 +45,8 @@ export const useSectionsDnD = (board: Board) => {
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
+      console.log("handleDragStart");
+
       setActiveItem(sectionMap[event.active.id.toString()] ?? null);
     },
     [sectionMap],
@@ -49,14 +54,18 @@ export const useSectionsDnD = (board: Board) => {
 
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
+      
       const { active, over } = event;
+      console.log("handleDragEnd", active, over);
+
 
       if (active.id !== over?.id) {
+        
         const oldIndex = updatedIds.indexOf(active.id.toString());
         const newIndex = updatedIds.indexOf(
           over ? over.id.toString() : updatedIds[updatedIds.length - 1],
         );
-
+        console.log("active != over", "old", oldIndex, "new", newIndex);
         const newUpdatedIds = arrayMove(updatedIds, oldIndex, newIndex);
         setUpdatedIds(newUpdatedIds);
 
@@ -69,7 +78,8 @@ export const useSectionsDnD = (board: Board) => {
         };
 
         try {
-          await updateBoard(payload).unwrap();
+          console.log(payload);
+          // await updateBoard(payload).unwrap();
         } catch (error) {
           console.error("Failed to update board:", error);
           setUpdatedIds(board.sectionsIds);
@@ -82,6 +92,8 @@ export const useSectionsDnD = (board: Board) => {
   );
 
   const handleDragCancel = useCallback(() => {
+    console.log("handleDragCancel");
+
     setActiveItem(null);
   }, []);
  

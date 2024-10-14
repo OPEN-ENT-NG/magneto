@@ -47,6 +47,7 @@ export const CardsHorizontalLayout: FC = () => {
           {board.sections.map((section) => {
             return (
               <DroppableSection
+                key={section._id}
                 id={section._id}
                 noCards={!section.cards.length}
               >

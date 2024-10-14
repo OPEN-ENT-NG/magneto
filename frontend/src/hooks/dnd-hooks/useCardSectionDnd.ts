@@ -3,13 +3,13 @@ import { useState, useCallback, useMemo } from "react";
 import {
   DragEndEvent,
   DragStartEvent,
-  MouseSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useTranslation } from "react-i18next";
 
+import { CustomPointerSensor } from "./customPointer";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import {
@@ -22,7 +22,14 @@ export const useCardSectionDnD = (board: Board) => {
   const [updateSection] = useUpdateSectionMutation();
   const [createSection] = useCreateSectionMutation();
   const { t } = useTranslation("magneto");
-  const sensors = useSensors(useSensor(MouseSensor));
+  
+  const sensors = useSensors(
+    useSensor(CustomPointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
 
   const cardMap = useMemo(() => {
     return board.sections.reduce(

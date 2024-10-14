@@ -10,8 +10,8 @@ import {
   mediaNameStyle,
 } from "./style";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
-import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { getFileExtension } from "~/components/file-picker-workspace/utils";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export interface FilePickerWorkspaceProps {

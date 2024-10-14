@@ -40,12 +40,12 @@ import {
   menuItemStyle,
 } from "./style";
 import { CardPayload } from "./types";
+import { convertMediaTypeToResourceType } from "./utils";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
-import { convertMediaTypeToResourceType } from "./utils";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();

@@ -16,8 +16,8 @@ import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { MediaProps } from "~/components/board-view/types";
-import { useMediaLibrary as useMediaLibraryHook } from "~/hooks/useMediaLibrary";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { useMediaLibrary as useMediaLibraryHook } from "~/hooks/useMediaLibrary";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);
 

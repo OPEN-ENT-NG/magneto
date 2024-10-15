@@ -2,6 +2,7 @@ import { Dispatch, ReactNode, SetStateAction } from "react";
 
 import { RightRole } from "edifice-ts-client";
 
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 
@@ -19,6 +20,8 @@ export type BoardContextType = {
   isLoading: boolean;
   boardRights: Record<RightRole, boolean> | null;
   hasEditRights: () => boolean;
+  displayModals: DisplayModalsState;
+  toggleBoardModals: (modalType: BOARD_MODAL_TYPE) => void;
 };
 
 export type Section = {
@@ -34,3 +37,7 @@ export type Section = {
 export type Sections = {
   all: Section[];
 };
+
+export interface DisplayModalsState {
+  [BOARD_MODAL_TYPE.PARAMETERS]: boolean;
+}

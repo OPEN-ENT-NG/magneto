@@ -13,12 +13,14 @@ import {
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import {
   SideMenuIconProp,
   SideMenuDividerProp,
 } from "~/models/side-menu.model";
+import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const useSideMenuData = (): (
@@ -27,6 +29,7 @@ export const useSideMenuData = (): (
 )[] => {
   const { t } = useTranslation("magneto");
   const { handleClickMedia, handleClickMenu } = useMediaLibrary();
+  const { toggleBoardModals } = useBoard();
 
   return [
     {
@@ -76,7 +79,7 @@ export const useSideMenuData = (): (
       icon: createElement(Icon, { path: mdiCog, size: 1.5 }),
       name: "",
       action: () => {
-        console.log("parameters");
+        toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS);
       },
     },
   ];

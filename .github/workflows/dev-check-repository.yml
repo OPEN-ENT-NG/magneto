@@ -1,37 +1,43 @@
 name: dev-check-repository
-
 on: [push]
-
 jobs:
   build-node-test:
     runs-on: ubuntu-latest
-
     container:
       image: opendigitaleducation/node:18-alpine-pnpm
       options: --user root -v ${{ github.workspace }}:/home/node/:rw
-
     steps:
       - uses: actions/checkout@v1
+      
+      - name: Update .npmrc with token
+        run: |
+          sed -i 's|${TIPTAP_PRO_TOKEN}|${{ secrets.TIPTAP_PRO_TOKEN }}|g' .npmrc
+        working-directory: ./frontend
+
       - name: Run npm install
         working-directory: ./frontend
         run: pnpm install
+        env:
+          TIPTAP_PRO_TOKEN: ${{ secrets.TIPTAP_PRO_TOKEN }}
+
       - name: Check Quality Code
         working-directory: ./frontend
         run: pnpm run format:check && pnpm run lint
+
       - name: Run Build Vite
         working-directory: ./frontend
         run: pnpm build
+
       - name: Run tests
         working-directory: ./frontend
         run: pnpm test
 
   build-gradle-test:
+    # Cette partie reste inchangée
     runs-on: ubuntu-latest
-
     container:
       image: gradle:4.5-alpine
       options: --user root -v ${{ github.workspace }}:/home/gradle/:rw
-
     steps:
       - uses: actions/checkout@v1
       - name: Run build gradle

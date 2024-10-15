@@ -14,6 +14,7 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import {
   SideMenuIconProp,
   SideMenuDividerProp,
@@ -25,13 +26,13 @@ export const useSideMenuData = (): (
   | SideMenuDividerProp
 )[] => {
   const { t } = useTranslation("magneto");
-  const { handleClickMedia } = useMediaLibrary();
+  const { handleClickMedia, handleClickMenu } = useMediaLibrary();
 
   return [
     {
       icon: createElement(Icon, { path: mdiFormatSize, size: 1.5 }),
       name: t("magneto.card.type.text"),
-      action: () => console.log("text"),
+      action: () => handleClickMenu(MENU_NOT_MEDIA_TYPE.TEXT),
     },
     {
       icon: createElement(Icon, { path: mdiImage, size: 1.5 }),
@@ -65,7 +66,7 @@ export const useSideMenuData = (): (
       }),
       name: t("magneto.card.type.card"),
       action: () => {
-        console.log("magnet");
+        handleClickMenu(MENU_NOT_MEDIA_TYPE.CARD);
       },
     },
     {

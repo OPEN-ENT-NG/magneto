@@ -9,6 +9,7 @@ import {
 import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaProps } from "~/components/board-view/types";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 
 export interface MediaLibraryProviderProps {
   children: ReactNode;
@@ -29,4 +30,9 @@ export type MediaLibraryContextType = {
   media: MediaProps | null;
   setMedia: Dispatch<SetStateAction<MediaProps | null>>;
   handleClickMedia: (type: MediaLibraryType) => void;
+  isCreateMagnetOpen: boolean;
+  setIsCreateMagnetOpen: Dispatch<SetStateAction<boolean>>;
+  magnetType: MENU_NOT_MEDIA_TYPE | null;
+  handleClickMenu: (type: MENU_NOT_MEDIA_TYPE) => void;
+  onClose: () => void;
 };

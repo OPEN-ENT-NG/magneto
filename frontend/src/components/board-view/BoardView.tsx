@@ -34,7 +34,7 @@ export const BoardView: FC = () => {
     resetZoom,
     isLoading,
     hasEditRights,
-    dispayModals,
+    displayModals,
     toggleBoardModals,
   } = useBoard();
   const headerHeight = useHeaderHeight();
@@ -89,7 +89,7 @@ export const BoardView: FC = () => {
       <CreateMagnet />
 
       <CreateBoard
-        isOpen={dispayModals.PARAMETERS}
+        isOpen={displayModals.PARAMETERS}
         toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
         boardToUpdate={board}
       />

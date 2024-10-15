@@ -37,7 +37,7 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(3);
-  const [dispayModals, setDisplayModals] =
+  const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
 
   const { id = "" } = useParams();
@@ -108,10 +108,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isLoading,
       boardRights,
       hasEditRights,
-      dispayModals,
+      displayModals,
       toggleBoardModals,
     }),
-    [board, zoomLevel, isLoading, boardRights, dispayModals],
+    [board, zoomLevel, isLoading, boardRights, displayModals],
   );
 
   return (

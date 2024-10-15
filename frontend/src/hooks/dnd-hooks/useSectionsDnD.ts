@@ -59,8 +59,14 @@ export const useSectionsDnD = (board: Board) => {
 
 
       if (active.id !== over?.id) {
-        const realSectionId = updatedIds.find((sectionId: string) => sectionId === over?.id) ?? board.sections.find((section: Section) => section.cardIds.map((cardId: string) => cardId === over?.id));
-        console.log(realSectionId);
+        const realSectionId = updatedIds.find((sectionId: string) => sectionId === over?.id) 
+        ?? board.sections.reduce((acc: string, section: Section) => {
+          const matchingCardId = section.cardIds.find(
+            (cardId: string) => cardId === over?.id,
+          );
+
+          return matchingCardId ? section._id : acc;
+      }, "");        console.log(realSectionId);
       
         const oldIndex = updatedIds.indexOf(active.id.toString());
         const newIndex = updatedIds.indexOf(realSectionId?.toString() ?? updatedIds[updatedIds.length - 1],

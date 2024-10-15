@@ -15,3 +15,5 @@ services:
       - ~/.pnpm:/.pnpm
       - ~/.npm:/.npm
       - ~/.cache:/.cache
+    environment:
+      - TIPTAP_PRO_TOKEN

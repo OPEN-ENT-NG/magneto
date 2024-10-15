@@ -88,11 +88,11 @@ export const BoardView: FC = () => {
 
       <CreateMagnet />
 
-        <CreateBoard
-          isOpen={dispayModals.PARAMETERS}
-          toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
-          boardToUpdate={board}
-        />
+      <CreateBoard
+        isOpen={dispayModals.PARAMETERS}
+        toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
+        boardToUpdate={board}
+      />
 
       <div className="zoom-container">
         <ZoomComponent

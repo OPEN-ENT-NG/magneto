@@ -8,6 +8,7 @@ import {
   Label,
   MediaLibrary,
   useOdeClient,
+  IconButton as IconButtonEdifice,
 } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -20,6 +21,7 @@ import {
   SelectChangeEvent,
   Typography,
   FormControl as FormControlMUI,
+  Paper,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -46,6 +48,14 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import {
+  iconButtonStyle,
+  imageInputActions,
+} from "../file-picker-workspace/style";
+import { Edit } from "@edifice-ui/icons";
+import { ImageContainer } from "../image-container/ImageContainer";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -69,6 +79,7 @@ export const CreateMagnet: FC = () => {
     isCreateMagnetOpen,
     onClose,
     magnetType,
+    handleClickMedia,
   } = useMediaLibrary();
 
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
@@ -110,7 +121,10 @@ export const CreateMagnet: FC = () => {
     }
   }, [media]);
 
-  const magnetTypeHasFilePickerWorkspace = media && magnetType !== "text";
+  const magnetTypeHasFilePickerWorkspace =
+    media && media.type === MEDIA_LIBRARY_TYPE.ATTACHMENT;
+
+  const magnetTypeHasImage = media && media.type === MEDIA_LIBRARY_TYPE.IMAGE;
 
   const magnetTypeHasCaption = magnetType !== "text";
 
@@ -144,6 +158,12 @@ export const CreateMagnet: FC = () => {
           <Box sx={contentContainerStyle}>
             {magnetTypeHasFilePickerWorkspace && (
               <FilePickerWorkspace addButtonLabel={"Change file"} />
+            )}
+            {magnetTypeHasImage && (
+              <ImageContainer
+                media={media}
+                handleClickMedia={handleClickMedia}
+              />
             )}
             <FormControl id="title">
               <Label>{t("magneto.card.title")}</Label>

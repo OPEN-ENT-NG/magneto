@@ -28,8 +28,8 @@ export const mediaNameStyle = {
 
 export const imageInputActions = {
   position: "absolute",
-  top: "-0.8rem",
-  right: "-0.8rem",
+  top: "-0.6rem",
+  right: "-0.6rem",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

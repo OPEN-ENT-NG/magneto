@@ -16,6 +16,7 @@ import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { MediaProps } from "~/components/board-view/types";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useMediaLibrary as useMediaLibraryHook } from "~/hooks/useMediaLibrary";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);
@@ -43,10 +44,25 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   } = useMediaLibraryHook();
 
   const [media, setMedia] = useState<MediaProps | null>(null);
+  const [isCreateMagnetOpen, setIsCreateMagnetOpen] = useState(false);
+  const [magnetType, setMagnetType] = useState<MENU_NOT_MEDIA_TYPE | null>(
+    null,
+  );
 
   const handleClickMedia = (type: MediaLibraryType) => {
     setMedia({ ...(media as MediaProps), type });
     mediaLibraryRef.current?.show(type);
+  };
+
+  const handleClickMenu = (type: MENU_NOT_MEDIA_TYPE) => {
+    setIsCreateMagnetOpen(true);
+    setMagnetType(type);
+  };
+
+  const onClose = () => {
+    setMedia(null);
+    setMagnetType(null);
+    setIsCreateMagnetOpen(false);
   };
 
   const updateLibraryMedia = () => {
@@ -76,7 +92,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       } else {
         const medialIb = libraryMedia as WorkspaceElement;
         setMedia({
-          type: (media as MediaProps).type,
+          type: (media as MediaProps)?.type ?? "",
           id: medialIb?._id || "",
           name: medialIb?.name || "",
           application: "",
@@ -85,6 +101,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
             : (libraryMedia as string),
         });
       }
+      setIsCreateMagnetOpen(true);
     }
   };
 
@@ -105,8 +122,13 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       media,
       setMedia,
       handleClickMedia,
+      isCreateMagnetOpen,
+      setIsCreateMagnetOpen,
+      magnetType,
+      handleClickMenu,
+      onClose,
     }),
-    [mediaLibraryRef, libraryMedia, media],
+    [mediaLibraryRef, libraryMedia, media, isCreateMagnetOpen, magnetType],
   );
 
   return (

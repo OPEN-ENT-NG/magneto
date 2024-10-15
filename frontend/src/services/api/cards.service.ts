@@ -1,5 +1,6 @@
 import { emptySplitApi } from "./empltySplitApi.service";
 import { ICardsParamsRequest, ICardsResponse } from "../../models/card.model";
+import { CardPayload } from "~/components/create-magnet/types";
 
 export const cardsApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -17,6 +18,14 @@ export const cardsApi = emptySplitApi.injectEndpoints({
         return `cards/${boardId}`;
       },
     }),
+    createCard: builder.mutation({
+      query: (params: CardPayload) => ({
+        url: "card",
+        method: "POST",
+        body: params,
+      }),
+      invalidatesTags: ["BoardData"],
+    }),
   }),
 });
 
@@ -24,4 +33,5 @@ export const {
   useGetAllCardsCollectionQuery,
   useLazyGetCardsBySectionQuery,
   useLazyGetAllCardsByBoardIdQuery,
+  useCreateCardMutation,
 } = cardsApi;

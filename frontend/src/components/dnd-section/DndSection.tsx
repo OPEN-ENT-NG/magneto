@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 
 import { useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
@@ -16,8 +16,8 @@ export const DndSection: FC<DndSectionProps> = ({
   noCards = false,
   sectionNumber,
 }) => {
-  let style = {};
 
+  console.log("dnd section hook id", id);
 
   const {
     isDragging,
@@ -28,7 +28,7 @@ export const DndSection: FC<DndSectionProps> = ({
     transition,
   } = useSortable({ id });
 
-  style = {
+  let style = {
     transform: CSS.Transform.toString(transform),
     transition: transition || undefined,
   };
@@ -44,9 +44,11 @@ export const DndSection: FC<DndSectionProps> = ({
     }
   }
 
+  const currentNode = getNode();
+
   return (
     <SectionWrapper
-      ref={getNode}
+      ref={currentNode}
       noCards={noCards}
       isLast={isLast}
       sectionNumber={sectionNumber}

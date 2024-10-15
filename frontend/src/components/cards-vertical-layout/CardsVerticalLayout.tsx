@@ -53,13 +53,12 @@ export const CardsVerticalLayout: FC = () => {
           {updatedIds.map((sectionId: string) => {
             const section = sectionMap[sectionId];
 
-            
             return (
               <DndSection
                 key={section._id}
                 id={section._id}
                 noCards={!section.cards.length}
-                sectionType ={ "vertical"}
+                sectionType={"vertical"}
                 dndType={"sortable"}
                 sectionNumber={
                   hasEditRights()
@@ -67,30 +66,31 @@ export const CardsVerticalLayout: FC = () => {
                     : board.sections.length
                 }
               >
-              <Box sx={sectionNameWrapperStyle}               
->
-                <SectionName section={section} />
-              </Box>
-              <CardsWrapper zoomLevel={zoomLevel}>
-                {section.cards.map((card: Card) => (
-                  <CardWrapper key={card.id}>
-                    <BoardCard
-                      card={card}
-                      zoomLevel={zoomLevel}
-                      canComment={board.canComment}
-                      displayNbFavorites={board.displayNbFavorites}
-                      key={card.id}
-                    />
-                  </CardWrapper>
-                ))}
-              </CardsWrapper>
-            </DndSection>);
+                <Box sx={sectionNameWrapperStyle}>
+                  <SectionName section={section} />
+                </Box>
+                <CardsWrapper zoomLevel={zoomLevel}>
+                  {section.cards.map((card: Card) => (
+                    <CardWrapper key={card.id}>
+                      <BoardCard
+                        card={card}
+                        zoomLevel={zoomLevel}
+                        canComment={board.canComment}
+                        displayNbFavorites={board.displayNbFavorites}
+                        key={card.id}
+                      />
+                    </CardWrapper>
+                  ))}
+                </CardsWrapper>
+              </DndSection>
+            );
           })}
           {/* new section */}
           {hasEditRights() && (
             <SectionWrapper
               sectionNumber={board.sections.length + 1}
-              isLast={true} >
+              isLast={true}
+            >
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={null} />
               </Box>

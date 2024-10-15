@@ -59,6 +59,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const resetZoom = (): void => {
     setZoomLevel(3);
   };
+console.log("alice board");
 
   const board = boardData
     ? new Board().build(boardData as IBoardItemResponse)
@@ -82,6 +83,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   }, [zoomLevel]);
 
   useEffect(() => {
+    console.log("useEffect", boardData);
     if (boardData && !isLoading) {
       updateRights(new Board().build(boardData as IBoardItemResponse).rights);
     }

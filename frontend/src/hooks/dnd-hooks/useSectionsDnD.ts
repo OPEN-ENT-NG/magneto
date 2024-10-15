@@ -28,8 +28,7 @@ export const useSectionsDnD = (board: Board) => {
 
   useEffect(() => {
     setUpdatedIds(board.sectionsIds);
-    console.log("updated id");
-  }, [board.sectionsIds]);
+  }, [board]);
 
   const sectionMap = useMemo(() => {
     console.log("section map");

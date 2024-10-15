@@ -11,8 +11,17 @@ import { checkUserRight, useOdeClient } from "@edifice-ui/react";
 import { RightRole } from "edifice-ts-client";
 import { useParams } from "react-router-dom";
 
-import { BoardContextType, BoardProviderProps } from "./types";
-import { fetchZoomPreference, updateZoomPreference } from "./utils";
+import {
+  BoardContextType,
+  BoardProviderProps,
+  DisplayModalsState,
+} from "./types";
+import {
+  fetchZoomPreference,
+  initialDisplayModals,
+  updateZoomPreference,
+} from "./utils";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 
@@ -28,6 +37,9 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(3);
+  const [displayModals, setDisplayModals] =
+    useState<DisplayModalsState>(initialDisplayModals);
+
   const { id = "" } = useParams();
   const { data: boardData, isLoading } = useGetBoardDataQuery(id);
   const [boardRights, setBoardRights] = useState<Record<
@@ -78,6 +90,13 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const hasEditRights = (): boolean => {
     return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
+
+  const toggleBoardModals = (modalType: BOARD_MODAL_TYPE) =>
+    setDisplayModals((prevState) => ({
+      ...prevState,
+      [modalType]: !prevState[modalType],
+    }));
+
   const value = useMemo<BoardContextType>(
     () => ({
       board,
@@ -89,8 +108,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isLoading,
       boardRights,
       hasEditRights,
+      displayModals,
+      toggleBoardModals,
     }),
-    [board, zoomLevel, isLoading, boardRights],
+    [board, zoomLevel, isLoading, boardRights, displayModals],
   );
 
   return (

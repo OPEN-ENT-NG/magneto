@@ -12,10 +12,12 @@ import { useHeaderHeight } from "./useHeaderHeight";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
+import { CreateBoard } from "../create-board/CreateBoard";
 import { CreateMagnet } from "../create-magnet/CreateMagnet";
 import { HeaderView } from "../header-view/HeaderView";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
@@ -32,6 +34,8 @@ export const BoardView: FC = () => {
     resetZoom,
     isLoading,
     hasEditRights,
+    displayModals,
+    toggleBoardModals,
   } = useBoard();
   const headerHeight = useHeaderHeight();
 
@@ -83,6 +87,12 @@ export const BoardView: FC = () => {
       </BoardBodyWrapper>
 
       <CreateMagnet />
+
+      <CreateBoard
+        isOpen={displayModals.PARAMETERS}
+        toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
+        boardToUpdate={board}
+      />
 
       <div className="zoom-container">
         <ZoomComponent

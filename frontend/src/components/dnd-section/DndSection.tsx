@@ -17,8 +17,6 @@ export const DndSection: FC<DndSectionProps> = ({
   sectionNumber,
 }) => {
 
-  console.log("dnd section hook id", id);
-
   const {
     isDragging,
     attributes,

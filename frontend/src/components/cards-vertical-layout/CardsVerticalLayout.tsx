@@ -14,10 +14,10 @@ import { SectionName } from "../section-name/SectionName";
 import { useBoard } from "~/providers/BoardProvider";
 import {
   horizontalListSortingStrategy,
+  rectSortingStrategy,
   SortableContext,
   useSortable,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
 import { useSectionsDnD } from "~/hooks/dnd-hooks/useSectionsDnD";
 import { Card } from "~/models/card.model";
@@ -47,7 +47,7 @@ export const CardsVerticalLayout: FC = () => {
     >
       <SortableContext
         items={updatedIds}
-        strategy={horizontalListSortingStrategy}
+        strategy={rectSortingStrategy}
       >
         <Box sx={mainWrapperProps}>
           {updatedIds.map((sectionId: string) => {

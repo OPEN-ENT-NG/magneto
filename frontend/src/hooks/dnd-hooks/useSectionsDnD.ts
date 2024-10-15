@@ -55,17 +55,21 @@ export const useSectionsDnD = (board: Board) => {
     async (event: DragEndEvent) => {
       
       const { active, over } = event;
-      console.log("handleDragEnd", active, over);
+      console.log({ active, over});
 
 
       if (active.id !== over?.id) {
-        
+        const realSectionId = updatedIds.find((sectionId: string) => sectionId === over?.id) ?? board.sections.find((section: Section) => section.cardIds.map((cardId: string) => cardId === over?.id));
+        console.log(realSectionId);
+      
         const oldIndex = updatedIds.indexOf(active.id.toString());
-        const newIndex = updatedIds.indexOf(
-          over ? over.id.toString() : updatedIds[updatedIds.length - 1],
+        const newIndex = updatedIds.indexOf(realSectionId?.toString() ?? updatedIds[updatedIds.length - 1],
         );
+
+        
         console.log("active != over", "old", oldIndex, "new", newIndex);
         const newUpdatedIds = arrayMove(updatedIds, oldIndex, newIndex);
+        console.log({updatedIds, newUpdatedIds});
         setUpdatedIds(newUpdatedIds);
 
         const payload = {
@@ -77,7 +81,7 @@ export const useSectionsDnD = (board: Board) => {
         };
 
         try {
-          console.log(payload);
+          console.log("payload", payload);
           // await updateBoard(payload).unwrap();
         } catch (error) {
           console.error("Failed to update board:", error);

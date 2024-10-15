@@ -39,7 +39,7 @@ import {
   footerButtonStyle,
   menuItemStyle,
 } from "./style";
-import { CardPayload } from "./types";
+import { CardPayload, CreateMagnetProps } from "./types";
 import { convertMediaTypeToResourceType } from "./utils";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { useBoard } from "~/providers/BoardProvider";
@@ -47,7 +47,7 @@ import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
 
-export const CreateMagnet: FC = () => {
+export const CreateMagnet: FC<CreateMagnetProps> = ({open}) => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { board } = useBoard();
@@ -62,14 +62,8 @@ export const CreateMagnet: FC = () => {
 
   const [createCard] = useCreateCardMutation();
 
-  const {
-    mediaLibraryRef,
-    mediaLibraryHandlers,
-    media,
-    isCreateMagnetOpen,
-    onClose,
-    magnetType,
-  } = useMediaLibrary();
+  const { mediaLibraryRef, mediaLibraryHandlers, media, onClose, magnetType } =
+    useMediaLibrary();
 
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
     const sectionTitle = event.target.value;
@@ -117,7 +111,7 @@ export const CreateMagnet: FC = () => {
   return (
     <>
       <Modal
-        open={isCreateMagnetOpen}
+        open={open}
         onClose={() => onCloseModal()}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"

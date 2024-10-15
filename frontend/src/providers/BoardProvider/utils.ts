@@ -1,10 +1,16 @@
 import { odeServices } from "edifice-ts-client";
 
+import { DisplayModalsState } from "./types";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import {
   Board,
   IBoardItemResponse,
   IBoardsResponse,
 } from "~/models/board.model";
+
+export const initialDisplayModals: DisplayModalsState = {
+  [BOARD_MODAL_TYPE.PARAMETERS]: false,
+};
 
 export const prepareBoardsState = (
   myBoardResponse: IBoardsResponse,

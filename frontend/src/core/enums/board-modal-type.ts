@@ -1,0 +1,3 @@
+export enum BOARD_MODAL_TYPE {
+  PARAMETERS = "PARAMETERS",
+}

@@ -65,7 +65,13 @@ export const BoardCard: FC<BoardCardProps> = ({
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: card.id });
+  } = useSortable({
+    id: card.id,
+    data: {
+      type: "card",
+      card: card,
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -83,6 +89,7 @@ export const BoardCard: FC<BoardCardProps> = ({
   return (
     <StyledCard
       data-dropdown-open={isOpen ? "true" : "false"}
+      data-type="card"
       zoomLevel={zoomLevel}
       isDragging={isDragging}
       ref={setNodeRef}

@@ -4,7 +4,6 @@ export interface DndSectionProps {
   id: string;
   children: ReactNode;
   sectionType: "vertical"|"horizontal";
-  dndType: "sortable"|"draggable"|"droppable";
   isLast?: boolean;
   isDragging?: boolean;
 

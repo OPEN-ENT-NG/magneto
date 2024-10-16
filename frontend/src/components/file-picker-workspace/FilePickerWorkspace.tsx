@@ -27,12 +27,8 @@ export const FilePickerWorkspace = ({
     <Box sx={{ width: "100%" }}>
       <Box sx={svgContainerStyle}>
         <Box sx={svgStyle}>
-          <img
-            src={media?.url}
-            style={{
-              maxHeight: "15rem",
-              objectFit: "contain",
-            }}
+          <CardContentSvgDisplay
+            extension={getFileExtension(media?.name ?? "")}
           />
           <Box sx={imageInputActions}>
             <IconButton

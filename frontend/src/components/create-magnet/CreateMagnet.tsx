@@ -8,7 +8,6 @@ import {
   Label,
   MediaLibrary,
   useOdeClient,
-  IconButton as IconButtonEdifice,
 } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -21,7 +20,6 @@ import {
   SelectChangeEvent,
   Typography,
   FormControl as FormControlMUI,
-  Paper,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -40,6 +38,7 @@ import {
   mediaLibraryStyle,
   footerButtonStyle,
   menuItemStyle,
+  formControlEditorStyle,
 } from "./style";
 import { CardPayload } from "./types";
 import { convertMediaTypeToResourceType } from "./utils";
@@ -48,13 +47,7 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
-import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
-import {
-  iconButtonStyle,
-  imageInputActions,
-} from "../file-picker-workspace/style";
-import { Edit } from "@edifice-ui/icons";
 import { ImageContainer } from "../image-container/ImageContainer";
 
 export const CreateMagnet: FC = () => {
@@ -124,7 +117,8 @@ export const CreateMagnet: FC = () => {
   const magnetTypeHasFilePickerWorkspace =
     media && media.type === MEDIA_LIBRARY_TYPE.ATTACHMENT;
 
-  const magnetTypeHasImage = media && media.type === MEDIA_LIBRARY_TYPE.IMAGE;
+  const magnetTypeHasImage =
+    media && media.url && media.type === MEDIA_LIBRARY_TYPE.IMAGE;
 
   const magnetTypeHasCaption = magnetType !== "text";
 
@@ -165,7 +159,7 @@ export const CreateMagnet: FC = () => {
                 handleClickMedia={handleClickMedia}
               />
             )}
-            <FormControl id="title">
+            <FormControl id="title" style={formControlStyle}>
               <Label>{t("magneto.card.title")}</Label>
               <Input
                 value={title}
@@ -176,7 +170,7 @@ export const CreateMagnet: FC = () => {
               />
             </FormControl>
             {magnetTypeHasCaption && (
-              <FormControl id="caption">
+              <FormControl id="caption" style={formControlStyle}>
                 <Label>{t("magneto.card.caption")}</Label>
                 <Input
                   value={caption}
@@ -187,7 +181,7 @@ export const CreateMagnet: FC = () => {
                 />
               </FormControl>
             )}
-            <FormControl id="description" style={formControlStyle}>
+            <FormControl id="description" style={formControlEditorStyle}>
               <Label>{t("magneto.create.board.description")} :</Label>
 
               <Box sx={editorStyle}>
@@ -231,8 +225,8 @@ export const CreateMagnet: FC = () => {
               <Button
                 style={footerButtonStyle}
                 color="tertiary"
-                variant="filled"
                 type="button"
+                variant="ghost"
                 onClick={() => onCloseModal()}
               >
                 {t("magneto.cancel")}
@@ -240,7 +234,7 @@ export const CreateMagnet: FC = () => {
               <Button
                 style={footerButtonStyle}
                 color="primary"
-                type="button"
+                type="submit"
                 variant="filled"
                 onClick={() => onUpload()}
               >

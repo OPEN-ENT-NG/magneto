@@ -43,12 +43,12 @@ import {
 import { CardPayload } from "./types";
 import { convertMediaTypeToResourceType } from "./utils";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
+import { ImageContainer } from "../image-container/ImageContainer";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
-import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
-import { ImageContainer } from "../image-container/ImageContainer";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();

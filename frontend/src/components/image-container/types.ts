@@ -1,4 +1,5 @@
 import { MediaLibraryType } from "@edifice-ui/react";
+
 import { MediaProps } from "../board-view/types";
 
 export interface ImageContainerProps {

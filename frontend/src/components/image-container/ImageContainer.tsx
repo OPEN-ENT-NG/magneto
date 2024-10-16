@@ -1,11 +1,13 @@
-import { Box } from "@mui/material";
-import { IconButton } from "@edifice-ui/react";
-import { Edit } from "@edifice-ui/icons";
-import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useEffect, useRef, useState } from "react";
+
+import { Edit } from "@edifice-ui/icons";
+import { IconButton } from "@edifice-ui/react";
+import { Box } from "@mui/material";
+
+import { imageStyle, mainBoxStyle, StyledIconButtonBox } from "./style";
 import { ImageContainerProps } from "./types";
 import { iconButtonStyle } from "../file-picker-workspace/style";
-import { imageStyle, mainBoxStyle, StyledIconButtonBox } from "./style";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 
 export const ImageContainer = ({
   media,

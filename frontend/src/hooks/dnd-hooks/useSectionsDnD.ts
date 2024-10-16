@@ -37,7 +37,7 @@ export const useSectionsDnD = (board: Board) => {
 
   useEffect(() => {
     setUpdatedSections(board.sections);
-  }, [board]);
+  }, [board.sections]);
 
   const sensors = useSensors(
     useSensor(CustomPointerSensor, {
@@ -126,24 +126,6 @@ export const useSectionsDnD = (board: Board) => {
     }
   }, []);
 
-  const createNewSection = useCallback(
-    async (activeCardId: string) => {
-      const newSectionTitle = `${t("magneto.card.section")} ${
-        updatedSections.length + 1
-      }`;
-      try {
-        (await createSection({
-          boardId: board._id,
-          title: newSectionTitle,
-          cardIds: [activeCardId],
-        }).unwrap()) as Section;
-      } catch (error) {
-        console.error("Failed to create new section:", error);
-      }
-    },
-    [board._id, updatedSections.length, createSection, t],
-  );
-
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
       const { active, over } = event;
@@ -153,8 +135,14 @@ export const useSectionsDnD = (board: Board) => {
       const overType = over.data.current?.type;
 
       if (activeType === "section" && overType === "section") {
-        // Réarrangement des sections
         const newOrder = updatedSections.map((section) => section._id);
+        setUpdatedSections((prev) =>
+          arrayMove(
+            prev,
+            prev.findIndex((s) => s._id === active.id),
+            prev.findIndex((s) => s._id === over.id),
+          ),
+        );
         try {
           await updateBoard({
             id: board._id,
@@ -163,8 +151,6 @@ export const useSectionsDnD = (board: Board) => {
           }).unwrap();
         } catch (error) {
           console.error("Failed to update board sections:", error);
-          // Réinitialiser l'état local en cas d'échec
-          setUpdatedSections(board.sections);
         }
       } else if (activeType === "card") {
         const activeSection = updatedSections.find((section) =>
@@ -175,11 +161,49 @@ export const useSectionsDnD = (board: Board) => {
           console.error("Active section not found");
           return;
         }
-
+        const activeCard = activeSection.cards.find(
+          (card) => card.id === active.id.toString(),
+        );
+        if (!activeCard) {
+          console.error("Active card not found");
+          return;
+        }
         if (over.id === "new-section") {
-          // Création d'une nouvelle section avec la carte
+          const newSectionTitle = `${t("magneto.card.section")} ${
+            updatedSections.length + 1
+          }`;
+          const newSection: Section = {
+            _id: `temp-${Date.now()}`,
+            title: newSectionTitle,
+            cardIds: [active.id.toString()],
+            cards: [cardMap[active.id.toString()].card],
+            boardId: board._id,
+            page: 0,
+          };
+
+          setUpdatedSections((prev) => [
+            ...prev.map((section) =>
+              section._id === activeSection._id
+                ? {
+                    ...section,
+                    cardIds: section.cardIds.filter(
+                      (id) => id !== active.id.toString(),
+                    ),
+                    cards: section.cards.filter(
+                      (card) => card.id !== active.id.toString(),
+                    ),
+                  }
+                : section,
+            ),
+            newSection,
+          ]);
+
           try {
-            await createNewSection(active.id.toString());
+            await createSection({
+              boardId: board._id,
+              title: newSectionTitle,
+              cardIds: [active.id.toString()],
+            }).unwrap();
 
             await updateSection({
               id: activeSection._id,
@@ -192,6 +216,9 @@ export const useSectionsDnD = (board: Board) => {
             console.error(
               "Failed to create new section or update original section:",
               error,
+            );
+            setUpdatedSections((prev) =>
+              prev.filter((section) => section._id !== newSection._id),
             );
           }
         } else {
@@ -208,7 +235,6 @@ export const useSectionsDnD = (board: Board) => {
           }
 
           if (activeSection._id === overSection._id) {
-            // Réarrangement dans la même section
             const newCardIds = arrayMove(
               activeSection.cardIds,
               activeSection.cardIds.indexOf(active.id.toString()),
@@ -216,11 +242,22 @@ export const useSectionsDnD = (board: Board) => {
                 ? activeSection.cardIds.length
                 : activeSection.cardIds.indexOf(over.id.toString()),
             );
+            const newCards = arrayMove(
+              activeSection.cards,
+              activeSection.cards.findIndex(
+                (card) => card.id === active.id.toString(),
+              ),
+              over.id === overSection._id
+                ? activeSection.cards.length
+                : activeSection.cards.findIndex(
+                    (card) => card.id === over.id.toString(),
+                  ),
+            );
 
             setUpdatedSections((prev) =>
               prev.map((section) =>
                 section._id === activeSection._id
-                  ? { ...section, cardIds: newCardIds }
+                  ? { ...section, cardIds: newCardIds, cards: newCards }
                   : section,
               ),
             );
@@ -233,29 +270,41 @@ export const useSectionsDnD = (board: Board) => {
               }).unwrap();
             } catch (error) {
               console.error("Failed to update section:", error);
-              setUpdatedSections((prev) => [...prev]);
             }
           } else {
-            // Déplacement vers une autre section
             const newActiveCardIds = activeSection.cardIds.filter(
               (id) => id !== active.id.toString(),
             );
+            const newActiveCards = activeSection.cards.filter(
+              (card) => card.id !== active.id.toString(),
+            );
             const newOverCardIds = [...overSection.cardIds];
+            const newOverCards = [...overSection.cards];
 
             if (over.id === overSection._id) {
               newOverCardIds.push(active.id.toString());
+              newOverCards.push(activeCard);
             } else {
               const overIndex = overSection.cardIds.indexOf(over.id.toString());
               newOverCardIds.splice(overIndex, 0, active.id.toString());
+              newOverCards.splice(overIndex, 0, activeCard);
             }
 
             setUpdatedSections((prev) =>
               prev.map((section) => {
                 if (section._id === activeSection._id) {
-                  return { ...section, cardIds: newActiveCardIds };
+                  return {
+                    ...section,
+                    cardIds: newActiveCardIds,
+                    cards: newActiveCards,
+                  };
                 }
                 if (section._id === overSection._id) {
-                  return { ...section, cardIds: newOverCardIds };
+                  return {
+                    ...section,
+                    cardIds: newOverCardIds,
+                    cards: newOverCards,
+                  };
                 }
                 return section;
               }),
@@ -276,7 +325,6 @@ export const useSectionsDnD = (board: Board) => {
               ]);
             } catch (error) {
               console.error("Failed to update sections:", error);
-              setUpdatedSections((prev) => [...prev]);
             }
           }
         }
@@ -289,8 +337,9 @@ export const useSectionsDnD = (board: Board) => {
       updatedSections,
       updateSection,
       updateBoard,
-      createNewSection,
-      setUpdatedSections,
+      createSection,
+      cardMap,
+      t,
     ],
   );
 
@@ -302,16 +351,28 @@ export const useSectionsDnD = (board: Board) => {
     const newSectionTitle = `${t("magneto.card.section")} ${
       updatedSections.length + 1
     }`;
+    const tempSection: Section = {
+      _id: `temp-${Date.now()}`,
+      title: newSectionTitle,
+      cardIds: [],
+      cards: [],
+      boardId: board._id,
+      page: 0,
+    };
+
+    setUpdatedSections((prev) => [...prev, tempSection]);
+
     try {
-      const newSection = (await createSection({
+      await createSection({
         boardId: board._id,
         title: newSectionTitle,
         cardIds: [],
-      }).unwrap()) as Section;
-
-      setUpdatedSections((prev) => [...prev, newSection]);
+      }).unwrap();
     } catch (error) {
       console.error("Failed to add new column:", error);
+      setUpdatedSections((prev) =>
+        prev.filter((section) => section._id !== tempSection._id),
+      );
     }
   }, [board._id, updatedSections.length, createSection, t]);
 

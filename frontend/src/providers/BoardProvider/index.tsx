@@ -60,9 +60,11 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     setZoomLevel(3);
   };
 
-  const board = boardData
-    ? new Board().build(boardData as IBoardItemResponse)
-    : new Board();
+  const board = useMemo(() => {
+    return boardData
+      ? new Board().build(boardData as IBoardItemResponse)
+      : new Board();
+  }, [boardData]);
 
   const prepareZoom = async () => {
     const zoom = await fetchZoomPreference();

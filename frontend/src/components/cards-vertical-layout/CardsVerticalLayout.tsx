@@ -79,7 +79,6 @@ export const CardsVerticalLayout: FC = () => {
               </CardsWrapper>
             </DndSection>
           ))}
-          {/* new section */}
           {hasEditRights() && (
             <DndSection
               sectionNumber={updatedSections.length + 1}

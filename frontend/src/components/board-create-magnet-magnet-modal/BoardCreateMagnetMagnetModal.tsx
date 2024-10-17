@@ -40,6 +40,7 @@ export const BoardCreateMagnetMagnetModal: FC<
     setInputValue((prevState) => ({
       ...prevState,
       [key]: !prevState[key],
+      cardIds: key === "isByFavorite" ? [] : prevState.cardIds,
     }));
   };
 
@@ -47,12 +48,14 @@ export const BoardCreateMagnetMagnetModal: FC<
     setInputValue((prevState) => ({
       ...prevState,
       currentTab: newValue,
+      cardIds: [],
     }));
   };
   const handleSearchChange = (newValue: string) => {
     setInputValue((prevState) => ({
       ...prevState,
       search: newValue,
+      cardIds: [],
     }));
   };
 

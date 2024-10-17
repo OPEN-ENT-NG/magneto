@@ -6,4 +6,5 @@ export interface BoardCardProps {
   canComment?: boolean;
   displayNbFavorites?: boolean;
   readOnly?: boolean;
+  boardCardClick?: (card: Card) => void;
 }

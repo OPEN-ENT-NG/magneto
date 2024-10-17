@@ -11,9 +11,10 @@ import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
 
-export const useCardDropDownItems: () => DropDownListItem[] = () => {
+export const useCardDropDownItems = (readOnly: boolean): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
-  return [
+
+  const allItems: DropDownListItem[] = [
     {
       primary: <Icon path={mdiPlay} size={"inherit"} />,
       secondary: t("magneto.card.options.preview"),
@@ -45,4 +46,14 @@ export const useCardDropDownItems: () => DropDownListItem[] = () => {
       OnClick: () => null,
     },
   ];
+
+  if (readOnly) {
+    return allItems.filter(
+      (item) =>
+        item.secondary === t("magneto.card.options.preview") ||
+        item.secondary === t("magneto.duplicate"),
+    );
+  }
+
+  return allItems;
 };

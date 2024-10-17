@@ -33,6 +33,9 @@ export const useSectionsDnD = (board: Board) => {
   const [updateSection] = useUpdateSectionMutation();
   const [createSection] = useCreateSectionMutation();
   const [updateBoard] = useUpdateBoardMutation();
+  const [originalSections, setOriginalSections] = useState<Section[]>(
+    board.sections,
+  );
   const { t } = useTranslation("magneto");
 
   useEffect(() => {
@@ -100,31 +103,102 @@ export const useSectionsDnD = (board: Board) => {
       const { active } = event;
       const activeType = active.data.current?.type;
 
-      if (activeType === "section") {
-        setActiveItem(sectionMap[active.id]);
+      if (activeType === "card") {
+        const cardInfo = cardMap[active.id.toString()];
+        if (cardInfo) {
+          setActiveItem(cardInfo.card);
+        }
+      } else if (activeType === "section") {
+        setActiveItem(sectionMap[active.id.toString()]);
       } else {
-        const cardInfo = cardMap[active.id];
-        setActiveItem(cardInfo ? cardInfo.card : null);
+        setActiveItem(null);
       }
+
+      setOriginalSections(updatedSections);
     },
-    [sectionMap, cardMap],
+    [cardMap, sectionMap, updatedSections],
   );
 
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) return;
+  const handleDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event;
+      console.log(over?.id ?? null);
 
-    const activeType = active.data.current?.type;
-    const overType = over.data.current?.type;
+      if (!over) return;
 
-    if (activeType === "section" && overType === "section") {
-      setUpdatedSections((prev) => {
-        const oldIndex = prev.findIndex((section) => section._id === active.id);
-        const newIndex = prev.findIndex((section) => section._id === over.id);
-        return arrayMove(prev, oldIndex, newIndex);
-      });
-    }
-  }, []);
+      const activeType = active.data.current?.type;
+      const overType = over.data.current?.type;
+
+      if (
+        activeType === "card" &&
+        (overType === "card" || overType === "section")
+      ) {
+        const activeSection = updatedSections.find((section) =>
+          section.cardIds.includes(active.id.toString()),
+        );
+        const overSection =
+          overType === "section"
+            ? updatedSections.find((section) => section._id === over.id)
+            : updatedSections.find((section) =>
+                section.cardIds.includes(over.id.toString()),
+              );
+
+        if (
+          activeSection &&
+          overSection &&
+          activeSection._id !== overSection._id &&
+          over.id !== "new-section"
+        ) {
+          setUpdatedSections((prev) => {
+            return prev.map((section) => {
+              if (section._id === activeSection._id) {
+                return {
+                  ...section,
+                  cardIds: section.cardIds.filter(
+                    (id) => id !== active.id.toString(),
+                  ),
+                  cards: section.cards.filter(
+                    (card) => card.id !== active.id.toString(),
+                  ),
+                };
+              }
+              if (section._id === overSection._id) {
+                const overIndex =
+                  overType === "section"
+                    ? section.cardIds.length
+                    : section.cardIds.indexOf(over.id.toString());
+                const newCardIds = arrayMove(
+                  [...section.cardIds, active.id.toString()],
+                  section.cardIds.length,
+                  overIndex,
+                );
+                const activeCard = activeSection.cards.find(
+                  (card) => card.id === active.id.toString(),
+                );
+                const newCards = arrayMove(
+                  [...section.cards, activeCard!],
+                  section.cards.length,
+                  overIndex,
+                );
+                return { ...section, cardIds: newCardIds, cards: newCards };
+              }
+              return section;
+            });
+          });
+        }
+        if (over.id === "new-section") setUpdatedSections(board.sections);
+      } else if (activeType === "section" && overType === "section") {
+        setUpdatedSections((prev) => {
+          const oldIndex = prev.findIndex(
+            (section) => section._id === active.id,
+          );
+          const newIndex = prev.findIndex((section) => section._id === over.id);
+          return arrayMove(prev, oldIndex, newIndex);
+        });
+      }
+    },
+    [updatedSections],
+  );
 
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
@@ -136,13 +210,6 @@ export const useSectionsDnD = (board: Board) => {
 
       if (activeType === "section" && overType === "section") {
         const newOrder = updatedSections.map((section) => section._id);
-        setUpdatedSections((prev) =>
-          arrayMove(
-            prev,
-            prev.findIndex((s) => s._id === active.id),
-            prev.findIndex((s) => s._id === over.id),
-          ),
-        );
         try {
           await updateBoard({
             id: board._id,
@@ -153,21 +220,27 @@ export const useSectionsDnD = (board: Board) => {
           console.error("Failed to update board sections:", error);
         }
       } else if (activeType === "card") {
-        const activeSection = updatedSections.find((section) =>
-          section.cardIds.includes(active.id.toString()),
+        const activeCardId = active.id.toString();
+        const originalActiveSection = originalSections.find((section) =>
+          section.cards.some((card) => card.id === activeCardId),
+        );
+        const currentOverSection = updatedSections.find((section) =>
+          section.cards.some((card) => card.id === activeCardId),
         );
 
-        if (!activeSection) {
-          console.error("Active section not found");
+        if (!originalActiveSection || !currentOverSection) {
+          console.error("Active or over section not found");
           return;
         }
-        const activeCard = activeSection.cards.find(
-          (card) => card.id === active.id.toString(),
+
+        const activeCard = originalActiveSection.cards.find(
+          (card) => card.id === activeCardId,
         );
         if (!activeCard) {
           console.error("Active card not found");
           return;
         }
+
         if (over.id === "new-section") {
           const newSectionTitle = `${t("magneto.card.section")} ${
             updatedSections.length + 1
@@ -175,22 +248,23 @@ export const useSectionsDnD = (board: Board) => {
           const newSection: Section = {
             _id: `temp-${Date.now()}`,
             title: newSectionTitle,
-            cardIds: [active.id.toString()],
-            cards: [cardMap[active.id.toString()].card],
+            cardIds: [activeCardId],
+            cards: [activeCard],
             boardId: board._id,
             page: 0,
           };
 
+          const newOriginalSectionCardIds =
+            originalActiveSection.cardIds.filter((id) => id !== activeCardId);
+
           setUpdatedSections((prev) => [
             ...prev.map((section) =>
-              section._id === activeSection._id
+              section._id === originalActiveSection._id
                 ? {
                     ...section,
-                    cardIds: section.cardIds.filter(
-                      (id) => id !== active.id.toString(),
-                    ),
+                    cardIds: newOriginalSectionCardIds,
                     cards: section.cards.filter(
-                      (card) => card.id !== active.id.toString(),
+                      (card) => card.id !== activeCardId,
                     ),
                   }
                 : section,
@@ -199,19 +273,18 @@ export const useSectionsDnD = (board: Board) => {
           ]);
 
           try {
-            await createSection({
-              boardId: board._id,
-              title: newSectionTitle,
-              cardIds: [active.id.toString()],
-            }).unwrap();
-
-            await updateSection({
-              id: activeSection._id,
-              boardId: board._id,
-              cardIds: activeSection.cardIds.filter(
-                (id) => id !== active.id.toString(),
-              ),
-            }).unwrap();
+            await Promise.all([
+              createSection({
+                boardId: board._id,
+                title: newSectionTitle,
+                cardIds: [activeCardId],
+              }).unwrap(),
+              updateSection({
+                id: originalActiveSection._id,
+                boardId: board._id,
+                cardIds: newOriginalSectionCardIds,
+              }).unwrap(),
+            ]);
           } catch (error) {
             console.error(
               "Failed to create new section or update original section:",
@@ -221,124 +294,107 @@ export const useSectionsDnD = (board: Board) => {
               prev.filter((section) => section._id !== newSection._id),
             );
           }
-        } else {
-          const overSection =
-            overType === "section"
-              ? updatedSections.find((section) => section._id === over.id)
-              : updatedSections.find((section) =>
-                  section.cardIds.includes(over.id.toString()),
-                );
-
-          if (!overSection) {
-            console.error("Over section not found");
-            return;
-          }
-
-          if (activeSection._id === overSection._id) {
-            const newCardIds = arrayMove(
-              activeSection.cardIds,
-              activeSection.cardIds.indexOf(active.id.toString()),
-              over.id === overSection._id
-                ? activeSection.cardIds.length
-                : activeSection.cardIds.indexOf(over.id.toString()),
-            );
-            const newCards = arrayMove(
-              activeSection.cards,
-              activeSection.cards.findIndex(
-                (card) => card.id === active.id.toString(),
-              ),
-              over.id === overSection._id
-                ? activeSection.cards.length
-                : activeSection.cards.findIndex(
-                    (card) => card.id === over.id.toString(),
+        } else if (originalActiveSection._id !== currentOverSection._id) {
+          const newOriginalSectionCardIds =
+            originalActiveSection.cardIds.filter((id) => id !== activeCardId);
+          const newOverSectionCardIds = arrayMove(
+            currentOverSection.cardIds,
+            currentOverSection.cardIds.indexOf(activeCardId),
+            over.id === currentOverSection._id
+              ? currentOverSection.cardIds.length - 1
+              : currentOverSection.cardIds.indexOf(over.id.toString()),
+          );
+          setUpdatedSections((prev) =>
+            prev.map((section) => {
+              if (section._id === originalActiveSection._id) {
+                return {
+                  ...section,
+                  cardIds: newOriginalSectionCardIds,
+                  cards: section.cards.filter(
+                    (card) => card.id !== activeCardId,
                   ),
-            );
-
-            setUpdatedSections((prev) =>
-              prev.map((section) =>
-                section._id === activeSection._id
-                  ? { ...section, cardIds: newCardIds, cards: newCards }
-                  : section,
-              ),
-            );
-
-            try {
-              await updateSection({
-                id: activeSection._id,
+                };
+              }
+              if (section._id === currentOverSection._id) {
+                return {
+                  ...section,
+                  cardIds: newOverSectionCardIds,
+                  cards: newOverSectionCardIds.map(
+                    (id) =>
+                      section.cards.find((card) => card.id === id) ||
+                      activeCard,
+                  ),
+                };
+              }
+              return section;
+            }),
+          );
+          try {
+            await Promise.all([
+              updateSection({
+                id: originalActiveSection._id,
                 boardId: board._id,
-                cardIds: newCardIds,
-              }).unwrap();
-            } catch (error) {
-              console.error("Failed to update section:", error);
-            }
-          } else {
-            const newActiveCardIds = activeSection.cardIds.filter(
-              (id) => id !== active.id.toString(),
-            );
-            const newActiveCards = activeSection.cards.filter(
-              (card) => card.id !== active.id.toString(),
-            );
-            const newOverCardIds = [...overSection.cardIds];
-            const newOverCards = [...overSection.cards];
+                cardIds: newOriginalSectionCardIds,
+              }).unwrap(),
+              updateSection({
+                id: currentOverSection._id,
+                boardId: board._id,
+                cardIds: newOverSectionCardIds,
+              }).unwrap(),
+            ]);
+          } catch (error) {
+            console.error("Failed to update sections:", error);
+          }
+        } else {
+          const newCardIds = arrayMove(
+            currentOverSection.cardIds,
+            currentOverSection.cardIds.indexOf(activeCardId),
+            over.id === currentOverSection._id
+              ? currentOverSection.cardIds.length - 1
+              : currentOverSection.cardIds.indexOf(over.id.toString()),
+          );
+          const newCards = arrayMove(
+            currentOverSection.cards,
+            currentOverSection.cards.findIndex(
+              (card) => card.id === activeCardId,
+            ),
+            over.id === currentOverSection._id
+              ? currentOverSection.cards.length - 1
+              : currentOverSection.cards.findIndex(
+                  (card) => card.id === over.id.toString(),
+                ),
+          );
 
-            if (over.id === overSection._id) {
-              newOverCardIds.push(active.id.toString());
-              newOverCards.push(activeCard);
-            } else {
-              const overIndex = overSection.cardIds.indexOf(over.id.toString());
-              newOverCardIds.splice(overIndex, 0, active.id.toString());
-              newOverCards.splice(overIndex, 0, activeCard);
-            }
+          setUpdatedSections((prev) =>
+            prev.map((section) =>
+              section._id === currentOverSection._id
+                ? { ...section, cardIds: newCardIds, cards: newCards }
+                : section,
+            ),
+          );
 
-            setUpdatedSections((prev) =>
-              prev.map((section) => {
-                if (section._id === activeSection._id) {
-                  return {
-                    ...section,
-                    cardIds: newActiveCardIds,
-                    cards: newActiveCards,
-                  };
-                }
-                if (section._id === overSection._id) {
-                  return {
-                    ...section,
-                    cardIds: newOverCardIds,
-                    cards: newOverCards,
-                  };
-                }
-                return section;
-              }),
-            );
-
-            try {
-              await Promise.all([
-                updateSection({
-                  id: activeSection._id,
-                  boardId: board._id,
-                  cardIds: newActiveCardIds,
-                }).unwrap(),
-                updateSection({
-                  id: overSection._id,
-                  boardId: board._id,
-                  cardIds: newOverCardIds,
-                }).unwrap(),
-              ]);
-            } catch (error) {
-              console.error("Failed to update sections:", error);
-            }
+          try {
+            await updateSection({
+              id: currentOverSection._id,
+              boardId: board._id,
+              cardIds: newCardIds,
+            }).unwrap();
+          } catch (error) {
+            console.error("Failed to update section:", error);
           }
         }
       }
 
       setActiveItem(null);
+      setOriginalSections(updatedSections);
     },
     [
       board,
       updatedSections,
+      originalSections,
       updateSection,
       updateBoard,
       createSection,
-      cardMap,
       t,
     ],
   );

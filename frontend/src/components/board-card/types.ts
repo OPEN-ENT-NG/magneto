@@ -5,5 +5,4 @@ export interface BoardCardProps {
   zoomLevel: number;
   canComment?: boolean;
   displayNbFavorites?: boolean;
-  boardCardClick?: (card: Card) => void;
 }

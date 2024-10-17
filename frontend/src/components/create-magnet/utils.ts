@@ -16,7 +16,7 @@ export const convertMediaTypeToResourceType = (
     case MEDIA_LIBRARY_TYPE.VIDEO:
       return RESOURCE_TYPE.VIDEO;
     case MEDIA_LIBRARY_TYPE.HYPERLINK:
-      return RESOURCE_TYPE.HYPERLINK;
+      return RESOURCE_TYPE.LINK;
     case MEDIA_LIBRARY_TYPE.EMBEDDER:
       return RESOURCE_TYPE.EMBEDDER;
     default:

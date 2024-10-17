@@ -32,7 +32,7 @@ export const FavoriteViewByCard: FunctionComponent<FavoriteViewByCardProps> = ({
   return filteredCards.length ? (
     <StyledGridBox zoomLevel={zoomLevel}>
       {filteredCards.map((card: Card) => (
-        <BoardCard key={card.id} card={card} zoomLevel={zoomLevel} />
+        <BoardCard key={card.id} card={card} zoomLevel={zoomLevel} readOnly />
       ))}
     </StyledGridBox>
   ) : (

@@ -122,7 +122,9 @@ export const useRenderContent = (
                         item
                         key={card.id}
                       >
-                        <BoardCard card={card} zoomLevel={zoomLevel} boardCardClick={updateSelectedMagnets}/>
+                      <Box onClick={() => updateSelectedMagnets(card)}>
+                        <BoardCard card={card} zoomLevel={zoomLevel} />
+                      </Box>
                       </Grid>
                     ))}
                   </Grid>

@@ -47,6 +47,9 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
       }
 
       return {
+        transform: isDragging ? "scale(1.05)" : "scale(1)",
+        opacity: isDragging ? "0.5" : "1",
+        cursor: isDragging ? "grabbing" : "grab",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "row",

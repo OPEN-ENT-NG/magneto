@@ -97,6 +97,10 @@ export const editorStyle = {
 };
 
 export const formControlStyle = {
+  marginBottom: "1rem",
+};
+
+export const formControlEditorStyle = {
   marginBottom: "3rem",
 };
 

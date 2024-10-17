@@ -38,10 +38,13 @@ import {
   mediaLibraryStyle,
   footerButtonStyle,
   menuItemStyle,
+  formControlEditorStyle,
 } from "./style";
 import { CardPayload } from "./types";
 import { convertMediaTypeToResourceType } from "./utils";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
+import { ImageContainer } from "../image-container/ImageContainer";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -69,6 +72,7 @@ export const CreateMagnet: FC = () => {
     isCreateMagnetOpen,
     onClose,
     magnetType,
+    handleClickMedia,
   } = useMediaLibrary();
 
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
@@ -110,7 +114,11 @@ export const CreateMagnet: FC = () => {
     }
   }, [media]);
 
-  const magnetTypeHasFilePickerWorkspace = media && magnetType !== "text";
+  const magnetTypeHasFilePickerWorkspace =
+    media && media.type === MEDIA_LIBRARY_TYPE.ATTACHMENT;
+
+  const magnetTypeHasImage =
+    media && media.url && media.type === MEDIA_LIBRARY_TYPE.IMAGE;
 
   const magnetTypeHasCaption = magnetType !== "text";
 
@@ -145,7 +153,13 @@ export const CreateMagnet: FC = () => {
             {magnetTypeHasFilePickerWorkspace && (
               <FilePickerWorkspace addButtonLabel={"Change file"} />
             )}
-            <FormControl id="title">
+            {magnetTypeHasImage && (
+              <ImageContainer
+                media={media}
+                handleClickMedia={handleClickMedia}
+              />
+            )}
+            <FormControl id="title" style={formControlStyle}>
               <Label>{t("magneto.card.title")}</Label>
               <Input
                 value={title}
@@ -156,7 +170,7 @@ export const CreateMagnet: FC = () => {
               />
             </FormControl>
             {magnetTypeHasCaption && (
-              <FormControl id="caption">
+              <FormControl id="caption" style={formControlStyle}>
                 <Label>{t("magneto.card.caption")}</Label>
                 <Input
                   value={caption}
@@ -167,7 +181,7 @@ export const CreateMagnet: FC = () => {
                 />
               </FormControl>
             )}
-            <FormControl id="description" style={formControlStyle}>
+            <FormControl id="description" style={formControlEditorStyle}>
               <Label>{t("magneto.create.board.description")} :</Label>
 
               <Box sx={editorStyle}>
@@ -211,8 +225,8 @@ export const CreateMagnet: FC = () => {
               <Button
                 style={footerButtonStyle}
                 color="tertiary"
-                variant="filled"
                 type="button"
+                variant="ghost"
                 onClick={() => onCloseModal()}
               >
                 {t("magneto.cancel")}
@@ -220,7 +234,7 @@ export const CreateMagnet: FC = () => {
               <Button
                 style={footerButtonStyle}
                 color="primary"
-                type="button"
+                type="submit"
                 variant="filled"
                 onClick={() => onUpload()}
               >

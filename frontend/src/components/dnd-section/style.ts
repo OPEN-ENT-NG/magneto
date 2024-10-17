@@ -38,7 +38,6 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
       };
     case "horizontal":
       return {
-        marginBottom: isLast || noCards ? "15%" : "none",
         transform: isDragging ? "scale(1.05)" : "scale(1)",
         opacity: isDragging ? "0.5" : "1",
         cursor: isDragging ? "grabbing" : "grab",
@@ -46,7 +45,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
-        padding: "1rem 1rem 0 0",
+        padding: isLast || noCards ? "1rem 1rem 15% 0" : "1rem 1rem 0 0",
         minWidth: "100%",
         width: "100%",
         height: "100%",

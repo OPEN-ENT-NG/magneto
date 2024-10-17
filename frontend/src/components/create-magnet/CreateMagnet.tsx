@@ -1,7 +1,10 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 import { FC, useEffect, useRef, useState } from "react";
 
 import { Editor, EditorRef } from "@edifice-ui/editor";
+import { Edit } from "@edifice-ui/icons";
 import {
+  IconButton as EdIconButton,
   Button,
   FormControl,
   Input,
@@ -42,7 +45,9 @@ import {
 } from "./style";
 import { CardPayload } from "./types";
 import { convertMediaTypeToResourceType } from "./utils";
+import { audioWrapperStyle } from "../card-content-audio/style";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
+import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
@@ -56,6 +61,7 @@ export const CreateMagnet: FC = () => {
   const { board } = useBoard();
 
   const [title, setTitle] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
@@ -100,7 +106,7 @@ export const CreateMagnet: FC = () => {
       locked: false,
       resourceId: media?.id ?? "",
       resourceType: magnetType ?? convertMediaTypeToResourceType(media?.type),
-      resourceUrl: media?.url ?? null,
+      resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
       title: title,
       ...(section?._id ? { sectionId: section._id } : {}),
     };
@@ -110,6 +116,8 @@ export const CreateMagnet: FC = () => {
 
   useEffect(() => {
     if (media?.name) {
+      if (magnetTypeHasAudio) return setTitle(media.name);
+      if (magnetTypeHasLink) setLinkUrl(media.url);
       setTitle(media.name.split(".").slice(0, -1).join("."));
     }
   }, [media]);
@@ -119,7 +127,10 @@ export const CreateMagnet: FC = () => {
 
   const magnetTypeHasImage =
     media && media.url && media.type === MEDIA_LIBRARY_TYPE.IMAGE;
-
+  const magnetTypeHasAudio =
+    media && media.url && media.type === MEDIA_LIBRARY_TYPE.AUDIO;
+  const magnetTypeHasLink =
+    media && media.url && media.type === MEDIA_LIBRARY_TYPE.HYPERLINK;
   const magnetTypeHasCaption = magnetType !== "text";
 
   return (
@@ -158,6 +169,33 @@ export const CreateMagnet: FC = () => {
                 media={media}
                 handleClickMedia={handleClickMedia}
               />
+            )}
+            {magnetTypeHasAudio && (
+              <Box sx={audioWrapperStyle}>
+                <audio controls preload="none" src={media.url}>
+                  <source src={media.url} type={media.type} />
+                </audio>
+                <EdIconButton
+                  aria-label="Edit image"
+                  color="tertiary"
+                  icon={<Edit />}
+                  onClick={() => handleClickMedia(MEDIA_LIBRARY_TYPE.AUDIO)}
+                  type="button"
+                  variant="ghost"
+                  style={iconButtonStyle}
+                />
+              </Box>
+            )}
+            {magnetTypeHasLink && (
+              <FormControl id="url" style={formControlStyle}>
+                <Label>{t("magneto.site.address")}</Label>
+                <Input
+                  value={linkUrl}
+                  size="md"
+                  type="text"
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                />
+              </FormControl>
             )}
             <FormControl id="title" style={formControlStyle}>
               <Label>{t("magneto.card.title")}</Label>

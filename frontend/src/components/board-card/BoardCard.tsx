@@ -46,12 +46,13 @@ export const BoardCard: FC<BoardCardProps> = ({
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
     useDropdown();
+
   const dropDownItemList = useCardDropDownItems(readOnly);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOpen = openDropdownId === card.id;
   const { getAvatarURL } = useDirectory();
   const handleToggleDropdown = () => {
-    if (card.id && !readOnly) {
+    if (card.id) {
       toggleDropdown(card.id);
     }
   };

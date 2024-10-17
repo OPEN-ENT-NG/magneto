@@ -14,20 +14,24 @@ import { DropDownListItem } from "../drop-down-list/types";
 export const useCardDropDownItems = (readOnly: boolean): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
 
-  const allItems: DropDownListItem[] = [
+  const readOnlyItems: DropDownListItem[] = [
     {
       primary: <Icon path={mdiPlay} size={"inherit"} />,
       secondary: t("magneto.card.options.preview"),
       OnClick: () => null,
     },
     {
-      primary: <Icon path={mdiPencil} size={"inherit"} />,
-      secondary: t("magneto.card.options.edit"),
-      OnClick: () => null,
-    },
-    {
       primary: <Icon path={mdiFileMultipleOutline} size={"inherit"} />,
       secondary: t("magneto.duplicate"),
+      OnClick: () => null,
+    },
+  ];
+
+  const editableItems: DropDownListItem[] = [
+    ...readOnlyItems,
+    {
+      primary: <Icon path={mdiPencil} size={"inherit"} />,
+      secondary: t("magneto.card.options.edit"),
       OnClick: () => null,
     },
     {
@@ -47,13 +51,5 @@ export const useCardDropDownItems = (readOnly: boolean): DropDownListItem[] => {
     },
   ];
 
-  if (readOnly) {
-    return allItems.filter(
-      (item) =>
-        item.secondary === t("magneto.card.options.preview") ||
-        item.secondary === t("magneto.duplicate"),
-    );
-  }
-
-  return allItems;
+  return readOnly ? readOnlyItems : editableItems;
 };

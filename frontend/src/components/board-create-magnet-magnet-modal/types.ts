@@ -1,3 +1,4 @@
+import { Card } from "~/models/card.model";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 
 export interface BoardCreateMagnetMagnetModalProps {
@@ -10,4 +11,5 @@ export interface InputValueState {
   currentTab: CURRENTTAB_STATE;
   isByBoards: boolean;
   isByFavorite: boolean;
+  cardIds?: string[];
 }

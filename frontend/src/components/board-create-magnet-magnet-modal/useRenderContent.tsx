@@ -70,13 +70,10 @@ export const useRenderContent = (
     }));
   }, [myBoardsResult, myCardsResult]);
 
-  const [cardsData, setCardsData] = useState<Card[]>([]);
-  useEffect(() => {
-    setCardsData(myCardsResult?.all?.map((card: ICardItemResponse) =>
+  const cardsData = myCardsResult?.all?.map((card: ICardItemResponse) =>
         new Card().build(card),
-      ) || []);
-  }, [myCardsResult]);
-
+      ) || [];
+    
   const isOneMagnetInBoards = boardsWithCards.some(
     (item: Board) => !!item.cards.length,
   );
@@ -99,58 +96,55 @@ export const useRenderContent = (
         cardIds: updatedSelectedMagnets,
       }));
     }
-
-    if (isByBoards) {
-      return isOneMagnetInBoards ? (
-        <List sx={listStyle}>
-          {boardsWithCards.map(
-            (board: Board) =>
-              !!board.cards.length && (
-                <ListItem key={board._id}>
-                  <Box width={"100%"}>
-                    <Box sx={boardTitleWrapperStyle}>
-                      <Typography sx={boardTitleStyle}>
-                        {board._title}
-                      </Typography>
-                      <Button
-                        sx={boardTitleButton}
-                        startIcon={<FileCopyOutlinedIcon />}
-                        onClick={() => duplicateBoardsAndToast(board._id)}
-                      >
-                        {t("magneto.cards.collection.board.duplicate")}
-                      </Button>
-                    </Box>
-                    <Grid container spacing={2} width="fit-content">
-                      {board.cards.map((card) => (
-                        <Grid
-                          item
-                          key={card.id}
-                          onClick={() => updateSelectedMagnets(card)}
-                        >
-                          <BoardCard card={card} zoomLevel={zoomLevel} />
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
-                </ListItem>
-              ),
-          )}
-        </List>
-      ) : (
-        <EmptyState title={t("magneto.cards.empty.text")} />
-      );
-    } else {
-      return cardsData.length ? (
-        <Grid container spacing={2} p={".5rem"}>
-          {cardsData.map((card: Card) => (
-            <Grid item key={card.id}>
-              <BoardCard card={card} zoomLevel={zoomLevel} />
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <EmptyState title={t("magneto.cards.empty.text")} />
-      );
-    }
   };
+
+  if (isByBoards) {
+    return isOneMagnetInBoards ? (
+      <List sx={listStyle}>
+        {boardsWithCards.map(
+          (board: Board) =>
+            !!board.cards.length && (
+              <ListItem key={board._id}>
+                <Box width={"100%"}>
+                  <Box sx={boardTitleWrapperStyle}>
+                    <Typography sx={boardTitleStyle}>{board._title}</Typography>
+                    <Button
+                      sx={boardTitleButton}
+                      startIcon={<FileCopyOutlinedIcon />}
+                      onClick={() => duplicateBoardsAndToast(board._id)}
+                    >
+                      {t("magneto.cards.collection.board.duplicate")}
+                    </Button>
+                  </Box>
+                  <Grid container spacing={2} width="fit-content">
+                    {board.cards.map((card) => (
+                      <Grid
+                        item
+                        key={card.id}
+                      >
+                        <BoardCard card={card} zoomLevel={zoomLevel} boardCardClick={updateSelectedMagnets}/>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              </ListItem>
+            ),
+        )}
+      </List>
+    ) : (
+      <EmptyState title={t("magneto.cards.empty.text")} />
+    );
+  } else {
+    return cardsData.length ? (
+      <Grid container spacing={2} p={".5rem"}>
+        {cardsData.map((card: Card) => (
+          <Grid item key={card.id}>
+            <BoardCard card={card} zoomLevel={zoomLevel} />
+          </Grid>
+        ))}
+      </Grid>
+    ) : (
+      <EmptyState title={t("magneto.cards.empty.text")} />
+    );
+  }
 };

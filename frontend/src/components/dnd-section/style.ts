@@ -38,7 +38,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
       };
     case "horizontal":
       return {
-        marginBottomProperties: isLast || noCards ? "15%" : "none",
+        marginBottom: isLast || noCards ? "15%" : "none",
         transform: isDragging ? "scale(1.05)" : "scale(1)",
         opacity: isDragging ? "0.5" : "1",
         cursor: isDragging ? "grabbing" : "grab",

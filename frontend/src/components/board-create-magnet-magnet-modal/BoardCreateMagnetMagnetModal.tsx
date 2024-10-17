@@ -113,7 +113,7 @@ export const BoardCreateMagnetMagnetModal: FC<
             label={t("magneto.cards.collection.favorite.view")}
           />
         </FormGroup>
-        <Box sx={contentContainerStyle}>{useRenderContent(inputValue)}</Box>
+        <Box sx={contentContainerStyle}>{useRenderContent(inputValue, setInputValue)}</Box>
         <Box sx={modalFooterStyle}></Box>
       </Box>
     </Modal>

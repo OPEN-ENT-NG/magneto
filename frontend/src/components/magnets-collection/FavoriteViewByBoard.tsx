@@ -81,6 +81,7 @@ export const FavoriteViewByBoard: FunctionComponent<
                       key={card.id}
                       card={card}
                       zoomLevel={zoomLevel}
+                      readOnly
                     />
                   ))}
               </StyledGridBox>

@@ -40,17 +40,18 @@ export const BoardCard: FC<BoardCardProps> = ({
   zoomLevel,
   canComment = false,
   displayNbFavorites = false,
+  readOnly = false,
 }) => {
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
     useDropdown();
-  const dropDownItemList = useCardDropDownItems();
+  const dropDownItemList = useCardDropDownItems(readOnly);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isOpen = openDropdownId === card.id;
   const { getAvatarURL } = useDirectory();
   const handleToggleDropdown = () => {
-    if (card.id) {
+    if (card.id && !readOnly) {
       toggleDropdown(card.id);
     }
   };
@@ -59,6 +60,15 @@ export const BoardCard: FC<BoardCardProps> = ({
     registerDropdown(card.id, dropdownRef.current);
   }, [card.id, registerDropdown]);
 
+  const sortableProps = useSortable({
+    id: card.id,
+    data: {
+      type: DND_ITEM_TYPE.CARD,
+      card: card,
+    },
+    disabled: readOnly,
+  });
+
   const {
     isDragging,
     attributes,
@@ -66,13 +76,7 @@ export const BoardCard: FC<BoardCardProps> = ({
     setNodeRef,
     transform,
     transition,
-  } = useSortable({
-    id: card.id,
-    data: {
-      type: DND_ITEM_TYPE.CARD,
-      card: card,
-    },
-  });
+  } = sortableProps;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -95,8 +99,7 @@ export const BoardCard: FC<BoardCardProps> = ({
       isDragging={isDragging}
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
+      {...(readOnly ? {} : { ...attributes, ...listeners })}
     >
       <StyledCardHeader
         ref={dropdownRef}
@@ -147,9 +150,11 @@ export const BoardCard: FC<BoardCardProps> = ({
           {displayNbFavorites && (
             <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>
           )}
-          <BottomIconButton aria-label="add to favorites" size="small">
-            <StarBorderIcon />
-          </BottomIconButton>
+          {!readOnly && (
+            <BottomIconButton aria-label="add to favorites" size="small">
+              <StarBorderIcon />
+            </BottomIconButton>
+          )}
         </StyledBox>
       </StyledCardActions>
       {isOpen && dropdownRef.current && (
@@ -161,7 +166,7 @@ export const BoardCard: FC<BoardCardProps> = ({
           position="right-top"
         />
       )}
-      {canComment && zoomLevel > 1 && (
+      {canComment && zoomLevel > 1 && !readOnly && (
         <CardComment
           commentData={{
             cardComment: card.lastComment,

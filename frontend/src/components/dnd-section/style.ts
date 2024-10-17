@@ -3,12 +3,12 @@ import { styled } from "@mui/material";
 import { SectionWrapperProps } from "./types";
 
 const prepareWidth: (sectionNumber: number) => string = (sectionNumber) => {
-    if (sectionNumber === 1) return "100%";
-    if (sectionNumber === 2) return "50%";
-    if (sectionNumber === 3) return "33%";
-    if (sectionNumber === 4) return "25%";
-    if (sectionNumber > 4) return "22%";
-    return "";
+  if (sectionNumber === 1) return "100%";
+  if (sectionNumber === 2) return "50%";
+  if (sectionNumber === 3) return "33%";
+  if (sectionNumber === 4) return "25%";
+  if (sectionNumber > 4) return "22%";
+  return "";
 };
 
 export const SectionWrapper = styled("div")<SectionWrapperProps>(({
@@ -18,8 +18,6 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
   noCards = true,
   sectionNumber = 0,
 }) => {
- 
-
   switch (sectionType) {
     case "vertical":
       return {

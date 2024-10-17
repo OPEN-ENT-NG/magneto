@@ -3,18 +3,18 @@ import { ReactNode } from "react";
 export interface DndSectionProps {
   id: string;
   children: ReactNode;
-  sectionType: "vertical"|"horizontal";
+  sectionType: "vertical" | "horizontal";
   isLast?: boolean;
   isDragging?: boolean;
 
   //horizontal
   noCards?: boolean;
-  //vertical, 
+  //vertical,
   sectionNumber?: number;
 }
 
 export interface SectionWrapperProps {
-  sectionType: "vertical"|"horizontal";
+  sectionType: "vertical" | "horizontal";
   isLast?: boolean;
   isDragging?: boolean;
 

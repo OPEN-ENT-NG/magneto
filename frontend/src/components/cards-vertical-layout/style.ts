@@ -33,7 +33,7 @@ export const mainWrapperProps = {
 export const SectionWrapper = styled("div")<SectionWrapperProps>(({
   sectionNumber,
   isLast = false,
-  isDragging = false 
+  isDragging = false,
 }) => {
   return {
     boxSizing: "border-box",

@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { SectionWrapper } from "./style";
 import { DndSectionProps } from "./types";
+import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 
 export const DndSection: FC<DndSectionProps> = ({
   id,
@@ -24,7 +25,7 @@ export const DndSection: FC<DndSectionProps> = ({
   } = useSortable({
     id,
     data: {
-      type: "section",
+      type: DND_ITEM_TYPE.SECTION,
       sectionType,
       isLast,
       noCards,
@@ -41,7 +42,7 @@ export const DndSection: FC<DndSectionProps> = ({
     <SectionWrapper
       ref={setNodeRef}
       style={style}
-      data-type="section"
+      data-type={DND_ITEM_TYPE.SECTION}
       noCards={noCards}
       isLast={isLast}
       sectionNumber={sectionNumber}

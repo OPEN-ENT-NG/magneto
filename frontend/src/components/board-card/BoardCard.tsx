@@ -31,6 +31,7 @@ import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
 import { Tooltip } from "../tooltip/Tooltip";
+import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 
@@ -68,7 +69,7 @@ export const BoardCard: FC<BoardCardProps> = ({
   } = useSortable({
     id: card.id,
     data: {
-      type: "card",
+      type: DND_ITEM_TYPE.CARD,
       card: card,
     },
   });
@@ -89,7 +90,7 @@ export const BoardCard: FC<BoardCardProps> = ({
   return (
     <StyledCard
       data-dropdown-open={isOpen ? "true" : "false"}
-      data-type="card"
+      data-type={DND_ITEM_TYPE.CARD}
       zoomLevel={zoomLevel}
       isDragging={isDragging}
       ref={setNodeRef}

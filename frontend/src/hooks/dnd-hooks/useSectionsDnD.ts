@@ -13,6 +13,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { useTranslation } from "react-i18next";
 
 import { CustomPointerSensor } from "./customPointer";
+import { DND_ITEM_TYPE } from "./types";
 import { createCardMap, createSectionMap } from "./utils";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
@@ -62,10 +63,10 @@ export const useSectionsDnD = (board: Board) => {
       const { active } = event;
       const activeType = active.data.current?.type;
 
-      if (activeType === "card") {
+      if (activeType === DND_ITEM_TYPE.CARD) {
         const cardInfo = cardMap[active.id.toString()];
         setActiveItem(cardInfo?.card || null);
-      } else if (activeType === "section") {
+      } else if (activeType === DND_ITEM_TYPE.SECTION) {
         setActiveItem(sectionMap[active.id.toString()] || null);
       } else {
         setActiveItem(null);
@@ -82,7 +83,7 @@ export const useSectionsDnD = (board: Board) => {
         section.cardIds.includes(active.id.toString()),
       );
       const overSection =
-        over.data.current?.type === "section"
+        over.data.current?.type === DND_ITEM_TYPE.SECTION
           ? updatedSections.find((section) => section._id === over.id)
           : updatedSections.find((section) =>
               section.cardIds.includes(over.id.toString()),
@@ -109,7 +110,7 @@ export const useSectionsDnD = (board: Board) => {
             }
             if (section._id === overSection._id) {
               const overIndex =
-                over.data.current?.type === "section"
+                over.data.current?.type === DND_ITEM_TYPE.SECTION
                   ? section.cardIds.length
                   : section.cardIds.indexOf(over.id.toString());
               const newCardIds = arrayMove(
@@ -153,11 +154,14 @@ export const useSectionsDnD = (board: Board) => {
       const overType = over.data.current?.type;
 
       if (
-        activeType === "card" &&
-        (overType === "card" || overType === "section")
+        activeType === DND_ITEM_TYPE.CARD &&
+        (overType === DND_ITEM_TYPE.CARD || overType === DND_ITEM_TYPE.SECTION)
       ) {
         handleCardDragOver(active, over);
-      } else if (activeType === "section" && overType === "section") {
+      } else if (
+        activeType === DND_ITEM_TYPE.SECTION &&
+        overType === DND_ITEM_TYPE.SECTION
+      ) {
         handleSectionDragOver(active, over);
       }
     },
@@ -400,9 +404,12 @@ export const useSectionsDnD = (board: Board) => {
       const activeType = active.data.current?.type;
       const overType = over.data.current?.type;
 
-      if (activeType === "section" && overType === "section") {
+      if (
+        activeType === DND_ITEM_TYPE.SECTION &&
+        overType === DND_ITEM_TYPE.SECTION
+      ) {
         await handleSectionDragEnd();
-      } else if (activeType === "card") {
+      } else if (activeType === DND_ITEM_TYPE.CARD) {
         await handleCardDragEnd(active, over);
       }
 

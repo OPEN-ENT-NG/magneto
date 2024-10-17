@@ -1,3 +1,7 @@
+export interface CreateMagnetProps {
+  open: boolean;
+}
+
 export interface CardPayload {
   boardId: string;
   caption: string;

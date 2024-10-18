@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 
 import { BoardBodyWrapper, BoardViewWrapper } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
+import { BoardCreateMagnetMagnetModal } from "../board-create-magnet-magnet-modal/BoardCreateMagnetMagnetModal";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
@@ -19,12 +20,13 @@ import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
-
   const sideMenuData = useSideMenuData();
   const {
     board,
@@ -38,7 +40,7 @@ export const BoardView: FC = () => {
     toggleBoardModals,
   } = useBoard();
   const headerHeight = useHeaderHeight();
-
+  const { magnetType, onClose } = useMediaLibrary();
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--header-height",
@@ -86,7 +88,12 @@ export const BoardView: FC = () => {
         )}
       </BoardBodyWrapper>
 
-      <CreateMagnet />
+      <CreateMagnet open={magnetType === MENU_NOT_MEDIA_TYPE.TEXT} />
+
+      <BoardCreateMagnetMagnetModal
+        open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
+        onClose={onClose}
+      />
 
       <CreateBoard
         isOpen={displayModals.PARAMETERS}

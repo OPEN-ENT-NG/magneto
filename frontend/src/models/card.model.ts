@@ -52,7 +52,6 @@ export interface ICardsSectionParamsRequest {
 
 export interface ICardsBoardParamsRequest {
   cardIds: Array<string>;
-  sectionId?: string;
   boardId: string;
 }
 

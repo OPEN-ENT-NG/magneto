@@ -49,6 +49,7 @@ import { audioWrapperStyle } from "../card-content-audio/style";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";
+import { VideoPlayer } from "../video-player/VideoPlayer";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
@@ -117,7 +118,8 @@ export const CreateMagnet: FC<CreateMagnetProps> = ({ open }) => {
     if (media?.name) {
       if (magnetTypeHasAudio) return setTitle(media.name);
       if (magnetTypeHasLink) setLinkUrl(media.url);
-      setTitle(media.name.split(".").slice(0, -1).join("."));
+      if (!magnetTypeHasVideo)
+        setTitle(media.name.split(".").slice(0, -1).join("."));
     }
   }, [media]);
 
@@ -130,6 +132,8 @@ export const CreateMagnet: FC<CreateMagnetProps> = ({ open }) => {
     media && media.url && media.type === MEDIA_LIBRARY_TYPE.AUDIO;
   const magnetTypeHasLink =
     media && media.url && media.type === MEDIA_LIBRARY_TYPE.HYPERLINK;
+  const magnetTypeHasVideo =
+    media && media.url && media.type === MEDIA_LIBRARY_TYPE.VIDEO;
   const magnetTypeHasCaption = magnetType !== "text";
 
   return (
@@ -185,6 +189,23 @@ export const CreateMagnet: FC<CreateMagnetProps> = ({ open }) => {
                 />
               </Box>
             )}
+            {magnetTypeHasAudio && (
+              <Box sx={audioWrapperStyle}>
+                <audio controls preload="none" src={media.url}>
+                  <source src={media.url} type={media.type} />
+                </audio>
+                <EdIconButton
+                  aria-label="Edit image"
+                  color="tertiary"
+                  icon={<Edit />}
+                  onClick={() => handleClickMedia(MEDIA_LIBRARY_TYPE.AUDIO)}
+                  type="button"
+                  variant="ghost"
+                  style={iconButtonStyle}
+                />
+              </Box>
+            )}
+            {magnetTypeHasVideo && <VideoPlayer />}
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>

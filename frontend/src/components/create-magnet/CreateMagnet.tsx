@@ -190,22 +190,6 @@ export const CreateMagnet: FC = () => {
                 />
               </Box>
             )}
-            {magnetTypeHasAudio && (
-              <Box sx={audioWrapperStyle}>
-                <audio controls preload="none" src={media.url}>
-                  <source src={media.url} type={media.type} />
-                </audio>
-                <EdIconButton
-                  aria-label="Edit image"
-                  color="tertiary"
-                  icon={<Edit />}
-                  onClick={() => handleClickMedia(MEDIA_LIBRARY_TYPE.AUDIO)}
-                  type="button"
-                  variant="ghost"
-                  style={iconButtonStyle}
-                />
-              </Box>
-            )}
             {magnetTypeHasVideo && <VideoPlayer />}
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>

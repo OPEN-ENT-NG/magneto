@@ -8,7 +8,6 @@ import {
   IconButton,
   Modal,
   Switch,
-  ToggleButton,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -71,7 +70,7 @@ export const BoardCreateMagnetMagnetModal: FC<
   };
 
   const createMagnetMagnet = async () => {
-    if (!!inputValue.cardIds) {
+    if (inputValue.cardIds) {
       const magnetMagnetParams = {
         boardId: board._id,
         cardIds: inputValue.cardIds,
@@ -144,11 +143,11 @@ export const BoardCreateMagnetMagnetModal: FC<
         <Box sx={modalFooterStyle}>
           <Box sx={duplicateButtonStyle}>
             <Button
-            onClick={() => createMagnetMagnet()}
-            disabled={!inputValue.cardIds?.length}
-          >
-            {t("magneto.card.options.duplicate")}
-          </Button>
+              onClick={() => createMagnetMagnet()}
+              disabled={!inputValue.cardIds?.length}
+            >
+              {t("magneto.card.options.duplicate")}
+            </Button>
           </Box>
         </Box>
       </Box>

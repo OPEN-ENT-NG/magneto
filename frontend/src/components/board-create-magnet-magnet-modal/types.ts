@@ -16,4 +16,3 @@ export interface InputValueState {
 export interface BoardCardWrapperProps {
   isCardSelected: boolean;
 }
-

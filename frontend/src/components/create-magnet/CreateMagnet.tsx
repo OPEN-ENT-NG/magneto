@@ -55,7 +55,7 @@ import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
 
-export const CreateMagnet: FC<CreateMagnetProps> = ({open}) => {
+export const CreateMagnet: FC<CreateMagnetProps> = ({ open }) => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { board } = useBoard();
@@ -75,7 +75,6 @@ export const CreateMagnet: FC<CreateMagnetProps> = ({open}) => {
     mediaLibraryRef,
     mediaLibraryHandlers,
     media,
-    isCreateMagnetOpen,
     onClose,
     magnetType,
     handleClickMedia,

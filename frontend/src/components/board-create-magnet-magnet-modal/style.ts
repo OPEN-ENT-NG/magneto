@@ -1,4 +1,5 @@
 import { FormControlLabel, styled } from "@mui/material";
+
 import { BoardCardWrapperProps } from "./types";
 
 export const modalContainerStyle = {
@@ -69,12 +70,12 @@ export const modalFooterStyle = {
   justifyContent: "flex-end",
   width: "100%",
   gap: "1rem",
-  height: "4rem"
+  height: "4rem",
 };
 
 export const duplicateButtonStyle = {
   marginTop: "1.5rem",
-}
+};
 
 export const formGroupStyle = { flexDirection: "row", gap: ".5rem" };
 
@@ -109,13 +110,12 @@ export const listStyle = {
   alignItems: "center",
 };
 
-
-export const BoardCardWrapper =  styled("div")<BoardCardWrapperProps>(({
+export const BoardCardWrapper = styled("div")<BoardCardWrapperProps>(({
   isCardSelected = false,
 }) => {
-  let boardCardStyle = {
+  const boardCardStyle = {
     border: isCardSelected ? "0.2rem solid #CEEAF5" : "",
     borderRadius: isCardSelected ? "10px" : "",
-  }
+  };
   return boardCardStyle;
 });

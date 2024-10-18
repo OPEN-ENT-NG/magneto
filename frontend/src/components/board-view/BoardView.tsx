@@ -94,7 +94,7 @@ export const BoardView: FC = () => {
         open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
         onClose={onClose}
       />
-      
+
       <CreateBoard
         isOpen={displayModals.PARAMETERS}
         toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}

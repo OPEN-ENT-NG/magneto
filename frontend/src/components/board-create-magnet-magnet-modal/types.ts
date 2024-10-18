@@ -10,7 +10,7 @@ export interface InputValueState {
   currentTab: CURRENTTAB_STATE;
   isByBoards: boolean;
   isByFavorite: boolean;
-  cardIds?: string[];
+  cardIds: string[];
 }
 
 export interface BoardCardWrapperProps {

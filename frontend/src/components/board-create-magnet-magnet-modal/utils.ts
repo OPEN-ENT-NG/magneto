@@ -6,4 +6,5 @@ export const initialInputvalue: InputValueState = {
   currentTab: CURRENTTAB_STATE.MINE,
   isByBoards: false,
   isByFavorite: false,
+  cardIds: [],
 };

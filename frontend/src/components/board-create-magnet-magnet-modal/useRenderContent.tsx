@@ -81,15 +81,13 @@ export const useRenderContent = (
   );
 
   const updateSelectedMagnets = (cardId: string) => {
-    console.log("initial selection", inputValue.cardIds);
-    let updatedSelectedMagnets = inputValue.cardIds ?? [];
+    let updatedSelectedMagnets = inputValue.cardIds;
     if (updatedSelectedMagnets.find((magnetId: string) => magnetId == cardId)) {
       const index = updatedSelectedMagnets.indexOf(cardId, 0);
       updatedSelectedMagnets.splice(index, 1);
     } else {
       updatedSelectedMagnets = [...updatedSelectedMagnets, cardId];
     }
-    console.log({ updatedSelectedMagnets });
     setInputValue((prevState) => ({
       ...prevState,
       cardIds: updatedSelectedMagnets,
@@ -97,7 +95,7 @@ export const useRenderContent = (
   };
 
   const isCardSelected = (cardId: string): boolean => {
-    return !!inputValue.cardIds?.find((magnetId: string) => magnetId == cardId);
+    return !!inputValue.cardIds.find((magnetId: string) => magnetId == cardId);
   };
 
   if (isByBoards) {

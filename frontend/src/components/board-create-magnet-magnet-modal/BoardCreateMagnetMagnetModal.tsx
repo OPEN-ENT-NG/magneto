@@ -69,7 +69,7 @@ export const BoardCreateMagnetMagnetModal: FC<
     onClose();
   };
 
-  const createMagnetMagnet = async () => {
+  const handleSubmit = async () => {
     if (inputValue.cardIds) {
       const magnetMagnetParams = {
         boardId: board._id,
@@ -151,7 +151,7 @@ export const BoardCreateMagnetMagnetModal: FC<
               {t("magneto.cancel")}
             </Button>
             <Button
-              onClick={() => createMagnetMagnet()}
+              onClick={() => handleSubmit()}
               disabled={!inputValue.cardIds?.length}
             >
               {t("magneto.card.options.duplicate")}

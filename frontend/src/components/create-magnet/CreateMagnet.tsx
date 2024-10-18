@@ -49,12 +49,12 @@ import { audioWrapperStyle } from "../card-content-audio/style";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";
+import { VideoPlayer } from "../video-player/VideoPlayer";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
-import { VideoPlayer } from "../video-player/VideoPlayer";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();

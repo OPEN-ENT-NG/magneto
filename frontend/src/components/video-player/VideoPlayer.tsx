@@ -1,18 +1,18 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 import { Edit } from "@edifice-ui/icons";
 import { IconButton } from "@edifice-ui/react";
 import { Box } from "@mui/material";
 
-import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
-import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { videoContainerStyle, videoStyle } from "./style";
 import {
   iconButtonStyle,
   imageInputActions,
 } from "../file-picker-workspace/style";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const VideoPlayer = () => {
   const { media, handleClickMedia } = useMediaLibrary();
-  console.log(media?.url);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -21,7 +21,12 @@ export const VideoPlayer = () => {
           {media?.url.includes("workspace") ? (
             <video controls src={media?.url} width={450} height={225}></video>
           ) : (
-            <iframe width={450} height={225} src={media?.url} />
+            <iframe
+              title="embed-link"
+              width={450}
+              height={225}
+              src={media?.url}
+            />
           )}
           <Box sx={imageInputActions}>
             <IconButton

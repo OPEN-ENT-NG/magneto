@@ -1,4 +1,5 @@
 import { FormControlLabel, styled } from "@mui/material";
+import { BoardCardWrapperProps } from "./types";
 
 export const modalContainerStyle = {
   position: "absolute",
@@ -102,3 +103,13 @@ export const listStyle = {
   flexDirection: "column",
   alignItems: "center",
 };
+
+
+export const BoardCardWrapper =  styled("div")<BoardCardWrapperProps>(({
+  isCardSelected = false,
+}) => {
+  let boardCardStyle = {
+    border: isCardSelected ? "" : "",
+  }
+  return boardCardStyle;
+});

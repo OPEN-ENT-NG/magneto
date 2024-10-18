@@ -5,6 +5,7 @@ import { Box, Button, Grid, List, ListItem, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import {
+  BoardCardWrapper,
   boardTitleButton,
   boardTitleStyle,
   boardTitleWrapperStyle,
@@ -78,25 +79,27 @@ export const useRenderContent = (
     (item: Board) => !!item.cards.length,
   );
 
-  const updateSelectedMagnets = (card: Card) => {
+  const updateSelectedMagnets = (cardId: string) => {
     console.log("initial selection", inputValue.cardIds);
     let updatedSelectedMagnets = inputValue.cardIds ?? [];
     if (
-      updatedSelectedMagnets.find((magnetId: string) => magnetId == card.id)
+      updatedSelectedMagnets.find((magnetId: string) => magnetId == cardId)
     ) {
-      const index = updatedSelectedMagnets.indexOf(card.id, 0);
-      if (index > -1) {
-        updatedSelectedMagnets.splice(index, 1);
-      } else {
-        updatedSelectedMagnets = [...updatedSelectedMagnets, card.id];
-      }
-      console.log({ updatedSelectedMagnets });
-      setInputValue((prevState) => ({
-        ...prevState,
-        cardIds: updatedSelectedMagnets,
-      }));
+      const index = updatedSelectedMagnets.indexOf(cardId, 0);
+      updatedSelectedMagnets.splice(index, 1);
+    } else {
+      updatedSelectedMagnets = [...updatedSelectedMagnets, cardId];
     }
+    console.log({ updatedSelectedMagnets });
+    setInputValue((prevState) => ({
+      ...prevState,
+      cardIds: updatedSelectedMagnets,
+    }));
   };
+
+  const isCardSelected = (cardId: string) : boolean => {
+    return !!inputValue.cardIds?.find((magnetId: string) => magnetId == cardId);
+  }
 
   if (isByBoards) {
     return isOneMagnetInBoards ? (
@@ -122,9 +125,9 @@ export const useRenderContent = (
                         item
                         key={card.id}
                       >
-                      <Box onClick={() => updateSelectedMagnets(card)}>
-                        <BoardCard card={card} zoomLevel={zoomLevel} />
-                      </Box>
+                      <BoardCardWrapper isCardSelected={isCardSelected(card.id)} onClick={() => {updateSelectedMagnets(card.id)}} >
+                        <BoardCard card={card} zoomLevel={zoomLevel} readOnly={true}/>
+                      </BoardCardWrapper>
                       </Grid>
                     ))}
                   </Grid>
@@ -141,7 +144,9 @@ export const useRenderContent = (
       <Grid container spacing={2} p={".5rem"}>
         {cardsData.map((card: Card) => (
           <Grid item key={card.id}>
-            <BoardCard card={card} zoomLevel={zoomLevel} />
+            <BoardCardWrapper isCardSelected={isCardSelected(card.id)} onClick={() => {updateSelectedMagnets(card.id)}}>
+                 <BoardCard card={card} zoomLevel={zoomLevel} readOnly={true}/>
+            </BoardCardWrapper>
           </Grid>
         ))}
       </Grid>

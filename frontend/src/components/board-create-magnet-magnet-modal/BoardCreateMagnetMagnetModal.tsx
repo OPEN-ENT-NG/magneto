@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 
-import { SearchBar } from "@edifice-ui/react";
+import { Button, SearchBar } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -8,6 +8,7 @@ import {
   IconButton,
   Modal,
   Switch,
+  ToggleButton,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -27,14 +28,18 @@ import { useRenderContent } from "./useRenderContent";
 import { initialInputvalue } from "./utils";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
+import { useBoard } from "~/providers/BoardProvider";
+import { useDuplicateCardMutation } from "~/services/api/cards.service";
 
 export const BoardCreateMagnetMagnetModal: FC<
   BoardCreateMagnetMagnetModalProps
 > = ({ open, onClose }) => {
+  const { board } = useBoard();
   const [inputValue, setInputValue] =
     useState<InputValueState>(initialInputvalue);
   const { currentTab, isByBoards, isByFavorite } = inputValue;
   const { t } = useTranslation("magneto");
+  const [duplicateCard] = useDuplicateCardMutation();
 
   const handleSwitchChange = (key: "isByBoards" | "isByFavorite") => {
     setInputValue((prevState) => ({
@@ -57,6 +62,22 @@ export const BoardCreateMagnetMagnetModal: FC<
       search: newValue,
       cardIds: [],
     }));
+  };
+
+  const onCloseModal = () => {
+    setInputValue(initialInputvalue);
+    onClose();
+  };
+
+  const createMagnetMagnet = async () => {
+    if (!!inputValue.cardIds) {
+      const magnetMagnetParams = {
+        boardId: board._id,
+        cardIds: inputValue.cardIds,
+      };
+      await duplicateCard(magnetMagnetParams);
+      onCloseModal();
+    }
   };
 
   return (
@@ -116,8 +137,17 @@ export const BoardCreateMagnetMagnetModal: FC<
             label={t("magneto.cards.collection.favorite.view")}
           />
         </FormGroup>
-        <Box sx={contentContainerStyle}>{useRenderContent(inputValue, setInputValue)}</Box>
-        <Box sx={modalFooterStyle}></Box>
+        <Box sx={contentContainerStyle}>
+          {useRenderContent(inputValue, setInputValue)}
+        </Box>
+        <Box sx={modalFooterStyle}>
+          <Button
+            onClick={() => createMagnetMagnet()}
+            disabled={!inputValue.cardIds?.length}
+          >
+            {t("magneto.card.options.duplicate")}
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );

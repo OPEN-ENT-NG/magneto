@@ -41,7 +41,6 @@ export const BoardCard: FC<BoardCardProps> = ({
   canComment = false,
   displayNbFavorites = false,
   readOnly = false,
-  boardCardClick,
 }) => {
   const { icon, type } = useResourceTypeDisplay(card.resourceType);
   const time = useElapsedTime(card.modificationDate);
@@ -102,7 +101,6 @@ export const BoardCard: FC<BoardCardProps> = ({
       ref={setNodeRef}
       style={style}
       {...(readOnly ? {} : { ...attributes, ...listeners })}
-      onClick={() => {boardCardClick && boardCardClick(card)}}
     >
       <StyledCardHeader
         ref={dropdownRef}

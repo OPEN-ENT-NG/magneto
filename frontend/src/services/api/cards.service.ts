@@ -1,5 +1,9 @@
 import { emptySplitApi } from "./empltySplitApi.service";
-import { ICardsBoardParamsRequest, ICardsParamsRequest, ICardsResponse } from "../../models/card.model";
+import {
+  ICardsBoardParamsRequest,
+  ICardsParamsRequest,
+  ICardsResponse,
+} from "../../models/card.model";
 import { CardPayload } from "~/components/create-magnet/types";
 
 export const cardsApi = emptySplitApi.injectEndpoints({
@@ -32,7 +36,8 @@ export const cardsApi = emptySplitApi.injectEndpoints({
         method: "POST",
         body: params,
       }),
-    })
+      invalidatesTags: ["BoardData"],
+    }),
   }),
 });
 

@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import {
   closeButtonStyle,
   contentContainerStyle,
+  duplicateButtonStyle,
   formGroupStyle,
   headerStyle,
   modalContainerStyle,
@@ -141,12 +142,14 @@ export const BoardCreateMagnetMagnetModal: FC<
           {useRenderContent(inputValue, setInputValue)}
         </Box>
         <Box sx={modalFooterStyle}>
-          <Button
+          <Box sx={duplicateButtonStyle}>
+            <Button
             onClick={() => createMagnetMagnet()}
             disabled={!inputValue.cardIds?.length}
           >
             {t("magneto.card.options.duplicate")}
           </Button>
+          </Box>
         </Box>
       </Box>
     </Modal>

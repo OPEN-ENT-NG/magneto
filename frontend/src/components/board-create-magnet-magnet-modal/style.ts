@@ -69,7 +69,12 @@ export const modalFooterStyle = {
   justifyContent: "flex-end",
   width: "100%",
   gap: "1rem",
+  height: "4rem"
 };
+
+export const duplicateButtonStyle = {
+  marginTop: "1.5rem",
+}
 
 export const formGroupStyle = { flexDirection: "row", gap: ".5rem" };
 

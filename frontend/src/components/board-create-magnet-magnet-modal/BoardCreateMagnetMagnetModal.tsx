@@ -143,6 +143,14 @@ export const BoardCreateMagnetMagnetModal: FC<
         <Box sx={modalFooterStyle}>
           <Box sx={duplicateButtonStyle}>
             <Button
+              color="tertiary"
+              type="button"
+              variant="ghost"
+              onClick={() => onCloseModal()}
+            >
+              {t("magneto.cancel")}
+            </Button>
+            <Button
               onClick={() => createMagnetMagnet()}
               disabled={!inputValue.cardIds?.length}
             >

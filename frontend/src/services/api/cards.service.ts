@@ -1,5 +1,9 @@
 import { emptySplitApi } from "./empltySplitApi.service";
-import { ICardsParamsRequest, ICardsResponse } from "../../models/card.model";
+import {
+  ICardsBoardParamsRequest,
+  ICardsParamsRequest,
+  ICardsResponse,
+} from "../../models/card.model";
 import { CardPayload } from "~/components/create-magnet/types";
 
 export const cardsApi = emptySplitApi.injectEndpoints({
@@ -26,6 +30,14 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["BoardData"],
     }),
+    duplicateCard: builder.mutation({
+      query: (params: ICardsBoardParamsRequest) => ({
+        url: "card/duplicate",
+        method: "POST",
+        body: params,
+      }),
+      invalidatesTags: ["BoardData"],
+    }),
   }),
 });
 
@@ -34,4 +46,5 @@ export const {
   useLazyGetCardsBySectionQuery,
   useLazyGetAllCardsByBoardIdQuery,
   useCreateCardMutation,
+  useDuplicateCardMutation,
 } = cardsApi;

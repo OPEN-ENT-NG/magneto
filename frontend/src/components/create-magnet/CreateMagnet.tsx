@@ -43,7 +43,7 @@ import {
   menuItemStyle,
   formControlEditorStyle,
 } from "./style";
-import { CardPayload } from "./types";
+import { CardPayload, CreateMagnetProps } from "./types";
 import { convertMediaTypeToResourceType } from "./utils";
 import { audioWrapperStyle } from "../card-content-audio/style";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
@@ -55,7 +55,7 @@ import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
 
-export const CreateMagnet: FC = () => {
+export const CreateMagnet: FC<CreateMagnetProps> = ({ open }) => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { board } = useBoard();
@@ -75,7 +75,6 @@ export const CreateMagnet: FC = () => {
     mediaLibraryRef,
     mediaLibraryHandlers,
     media,
-    isCreateMagnetOpen,
     onClose,
     magnetType,
     handleClickMedia,
@@ -136,7 +135,7 @@ export const CreateMagnet: FC = () => {
   return (
     <>
       <Modal
-        open={isCreateMagnetOpen}
+        open={open}
         onClose={() => onCloseModal()}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"

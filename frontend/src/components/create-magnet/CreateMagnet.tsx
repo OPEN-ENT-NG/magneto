@@ -11,6 +11,7 @@ import {
   Label,
   MediaLibrary,
   useOdeClient,
+  MediaLibraryType,
 } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
@@ -99,6 +100,11 @@ export const CreateMagnet: FC = () => {
     onClose();
   };
 
+  const modifyFile = (type: MediaLibraryType) => {
+    onCloseModal();
+    handleClickMedia(type);
+  };
+
   const onUpload = async () => {
     const payload: CardPayload = {
       boardId: board._id,
@@ -166,13 +172,13 @@ export const CreateMagnet: FC = () => {
           </Box>
           <Box sx={contentContainerStyle}>
             {magnetTypeHasFilePickerWorkspace && (
-              <FilePickerWorkspace addButtonLabel={"Change file"} />
+              <FilePickerWorkspace
+                modifyFile={modifyFile}
+                addButtonLabel={"Change file"}
+              />
             )}
             {magnetTypeHasImage && (
-              <ImageContainer
-                media={media}
-                handleClickMedia={handleClickMedia}
-              />
+              <ImageContainer media={media} handleClickMedia={modifyFile} />
             )}
             {magnetTypeHasAudio && (
               <Box sx={audioWrapperStyle}>
@@ -183,14 +189,14 @@ export const CreateMagnet: FC = () => {
                   aria-label="Edit image"
                   color="tertiary"
                   icon={<Edit />}
-                  onClick={() => handleClickMedia(MEDIA_LIBRARY_TYPE.AUDIO)}
+                  onClick={() => modifyFile(MEDIA_LIBRARY_TYPE.AUDIO)}
                   type="button"
                   variant="ghost"
                   style={iconButtonStyle}
                 />
               </Box>
             )}
-            {magnetTypeHasVideo && <VideoPlayer />}
+            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>

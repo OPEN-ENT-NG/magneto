@@ -23,7 +23,8 @@ export const useCreateSectionDropDownItems: (
 
   if (!section) return [];
 
-  const { boardId, _id, cardIds, displayed } = section;
+  const { boardId, _id, cardIds } = section;
+  const displayed = section.displayed ?? true;
 
   const duplicateSection = async () => {
     if (!boardId || !_id) return;

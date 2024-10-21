@@ -1,5 +1,5 @@
 import { Edit } from "@edifice-ui/icons";
-import { IconButton } from "@edifice-ui/react";
+import { IconButton, MediaLibraryType } from "@edifice-ui/react";
 import { Box, Typography } from "@mui/material";
 
 import {
@@ -16,12 +16,14 @@ import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export interface FilePickerWorkspaceProps {
   addButtonLabel: string;
+  modifyFile: (type: MediaLibraryType) => void;
 }
 
 export const FilePickerWorkspace = ({
   addButtonLabel = "Add image",
+  modifyFile,
 }: FilePickerWorkspaceProps) => {
-  const { media, handleClickMedia } = useMediaLibrary();
+  const { media } = useMediaLibrary();
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -36,7 +38,7 @@ export const FilePickerWorkspace = ({
               color="tertiary"
               icon={<Edit />}
               onClick={() => {
-                handleClickMedia(MEDIA_LIBRARY_TYPE.ATTACHMENT);
+                modifyFile(MEDIA_LIBRARY_TYPE.ATTACHMENT);
               }}
               type="button"
               variant="ghost"

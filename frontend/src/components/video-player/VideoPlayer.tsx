@@ -1,9 +1,12 @@
 /* eslint-disable jsx-a11y/media-has-caption */
+import { FC } from "react";
+
 import { Edit } from "@edifice-ui/icons";
 import { IconButton } from "@edifice-ui/react";
 import { Box } from "@mui/material";
 
 import { videoContainerStyle, videoStyle } from "./style";
+import { VideoPlayerProps } from "./types";
 import {
   iconButtonStyle,
   imageInputActions,
@@ -11,8 +14,8 @@ import {
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
-export const VideoPlayer = () => {
-  const { media, handleClickMedia } = useMediaLibrary();
+export const VideoPlayer: FC<VideoPlayerProps> = ({ modifyFile }) => {
+  const { media } = useMediaLibrary();
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -34,7 +37,7 @@ export const VideoPlayer = () => {
               color="tertiary"
               icon={<Edit />}
               onClick={() => {
-                handleClickMedia(MEDIA_LIBRARY_TYPE.VIDEO);
+                modifyFile(MEDIA_LIBRARY_TYPE.VIDEO);
               }}
               type="button"
               variant="ghost"

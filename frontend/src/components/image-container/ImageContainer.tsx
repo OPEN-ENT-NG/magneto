@@ -43,6 +43,7 @@ export const ImageContainer = ({
       }
     };
   }, [media]);
+  console.log(media?.url);
 
   return (
     <Box ref={containerRef} sx={mainBoxStyle}>

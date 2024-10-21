@@ -1,5 +1,8 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 import { useState, useEffect, FC } from "react";
+
 import { CardMedia } from "@mui/material";
+
 import { imgStyle, videoImgStyle, videoStyle } from "./style";
 import { CardContentImageDisplayProps } from "./types";
 import { getVideoThumbnailUrl } from "./utils";

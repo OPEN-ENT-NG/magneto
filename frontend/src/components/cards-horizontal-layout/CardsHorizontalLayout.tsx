@@ -12,6 +12,7 @@ import {
   UlWrapper,
 } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
+import { CardWrapper } from "../cards-vertical-layout/style";
 import { DndSection } from "../dnd-section/DndSection";
 import { SectionName } from "../section-name/SectionName";
 import { useSectionsDnD } from "~/hooks/dnd-hooks/useSectionsDnD";
@@ -103,7 +104,7 @@ export const CardsHorizontalLayout: FC = () => {
               </Box>
               <UlWrapper className="grid ps-0 list-unstyled left-float">
                 {activeItem.cards.map((card: Card) => (
-                  <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
+                  <CardBoxStyle zoomLevel={zoomLevel} key={card.id}>
                     <BoardCard
                       card={card}
                       zoomLevel={zoomLevel}
@@ -115,14 +116,14 @@ export const CardsHorizontalLayout: FC = () => {
               </UlWrapper>
             </SectionWrapper>
           ) : (
-            <CardBoxStyle zoomLevel={zoomLevel}>
+            <CardWrapper>
               <BoardCard
                 card={activeItem as Card}
                 zoomLevel={zoomLevel}
                 canComment={board.canComment}
                 displayNbFavorites={board.displayNbFavorites}
               />
-            </CardBoxStyle>
+            </CardWrapper>
           ))}
       </DragOverlay>
     </DndContext>

@@ -114,7 +114,7 @@ export const BoardCardWrapper = styled("div")<BoardCardWrapperProps>(({
   isCardSelected = false,
 }) => {
   const boardCardStyle = {
-    border: isCardSelected ? "0.2rem solid #CEEAF5" : "",
+    border: isCardSelected ? "0.2rem solid #CEEAF5" : "0.2rem solid transparent",
     borderRadius: isCardSelected ? "10px" : "",
   };
   return boardCardStyle;

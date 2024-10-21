@@ -1,8 +1,9 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 import { useState, useEffect, FC } from "react";
 
 import { CardMedia } from "@mui/material";
 
-import { imgStyle, videoImgStyle } from "./style";
+import { imgStyle, videoImgStyle, videoStyle } from "./style";
 import { CardContentImageDisplayProps } from "./types";
 import { getVideoThumbnailUrl } from "./utils";
 
@@ -24,14 +25,17 @@ export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
 
   return (
     <>
-      {!!url && (
-        <CardMedia
-          component="img"
-          image={imageUrl}
-          alt="Video thumbnail"
-          sx={videoImgStyle}
-        />
-      )}
+      {!!url &&
+        (url.startsWith("/workspace/") ? (
+          <video controls src={url} style={videoStyle}></video>
+        ) : (
+          <CardMedia
+            component="img"
+            image={imageUrl}
+            alt="Video thumbnail"
+            sx={videoImgStyle}
+          />
+        ))}
       {!!defaultImageSrc && (
         <CardMedia
           component="img"

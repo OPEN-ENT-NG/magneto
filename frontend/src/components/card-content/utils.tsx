@@ -12,6 +12,8 @@ export const onClick = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO:
+      if (card.resourceUrl.startsWith("/workspace/")) return null;
+      else return redirect(card.resourceUrl);
     case RESOURCE_TYPE.LINK:
       return redirect(card.resourceUrl);
     case RESOURCE_TYPE.TEXT:

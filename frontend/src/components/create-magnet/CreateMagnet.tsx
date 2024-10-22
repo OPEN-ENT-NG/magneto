@@ -145,13 +145,19 @@ export const CreateMagnet: FC = () => {
     media && media.url && media.type === MEDIA_LIBRARY_TYPE.VIDEO;
   const magnetTypeHasCaption = magnetType !== "text";
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (isCreateMagnetOpen) {
       setTimeout(() => {
         firstInputRef.current?.focus();
       }, 100);
     }
-  }, [isCreateMagnetOpen]);*/
+  }, [isCreateMagnetOpen]);
+
+  useEffect(() => {
+    if (board.sections) {
+      setSection(board.sections[0]);
+    }
+  }, [board.sections]);
 
   return (
     <>
@@ -211,7 +217,7 @@ export const CreateMagnet: FC = () => {
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>
                 <Input
-                  autoFocus
+                  ref={firstInputRef}
                   value={linkUrl}
                   size="md"
                   type="text"
@@ -222,7 +228,7 @@ export const CreateMagnet: FC = () => {
             <FormControl id="title" style={formControlStyle}>
               <Label>{t("magneto.card.title")}</Label>
               <Input
-                autoFocus={!magnetTypeHasLink}
+                ref={magnetTypeHasLink ? null : firstInputRef}
                 value={title}
                 placeholder={t("magneto.card.title")}
                 size="md"
@@ -254,7 +260,7 @@ export const CreateMagnet: FC = () => {
                 />
               </Box>
             </FormControl>
-            {section !== null && (
+            {section && (
               <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
                 <InputLabel
                   id="input-section"

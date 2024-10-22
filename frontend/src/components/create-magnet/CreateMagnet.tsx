@@ -83,6 +83,8 @@ export const CreateMagnet: FC = () => {
     handleClickMedia,
   } = useMediaLibrary();
 
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
     const sectionTitle = event.target.value;
     const selectedSection = board.sections.find(
@@ -143,6 +145,20 @@ export const CreateMagnet: FC = () => {
     media && media.url && media.type === MEDIA_LIBRARY_TYPE.VIDEO;
   const magnetTypeHasCaption = magnetType !== "text";
 
+  useEffect(() => {
+    if (isCreateMagnetOpen) {
+      setTimeout(() => {
+        firstInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isCreateMagnetOpen]);
+
+  useEffect(() => {
+    if (board.sections) {
+      setSection(board.sections[0]);
+    }
+  }, [board.sections]);
+
   return (
     <>
       <Modal
@@ -201,6 +217,7 @@ export const CreateMagnet: FC = () => {
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>
                 <Input
+                  ref={firstInputRef}
                   value={linkUrl}
                   size="md"
                   type="text"
@@ -211,6 +228,7 @@ export const CreateMagnet: FC = () => {
             <FormControl id="title" style={formControlStyle}>
               <Label>{t("magneto.card.title")}</Label>
               <Input
+                ref={magnetTypeHasLink ? null : firstInputRef}
                 value={title}
                 placeholder={t("magneto.card.title")}
                 size="md"
@@ -231,7 +249,7 @@ export const CreateMagnet: FC = () => {
               </FormControl>
             )}
             <FormControl id="description" style={formControlEditorStyle}>
-              <Label>{t("magneto.create.board.description")} :</Label>
+              <Label>{t("magneto.create.board.description")}</Label>
 
               <Box sx={editorStyle}>
                 <Editor
@@ -242,7 +260,7 @@ export const CreateMagnet: FC = () => {
                 />
               </Box>
             </FormControl>
-            {section !== null && (
+            {section && (
               <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
                 <InputLabel
                   id="input-section"

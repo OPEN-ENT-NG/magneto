@@ -47,6 +47,7 @@ export default ({ mode }: { mode: string }) => {
     "/explorer": proxyObj,
     "/todoapp": proxyObj,
     "/magneto": proxyObj,
+    "/resources-applications": proxyObj,
   };
 
   const base = mode === "production" ? "/magneto" : "";

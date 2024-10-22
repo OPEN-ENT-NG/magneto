@@ -50,11 +50,13 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   );
 
   const handleClickMedia = (type: MediaLibraryType) => {
+    setMagnetType(null);
     setMedia({ ...(media as MediaProps), type });
     mediaLibraryRef.current?.show(type);
   };
 
   const handleClickMenu = (type: MENU_NOT_MEDIA_TYPE) => {
+    setMedia(null);
     setMagnetType(type);
     if (type === MENU_NOT_MEDIA_TYPE.TEXT) {
       setIsCreateMagnetOpen(true);

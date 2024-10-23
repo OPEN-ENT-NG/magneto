@@ -10,7 +10,7 @@ import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsFreeLayout: FC = () => {
-  const { board, zoomLevel } = useBoard();
+  const { board, zoomLevel, hasEditRights } = useBoard();
   const {
     updatedIds,
     activeItem,
@@ -45,6 +45,7 @@ export const CardsFreeLayout: FC = () => {
                     zoomLevel={zoomLevel}
                     canComment={board.canComment}
                     displayNbFavorites={board.displayNbFavorites}
+                    readOnly={hasEditRights()}
                   />
                 </LiWrapper>
               );

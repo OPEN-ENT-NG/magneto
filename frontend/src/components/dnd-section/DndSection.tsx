@@ -14,6 +14,7 @@ export const DndSection: FC<DndSectionProps> = ({
   isLast = false,
   noCards = false,
   sectionNumber,
+  readOnly =  false,
 }) => {
   const {
     attributes,
@@ -48,8 +49,7 @@ export const DndSection: FC<DndSectionProps> = ({
       sectionNumber={sectionNumber}
       sectionType={sectionType}
       isDragging={isDragging}
-      {...attributes}
-      {...listeners}
+      {...(readOnly ? {} : { ...attributes, ...listeners })}
     >
       {children}
     </SectionWrapper>

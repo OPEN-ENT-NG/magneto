@@ -1,79 +1,84 @@
-.card {
-  padding: unset !important;
-  margin: unset !important;
-  display: flex;
-  flex-wrap: wrap !important;
-  flex-direction: column;
+.board-item {
+  // Nested selectors for scoping
+  .card {
+    padding: unset !important;
+    margin: unset !important;
+    display: flex;
+    flex-wrap: wrap !important;
+    flex-direction: column;
 
-  .board-title {
-    width: 100%;
-    div {
+    .board-title {
       width: 100%;
-    }
+      div {
+        width: 100%;
+      }
 
-    .tooltip {
-      max-width: 100%;
-      width: fit-content;
-      pointer-events: none;
-      .tooltip-arrow {
-        left: 1rem !important;
+      .tooltip {
+        max-width: 100%;
+        width: fit-content;
+        pointer-events: none;
+        .tooltip-arrow {
+          left: 1rem !important;
+        }
       }
     }
-  }
 
-  .board-number-magnets {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    svg {
-      color: #ffb600;
-      font-size: 16px;
-    }
-
-    svg + p {
-      font-size: 13px;
-    }
-  }
-
-  .board-about {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    .board-about-left-content,
-    .board-about-right-content {
-      margin: 0 !important;
+    .board-number-magnets {
       display: flex;
-      gap: 0.5rem;
+      justify-content: center;
       align-items: center;
 
-      .med-resource-card-text {
-        margin-top: 1px;
+      svg {
+        color: #ffb600;
+        font-size: 16px;
+      }
+
+      svg + p {
         font-size: 13px;
       }
     }
+
+    .board-about {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      .board-about-left-content,
+      .board-about-right-content {
+        margin: 0 !important;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+
+        .med-resource-card-text {
+          margin-top: 1px;
+          font-size: 13px;
+        }
+      }
+    }
+
+    strong {
+      width: 100%;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap !important;
+    }
+
+    .card-body {
+      width: 100%;
+    }
+
+    .card-image {
+      width: 100%;
+      position: relative;
+      aspect-ratio: 16 / 10;
+      background-color: transparent !important;
+
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
   }
-}
-strong {
-  width: 100%;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap !important;
-}
-
-.card-body {
-  width: 100%;
-}
-.card-image {
-  width: 100%;
-  position: relative;
-  aspect-ratio: 16 / 10;
-  background-color: transparent !important;
-}
-
-.card-image img {
-  position: absolute;
-  top: 0;
-  left: 0;
 }

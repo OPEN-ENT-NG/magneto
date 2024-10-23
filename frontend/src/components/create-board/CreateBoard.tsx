@@ -1,9 +1,4 @@
-import React, {
-  CSSProperties,
-  FunctionComponent,
-  useEffect,
-  useState,
-} from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 
 // eslint-disable-next-line import/order
 import {
@@ -17,7 +12,6 @@ import {
   Radio,
   TextArea,
 } from "@edifice-ui/react";
-import "./CreateBoard.scss";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
@@ -33,68 +27,7 @@ import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
-
-const styles: Record<string, CSSProperties> = {
-  gridCol: {
-    padding: ".8rem",
-  },
-  errorText: {
-    marginTop: "0.3em",
-    fontSize: "1.15rem",
-    color: "red",
-  },
-  formControlSpacingSmall: {
-    marginBottom: "0.5em",
-  },
-  formControlSpacingMedium: {
-    marginBottom: "1em",
-  },
-  formControlSpacingLarge: {
-    marginBottom: "1.5em",
-  },
-  footerButtonContainer: {
-    float: "right" as const,
-  },
-  footerButton: {
-    marginLeft: "0.25em",
-    marginTop: "1.5em",
-  },
-  flexContainer: {
-    display: "flex" as const,
-    flexWrap: "wrap" as const,
-  },
-  flexCenterAligned: {
-    display: "flex" as const,
-    flexWrap: "wrap" as const,
-    alignItems: "center",
-  },
-  flexSpaceAround: {
-    display: "flex" as const,
-    flexWrap: "wrap" as const,
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  textIconPair: {
-    display: "flex" as const,
-    alignItems: "center",
-    gap: "0.25em",
-    marginRight: "0.75em",
-  },
-  layoutText: {
-    marginRight: "0.15em",
-    marginLeft: "0.15em",
-    width: "max-content",
-  },
-  infoText: {
-    fontSize: "1.2rem",
-  },
-  textArea: {
-    borderColor: "var(--edifice-input-border-color)",
-  },
-  radioMargin: {
-    marginRight: "0.4em",
-  },
-};
+import { styles } from "./style";
 
 type Props = {
   isOpen: boolean;
@@ -338,7 +271,7 @@ export const CreateBoard: FunctionComponent<Props> = ({
                     </FormControl>
                   </div>
                   <div style={styles.formControlSpacingLarge}>
-                    <h5 style={styles.formControlSpacingSmall}>
+                    <h5 style={styles.formControlSpacingMedium}>
                       {t("magneto.create.board.options")}
                     </h5>
                     <Checkbox
@@ -362,40 +295,37 @@ export const CreateBoard: FunctionComponent<Props> = ({
                   </div>
                   <div>
                     <h5>Quelle disposition des aimants souhaitez-vous?</h5>
-                    <div style={styles.flexSpaceAround}>
-                      <div style={styles.textIconPair}>
+                    <div style={styles.layoutOptionsContainer}>
+                      <div style={styles.layoutOption}>
                         <Radio
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="free"
                           checked={disposition == "free"}
-                          style={{ marginRight: "0.4em" }}
                         />
                         <span style={styles.layoutText}>
                           {t("magneto.create.board.display.free")}
                         </span>
                         <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div style={styles.textIconPair}>
+                      <div style={styles.layoutOption}>
                         <Radio
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="vertical"
                           checked={disposition == "vertical"}
-                          style={{ marginRight: "0.4em" }}
                         />
                         <span style={styles.layoutText}>
                           {t("magneto.create.board.display.vertical")}
                         </span>
                         <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div style={styles.textIconPair}>
+                      <div style={styles.layoutOption}>
                         <Radio
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="horizontal"
                           checked={disposition == "horizontal"}
-                          style={{ marginRight: "0.4em" }}
                         />
                         <span style={styles.layoutText}>
                           {t("magneto.create.board.display.horizontal")}

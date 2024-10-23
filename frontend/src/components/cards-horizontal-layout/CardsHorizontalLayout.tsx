@@ -59,6 +59,7 @@ export const CardsHorizontalLayout: FC = () => {
                   ? updatedSections.length + 1
                   : updatedSections.length
               }
+              readOnly={hasEditRights()}
             >
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={section} />
@@ -75,6 +76,7 @@ export const CardsHorizontalLayout: FC = () => {
                         zoomLevel={zoomLevel}
                         canComment={board.canComment}
                         displayNbFavorites={board.displayNbFavorites}
+                        readOnly={hasEditRights()}
                       />
                     </CardBoxStyle>
                   ))}

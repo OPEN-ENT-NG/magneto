@@ -126,8 +126,10 @@ export const CreateMagnet: FC = () => {
   useEffect(() => {
     if (media?.name) {
       if (magnetTypeHasAudio) return setTitle(media.name);
-      if (magnetTypeHasLink) setLinkUrl(media.url);
-      if (!magnetTypeHasVideo)
+      if (magnetTypeHasLink) {
+        setLinkUrl(media.url);
+        setTitle(media.name.replace(/^https?:\/\//, ""));
+      } else if (!magnetTypeHasVideo)
         setTitle(media.name.split(".").slice(0, -1).join("."));
     }
   }, [media]);

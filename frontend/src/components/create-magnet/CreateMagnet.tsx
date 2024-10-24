@@ -125,7 +125,7 @@ export const CreateMagnet: FC = () => {
 
   useEffect(() => {
     if (media?.name) {
-      if (magnetTypeHasAudio) return setTitle(media.name);
+      if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
       if (magnetTypeHasLink) {
         setLinkUrl(media.url);
         setTitle(media.name.replace(/^https?:\/\//, ""));
@@ -200,7 +200,7 @@ export const CreateMagnet: FC = () => {
             )}
             {magnetTypeHasAudio && (
               <Box sx={audioWrapperStyle}>
-                <audio controls preload="none" src={media.url}>
+                <audio controls preload="metadata" src={media.url}>
                   <source src={media.url} type={media.type} />
                 </audio>
                 <EdIconButton

@@ -40,7 +40,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const inputWrapperRef = useRef<HTMLDivElement>(null);
   const {
     board: { id: boardId },
-    hasEditRights,
+    hasManageRights,
   } = useBoard();
   const dropDownItemList = useCreateSectionDropDownItems(
     section,
@@ -122,10 +122,10 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         onBlur={handleKeyDownAndBlur}
         onKeyDown={handleKeyDown}
         ref={inputWrapperRef}
-        disabled={!hasEditRights()}
+        disabled={!hasManageRights()}
         fullWidth
       />
-      {section && hasEditRights() && (
+      {section && hasManageRights() && (
         <IconButton
           size="large"
           sx={iconButtonStyle}

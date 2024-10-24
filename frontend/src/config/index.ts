@@ -20,3 +20,4 @@ export const rights = {
     right: "fr-cgi-magneto-controller-ShareBoardController|initManagerRight",
   },
 };
+

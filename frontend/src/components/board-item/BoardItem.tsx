@@ -19,7 +19,6 @@ import "./BoardItem.scss";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board } from "~/models/board.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
-import { styled } from "@mui/material";
 
 interface BoardItemProps {
   board: {
@@ -45,13 +44,6 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   isBoardDragged,
   setIsBoardDragged,
 }) => {
-  const StyledCardImage = styled(Card.Image)({
-    width: "100%",
-    position: "relative",
-    aspectRatio: "16 / 10",
-    backgroundColor: "transparent !important",
-  });
-
   const { user, currentApp } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { selectedBoardsIds, toggleSelect, selectedBoards } =

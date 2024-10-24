@@ -17,6 +17,7 @@ import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import { useTranslation } from "react-i18next";
 
+import { styles } from "./style";
 import UniqueImagePicker from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
@@ -27,7 +28,6 @@ import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
-import { styles } from "./style";
 
 type Props = {
   isOpen: boolean;

@@ -12,12 +12,12 @@ import {
   Radio,
   TextArea,
 } from "@edifice-ui/react";
-import "./CreateBoard.scss";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import { useTranslation } from "react-i18next";
 
+import { styles } from "./style";
 import UniqueImagePicker from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
@@ -29,7 +29,7 @@ import {
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
 
-type props = {
+type Props = {
   isOpen: boolean;
   toggle: () => void;
   boardToUpdate?: Board;
@@ -43,12 +43,12 @@ export interface FormInputs {
   formSlug: string;
 }
 
-export const CreateBoard: FunctionComponent<props> = ({
+export const CreateBoard: FunctionComponent<Props> = ({
   isOpen,
   toggle,
   boardToUpdate,
   reset,
-}: props) => {
+}: Props) => {
   const { t } = useTranslation("magneto");
   const {
     cover: thumbnail,
@@ -211,9 +211,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                 lg={width < 1280 ? "2" : "3"}
                 md="2"
                 sm="4"
-                style={{
-                  padding: ".8rem",
-                }}
+                style={styles.gridCol}
               >
                 <UniqueImagePicker
                   addButtonLabel="Add image"
@@ -233,7 +231,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                 />
                 {(thumbnail == "" || thumbnail == null) &&
                   thumbnailSrc == "" && (
-                    <div className="font-red">
+                    <div style={styles.errorText}>
                       {t("magneto.board.manage.ask.image")}
                     </div>
                   )}
@@ -242,13 +240,14 @@ export const CreateBoard: FunctionComponent<props> = ({
                 lg={width < 1280 ? "6" : "9"}
                 md="6"
                 sm="4"
-                style={{
-                  padding: ".8rem",
-                }}
+                style={styles.gridCol}
               >
                 <div>
                   <div>
-                    <FormControl id="title" className="mb-0-5">
+                    <FormControl
+                      id="title"
+                      style={styles.formControlSpacingSmall}
+                    >
                       <Label>{t("magneto.create.board.title")} * :</Label>
                       <Input
                         value={title}
@@ -258,18 +257,21 @@ export const CreateBoard: FunctionComponent<props> = ({
                         onChange={(e) => setTitle(e.target.value)}
                       />
                     </FormControl>
-                    <FormControl id="description" className="mb-1-5">
+                    <FormControl
+                      id="description"
+                      style={styles.formControlSpacingLarge}
+                    >
                       <Label>{t("magneto.create.board.description")} :</Label>
                       <TextArea
-                        className="styled-text-area"
+                        style={styles.textArea}
                         size="md"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                       />
                     </FormControl>
                   </div>
-                  <div className="mb-1-5">
-                    <h5 className="mb-1">
+                  <div style={styles.formControlSpacingLarge}>
+                    <h5 style={styles.formControlSpacingMedium}>
                       {t("magneto.create.board.options")}
                     </h5>
                     <Checkbox
@@ -293,51 +295,46 @@ export const CreateBoard: FunctionComponent<props> = ({
                   </div>
                   <div>
                     <h5>Quelle disposition des aimants souhaitez-vous?</h5>
-                    <div className="d-flex justify-around align-items-center">
-                      <div className="d-flex align-items-center text-icon-pair mg-75">
+                    <div style={styles.layoutOptionsContainer}>
+                      <div style={styles.layoutOption}>
                         <Radio
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="free"
                           checked={disposition == "free"}
-                          className="mg-4"
                         />
-                        <span className="text">
+                        <span style={styles.layoutText}>
                           {t("magneto.create.board.display.free")}
                         </span>
                         <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div className="d-flex align-items-center text-icon-pair mg-75">
+                      <div style={styles.layoutOption}>
                         <Radio
                           model={disposition}
                           onChange={(e) => setDisposition(e.target.value)}
                           value="vertical"
                           checked={disposition == "vertical"}
-                          className="mg-4"
                         />
-                        <span className="text">
+                        <span style={styles.layoutText}>
                           {t("magneto.create.board.display.vertical")}
                         </span>
                         <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
-                      <div className="d-flex align-items-center text-icon-pair">
+                      <div style={styles.layoutOption}>
                         <Radio
                           model={disposition}
-                          onChange={(e) => {
-                            setDisposition(e.target.value);
-                          }}
+                          onChange={(e) => setDisposition(e.target.value)}
                           value="horizontal"
                           checked={disposition == "horizontal"}
-                          className="mg-4"
                         />
-                        <span className="text">
+                        <span style={styles.layoutText}>
                           {t("magneto.create.board.display.horizontal")}
                         </span>
                         <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
                       </div>
                     </div>
                   </div>
-                  <div className="mb-1">
+                  <div style={styles.formControlSpacingMedium}>
                     <FormControl id="keywords">
                       <Label>{t("magneto.board.keywords")} :</Label>
                       <Input
@@ -353,7 +350,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                     </FormControl>
                   </div>
                   <div>
-                    <div className="mb-0-5">
+                    <div style={styles.formControlSpacingSmall}>
                       {t("magneto.board.background.title")}
                     </div>
                     <UniqueImagePicker
@@ -372,7 +369,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                         }
                       }}
                     />
-                    <i className="font-little">
+                    <i style={styles.infoText}>
                       {t("magneto.board.background.warning")}
                     </i>
                   </div>
@@ -381,12 +378,12 @@ export const CreateBoard: FunctionComponent<props> = ({
             </Grid>
           </Modal.Body>
           <Modal.Footer>
-            <div className="right">
+            <div style={styles.footerButtonContainer}>
               <Button
                 color="tertiary"
                 type="button"
                 variant="ghost"
-                className="footer-button"
+                style={styles.footerButton}
                 onClick={resetFields}
               >
                 {t("magneto.cancel")}
@@ -395,7 +392,7 @@ export const CreateBoard: FunctionComponent<props> = ({
                 color="primary"
                 type="submit"
                 variant="filled"
-                className="footer-button"
+                style={styles.footerButton}
                 onClick={onSubmit}
                 disabled={
                   (thumbnailSrc == "" && thumbnail == "") || title == ""

@@ -90,7 +90,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
   return (
     <div
       ref={drag}
-      className={`board ${isDragging ? "dragging" : ""}`}
+      className={`board-item board ${isDragging ? "dragging" : ""}`}
       style={{
         opacity: isDragging || isDragged ? 0.5 : 1,
         cursor: "move",

@@ -35,7 +35,7 @@ export const BoardView: FC = () => {
     zoomOut,
     resetZoom,
     isLoading,
-    hasEditRights,
+    hasManageRights,
     displayModals,
     toggleBoardModals,
   } = useBoard();
@@ -66,7 +66,7 @@ export const BoardView: FC = () => {
   ) : (
     <BoardViewWrapper layout={board.layoutType}>
       <HeaderView />
-      {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}
+      {hasManageRights() && <SideMenu sideMenuData={sideMenuData} />}
       <BoardBodyWrapper layout={board.layoutType} headerHeight={headerHeight}>
         {displayLayout()}
         {board.backgroundUrl ? (

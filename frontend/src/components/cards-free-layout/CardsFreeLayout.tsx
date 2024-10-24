@@ -45,7 +45,7 @@ export const CardsFreeLayout: FC = () => {
                     zoomLevel={zoomLevel}
                     canComment={board.canComment}
                     displayNbFavorites={board.displayNbFavorites}
-                    readOnly={hasEditRights()}
+                    readOnly={!hasEditRights()}
                   />
                 </LiWrapper>
               );

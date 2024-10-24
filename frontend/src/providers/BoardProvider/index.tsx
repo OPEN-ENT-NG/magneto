@@ -98,6 +98,14 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
 
+  const hasManageRights = (): boolean => {
+    return board.owner.userId === user?.userId || !!boardRights?.manager;
+  };
+
+  const hasManageRights = (): boolean => {
+    return board.owner.userId === user?.userId || !!boardRights?.manager;
+  };
+
   const toggleBoardModals = (modalType: BOARD_MODAL_TYPE) =>
     setDisplayModals((prevState) => ({
       ...prevState,
@@ -116,7 +124,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isFetching,
       boardRights,
       hasEditRights,
-      hasManagerRights,
+      hasManageRights,
       displayModals,
       toggleBoardModals,
     }),

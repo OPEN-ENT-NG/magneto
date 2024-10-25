@@ -17,6 +17,7 @@ import { DND_ITEM_TYPE } from "./types";
 import { createCardMap, createSectionMap } from "./utils";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
+import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useUpdateBoardMutation } from "~/services/api/boards.service";
 import {
@@ -32,12 +33,13 @@ export const useSectionsDnD = (board: Board) => {
   const [originalSections, setOriginalSections] = useState<Section[]>(
     board.sections,
   );
-
+  const [newMagnetOver, setNewMagnetOver] = useState<Card[]>([]);
   const [updateSection] = useUpdateSectionMutation();
   const [createSection] = useCreateSectionMutation();
   const [updateBoard] = useUpdateBoardMutation();
-
+  const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
+console.log(isFetching);
 
   useEffect(() => {
     setUpdatedSections(board.sections);
@@ -45,17 +47,18 @@ export const useSectionsDnD = (board: Board) => {
 
   const sensors = useSensors(
     useSensor(CustomPointerSensor, {
-      activationConstraint: { distance: 8 },
+      activationConstraint: { distance: 1 },
+      isFetching,
     }),
   );
 
   const sectionMap = useMemo(
     () => createSectionMap(updatedSections),
-    [updatedSections],
+    [updatedSections, newMagnetOver],
   );
   const cardMap = useMemo(
     () => createCardMap(updatedSections),
-    [updatedSections],
+    [updatedSections, newMagnetOver],
   );
 
   const handleDragStart = useCallback(
@@ -65,7 +68,7 @@ export const useSectionsDnD = (board: Board) => {
 
       if (activeType === DND_ITEM_TYPE.CARD) {
         const cardInfo = cardMap[active.id.toString()];
-        setActiveItem(cardInfo?.card || null);
+        setActiveItem(cardInfo?.card ?? null);
       } else if (activeType === DND_ITEM_TYPE.SECTION) {
         setActiveItem(sectionMap[active.id.toString()] || null);
       } else {
@@ -88,6 +91,70 @@ export const useSectionsDnD = (board: Board) => {
           : updatedSections.find((section) =>
               section.cardIds.includes(over.id.toString()),
             );
+
+      // Si on survole new-section
+      if (over.id === "new-section") {
+        // Ne stocke la carte dans newMagnetOver que si elle n'y est pas déjà
+        if (newMagnetOver.length === 0 && activeItem instanceof Card) {
+          setNewMagnetOver([activeItem]);
+
+          // Retire la carte de sa section d'origine
+          setUpdatedSections((prev) =>
+            prev.map((section) => {
+              if (section._id === activeSection?._id) {
+                return {
+                  ...section,
+                  cardIds: section.cardIds.filter(
+                    (id) => id !== active.id.toString(),
+                  ),
+                  cards: section.cards.filter(
+                    (card) => card.id !== active.id.toString(),
+                  ),
+                };
+              }
+              return section;
+            }),
+          );
+        }
+        return;
+      }
+
+      // Si on quitte new-section pour une autre section
+      if (newMagnetOver.length > 0 && activeSection === undefined) {
+        const draggedCard = newMagnetOver[0];
+        // Vide newMagnetOver
+
+        if (overSection) {
+          // Ajoute la carte à la section survolée
+          setNewMagnetOver([]);
+          setUpdatedSections((prev) =>
+            prev.map((section) => {
+              if (section._id === overSection._id) {
+                const overIndex =
+                  over.data.current?.type === DND_ITEM_TYPE.SECTION
+                    ? section.cardIds.length
+                    : section.cardIds.indexOf(over.id.toString());
+
+                const newCardIds = arrayMove(
+                  [...section.cardIds, draggedCard.id],
+                  section.cardIds.length,
+                  overIndex,
+                );
+
+                const newCards = arrayMove(
+                  [...section.cards, draggedCard],
+                  section.cards.length,
+                  overIndex,
+                );
+
+                return { ...section, cardIds: newCardIds, cards: newCards };
+              }
+              return section;
+            }),
+          );
+        }
+        return;
+      }
 
       if (
         activeSection &&
@@ -132,9 +199,8 @@ export const useSectionsDnD = (board: Board) => {
           }),
         );
       }
-      if (over.id === "new-section") setUpdatedSections(board.sections);
     },
-    [updatedSections, board.sections],
+    [updatedSections, newMagnetOver, activeItem],
   );
 
   const handleSectionDragOver = useCallback((active: Active, over: Over) => {
@@ -353,8 +419,8 @@ export const useSectionsDnD = (board: Board) => {
         section.cards.some((card) => card.id === activeCardId),
       );
 
-      if (!originalActiveSection || !currentOverSection) {
-        console.error("Active or over section not found");
+      if (!originalActiveSection) {
+        console.error("Active section not found");
         return;
       }
 
@@ -365,27 +431,34 @@ export const useSectionsDnD = (board: Board) => {
         console.error("Active card not found");
         return;
       }
+      console.log(over.id);
 
-      if (over.id === "new-section") {
-        await handleNewSectionCreation(
+      if (over.id === "new-section" || over.id === newMagnetOver[0]?.id) {
+        setNewMagnetOver([]);
+        return await handleNewSectionCreation(
           activeCardId,
           activeCard,
           originalActiveSection,
         );
-      } else if (originalActiveSection._id !== currentOverSection._id) {
-        await handleCardMoveBetweenSections(
+      }
+      if (!currentOverSection) {
+        console.error("Over section not found");
+        return;
+      }
+      if (originalActiveSection._id !== currentOverSection._id) {
+        return await handleCardMoveBetweenSections(
           activeCardId,
           originalActiveSection,
           currentOverSection,
           over,
         );
-      } else {
-        await handleCardMoveWithinSection(
-          activeCardId,
-          currentOverSection,
-          over,
-        );
       }
+
+      return await handleCardMoveWithinSection(
+        activeCardId,
+        currentOverSection,
+        over,
+      );
     },
     [
       originalSections,
@@ -412,7 +485,7 @@ export const useSectionsDnD = (board: Board) => {
       } else if (activeType === DND_ITEM_TYPE.CARD) {
         await handleCardDragEnd(active, over);
       }
-
+      setNewMagnetOver([]);
       setActiveItem(null);
       setOriginalSections(updatedSections);
     },
@@ -451,8 +524,10 @@ export const useSectionsDnD = (board: Board) => {
       );
     }
   }, [board._id, createSection, t, updatedSections.length]);
+  console.log(cardMap);
 
   return {
+    newMagnetOver,
     activeItem,
     updatedSections,
     sensors,

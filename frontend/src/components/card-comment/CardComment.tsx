@@ -20,6 +20,7 @@ import {
   userNameStyle,
 } from "./style";
 import { CardCommentProps } from "./types";
+import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useAddCommentMutation } from "~/services/api/comment.service";
@@ -78,6 +79,7 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
       <Box sx={inputContainerStyle}>
         <Avatar sx={avatarStyle} src={avatar}></Avatar>
         <InputBase
+          data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
           placeholder={t("magneto.add.comment")}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

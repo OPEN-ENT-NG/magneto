@@ -52,7 +52,6 @@ export const StyledCard = styled(Card, {
     width: handleCardSize(zoomLevel).width,
     height: handleCardSize(zoomLevel).height,
 
-    transform: isDragging ? "scale(1.05)" : "scale(1)",
     opacity: isDragging ? "0.5" : "1",
     cursor: isDragging ? "grabbing" : "grab",
   }),

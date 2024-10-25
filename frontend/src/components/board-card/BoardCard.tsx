@@ -80,7 +80,12 @@ export const BoardCard: FC<BoardCardProps> = ({
   } = sortableProps;
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString({
+      x: transform?.x ?? 0,
+      y: transform?.y ?? 0,
+      scaleX: 1,
+      scaleY: 1,
+    }),
     transition: transition || undefined,
   };
 

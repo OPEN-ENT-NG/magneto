@@ -14,6 +14,7 @@ import {
 import { BoardCard } from "../board-card/BoardCard";
 import { DndSection } from "../dnd-section/DndSection";
 import { SectionName } from "../section-name/SectionName";
+import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { useSectionsDnD } from "~/hooks/dnd-hooks/useSectionsDnD";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
@@ -24,6 +25,7 @@ export const CardsVerticalLayout: FC = () => {
     activeItem,
     updatedSections,
     sensors,
+    newMagnetOver,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
@@ -31,6 +33,8 @@ export const CardsVerticalLayout: FC = () => {
   } = useSectionsDnD(board);
 
   if (!updatedSections.length) return null;
+
+  console.log(newMagnetOver);
 
   return (
     <DndContext
@@ -86,10 +90,23 @@ export const CardsVerticalLayout: FC = () => {
               noCards={true}
               sectionType="vertical"
               id="new-section"
+              data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
             >
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={null} />
               </Box>
+              <CardsWrapper zoomLevel={zoomLevel}>
+                {newMagnetOver.map((card: Card) => (
+                  <CardWrapper key={card.id}>
+                    <BoardCard
+                      card={card}
+                      zoomLevel={zoomLevel}
+                      canComment={board.canComment}
+                      displayNbFavorites={board.displayNbFavorites}
+                    />
+                  </CardWrapper>
+                ))}
+              </CardsWrapper>
             </DndSection>
           )}
         </Box>
@@ -98,17 +115,13 @@ export const CardsVerticalLayout: FC = () => {
         {activeItem &&
           ("cards" in activeItem ? (
             <SectionWrapper
+              isLast={true}
               key={activeItem._id}
-              sectionNumber={
-                hasEditRights()
-                  ? updatedSections.length + 1
-                  : updatedSections.length
-              }
             >
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={activeItem} />
               </Box>
-              <CardsWrapper zoomLevel={zoomLevel}>
+              <CardsWrapper zoomLevel={zoomLevel} isDragging={true}>
                 {activeItem.cards.map((card: Card) => (
                   <CardWrapper key={card.id}>
                     <BoardCard

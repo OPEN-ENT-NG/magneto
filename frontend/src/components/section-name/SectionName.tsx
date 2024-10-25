@@ -20,6 +20,7 @@ import { useCreateSectionDropDownItems } from "./useCreateSectionDropDownItems";
 import { DeleteSectionModal } from "../delete-section-modal/DeleteSectionModal";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
+import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoard } from "~/providers/BoardProvider";
 import {
@@ -74,6 +75,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       return toast.warning(t("magneto.change.section.empty.title"));
     }
     if (section) {
+      if (section.title === inputValue) return;
       return updateSectionAndToast({
         boardId,
         id: section?._id,
@@ -108,13 +110,18 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const isOpen = openDropdownId === section?._id;
 
   return (
-    <Box sx={boxStyle} ref={dropdownRef}>
+    <Box
+      sx={boxStyle}
+      ref={dropdownRef}
+      data-dropdown-open={isOpen ? "true" : "false"}
+    >
       {section?.displayed === false && (
         <Box sx={{ width: "1.5rem" }}>
           <Icon path={mdiEyeOff} size={"inherit"} />
         </Box>
       )}
       <InputBase
+        data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
         sx={inputStyle}
         value={inputValue}
         placeholder={section ? "" : t("magneto.section.insert.title")}

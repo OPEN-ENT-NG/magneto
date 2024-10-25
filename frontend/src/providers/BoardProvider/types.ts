@@ -18,6 +18,7 @@ export type BoardContextType = {
   zoomOut: () => void;
   resetZoom: () => void;
   isLoading: boolean;
+  isFetching: boolean;
   boardRights: Record<RightRole, boolean> | null;
   hasEditRights: () => boolean;
   displayModals: DisplayModalsState;

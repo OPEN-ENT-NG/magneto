@@ -31,7 +31,7 @@ export const mainWrapperProps = {
 };
 
 export const SectionWrapper = styled("div")<SectionWrapperProps>(({
-  sectionNumber,
+  sectionNumber = 0,
   isLast = false,
   isDragging = false,
 }) => {
@@ -62,31 +62,28 @@ export const sectionNameWrapperStyle = {
   alignSelf: "center",
 };
 
-export const CardsWrapper = styled("div")<{ zoomLevel: number }>(({
-  zoomLevel,
-}) => {
-  return {
-    gridTemplateColumns: `repeat(auto-fill, ${
-      handleCardSize(zoomLevel).width
-    })`,
-    gap: "1.5rem",
-    display: "grid",
-    justifyContent: "space-evenly",
-    flexWrap: "wrap",
-    alignContent: "flex-start",
-    overflowY: "auto",
-    flexGrow: 1,
-    width: "100%",
-    "&::-webkit-scrollbar": {
-      width: "0.8rem",
-      height: "0.8rem",
-    },
-    "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "rgba(170,170,170,1)",
-      borderRadius: "0.3rem",
-    },
-  };
-});
+export const CardsWrapper = styled("div")<{
+  zoomLevel: number;
+  isDragging?: boolean;
+}>(({ zoomLevel, isDragging = false }) => ({
+  gridTemplateColumns: `repeat(auto-fill, ${handleCardSize(zoomLevel).width})`,
+  gap: "1.5rem",
+  display: "grid",
+  justifyContent: "space-evenly",
+  flexWrap: "wrap",
+  alignContent: "flex-start",
+  overflowY: "auto",
+  flexGrow: 1,
+  width: "100%",
+  "&::-webkit-scrollbar": {
+    width: isDragging ? "0" : "0.8rem",
+    height: isDragging ? "0" : "0.8rem",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: isDragging ? "transparent" : "rgba(170,170,170,1)",
+    borderRadius: "0.3rem",
+  },
+}));
 
 export const CardWrapper = styled("div")({
   display: "flex",

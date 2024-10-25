@@ -64,6 +64,7 @@ export const CreateMagnet: FC = () => {
 
   const [title, setTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
+  const [openInNewTab, setOpenInNewTab] = useState<boolean>(true);
   const [caption, setCaption] = useState("");
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
@@ -117,6 +118,7 @@ export const CreateMagnet: FC = () => {
       resourceType: magnetType ?? convertMediaTypeToResourceType(media?.type),
       resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
       title: title,
+      openInNewTab: openInNewTab ? openInNewTab : null,
       ...(section?._id ? { sectionId: section._id } : {}),
     };
     await createCard(payload);
@@ -129,6 +131,7 @@ export const CreateMagnet: FC = () => {
       if (magnetTypeHasLink) {
         setLinkUrl(media.url);
         setTitle(media.name.replace(/^(?:https?:\/\/(?:www\.)?|www\.)/, ""));
+        setOpenInNewTab(!!media.targetUrl && media.targetUrl === "_blank");
       } else if (!magnetTypeHasVideo)
         setTitle(media.name.split(".").slice(0, -1).join("."));
     }

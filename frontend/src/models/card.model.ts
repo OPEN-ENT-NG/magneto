@@ -66,6 +66,7 @@ export interface ICardPayload {
   resourceUrl?: string;
   boardId: string;
   sectionId?: string;
+  openInNewTab?: boolean;
 }
 
 export interface IMetadata {

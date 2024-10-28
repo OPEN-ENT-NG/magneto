@@ -825,6 +825,7 @@ public class DefaultCardService implements CardService {
                                                     .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
                                             .put(Mongo.ELSE, 0)))
                             .put(Field.ISLIKED, 1)
+                            .put(Field.OPENINNEWTAB, 1)
                     );
         }
         return query.getAggregate();
@@ -892,6 +893,7 @@ public class DefaultCardService implements CardService {
                     .put(Field.LASTMODIFIERID, 1)
                     .put(Field.LASTMODIFIERNAME, 1)
                     .put(Field.FAVORITE_LIST, 1)
+                    .put(Field.OPENINNEWTAB, 1)
                     .put(Field.LASTCOMMENT, new JsonObject()
                             .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
                     .put(Field.NBOFCOMMENTS, new JsonObject()
@@ -961,6 +963,7 @@ public class DefaultCardService implements CardService {
                     .put(Field.LASTMODIFIERID, 1)
                     .put(Field.LASTMODIFIERNAME, 1)
                     .put(Field.FAVORITE_LIST, 1)
+                    .put(Field.OPENINNEWTAB, 1)
                     .put(Field.LASTCOMMENT, new JsonObject()
                             .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
                     .put(Field.NBOFCOMMENTS, new JsonObject()

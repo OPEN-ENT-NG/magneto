@@ -306,7 +306,8 @@ public class Card implements Model<Card> {
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
-                .put(Field.FAVORITE_LIST, this.getFavoriteList());
+                .put(Field.FAVORITE_LIST, this.getFavoriteList())
+                .put(Field.OPENINNEWTAB, this.openInNewTab());
     }
 
     @Override

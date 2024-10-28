@@ -26,6 +26,7 @@ export interface ICardItemResponse {
   nbOfComments?: number;
   nbOfFavorites?: number;
   liked?: boolean;
+  openInNewTab?: boolean;
 }
 
 export interface ICardsResponse {
@@ -270,6 +271,7 @@ export class Card {
   private _nbOfFavorites?: number;
   private _liked?: boolean;
   private _resource?: FileViewModel;
+  private _openInNewTab?: boolean;
 
   constructor() {
     this._id = "";
@@ -302,6 +304,7 @@ export class Card {
     this._lastComment = new CardComment();
     this._nbOfFavorites = -1;
     this._liked = false;
+    this._openInNewTab = false;
     if (this._resourceType === "file") this._resource = this.initResource();
     return this;
   }
@@ -332,6 +335,7 @@ export class Card {
         : undefined;
     this._nbOfFavorites = data.nbOfFavorites;
     this._liked = data.liked;
+    this._openInNewTab = data.openInNewTab;
     if (this._resourceType === "file") this._resource = undefined; //this.initResource();
     return this;
   }
@@ -487,6 +491,14 @@ export class Card {
 
   set liked(value: boolean) {
     this._liked = value;
+  }
+
+  get openInNewTab(): boolean {
+    return this._openInNewTab ? this._openInNewTab : false;
+  }
+
+  set openInNewTab(value: boolean) {
+    this._openInNewTab = value;
   }
 
   isType = (resourceType: string): boolean => {

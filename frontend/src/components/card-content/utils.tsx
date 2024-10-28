@@ -5,17 +5,19 @@ import { CardContentText } from "../card-content-text/cardContentText";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 
-export const redirect = (url: string) => {
-  window.open(url, "_blank", "noopener,noreferrer");
+export const redirect = (card: Card) => {
+  card.resourceType != RESOURCE_TYPE.LINK || card.openInNewTab
+    ? window.open(card.resourceUrl, "_blank", "noopener,noreferrer")
+    : window.open(card.resourceUrl);
 };
 export const onClick = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO:
       if (card.resourceUrl.startsWith("/workspace/")) return null;
-      else return redirect(card.resourceUrl);
+      else return redirect(card);
     case RESOURCE_TYPE.LINK:
-      return redirect(card.resourceUrl);
+      return redirect(card);
     case RESOURCE_TYPE.TEXT:
       return null;
     case RESOURCE_TYPE.IMAGE:

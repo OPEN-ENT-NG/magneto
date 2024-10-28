@@ -41,7 +41,8 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     useState<DisplayModalsState>(initialDisplayModals);
 
   const { id = "" } = useParams();
-  const { data: boardData, isLoading } = useGetBoardDataQuery(id);
+  const { data: boardData, isLoading, isFetching } = useGetBoardDataQuery(id);
+
   const [boardRights, setBoardRights] = useState<Record<
     RightRole,
     boolean
@@ -108,6 +109,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       zoomOut,
       resetZoom,
       isLoading,
+      isFetching,
       boardRights,
       hasEditRights,
       displayModals,

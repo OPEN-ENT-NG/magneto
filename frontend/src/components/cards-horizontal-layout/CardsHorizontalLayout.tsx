@@ -15,6 +15,7 @@ import { BoardCard } from "../board-card/BoardCard";
 import { CardWrapper } from "../cards-vertical-layout/style";
 import { DndSection } from "../dnd-section/DndSection";
 import { SectionName } from "../section-name/SectionName";
+import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { useSectionsDnD } from "~/hooks/dnd-hooks/useSectionsDnD";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
@@ -25,6 +26,7 @@ export const CardsHorizontalLayout: FC = () => {
     activeItem,
     updatedSections,
     sensors,
+    newMagnetOver,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
@@ -87,10 +89,23 @@ export const CardsHorizontalLayout: FC = () => {
               noCards={true}
               sectionType="horizontal"
               id="new-section"
+              data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
             >
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={null} />
               </Box>
+              <UlWrapper className="grid ps-0 list-unstyled left-float">
+                {newMagnetOver.map((card: Card) => (
+                  <CardBoxStyle key={card.id} zoomLevel={zoomLevel}>
+                    <BoardCard
+                      card={card}
+                      zoomLevel={zoomLevel}
+                      canComment={board.canComment}
+                      displayNbFavorites={board.displayNbFavorites}
+                    />
+                  </CardBoxStyle>
+                ))}
+              </UlWrapper>
             </DndSection>
           )}
         </Box>
@@ -98,7 +113,7 @@ export const CardsHorizontalLayout: FC = () => {
       <DragOverlay>
         {activeItem &&
           ("cards" in activeItem ? (
-            <SectionWrapper key={activeItem._id}>
+            <SectionWrapper isLast={true} key={activeItem._id}>
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={activeItem} />
               </Box>

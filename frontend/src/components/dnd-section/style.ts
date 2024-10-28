@@ -31,14 +31,11 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
         borderRight: !isLast ? "1px solid #aaa" : "",
         height: "100%",
         overflow: "hidden",
-
-        transform: isDragging ? "scale(1.05)" : "scale(1)",
         opacity: isDragging ? "0.5" : "1",
         cursor: isDragging ? "grabbing" : "grab",
       };
     case "horizontal":
       return {
-        transform: isDragging ? "scale(1.05)" : "scale(1)",
         opacity: isDragging ? "0.5" : "1",
         cursor: isDragging ? "grabbing" : "grab",
         boxSizing: "border-box",

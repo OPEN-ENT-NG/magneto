@@ -1,5 +1,5 @@
 export interface SectionWrapperProps {
-  sectionNumber: number;
+  sectionNumber?: number;
   isLast?: boolean;
   isDragging?: boolean;
 }

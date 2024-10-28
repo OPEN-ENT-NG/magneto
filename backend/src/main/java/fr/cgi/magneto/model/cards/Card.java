@@ -33,6 +33,7 @@ public class Card implements Model<Card> {
     private Integer nbOfComments;
     private Integer nbOfFavorites;
     private boolean isLiked;
+    private boolean openInNewTab;
 
     private List<String> favoriteList;
 
@@ -59,6 +60,7 @@ public class Card implements Model<Card> {
         this.favoriteList = (favoriteListOrNull != null) ? favoriteListOrNull.getList() : new JsonArray().getList();
         this.nbOfFavorites = card.getInteger(Field.NBOFFAVORITES, 0);
         this.isLiked = card.getBoolean(Field.ISLIKED, false);
+        this.openInNewTab = card.getBoolean(Field.OPENINNEWTAB, false);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -268,6 +270,15 @@ public class Card implements Model<Card> {
     public Card setFavoriteList(List<String> favoriteList) {
     	this.favoriteList = favoriteList;
     	return this;
+    }
+
+    public boolean openInNewTab() {
+        return openInNewTab;
+    }
+
+    public Card setOpenInNewTab(boolean willOpenInNewTab) {
+        this.openInNewTab = willOpenInNewTab;
+        return this;
     }
 
     @Override

@@ -109,6 +109,7 @@ public class Field {
     public static final String ISLOCKED = "isLocked";
     public static final String LOCKED = "locked";
     public static final String NBOFFAVORITES = "nbOfFavorites";
+    public static final String OPENINNEWTAB = "openInNewTab";
 
     public static final String FAVORITELIST = "favoriteList";
 

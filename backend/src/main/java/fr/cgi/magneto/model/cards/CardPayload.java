@@ -29,6 +29,7 @@ public class CardPayload implements Model<CardPayload> {
     private String boardId;
     private String sectionId;
     private List<String> favoriteList;
+    private boolean openInNewTab;
 
 
     public CardPayload(JsonObject card) {
@@ -48,6 +49,7 @@ public class CardPayload implements Model<CardPayload> {
         this.boardId = card.getString(Field.BOARDID);
         this.sectionId = card.getString(Field.SECTIONID);
         this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
+        this.openInNewTab = card.getBoolean(Field.OPENINNEWTAB, false);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -217,6 +219,15 @@ public class CardPayload implements Model<CardPayload> {
         return favoriteList;
     }
 
+    public boolean openInNewTab() {
+        return openInNewTab;
+    }
+
+    public CardPayload setOpenInNewTab(boolean willOpenInNewTab) {
+        this.openInNewTab = willOpenInNewTab;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
 
@@ -232,7 +243,8 @@ public class CardPayload implements Model<CardPayload> {
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.LASTMODIFIERID, this.getLastModifierId())
                 .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
-                .put(Field.FAVORITE_LIST, this.getFavoriteList());
+                .put(Field.FAVORITE_LIST, this.getFavoriteList())
+                .put(Field.OPENINNEWTAB, this.openInNewTab());
 
         // If create
         if (this.getId() == null) {

@@ -32,6 +32,9 @@
     },
     "boardId": {
       "type": "string"
+    },
+    "openInNewTab": {
+      "type": "boolean"
     }
   },
   "required": ["resourceType"]

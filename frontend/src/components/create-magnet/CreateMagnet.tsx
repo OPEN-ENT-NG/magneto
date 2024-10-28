@@ -118,7 +118,7 @@ export const CreateMagnet: FC = () => {
       resourceType: magnetType ?? convertMediaTypeToResourceType(media?.type),
       resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
       title: title,
-      openInNewTab: openInNewTab ? openInNewTab : null,
+      openInNewTab: openInNewTab,
       ...(section?._id ? { sectionId: section._id } : {}),
     };
     await createCard(payload);

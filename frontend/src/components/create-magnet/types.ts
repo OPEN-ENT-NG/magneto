@@ -12,4 +12,5 @@ export interface CardPayload {
   resourceUrl: string | null;
   sectionId?: string;
   title: string;
+  openInNewTab?: boolean;
 }

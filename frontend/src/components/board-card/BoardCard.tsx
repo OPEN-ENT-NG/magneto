@@ -87,6 +87,7 @@ export const BoardCard: FC<BoardCardProps> = ({
       scaleY: 1,
     }),
     transition: transition || undefined,
+    cursor: listeners ? "move" : "default",
   };
 
   useEffect(() => {

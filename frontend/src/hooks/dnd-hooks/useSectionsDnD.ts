@@ -39,7 +39,6 @@ export const useSectionsDnD = (board: Board) => {
   const [updateBoard] = useUpdateBoardMutation();
   const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
-console.log(isFetching);
 
   useEffect(() => {
     setUpdatedSections(board.sections);
@@ -56,6 +55,7 @@ console.log(isFetching);
     () => createSectionMap(updatedSections),
     [updatedSections, newMagnetOver],
   );
+
   const cardMap = useMemo(
     () => createCardMap(updatedSections),
     [updatedSections, newMagnetOver],
@@ -188,6 +188,7 @@ console.log(isFetching);
               const activeCard = activeSection.cards.find(
                 (card) => card.id === active.id.toString(),
               );
+
               const newCards = arrayMove(
                 [...section.cards, activeCard!],
                 section.cards.length,
@@ -431,7 +432,6 @@ console.log(isFetching);
         console.error("Active card not found");
         return;
       }
-      console.log(over.id);
 
       if (over.id === "new-section" || over.id === newMagnetOver[0]?.id) {
         setNewMagnetOver([]);
@@ -524,7 +524,6 @@ console.log(isFetching);
       );
     }
   }, [board._id, createSection, t, updatedSections.length]);
-  console.log(cardMap);
 
   return {
     newMagnetOver,

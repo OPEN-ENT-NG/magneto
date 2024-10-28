@@ -30,7 +30,6 @@ export class CustomPointerSensor extends PointerSensor {
         if (dropdownOpen || isNonDraggable) {
           return false;
         }
-
         const shouldActivate = !event.isPrimary || event.button === 0;
         if (shouldActivate) {
           onActivation?.({ event: event.nativeEvent });

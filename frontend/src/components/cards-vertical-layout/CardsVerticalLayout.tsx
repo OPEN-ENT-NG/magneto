@@ -34,8 +34,6 @@ export const CardsVerticalLayout: FC = () => {
 
   if (!updatedSections.length) return null;
 
-  console.log(newMagnetOver);
-
   return (
     <DndContext
       sensors={sensors}
@@ -114,10 +112,7 @@ export const CardsVerticalLayout: FC = () => {
       <DragOverlay>
         {activeItem &&
           ("cards" in activeItem ? (
-            <SectionWrapper
-              isLast={true}
-              key={activeItem._id}
-            >
+            <SectionWrapper isLast={true} key={activeItem._id}>
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={activeItem} />
               </Box>

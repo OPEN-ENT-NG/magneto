@@ -36,6 +36,7 @@ export const DndSection: FC<DndSectionProps> = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    cursor: listeners && id !== "new-section" ? "move" : "default",
   };
 
   return (
@@ -48,8 +49,7 @@ export const DndSection: FC<DndSectionProps> = ({
       sectionNumber={sectionNumber}
       sectionType={sectionType}
       isDragging={isDragging}
-      {...attributes}
-      {...listeners}
+      {...(id === "new-section" ? {} : { ...attributes, ...listeners })}
     >
       {children}
     </SectionWrapper>

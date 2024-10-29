@@ -318,7 +318,7 @@ export const CreateMagnet: FC = () => {
           appCode={appCode}
           ref={mediaLibraryRef}
           multiple={false}
-          visibility="public"
+          visibility="protected"
           {...mediaLibraryHandlers}
         />
       </Box>

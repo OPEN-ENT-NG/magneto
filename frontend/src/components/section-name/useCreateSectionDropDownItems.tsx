@@ -22,7 +22,7 @@ export const useCreateSectionDropDownItems: (
   const [duplicate] = useDuplicateSectionMutation();
   const [update] = useUpdateSectionMutation();
 
-  const { hasManagerRights } = useBoard();
+  const { hasManageRights } = useBoard();
 
   if (!section) return [];
 
@@ -84,7 +84,7 @@ export const useCreateSectionDropDownItems: (
     OnClick: duplicateSection,
   });
 
-  if (hasManagerRights()) {
+  if (hasManageRights()) {
     items.push(displayItem);
     items.push({
       primary: <Icon path={mdiDelete} size={"inherit"} />,

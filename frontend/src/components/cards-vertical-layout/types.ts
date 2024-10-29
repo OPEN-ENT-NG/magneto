@@ -3,3 +3,9 @@ export interface SectionWrapperProps {
   isLast?: boolean;
   isDragging?: boolean;
 }
+
+export type CardDisplayProps = {
+  zoomLevel: number;
+  canComment: boolean;
+  displayNbFavorites: boolean;
+};

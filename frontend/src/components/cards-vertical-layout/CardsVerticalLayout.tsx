@@ -158,13 +158,9 @@ export const CardsVerticalLayout: FC = () => {
     handleDragStart,
   ]);
 
-  const memoizedHandleDragOver = useCallback(handleDragOver, [
-    handleDragOver,
-  ]);
+  const memoizedHandleDragOver = useCallback(handleDragOver, [handleDragOver]);
 
-  const memoizedHandleDragEnd = useCallback(handleDragEnd, [
-    handleDragEnd,
-  ]);
+  const memoizedHandleDragEnd = useCallback(handleDragEnd, [handleDragEnd]);
 
   const memoizedHandleDragCancel = useCallback(handleDragCancel, [
     handleDragCancel,
@@ -201,6 +197,7 @@ export const CardsVerticalLayout: FC = () => {
   );
 
   if (!updatedSections.length) return null;
+  console.log(updatedSections[0].cardIds.length);
 
   return (
     <DndContext

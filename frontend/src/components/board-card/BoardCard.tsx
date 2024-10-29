@@ -50,7 +50,7 @@ const MemoizedCardComment = memo(
       prevComment.cardComment === nextComment.cardComment &&
       prevComment.nbOfComment === nextComment.nbOfComment
     );
-  }
+  },
 );
 
 const MemoizedCardHeader = memo(

@@ -44,13 +44,13 @@ const MemoizedCardComment = memo(
   (prevProps: CardCommentProps, nextProps: CardCommentProps) => {
     const prevComment = prevProps.commentData;
     const nextComment = nextProps.commentData;
-    
+
     return (
       prevComment.cardId === nextComment.cardId &&
       prevComment.cardComment === nextComment.cardComment &&
       prevComment.nbOfComment === nextComment.nbOfComment
     );
-  }
+  },
 );
 
 const MemoizedCardHeader = memo(
@@ -317,7 +317,7 @@ const MemoizedBoardCard = memo(BoardCard, (prevProps, nextProps) => {
     prevProps.card.modificationDate === nextProps.card.modificationDate &&
     prevProps.zoomLevel === nextProps.zoomLevel &&
     prevProps.canComment === nextProps.canComment &&
-    prevProps.card.lastComment === nextProps.card.lastComment && 
+    prevProps.card.lastComment === nextProps.card.lastComment &&
     prevProps.card.nbOfComments === nextProps.card.nbOfComments &&
     prevProps.displayNbFavorites === nextProps.displayNbFavorites &&
     prevProps.readOnly === nextProps.readOnly

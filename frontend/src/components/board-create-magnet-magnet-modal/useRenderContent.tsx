@@ -144,20 +144,22 @@ export const useRenderContent = (
     );
   } else {
     return cardsData.length ? (
-      <Grid container spacing={2} p={".5rem"}>
-        {cardsData.map((card: Card) => (
-          <Grid item key={card.id}>
-            <BoardCardWrapper
-              isCardSelected={isCardSelected(card.id)}
-              onClick={() => {
-                updateSelectedMagnets(card.id);
-              }}
-            >
-              <BoardCard card={card} zoomLevel={zoomLevel} readOnly={true} />
-            </BoardCardWrapper>
-          </Grid>
-        ))}
-      </Grid>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Grid container spacing={2} p={".5rem"}>
+          {cardsData.map((card: Card) => (
+            <Grid item key={card.id}>
+              <BoardCardWrapper
+                isCardSelected={isCardSelected(card.id)}
+                onClick={() => {
+                  updateSelectedMagnets(card.id);
+                }}
+              >
+                <BoardCard card={card} zoomLevel={zoomLevel} readOnly={true} />
+              </BoardCardWrapper>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     ) : (
       <EmptyState title={t("magneto.cards.empty.text")} />
     );

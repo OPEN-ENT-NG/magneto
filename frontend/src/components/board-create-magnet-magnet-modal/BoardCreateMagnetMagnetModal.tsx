@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 
-import { Button, SearchBar } from "@edifice-ui/react";
+import { Button, SearchBar, useToast } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -40,6 +40,7 @@ export const BoardCreateMagnetMagnetModal: FC<
   const { currentTab, isByBoards, isByFavorite } = inputValue;
   const { t } = useTranslation("magneto");
   const [duplicateCard] = useDuplicateCardMutation();
+  const toast = useToast();
 
   const handleSwitchChange = (key: "isByBoards" | "isByFavorite") => {
     setInputValue((prevState) => ({
@@ -75,8 +76,13 @@ export const BoardCreateMagnetMagnetModal: FC<
         boardId: board._id,
         cardIds: inputValue.cardIds,
       };
-      await duplicateCard(magnetMagnetParams);
-      onCloseModal();
+      try {
+        await duplicateCard(magnetMagnetParams);
+        toast.success(t("magneto.duplicate.cards.confirm"));
+        onCloseModal();
+      } catch (err) {
+        console.error("failed to duplicate cards");
+      }
     }
   };
 
@@ -105,7 +111,7 @@ export const BoardCreateMagnetMagnetModal: FC<
             <CloseIcon fontSize="inherit" />
           </IconButton>
         </Box>
-        <Box sx={{ width: "100%", padding: "0 10%", margin: "auto" }}>
+        <Box sx={{ width: "100%", padding: "2rem 10%", margin: "auto" }}>
           <SearchBar
             onChange={(e) => {
               handleSearchChange(e.target.value);
@@ -116,7 +122,17 @@ export const BoardCreateMagnetMagnetModal: FC<
             className="searchbar"
           />
         </Box>
-        <TabList currentTab={currentTab} onChange={handleTabChange} />
+        <Box
+          sx={{
+            width: "100%",
+            pb: "1rem",
+            margin: "auto",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <TabList currentTab={currentTab} onChange={handleTabChange} />
+        </Box>
         <FormGroup sx={formGroupStyle}>
           <StyledFormControlLabel
             control={

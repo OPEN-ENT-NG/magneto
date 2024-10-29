@@ -39,7 +39,8 @@ export const handleCardSize = (zoomLevel: number) => {
 };
 
 export const StyledCard = styled(Card, {
-  shouldForwardProp: (prop) => prop !== "zoomLevel",
+  shouldForwardProp: (prop) =>
+    !["zoomLevel", "isDragging"].includes(prop as string),
 })<{ zoomLevel: number; isDragging: boolean }>(
   ({ zoomLevel = 3, isDragging = false }) => ({
     display: "flex",
@@ -51,7 +52,6 @@ export const StyledCard = styled(Card, {
     boxShadow: "0 1px 3px rgba(0,0,0,.1)",
     width: handleCardSize(zoomLevel).width,
     height: handleCardSize(zoomLevel).height,
-
     opacity: isDragging ? "0.5" : "1",
     cursor: isDragging ? "grabbing" : "grab",
   }),

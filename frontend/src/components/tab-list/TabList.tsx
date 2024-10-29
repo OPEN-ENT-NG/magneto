@@ -2,7 +2,6 @@
 
 import { FC, SyntheticEvent } from "react";
 
-import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 
 import { StyledTab, tabsStyle } from "./style";

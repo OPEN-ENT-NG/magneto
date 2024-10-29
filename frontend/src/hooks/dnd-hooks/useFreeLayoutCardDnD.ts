@@ -21,7 +21,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
   const sensors = useSensors(
     useSensor(CustomPointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 1,
       },
     }),
   );

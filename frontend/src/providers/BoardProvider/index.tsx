@@ -73,6 +73,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   };
 
   const updateRights = async (rights: any) => {
+
+    console.log(rights);
+    console.log(await checkUserRight(rights, "publish"));
+
     setBoardRights(await checkUserRight(rights, "publish"));
   };
 
@@ -92,14 +96,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
 
   const hasEditRights = (): boolean => {
     return board.owner.userId === user?.userId || !!boardRights?.publish;
-  };
-
-  const hasManagerRights = (): boolean => {
-    return board.owner.userId === user?.userId || !!boardRights?.manager;
-  };
-
-  const hasManageRights = (): boolean => {
-    return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
 
   const hasManageRights = (): boolean => {

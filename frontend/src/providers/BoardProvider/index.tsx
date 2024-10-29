@@ -73,7 +73,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   };
 
   const updateRights = async (rights: any) => {
-    setBoardRights(await checkUserRight(rights));
+    setBoardRights(await checkUserRight(rights, "publish"));
   };
 
   useEffect(() => {
@@ -91,6 +91,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   }, [boardData]);
 
   const hasEditRights = (): boolean => {
+    return board.owner.userId === user?.userId || !!boardRights?.publish;
+  };
+
+  const hasManagerRights = (): boolean => {
     return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
 
@@ -112,6 +116,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isFetching,
       boardRights,
       hasEditRights,
+      hasManagerRights,
       displayModals,
       toggleBoardModals,
     }),

@@ -11,6 +11,7 @@ import {
   useDuplicateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const useCreateSectionDropDownItems: (
   section: Section | null | undefined,
@@ -20,6 +21,8 @@ export const useCreateSectionDropDownItems: (
   const toast = useToast();
   const [duplicate] = useDuplicateSectionMutation();
   const [update] = useUpdateSectionMutation();
+
+  const { hasManagerRights } = useBoard();
 
   if (!section) return [];
 
@@ -72,17 +75,23 @@ export const useCreateSectionDropDownItems: (
         secondary: t("magneto.card.options.hide.section.on"),
         OnClick: toggleDisplay,
       };
-  return [
-    {
-      primary: <Icon path={mdiFileMultipleOutline} size={"inherit"} />,
-      secondary: t("magneto.duplicate"),
-      OnClick: duplicateSection,
-    },
-    displayItem,
-    {
+
+  const items: DropDownListItem[] = [];
+
+  items.push({
+    primary: <Icon path={mdiFileMultipleOutline} size={"inherit"} />,
+    secondary: t("magneto.duplicate"),
+    OnClick: duplicateSection,
+  });
+
+  if (hasManagerRights()) {
+    items.push(displayItem);
+    items.push({
       primary: <Icon path={mdiDelete} size={"inherit"} />,
       secondary: t("magneto.delete"),
       OnClick: toggleModal,
-    },
-  ];
+    });
+  }
+
+  return items;
 };

@@ -21,6 +21,7 @@ export type BoardContextType = {
   isFetching: boolean;
   boardRights: Record<RightRole, boolean> | null;
   hasEditRights: () => boolean;
+  hasManagerRights: () => boolean;
   displayModals: DisplayModalsState;
   toggleBoardModals: (modalType: BOARD_MODAL_TYPE) => void;
 };

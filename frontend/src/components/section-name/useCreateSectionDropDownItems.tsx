@@ -6,12 +6,12 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
+import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import {
   useDuplicateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
-import { useBoard } from "~/providers/BoardProvider";
 
 export const useCreateSectionDropDownItems: (
   section: Section | null | undefined,

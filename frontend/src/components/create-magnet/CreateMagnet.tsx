@@ -128,7 +128,7 @@ export const CreateMagnet: FC = () => {
       if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
       if (magnetTypeHasLink) {
         setLinkUrl(media.url);
-        setTitle(media.name.replace(/^https?:\/\//, ""));
+        setTitle(media.name.replace(/^(?:https?:\/\/(?:www\.)?|www\.)/, ""));
       } else if (!magnetTypeHasVideo)
         setTitle(media.name.split(".").slice(0, -1).join("."));
     }

@@ -6,6 +6,7 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
+import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import {
   useDuplicateSectionMutation,
@@ -20,6 +21,8 @@ export const useCreateSectionDropDownItems: (
   const toast = useToast();
   const [duplicate] = useDuplicateSectionMutation();
   const [update] = useUpdateSectionMutation();
+
+  const { hasManagerRights } = useBoard();
 
   if (!section) return [];
 
@@ -72,17 +75,23 @@ export const useCreateSectionDropDownItems: (
         secondary: t("magneto.card.options.hide.section.on"),
         OnClick: toggleDisplay,
       };
-  return [
-    {
-      primary: <Icon path={mdiFileMultipleOutline} size={"inherit"} />,
-      secondary: t("magneto.duplicate"),
-      OnClick: duplicateSection,
-    },
-    displayItem,
-    {
+
+  const items: DropDownListItem[] = [];
+
+  items.push({
+    primary: <Icon path={mdiFileMultipleOutline} size={"inherit"} />,
+    secondary: t("magneto.duplicate"),
+    OnClick: duplicateSection,
+  });
+
+  if (hasManagerRights()) {
+    items.push(displayItem);
+    items.push({
       primary: <Icon path={mdiDelete} size={"inherit"} />,
       secondary: t("magneto.delete"),
       OnClick: toggleModal,
-    },
-  ];
+    });
+  }
+
+  return items;
 };

@@ -7,7 +7,7 @@ export const modalContainerStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "110rem",
+  width: "130rem",
   bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: "1.6rem",
@@ -27,7 +27,7 @@ export const headerStyle = {
 export const titleStyle = {
   fontWeight: "bold",
   fontFamily: "Comfortaa",
-  fontSize: "1.8rem",
+  fontSize: "2.6rem",
 };
 
 export const closeButtonStyle = {
@@ -101,7 +101,16 @@ export const boardTitleWrapperStyle = {
   marginBottom: "1.5rem",
 };
 
-export const boardTitleButton = { color: "black", textDecoration: "underline" };
+export const boardTitleButton = {
+  color: "#555555",
+  textDecoration: "underline",
+  textTransform: "none",
+  fontSize: "1.5rem",
+  "&:hover": {
+    textDecoration: "underline",
+    background: "transparent",
+  },
+};
 
 export const listStyle = {
   width: "100%",

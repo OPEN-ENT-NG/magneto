@@ -157,11 +157,9 @@ export const BoardCard: FC<BoardCardProps> = ({
           {displayNbFavorites && (
             <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>
           )}
-          {!readOnly && (
-            <BottomIconButton aria-label="add to favorites" size="small">
-              <StarBorderIcon />
-            </BottomIconButton>
-          )}
+          <BottomIconButton aria-label="add to favorites" size="small">
+            <StarBorderIcon />
+          </BottomIconButton>
         </StyledBox>
       </StyledCardActions>
       {isOpen && dropdownRef.current && (

@@ -17,21 +17,19 @@ export const TabList: FC<TabListProps> = ({ currentTab, onChange }) => {
   const tabs = useTabs();
 
   return (
-    <Box>
-      <Tabs
-        sx={tabsStyle}
-        value={currentTab}
-        onChange={handleChange}
-        aria-label="basic tabs example"
-      >
-        {tabs.map((item) => (
-          <StyledTab
-            key={item.tabValue}
-            label={item.label.toUpperCase()}
-            value={item.tabValue}
-          />
-        ))}
-      </Tabs>
-    </Box>
+    <Tabs
+      sx={tabsStyle}
+      value={currentTab}
+      onChange={handleChange}
+      aria-label="basic tabs example"
+    >
+      {tabs.map((item) => (
+        <StyledTab
+          key={item.tabValue}
+          label={item.label.toUpperCase()}
+          value={item.tabValue}
+        />
+      ))}
+    </Tabs>
   );
 };

@@ -6,6 +6,7 @@ export interface DndSectionProps {
   sectionType: "vertical" | "horizontal";
   isLast?: boolean;
   isDragging?: boolean;
+  readOnly?: boolean;
 
   //horizontal
   noCards?: boolean;

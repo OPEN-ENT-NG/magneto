@@ -94,7 +94,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     return board.owner.userId === user?.userId || !!boardRights?.publish;
   };
 
-  const hasManagerRights = (): boolean => {
+  const hasManageRights = (): boolean => {
     return board.owner.userId === user?.userId || !!boardRights?.manager;
   };
 
@@ -116,7 +116,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isFetching,
       boardRights,
       hasEditRights,
-      hasManagerRights,
+      hasManageRights,
       displayModals,
       toggleBoardModals,
     }),

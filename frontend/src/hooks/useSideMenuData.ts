@@ -31,7 +31,7 @@ export const useSideMenuData = (): (
   const { handleClickMedia, handleClickMenu } = useMediaLibrary();
   const { toggleBoardModals, hasManageRights } = useBoard();
 
-  const items: any[] = [];
+  const items: (SideMenuIconProp | SideMenuDividerProp)[] = [];
 
   items.push(
     {

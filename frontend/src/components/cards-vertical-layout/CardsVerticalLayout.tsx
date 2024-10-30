@@ -20,7 +20,7 @@ import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsVerticalLayout: FC = () => {
-  const { board, zoomLevel, hasEditRights } = useBoard();
+  const { board, zoomLevel, hasEditRights, hasManageRights } = useBoard();
   const {
     activeItem,
     updatedSections,
@@ -54,10 +54,11 @@ export const CardsVerticalLayout: FC = () => {
               noCards={!section.cards.length}
               sectionType="vertical"
               sectionNumber={
-                hasEditRights()
+                hasManageRights()
                   ? updatedSections.length + 1
                   : updatedSections.length
               }
+              readOnly={!hasEditRights()}
             >
               <Box sx={sectionNameWrapperStyle}>
                 <SectionName section={section} />
@@ -74,6 +75,7 @@ export const CardsVerticalLayout: FC = () => {
                         zoomLevel={zoomLevel}
                         canComment={board.canComment}
                         displayNbFavorites={board.displayNbFavorites}
+                        readOnly={!hasEditRights()}
                       />
                     </CardWrapper>
                   ))}
@@ -81,7 +83,7 @@ export const CardsVerticalLayout: FC = () => {
               </CardsWrapper>
             </DndSection>
           ))}
-          {hasEditRights() && (
+          {hasManageRights() && (
             <DndSection
               sectionNumber={updatedSections.length + 1}
               isLast={true}

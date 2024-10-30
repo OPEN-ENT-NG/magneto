@@ -61,7 +61,6 @@ export const useMediaLibrary = () => {
         break;
       }
       default: {
-        console.log(result[0]);
         updatedMedia = result[0];
       }
     }

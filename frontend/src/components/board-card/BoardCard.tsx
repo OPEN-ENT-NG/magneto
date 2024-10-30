@@ -171,7 +171,7 @@ export const BoardCard: FC<BoardCardProps> = ({
           position="right-top"
         />
       )}
-      {canComment && zoomLevel > 1 && !readOnly && (
+      {canComment && zoomLevel > 1 && (
         <CardComment
           commentData={{
             cardComment: card.lastComment,

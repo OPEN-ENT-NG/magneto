@@ -20,7 +20,7 @@ import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsVerticalLayout: FC = () => {
-  const { board, zoomLevel, hasEditRights, hasManageRights } = useBoard();
+  const { board, zoomLevel, hasEditRights } = useBoard();
   const {
     activeItem,
     updatedSections,
@@ -54,7 +54,7 @@ export const CardsVerticalLayout: FC = () => {
               noCards={!section.cards.length}
               sectionType="vertical"
               sectionNumber={
-                hasManageRights()
+                hasEditRights()
                   ? updatedSections.length + 1
                   : updatedSections.length
               }
@@ -83,7 +83,7 @@ export const CardsVerticalLayout: FC = () => {
               </CardsWrapper>
             </DndSection>
           ))}
-          {hasManageRights() && (
+          {hasEditRights() && (
             <DndSection
               sectionNumber={updatedSections.length + 1}
               isLast={true}

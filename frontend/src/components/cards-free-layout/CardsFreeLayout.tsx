@@ -8,6 +8,7 @@ import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { CardDisplayProps } from "../cards-vertical-layout/types";
 import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
+import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
 const MemoizedBoardCard = memo(BoardCard);
@@ -21,7 +22,7 @@ const MemoizedCardItem = memo(
     totalCards,
   }: {
     cardId: string;
-    card: any;
+    card: Card;
     displayProps: CardDisplayProps;
     index: number;
     totalCards: number;
@@ -59,7 +60,7 @@ const MemoizedDragOverlay = memo(
     activeItem,
     displayProps,
   }: {
-    activeItem: any;
+    activeItem: Card | null;
     displayProps: CardDisplayProps;
   }) => {
     if (!activeItem) return null;

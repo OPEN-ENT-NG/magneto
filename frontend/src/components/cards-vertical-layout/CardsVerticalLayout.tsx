@@ -15,10 +15,11 @@ import { CardDisplayProps } from "./types";
 import { BoardCard } from "../board-card/BoardCard";
 import { DndSection } from "../dnd-section/DndSection";
 import { SectionName } from "../section-name/SectionName";
-import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
+import { ActiveItemState, DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useSectionsDnD from "~/hooks/dnd-hooks/useSectionsDnD";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
+import { Section } from "~/providers/BoardProvider/types";
 
 const MemoizedBoardCard = memo(BoardCard);
 
@@ -78,7 +79,7 @@ const MemoizedSection = memo(
     isLast = false,
     isDraggable = true,
   }: {
-    section: any;
+    section: Section;
     sectionNumber: number;
     displayProps: CardDisplayProps;
     isLast?: boolean;
@@ -109,7 +110,7 @@ const MemoizedDragOverlay = memo(
     activeItem,
     displayProps,
   }: {
-    activeItem: any;
+    activeItem: ActiveItemState;
     displayProps: CardDisplayProps;
   }) => {
     if (!activeItem) return null;
@@ -220,7 +221,7 @@ export const CardsVerticalLayout: FC = () => {
 
           {hasEditRights() && (
             <MemoizedSection
-              section={editRightsSection}
+              section={editRightsSection as Section}
               sectionNumber={sectionCount + 1}
               displayProps={displayProps}
               isLast={true}

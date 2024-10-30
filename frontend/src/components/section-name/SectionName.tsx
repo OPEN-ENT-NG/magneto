@@ -136,7 +136,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         disabled={!hasEditRights()}
         fullWidth
       />
-      {section && hasEditRights() && (
+      {section._id !== "new-section" && hasEditRights() && (
         <IconButton
           size="large"
           sx={iconButtonStyle}

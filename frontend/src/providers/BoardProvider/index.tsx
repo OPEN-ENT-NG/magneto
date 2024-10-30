@@ -73,9 +73,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   };
 
   const updateRights = async (rights: any) => {
-    console.log(rights);
-    console.log(await checkUserRight(rights, "publish"));
-
     setBoardRights(await checkUserRight(rights, "publish"));
   };
 

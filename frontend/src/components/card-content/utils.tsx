@@ -42,7 +42,7 @@ export const displayContentByType = (card: Card) => {
       return (
         <CardContentAudio
           ressourceId={card.resourceId}
-          type={card.metadata.contentType}
+          type={card.metadata.contentType ?? ""}
         />
       );
     case RESOURCE_TYPE.FILE:

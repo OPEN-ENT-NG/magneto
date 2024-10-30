@@ -21,7 +21,7 @@ import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const CardsHorizontalLayout: FC = () => {
-  const { board, zoomLevel, hasEditRights, hasManageRights } = useBoard();
+  const { board, zoomLevel, hasEditRights } = useBoard();
   const {
     activeItem,
     updatedSections,
@@ -55,7 +55,7 @@ export const CardsHorizontalLayout: FC = () => {
               noCards={!section.cards.length}
               sectionType="horizontal"
               sectionNumber={
-                hasManageRights()
+                hasEditRights()
                   ? updatedSections.length + 1
                   : updatedSections.length
               }
@@ -84,7 +84,7 @@ export const CardsHorizontalLayout: FC = () => {
               </UlWrapper>
             </DndSection>
           ))}
-          {hasManageRights() && (
+          {hasEditRights() && (
             <DndSection
               sectionNumber={updatedSections.length + 1}
               isLast={true}

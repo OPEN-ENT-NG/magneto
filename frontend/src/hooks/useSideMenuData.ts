@@ -29,9 +29,11 @@ export const useSideMenuData = (): (
 )[] => {
   const { t } = useTranslation("magneto");
   const { handleClickMedia, handleClickMenu } = useMediaLibrary();
-  const { toggleBoardModals } = useBoard();
+  const { toggleBoardModals, hasManageRights } = useBoard();
 
-  return [
+  const items: (SideMenuIconProp | SideMenuDividerProp)[] = [];
+
+  items.push(
     {
       icon: createElement(Icon, { path: mdiFormatSize, size: 1.5 }),
       name: t("magneto.card.type.text"),
@@ -72,15 +74,22 @@ export const useSideMenuData = (): (
         handleClickMenu(MENU_NOT_MEDIA_TYPE.CARD);
       },
     },
-    {
-      divider: true,
-    },
-    {
-      icon: createElement(Icon, { path: mdiCog, size: 1.5 }),
-      name: "",
-      action: () => {
-        toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS);
+  );
+
+  if (hasManageRights()) {
+    items.push(
+      {
+        divider: true,
       },
-    },
-  ];
+      {
+        icon: createElement(Icon, { path: mdiCog, size: 1.5 }),
+        name: "",
+        action: () => {
+          toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS);
+        },
+      },
+    );
+  }
+
+  return items;
 };

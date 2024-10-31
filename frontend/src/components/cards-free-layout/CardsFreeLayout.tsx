@@ -63,6 +63,7 @@ const MemoizedDragOverlay = memo(
     activeItem: Card | null;
     displayProps: CardDisplayProps;
   }) => {
+    const { hasEditRights } = useBoard();
     if (!activeItem) return null;
 
     return (
@@ -78,7 +79,7 @@ const MemoizedDragOverlay = memo(
 );
 
 export const CardsFreeLayout: FC = () => {
-  const { board, zoomLevel, hasEditRights } = useBoard();
+  const { board, zoomLevel } = useBoard();
   const {
     updatedIds,
     activeItem,

@@ -774,7 +774,8 @@ public class DefaultCardService implements CardService {
         }
         List<String> groupField = Arrays.asList(Field.TITLE, Field.DESCRIPTION, Field.CAPTION, Field.RESOURCEID, Field.RESOURCETYPE, Field.RESOURCEURL);
         List<String> externalGroupField = Arrays.asList(Field.PARENTID, Field._ID, Field.CREATIONDATE, Field.BOARDID,
-                Field.MODIFICATIONDATE, Field.OWNERID, Field.OWNERNAME, Field.LASTMODIFIERID, Field.LASTMODIFIERNAME, Field.RESULT, Field.FAVORITELIST, Field.ISLIKED);
+                Field.MODIFICATIONDATE, Field.OWNERID, Field.OWNERNAME, Field.LASTMODIFIERID, Field.LASTMODIFIERNAME, Field.RESULT, Field.FAVORITELIST,
+                Field.ISLIKED, Field.OPENINNEWTAB);
         Map<String, String> fieldAccumulators = new HashMap<>();
         for (String field : externalGroupField) {
             fieldAccumulators.put(field, field.equals(Field.ISLIKED) ? Mongo.MAX : Mongo.FIRST);

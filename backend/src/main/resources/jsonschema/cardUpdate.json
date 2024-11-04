@@ -31,7 +31,7 @@
       "type": "string"
     },
     "openInNewTab": {
-      "type": "boolean"
+      "type": ["boolean", "null"]
     }
   },
   "required": ["resourceType", "boardId"]

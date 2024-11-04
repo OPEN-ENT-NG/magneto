@@ -34,8 +34,8 @@
       "type": "string"
     },
     "openInNewTab": {
-      "type": "boolean"
+      "type": ["boolean", "null"]
     }
   },
-  "required": ["resourceType"]
+  "required": ["resourceType", "openInNewTab"]
 }

@@ -24,13 +24,22 @@ import { Section } from "~/providers/BoardProvider/types";
 const MemoizedBoardCard = memo(BoardCard);
 
 const MemoizedCardWrapper = memo(
-  ({ card, displayProps }: { card: Card; displayProps: CardDisplayProps }) => (
+  ({
+    card,
+    displayProps,
+    hasEditRights,
+  }: {
+    card: Card;
+    displayProps: CardDisplayProps;
+    hasEditRights: boolean;
+  }) => (
     <CardWrapper>
       <MemoizedBoardCard
         card={card}
         zoomLevel={displayProps.zoomLevel}
         canComment={displayProps.canComment}
         displayNbFavorites={displayProps.displayNbFavorites}
+        readOnly={!hasEditRights}
       />
     </CardWrapper>
   ),
@@ -42,7 +51,8 @@ const MemoizedCardWrapper = memo(
       prevProps.card.lastComment === nextProps.card.lastComment &&
       prevProps.card.nbOfComments === nextProps.card.nbOfComments &&
       prevProps.displayProps.displayNbFavorites ===
-        nextProps.displayProps.displayNbFavorites
+        nextProps.displayProps.displayNbFavorites &&
+      prevProps.hasEditRights === nextProps.hasEditRights
     );
   },
 );
@@ -52,10 +62,12 @@ const MemoizedCardsSection = memo(
     cards,
     cardIds,
     displayProps,
+    hasEditRights,
   }: {
     cards: Card[];
     cardIds: string[];
     displayProps: CardDisplayProps;
+    hasEditRights: boolean;
   }) => (
     <CardsWrapper zoomLevel={displayProps.zoomLevel}>
       <SortableContext items={cardIds} strategy={rectSortingStrategy}>
@@ -64,6 +76,7 @@ const MemoizedCardsSection = memo(
             key={card.id}
             card={card}
             displayProps={displayProps}
+            hasEditRights={hasEditRights}
           />
         ))}
       </SortableContext>
@@ -76,12 +89,16 @@ const MemoizedSection = memo(
     section,
     sectionNumber,
     displayProps,
+    hasEditRights,
+    hasManageRights,
     isLast = false,
     isDraggable = true,
   }: {
     section: Section;
     sectionNumber: number;
     displayProps: CardDisplayProps;
+    hasEditRights: boolean;
+    hasManageRights: boolean;
     isLast?: boolean;
     isDraggable?: boolean;
   }) => (
@@ -92,6 +109,7 @@ const MemoizedSection = memo(
       sectionNumber={sectionNumber}
       isLast={isLast}
       data-type={!isDraggable ? DND_ITEM_TYPE.NON_DRAGGABLE : undefined}
+      readOnly={!hasManageRights}
     >
       <Box sx={sectionNameWrapperStyle}>
         <SectionName section={section} />
@@ -100,18 +118,20 @@ const MemoizedSection = memo(
         cards={section.cards}
         cardIds={section.cardIds}
         displayProps={displayProps}
+        hasEditRights={hasEditRights}
       />
     </DndSection>
   ),
 );
-
 const MemoizedDragOverlay = memo(
   ({
     activeItem,
     displayProps,
+    hasEditRights,
   }: {
     activeItem: ActiveItemState;
     displayProps: CardDisplayProps;
+    hasEditRights: boolean;
   }) => {
     if (!activeItem) return null;
 
@@ -127,6 +147,7 @@ const MemoizedDragOverlay = memo(
                 key={card.id}
                 card={card}
                 displayProps={displayProps}
+                hasEditRights={hasEditRights}
               />
             ))}
           </CardsWrapper>
@@ -138,12 +159,13 @@ const MemoizedDragOverlay = memo(
       <MemoizedCardWrapper
         card={activeItem as Card}
         displayProps={displayProps}
+        hasEditRights={hasEditRights}
       />
     );
   },
 );
 export const CardsVerticalLayout: FC = () => {
-  const { board, zoomLevel, hasEditRights } = useBoard();
+  const { board, zoomLevel, hasEditRights, hasManageRights } = useBoard();
   const {
     activeItem,
     updatedSections,
@@ -216,6 +238,8 @@ export const CardsVerticalLayout: FC = () => {
               section={section}
               sectionNumber={sectionNumber}
               displayProps={displayProps}
+              hasEditRights={hasEditRights()}
+              hasManageRights={hasManageRights()}
             />
           ))}
 
@@ -224,6 +248,8 @@ export const CardsVerticalLayout: FC = () => {
               section={editRightsSection as Section}
               sectionNumber={sectionCount + 1}
               displayProps={displayProps}
+              hasEditRights={hasEditRights()}
+              hasManageRights={hasManageRights()}
               isLast={true}
               isDraggable={false}
             />
@@ -235,6 +261,7 @@ export const CardsVerticalLayout: FC = () => {
         <MemoizedDragOverlay
           activeItem={activeItem}
           displayProps={displayProps}
+          hasEditRights={hasEditRights()}
         />
       </DragOverlay>
     </DndContext>

@@ -74,7 +74,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       setInputValue(section?.title ?? "");
       return toast.warning(t("magneto.change.section.empty.title"));
     }
-    if (section) {
+    if (section?._id !== "new-section") {
       if (section.title === inputValue) return;
       return updateSectionAndToast({
         boardId,
@@ -124,7 +124,11 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
         sx={inputStyle}
         value={inputValue}
-        placeholder={section ? "" : t("magneto.section.insert.title")}
+        placeholder={
+          section?._id === "new-section"
+            ? t("magneto.section.insert.title")
+            : ""
+        }
         onChange={handleInputChange}
         onBlur={handleKeyDownAndBlur}
         onKeyDown={handleKeyDown}
@@ -132,7 +136,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         disabled={!hasEditRights()}
         fullWidth
       />
-      {section && hasEditRights() && (
+      {section._id !== "new-section" && hasEditRights() && (
         <IconButton
           size="large"
           sx={iconButtonStyle}

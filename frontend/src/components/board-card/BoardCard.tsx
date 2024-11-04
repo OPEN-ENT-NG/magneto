@@ -1,185 +1,327 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useMemo, useCallback, memo } from "react";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import { Tooltip } from "@mui/material";
 
 import {
-  StyledTypography,
-  StyledCard,
   StyledCardHeader,
+  StyledAvatar,
   StyledIconButton,
   StyledTypographySubheader,
-  StyledAvatar,
   StyledCardContent,
   StyledContentTitleTypography,
-  StyledCardActions,
-  StyledLegendTypography,
   CardContentWrapper,
+  StyledCardActions,
+  StyledTypographyContainer,
+  StyledTypography,
+  StyledLegendTypography,
   StyledBox,
   Simple14Typography,
   BottomIconButton,
-  StyledTypographyContainer,
+  StyledCard,
 } from "./style";
 import { BoardCardProps } from "./types";
 import { useCardDropDownItems } from "./useCardDropDownItems";
 import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
 import { CardComment } from "../card-comment/CardComment";
+import { CardCommentProps } from "../card-comment/types";
 import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
-import { Tooltip } from "../tooltip/Tooltip";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 
-export const BoardCard: FC<BoardCardProps> = ({
-  card,
-  zoomLevel,
-  canComment = false,
-  displayNbFavorites = false,
-  readOnly = false,
-}) => {
-  const { icon, type } = useResourceTypeDisplay(card.resourceType);
-  const time = useElapsedTime(card.modificationDate);
-  const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
-    useDropdown();
+const MemoizedCardContent = memo(CardContent);
+const MemoizedDropDownList = memo(DropDownList);
 
-  const dropDownItemList = useCardDropDownItems(readOnly);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const isOpen = openDropdownId === card.id;
-  const { getAvatarURL } = useDirectory();
-  const handleToggleDropdown = () => {
-    if (card.id) {
-      toggleDropdown(card.id);
-    }
-  };
+const MemoizedCardComment = memo(
+  CardComment,
+  (prevProps: CardCommentProps, nextProps: CardCommentProps) => {
+    const prevComment = prevProps.commentData;
+    const nextComment = nextProps.commentData;
 
-  useEffect(() => {
-    registerDropdown(card.id, dropdownRef.current);
-  }, [card.id, registerDropdown]);
+    return (
+      prevComment.cardId === nextComment.cardId &&
+      prevComment.cardComment === nextComment.cardComment &&
+      prevComment.nbOfComment === nextComment.nbOfComment
+    );
+  },
+);
 
-  const sortableProps = useSortable({
-    id: card.id,
-    data: {
-      type: DND_ITEM_TYPE.CARD,
-      card: card,
-    },
-    disabled: readOnly,
-  });
+const MemoizedCardHeader = memo(
+  ({
+    avatarUrl,
+    ownerName,
+    timeLabel,
+    timeTooltip,
+    onToggleDropdown,
+  }: {
+    avatarUrl: string;
+    ownerName: string;
+    timeLabel: string;
+    timeTooltip: string;
+    onToggleDropdown: () => void;
+  }) => (
+    <StyledCardHeader
+      avatar={<StyledAvatar aria-label="recipe" src={avatarUrl} />}
+      action={
+        <StyledIconButton aria-label="settings" onClick={onToggleDropdown}>
+          <MoreVertIcon />
+        </StyledIconButton>
+      }
+      title={ownerName}
+      subheader={
+        <Tooltip title={timeTooltip} placement="bottom-start">
+          <StyledTypographySubheader>{timeLabel}</StyledTypographySubheader>
+        </Tooltip>
+      }
+    />
+  ),
+);
 
-  const {
-    isDragging,
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = sortableProps;
+const MemoizedContent = memo(
+  ({
+    title,
+    zoomLevel,
+    resourceType,
+    card,
+  }: {
+    title: string;
+    zoomLevel: number;
+    resourceType: string;
+    card: any;
+  }) => (
+    <StyledCardContent>
+      <StyledContentTitleTypography zoomLevel={zoomLevel}>
+        {title || <span>&nbsp;</span>}
+      </StyledContentTitleTypography>
+      {zoomLevel > 1 && (
+        <CardContentWrapper resourceType={resourceType}>
+          <MemoizedCardContent card={card} />
+        </CardContentWrapper>
+      )}
+    </StyledCardContent>
+  ),
+);
 
-  const style = {
-    transform: CSS.Translate.toString({
-      x: transform?.x ?? 0,
-      y: transform?.y ?? 0,
-      scaleX: 1,
-      scaleY: 1,
-    }),
-    transition: transition || undefined,
-    cursor: listeners ? "move" : "default",
-  };
-
-  useEffect(() => {
-    registerDropdown(card.id, dropdownRef.current);
-  }, [card.id, registerDropdown]);
-
-  useEffect(() => {
-    if (isDragging) return closeDropdown();
-  }, [isDragging]);
-
-  return (
-    <StyledCard
-      data-dropdown-open={isOpen ? "true" : "false"}
-      data-type={DND_ITEM_TYPE.CARD}
-      zoomLevel={zoomLevel}
-      isDragging={isDragging}
-      ref={setNodeRef}
-      style={style}
-      {...(readOnly ? {} : { ...attributes, ...listeners })}
-    >
-      <StyledCardHeader
-        ref={dropdownRef}
-        avatar={
-          <StyledAvatar
-            aria-label="recipe"
-            src={getAvatarURL(card.ownerId, "user")}
-          />
-        }
-        action={
-          <StyledIconButton
-            aria-label="settings"
-            onClick={handleToggleDropdown}
-          >
-            <MoreVertIcon />
-          </StyledIconButton>
-        }
-        title={card.ownerName}
-        subheader={
-          <Tooltip title={time.tooltip} placement="bottom-start">
-            <StyledTypographySubheader>{time.label}</StyledTypographySubheader>
-          </Tooltip>
-        }
-      />
-      <StyledCardContent>
-        <StyledContentTitleTypography zoomLevel={zoomLevel}>
-          {card.title || <span>&nbsp;</span>}
-        </StyledContentTitleTypography>
+const MemoizedCardActions = memo(
+  ({
+    zoomLevel,
+    icon,
+    type,
+    caption,
+    nbOfFavorites,
+    displayNbFavorites,
+  }: {
+    zoomLevel: number;
+    icon: string;
+    type: string;
+    caption: string;
+    nbOfFavorites: number;
+    displayNbFavorites: boolean;
+  }) => (
+    <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
+      <StyledTypographyContainer>
+        <StyledTypography>
+          <Icon path={icon} size={1} />
+          {type}
+        </StyledTypography>
         {zoomLevel > 1 && (
-          <CardContentWrapper resourceType={card.resourceType}>
-            <CardContent card={card} />
-          </CardContentWrapper>
+          <Tooltip title={caption}>
+            <StyledLegendTypography>{caption}</StyledLegendTypography>
+          </Tooltip>
         )}
-      </StyledCardContent>
-      <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
-        <StyledTypographyContainer>
-          <StyledTypography>
-            <Icon path={icon} size={1} />
-            {type}
-          </StyledTypography>
-          {zoomLevel > 1 && (
-            <Tooltip title={card.caption}>
-              <StyledLegendTypography>{card.caption}</StyledLegendTypography>
-            </Tooltip>
-          )}
-        </StyledTypographyContainer>
-        <StyledBox>
-          {displayNbFavorites && (
-            <Simple14Typography>{card.nbOfFavorites}</Simple14Typography>
-          )}
-          <BottomIconButton aria-label="add to favorites" size="small">
-            <StarBorderIcon />
-          </BottomIconButton>
-        </StyledBox>
-      </StyledCardActions>
-      {isOpen && dropdownRef.current && (
-        <DropDownList
-          items={dropDownItemList}
-          onClose={() => toggleDropdown(null)}
-          open={isOpen}
-          anchorEl={dropdownRef.current}
-          position="right-top"
-        />
-      )}
-      {canComment && zoomLevel > 1 && (
-        <CardComment
-          commentData={{
-            cardComment: card.lastComment,
-            nbOfComment: card.nbOfComments,
-            cardId: card.id,
-          }}
-        />
-      )}
-    </StyledCard>
+      </StyledTypographyContainer>
+      <StyledBox>
+        {displayNbFavorites && (
+          <Simple14Typography>{nbOfFavorites}</Simple14Typography>
+        )}
+        <BottomIconButton aria-label="add to favorites" size="small">
+          <StarBorderIcon />
+        </BottomIconButton>
+      </StyledBox>
+    </StyledCardActions>
+  ),
+);
+
+export const BoardCard: FC<BoardCardProps> = memo(
+  ({
+    card,
+    zoomLevel,
+    canComment = false,
+    displayNbFavorites = false,
+    readOnly = false,
+  }) => {
+    const { icon, type } = useResourceTypeDisplay(card.resourceType);
+    const time = useElapsedTime(card.modificationDate);
+    const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
+      useDropdown();
+    const dropDownItemList = useCardDropDownItems(readOnly);
+    const { getAvatarURL } = useDirectory();
+
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const isOpen = openDropdownId === card.id;
+
+    const handleToggleDropdown = useCallback(() => {
+      if (card.id) {
+        toggleDropdown(card.id);
+      }
+    }, [card.id, toggleDropdown]);
+
+    const handleDropdownClose = useCallback(
+      () => toggleDropdown(null),
+      [toggleDropdown],
+    );
+
+    const sortableProps = useSortable({
+      id: card.id,
+      data: {
+        type: DND_ITEM_TYPE.CARD,
+        card: card,
+      },
+      disabled: readOnly,
+    });
+
+    const {
+      isDragging,
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+    } = sortableProps;
+
+    // Mémorisation du style
+    const style = useMemo(
+      () => ({
+        transform: CSS.Translate.toString({
+          x: transform?.x ?? 0,
+          y: transform?.y ?? 0,
+          scaleX: 1,
+          scaleY: 1,
+        }),
+        transition: transition || undefined,
+        cursor: listeners ? "move" : "default",
+      }),
+      [transform, transition, listeners],
+    );
+
+    const headerProps = useMemo(
+      () => ({
+        avatarUrl: getAvatarURL(card.ownerId, "user"),
+        ownerName: card.ownerName,
+        timeLabel: time.label,
+        timeTooltip: time.tooltip,
+        onToggleDropdown: handleToggleDropdown,
+      }),
+      [
+        card.ownerId,
+        card.ownerName,
+        time.label,
+        time.tooltip,
+        handleToggleDropdown,
+        getAvatarURL,
+      ],
+    );
+
+    const contentProps = useMemo(
+      () => ({
+        title: card.title,
+        zoomLevel,
+        resourceType: card.resourceType,
+        card,
+      }),
+      [card.title, zoomLevel, card.resourceType, card],
+    );
+
+    const actionProps = useMemo(
+      () => ({
+        zoomLevel,
+        icon,
+        type,
+        caption: card.caption,
+        nbOfFavorites: card.nbOfFavorites,
+        displayNbFavorites,
+      }),
+      [
+        zoomLevel,
+        icon,
+        type,
+        card.caption,
+        card.nbOfFavorites,
+        displayNbFavorites,
+      ],
+    );
+
+    // Effets
+    useEffect(() => {
+      registerDropdown(card.id, dropdownRef.current);
+    }, [card.id, registerDropdown]);
+
+    useEffect(() => {
+      if (isDragging) closeDropdown();
+    }, [isDragging, closeDropdown]);
+
+    const commentData = useMemo(
+      () => ({
+        cardComment: card.lastComment,
+        nbOfComment: card.nbOfComments,
+        cardId: card.id,
+      }),
+      [card.lastComment, card.nbOfComments, card.id],
+    );
+
+    return (
+      <StyledCard
+        data-dropdown-open={isOpen ? "true" : "false"}
+        data-type={DND_ITEM_TYPE.CARD}
+        zoomLevel={zoomLevel}
+        isDragging={isDragging}
+        ref={setNodeRef}
+        style={style}
+        {...(readOnly ? {} : { ...attributes, ...listeners })}
+      >
+        <div ref={dropdownRef}>
+          <MemoizedCardHeader {...headerProps} />
+        </div>
+        <MemoizedContent {...contentProps} />
+        <MemoizedCardActions {...actionProps} />
+
+        {isOpen && dropdownRef.current && (
+          <MemoizedDropDownList
+            items={dropDownItemList}
+            onClose={handleDropdownClose}
+            open={isOpen}
+            anchorEl={dropdownRef.current}
+            position="right-top"
+          />
+        )}
+
+        {canComment && zoomLevel > 1 && (
+          <MemoizedCardComment commentData={commentData} />
+        )}
+      </StyledCard>
+    );
+  },
+);
+
+BoardCard.displayName = "BoardCard";
+const MemoizedBoardCard = memo(BoardCard, (prevProps, nextProps) => {
+  return (
+    prevProps.card.id === nextProps.card.id &&
+    prevProps.card.modificationDate === nextProps.card.modificationDate &&
+    prevProps.zoomLevel === nextProps.zoomLevel &&
+    prevProps.canComment === nextProps.canComment &&
+    prevProps.card.lastComment === nextProps.card.lastComment &&
+    prevProps.card.nbOfComments === nextProps.card.nbOfComments &&
+    prevProps.displayNbFavorites === nextProps.displayNbFavorites &&
+    prevProps.readOnly === nextProps.readOnly
   );
-};
+});
+
+export default MemoizedBoardCard;

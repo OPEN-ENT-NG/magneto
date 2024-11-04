@@ -15,3 +15,5 @@ export enum DND_ITEM_TYPE {
 export interface CustomPointerSensorOptions extends PointerSensorOptions {
   isLoading?: boolean;
 }
+
+export type ActiveItemState = Card | Section | null;

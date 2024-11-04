@@ -13,7 +13,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { useTranslation } from "react-i18next";
 
 import { CustomPointerSensor } from "./customPointer";
-import { DND_ITEM_TYPE } from "./types";
+import { ActiveItemState, DND_ITEM_TYPE } from "./types";
 import { createCardMap, createSectionMap } from "./utils";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
@@ -26,7 +26,7 @@ import {
 } from "~/services/api/sections.service";
 
 export const useSectionsDnD = (board: Board) => {
-  const [activeItem, setActiveItem] = useState<Card | Section | null>(null);
+  const [activeItem, setActiveItem] = useState<ActiveItemState>(null);
   const [updatedSections, setUpdatedSections] = useState<Section[]>(
     board.sections,
   );

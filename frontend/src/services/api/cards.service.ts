@@ -38,6 +38,14 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["BoardData"],
     }),
+    favoriteCard: builder.mutation({
+      query: (params: {cardId: string, isFavorite: boolean}) => ({
+        url: `card/${params.cardId}/favorite`,
+        method: "PUT",
+        body: {isFavorite: params.isFavorite},
+      }),
+      invalidatesTags: ["BoardData"],
+    }),
   }),
 });
 
@@ -47,4 +55,5 @@ export const {
   useLazyGetAllCardsByBoardIdQuery,
   useCreateCardMutation,
   useDuplicateCardMutation,
+  useFavoriteCardMutation
 } = cardsApi;

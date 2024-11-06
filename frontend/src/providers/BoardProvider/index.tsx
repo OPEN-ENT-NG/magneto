@@ -39,7 +39,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
-
   const { id = "" } = useParams();
   const { data: boardData, isLoading, isFetching } = useGetBoardDataQuery(id);
 
@@ -120,7 +119,13 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       displayModals,
       toggleBoardModals,
     }),
-    [board, zoomLevel, isLoading, boardRights, displayModals],
+    [
+      board,
+      zoomLevel,
+      isLoading,
+      boardRights,
+      displayModals,
+    ],
   );
 
   return (

@@ -42,4 +42,5 @@ export type Sections = {
 
 export interface DisplayModalsState {
   [BOARD_MODAL_TYPE.PARAMETERS]: boolean;
+  [BOARD_MODAL_TYPE.COMMENT_PANEL]: boolean;
 }

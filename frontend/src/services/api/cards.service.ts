@@ -11,6 +11,7 @@ export const cardsApi = emptySplitApi.injectEndpoints({
     getAllCardsCollection: builder.query({
       query: (params: ICardsParamsRequest) =>
         `cards/collection?boardId=${params.boardId}&searchText=${params.searchText}&sortBy=${params.sortBy}&isPublic=${params.isPublic}&isFavorite=${params.isFavorite}&isShared=${params.isShared}&page=${params.page}`,
+        providesTags: ["AllCards"],
     }),
     getCardsBySection: builder.query<ICardsResponse, string>({
       query: (sectionId: string) => {
@@ -44,7 +45,7 @@ export const cardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
         body: {isFavorite: params.isFavorite},
       }),
-      invalidatesTags: ["BoardData"],
+      invalidatesTags: ["BoardData", "AllCards"],
     }),
   }),
 });

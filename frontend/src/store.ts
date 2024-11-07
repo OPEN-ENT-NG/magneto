@@ -1,17 +1,23 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import type { PreloadedState } from "@reduxjs/toolkit";
 
-import { emptySplitApi } from "./services/api/empltySplitApi.service";
+import {
+  emptySplitApi,
+  workspaceSplitApi,
+} from "./services/api/empltySplitApi.service";
 
 const rootReducer = combineReducers({
   [emptySplitApi.reducerPath]: emptySplitApi.reducer,
+  [workspaceSplitApi.reducerPath]: workspaceSplitApi.reducer,
 });
 
 export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
   return configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(emptySplitApi.middleware),
+      getDefaultMiddleware()
+        .concat(emptySplitApi.middleware)
+        .concat(workspaceSplitApi.middleware),
     preloadedState,
   });
 };

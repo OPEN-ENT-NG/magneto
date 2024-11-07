@@ -66,12 +66,14 @@ export const commentPanelBody: SxProps = {
 };
 
 export const commentPanelFooter: SxProps = {
+  boxSizing: "border-box",
   display: "flex",
   justifyContent: "space-between",
   backgroundColor: "#F7F7FA",
-  padding: "1rem 1.5rem",
+  padding: "1rem 2rem",
   width: "100%",
-  height: "6.5rem",
+  height:"fit-content",
+  minHeight: "6.5rem",
 };
 
 export const avatarStyle = {
@@ -83,8 +85,9 @@ export const avatarStyle = {
 export const leftFooterContent: SxProps = {
   display: "flex",
   alignItems: "center",
-  gap: ".5rem",
+  gap: "1rem",
   flex: 1,
+  height:"fit-content",
 };
 
 export const footerInputStyle: SxProps = {
@@ -98,9 +101,12 @@ export const SubmitIconButton = styled(IconButton)<{ isEnabled: boolean }>(({
   return {
     boxSizing: "border-box",
     fontSize: "2.5rem",
-    borderRadius: "0.8rem",
+    borderRadius: "50%",
     color: isEnabled ? "#2A9AC7" : "#4a4a4a",
     opacity: 1,
+    "&:hover": {
+      borderRadius: "50%",
+    },
   };
 });
 

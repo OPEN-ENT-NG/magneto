@@ -1,12 +1,15 @@
-import { styled, SxProps, TextField } from "@mui/material";
+import { Box, styled, SxProps, TextField } from "@mui/material";
 
-import { CommentInputProps } from "./types";
+import { CommentInputProps, IsLastProps } from "./types";
 
-export const commentPanelItemWrapper: SxProps = {
+export const CommentPanelItemWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "isLast",
+})<IsLastProps>(({ isLast }) => ({
   display: "flex",
   gap: "1rem",
   width: "100%",
-};
+  marginBottom: isLast ? "1rem" : "0",
+}));
 
 export const rightContentWrapper: SxProps = {
   display: "flex",
@@ -56,6 +59,11 @@ export const StyledCommentInput = styled(TextField, {
     border: "none",
     color: "#4A4A4A",
     transition: "all 0.2s ease-in-out",
+    pointerEvents: isEditing ? "auto" : "none",
+
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: `1px solid ${isEditing ? "#2A9AC7" : "#E4E4E4"}`,
+    },
 
     "& fieldset": {
       border: `1px solid ${isEditing ? "#2A9AC7" : "#E4E4E4"}`,
@@ -100,11 +108,11 @@ export const updateIcon = {
   transform: "translateY(-50%)",
   boxSizing: "border-box",
   fontSize: "2.5rem",
-  borderRadius: "0.8rem",
+  borderRadius: "50%",
   color: "#2A9AC7",
   opacity: 1,
   "&:hover": {
-    backgroundColor: "transparent",
+    borderRadius: "50%",
   },
 };
 

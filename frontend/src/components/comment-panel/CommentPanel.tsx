@@ -1,4 +1,4 @@
-import { FC, useState, KeyboardEvent, useEffect } from "react";
+import { FC, useState, KeyboardEvent, useEffect, useRef } from "react";
 
 import { useUser } from "@edifice-ui/react";
 import { mdiArrowUpCircle } from "@mdi/js";
@@ -10,8 +10,8 @@ import {
   Box,
   Divider,
   IconButton,
-  InputBase,
   Modal,
+  TextareaAutosize,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -25,14 +25,13 @@ import {
   commentPanelTitle,
   commentPanelWrapper,
   dividerTextStyle,
-  footerInputStyle,
   leftFooterContent,
   leftHeaderContent,
   SubmitIconButton,
   transparentBackDrop,
 } from "./style";
 import { CommentOrDivider, CommentPanelProps } from "./types";
-import { processCommentsWithDividers } from "./utils";
+import { processCommentsWithDividers, scrollToBottom } from "./utils";
 import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useBoard } from "~/providers/BoardProvider";
@@ -49,13 +48,27 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
   const { data: commentsData } = useGetAllCommentsQuery({ cardId });
   const [inputValue, setInputValue] = useState<string>("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
+    null,
+  );
   const [comsAndDividers, setComsAndDividers] = useState<CommentOrDivider[]>(
     [],
   );
+  const commentBodyRef = useRef<HTMLDivElement>(null);
+  const prevLengthRef = useRef(0);
+
   useEffect(() => {
-    if (commentsData?.all.length)
+    if (commentsData?.all.length) {
       setComsAndDividers(processCommentsWithDividers(commentsData.all));
+    }
   }, [commentsData]);
+
+  useEffect(() => {
+    if (comsAndDividers.length > prevLengthRef.current) {
+      scrollToBottom(commentBodyRef);
+    }
+    prevLengthRef.current = comsAndDividers.length;
+  }, [comsAndDividers]);
 
   const handleSubmit = async () => {
     if (!inputValue) return;
@@ -73,9 +86,13 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
   const handleKeyDown = (
     e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    if (e.key === "Enter" && !!inputValue) return handleSubmit();
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (inputValue) {
+        handleSubmit();
+      }
+    }
   };
-  console.log(comsAndDividers);
 
   return (
     <Modal
@@ -109,19 +126,29 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
           </IconButton>
         </Box>
         <Box sx={commentPanelBody}>
-          {comsAndDividers.map((item) =>
+          {comsAndDividers.map((item, index) =>
             typeof item === "string" ? (
               <Divider key={item} sx={{ my: 2 }}>
                 <Typography sx={dividerTextStyle}>{item}</Typography>
               </Divider>
             ) : (
               <CommentPanelItem
+                isLast={comsAndDividers.lastIndexOf(item) === index}
                 comment={item}
                 key={item._id}
                 cardId={cardId}
                 isEditing={editingCommentId === item._id}
-                onStartEditing={() => setEditingCommentId(item._id)}
-                onStopEditing={() => setEditingCommentId(null)}
+                isDeleting={deletingCommentId === item._id}
+                onStartEditing={() => {
+                  setEditingCommentId(item._id);
+                }}
+                onStartDeleting={() => {
+                  setDeletingCommentId(item._id);
+                }}
+                onStopEditing={() => {
+                  setEditingCommentId(null);
+                  setDeletingCommentId(null);
+                }}
               />
             ),
           )}
@@ -129,8 +156,19 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
         <Box sx={commentPanelFooter}>
           <Box sx={leftFooterContent}>
             <Avatar sx={avatarStyle} src={avatar}></Avatar>
-            <InputBase
-              sx={footerInputStyle}
+            <TextareaAutosize
+              minRows={1}
+              maxRows={4}
+              style={{
+                width: "100%",
+                border: "none",
+                outline: "none",
+                resize: "none",
+                padding: "8px 12px",
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                backgroundColor: "transparent",
+              }}
               placeholder={`${t("magneto.add.comment")}...`}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}

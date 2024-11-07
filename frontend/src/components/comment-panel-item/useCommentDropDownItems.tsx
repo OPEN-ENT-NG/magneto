@@ -8,6 +8,7 @@ import { DropDownListItem } from "../drop-down-list/types";
 
 export const useCommentDropDownItems = (
   setIsEditing: Dispatch<SetStateAction<boolean>>,
+  setisDeleting: Dispatch<SetStateAction<boolean>>,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
 
@@ -21,10 +22,10 @@ export const useCommentDropDownItems = (
       {
         primary: <Icon path={mdiDelete} size={"inherit"} />,
         secondary: t("magneto.card.options.delete"),
-        OnClick: () => null,
+        OnClick: () => setisDeleting(true),
       },
     ],
-    [t, setIsEditing],
+    [t, setIsEditing, setisDeleting],
   );
 
   return useMemo(() => dropdownItems, [dropdownItems]);

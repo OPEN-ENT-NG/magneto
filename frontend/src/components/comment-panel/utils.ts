@@ -1,3 +1,5 @@
+import { RefObject } from "react";
+
 import dayjs from "dayjs";
 
 import { CommentOrDivider } from "./types";
@@ -9,39 +11,32 @@ export const processCommentsWithDividers = (
   if (!comments?.length) return [];
 
   const sortedComments = [...comments].sort(
-    (a, b) =>
-      dayjs(a.modificationDate).valueOf() - dayjs(b.modificationDate).valueOf(),
+    (a, b) => dayjs(a.creationDate).valueOf() - dayjs(b.creationDate).valueOf(),
   );
 
   return sortedComments.reduce(
     (acc: CommentOrDivider[], comment: Comment, index: number) => {
-      const currentDivider = dayjs(comment.modificationDate).isSame(
-        dayjs(),
-        "day",
-      )
+      const currentDivider = dayjs(comment.creationDate).isSame(dayjs(), "day")
         ? "Aujourd'hui"
-        : dayjs(comment.modificationDate).isSame(
-            dayjs().subtract(1, "day"),
-            "day",
-          )
+        : dayjs(comment.creationDate).isSame(dayjs().subtract(1, "day"), "day")
         ? "Hier"
-        : dayjs(comment.modificationDate).format("DD/MM/YYYY");
+        : dayjs(comment.creationDate).format("DD/MM/YYYY");
 
       const needsDivider =
         index === 0 ||
         (() => {
           const prevComment = sortedComments[index - 1];
-          const prevDivider = dayjs(prevComment.modificationDate).isSame(
+          const prevDivider = dayjs(prevComment.creationDate).isSame(
             dayjs(),
             "day",
           )
             ? "Aujourd'hui"
-            : dayjs(prevComment.modificationDate).isSame(
+            : dayjs(prevComment.creationDate).isSame(
                 dayjs().subtract(1, "day"),
                 "day",
               )
             ? "Hier"
-            : dayjs(prevComment.modificationDate).format("DD/MM/YYYY");
+            : dayjs(prevComment.creationDate).format("DD/MM/YYYY");
 
           return prevDivider !== currentDivider;
         })();
@@ -52,4 +47,10 @@ export const processCommentsWithDividers = (
     },
     [],
   );
+};
+
+export const scrollToBottom = (ref: RefObject<HTMLDivElement>) => {
+  if (ref.current) {
+    ref.current.scrollTop = ref.current.scrollHeight;
+  }
 };

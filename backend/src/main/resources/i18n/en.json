@@ -130,6 +130,7 @@
   "magneto.duplicate.cards.confirm": "The selected cards have successfully been duplicated.",
   "magneto.delete.comment": "Delete comment",
   "magneto.delete.comment.message": "Are you sure you want to delete the selected comment ?",
+  "magneto.delete.comment.success": "Votre commentaire a été supprimé avec succès.",
   "magneto.delete.comment.error": "Error while deleting comment",
   "magneto.section.insert.title": "Nom de section ...",
   "magneto.section.default.title": "Section 1",

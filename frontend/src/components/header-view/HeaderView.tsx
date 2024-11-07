@@ -17,14 +17,16 @@ import {
 import { BoardDescription } from "../board-description/BoardDescription";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useNavigate } from "react-router-dom";
 
 export const HeaderView: FC = () => {
   const { board } = useBoard();
+  const navigate = useNavigate();
   const { currentApp } = useOdeClient();
   const { t } = useTranslation("magneto");
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
-  const onClick = () => console.log("read clicked");
+  const onClick = () => navigate(`/board/${board.id}/read`);
 
   const boardHasCards = (): boolean => {
     return (

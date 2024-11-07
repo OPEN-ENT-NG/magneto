@@ -5,7 +5,7 @@ export const commentPanelWrapper: SxProps = {
   display: "flex",
   flexDirection: "column",
   maxHeight: "80vh",
-  width: "42rem",
+  width: "45rem",
   borderRadius: "1.5rem 1.5rem 0 0",
   position: "absolute",
   bottom: "0%",
@@ -49,7 +49,7 @@ export const transparentBackDrop = {
 
 export const commentPanelBody: SxProps = {
   boxSizing: "border-box",
-  padding: "0 1rem",
+  padding: ".5rem 2rem",
   display: "flex",
   flexDirection: "column",
   gap: "2rem",
@@ -103,3 +103,12 @@ export const SubmitIconButton = styled(IconButton)<{ isEnabled: boolean }>(({
     opacity: 1,
   };
 });
+
+export const dividerTextStyle = {
+  px: 1.5,
+  py: 0.5,
+  bgcolor: "grey.50",
+  borderRadius: "2rem",
+  color: "text.secondary",
+  fontSize: "1.6rem",
+};

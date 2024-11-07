@@ -1,4 +1,5 @@
-import { FC, useState, KeyboardEvent } from "react";
+import { FC, useState, KeyboardEvent, useEffect } from "react";
+
 import { useUser } from "@edifice-ui/react";
 import { mdiArrowUpCircle } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -7,6 +8,7 @@ import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import {
   Avatar,
   Box,
+  Divider,
   IconButton,
   InputBase,
   Modal,
@@ -22,20 +24,22 @@ import {
   commentPanelheader,
   commentPanelTitle,
   commentPanelWrapper,
+  dividerTextStyle,
   footerInputStyle,
   leftFooterContent,
   leftHeaderContent,
   SubmitIconButton,
   transparentBackDrop,
 } from "./style";
+import { CommentOrDivider, CommentPanelProps } from "./types";
+import { processCommentsWithDividers } from "./utils";
+import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useBoard } from "~/providers/BoardProvider";
-import { CommentPanelProps } from "./types";
 import {
   useAddCommentMutation,
   useGetAllCommentsQuery,
 } from "~/services/api/comment.service";
-import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 
 export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
   const { t } = useTranslation("magneto");
@@ -45,6 +49,13 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
   const { data: commentsData } = useGetAllCommentsQuery({ cardId });
   const [inputValue, setInputValue] = useState<string>("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [comsAndDividers, setComsAndDividers] = useState<CommentOrDivider[]>(
+    [],
+  );
+  useEffect(() => {
+    if (commentsData?.all.length)
+      setComsAndDividers(processCommentsWithDividers(commentsData.all));
+  }, [commentsData]);
 
   const handleSubmit = async () => {
     if (!inputValue) return;
@@ -64,6 +75,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
   ) => {
     if (e.key === "Enter" && !!inputValue) return handleSubmit();
   };
+  console.log(comsAndDividers);
 
   return (
     <Modal
@@ -97,8 +109,12 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
           </IconButton>
         </Box>
         <Box sx={commentPanelBody}>
-          {commentsData &&
-            commentsData.all.map((item) => (
+          {comsAndDividers.map((item) =>
+            typeof item === "string" ? (
+              <Divider key={item} sx={{ my: 2 }}>
+                <Typography sx={dividerTextStyle}>{item}</Typography>
+              </Divider>
+            ) : (
               <CommentPanelItem
                 comment={item}
                 key={item._id}
@@ -107,7 +123,8 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
                 onStartEditing={() => setEditingCommentId(item._id)}
                 onStopEditing={() => setEditingCommentId(null)}
               />
-            ))}
+            ),
+          )}
         </Box>
         <Box sx={commentPanelFooter}>
           <Box sx={leftFooterContent}>

@@ -19,6 +19,7 @@ import {
 import { BoardDescription } from "../board-description/BoardDescription";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useNavigate } from "react-router-dom";
 
 export const HeaderView: FC = () => {
   const { board } = useBoard();

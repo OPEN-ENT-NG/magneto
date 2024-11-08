@@ -129,7 +129,11 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
           {comsAndDividers.map((item, index) =>
             typeof item === "string" ? (
               <Divider key={item} sx={{ my: 2 }}>
-                <Typography sx={dividerTextStyle}>{item}</Typography>
+                <Typography sx={dividerTextStyle}>
+                  {item === "magneto.yesterday" || item === "magneto.today"
+                    ? t(item)
+                    : item}
+                </Typography>
               </Divider>
             ) : (
               <CommentPanelItem

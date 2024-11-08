@@ -17,9 +17,9 @@ export const processCommentsWithDividers = (
   return sortedComments.reduce(
     (acc: CommentOrDivider[], comment: Comment, index: number) => {
       const currentDivider = dayjs(comment.creationDate).isSame(dayjs(), "day")
-        ? "Aujourd'hui"
+        ? "magneto.today"
         : dayjs(comment.creationDate).isSame(dayjs().subtract(1, "day"), "day")
-        ? "Hier"
+        ? "magneto.yesterday"
         : dayjs(comment.creationDate).format("DD/MM/YYYY");
 
       const needsDivider =
@@ -30,12 +30,12 @@ export const processCommentsWithDividers = (
             dayjs(),
             "day",
           )
-            ? "Aujourd'hui"
+            ? "magneto.today"
             : dayjs(prevComment.creationDate).isSame(
                 dayjs().subtract(1, "day"),
                 "day",
               )
-            ? "Hier"
+            ? "magneto.yesterday"
             : dayjs(prevComment.creationDate).format("DD/MM/YYYY");
 
           return prevDivider !== currentDivider;

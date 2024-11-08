@@ -222,5 +222,7 @@
   "magneto.share.save.sharebookmark": "Enregistrer comme favori de partage",
   "magneto.explorer.modal.share.search": "Rechercher des utilisateurs",
   "magneto.explorer.cancel": "Annuler",
-  "magneto.share.heading.tooltip.message": "Vos favoris de partage s’affichent en priorité dans votre liste lorsque vous recherchez un groupe ou une personne, vous pouvez les retrouver dans l’annuaire."
+  "magneto.share.heading.tooltip.message": "Vos favoris de partage s’affichent en priorité dans votre liste lorsque vous recherchez un groupe ou une personne, vous pouvez les retrouver dans l’annuaire.",
+  "magneto.today":"Aujourd'hui",
+  "magneto.yesterday":"Hier"
 }

@@ -68,20 +68,47 @@ export const useRenderContent = (
 
     return boardData.map((board: Board) => ({
       ...board,
-      cards: cardsData.filter((card: Card) => card.boardId === board._id),
+      cards: cardsData
+        .filter((card: Card) => card.boardId === board._id)
+        .sort((a: Card, b: Card) => {
+          if (!isByFavorite) {
+            return a.title.localeCompare(b.title);
+          } else {
+            if (a.liked === b.liked) {
+              // Si les deux ont le même statut "liked", comparer par "title"
+              return a.title.localeCompare(b.title);
+            }
+            // Placer "liked = true" avant "liked = false"
+            return a.liked ? -1 : 1;
+          }
+        }),
     }));
   }, [myBoardsResult, myCardsResult]);
 
   const cardsData =
-    myCardsResult?.all?.map((card: ICardItemResponse) =>
-      new Card().build(card),
-    ) || [];
+    myCardsResult?.all
+      ?.map((card: ICardItemResponse) => new Card().build(card))
+      .sort((a: Card, b: Card) => {
+        if (!isByFavorite) {
+          return a.title.localeCompare(b.title);
+        } else {
+          if (a.liked === b.liked) {
+            // Si les deux ont le même statut "liked", comparer par "title"
+            return a.title.localeCompare(b.title);
+          }
+          // Placer "liked = true" avant "liked = false"
+          return a.liked ? -1 : 1;
+        }
+      }) || [];
 
   const isOneMagnetInBoards = boardsWithCards.some(
     (item: Board) => !!item.cards.length,
   );
 
-  const updateSelectedMagnets = (event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, cardId: string) => {
+  const updateSelectedMagnets = (
+    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+    cardId: string,
+  ) => {
     if (!isSelectable(event)) {
       // Empêche la sélection si l'élément est non-sélectionnable
       event.preventDefault();
@@ -102,14 +129,15 @@ export const useRenderContent = (
     }));
   };
 
-  const isSelectable = (event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>): boolean => {
+  const isSelectable = (
+    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+  ): boolean => {
     const element = event.target as Element;
-    const isNonSelectable = element.closest(`[data-type="${POINTER_TYPES.NON_SELECTABLE}"]`) !== null;
-    const dropdownOpen = document.querySelector(
-      '[data-dropdown-open="true"]',
-    );
+    const isNonSelectable =
+      element.closest(`[data-type="${POINTER_TYPES.NON_SELECTABLE}"]`) !== null;
+    const dropdownOpen = document.querySelector('[data-dropdown-open="true"]');
     return !isNonSelectable && !dropdownOpen;
-  }
+  };
 
   useEffect(() => {
     document.addEventListener("mousedown", isSelectable);

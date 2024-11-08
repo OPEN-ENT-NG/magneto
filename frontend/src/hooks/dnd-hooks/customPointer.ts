@@ -1,7 +1,6 @@
 import { PointerSensor } from "@dnd-kit/core";
 
 import { CustomPointerSensorOptions, DND_ITEM_TYPE } from "./types";
-import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 
 export class CustomPointerSensor extends PointerSensor {
   static activators = [

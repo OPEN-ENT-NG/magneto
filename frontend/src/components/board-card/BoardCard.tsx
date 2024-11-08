@@ -4,8 +4,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Tooltip } from "@mui/material";
 
 import {
@@ -33,11 +33,11 @@ import { CardCommentProps } from "../card-comment/types";
 import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
+import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useFavoriteCardMutation } from "~/services/api/cards.service";
-import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -73,7 +73,11 @@ const MemoizedCardHeader = memo(
     <StyledCardHeader
       avatar={<StyledAvatar aria-label="recipe" src={avatarUrl} />}
       action={
-        <StyledIconButton aria-label="settings" onClick={onToggleDropdown} data-type={POINTER_TYPES.NON_SELECTABLE}>
+        <StyledIconButton
+          aria-label="settings"
+          onClick={onToggleDropdown}
+          data-type={POINTER_TYPES.NON_SELECTABLE}
+        >
           <MoreVertIcon />
         </StyledIconButton>
       }
@@ -148,8 +152,13 @@ const MemoizedCardActions = memo(
         {displayNbFavorites && (
           <Simple14Typography>{nbOfFavorites}</Simple14Typography>
         )}
-        <BottomIconButton aria-label="add to favorites" size="small" onClick={() => handleFavoriteClick()} data-type={POINTER_TYPES.NON_SELECTABLE}>
-          {cardIsLiked ? <StarIcon /> :  <StarBorderIcon />}
+        <BottomIconButton
+          aria-label="add to favorites"
+          size="small"
+          onClick={() => handleFavoriteClick()}
+          data-type={POINTER_TYPES.NON_SELECTABLE}
+        >
+          {cardIsLiked ? <StarIcon /> : <StarBorderIcon />}
         </BottomIconButton>
       </StyledBox>
     </StyledCardActions>
@@ -205,8 +214,8 @@ export const BoardCard: FC<BoardCardProps> = memo(
     } = sortableProps;
 
     const handleFavoriteClick = () => {
-      favoriteCard({cardId: card.id, isFavorite: card.liked});
-    }
+      favoriteCard({ cardId: card.id, isFavorite: card.liked });
+    };
 
     // Mémorisation du style
     const style = useMemo(
@@ -291,8 +300,6 @@ export const BoardCard: FC<BoardCardProps> = memo(
       }),
       [card.lastComment, card.nbOfComments, card.id],
     );
-
-    
 
     return (
       <StyledCard

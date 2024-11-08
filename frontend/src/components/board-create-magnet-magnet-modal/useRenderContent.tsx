@@ -15,6 +15,7 @@ import { InputValueState } from "./types";
 import { BoardCard } from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { CURRENTTAB_STATE } from "../tab-list/types";
+import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { ICardItemResponse, Card } from "~/models/card.model";
@@ -23,7 +24,6 @@ import {
   useGetAllBoardsQuery,
 } from "~/services/api/boards.service";
 import { useGetAllCardsCollectionQuery } from "~/services/api/cards.service";
-import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 
 export const useRenderContent = (
   inputValue: InputValueState,

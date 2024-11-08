@@ -1,5 +1,6 @@
 import { FC, useState, DragEvent, useRef } from "react";
 
+import { useWorkspaceFile } from "@edifice-ui/react";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -13,13 +14,13 @@ import {
   textStyle,
   whiteBoxStyle,
 } from "./style";
-import { FileDropZoneProps } from "./types";
 import { FILE_VALIDATION_CONFIG } from "~/core/constants/fileValidation.config.const";
 import { useBoard } from "~/providers/BoardProvider";
 
-export const FileDropZone: FC<FileDropZoneProps> = ({ onFilesDrop }) => {
+export const FileDropZone: FC = () => {
   const [isExplorerDragging, setIsExplorerDragging] = useState<boolean>(false);
   const dragCounter = useRef(0);
+  const { create } = useWorkspaceFile();
   const {
     board: { title },
   } = useBoard();
@@ -77,7 +78,7 @@ export const FileDropZone: FC<FileDropZoneProps> = ({ onFilesDrop }) => {
     }
   };
 
-  const handleDrop = (event: DragEvent): void => {
+  const handleDrop = async (event: DragEvent): Promise<void> => {
     event.preventDefault();
     dragCounter.current = 0;
 
@@ -88,7 +89,46 @@ export const FileDropZone: FC<FileDropZoneProps> = ({ onFilesDrop }) => {
     setIsExplorerDragging(false);
 
     const file = event.dataTransfer.files[0];
-    onFilesDrop?.(file);
+    try {
+      const createResponse = await create(file, {
+        visibility: "protected",
+        application: "magneto",
+      });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+
+      const url = `/workspace/${
+        createResponse?.public ? "pub/" : ""
+      }document/${createResponse?._id}`;
+
+      console.log({ createResponse, url });
+    } catch (error) {
+      console.error(
+        "Erreur lors de la création ou récupération du fichier:",
+        error,
+      );
+    }
   };
 
   return (

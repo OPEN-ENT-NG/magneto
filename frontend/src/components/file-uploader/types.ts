@@ -1,3 +1,3 @@
 export type FileDropZoneProps = {
-  onFilesDrop?: (files: File[]) => void;
+  onFilesDrop?: (files: File) => void;
 };

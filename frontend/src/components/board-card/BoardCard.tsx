@@ -37,6 +37,7 @@ import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useFavoriteCardMutation } from "~/services/api/cards.service";
+import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -72,7 +73,7 @@ const MemoizedCardHeader = memo(
     <StyledCardHeader
       avatar={<StyledAvatar aria-label="recipe" src={avatarUrl} />}
       action={
-        <StyledIconButton aria-label="settings" onClick={onToggleDropdown}>
+        <StyledIconButton aria-label="settings" onClick={onToggleDropdown} data-type={POINTER_TYPES.NON_SELECTABLE}>
           <MoreVertIcon />
         </StyledIconButton>
       }
@@ -147,7 +148,7 @@ const MemoizedCardActions = memo(
         {displayNbFavorites && (
           <Simple14Typography>{nbOfFavorites}</Simple14Typography>
         )}
-        <BottomIconButton aria-label="add to favorites" size="small" onClick={() => handleFavoriteClick()}>
+        <BottomIconButton aria-label="add to favorites" size="small" onClick={() => handleFavoriteClick()} data-type={POINTER_TYPES.NON_SELECTABLE}>
           {cardIsLiked ? <StarIcon /> :  <StarBorderIcon />}
         </BottomIconButton>
       </StyledBox>

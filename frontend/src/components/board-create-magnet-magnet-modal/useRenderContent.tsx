@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, MouseEvent } from "react";
 
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import { Box, Button, Grid, List, ListItem, Typography } from "@mui/material";
@@ -23,6 +23,7 @@ import {
   useGetAllBoardsQuery,
 } from "~/services/api/boards.service";
 import { useGetAllCardsCollectionQuery } from "~/services/api/cards.service";
+import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 
 export const useRenderContent = (
   inputValue: InputValueState,
@@ -80,8 +81,15 @@ export const useRenderContent = (
     (item: Board) => !!item.cards.length,
   );
 
-  const updateSelectedMagnets = (cardId: string) => {
+  const updateSelectedMagnets = (event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>, cardId: string) => {
+    if (!isSelectable(event)) {
+      // Empêche la sélection si l'élément est non-sélectionnable
+      event.preventDefault();
+      return;
+    }
+
     let updatedSelectedMagnets = inputValue.cardIds;
+
     if (updatedSelectedMagnets.find((magnetId: string) => magnetId == cardId)) {
       const index = updatedSelectedMagnets.indexOf(cardId, 0);
       updatedSelectedMagnets.splice(index, 1);
@@ -93,6 +101,22 @@ export const useRenderContent = (
       cardIds: updatedSelectedMagnets,
     }));
   };
+
+  const isSelectable = (event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>): boolean => {
+    const element = event.target as Element;
+    const isNonSelectable = element.closest(`[data-type="${POINTER_TYPES.NON_SELECTABLE}"]`) !== null;
+    const dropdownOpen = document.querySelector(
+      '[data-dropdown-open="true"]',
+    );
+    return !isNonSelectable && !dropdownOpen;
+  }
+
+  useEffect(() => {
+    document.addEventListener("mousedown", isSelectable);
+    return () => {
+      document.removeEventListener("mousedown", isSelectable);
+    };
+  }, []);
 
   const isCardSelected = (cardId: string): boolean => {
     return !!inputValue.cardIds.find((magnetId: string) => magnetId == cardId);
@@ -121,8 +145,8 @@ export const useRenderContent = (
                       <Grid item key={card.id}>
                         <BoardCardWrapper
                           isCardSelected={isCardSelected(card.id)}
-                          onClick={() => {
-                            updateSelectedMagnets(card.id);
+                          onClick={(event) => {
+                            updateSelectedMagnets(event, card.id);
                           }}
                         >
                           <BoardCard
@@ -150,8 +174,8 @@ export const useRenderContent = (
             <Grid item key={card.id}>
               <BoardCardWrapper
                 isCardSelected={isCardSelected(card.id)}
-                onClick={() => {
-                  updateSelectedMagnets(card.id);
+                onClick={(event) => {
+                  updateSelectedMagnets(event, card.id);
                 }}
               >
                 <BoardCard card={card} zoomLevel={zoomLevel} readOnly={true} />

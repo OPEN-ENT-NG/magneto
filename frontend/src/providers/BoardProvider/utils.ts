@@ -10,6 +10,7 @@ import {
 
 export const initialDisplayModals: DisplayModalsState = {
   [BOARD_MODAL_TYPE.PARAMETERS]: false,
+  [BOARD_MODAL_TYPE.COMMENT_PANEL]: false,
 };
 
 export const prepareBoardsState = (

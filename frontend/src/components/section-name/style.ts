@@ -27,9 +27,6 @@ export const inputStyle = {
 export const iconButtonStyle = {
   padding: "0.25rem",
   marginLeft: "0.5rem",
-  "&:hover": {
-    backgroundColor: "transparent",
-  },
 };
 
 export const iconStyle = { fontSize: "3rem" };

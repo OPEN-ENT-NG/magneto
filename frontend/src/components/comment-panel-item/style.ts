@@ -59,14 +59,15 @@ export const StyledCommentInput = styled(TextField, {
     border: "none",
     color: "#4A4A4A",
     transition: "all 0.2s ease-in-out",
-    pointerEvents: isEditing ? "auto" : "none",
 
     "& .MuiOutlinedInput-notchedOutline": {
       border: `1px solid ${isEditing ? "#2A9AC7" : "#E4E4E4"}`,
+      pointerEvents: "none",
     },
 
     "& fieldset": {
       border: `1px solid ${isEditing ? "#2A9AC7" : "#E4E4E4"}`,
+      pointerEvents: "none",
     },
 
     "&:hover fieldset": {
@@ -80,7 +81,9 @@ export const StyledCommentInput = styled(TextField, {
 
   "& .MuiOutlinedInput-input": {
     padding: "0",
-    paddingRight: isEditing ? "3rem" : "0",
+    paddingRight: isEditing ? "3.5rem" : "0",
+    cursor: isEditing ? "text" : "default",
+    userSelect: "text",
     "&.Mui-disabled": {
       "-webkit-text-fill-color": "#4A4A4A !important",
     },
@@ -96,6 +99,7 @@ export const StyledCommentInput = styled(TextField, {
       backgroundColor: "rgba(170,170,170,1)",
       borderRadius: "0.3rem",
     },
+    overflow: "auto !important",
   },
 
   width: "100%",
@@ -103,8 +107,10 @@ export const StyledCommentInput = styled(TextField, {
 
 export const updateIcon = {
   position: "absolute",
-  right: "1.5rem",
+  right: "2.5rem",
   top: "50%",
+  width: "3.5rem",
+  height: "3.5rem",
   transform: "translateY(-50%)",
   boxSizing: "border-box",
   fontSize: "2.5rem",

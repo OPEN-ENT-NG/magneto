@@ -56,13 +56,11 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
-import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
-import { CommentPanel } from "../comment-panel/CommentPanel";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
-  const { board, displayModals, toggleBoardModals } = useBoard();
+  const { board } = useBoard();
 
   const [title, setTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -173,12 +171,6 @@ export const CreateMagnet: FC = () => {
         style={{ zIndex: 1000 }}
       >
         <Box sx={modalContainerStyle}>
-          <Button
-            onClick={() => toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)}
-          >
-            com
-          </Button>
-          {displayModals.COMMENT_PANEL && <CommentPanel cardId="8df5c8be-eac9-401f-b4aa-a8144602f7b9"/>}
           <Box sx={headerStyle}>
             <Typography
               id="modal-title"

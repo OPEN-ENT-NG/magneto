@@ -11,7 +11,6 @@ import {
   Divider,
   IconButton,
   Modal,
-  TextareaAutosize,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -27,6 +26,7 @@ import {
   dividerTextStyle,
   leftFooterContent,
   leftHeaderContent,
+  StyledTextarea,
   SubmitIconButton,
   transparentBackDrop,
 } from "./style";
@@ -125,7 +125,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
             <CloseIcon fontSize="inherit" />
           </IconButton>
         </Box>
-        <Box sx={commentPanelBody}>
+        <Box sx={commentPanelBody} ref={commentBodyRef}>
           {comsAndDividers.map((item, index) =>
             typeof item === "string" ? (
               <Divider key={item} sx={{ my: 2 }}>
@@ -156,19 +156,9 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
         <Box sx={commentPanelFooter}>
           <Box sx={leftFooterContent}>
             <Avatar sx={avatarStyle} src={avatar}></Avatar>
-            <TextareaAutosize
+            <StyledTextarea
               minRows={1}
               maxRows={4}
-              style={{
-                width: "100%",
-                border: "none",
-                outline: "none",
-                resize: "none",
-                padding: "8px 12px",
-                fontFamily: "inherit",
-                fontSize: "inherit",
-                backgroundColor: "transparent",
-              }}
               placeholder={`${t("magneto.add.comment")}...`}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}

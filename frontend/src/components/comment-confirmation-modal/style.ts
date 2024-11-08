@@ -2,7 +2,6 @@ import { SxProps, Theme } from "@mui/material";
 
 import { StyleProps } from "./types";
 
-
 export const modalPaperStyles = ({ rect }: StyleProps): SxProps<Theme> => ({
   position: "absolute",
   top: `${rect.top + window.scrollY}px`,

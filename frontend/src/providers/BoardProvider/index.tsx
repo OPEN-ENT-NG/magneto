@@ -119,13 +119,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       displayModals,
       toggleBoardModals,
     }),
-    [
-      board,
-      zoomLevel,
-      isLoading,
-      boardRights,
-      displayModals,
-    ],
+    [board, zoomLevel, isLoading, boardRights, displayModals],
   );
 
   return (

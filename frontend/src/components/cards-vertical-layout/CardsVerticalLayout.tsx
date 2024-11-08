@@ -220,7 +220,6 @@ export const CardsVerticalLayout: FC = () => {
   );
 
   if (!updatedSections.length) return null;
-  console.log(updatedSections[0].cardIds.length);
 
   return (
     <DndContext

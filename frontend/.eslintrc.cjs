@@ -19,6 +19,12 @@ module.exports = {
   },
   plugins: ["react", "import", "jsx-a11y"],
   rules: {
+    "jsx-a11y/no-autofocus": [
+      "warn",
+      {
+        "ignoreNonDOM": true
+      }
+    ],
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/ban-ts-comment": "off",

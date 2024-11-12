@@ -128,7 +128,6 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   useEffect(() => {
     updateLibraryMedia();
   }, [libraryMedia, workspaceElement]);
-  console.log(media, getMediaLibraryType(workspaceElement?.name));
 
   const value = useMemo<MediaLibraryContextType>(
     () => ({

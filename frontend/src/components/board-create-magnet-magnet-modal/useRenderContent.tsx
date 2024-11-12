@@ -1,4 +1,4 @@
-import { useEffect, useMemo, MouseEvent } from "react";
+import { useEffect, useMemo, MouseEvent as ReactMouseEvent } from "react";
 
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import { Box, Button, Grid, List, ListItem, Typography } from "@mui/material";
@@ -105,12 +105,19 @@ export const useRenderContent = (
     (item: Board) => !!item.cards.length,
   );
 
+  const isSelectable = (event: MouseEvent): boolean => {
+    const element = event.target as Element;
+    const isNonSelectable =
+      element.closest(`[data-type="${POINTER_TYPES.NON_SELECTABLE}"]`) !== null;
+    const dropdownOpen = document.querySelector('[data-dropdown-open="true"]');
+    return !isNonSelectable && !dropdownOpen;
+  };
+
   const updateSelectedMagnets = (
-    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+    event: ReactMouseEvent<HTMLDivElement>,
     cardId: string,
   ) => {
-    if (!isSelectable(event)) {
-      // Empêche la sélection si l'élément est non-sélectionnable
+    if (!isSelectable(event.nativeEvent)) {
       event.preventDefault();
       return;
     }
@@ -129,20 +136,16 @@ export const useRenderContent = (
     }));
   };
 
-  const isSelectable = (
-    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
-  ): boolean => {
-    const element = event.target as Element;
-    const isNonSelectable =
-      element.closest(`[data-type="${POINTER_TYPES.NON_SELECTABLE}"]`) !== null;
-    const dropdownOpen = document.querySelector('[data-dropdown-open="true"]');
-    return !isNonSelectable && !dropdownOpen;
-  };
-
   useEffect(() => {
-    document.addEventListener("mousedown", isSelectable);
+    const handleMouseDown = (e: MouseEvent) => {
+      if (!isSelectable(e)) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("mousedown", handleMouseDown);
     return () => {
-      document.removeEventListener("mousedown", isSelectable);
+      document.removeEventListener("mousedown", handleMouseDown);
     };
   }, []);
 

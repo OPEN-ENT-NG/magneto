@@ -89,7 +89,6 @@ export const StyledCardHeader = styled(CardHeader)({
     paddingBottom: 0,
     color: "#707070",
   },
-  
 });
 
 const handleStyledCardContentHeight = (zoomLevel: number) => {

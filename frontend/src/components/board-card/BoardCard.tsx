@@ -2,6 +2,7 @@ import { FC, useEffect, useRef, useMemo, useCallback, memo } from "react";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
 import LockIcon from "@mui/icons-material/Lock";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -38,9 +39,8 @@ import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
-import { useFavoriteCardMutation } from "~/services/api/cards.service";
-import { useUser } from "@edifice-ui/react";
 import { useBoard } from "~/providers/BoardProvider";
+import { useFavoriteCardMutation } from "~/services/api/cards.service";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -191,12 +191,17 @@ export const BoardCard: FC<BoardCardProps> = memo(
     const { hasEditRights, hasManageRights } = useBoard();
 
     const hasLockedCardRights = (): boolean => {
-      let isCardOwner: boolean = card.ownerId == user?.userId;
-      console.log("rights check", (card.locked && (isCardOwner || hasManageRights())) || (!card.locked && (isCardOwner || hasManageRights() || hasEditRights())));
-      return (card.locked && (isCardOwner || hasManageRights())) || (!card.locked && (isCardOwner || hasManageRights() || hasEditRights()));
-    }
+      const isCardOwner: boolean = card.ownerId == user?.userId;
+      return (
+        (card.locked && (isCardOwner || hasManageRights())) ||
+        (!card.locked && (isCardOwner || hasManageRights() || hasEditRights()))
+      );
+    };
 
-    const dropDownItemList = card.locked ? useCardDropDownItems(readOnly, !hasLockedCardRights()) : useCardDropDownItems(readOnly);
+    const dropDownItemList = useCardDropDownItems(
+      readOnly,
+      card.locked ? !hasLockedCardRights() : false,
+    );
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const isOpen = openDropdownId === card.id;

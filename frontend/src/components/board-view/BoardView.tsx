@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, DragEvent, useRef } from "react";
 
 import "./BoardView.scss";
 
@@ -15,7 +15,7 @@ import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizonta
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
 import { CreateBoard } from "../create-board/CreateBoard";
 import { CreateMagnet } from "../create-magnet/CreateMagnet";
-import { FileDropZone } from "../file-uploader/FileUploader";
+import { FileDropZone } from "../file-drop-zone/FileDropZone";
 import { HeaderView } from "../header-view/HeaderView";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
@@ -39,9 +39,14 @@ export const BoardView: FC = () => {
     hasEditRights,
     displayModals,
     toggleBoardModals,
+    setIsFileDragging,
+    isFileDragging,
   } = useBoard();
   const headerHeight = useHeaderHeight();
+  const dragCounter = useRef(0);
   const { magnetType, onClose } = useMediaLibrary();
+  const leaveTimer = useRef<NodeJS.Timeout>();
+
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--header-height",
@@ -62,17 +67,47 @@ export const BoardView: FC = () => {
     }
   };
 
+  const handleDragEnter = (event: DragEvent): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer?.types.includes("Files")) {
+      dragCounter.current++;
+      setIsFileDragging(true);
+    }
+  };
+
+  const handleDragLeave = (event: DragEvent): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    leaveTimer.current = setTimeout(() => {
+      dragCounter.current--;
+      if (dragCounter.current <= 0) {
+        dragCounter.current = 0;
+        setIsFileDragging(false);
+      }
+    }, 50);
+  };
+
+  const handleDragOver = (event: DragEvent): void => {
+    event.preventDefault();
+  };
+
   return isLoading ? (
     <LoadingScreen position={false} />
   ) : (
     <BoardViewWrapper layout={board.layoutType}>
       <HeaderView />
+
       {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}
-      <BoardBodyWrapper layout={board.layoutType} headerHeight={headerHeight}>
-        {hasEditRights() &&
-          !board.cardIds?.length &&
-          !board.sections?.length && <FileDropZone />}
+      <BoardBodyWrapper
+        layout={board.layoutType}
+        headerHeight={headerHeight}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+      >
         {displayLayout()}
+        {hasEditRights() && isFileDragging && <FileDropZone />}
         {board.backgroundUrl ? (
           <img
             src={board.backgroundUrl}

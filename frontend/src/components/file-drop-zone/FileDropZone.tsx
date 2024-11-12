@@ -1,4 +1,4 @@
-import { FC, useState, DragEvent, useRef } from "react";
+import { FC, DragEvent } from "react";
 
 import { useToast, useWorkspaceFile } from "@edifice-ui/react";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
@@ -19,10 +19,9 @@ import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const FileDropZone: FC = () => {
-  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const { isFileDragging, setIsFileDragging } = useBoard();
   const { setWorkspaceElement } = useMediaLibrary();
   const toast = useToast();
-  const dragCounter = useRef(0);
   const { create } = useWorkspaceFile();
   const {
     board: { title },
@@ -62,29 +61,14 @@ export const FileDropZone: FC = () => {
     return hasValidExtension && hasValidSize;
   };
 
-  const handleDragEnter = (event: DragEvent): void => {
-    event.preventDefault();
-    dragCounter.current++;
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (event: DragEvent): void => {
-    event.preventDefault();
-    dragCounter.current--;
-    if (dragCounter.current === 0) {
-      setIsDragging(false);
-    }
-  };
-
   const handleDrop = async (event: DragEvent): Promise<void> => {
     event.preventDefault();
-    dragCounter.current = 0;
 
     if (!validateFile(event.dataTransfer)) {
-      return setIsDragging(false);
+      return setIsFileDragging(false);
     }
 
-    setIsDragging(false);
+    setIsFileDragging(false);
 
     const file = event.dataTransfer.files[0];
     try {
@@ -99,15 +83,13 @@ export const FileDropZone: FC = () => {
   };
 
   return (
-    <DragBox isDragging={isDragging} data-dragging={isDragging}>
+    <DragBox isDragging={isFileDragging} id="dropzone">
       <InnerBox
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        isDragging={isDragging}
+        isDragging={isFileDragging}
       >
-        {isDragging && (
+        {isFileDragging && (
           <Box sx={flyingBox}>
             <Typography sx={textStyle}>
               <Box sx={ellipsisBoxStyle}>

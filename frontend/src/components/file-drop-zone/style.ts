@@ -10,9 +10,7 @@ export const DragBox = styled(Box)<{ isDragging: boolean }>(
     borderRadius: "1rem",
     border: isDragging ? "3px dashed #FF8D2E" : "none",
     backgroundColor: isDragging ? "rgba(255, 255, 255, 0.4)" : "transparent",
-    zIndex: isDragging ? "1000" : "0",
-    touchAction: "auto",
-    "-ms-touch-action": "auto",
+    zIndex: "1000",
   }),
 );
 
@@ -23,9 +21,6 @@ export const InnerBox = styled(Box)<{ isDragging: boolean }>(
     height: "100%",
     mt: isDragging ? 2 : 0,
     transition: "margin 0.2s",
-    zIndex: isDragging ? "1000" : "0",
-    touchAction: "auto",
-    "-ms-touch-action": "auto",
   }),
 );
 

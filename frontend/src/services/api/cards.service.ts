@@ -11,6 +11,7 @@ export const cardsApi = emptySplitApi.injectEndpoints({
     getAllCardsCollection: builder.query({
       query: (params: ICardsParamsRequest) =>
         `cards/collection?boardId=${params.boardId}&searchText=${params.searchText}&sortBy=${params.sortBy}&isPublic=${params.isPublic}&isFavorite=${params.isFavorite}&isShared=${params.isShared}&page=${params.page}`,
+      providesTags: ["AllCards"],
     }),
     getCardsBySection: builder.query<ICardsResponse, string>({
       query: (sectionId: string) => {
@@ -38,6 +39,14 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["BoardData"],
     }),
+    favoriteCard: builder.mutation({
+      query: (params: { cardId: string; isFavorite: boolean }) => ({
+        url: `card/${params.cardId}/favorite`,
+        method: "PUT",
+        body: { isFavorite: params.isFavorite },
+      }),
+      invalidatesTags: ["BoardData", "AllCards"],
+    }),
   }),
 });
 
@@ -47,4 +56,5 @@ export const {
   useLazyGetAllCardsByBoardIdQuery,
   useCreateCardMutation,
   useDuplicateCardMutation,
+  useFavoriteCardMutation,
 } = cardsApi;

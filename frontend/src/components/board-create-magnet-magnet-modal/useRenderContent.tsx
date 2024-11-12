@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, MouseEvent as ReactMouseEvent } from "react";
 
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import { Box, Button, Grid, List, ListItem, Typography } from "@mui/material";
@@ -15,6 +15,7 @@ import { InputValueState } from "./types";
 import { BoardCard } from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { CURRENTTAB_STATE } from "../tab-list/types";
+import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { ICardItemResponse, Card } from "~/models/card.model";
@@ -67,21 +68,62 @@ export const useRenderContent = (
 
     return boardData.map((board: Board) => ({
       ...board,
-      cards: cardsData.filter((card: Card) => card.boardId === board._id),
+      cards: cardsData
+        .filter((card: Card) => card.boardId === board._id)
+        .sort((a: Card, b: Card) => {
+          if (!isByFavorite) {
+            return a.title.localeCompare(b.title);
+          } else {
+            if (a.liked === b.liked) {
+              // Si les deux ont le même statut "liked", comparer par "title"
+              return a.title.localeCompare(b.title);
+            }
+            // Placer "liked = true" avant "liked = false"
+            return a.liked ? -1 : 1;
+          }
+        }),
     }));
   }, [myBoardsResult, myCardsResult]);
 
   const cardsData =
-    myCardsResult?.all?.map((card: ICardItemResponse) =>
-      new Card().build(card),
-    ) || [];
+    myCardsResult?.all
+      ?.map((card: ICardItemResponse) => new Card().build(card))
+      .sort((a: Card, b: Card) => {
+        if (!isByFavorite) {
+          return a.title.localeCompare(b.title);
+        } else {
+          if (a.liked === b.liked) {
+            // Si les deux ont le même statut "liked", comparer par "title"
+            return a.title.localeCompare(b.title);
+          }
+          // Placer "liked = true" avant "liked = false"
+          return a.liked ? -1 : 1;
+        }
+      }) || [];
 
   const isOneMagnetInBoards = boardsWithCards.some(
     (item: Board) => !!item.cards.length,
   );
 
-  const updateSelectedMagnets = (cardId: string) => {
+  const isSelectable = (event: MouseEvent): boolean => {
+    const element = event.target as Element;
+    const isNonSelectable =
+      element.closest(`[data-type="${POINTER_TYPES.NON_SELECTABLE}"]`) !== null;
+    const dropdownOpen = document.querySelector('[data-dropdown-open="true"]');
+    return !isNonSelectable && !dropdownOpen;
+  };
+
+  const updateSelectedMagnets = (
+    event: ReactMouseEvent<HTMLDivElement>,
+    cardId: string,
+  ) => {
+    if (!isSelectable(event.nativeEvent)) {
+      event.preventDefault();
+      return;
+    }
+
     let updatedSelectedMagnets = inputValue.cardIds;
+
     if (updatedSelectedMagnets.find((magnetId: string) => magnetId == cardId)) {
       const index = updatedSelectedMagnets.indexOf(cardId, 0);
       updatedSelectedMagnets.splice(index, 1);
@@ -93,6 +135,19 @@ export const useRenderContent = (
       cardIds: updatedSelectedMagnets,
     }));
   };
+
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      if (!isSelectable(e)) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown);
+    };
+  }, []);
 
   const isCardSelected = (cardId: string): boolean => {
     return !!inputValue.cardIds.find((magnetId: string) => magnetId == cardId);
@@ -121,8 +176,8 @@ export const useRenderContent = (
                       <Grid item key={card.id}>
                         <BoardCardWrapper
                           isCardSelected={isCardSelected(card.id)}
-                          onClick={() => {
-                            updateSelectedMagnets(card.id);
+                          onClick={(event) => {
+                            updateSelectedMagnets(event, card.id);
                           }}
                         >
                           <BoardCard
@@ -150,8 +205,8 @@ export const useRenderContent = (
             <Grid item key={card.id}>
               <BoardCardWrapper
                 isCardSelected={isCardSelected(card.id)}
-                onClick={() => {
-                  updateSelectedMagnets(card.id);
+                onClick={(event) => {
+                  updateSelectedMagnets(event, card.id);
                 }}
               >
                 <BoardCard card={card} zoomLevel={zoomLevel} readOnly={true} />

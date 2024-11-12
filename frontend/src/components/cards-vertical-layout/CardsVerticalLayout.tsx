@@ -232,7 +232,7 @@ export const CardsVerticalLayout: FC = () => {
     >
       <SortableContext items={sectionIds} strategy={rectSortingStrategy}>
         <Box sx={mainWrapperProps}>
-          <FileDropZone />
+          {hasEditRights() && <FileDropZone />}
           {updatedSections.map((section) => (
             <MemoizedSection
               key={section._id}

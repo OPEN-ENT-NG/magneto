@@ -7,6 +7,7 @@ import { Box } from "@mui/material";
 import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
 import { BoardCard } from "../board-card/BoardCard";
 import { CardDisplayProps } from "../cards-vertical-layout/types";
+import { FileDropZone } from "../file-uploader/FileUploader";
 import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
@@ -79,7 +80,7 @@ const MemoizedDragOverlay = memo(
 );
 
 export const CardsFreeLayout: FC = () => {
-  const { board, zoomLevel } = useBoard();
+  const { board, zoomLevel, hasEditRights } = useBoard();
   const {
     updatedIds,
     activeItem,
@@ -89,7 +90,6 @@ export const CardsFreeLayout: FC = () => {
     handleDragEnd,
     handleDragCancel,
   } = useFreeLayoutCardDnD(board);
-
   const displayProps = useMemo(
     () => ({
       zoomLevel,
@@ -117,6 +117,7 @@ export const CardsFreeLayout: FC = () => {
     >
       <SortableContext items={updatedIds} strategy={rectSortingStrategy}>
         <Box sx={mainWrapperProps}>
+          {hasEditRights() && <FileDropZone />}
           <UlWrapper className="grid ps-0 list-unstyled mb-24 left-float">
             {updatedIds.map((cardId, index) => (
               <MemoizedCardItem

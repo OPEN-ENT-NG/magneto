@@ -15,6 +15,7 @@ import { BoardCard } from "../board-card/BoardCard";
 import { CardWrapper } from "../cards-vertical-layout/style";
 import { CardDisplayProps } from "../cards-vertical-layout/types";
 import { DndSection } from "../dnd-section/DndSection";
+import { FileDropZone } from "../file-uploader/FileUploader";
 import { SectionName } from "../section-name/SectionName";
 import { ActiveItemState, DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { useSectionsDnD } from "~/hooks/dnd-hooks/useSectionsDnD";
@@ -234,6 +235,7 @@ export const CardsHorizontalLayout: FC = () => {
     >
       <SortableContext items={sectionIds} strategy={rectSortingStrategy}>
         <Box sx={mainWrapperProps}>
+        {hasEditRights() && <FileDropZone />}
           {updatedSections.map((section) => (
             <MemoizedSection
               key={section._id}

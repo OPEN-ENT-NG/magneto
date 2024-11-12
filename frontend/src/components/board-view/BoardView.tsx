@@ -15,6 +15,7 @@ import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizonta
 import { CardsVerticalLayout } from "../cards-vertical-layout/CardsVerticalLayout";
 import { CreateBoard } from "../create-board/CreateBoard";
 import { CreateMagnet } from "../create-magnet/CreateMagnet";
+import { FileDropZone } from "../file-uploader/FileUploader";
 import { HeaderView } from "../header-view/HeaderView";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
@@ -68,6 +69,9 @@ export const BoardView: FC = () => {
       <HeaderView />
       {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}
       <BoardBodyWrapper layout={board.layoutType} headerHeight={headerHeight}>
+        {hasEditRights() &&
+          !board.cardIds?.length &&
+          !board.sections?.length && <FileDropZone />}
         {displayLayout()}
         {board.backgroundUrl ? (
           <img

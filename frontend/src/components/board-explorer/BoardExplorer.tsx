@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import "./BoardExplorer.scss";
 import { Button } from "@edifice-ui/react";
 import { Box } from "@mui/material";
+import { ExplorerFileViewer } from "../explorer-file-viewer/ExplorerFileViewer";
 
 export const retourStyle = {
   position: "relative",
@@ -44,7 +45,11 @@ export const BoardExplorer: FC = () => {
           </Button>
         </div>
       </div>
-      {/* Votre contenu principal ici */}
+      <iframe src="/workspace/document/d4d8f327-382d-4be1-8a29-88b84498d8d9"></iframe>
+      <ExplorerFileViewer
+        file={"/workspace/document/d4d8f327-382d-4be1-8a29-88b84498d8d9"}
+        type={"DOCX"}
+      />
     </div>
   );
 };

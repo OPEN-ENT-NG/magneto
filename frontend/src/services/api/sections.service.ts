@@ -1,4 +1,4 @@
-import { emptySplitApi } from "./empltySplitApi.service";
+import { emptySplitApi } from "./emptySplitApi.service";
 import { SectionPayload } from "~/models/board.model";
 import { Sections } from "~/providers/BoardProvider/types";
 

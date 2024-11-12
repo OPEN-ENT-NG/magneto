@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import type { PreloadedState } from "@reduxjs/toolkit";
 
-import { emptySplitApi } from "./services/api/empltySplitApi.service";
+import { emptySplitApi } from "./services/api/emptySplitApi.service";
 import { emptySplitWorkspace } from "./services/api/emptySplitWorkspace";
 
 const rootReducer = combineReducers({

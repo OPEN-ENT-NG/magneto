@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Tooltip } from "@mui/material";
 
@@ -32,9 +33,11 @@ import { CardCommentProps } from "../card-comment/types";
 import { CardContent } from "../card-content/CardContent";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
+import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
+import { useFavoriteCardMutation } from "~/services/api/cards.service";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -70,7 +73,11 @@ const MemoizedCardHeader = memo(
     <StyledCardHeader
       avatar={<StyledAvatar aria-label="recipe" src={avatarUrl} />}
       action={
-        <StyledIconButton aria-label="settings" onClick={onToggleDropdown}>
+        <StyledIconButton
+          aria-label="settings"
+          onClick={onToggleDropdown}
+          data-type={POINTER_TYPES.NON_SELECTABLE}
+        >
           <MoreVertIcon />
         </StyledIconButton>
       }
@@ -111,19 +118,23 @@ const MemoizedContent = memo(
 
 const MemoizedCardActions = memo(
   ({
+    cardIsLiked,
     zoomLevel,
     icon,
     type,
     caption,
     nbOfFavorites,
     displayNbFavorites,
+    handleFavoriteClick,
   }: {
+    cardIsLiked: boolean;
     zoomLevel: number;
     icon: string;
     type: string;
     caption: string;
     nbOfFavorites: number;
     displayNbFavorites: boolean;
+    handleFavoriteClick: () => void;
   }) => (
     <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
       <StyledTypographyContainer>
@@ -141,8 +152,13 @@ const MemoizedCardActions = memo(
         {displayNbFavorites && (
           <Simple14Typography>{nbOfFavorites}</Simple14Typography>
         )}
-        <BottomIconButton aria-label="add to favorites" size="small">
-          <StarBorderIcon />
+        <BottomIconButton
+          aria-label="add to favorites"
+          size="small"
+          onClick={() => handleFavoriteClick()}
+          data-type={POINTER_TYPES.NON_SELECTABLE}
+        >
+          {cardIsLiked ? <StarIcon /> : <StarBorderIcon />}
         </BottomIconButton>
       </StyledBox>
     </StyledCardActions>
@@ -163,6 +179,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
       useDropdown();
     const dropDownItemList = useCardDropDownItems(readOnly);
     const { getAvatarURL } = useDirectory();
+    const [favoriteCard] = useFavoriteCardMutation();
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const isOpen = openDropdownId === card.id;
@@ -195,6 +212,10 @@ export const BoardCard: FC<BoardCardProps> = memo(
       transform,
       transition,
     } = sortableProps;
+
+    const handleFavoriteClick = () => {
+      favoriteCard({ cardId: card.id, isFavorite: card.liked });
+    };
 
     // Mémorisation du style
     const style = useMemo(
@@ -241,20 +262,24 @@ export const BoardCard: FC<BoardCardProps> = memo(
 
     const actionProps = useMemo(
       () => ({
+        cardIsLiked: card.liked,
         zoomLevel,
         icon,
         type,
         caption: card.caption,
         nbOfFavorites: card.nbOfFavorites,
         displayNbFavorites,
+        handleFavoriteClick,
       }),
       [
+        card.liked,
         zoomLevel,
         icon,
         type,
         card.caption,
         card.nbOfFavorites,
         displayNbFavorites,
+        handleFavoriteClick,
       ],
     );
 

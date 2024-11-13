@@ -5,6 +5,7 @@ import "./BoardView.scss";
 import { LoadingScreen } from "@edifice-ui/react";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
+import { GlobalStyles } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { BoardBodyWrapper, BoardViewWrapper } from "./style";
@@ -95,61 +96,72 @@ export const BoardView: FC = () => {
   return isLoading ? (
     <LoadingScreen position={false} />
   ) : (
-    <BoardViewWrapper layout={board.layoutType}>
-      <HeaderView />
-
-      {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}
-      <BoardBodyWrapper
-        layout={board.layoutType}
-        headerHeight={headerHeight}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-      >
-        {displayLayout()}
-        {hasEditRights() && isFileDragging && <FileDropZone />}
-        {board.backgroundUrl ? (
-          <img
-            src={board.backgroundUrl}
-            alt="backgroundImage"
-            className="background-image"
-          ></img>
-        ) : (
-          <div className="no-background-image"></div>
-        )}
-        {!board.cardIds?.length && !board.sections?.length && (
-          <div className="cards-empty-state">
-            <div className="card-empty-state-message">
-              {t("magneto.add.content.from.menu")}
+    <>
+      <GlobalStyles
+        styles={{
+          "main.container-fluid": {
+            padding: "0 !important",
+            width: "100%",
+            marginLeft: hasEditRights() ? "8.1rem" : 0,
+            maxWidth: "93%",
+          },
+        }}
+      />
+      <BoardViewWrapper layout={board.layoutType}>
+        <HeaderView />
+        {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}
+        <BoardBodyWrapper
+          layout={board.layoutType}
+          headerHeight={headerHeight}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+        >
+          {displayLayout()}
+          {hasEditRights() && isFileDragging && <FileDropZone />}
+          {board.backgroundUrl ? (
+            <img
+              src={board.backgroundUrl}
+              alt="backgroundImage"
+              className="background-image"
+            ></img>
+          ) : (
+            <div className="no-background-image"></div>
+          )}
+          {!board.cardIds?.length && !board.sections?.length && (
+            <div className="cards-empty-state">
+              <div className="card-empty-state-message">
+                {t("magneto.add.content.from.menu")}
+              </div>
+              <Icon path={mdiKeyboardBackspace} size={7} />
             </div>
-            <Icon path={mdiKeyboardBackspace} size={7} />
-          </div>
-        )}
-      </BoardBodyWrapper>
+          )}
+        </BoardBodyWrapper>
 
-      <CreateMagnet open={magnetType === MENU_NOT_MEDIA_TYPE.TEXT} />
+        <CreateMagnet open={magnetType === MENU_NOT_MEDIA_TYPE.TEXT} />
 
-      <BoardCreateMagnetMagnetModal
-        open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
-        onClose={onClose}
-      />
-
-      <CreateBoard
-        isOpen={displayModals.PARAMETERS}
-        toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
-        boardToUpdate={board}
-      />
-
-      <div className="zoom-container">
-        <ZoomComponent
-          opacity={0.75}
-          zoomLevel={zoomLevel}
-          zoomMaxLevel={5}
-          zoomIn={zoomIn}
-          zoomOut={zoomOut}
-          resetZoom={resetZoom}
+        <BoardCreateMagnetMagnetModal
+          open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
+          onClose={onClose}
         />
-      </div>
-    </BoardViewWrapper>
+
+        <CreateBoard
+          isOpen={displayModals.PARAMETERS}
+          toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
+          boardToUpdate={board}
+        />
+
+        <div className="zoom-container">
+          <ZoomComponent
+            opacity={0.75}
+            zoomLevel={zoomLevel}
+            zoomMaxLevel={5}
+            zoomIn={zoomIn}
+            zoomOut={zoomOut}
+            resetZoom={resetZoom}
+          />
+        </div>
+      </BoardViewWrapper>
+    </>
   );
 };

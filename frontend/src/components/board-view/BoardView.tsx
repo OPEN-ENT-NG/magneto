@@ -1,4 +1,4 @@
-import { FC, useEffect, DragEvent, useRef } from "react";
+import { FC, useEffect, DragEvent, useState } from "react";
 
 import "./BoardView.scss";
 
@@ -44,9 +44,8 @@ export const BoardView: FC = () => {
     isFileDragging,
   } = useBoard();
   const headerHeight = useHeaderHeight();
-  const dragCounter = useRef(0);
+  const [, setDragCounter] = useState<number>(0);
   const { magnetType, onClose } = useMediaLibrary();
-  const leaveTimer = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -71,26 +70,39 @@ export const BoardView: FC = () => {
   const handleDragEnter = (event: DragEvent): void => {
     event.preventDefault();
     event.stopPropagation();
+
     if (event.dataTransfer?.types.includes("Files")) {
-      dragCounter.current++;
-      setIsFileDragging(true);
+      setDragCounter((prev) => {
+        const newCount = prev + 1;
+        if (newCount === 1) {
+          setIsFileDragging(true);
+        }
+        return newCount;
+      });
     }
   };
 
   const handleDragLeave = (event: DragEvent): void => {
     event.preventDefault();
     event.stopPropagation();
-    leaveTimer.current = setTimeout(() => {
-      dragCounter.current--;
-      if (dragCounter.current <= 0) {
-        dragCounter.current = 0;
+
+    setDragCounter((prev) => {
+      const newCount = prev - 1;
+      if (newCount <= 0) {
         setIsFileDragging(false);
+        return 0;
       }
-    }, 50);
+      return newCount;
+    });
   };
 
   const handleDragOver = (event: DragEvent): void => {
     event.preventDefault();
+    event.stopPropagation();
+  };
+  const handleResetDrag = () => {
+    setDragCounter(0);
+    setIsFileDragging(false);
   };
 
   return isLoading ? (
@@ -118,7 +130,9 @@ export const BoardView: FC = () => {
           onDragOver={handleDragOver}
         >
           {displayLayout()}
-          {hasEditRights() && isFileDragging && <FileDropZone />}
+          {hasEditRights() && isFileDragging && (
+            <FileDropZone handleResetdrag={handleResetDrag} />
+          )}
           {board.backgroundUrl ? (
             <img
               src={board.backgroundUrl}

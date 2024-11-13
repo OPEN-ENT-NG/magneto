@@ -14,13 +14,14 @@ import {
   textStyle,
   whiteBoxStyle,
 } from "./style";
+import { FileDropZoneProps } from "./types";
 import { APPLICATION_X_MOZ_FILE, FILES } from "~/core/constants/files.const";
 import { FILE_VALIDATION_CONFIG } from "~/core/constants/fileValidation.config.const";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
-export const FileDropZone: FC = () => {
-  const { isFileDragging, setIsFileDragging } = useBoard();
+export const FileDropZone: FC<FileDropZoneProps> = ({ handleResetdrag }) => {
+  const { isFileDragging } = useBoard();
   const { setWorkspaceElement } = useMediaLibrary();
   const toast = useToast();
   const { create } = useWorkspaceFile();
@@ -66,10 +67,10 @@ export const FileDropZone: FC = () => {
     event.preventDefault();
 
     if (!validateFile(event.dataTransfer)) {
-      return setIsFileDragging(false);
+      return handleResetdrag();
     }
 
-    setIsFileDragging(false);
+    handleResetdrag();
 
     const file = event.dataTransfer.files[0];
     try {

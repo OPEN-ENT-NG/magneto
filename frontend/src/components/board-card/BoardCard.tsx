@@ -192,10 +192,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
 
     const hasLockedCardRights = (): boolean => {
       const isCardOwner: boolean = card.ownerId == user?.userId;
-      return (
-        (card.locked && (isCardOwner || hasManageRights())) ||
-        (!card.locked && (isCardOwner || hasEditRights()))
-      );
+      return isCardOwner || (card.locked ? hasManageRights() : hasEditRights());
     };
 
     const dropDownItemList = useCardDropDownItems(

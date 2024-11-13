@@ -23,7 +23,6 @@ export const wrapperBoxStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   boxSizing: "border-box",
-  marginTop: "67px",
 };
 
 export const leftWrapperStyle = {

@@ -87,6 +87,7 @@ export const StyledCardHeader = styled(CardHeader)({
     marginTop: 0,
     paddingTop: 0,
     paddingBottom: 0,
+    color: "#707070",
   },
 });
 

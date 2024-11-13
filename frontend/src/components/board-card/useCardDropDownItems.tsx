@@ -13,23 +13,33 @@ import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
 
-export const useCardDropDownItems = (readOnly: boolean): DropDownListItem[] => {
+export const useCardDropDownItems = (
+  readOnly: boolean,
+  lockedAndNoRights?: boolean,
+): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
 
-  const readOnlyItems: DropDownListItem[] = useMemo(
+  const lockedAndNoRightsItems: DropDownListItem[] = useMemo(
     () => [
       {
         primary: <Icon path={mdiPlay} size={"inherit"} />,
         secondary: t("magneto.card.options.preview"),
         OnClick: () => null,
       },
+    ],
+    [t],
+  );
+
+  const readOnlyItems: DropDownListItem[] = useMemo(
+    () => [
+      ...lockedAndNoRightsItems,
       {
         primary: <Icon path={mdiFileMultipleOutline} size={"inherit"} />,
         secondary: t("magneto.duplicate"),
         OnClick: () => null,
       },
     ],
-    [t],
+    [lockedAndNoRightsItems, t],
   );
 
   const editableItems: DropDownListItem[] = useMemo(
@@ -60,7 +70,12 @@ export const useCardDropDownItems = (readOnly: boolean): DropDownListItem[] => {
   );
 
   return useMemo(
-    () => (readOnly ? readOnlyItems : editableItems),
-    [readOnly, readOnlyItems, editableItems],
+    () =>
+      lockedAndNoRights
+        ? lockedAndNoRightsItems
+        : readOnly
+        ? readOnlyItems
+        : editableItems,
+    [readOnly, readOnlyItems, editableItems, lockedAndNoRights],
   );
 };

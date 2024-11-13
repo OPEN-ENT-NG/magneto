@@ -3,7 +3,7 @@ import {
   FetchBaseQueryMeta,
 } from "@reduxjs/toolkit/query";
 
-import { emptySplitApi } from "./empltySplitApi.service";
+import { emptySplitApi } from "./emptySplitApi.service";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { IBoardItemResponse } from "~/models/board.model";
 import { ICardsResponse } from "~/models/card.model";

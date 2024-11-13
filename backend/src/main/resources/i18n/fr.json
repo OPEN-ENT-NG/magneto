@@ -193,7 +193,7 @@
   "magneto.yes": "Oui",
   "magneto.no": "Non",
   "magneto.dropzone.create.error": "Erreur lors de la création de votre fichier sur le workspace",
-  "magneto.dropzone.overlay.label": "Déposez le fichier",
+  "magneto.dropzone.overlay.label": "Déposer le fichier pour l'importer dans {{board}}",
   "magneto.dropzone.overlay.warning": "Il est impossible d'importer un dossier",
   "magneto.dropzone.overlay.solution": "Veuillez importer un <b>fichier</b>",
   "magneto.dropzone.overlay.action": "J'ai compris",
@@ -223,6 +223,6 @@
   "magneto.explorer.modal.share.search": "Rechercher des utilisateurs",
   "magneto.explorer.cancel": "Annuler",
   "magneto.share.heading.tooltip.message": "Vos favoris de partage s’affichent en priorité dans votre liste lorsque vous recherchez un groupe ou une personne, vous pouvez les retrouver dans l’annuaire.",
-  "magneto.today":"Aujourd'hui",
-  "magneto.yesterday":"Hier"
+  "magneto.today": "Aujourd'hui",
+  "magneto.yesterday": "Hier"
 }

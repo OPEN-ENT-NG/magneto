@@ -1,4 +1,4 @@
-import { emptySplitApi } from "./empltySplitApi.service";
+import { emptySplitApi } from "./emptySplitApi.service";
 import { IBoardsParamsRequest, IBoardPayload } from "~/models/board.model";
 
 export const boardsApi = emptySplitApi.injectEndpoints({

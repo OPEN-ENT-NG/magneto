@@ -24,6 +24,8 @@ export type BoardContextType = {
   hasManageRights: () => boolean;
   displayModals: DisplayModalsState;
   toggleBoardModals: (modalType: BOARD_MODAL_TYPE) => void;
+  isFileDragging: boolean;
+  setIsFileDragging: Dispatch<SetStateAction<boolean>>;
 };
 
 export type Section = {

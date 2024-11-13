@@ -97,6 +97,15 @@ const MemoizedCardHeader = memo(
       }
     />
   ),
+  (prevProps, nextProps) => {
+    return (
+      prevProps.avatarUrl === nextProps.avatarUrl &&
+      prevProps.ownerName === nextProps.ownerName &&
+      prevProps.timeLabel === nextProps.timeLabel &&
+      prevProps.timeTooltip === nextProps.timeTooltip &&
+      prevProps.onToggleDropdown === nextProps.onToggleDropdown
+    );
+  },
 );
 
 const MemoizedContent = memo(
@@ -122,6 +131,14 @@ const MemoizedContent = memo(
       )}
     </StyledCardContent>
   ),
+  (prevProps, nextProps) => {
+    return (
+      prevProps.title === nextProps.title &&
+      prevProps.zoomLevel === nextProps.zoomLevel &&
+      prevProps.resourceType === nextProps.resourceType &&
+      prevProps.card === nextProps.card
+    );
+  },
 );
 
 const MemoizedCardActions = memo(
@@ -171,6 +188,18 @@ const MemoizedCardActions = memo(
       </StyledBox>
     </StyledCardActions>
   ),
+  (prevProps, nextProps) => {
+    return (
+      prevProps.cardIsLiked === nextProps.cardIsLiked &&
+      prevProps.zoomLevel === nextProps.zoomLevel &&
+      prevProps.icon === nextProps.icon &&
+      prevProps.type === nextProps.type &&
+      prevProps.caption === nextProps.caption &&
+      prevProps.nbOfFavorites === nextProps.nbOfFavorites &&
+      prevProps.displayNbFavorites === nextProps.displayNbFavorites &&
+      prevProps.handleFavoriteClick === nextProps.handleFavoriteClick
+    );
+  },
 );
 
 export const BoardCard: FC<BoardCardProps> = memo(
@@ -232,11 +261,10 @@ export const BoardCard: FC<BoardCardProps> = memo(
       transition,
     } = sortableProps;
 
-    const handleFavoriteClick = () => {
+    const handleFavoriteClick = useCallback(() => {
       favoriteCard({ cardId: card.id, isFavorite: card.liked });
-    };
+    }, [card.id, card.liked, favoriteCard]);
 
-    // Mémorisation du style
     const style = useMemo(
       () => ({
         transform: CSS.Translate.toString({
@@ -360,6 +388,7 @@ BoardCard.displayName = "BoardCard";
 const MemoizedBoardCard = memo(BoardCard, (prevProps, nextProps) => {
   return (
     prevProps.card.id === nextProps.card.id &&
+    prevProps.card.liked === nextProps.card.liked &&
     prevProps.card.modificationDate === nextProps.card.modificationDate &&
     prevProps.zoomLevel === nextProps.zoomLevel &&
     prevProps.canComment === nextProps.canComment &&

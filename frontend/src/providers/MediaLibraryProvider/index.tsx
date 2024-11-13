@@ -15,6 +15,7 @@ import {
 import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
+import { getMediaLibraryType } from "./utils";
 import { MediaProps } from "~/components/board-view/types";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useMediaLibrary as useMediaLibraryHook } from "~/hooks/useMediaLibrary";
@@ -42,7 +43,8 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
     onSuccess,
     onTabChange,
   } = useMediaLibraryHook();
-
+  const [workspaceElement, setWorkspaceElement] =
+    useState<WorkspaceElement | null>(null);
   const [media, setMedia] = useState<MediaProps | null>(null);
   const [isCreateMagnetOpen, setIsCreateMagnetOpen] = useState(false);
   const [magnetType, setMagnetType] = useState<MENU_NOT_MEDIA_TYPE | null>(
@@ -67,9 +69,11 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
     setMedia(null);
     setMagnetType(null);
     setIsCreateMagnetOpen(false);
+    setWorkspaceElement(null);
   };
 
   const updateLibraryMedia = () => {
+    setMedia(null);
     if (libraryMedia) {
       if (libraryMedia.url) {
         const medialIb = libraryMedia as IExternalLink;
@@ -105,16 +109,30 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
             : (libraryMedia as string),
         });
       }
-      setIsCreateMagnetOpen(true);
+      return setIsCreateMagnetOpen(true);
+    }
+    if (workspaceElement) {
+      setMedia({
+        type: getMediaLibraryType(workspaceElement?.name),
+        id: workspaceElement?._id || "",
+        name: workspaceElement?.name || "",
+        application: "",
+        url: workspaceElement?._id
+          ? `/workspace/document/${workspaceElement?._id}`
+          : (libraryMedia as string),
+      });
+      return setIsCreateMagnetOpen(true);
     }
   };
 
   useEffect(() => {
     updateLibraryMedia();
-  }, [libraryMedia]);
+  }, [libraryMedia, workspaceElement]);
 
   const value = useMemo<MediaLibraryContextType>(
     () => ({
+      workspaceElement,
+      setWorkspaceElement,
       mediaLibraryRef,
       libraryMedia,
       mediaLibraryHandlers: {
@@ -132,7 +150,14 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       handleClickMenu,
       onClose,
     }),
-    [mediaLibraryRef, libraryMedia, media, isCreateMagnetOpen, magnetType],
+    [
+      mediaLibraryRef,
+      libraryMedia,
+      media,
+      isCreateMagnetOpen,
+      magnetType,
+      workspaceElement,
+    ],
   );
 
   return (

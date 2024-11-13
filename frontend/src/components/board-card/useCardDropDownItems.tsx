@@ -18,6 +18,25 @@ export const useCardDropDownItems = (
   lockedAndNoRights?: boolean,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
+  
+
+  //put in boardCard
+  const [updateCard] = useUpdateCardMutation();
+  const lockOrUnlockMagnet = () => {
+    const payload: CardPayload = {
+      boardId: board._id,
+      caption: caption,
+      description: editorRef.current?.getContent("html") as string,
+      locked: false,
+      resourceId: media?.id ?? "",
+      resourceType: magnetType ?? convertMediaTypeToResourceType(media?.type),
+      resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
+      title: title,
+      ...(section?._id ? { sectionId: section._id } : {}),
+    };
+
+    await updateCard()
+  }
 
   const lockedAndNoRightsItems: DropDownListItem[] = useMemo(
     () => [
@@ -58,7 +77,7 @@ export const useCardDropDownItems = (
       {
         primary: <Icon path={mdiLock} size={"inherit"} />,
         secondary: t("magneto.card.options.lock"),
-        OnClick: () => null,
+        OnClick: () => {},
       },
       {
         primary: <Icon path={mdiDelete} size={"inherit"} />,

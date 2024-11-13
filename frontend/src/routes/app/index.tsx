@@ -207,9 +207,8 @@ export const App = () => {
               isOpen={showModal}
               i18nKey={modalProps.i18nKey}
               param={modalProps.param}
-              hasSubmit={modalProps.hasSubmit}
               onSubmit={modalProps.onSubmit}
-              onCancel={modalProps.onCancel}
+              onClose={modalProps.onCancel}
             ></MessageModal>
           </Grid.Col>
         </Grid>

@@ -10,6 +10,7 @@ import {
   mdiShareVariant,
 } from "@mdi/js";
 import { Icon } from "@mdi/react";
+import { Box } from "@mui/material";
 import dayjs from "dayjs";
 import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
@@ -61,7 +62,6 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
-    // end: //...
   });
 
   const isSameAsUser = (id: string) => {
@@ -87,14 +87,27 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
     );
   }, [isBoardDragged, selectedBoards]);
 
+  const handleClick = (e: React.MouseEvent) => {
+    //si la classe du bouton select change, la changer ci dessous
+    if ((e.target as HTMLElement).closest(".btn-ghost-secondary")) {
+      return;
+    }
+    navigate(`/board/${board.id}/view`);
+  };
+
+  const handleSelect = () => {
+    toggleSelect(board as Board);
+  };
+
   return (
-    <div
+    <Box
       ref={drag}
       className={`board-item board ${isDragging ? "dragging" : ""}`}
       style={{
         opacity: isDragging || isDragged ? 0.5 : 1,
         cursor: "move",
       }}
+      onClick={handleClick}
     >
       <Card
         app={currentApp!}
@@ -105,15 +118,14 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
         isLoading={false}
         isSelectable={true}
         isSelected={selectedBoardsIds.includes(board.id)}
-        onSelect={() => toggleSelect(board as Board)}
-        onClick={() => navigate(`/board/${board.id}/view`)}
+        onSelect={handleSelect}
       >
         <Card.Body flexDirection={"column"}>
           <Card.Image
             className="image-c"
             imageSrc={board.imageUrl}
             variant="landscape"
-          ></Card.Image>
+          />
 
           <div className="board-title">
             <Tooltip message={board.title} placement="bottom-start">
@@ -126,7 +138,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
               path={mdiMagnet}
               size={1}
               className="med-resource-card-text"
-            ></Icon>
+            />
             <Card.Text className="med-resource-card-text board-text">
               {board.layoutType == LAYOUT_TYPE.FREE
                 ? board.nbCards
@@ -141,7 +153,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                 message={t("magneto.board.date.update")}
                 placement="bottom"
               >
-                <Icon path={mdiCalendarBlank} size={1}></Icon>
+                <Icon path={mdiCalendarBlank} size={1} />
               </Tooltip>
               <Card.Text className="med-resource-card-text">
                 {dayjs(board.modificationDate, {
@@ -158,7 +170,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                   }`}
                   placement="bottom"
                 >
-                  <Icon path={mdiAccountCircle} size={1}></Icon>
+                  <Icon path={mdiAccountCircle} size={1} />
                 </Tooltip>
               )}
               {isSameAsUser(board.owner.userId) && (
@@ -166,7 +178,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                   message={t("magneto.board.tooltip.my.board")}
                   placement="bottom"
                 >
-                  <Icon path={mdiCrown} size={1}></Icon>
+                  <Icon path={mdiCrown} size={1} />
                 </Tooltip>
               )}
               {board.shared?.length > 0 && (
@@ -174,7 +186,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                   message={t("magneto.board.tooltip.shared.board")}
                   placement="bottom"
                 >
-                  <Icon path={mdiShareVariant} size={1}></Icon>
+                  <Icon path={mdiShareVariant} size={1} />
                 </Tooltip>
               )}
               {board.isPublished && (
@@ -182,13 +194,13 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                   message={t("magneto.board.tooltip.public.board")}
                   placement="bottom"
                 >
-                  <Icon path={mdiEarth} size={1}></Icon>
+                  <Icon path={mdiEarth} size={1} />
                 </Tooltip>
               )}
             </div>
           </div>
         </Card.Body>
       </Card>
-    </div>
+    </Box>
   );
 };

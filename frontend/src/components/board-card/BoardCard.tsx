@@ -2,7 +2,9 @@ import { FC, useEffect, useRef, useMemo, useCallback, memo } from "react";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useUser } from "@edifice-ui/react";
 import Icon from "@mdi/react";
+import LockIcon from "@mui/icons-material/Lock";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -37,6 +39,7 @@ import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
+import { useBoard } from "~/providers/BoardProvider";
 import { useFavoriteCardMutation } from "~/services/api/cards.service";
 
 const MemoizedCardContent = memo(CardContent);
@@ -63,23 +66,28 @@ const MemoizedCardHeader = memo(
     timeLabel,
     timeTooltip,
     onToggleDropdown,
+    isLocked,
   }: {
     avatarUrl: string;
     ownerName: string;
     timeLabel: string;
     timeTooltip: string;
     onToggleDropdown: () => void;
+    isLocked: boolean;
   }) => (
     <StyledCardHeader
       avatar={<StyledAvatar aria-label="recipe" src={avatarUrl} />}
       action={
-        <StyledIconButton
-          aria-label="settings"
-          onClick={onToggleDropdown}
-          data-type={POINTER_TYPES.NON_SELECTABLE}
-        >
-          <MoreVertIcon />
-        </StyledIconButton>
+        <div>
+          {isLocked && <LockIcon />}
+          <StyledIconButton
+            aria-label="settings"
+            onClick={onToggleDropdown}
+            data-type={POINTER_TYPES.NON_SELECTABLE}
+          >
+            <MoreVertIcon />
+          </StyledIconButton>
+        </div>
       }
       title={ownerName}
       subheader={
@@ -177,9 +185,20 @@ export const BoardCard: FC<BoardCardProps> = memo(
     const time = useElapsedTime(card.modificationDate);
     const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
       useDropdown();
-    const dropDownItemList = useCardDropDownItems(readOnly);
     const { getAvatarURL } = useDirectory();
     const [favoriteCard] = useFavoriteCardMutation();
+    const { user } = useUser();
+    const { hasEditRights, hasManageRights } = useBoard();
+
+    const hasLockedCardRights = (): boolean => {
+      const isCardOwner: boolean = card.ownerId == user?.userId;
+      return isCardOwner || (card.locked ? hasManageRights() : hasEditRights());
+    };
+
+    const dropDownItemList = useCardDropDownItems(
+      readOnly,
+      card.locked ? !hasLockedCardRights() : false,
+    );
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const isOpen = openDropdownId === card.id;
@@ -239,6 +258,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
         timeLabel: time.label,
         timeTooltip: time.tooltip,
         onToggleDropdown: handleToggleDropdown,
+        isLocked: card.locked,
       }),
       [
         card.ownerId,
@@ -247,6 +267,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
         time.tooltip,
         handleToggleDropdown,
         getAvatarURL,
+        card.locked,
       ],
     );
 

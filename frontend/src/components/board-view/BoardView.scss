@@ -7,17 +7,17 @@
   z-index: 2;
 }
 
-header.header:has(+ main.container-fluid) {
-  position: fixed;
-  width: 100%;
-}
+// header.header:has(+ main.container-fluid) {
+//   position: fixed;
+//   width: 100%;
+// }
 
-main.container-fluid {
-  padding: unset !important;
-  width: 100%;
-  margin-left: 8.1rem;
-  max-width: 93%;
-}
+// main.container-fluid {
+//   padding: unset !important;
+//   width: 100%;
+//   margin-left: 8.1rem;
+//   max-width: 93%;
+// }
 
 .no-background-image {
   position: absolute;

@@ -10,10 +10,11 @@ import {
   DragBox,
   ellipsisBoxStyle,
   flyingBox,
-  InnerBox,
+  innerBox,
   textStyle,
   whiteBoxStyle,
 } from "./style";
+import { APPLICATION_X_MOZ_FILE, FILES } from "~/core/constants/files.const";
 import { FILE_VALIDATION_CONFIG } from "~/core/constants/fileValidation.config.const";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -31,8 +32,8 @@ export const FileDropZone: FC = () => {
   const validateFile = (dataTransfer: DataTransfer | null): boolean => {
     if (!dataTransfer?.types) return false;
     const isFile =
-      dataTransfer.types.includes("Files") &&
-      !dataTransfer.types.includes("application/x-moz-file");
+      dataTransfer.types.includes(FILES) &&
+      !dataTransfer.types.includes(APPLICATION_X_MOZ_FILE);
     if (!isFile) return false;
     if (dataTransfer.files.length !== 1) {
       toast.error(t("magneto.dropzone.create.error"));
@@ -84,10 +85,10 @@ export const FileDropZone: FC = () => {
 
   return (
     <DragBox isDragging={isFileDragging} id="dropzone">
-      <InnerBox
+      <Box
+        sx={innerBox}
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        isDragging={isFileDragging}
       >
         {isFileDragging && (
           <Box sx={flyingBox}>
@@ -100,7 +101,7 @@ export const FileDropZone: FC = () => {
             </Typography>
           </Box>
         )}
-      </InnerBox>
+      </Box>
     </DragBox>
   );
 };

@@ -14,15 +14,12 @@ export const DragBox = styled(Box)<{ isDragging: boolean }>(
   }),
 );
 
-export const InnerBox = styled(Box)<{ isDragging: boolean }>(
-  ({ isDragging }) => ({
-    position: "relative",
-    width: "100%",
-    height: "100%",
-    mt: isDragging ? 2 : 0,
-    transition: "margin 0.2s",
-  }),
-);
+export const innerBox = {
+  position: "relative",
+  width: "100%",
+  height: "100%",
+  transition: "margin 0.2s",
+};
 
 export const flyingBox = {
   position: "absolute",

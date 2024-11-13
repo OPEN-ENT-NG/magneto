@@ -194,7 +194,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
       const isCardOwner: boolean = card.ownerId == user?.userId;
       return (
         (card.locked && (isCardOwner || hasManageRights())) ||
-        (!card.locked && (isCardOwner || hasManageRights() || hasEditRights()))
+        (!card.locked && (isCardOwner || hasEditRights()))
       );
     };
 

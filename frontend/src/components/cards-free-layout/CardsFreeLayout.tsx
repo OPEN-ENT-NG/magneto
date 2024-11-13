@@ -89,7 +89,6 @@ export const CardsFreeLayout: FC = () => {
     handleDragEnd,
     handleDragCancel,
   } = useFreeLayoutCardDnD(board);
-
   const displayProps = useMemo(
     () => ({
       zoomLevel,

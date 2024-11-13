@@ -36,6 +36,7 @@ export const useBoard = () => {
 };
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
+  const [isFileDragging, setIsFileDragging] = useState<boolean>(false);
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
@@ -118,8 +119,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       hasManageRights,
       displayModals,
       toggleBoardModals,
+      isFileDragging,
+      setIsFileDragging,
     }),
-    [board, zoomLevel, isLoading, boardRights, displayModals],
+    [board, zoomLevel, isLoading, boardRights, displayModals, isFileDragging],
   );
 
   return (

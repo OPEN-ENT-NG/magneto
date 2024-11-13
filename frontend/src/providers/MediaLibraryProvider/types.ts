@@ -28,6 +28,8 @@ export type MediaLibraryContextType = {
     ) => Promise<void>;
   };
   media: MediaProps | null;
+  workspaceElement: WorkspaceElement | null;
+  setWorkspaceElement: Dispatch<SetStateAction<WorkspaceElement | null>>;
   setMedia: Dispatch<SetStateAction<MediaProps | null>>;
   handleClickMedia: (type: MediaLibraryType) => void;
   isCreateMagnetOpen: boolean;

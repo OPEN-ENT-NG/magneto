@@ -40,7 +40,10 @@ import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useBoard } from "~/providers/BoardProvider";
-import { useFavoriteCardMutation, useUpdateCardMutation } from "~/services/api/cards.service";
+import {
+  useFavoriteCardMutation,
+  useUpdateCardMutation,
+} from "~/services/api/cards.service";
 import { CardPayload } from "../create-magnet/types";
 import { Section } from "~/providers/BoardProvider/types";
 
@@ -227,22 +230,29 @@ export const BoardCard: FC<BoardCardProps> = memo(
     };
 
     //put in boardCard
-  const [updateCard] = useUpdateCardMutation();
-  const lockOrUnlockMagnet = async () => {
-    const payload: CardPayload = {
-      boardId: board._id,
-      caption: card.caption,
-      description: card.description,
-      locked: !card.locked,
-      resourceId: card.resourceId,
-      resourceType: card.resourceType,
-      resourceUrl: card.resourceUrl,
-      title: card.title,
-      ...(!!board.sections.length ? { sectionId: board.sections.find((section: Section) => section.cardIds.includes(card.id))?._id}  : {}),
-    };
+    const [updateCard] = useUpdateCardMutation();
+    const lockOrUnlockMagnet = async () => {
+      const payload: CardPayload = {
+        id: card.id,
+        boardId: board._id,
+        caption: card.caption,
+        description: card.description,
+        locked: !card.locked,
+        resourceId: card.resourceId,
+        resourceType: card.resourceType,
+        resourceUrl: card.resourceUrl,
+        title: card.title,
+        ...(!!board.sections.length
+          ? {
+              sectionId: board.sections.find((section: Section) =>
+                section.cardIds.includes(card.id),
+              )?._id,
+            }
+          : {}),
+      };
 
-    await updateCard(payload);
-  }
+      await updateCard(payload);
+    };
 
     const dropDownItemList = useCardDropDownItems(
       readOnly,

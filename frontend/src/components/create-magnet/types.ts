@@ -3,6 +3,7 @@ export interface CreateMagnetProps {
 }
 
 export interface CardPayload {
+  id?: string;
   boardId: string;
   caption: string;
   description: string;

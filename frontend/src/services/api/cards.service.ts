@@ -31,6 +31,14 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["BoardData"],
     }),
+    updateCard: builder.mutation({
+      query: (params: CardPayload) => ({
+        url: "card",
+        method: "PUT",
+        body: params,
+      }),
+      invalidatesTags: ["BoardData"],
+    }),
     duplicateCard: builder.mutation({
       query: (params: ICardsBoardParamsRequest) => ({
         url: "card/duplicate",
@@ -55,6 +63,7 @@ export const {
   useLazyGetCardsBySectionQuery,
   useLazyGetAllCardsByBoardIdQuery,
   useCreateCardMutation,
+  useUpdateCardMutation,
   useDuplicateCardMutation,
   useFavoriteCardMutation,
 } = cardsApi;

@@ -33,6 +33,7 @@ import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
 import { CardComment } from "../card-comment/CardComment";
 import { CardCommentProps } from "../card-comment/types";
 import { CardContent } from "../card-content/CardContent";
+import { CardPayload } from "../create-magnet/types";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
 import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
@@ -40,7 +41,11 @@ import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useBoard } from "~/providers/BoardProvider";
-import { useFavoriteCardMutation } from "~/services/api/cards.service";
+import { Section } from "~/providers/BoardProvider/types";
+import {
+  useFavoriteCardMutation,
+  useUpdateCardMutation,
+} from "~/services/api/cards.service";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -217,15 +222,42 @@ export const BoardCard: FC<BoardCardProps> = memo(
     const { getAvatarURL } = useDirectory();
     const [favoriteCard] = useFavoriteCardMutation();
     const { user } = useUser();
-    const { hasEditRights, hasManageRights } = useBoard();
+    const { board, hasEditRights, hasManageRights } = useBoard();
 
     const hasLockedCardRights = (): boolean => {
       const isCardOwner: boolean = card.ownerId == user?.userId;
       return isCardOwner || (card.locked ? hasManageRights() : hasEditRights());
     };
 
+    //put in boardCard
+    const [updateCard] = useUpdateCardMutation();
+    const lockOrUnlockMagnet = async () => {
+      const payload: CardPayload = {
+        id: card.id,
+        boardId: board._id,
+        caption: card.caption,
+        description: card.description,
+        locked: !card.locked,
+        resourceId: card.resourceId,
+        resourceType: card.resourceType,
+        resourceUrl: card.resourceUrl,
+        title: card.title,
+        ...(board.sections.length
+          ? {
+              sectionId: board.sections.find((section: Section) =>
+                section.cardIds.includes(card.id),
+              )?._id,
+            }
+          : {}),
+      };
+
+      await updateCard(payload);
+    };
+
     const dropDownItemList = useCardDropDownItems(
       readOnly,
+      card.locked,
+      lockOrUnlockMagnet,
       card.locked ? !hasLockedCardRights() : false,
     );
 

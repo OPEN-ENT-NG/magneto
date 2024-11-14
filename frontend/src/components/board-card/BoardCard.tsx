@@ -256,8 +256,9 @@ export const BoardCard: FC<BoardCardProps> = memo(
 
     const dropDownItemList = useCardDropDownItems(
       readOnly,
-      card.locked ? !hasLockedCardRights() : false,
+      card.locked,
       lockOrUnlockMagnet,
+      card.locked ? !hasLockedCardRights() : false,
     );
 
     const dropdownRef = useRef<HTMLDivElement>(null);

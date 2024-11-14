@@ -15,8 +15,9 @@ import { DropDownListItem } from "../drop-down-list/types";
 
 export const useCardDropDownItems = (
   readOnly: boolean,
-  lockedAndNoRights?: boolean,
+  isLocked: boolean,
   lockOrUnlockMagnet: () => void,
+  lockedAndNoRights?: boolean,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
 
@@ -58,7 +59,9 @@ export const useCardDropDownItems = (
       },
       {
         primary: <Icon path={mdiLock} size={"inherit"} />,
-        secondary: t("magneto.card.options.lock"),
+        secondary: isLocked
+          ? t("magneto.card.options.unlock")
+          : t("magneto.card.options.lock"),
         OnClick: () => lockOrUnlockMagnet(),
       },
       {

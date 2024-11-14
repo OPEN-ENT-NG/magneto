@@ -55,19 +55,6 @@ export interface ICardsBoardParamsRequest {
   boardId: string;
 }
 
-export interface ICardPayload {
-  id?: string;
-  title: string;
-  description: string;
-  caption: string;
-  resourceId: string;
-  resourceType: string;
-  locked?: boolean;
-  resourceUrl?: string;
-  boardId: string;
-  sectionId?: string;
-}
-
 export interface IMetadata {
   name: string;
   filename: string;

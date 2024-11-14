@@ -19,9 +19,6 @@ export const useCardDropDownItems = (
   lockOrUnlockMagnet: () => void,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
-  
-
-  
 
   const lockedAndNoRightsItems: DropDownListItem[] = useMemo(
     () => [

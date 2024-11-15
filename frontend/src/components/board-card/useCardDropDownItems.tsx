@@ -12,74 +12,103 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
+import { Card } from "~/models/card.model";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const useCardDropDownItems = (
   readOnly: boolean,
   isLocked: boolean,
   lockOrUnlockMagnet: () => void,
+  card: Card,
   lockedAndNoRights?: boolean,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
+  const { openCardPreview } = useBoard();
 
-  const lockedAndNoRightsItems: DropDownListItem[] = useMemo(
-    () => [
-      {
-        primary: <Icon path={mdiPlay} size={"inherit"} />,
-        secondary: t("magneto.card.options.preview"),
-        OnClick: () => null,
-      },
-    ],
-    [t],
+  const icons = useMemo(
+    () => ({
+      play: <Icon path={mdiPlay} size="inherit" />,
+      pencil: <Icon path={mdiPencil} size="inherit" />,
+      fileMultiple: <Icon path={mdiFileMultipleOutline} size="inherit" />,
+      bookArrow: <Icon path={mdiBookArrowRight} size="inherit" />,
+      lock: <Icon path={mdiLock} size="inherit" />,
+      delete: <Icon path={mdiDelete} size="inherit" />,
+    }),
+    [],
   );
 
-  const readOnlyItems: DropDownListItem[] = useMemo(
-    () => [
-      ...lockedAndNoRightsItems,
-      {
-        primary: <Icon path={mdiFileMultipleOutline} size={"inherit"} />,
-        secondary: t("magneto.duplicate"),
-        OnClick: () => null,
-      },
-    ],
-    [lockedAndNoRightsItems, t],
+  const handlers = useMemo(
+    () => ({
+      preview: () => openCardPreview(card),
+      duplicate: () => null,
+      edit: () => null,
+      move: () => null,
+      delete: () => null,
+      lock: lockOrUnlockMagnet,
+    }),
+    [openCardPreview, lockOrUnlockMagnet, card],
   );
 
-  const editableItems: DropDownListItem[] = useMemo(
-    () => [
-      ...readOnlyItems,
-      {
-        primary: <Icon path={mdiPencil} size={"inherit"} />,
-        secondary: t("magneto.card.options.edit"),
-        OnClick: () => null,
-      },
-      {
-        primary: <Icon path={mdiBookArrowRight} size={"inherit"} />,
-        secondary: t("magneto.card.options.move"),
-        OnClick: () => null,
-      },
-      {
-        primary: <Icon path={mdiLock} size={"inherit"} />,
-        secondary: isLocked
-          ? t("magneto.card.options.unlock")
-          : t("magneto.card.options.lock"),
-        OnClick: () => lockOrUnlockMagnet(),
-      },
-      {
-        primary: <Icon path={mdiDelete} size={"inherit"} />,
-        secondary: t("magneto.card.options.delete"),
-        OnClick: () => null,
-      },
-    ],
-    [readOnlyItems, t],
+  const labels = useMemo(
+    () => ({
+      preview: t("magneto.card.options.preview"),
+      duplicate: t("magneto.duplicate"),
+      edit: t("magneto.card.options.edit"),
+      move: t("magneto.card.options.move"),
+      delete: t("magneto.card.options.delete"),
+      lock: isLocked
+        ? t("magneto.card.options.unlock")
+        : t("magneto.card.options.lock"),
+    }),
+    [t, isLocked],
   );
 
-  return useMemo(
-    () =>
-      lockedAndNoRights
-        ? lockedAndNoRightsItems
-        : readOnly
-        ? readOnlyItems
-        : editableItems,
-    [readOnly, readOnlyItems, editableItems, lockedAndNoRights],
+  const menuItems = useMemo(
+    () => ({
+      preview: {
+        primary: icons.play,
+        secondary: labels.preview,
+        OnClick: handlers.preview,
+      },
+      duplicate: {
+        primary: icons.fileMultiple,
+        secondary: labels.duplicate,
+        OnClick: handlers.duplicate,
+      },
+      edit: {
+        primary: icons.pencil,
+        secondary: labels.edit,
+        OnClick: handlers.edit,
+      },
+      move: {
+        primary: icons.bookArrow,
+        secondary: labels.move,
+        OnClick: handlers.move,
+      },
+      lock: {
+        primary: icons.lock,
+        secondary: labels.lock,
+        OnClick: handlers.lock,
+      },
+      delete: {
+        primary: icons.delete,
+        secondary: labels.delete,
+        OnClick: handlers.delete,
+      },
+    }),
+    [icons, labels, handlers],
   );
+
+  return useMemo(() => {
+    if (lockedAndNoRights) return [menuItems.preview];
+    if (readOnly) return [menuItems.preview, menuItems.duplicate];
+    return [
+      menuItems.preview,
+      menuItems.duplicate,
+      menuItems.edit,
+      menuItems.move,
+      menuItems.lock,
+      menuItems.delete,
+    ];
+  }, [lockedAndNoRights, readOnly, menuItems]);
 };

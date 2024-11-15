@@ -23,6 +23,7 @@ import {
 } from "./utils";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Board, IBoardItemResponse } from "~/models/board.model";
+import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 
 const BoardContext = createContext<BoardContextType | null>(null);
@@ -37,6 +38,7 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [isFileDragging, setIsFileDragging] = useState<boolean>(false);
+  const [cardInPreview, setCardInPreview] = useState<Card | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
@@ -104,6 +106,17 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       [modalType]: !prevState[modalType],
     }));
 
+  const cleanCardInPreview = () => setCardInPreview(null);
+
+  const openCardPreview = (card: Card) => {
+    setCardInPreview(card);
+    toggleBoardModals(BOARD_MODAL_TYPE.CARD_PREVIEW);
+  };
+
+  const closeCardPreview = () => {
+    setCardInPreview(null);
+    toggleBoardModals(BOARD_MODAL_TYPE.CARD_PREVIEW);
+  };
   const value = useMemo<BoardContextType>(
     () => ({
       board,
@@ -121,6 +134,11 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       toggleBoardModals,
       isFileDragging,
       setIsFileDragging,
+      cardInPreview,
+      setCardInPreview,
+      cleanCardInPreview,
+      openCardPreview,
+      closeCardPreview,
     }),
     [board, zoomLevel, isLoading, boardRights, displayModals, isFileDragging],
   );

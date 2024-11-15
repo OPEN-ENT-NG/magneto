@@ -19,10 +19,10 @@ import {
   avatarStyle,
   closeButtonStyle,
   commentPanelBody,
-  commentPanelFooter,
+  CommentPanelFooter,
   commentPanelheader,
   commentPanelTitle,
-  commentPanelWrapper,
+  CommentPanelWrapper,
   dividerTextStyle,
   leftFooterContent,
   leftHeaderContent,
@@ -31,7 +31,11 @@ import {
   transparentBackDrop,
 } from "./style";
 import { CommentOrDivider, CommentPanelProps } from "./types";
-import { processCommentsWithDividers, scrollToBottom } from "./utils";
+import {
+  getModalPosition,
+  processCommentsWithDividers,
+  scrollToBottom,
+} from "./utils";
 import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useBoard } from "~/providers/BoardProvider";
@@ -40,7 +44,13 @@ import {
   useGetAllCommentsQuery,
 } from "~/services/api/comment.service";
 
-export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
+export const CommentPanel: FC<CommentPanelProps> = ({
+  isInCardPreview = false,
+  cardId,
+  anchorEl,
+  anchorOrigin = { vertical: "bottom", horizontal: "right" },
+  transformOrigin = { vertical: "bottom", horizontal: "right" },
+}) => {
   const { t } = useTranslation("magneto");
   const { displayModals, toggleBoardModals } = useBoard();
   const { avatar } = useUser();
@@ -56,7 +66,23 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
   );
   const commentBodyRef = useRef<HTMLDivElement>(null);
   const prevLengthRef = useRef(0);
-
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      const mainScrollable = document.querySelector('[data-scrollable="true"]');
+      const commentBody = document.querySelector('[data-comment-body="true"]');
+      if (commentBody?.contains(e.target as Node)) {
+        return;
+      }
+      if (mainScrollable) {
+        e.preventDefault();
+        mainScrollable.scrollTop += e.deltaY;
+      }
+    };
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
   useEffect(() => {
     if (commentsData?.all.length) {
       setComsAndDividers(processCommentsWithDividers(commentsData.all));
@@ -93,14 +119,24 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
       }
     }
   };
+  if (!anchorEl) return;
+
+  const modalPosition = getModalPosition(
+    anchorEl,
+    anchorOrigin,
+    transformOrigin,
+  );
+
+  const handleClose = () => {
+    toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL);
+    setEditingCommentId(null);
+  };
 
   return (
     <Modal
       open={displayModals.COMMENT_PANEL}
-      onClose={() => {
-        toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL);
-        setEditingCommentId(null);
-      }}
+      disableScrollLock
+      onClose={handleClose}
       aria-labelledby="modal-title"
       aria-describedby="modal-section-deletion"
       slotProps={{
@@ -109,7 +145,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
         },
       }}
     >
-      <Box sx={commentPanelWrapper}>
+      <CommentPanelWrapper isInCardPreview={isInCardPreview} sx={modalPosition}>
         <Box sx={commentPanelheader}>
           <Box sx={leftHeaderContent}>
             <ForumOutlinedIcon sx={commentPanelTitle} />
@@ -125,7 +161,11 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
             <CloseIcon fontSize="inherit" />
           </IconButton>
         </Box>
-        <Box sx={commentPanelBody} ref={commentBodyRef}>
+        <Box
+          sx={commentPanelBody}
+          ref={commentBodyRef}
+          data-comment-body="true"
+        >
           {comsAndDividers.map((item, index) =>
             typeof item === "string" ? (
               <Divider key={item} sx={{ my: 2 }}>
@@ -157,7 +197,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
             ),
           )}
         </Box>
-        <Box sx={commentPanelFooter}>
+        <CommentPanelFooter isInCardPreview={isInCardPreview}>
           <Box sx={leftFooterContent}>
             <Avatar sx={avatarStyle} src={avatar}></Avatar>
             <StyledTextarea
@@ -177,8 +217,8 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
           >
             <Icon path={mdiArrowUpCircle} size={2} />
           </SubmitIconButton>
-        </Box>
-      </Box>
+        </CommentPanelFooter>
+      </CommentPanelWrapper>
     </Modal>
   );
 };

@@ -4,7 +4,12 @@ import { Tooltip as TooltipMUI } from "@mui/material";
 
 import { TooltipProps } from "./types";
 
-export const Tooltip: FC<TooltipProps> = ({ children, title, placement }) => {
+export const Tooltip: FC<TooltipProps> = ({
+  children,
+  title,
+  placement,
+  width = "20rem",
+}) => {
   return (
     <TooltipMUI
       title={title}
@@ -16,6 +21,8 @@ export const Tooltip: FC<TooltipProps> = ({ children, title, placement }) => {
         tooltip: {
           sx: {
             fontSize: "1.4rem",
+            width: { width },
+            maxWidth: "none",
           },
         },
       }}

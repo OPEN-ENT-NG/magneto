@@ -1,19 +1,28 @@
-import { IconButton, styled, SxProps, TextareaAutosize } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  styled,
+  SxProps,
+  TextareaAutosize,
+} from "@mui/material";
 
-export const commentPanelWrapper: SxProps = {
+import { CommentPanelWrapperProps } from "./types";
+
+export const CommentPanelWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "isInCardPreview",
+})<CommentPanelWrapperProps>(({ isInCardPreview }) => ({
   boxSizing: "border-box",
   display: "flex",
   flexDirection: "column",
-  maxHeight: "80vh",
+  maxHeight: "80%",
   width: "45rem",
-  borderRadius: "1.5rem 1.5rem 0 0",
-  position: "absolute",
-  bottom: "0%",
-  right: "5%",
-  boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px;",
+  borderRadius: isInCardPreview
+    ? "1.6rem 1.6rem 1.6rem 0"
+    : "1.6rem 1.6rem 0 0",
+  boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
   zIndex: 1400,
   backgroundColor: "white",
-};
+}));
 
 export const commentPanelheader: SxProps = {
   width: "100%",
@@ -67,18 +76,21 @@ export const commentPanelBody: SxProps = {
   },
 };
 
-export const commentPanelFooter: SxProps = {
+export const CommentPanelFooter = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "isInCardPreview",
+})<CommentPanelWrapperProps>(({ isInCardPreview }) => ({
   boxSizing: "border-box",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   backgroundColor: "#F7F7FA",
   padding: "1rem 2rem",
+  borderRadius: isInCardPreview ? "0 0 1.6rem 0" : "0",
   width: "100%",
   height: "fit-content",
   minHeight: "6.5rem",
   flexShrink: 0,
-};
+}));
 
 export const avatarStyle = {
   width: "3rem",

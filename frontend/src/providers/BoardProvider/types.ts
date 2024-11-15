@@ -26,6 +26,11 @@ export type BoardContextType = {
   toggleBoardModals: (modalType: BOARD_MODAL_TYPE) => void;
   isFileDragging: boolean;
   setIsFileDragging: Dispatch<SetStateAction<boolean>>;
+  cardInPreview: Card | null;
+  setCardInPreview: Dispatch<SetStateAction<Card | null>>;
+  cleanCardInPreview: () => void;
+  openCardPreview: (card: Card) => void;
+  closeCardPreview: () => void;
 };
 
 export type Section = {
@@ -45,4 +50,5 @@ export type Sections = {
 export interface DisplayModalsState {
   [BOARD_MODAL_TYPE.PARAMETERS]: boolean;
   [BOARD_MODAL_TYPE.COMMENT_PANEL]: boolean;
+  [BOARD_MODAL_TYPE.CARD_PREVIEW]: boolean;
 }

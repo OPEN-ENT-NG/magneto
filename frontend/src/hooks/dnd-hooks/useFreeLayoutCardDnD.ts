@@ -14,9 +14,22 @@ import { Card } from "~/models/card.model";
 import { useUpdateBoardMutation } from "~/services/api/boards.service";
 
 export const useFreeLayoutCardDnD = (board: Board) => {
-  const [updatedIds, setUpdatedIds] = useState<string[]>(board.cardIds);
+  const validCardIds = useMemo(() => {
+    const cardSet = new Set(board.cards.map((card) => card.id));
+    return board.cardIds.filter((id) => cardSet.has(id));
+  }, [board.cards, board.cardIds]);
+
+  const [updatedIds, setUpdatedIds] = useState<string[]>(validCardIds);
   const [activeItem, setActiveItem] = useState<Card | null>(null);
   const [updateBoard] = useUpdateBoardMutation();
+
+  const cardMap = useMemo(() => {
+    const map: Record<string, Card> = {};
+    board.cards.forEach((card) => {
+      map[card.id] = card;
+    });
+    return map;
+  }, [board.cards]);
 
   const sensors = useSensors(
     useSensor(CustomPointerSensor, {
@@ -27,22 +40,17 @@ export const useFreeLayoutCardDnD = (board: Board) => {
   );
 
   useEffect(() => {
-    setUpdatedIds(board.cardIds);
-  }, [board.cardIds]);
-
-  const cardMap = useMemo(() => {
-    return board.cards.reduce(
-      (acc, card) => {
-        acc[card.id] = card;
-        return acc;
-      },
-      {} as Record<string, Card>,
-    );
-  }, [board.cards]);
+    setUpdatedIds(validCardIds);
+  }, [validCardIds]);
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
-      setActiveItem(cardMap[event.active.id.toString()] ?? null);
+      const cardId = event.active.id.toString();
+      const card = cardMap[cardId];
+
+      if (card) {
+        setActiveItem(card);
+      }
     },
     [cardMap],
   );
@@ -51,42 +59,54 @@ export const useFreeLayoutCardDnD = (board: Board) => {
     async (event: DragEndEvent) => {
       const { active, over } = event;
 
-      if (active.id !== over?.id) {
-        const oldIndex = updatedIds.indexOf(active.id.toString());
-        const newIndex = updatedIds.indexOf(
-          over ? over.id.toString() : updatedIds[updatedIds.length - 1],
-        );
+      try {
+        if (active.id !== over?.id && over) {
+          const activeId = active.id.toString();
+          const overId = over.id.toString();
 
-        const newUpdatedIds = arrayMove(updatedIds, oldIndex, newIndex);
-        setUpdatedIds(newUpdatedIds);
+          if (!cardMap[activeId]) {
+            return;
+          }
 
-        const payload = {
-          id: board._id,
-          cardIds: newUpdatedIds,
-          layoutType: board.layoutType,
-          canComment: board.canComment,
-          displayNbFavorites: board.displayNbFavorites,
-        };
+          const oldIndex = updatedIds.indexOf(activeId);
+          const newIndex = updatedIds.indexOf(overId);
 
-        try {
+          if (oldIndex === -1) {
+            return;
+          }
+
+          const newUpdatedIds = arrayMove(updatedIds, oldIndex, newIndex);
+          setUpdatedIds(newUpdatedIds);
+
+          const payload = {
+            id: board._id,
+            cardIds: newUpdatedIds,
+            layoutType: board.layoutType,
+            canComment: board.canComment,
+            displayNbFavorites: board.displayNbFavorites,
+          };
+
           await updateBoard(payload).unwrap();
-        } catch (error) {
-          console.error("Failed to update board:", error);
-          setUpdatedIds(board.cardIds);
         }
+      } catch (error) {
+        setUpdatedIds(validCardIds);
+      } finally {
+        setActiveItem(null);
       }
-
-      setActiveItem(null);
     },
-    [board, updatedIds, updateBoard],
+    [board, updatedIds, updateBoard, cardMap, validCardIds],
   );
 
   const handleDragCancel = useCallback(() => {
     setActiveItem(null);
   }, []);
 
+  const safeUpdatedIds = useMemo(() => {
+    return updatedIds.filter((id) => cardMap[id]);
+  }, [updatedIds, cardMap]);
+
   return {
-    updatedIds,
+    updatedIds: safeUpdatedIds,
     activeItem,
     cardMap,
     sensors,

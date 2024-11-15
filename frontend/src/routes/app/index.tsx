@@ -209,7 +209,13 @@ export const App = () => {
               param={modalProps.param}
               onSubmit={modalProps.onSubmit}
               onClose={modalProps.onCancel}
-            ></MessageModal>
+            >
+              {!!modalProps.i18nKey &&
+              !!modalProps.param &&
+              modalProps.param != ""
+                ? t(modalProps.i18nKey, { 0: modalProps.param })
+                : t(modalProps.i18nKey)}
+            </MessageModal>
           </Grid.Col>
         </Grid>
       </DndProvider>

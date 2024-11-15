@@ -51,4 +51,5 @@ export interface DisplayModalsState {
   [BOARD_MODAL_TYPE.PARAMETERS]: boolean;
   [BOARD_MODAL_TYPE.COMMENT_PANEL]: boolean;
   [BOARD_MODAL_TYPE.CARD_PREVIEW]: boolean;
+  [BOARD_MODAL_TYPE.DELETE]: boolean;
 }

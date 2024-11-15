@@ -9,6 +9,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Tooltip } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   StyledCardHeader,
@@ -36,12 +37,15 @@ import { CardContent } from "../card-content/CardContent";
 import { CardPayload } from "../create-magnet/types";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
+import { MessageModal } from "../message-modal/MessageModal";
 import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useBoard } from "~/providers/BoardProvider";
 import {
+  useDeleteCardsMutation,
   useFavoriteCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
@@ -222,7 +226,11 @@ export const BoardCard: FC<BoardCardProps> = memo(
     const [updateCard] = useUpdateCardMutation();
     const [favoriteCard] = useFavoriteCardMutation();
     const { user } = useUser();
-    const { board, hasEditRights, hasManageRights } = useBoard();
+    const { board, hasEditRights, hasManageRights, displayModals, toggleBoardModals } =
+      useBoard();
+    const { t } = useTranslation("magneto");
+
+    const [deleteCards] = useDeleteCardsMutation();
 
     const hasLockedCardRights = (): boolean => {
       const isCardOwner: boolean = card.ownerId == user?.userId;
@@ -243,6 +251,10 @@ export const BoardCard: FC<BoardCardProps> = memo(
       };
 
       await updateCard(payload);
+    };
+
+    const deleteMagnet = async (): Promise<void> => {
+      deleteCards({ cardIds: [card.id], boardId: board.id });
     };
 
     const dropDownItemList = useCardDropDownItems(
@@ -389,6 +401,19 @@ export const BoardCard: FC<BoardCardProps> = memo(
         </div>
         <MemoizedContent {...contentProps} />
         <MemoizedCardActions {...actionProps} />
+
+        {displayModals.DELETE_MODAL && (
+          <MessageModal
+            isOpen={displayModals.DELETE_MODAL}
+            title={t("magneto.delete.cards")}
+            onSubmit={() => deleteMagnet()}
+            disableSubmit={() => false}
+            submitButtonName={t("magneto.delete")}
+            onClose={() => toggleBoardModals(BOARD_MODAL_TYPE.DELETE)}
+          >
+            {t("magneto.delete.cards.message")}
+          </MessageModal>
+        )}
 
         {isOpen && dropdownRef.current && (
           <MemoizedDropDownList

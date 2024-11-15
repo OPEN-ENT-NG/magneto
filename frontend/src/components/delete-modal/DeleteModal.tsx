@@ -24,7 +24,6 @@ type props = {
   hasSharedElement: boolean;
 };
 
-
 export const DeleteModal: FunctionComponent<props> = ({
   isOpen,
   toggle,

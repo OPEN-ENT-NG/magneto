@@ -69,7 +69,7 @@ export const CommentContainer = styled(Box)<{ isVisible: boolean }>(
     marginRight: "2rem",
     "@media (max-width: 1200px)": {
       position: "absolute",
-      zIndex: 1500,
+      zIndex: 20000,
     },
   }),
 );

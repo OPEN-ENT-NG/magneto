@@ -41,7 +41,6 @@ import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useBoard } from "~/providers/BoardProvider";
-import { Section } from "~/providers/BoardProvider/types";
 import {
   useFavoriteCardMutation,
   useUpdateCardMutation,
@@ -220,6 +219,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
     const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
       useDropdown();
     const { getAvatarURL } = useDirectory();
+    const [updateCard] = useUpdateCardMutation();
     const [favoriteCard] = useFavoriteCardMutation();
     const { user } = useUser();
     const { board, hasEditRights, hasManageRights } = useBoard();
@@ -229,8 +229,6 @@ export const BoardCard: FC<BoardCardProps> = memo(
       return isCardOwner || (card.locked ? hasManageRights() : hasEditRights());
     };
 
-    //put in boardCard
-    const [updateCard] = useUpdateCardMutation();
     const lockOrUnlockMagnet = async () => {
       const payload: CardPayload = {
         id: card.id,
@@ -242,13 +240,6 @@ export const BoardCard: FC<BoardCardProps> = memo(
         resourceType: card.resourceType,
         resourceUrl: card.resourceUrl,
         title: card.title,
-        ...(board.sections.length
-          ? {
-              sectionId: board.sections.find((section: Section) =>
-                section.cardIds.includes(card.id),
-              )?._id,
-            }
-          : {}),
       };
 
       await updateCard(payload);
@@ -258,6 +249,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
       readOnly,
       card.locked,
       lockOrUnlockMagnet,
+      card,
       card.locked ? !hasLockedCardRights() : false,
     );
 

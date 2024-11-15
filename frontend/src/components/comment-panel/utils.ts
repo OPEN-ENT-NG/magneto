@@ -54,3 +54,50 @@ export const scrollToBottom = (ref: RefObject<HTMLDivElement>) => {
     ref.current.scrollTop = ref.current.scrollHeight;
   }
 };
+
+export const getModalPosition = (
+  anchorEl: HTMLElement,
+  anchorOrigin: {
+    vertical: "top" | "center" | "bottom";
+    horizontal: "left" | "center" | "right";
+  },
+  transformOrigin: {
+    vertical: "top" | "center" | "bottom";
+    horizontal: "left" | "center" | "right";
+  },
+) => {
+  const rect = anchorEl.getBoundingClientRect();
+  const anchorPoint = {
+    x:
+      anchorOrigin.horizontal === "left"
+        ? rect.left
+        : anchorOrigin.horizontal === "center"
+        ? rect.left + rect.width / 2
+        : rect.right,
+    y:
+      anchorOrigin.vertical === "top"
+        ? rect.top
+        : anchorOrigin.vertical === "center"
+        ? rect.top + rect.height / 2
+        : rect.bottom,
+  };
+
+  return {
+    position: "absolute",
+    left: `${anchorPoint.x}px`,
+    top: `${anchorPoint.y}px`,
+    transform: `translate(${
+      transformOrigin.horizontal === "left"
+        ? "0"
+        : transformOrigin.horizontal === "center"
+        ? "-50%"
+        : "-100%"
+    }, ${
+      transformOrigin.vertical === "top"
+        ? "0"
+        : transformOrigin.vertical === "center"
+        ? "-50%"
+        : "-100%"
+    })`,
+  };
+};

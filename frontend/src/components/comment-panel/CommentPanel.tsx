@@ -11,7 +11,6 @@ import {
   Divider,
   IconButton,
   Modal,
-  SxProps,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -20,10 +19,10 @@ import {
   avatarStyle,
   closeButtonStyle,
   commentPanelBody,
-  commentPanelFooter,
+  CommentPanelFooter,
   commentPanelheader,
   commentPanelTitle,
-  commentPanelWrapper,
+  CommentPanelWrapper,
   dividerTextStyle,
   leftFooterContent,
   leftHeaderContent,
@@ -46,6 +45,7 @@ import {
 } from "~/services/api/comment.service";
 
 export const CommentPanel: FC<CommentPanelProps> = ({
+  isInCardPreview = false,
   cardId,
   anchorEl,
   anchorOrigin = { vertical: "bottom", horizontal: "right" },
@@ -66,7 +66,23 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   );
   const commentBodyRef = useRef<HTMLDivElement>(null);
   const prevLengthRef = useRef(0);
-
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      const mainScrollable = document.querySelector('[data-scrollable="true"]');
+      const commentBody = document.querySelector('[data-comment-body="true"]');
+      if (commentBody?.contains(e.target as Node)) {
+        return;
+      }
+      if (mainScrollable) {
+        e.preventDefault();
+        mainScrollable.scrollTop += e.deltaY;
+      }
+    };
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
   useEffect(() => {
     if (commentsData?.all.length) {
       setComsAndDividers(processCommentsWithDividers(commentsData.all));
@@ -104,11 +120,13 @@ export const CommentPanel: FC<CommentPanelProps> = ({
     }
   };
   if (!anchorEl) return;
+
   const modalPosition = getModalPosition(
     anchorEl,
     anchorOrigin,
     transformOrigin,
   );
+
   const handleClose = () => {
     toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL);
     setEditingCommentId(null);
@@ -127,7 +145,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({
         },
       }}
     >
-      <Box sx={{ ...commentPanelWrapper, ...modalPosition } as SxProps}>
+      <CommentPanelWrapper isInCardPreview={isInCardPreview} sx={modalPosition}>
         <Box sx={commentPanelheader}>
           <Box sx={leftHeaderContent}>
             <ForumOutlinedIcon sx={commentPanelTitle} />
@@ -143,7 +161,11 @@ export const CommentPanel: FC<CommentPanelProps> = ({
             <CloseIcon fontSize="inherit" />
           </IconButton>
         </Box>
-        <Box sx={commentPanelBody} ref={commentBodyRef}>
+        <Box
+          sx={commentPanelBody}
+          ref={commentBodyRef}
+          data-comment-body="true"
+        >
           {comsAndDividers.map((item, index) =>
             typeof item === "string" ? (
               <Divider key={item} sx={{ my: 2 }}>
@@ -175,7 +197,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({
             ),
           )}
         </Box>
-        <Box sx={commentPanelFooter}>
+        <CommentPanelFooter isInCardPreview={isInCardPreview}>
           <Box sx={leftFooterContent}>
             <Avatar sx={avatarStyle} src={avatar}></Avatar>
             <StyledTextarea
@@ -195,8 +217,8 @@ export const CommentPanel: FC<CommentPanelProps> = ({
           >
             <Icon path={mdiArrowUpCircle} size={2} />
           </SubmitIconButton>
-        </Box>
-      </Box>
+        </CommentPanelFooter>
+      </CommentPanelWrapper>
     </Modal>
   );
 };

@@ -27,6 +27,7 @@ export const modalBodyStyle = {
 export const contentWrapper = {
   flex: 1,
   maxWidth: "100%",
+  minWidth: "60rem",
   overflowY: "auto",
   "&::-webkit-scrollbar": {
     height: "1.6rem",
@@ -66,5 +67,9 @@ export const CommentContainer = styled(Box)<{ isVisible: boolean }>(
     position: "relative",
     display: isVisible ? "block" : "none",
     marginRight: "2rem",
+    "@media (max-width: 1200px)": {
+      position: "absolute",
+      zIndex: 1500,
+    },
   }),
 );

@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
@@ -15,6 +15,7 @@ import {
 import { CommentPanel } from "../comment-panel/CommentPanel";
 import { PreviewContent } from "../preview-content/PreviewContent";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { useWindowResize } from "~/hooks/useWindowResize";
 import { useBoard } from "~/providers/BoardProvider";
 
 export const PreviewModal: FC = () => {
@@ -25,8 +26,8 @@ export const PreviewModal: FC = () => {
     board: { canComment },
     toggleBoardModals,
   } = useBoard();
-  const commentDivRef = useRef<HTMLDivElement>(null);
   const [isRefReady, setIsRefReady] = useState(false);
+  const commentDivRef = useWindowResize();
 
   useEffect(() => {
     if (COMMENT_PANEL && commentDivRef.current) {
@@ -52,7 +53,7 @@ export const PreviewModal: FC = () => {
           >
             <CloseIcon fontSize="inherit" />
           </IconButton>
-          <Box sx={contentWrapper}>
+          <Box sx={contentWrapper} data-scrollable="true">
             {cardInPreview && <PreviewContent card={cardInPreview} />}
           </Box>
           <CommentContainer isVisible={COMMENT_PANEL} />
@@ -73,6 +74,7 @@ export const PreviewModal: FC = () => {
           <CommentPanel
             cardId={cardInPreview.id}
             anchorEl={commentDivRef.current}
+            isInCardPreview
           />
         )}
       </Box>

@@ -11,6 +11,7 @@ import {
   Divider,
   IconButton,
   Modal,
+  SxProps,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -31,7 +32,11 @@ import {
   transparentBackDrop,
 } from "./style";
 import { CommentOrDivider, CommentPanelProps } from "./types";
-import { processCommentsWithDividers, scrollToBottom } from "./utils";
+import {
+  getModalPosition,
+  processCommentsWithDividers,
+  scrollToBottom,
+} from "./utils";
 import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useBoard } from "~/providers/BoardProvider";
@@ -40,7 +45,12 @@ import {
   useGetAllCommentsQuery,
 } from "~/services/api/comment.service";
 
-export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
+export const CommentPanel: FC<CommentPanelProps> = ({
+  cardId,
+  anchorEl,
+  anchorOrigin = { vertical: "bottom", horizontal: "right" },
+  transformOrigin = { vertical: "bottom", horizontal: "right" },
+}) => {
   const { t } = useTranslation("magneto");
   const { displayModals, toggleBoardModals } = useBoard();
   const { avatar } = useUser();
@@ -93,14 +103,22 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
       }
     }
   };
+  if (!anchorEl) return;
+  const modalPosition = getModalPosition(
+    anchorEl,
+    anchorOrigin,
+    transformOrigin,
+  );
+  const handleClose = () => {
+    toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL);
+    setEditingCommentId(null);
+  };
 
   return (
     <Modal
       open={displayModals.COMMENT_PANEL}
-      onClose={() => {
-        toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL);
-        setEditingCommentId(null);
-      }}
+      disableScrollLock
+      onClose={handleClose}
       aria-labelledby="modal-title"
       aria-describedby="modal-section-deletion"
       slotProps={{
@@ -109,7 +127,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({ cardId }) => {
         },
       }}
     >
-      <Box sx={commentPanelWrapper}>
+      <Box sx={{ ...commentPanelWrapper, ...modalPosition } as SxProps}>
         <Box sx={commentPanelheader}>
           <Box sx={leftHeaderContent}>
             <ForumOutlinedIcon sx={commentPanelTitle} />

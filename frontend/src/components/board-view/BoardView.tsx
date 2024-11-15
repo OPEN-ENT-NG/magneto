@@ -18,6 +18,7 @@ import { CreateBoard } from "../create-board/CreateBoard";
 import { CreateMagnet } from "../create-magnet/CreateMagnet";
 import { FileDropZone } from "../file-drop-zone/FileDropZone";
 import { HeaderView } from "../header-view/HeaderView";
+import { PreviewModal } from "../Preview-modal/PreviewModal";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
@@ -42,6 +43,7 @@ export const BoardView: FC = () => {
     toggleBoardModals,
     setIsFileDragging,
     isFileDragging,
+    cardInPreview,
   } = useBoard();
   const headerHeight = useHeaderHeight();
   const [, setDragCounter] = useState<number>(0);
@@ -153,7 +155,7 @@ export const BoardView: FC = () => {
         </BoardBodyWrapper>
 
         <CreateMagnet open={magnetType === MENU_NOT_MEDIA_TYPE.TEXT} />
-
+        {cardInPreview && displayModals.CARD_PREVIEW && <PreviewModal />}
         <BoardCreateMagnetMagnetModal
           open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
           onClose={onClose}

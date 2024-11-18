@@ -226,7 +226,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
     const [updateCard] = useUpdateCardMutation();
     const [favoriteCard] = useFavoriteCardMutation();
     const { user } = useUser();
-    const { board, hasEditRights, hasManageRights, displayModals, toggleBoardModals } =
+    const { board, hasEditRights, hasManageRights, displayModals, activeCard, closeActiveCardAction } =
       useBoard();
     const { t } = useTranslation("magneto");
 
@@ -402,14 +402,14 @@ export const BoardCard: FC<BoardCardProps> = memo(
         <MemoizedContent {...contentProps} />
         <MemoizedCardActions {...actionProps} />
 
-        {displayModals.DELETE_MODAL && (
+        {activeCard?.id == card.id && displayModals.DELETE_MODAL && (
           <MessageModal
             isOpen={displayModals.DELETE_MODAL}
             title={t("magneto.delete.cards")}
             onSubmit={() => deleteMagnet()}
             disableSubmit={() => false}
             submitButtonName={t("magneto.delete")}
-            onClose={() => toggleBoardModals(BOARD_MODAL_TYPE.DELETE)}
+            onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.DELETE)}
           >
             {t("magneto.delete.cards.message")}
           </MessageModal>

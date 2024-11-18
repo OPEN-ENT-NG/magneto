@@ -24,7 +24,7 @@ export const useCardDropDownItems = (
   lockedAndNoRights?: boolean,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
-  const { openActiveCardAction, toggleBoardModals } = useBoard();
+  const { openActiveCardAction } = useBoard();
 
   const icons = useMemo(
     () => ({
@@ -44,10 +44,10 @@ export const useCardDropDownItems = (
       duplicate: () => null,
       edit: () => null,
       move: () => null,
-      delete: () => toggleBoardModals(BOARD_MODAL_TYPE.DELETE),
+      delete: () => openActiveCardAction(card, BOARD_MODAL_TYPE.DELETE),
       lock: lockOrUnlockMagnet,
     }),
-    [openActiveCardAction, lockOrUnlockMagnet, card, toggleBoardModals],
+    [openActiveCardAction, lockOrUnlockMagnet, card],
   );
 
   const labels = useMemo(

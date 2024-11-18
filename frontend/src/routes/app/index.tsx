@@ -203,16 +203,14 @@ export const App = () => {
               onSetModalProps={setModalProps}
             />
             <CreateBoard isOpen={isOpen} toggle={toggle} />
+
             <MessageModal
               isOpen={showModal}
-              i18nKey={modalProps.i18nKey}
-              param={modalProps.param}
               onSubmit={modalProps.onSubmit}
+              submitButtonName={t("magneto.confirm")}
               onClose={modalProps.onCancel}
             >
-              {!!modalProps.i18nKey &&
-              !!modalProps.param &&
-              modalProps.param != ""
+              {!!modalProps.i18nKey && !!modalProps.param
                 ? t(modalProps.i18nKey, { 0: modalProps.param })
                 : t(modalProps.i18nKey)}
             </MessageModal>

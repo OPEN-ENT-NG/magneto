@@ -19,6 +19,7 @@ export const displayPreviewContentByType = (card: Card) => {
         <CardContentAudio
           ressourceId={card.resourceId}
           type={card.metadata ? card.metadata.contentType : ""}
+          isPreview
         />
       );
     case RESOURCE_TYPE.FILE:

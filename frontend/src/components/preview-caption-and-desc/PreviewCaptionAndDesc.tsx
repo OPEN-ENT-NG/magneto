@@ -13,7 +13,6 @@ export const PreviewCaptionAndDesc: FC<PreviewCaptionAndDescProps> = ({
 }) => {
   const captionRef = useRef<HTMLElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
-  console.log(caption, description);
 
   useEffect(() => {
     const checkOverflow = () => {

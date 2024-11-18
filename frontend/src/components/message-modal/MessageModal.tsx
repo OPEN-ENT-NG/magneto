@@ -23,7 +23,7 @@ export type MessageModalProps = {
   disableSubmit?: () => boolean;
   submitButtonName?: string;
   onClose: () => void;
-  // isHard?: boolean;
+  isHard?: boolean;
 };
 
 export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
@@ -34,15 +34,15 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   disableSubmit,
   submitButtonName,
   onClose,
-  // isHard = false,
+  isHard = false,
 }) => {
   const { t } = useTranslation("magneto");
 
   return (
     <Modal
       open={isOpen}
-      onClose={onClose}
-      // isHard={isHard}
+      onClose={isHard ? () => null : onClose}
+      disableEscapeKeyDown={isHard}
       aria-labelledby="modal-title"
       aria-describedby="modal-message"
     >

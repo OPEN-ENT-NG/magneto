@@ -15,7 +15,7 @@ export const CardContentAudio: FC<CardContentAudioProps> = ({
     <Box sx={audioWrapperStyle}>
       <audio
         controls
-        preload="none"
+        preload="metadata"
         src={`${RootsConst.workspace}${ressourceId}`}
       >
         <source src={`${RootsConst.workspace}${ressourceId}`} type={type} />

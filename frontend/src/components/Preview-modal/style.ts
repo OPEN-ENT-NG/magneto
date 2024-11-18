@@ -1,25 +1,29 @@
 import { Box, styled } from "@mui/material";
 
-export const modalWrapperStyle = {
+import { ModalWrapperProps } from "./types";
+
+export const ModalWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "isCommentOpen",
+})<ModalWrapperProps>(({ isCommentOpen, theme }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "120rem",
+  width: "fit-content",
   maxWidth: "90%",
-  maxHeight: "calc(100vh - 4rem)",
-  height: "calc(100vh - 4rem)",
-  bgcolor: "background.paper",
-  boxShadow: 24,
+  maxHeight: "calc(100vh - 10rem)",
+  height: isCommentOpen ? "calc(100vh - 10rem)" : "fit-content",
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[24],
   borderRadius: "1.6rem",
   overflow: "hidden",
-};
+}));
 
 export const modalBodyStyle = {
   width: "100%",
   height: "100%",
   position: "relative",
-  padding: "6rem 4rem",
+  padding: "3rem 4rem",
   maxHeight: "100%",
   display: "flex",
 };

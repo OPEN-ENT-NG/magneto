@@ -226,8 +226,14 @@ export const BoardCard: FC<BoardCardProps> = memo(
     const [updateCard] = useUpdateCardMutation();
     const [favoriteCard] = useFavoriteCardMutation();
     const { user } = useUser();
-    const { board, hasEditRights, hasManageRights, displayModals, activeCard, closeActiveCardAction } =
-      useBoard();
+    const {
+      board,
+      hasEditRights,
+      hasManageRights,
+      displayModals,
+      activeCard,
+      closeActiveCardAction,
+    } = useBoard();
     const { t } = useTranslation("magneto");
 
     const [deleteCards] = useDeleteCardsMutation();

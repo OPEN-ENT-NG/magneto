@@ -12,9 +12,9 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
-import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 
 export const useCardDropDownItems = (
   readOnly: boolean,

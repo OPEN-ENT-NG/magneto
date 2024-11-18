@@ -26,11 +26,11 @@ export type BoardContextType = {
   toggleBoardModals: (modalType: BOARD_MODAL_TYPE) => void;
   isFileDragging: boolean;
   setIsFileDragging: Dispatch<SetStateAction<boolean>>;
-  cardInPreview: Card | null;
-  setCardInPreview: Dispatch<SetStateAction<Card | null>>;
-  cleanCardInPreview: () => void;
-  openCardPreview: (card: Card) => void;
-  closeCardPreview: () => void;
+  activeCard: Card | null;
+  setActiveCard: Dispatch<SetStateAction<Card | null>>;
+  cleanActiveCard: () => void;
+  openActiveCardAction: (card: Card, actionType: BOARD_MODAL_TYPE) => void;
+  closeActiveCardAction: (actionType: BOARD_MODAL_TYPE) => void;
 };
 
 export type Section = {

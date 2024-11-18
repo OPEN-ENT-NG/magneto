@@ -43,7 +43,7 @@ export const BoardView: FC = () => {
     toggleBoardModals,
     setIsFileDragging,
     isFileDragging,
-    cardInPreview,
+    activeCard,
   } = useBoard();
   const headerHeight = useHeaderHeight();
   const [, setDragCounter] = useState<number>(0);
@@ -155,7 +155,7 @@ export const BoardView: FC = () => {
         </BoardBodyWrapper>
 
         <CreateMagnet open={magnetType === MENU_NOT_MEDIA_TYPE.TEXT} />
-        {cardInPreview && displayModals.CARD_PREVIEW && <PreviewModal />}
+        {activeCard && displayModals.CARD_PREVIEW && <PreviewModal />}
         <BoardCreateMagnetMagnetModal
           open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
           onClose={onClose}

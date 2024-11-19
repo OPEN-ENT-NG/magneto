@@ -415,6 +415,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
             onSubmit={() => deleteMagnet()}
             disableSubmit={() => false}
             submitButtonName={t("magneto.delete")}
+            cancelButtonName={t("magneto.cancel")}
             onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.DELETE)}
           >
             {t("magneto.delete.cards.message")}

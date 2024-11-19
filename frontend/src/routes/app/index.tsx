@@ -208,6 +208,7 @@ export const App = () => {
               isOpen={showModal}
               onSubmit={modalProps.onSubmit}
               submitButtonName={t("magneto.confirm")}
+              cancelButtonName={t("magneto.cancel")}
               onClose={modalProps.onCancel}
             >
               {!!modalProps.i18nKey && !!modalProps.param

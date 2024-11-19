@@ -2,7 +2,6 @@ import React, { ReactNode } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
 
 import {
   closeButtonStyle,
@@ -14,18 +13,7 @@ import {
   submitButtonsStyle,
   titleStyle,
 } from "./style";
-
-export type MessageModalProps = {
-  isOpen: boolean;
-  title?: string;
-  children?: ReactNode;
-  onSubmit?: () => void;
-  disableSubmit?: () => boolean;
-  submitButtonName?: string;
-  cancelButtonName?: string;
-  onClose: () => void;
-  isHard?: boolean;
-};
+import { MessageModalProps } from "./types";
 
 export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   isOpen,
@@ -38,8 +26,6 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   onClose,
   isHard = false,
 }) => {
-  const { t } = useTranslation("magneto");
-
   return (
     <Modal
       open={isOpen}
@@ -88,7 +74,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
                 onClick={() => onSubmit()}
                 disabled={!!disableSubmit && disableSubmit()}
               >
-                {submitButtonName ? t(submitButtonName) : "Submit"}
+                {submitButtonName ? submitButtonName : "Submit"}
               </StyledButton>
             )}
           </Box>

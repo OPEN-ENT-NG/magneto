@@ -8,7 +8,7 @@ import {
   closeButtonStyle,
   commentButtonStyle,
   CommentContainer,
-  contentWrapper,
+  StyledContentBox,
   modalBodyStyle,
   ModalWrapper,
 } from "./style";
@@ -44,7 +44,7 @@ export const PreviewModal: FC = () => {
       aria-labelledby="modal-card-preview"
       aria-describedby="modal-card-preview"
     >
-      <ModalWrapper isCommentOpen={COMMENT_PANEL} ref={commentDivRef}>
+      <ModalWrapper ref={commentDivRef} isCommentOpen={COMMENT_PANEL}>
         <Box sx={modalBodyStyle}>
           <IconButton
             onClick={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
@@ -53,9 +53,12 @@ export const PreviewModal: FC = () => {
           >
             <CloseIcon fontSize="inherit" />
           </IconButton>
-          <Box sx={contentWrapper} data-scrollable="true">
+          <StyledContentBox
+            isCommentOpen={COMMENT_PANEL}
+            data-scrollable="true"
+          >
             {activeCard && <PreviewContent card={activeCard} />}
-          </Box>
+          </StyledContentBox>
           <CommentContainer isVisible={COMMENT_PANEL} />
           {canComment && !COMMENT_PANEL && (
             <IconButton

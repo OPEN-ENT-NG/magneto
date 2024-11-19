@@ -46,11 +46,11 @@ esac
 done
 
 clean () {
-  rm -rf node_modules 
-  rm -rf dist 
-  rm -rf build 
+  rm -rf node_modules
+  rm -rf dist
+  rm -rf build
   rm -rf .pnpm-store
-  rm -f package.json 
+  rm -f package.json
   rm -f pnpm-lock.yaml
 }
 
@@ -113,6 +113,10 @@ installDeps() {
 
 runTest() {
   docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm test"
+}
+
+runDev() {
+  docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm run dev"
 }
 
 prettierDocker() {
@@ -184,11 +188,17 @@ do
     runLocal)
       runLocal
       ;;
+    runDev)
+      runDev
+      ;;
     installDeps)
       installDeps
       ;;
     runTest)
       runTest
+      ;;
+    runDev)
+      runDev
       ;;
     prettierDocker)
       prettierDocker

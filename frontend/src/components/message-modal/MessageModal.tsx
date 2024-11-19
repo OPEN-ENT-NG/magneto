@@ -22,6 +22,7 @@ export type MessageModalProps = {
   onSubmit?: () => void;
   disableSubmit?: () => boolean;
   submitButtonName?: string;
+  cancelButtonName?: string;
   onClose: () => void;
   isHard?: boolean;
 };
@@ -33,6 +34,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   onSubmit,
   disableSubmit,
   submitButtonName,
+  cancelButtonName,
   onClose,
   isHard = false,
 }) => {
@@ -76,7 +78,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
               isFilled={false}
               onClick={() => onClose()}
             >
-              {t("magneto.cancel")}
+              {cancelButtonName ? cancelButtonName : "Cancel"}
             </StyledButton>
 
             {!!onSubmit && (
@@ -86,7 +88,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
                 onClick={() => onSubmit()}
                 disabled={!!disableSubmit && disableSubmit()}
               >
-                {submitButtonName ? t(submitButtonName) : t("magneto.submit")}
+                {submitButtonName ? t(submitButtonName) : "Submit"}
               </StyledButton>
             )}
           </Box>

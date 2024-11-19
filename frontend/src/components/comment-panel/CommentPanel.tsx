@@ -85,8 +85,9 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   }, []);
   useEffect(() => {
     if (commentsData?.all.length) {
-      setComsAndDividers(processCommentsWithDividers(commentsData.all));
+      return setComsAndDividers(processCommentsWithDividers(commentsData.all));
     }
+    return setComsAndDividers([]);
   }, [commentsData]);
 
   useEffect(() => {

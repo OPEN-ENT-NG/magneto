@@ -1,3 +1,4 @@
+import { CardContentAudio } from "../card-content-audio/CardContentAudio";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
@@ -12,9 +13,15 @@ export const displayPreviewContentByType = (card: Card) => {
     case RESOURCE_TYPE.TEXT:
       return null;
     case RESOURCE_TYPE.IMAGE:
-      return <PreviewContentImage card={card} />;
+      return <PreviewContentImage ressourceUrl={card.resourceUrl} />;
     case RESOURCE_TYPE.AUDIO:
-      return null;
+      return (
+        <CardContentAudio
+          ressourceId={card.resourceId}
+          type={card.metadata ? card.metadata.contentType : ""}
+          isPreview
+        />
+      );
     case RESOURCE_TYPE.FILE:
       return null;
     default:

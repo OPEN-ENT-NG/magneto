@@ -10,7 +10,7 @@ import {
   CommentContainer,
   contentWrapper,
   modalBodyStyle,
-  modalWrapperStyle,
+  ModalWrapper,
 } from "./style";
 import { CommentPanel } from "../comment-panel/CommentPanel";
 import { PreviewContent } from "../preview-content/PreviewContent";
@@ -44,7 +44,7 @@ export const PreviewModal: FC = () => {
       aria-labelledby="modal-card-preview"
       aria-describedby="modal-card-preview"
     >
-      <Box sx={modalWrapperStyle} ref={commentDivRef}>
+      <ModalWrapper isCommentOpen={COMMENT_PANEL} ref={commentDivRef}>
         <Box sx={modalBodyStyle}>
           <IconButton
             onClick={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
@@ -77,7 +77,7 @@ export const PreviewModal: FC = () => {
             isInCardPreview
           />
         )}
-      </Box>
+      </ModalWrapper>
     </Modal>
   );
 };

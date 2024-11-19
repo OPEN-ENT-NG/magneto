@@ -55,6 +55,14 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["BoardData", "AllCards"],
     }),
+    deleteCards: builder.mutation({
+      query: (params: { boardId: string; cardIds: string[] }) => ({
+        url: `cards/${params.boardId}`,
+        method: "DELETE",
+        body: { cardIds: params.cardIds },
+      }),
+      invalidatesTags: ["BoardData"],
+    }),
   }),
 });
 
@@ -66,4 +74,5 @@ export const {
   useUpdateCardMutation,
   useDuplicateCardMutation,
   useFavoriteCardMutation,
+  useDeleteCardsMutation,
 } = cardsApi;

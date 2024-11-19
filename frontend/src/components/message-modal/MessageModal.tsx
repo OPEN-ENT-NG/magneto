@@ -1,70 +1,85 @@
 import React from "react";
 
-import { Button, Modal } from "@edifice-ui/react";
-import { useTranslation } from "react-i18next";
+import CloseIcon from "@mui/icons-material/Close";
+import { Box, IconButton, Modal, Typography } from "@mui/material";
 
-type MessageModalProps = {
-  isOpen: boolean;
-  i18nKey: string;
-  param?: string;
-  hasSubmit: boolean;
-  onSubmit?: () => void;
-  onCancel: () => void;
-};
+import {
+  closeButtonStyle,
+  contentContainerStyle,
+  headerStyle,
+  modalContainerStyle,
+  modalFooterStyle,
+  StyledButton,
+  submitButtonsStyle,
+  titleStyle,
+} from "./style";
+import { MessageModalProps } from "./types";
 
 export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   isOpen,
-  i18nKey,
-  param,
-  hasSubmit,
+  title,
+  children,
   onSubmit,
-  onCancel,
+  disableSubmit,
+  submitButtonName,
+  cancelButtonName,
+  onClose,
+  isHard = false,
 }) => {
-  const { t } = useTranslation("magneto");
-
   return (
-    <>
-      {isOpen && (
-        <Modal
-          id={"displayMessage"}
-          isOpen={isOpen}
-          onModalClose={onCancel}
-          size="md"
-          viewport={false}
-        >
-          <Modal.Header onModalClose={onCancel}> </Modal.Header>
-          <Modal.Body>
-            {!!i18nKey && !!param && param != ""
-              ? t(i18nKey, { 0: param })
-              : t(i18nKey)}
-          </Modal.Body>
+    <Modal
+      open={isOpen}
+      onClose={isHard ? () => null : onClose}
+      disableEscapeKeyDown={isHard}
+      aria-labelledby="modal-title"
+      aria-describedby="modal-message"
+    >
+      <Box sx={modalContainerStyle}>
+        <Box sx={headerStyle}>
+          {title && title != "" && (
+            <Typography
+              id="modal-title"
+              variant="h4"
+              component="h2"
+              sx={titleStyle}
+            >
+              {title}
+            </Typography>
+          )}
+          <IconButton
+            onClick={onClose}
+            aria-label="close"
+            sx={closeButtonStyle}
+          >
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+        </Box>
 
-          <Modal.Footer>
-            <div className="right">
-              <Button
-                color="tertiary"
-                type="button"
-                variant="ghost"
-                className="footer-button"
-                onClick={onCancel}
+        {children && <Box sx={contentContainerStyle}>{children}</Box>}
+
+        <Box sx={modalFooterStyle}>
+          <Box sx={submitButtonsStyle}>
+            <StyledButton
+              variant="text"
+              isFilled={false}
+              onClick={() => onClose()}
+            >
+              {cancelButtonName ? cancelButtonName : "Cancel"}
+            </StyledButton>
+
+            {!!onSubmit && (
+              <StyledButton
+                variant="contained"
+                isFilled={true}
+                onClick={() => onSubmit()}
+                disabled={!!disableSubmit && disableSubmit()}
               >
-                {t("magneto.cancel")}
-              </Button>
-              {hasSubmit && (
-                <Button
-                  color="primary"
-                  type="submit"
-                  variant="filled"
-                  className="footer-button"
-                  onClick={onSubmit}
-                >
-                  {t("magneto.confirm")}
-                </Button>
-              )}
-            </div>
-          </Modal.Footer>
-        </Modal>
-      )}
-    </>
+                {submitButtonName ? submitButtonName : "Submit"}
+              </StyledButton>
+            )}
+          </Box>
+        </Box>
+      </Box>
+    </Modal>
   );
 };

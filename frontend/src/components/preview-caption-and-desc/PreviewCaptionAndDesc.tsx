@@ -2,7 +2,7 @@ import { FC, useEffect, useRef, useState } from "react";
 
 import { Box, Typography } from "@mui/material";
 
-import { captionStyle, contentWrapper, descriptionStyle } from "./style";
+import { captionStyle, contentWrapper } from "./style";
 import { PreviewCaptionAndDescProps } from "./types";
 import { CardContentText } from "../card-content-text/cardContentText";
 import { Tooltip } from "../tooltip/Tooltip";
@@ -41,9 +41,7 @@ export const PreviewCaptionAndDesc: FC<PreviewCaptionAndDescProps> = ({
           {caption}
         </Typography>
       )}
-      <Typography sx={descriptionStyle}>
         <CardContentText text={description} />
-      </Typography>
     </Box>
   );
 };

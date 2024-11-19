@@ -18,6 +18,7 @@ import { useSVG } from "~/providers/SVGProvider";
 export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
   url,
+  isPreview = false,
 }) => {
   const { svgDoc } = useSVG();
   const { getIconCode } = useOdeIcons();
@@ -43,6 +44,7 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
         <>
           {svgDoc.getElementById(icon) ? (
             <StyledAppIcon
+              isPreview={isPreview}
               app={{
                 address: `/${appName}`,
                 icon: `${appName}-large`,
@@ -54,7 +56,7 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
               }}
             />
           ) : icon === "magneto" ? (
-            <StyledAppIcon app={currentApp} />
+            <StyledAppIcon isPreview={isPreview} app={currentApp} />
           ) : (
             <DefaultLinkIcon />
           )}
@@ -85,5 +87,9 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
     }
   };
 
-  return <StyledBoxSvg>{getSvgByExtension(extension)}</StyledBoxSvg>;
+  return (
+    <StyledBoxSvg isPreview={isPreview}>
+      {getSvgByExtension(extension)}
+    </StyledBoxSvg>
+  );
 };

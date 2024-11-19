@@ -1,18 +1,21 @@
 import { Box, styled } from "@mui/material";
 
-import { ModalWrapperProps } from "./types";
+interface ModalWrapperProps {
+  isCommentOpen?: boolean;
+}
 
 export const ModalWrapper = styled(Box, {
   shouldForwardProp: (prop) => prop !== "isCommentOpen",
-})<ModalWrapperProps>(({ isCommentOpen, theme }) => ({
+})<ModalWrapperProps>(({ theme, isCommentOpen }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "fit-content",
-  maxWidth: "90%",
-  maxHeight: "calc(100vh - 10rem)",
+  minWidth: "80rem",
+  maxWidth: "80%",
   height: isCommentOpen ? "calc(100vh - 10rem)" : "fit-content",
+  maxHeight: "calc(100vh - 10rem)",
   backgroundColor: theme.palette.background.paper,
   boxShadow: theme.shadows[24],
   borderRadius: "1.6rem",
@@ -23,26 +26,27 @@ export const modalBodyStyle = {
   width: "100%",
   height: "100%",
   position: "relative",
-  padding: "3rem 4rem",
-  maxHeight: "100%",
+  padding: "5rem",
   display: "flex",
 };
 
-export const contentWrapper = {
-  flex: 1,
-  maxWidth: "100%",
-  minWidth: "60rem",
-  overflowY: "auto",
-  "&::-webkit-scrollbar": {
-    height: "1.6rem",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "rgba(170,170,170,1)",
-    borderRadius: "0.6rem",
-    border: "0.4rem solid transparent",
-    backgroundClip: "padding-box",
-  },
-};
+export const StyledContentBox = styled(Box)<{ isCommentOpen?: boolean }>(
+  ({ isCommentOpen }) => ({
+    flex: 1,
+    width: "fit-content",
+    maxHeight: isCommentOpen ? "calc(100vh - 20rem)" : "60vh",
+    overflowY: "auto",
+    "&::-webkit-scrollbar": {
+      height: "1.6rem",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "rgba(170,170,170,1)",
+      borderRadius: "0.6rem",
+      border: "0.4rem solid transparent",
+      backgroundClip: "padding-box",
+    },
+  }),
+);
 
 export const closeButtonStyle = {
   fontSize: "2.5rem",

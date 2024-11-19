@@ -1,54 +1,23 @@
 #!/bin/bash
-MVN_OPTS="-Duser.home=/var/maven"
 
-if [ ! -e node_modules ]
-then
-  mkdir node_modules
-fi
+# Frontend
+cd frontend
+#./build.sh --no-docker clean init build
+./build.sh localDep installDeps build
+cd ..
 
-case `uname -s` in
-  MINGW*)
-    USER_UID=1000
-    GROUP_UID=1000
-    ;;
-  *)
-    if [ -z ${USER_UID:+x} ]
-    then
-      USER_UID=`id -u`
-      GROUP_GID=`id -g`
-    fi
-esac
+# Create directory structure and copy frontend dist
+cd backend
+cp -R ../frontend/dist/* ./src/main/resources/
 
-init(){
-  me=`id -u`:`id -g`
-  echo "DEFAULT_DOCKER_USER=$me"> .env
-}
+# Move old ui to src/main/resources
+#cp -R ../frontend/old/* ./src/main/resources/public/
+#cp -R ../frontend/old/*.html ./src/main/resources/
 
-clean () {
-  docker compose run --rm maven mvn $MVN_OPTS clean
-}
-
-buildNode () {
-  case `uname -s` in
-    MINGW*)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --production=false --no-bin-links && node_modules/gulp/bin/gulp.js build && yarn run build:sass"
-      ;;
-    *)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --production=false && node_modules/gulp/bin/gulp.js build && yarn run build:sass"
-  esac
-}
-
-buildGulp () {
-    docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "node_modules/gulp/bin/gulp.js build"
-}
-
-buildCss () {
-    docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn run build:sass"
-}
-
-install () {
-  docker compose run --rm maven mvn $MVN_OPTS clean install -U -DskipTests
-}
+# Create view directory and copy HTML files
+mkdir -p ./src/main/resources/view
+mv ./src/main/resources/*.html ./src/main/resources/view
+cp -R ./src/main/resources/notify ./src/main/resources/view/notify
 
 # Copy angular dist @TODO MUST DELETE THIS INSTRUCTION WHEN IN PRODUCTION
 cp -R ./src/main/resources/angular-dist/* ./src/main/resources/public
@@ -58,110 +27,5 @@ mv ./src/main/resources/public/view/magneto.html ./src/main/resources/view
 #./build.sh --no-docker clean build
 ./build.sh clean build
 
-testNode () {
-  rm -rf coverage
-  rm -rf */build
-  case `uname -s` in
-    MINGW*)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --no-bin-links && node_modules/gulp/bin/gulp.js drop-cache && yarn test"
-      ;;
-    *)
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install && node_modules/gulp/bin/gulp.js drop-cache && yarn test"
-  esac
-}
-
-testNodeDev () {
-  rm -rf coverage
-  rm -rf */build
-  case `uname -s` in
-    MINGW*)
-       # DEBUG MODE using  NODE_OPTIONS=--unhandled-rejections=warn
-       # docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --no-bin-links && node_modules/gulp/bin/gulp.js drop-cache && NODE_OPTIONS=--unhandled-rejections=warn yarn run test:dev"
-
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install --no-bin-links && node_modules/gulp/bin/gulp.js drop-cache && yarn run test:dev"
-      ;;
-    *)
-      # DEBUG MODE using  NODE_OPTIONS=--unhandled-rejections=warn
-      # docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install && node_modules/gulp/bin/gulp.js drop-cache && NODE_OPTIONS=--unhandled-rejections=warn yarn run test:dev"
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "yarn install && node_modules/gulp/bin/gulp.js drop-cache && yarn run test:dev"
-  esac
-}
-
-test() {
-  docker compose run --rm maven mvn $MVN_OPTS test
-}
-
-
-publish() {
-    version=`docker-compose run --rm maven mvn $MVN_OPTS help:evaluate -Dexpression=project.version -q -DforceStdout`
-    level=`echo $version | cut -d'-' -f3`
-    case "$level" in
-        *SNAPSHOT)
-            export nexusRepository='snapshots'
-            ;;
-        *)
-            export nexusRepository='releases'
-            ;;
-    esac
-    docker-compose run --rm maven mvn -DrepositoryId=ode-$nexusRepository -DskiptTests -Dmaven.test.skip=true --settings /var/maven/.m2/settings.xml deploy
-}
-
-publishNexus() {
-  version=`docker compose run --rm maven mvn $MVN_OPTS help:evaluate -Dexpression=project.version -q -DforceStdout`
-  level=`echo $version | cut -d'-' -f3`
-  case "$level" in
-    *SNAPSHOT) export nexusRepository='snapshots' ;;
-    *)         export nexusRepository='releases' ;;
-  esac
-  docker compose run --rm  maven mvn -DrepositoryId=ode-$nexusRepository -Durl=$repo -DskipTests -Dmaven.test.skip=true --settings /var/maven/.m2/settings.xml deploy
-}
-
-for param in "$@"
-do
-  case $param in
-    init)
-      init
-      ;;
-    clean)
-      clean
-      ;;
-    buildNode)
-      buildNode
-      ;;
-    buildGulp)
-      buildGulp
-      ;;
-    buildCss)
-      buildCss
-      ;;
-    buildMaven)
-      install
-      ;;
-    install)
-      buildNode && install
-      ;;
-    publish)
-      publish
-      ;;
-    publishNexus)
-      publishNexus
-      ;;
-    test)
-      testNode ; test
-      ;;
-    testNode)
-      testNode
-      ;;
-    testNodeDev)
-      testNodeDev
-      ;;
-    test)
-      test
-      ;;
-    *)
-      echo "Invalid argument : $param"
-  esac
-  if [ ! $? -eq 0 ]; then
-    exit 1
-  fi
-done
+# Clean up - remove frontend/dist and backend/src/main/resources
+rm -rf ../frontend/dist

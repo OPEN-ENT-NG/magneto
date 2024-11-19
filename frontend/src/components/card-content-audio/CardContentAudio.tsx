@@ -1,25 +1,24 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { FC } from "react";
 
-import { Box } from "@mui/material";
-
-import { audioWrapperStyle } from "./style";
+import { AudioWrapper } from "./style";
 import { CardContentAudioProps } from "./types";
 import { RootsConst } from "~/core/constants/roots.const";
 
 export const CardContentAudio: FC<CardContentAudioProps> = ({
   ressourceId,
   type,
+  isPreview = false,
 }) => {
   return (
-    <Box sx={audioWrapperStyle}>
+    <AudioWrapper isPreview={isPreview}>
       <audio
         controls
-        preload="none"
+        preload="metadata"
         src={`${RootsConst.workspace}${ressourceId}`}
       >
         <source src={`${RootsConst.workspace}${ressourceId}`} type={type} />
       </audio>
-    </Box>
+    </AudioWrapper>
   );
 };

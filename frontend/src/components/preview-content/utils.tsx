@@ -4,6 +4,7 @@ import { redirect } from "../card-content/utils";
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
 import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
+import CSVParser from "../csv-viewer/CSVViewer";
 import { ExternalVideoPlayer } from "../external-video-player/ExternalVideoPlayer";
 import { getVideoSource } from "../external-video-player/utils";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
@@ -12,6 +13,7 @@ import { Card } from "~/models/card.model";
 
 export const displayPreviewContentByType = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
+
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO: {
       const videoSource = getVideoSource(card.resourceUrl);
@@ -47,7 +49,7 @@ export const displayPreviewContentByType = (card: Card) => {
         />
       );
     case RESOURCE_TYPE.FILE:
-      return null;
+      return <CSVParser ressourceId={card.resourceId} />;
     default:
       return null;
   }

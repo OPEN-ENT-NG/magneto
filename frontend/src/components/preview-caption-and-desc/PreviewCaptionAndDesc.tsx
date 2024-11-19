@@ -41,7 +41,7 @@ export const PreviewCaptionAndDesc: FC<PreviewCaptionAndDescProps> = ({
           {caption}
         </Typography>
       )}
-        <CardContentText text={description} />
+      <CardContentText text={description} />
     </Box>
   );
 };

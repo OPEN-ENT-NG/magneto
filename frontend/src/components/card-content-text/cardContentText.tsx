@@ -29,11 +29,5 @@ export const CardContentText: FC<CardContentTextProps> = ({ text }) => {
     ],
   });
 
-  return (
-    <Box
-      sx={textWrapperStyle}
-    >
-      {parse(cleanHtml)}
-    </Box>
-  );
+  return <Box sx={textWrapperStyle}>{parse(cleanHtml)}</Box>;
 };

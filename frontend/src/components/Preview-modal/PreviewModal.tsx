@@ -20,9 +20,9 @@ import { useBoard } from "~/providers/BoardProvider";
 
 export const PreviewModal: FC = () => {
   const {
-    closeCardPreview,
+    closeActiveCardAction,
     displayModals: { CARD_PREVIEW, COMMENT_PANEL },
-    cardInPreview,
+    activeCard,
     board: { canComment },
     toggleBoardModals,
   } = useBoard();
@@ -40,21 +40,21 @@ export const PreviewModal: FC = () => {
   return (
     <Modal
       open={CARD_PREVIEW}
-      onClose={() => closeCardPreview()}
+      onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
       aria-labelledby="modal-card-preview"
       aria-describedby="modal-card-preview"
     >
       <Box sx={modalWrapperStyle} ref={commentDivRef}>
         <Box sx={modalBodyStyle}>
           <IconButton
-            onClick={() => closeCardPreview()}
+            onClick={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
             aria-label="close"
             sx={closeButtonStyle}
           >
             <CloseIcon fontSize="inherit" />
           </IconButton>
           <Box sx={contentWrapper} data-scrollable="true">
-            {cardInPreview && <PreviewContent card={cardInPreview} />}
+            {activeCard && <PreviewContent card={activeCard} />}
           </Box>
           <CommentContainer isVisible={COMMENT_PANEL} />
           {canComment && !COMMENT_PANEL && (
@@ -64,15 +64,15 @@ export const PreviewModal: FC = () => {
               sx={commentButtonStyle}
             >
               <Typography fontSize="inherit">
-                {cardInPreview?.nbOfComments}
+                {activeCard?.nbOfComments}
               </Typography>
               <ForumOutlinedIcon fontSize="inherit" />
             </IconButton>
           )}
         </Box>
-        {cardInPreview && COMMENT_PANEL && isRefReady && (
+        {activeCard && COMMENT_PANEL && isRefReady && (
           <CommentPanel
-            cardId={cardInPreview.id}
+            cardId={activeCard.id}
             anchorEl={commentDivRef.current}
             isInCardPreview
           />

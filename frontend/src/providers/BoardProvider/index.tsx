@@ -38,7 +38,7 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [isFileDragging, setIsFileDragging] = useState<boolean>(false);
-  const [cardInPreview, setCardInPreview] = useState<Card | null>(null);
+  const [activeCard, setActiveCard] = useState<Card | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
@@ -106,16 +106,16 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       [modalType]: !prevState[modalType],
     }));
 
-  const cleanCardInPreview = () => setCardInPreview(null);
+  const cleanActiveCard = () => setActiveCard(null);
 
-  const openCardPreview = (card: Card) => {
-    setCardInPreview(card);
-    toggleBoardModals(BOARD_MODAL_TYPE.CARD_PREVIEW);
+  const openActiveCardAction = (card: Card, actionType: BOARD_MODAL_TYPE) => {
+    setActiveCard(card);
+    toggleBoardModals(actionType);
   };
 
-  const closeCardPreview = () => {
-    setCardInPreview(null);
-    toggleBoardModals(BOARD_MODAL_TYPE.CARD_PREVIEW);
+  const closeActiveCardAction = (actionType: BOARD_MODAL_TYPE) => {
+    setActiveCard(null);
+    toggleBoardModals(actionType);
   };
   const value = useMemo<BoardContextType>(
     () => ({
@@ -134,11 +134,11 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       toggleBoardModals,
       isFileDragging,
       setIsFileDragging,
-      cardInPreview,
-      setCardInPreview,
-      cleanCardInPreview,
-      openCardPreview,
-      closeCardPreview,
+      activeCard,
+      setActiveCard,
+      cleanActiveCard,
+      openActiveCardAction,
+      closeActiveCardAction,
     }),
     [board, zoomLevel, isLoading, boardRights, displayModals, isFileDragging],
   );

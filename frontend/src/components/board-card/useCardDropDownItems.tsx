@@ -12,6 +12,7 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 
@@ -23,7 +24,7 @@ export const useCardDropDownItems = (
   lockedAndNoRights?: boolean,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
-  const { openCardPreview } = useBoard();
+  const { openActiveCardAction } = useBoard();
 
   const icons = useMemo(
     () => ({
@@ -39,14 +40,14 @@ export const useCardDropDownItems = (
 
   const handlers = useMemo(
     () => ({
-      preview: () => openCardPreview(card),
+      preview: () => openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW),
       duplicate: () => null,
       edit: () => null,
       move: () => null,
-      delete: () => null,
+      delete: () => openActiveCardAction(card, BOARD_MODAL_TYPE.DELETE),
       lock: lockOrUnlockMagnet,
     }),
-    [openCardPreview, lockOrUnlockMagnet, card],
+    [openActiveCardAction, lockOrUnlockMagnet, card],
   );
 
   const labels = useMemo(

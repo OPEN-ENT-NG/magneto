@@ -1,6 +1,6 @@
 import { GridColDef } from "@mui/x-data-grid";
 
-import { GridDataType } from "./types";
+import { GridDataType, PAGE_SIZE_OPTIONS } from "./types";
 
 const detectSeparator = (line: string): string => {
   const separators = [";", ",", "\t", "|"];
@@ -52,3 +52,10 @@ export const parseCSV = (data: string): GridDataType => {
 
   return { rows, columns };
 };
+
+export const pageSizeOptions = [
+  PAGE_SIZE_OPTIONS.FIVE,
+  PAGE_SIZE_OPTIONS.TEN,
+  PAGE_SIZE_OPTIONS.TWENTY_FIVE,
+  PAGE_SIZE_OPTIONS.FIFTY,
+];

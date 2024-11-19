@@ -3,8 +3,8 @@ import { FC, useEffect, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 import { gridStyle } from "./style";
-import { CSVParserProps } from "./types";
-import { parseCSV } from "./utils";
+import { CSVParserProps, PAGE_SIZE_OPTIONS } from "./types";
+import { pageSizeOptions, parseCSV } from "./utils";
 import { useGetRessourceQuery } from "~/services/api/workspace.service";
 
 interface GridDataType {
@@ -32,9 +32,9 @@ const CSVParser: FC<CSVParserProps> = ({ ressourceId }) => {
     <DataGrid
       {...gridData}
       initialState={{
-        pagination: { paginationModel: { pageSize: 10 } },
+        pagination: { paginationModel: { pageSize: PAGE_SIZE_OPTIONS.TEN } },
       }}
-      pageSizeOptions={[5, 10, 25, 50]}
+      pageSizeOptions={pageSizeOptions}
       disableRowSelectionOnClick
       sx={gridStyle}
     />

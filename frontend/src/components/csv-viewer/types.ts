@@ -13,3 +13,9 @@ export interface SeparatorCount {
   separator: string;
   count: number;
 }
+export enum PAGE_SIZE_OPTIONS {
+  FIVE = 5,
+  TEN = 10,
+  TWENTY_FIVE = 25,
+  FIFTY = 50,
+}

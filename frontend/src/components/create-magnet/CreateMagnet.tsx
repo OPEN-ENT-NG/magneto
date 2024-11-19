@@ -43,10 +43,10 @@ import {
   footerButtonStyle,
   menuItemStyle,
   formControlEditorStyle,
+  audioWrapperStyle,
 } from "./style";
 import { CardPayload } from "./types";
 import { convertMediaTypeToResourceType } from "./utils";
-import { audioWrapperStyle } from "../card-content-audio/style";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";

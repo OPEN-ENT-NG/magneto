@@ -15,6 +15,7 @@ export const CommentPanelWrapper = styled(Box, {
   display: "flex",
   flexDirection: "column",
   maxHeight: "80%",
+  height: "80%",
   width: "45rem",
   borderRadius: isInCardPreview
     ? "1.6rem 1.6rem 1.6rem 0"

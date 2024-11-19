@@ -15,12 +15,3 @@ export const captionStyle = {
   textOverflow: "ellipsis",
   color: "#5b6472",
 };
-
-export const descriptionStyle = {
-  fontSize: "1.5rem",
-  overflowX: "hidden",
-  wordBreak: "break-word",
-  overflowWrap: "break-word",
-  textOverflow: "ellipsis",
-  color: "#5b6472",
-};

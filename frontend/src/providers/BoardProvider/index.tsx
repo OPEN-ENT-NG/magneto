@@ -117,6 +117,8 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     setActiveCard(null);
     toggleBoardModals(actionType);
   };
+  console.log(displayModals);
+
   const value = useMemo<BoardContextType>(
     () => ({
       board,

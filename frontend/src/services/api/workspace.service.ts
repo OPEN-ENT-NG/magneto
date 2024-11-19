@@ -7,9 +7,10 @@ export const workspaceApi = emptySplitWorkspace.injectEndpoints({
       query: ({ visibility, id }) => ({
         url: `${visibility ? "pub/" : ""}document/${id}`,
         method: "GET",
+        responseHandler: (response) => response.text(),
       }),
     }),
   }),
 });
 
-export const { useLazyGetRessourceQuery } = workspaceApi;
+export const { useGetRessourceQuery } = workspaceApi;

@@ -261,6 +261,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
 
     const deleteMagnet = async (): Promise<void> => {
       deleteCards({ cardIds: [card.id], boardId: board.id });
+      closeActiveCardAction(BOARD_MODAL_TYPE.DELETE);
     };
 
     const dropDownItemList = useCardDropDownItems(
@@ -412,7 +413,9 @@ export const BoardCard: FC<BoardCardProps> = memo(
           <MessageModal
             isOpen={displayModals.DELETE_MODAL}
             title={t("magneto.delete.cards")}
-            onSubmit={() => deleteMagnet()}
+            onSubmit={() => {
+              deleteMagnet();
+            }}
             disableSubmit={() => false}
             submitButtonName={t("magneto.delete")}
             cancelButtonName={t("magneto.cancel")}

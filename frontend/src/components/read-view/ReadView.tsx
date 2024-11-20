@@ -1,4 +1,11 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FC,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { Button } from "@edifice-ui/react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -23,28 +30,24 @@ import {
   boxStyle,
   commentButtonWrapperStyle,
   contentStyle,
-  iconButtonReturnStyle,
   inputLabelStyle,
   leftNavigationStyle,
   menuItemStyle,
   retourStyle,
   rightNavigationStyle,
   selectStyle,
+  styledContentBox,
 } from "./style";
 import { CommentPanel } from "../comment-panel/CommentPanel";
 import { PreviewContent } from "../preview-content/PreviewContent";
-import {
-  commentButtonStyle,
-  CommentContainer,
-  modalBodyStyle,
-} from "../Preview-modal/style";
+import { commentButtonStyle, CommentContainer } from "../Preview-modal/style";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useWindowResize } from "~/hooks/useWindowResize";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 
-export const BoardExplorer: FC = () => {
+export const ReadView: FC = () => {
   const {
     board,
     displayModals: { COMMENT_PANEL },
@@ -53,7 +56,8 @@ export const BoardExplorer: FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("magneto");
   const [isRefReady, setIsRefReady] = useState(false);
-  const commentDivRef = useWindowResize();
+  const commentDivRef =
+    useWindowResize() as MutableRefObject<HTMLElement | null>;
 
   const filteredSections = useMemo(() => {
     return board.sections.filter(
@@ -151,6 +155,24 @@ export const BoardExplorer: FC = () => {
     };
   }, [handleKeyNavigation]);
 
+  useEffect(() => {
+    const rootElement = document.getElementById("root");
+    if (rootElement) {
+      commentDivRef.current = rootElement;
+      const originalGetBoundingClientRect =
+        rootElement.getBoundingClientRect.bind(rootElement);
+      rootElement.getBoundingClientRect = () => {
+        const originalRect = originalGetBoundingClientRect();
+        return new DOMRect(
+          originalRect.x - 20,
+          originalRect.y + 4,
+          originalRect.width,
+          originalRect.height,
+        );
+      };
+    }
+  }, []);
+
   return (
     <>
       <GlobalStyles
@@ -158,9 +180,12 @@ export const BoardExplorer: FC = () => {
           "main.container-fluid": {
             width: " 65% !important",
             maxWidth: "100% !important",
+            minHeight: "calc(100vh - 70px)",
+            maxHeight: "calc(100vh - 70px)",
             position: "relative",
             paddingRight: "0 !important",
             paddingLeft: "0 !important",
+            boxSizing: "border-box",
           },
         }}
       />
@@ -177,9 +202,13 @@ export const BoardExplorer: FC = () => {
             label={t("magneto.card.section")}
             sx={selectStyle}
           >
-            {filteredSections.map((s: Section) => (
-              <MenuItem key={s._id} value={s._id} sx={menuItemStyle}>
-                {s.title}
+            {filteredSections.map((section: Section) => (
+              <MenuItem
+                key={section._id}
+                value={section._id}
+                sx={menuItemStyle}
+              >
+                {section.title}
               </MenuItem>
             ))}
           </Select>
@@ -194,13 +223,11 @@ export const BoardExplorer: FC = () => {
         onClick={navigateToView}
         style={retourStyle}
       >
-        <IconButton sx={iconButtonReturnStyle}>
-          <ArrowBackIcon sx={{ color: "white" }} />
-        </IconButton>
+        <ArrowBackIcon sx={{ color: "white" }} />
         {"Retour"}
       </Button>
 
-      <Box sx={contentStyle}>
+      <Box sx={contentStyle} data-scrollable="true">
         <Box sx={boxStyle}>
           {cardIndex > 0 && (
             <IconButton
@@ -220,11 +247,9 @@ export const BoardExplorer: FC = () => {
           )}
         </Box>
         <Box>
-          <Box sx={modalBodyStyle}>
-            <Box data-scrollable="true">
-              {card && <PreviewContent card={card} />}
-            </Box>
-            <Box sx={commentButtonWrapperStyle} ref={commentDivRef}>
+          <Box sx={styledContentBox}>
+            {card && <PreviewContent card={card} />}
+            <Box sx={commentButtonWrapperStyle}>
               <CommentContainer isVisible={COMMENT_PANEL} />
               {board.canComment && !COMMENT_PANEL && (
                 <IconButton
@@ -243,11 +268,7 @@ export const BoardExplorer: FC = () => {
             </Box>
           </Box>
           {card && COMMENT_PANEL && isRefReady && (
-            <CommentPanel
-              cardId={card.id}
-              anchorEl={commentDivRef.current}
-              isInCardPreview
-            />
+            <CommentPanel cardId={card.id} anchorEl={commentDivRef.current} />
           )}
         </Box>
       </Box>

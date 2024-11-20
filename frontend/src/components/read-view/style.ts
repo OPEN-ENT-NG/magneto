@@ -1,13 +1,29 @@
 export const contentStyle = {
-  paddingRight: "1.6rem",
-  paddingLeft: "15rem",
+  padding: "4rem 10rem",
+  height: "100%",
+  maxHeight: "100%",
+  overflowY: "auto",
+  "&::-webkit-scrollbar": {
+    height: "1.6rem",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "rgba(170,170,170,1)",
+    borderRadius: "0.6rem",
+    border: "0.4rem solid transparent",
+    backgroundClip: "padding-box",
+  },
+};
+
+export const styledContentBox = {
+  width: "100%",
+  height: "100%",
+  maxHeight: "100%",
 };
 
 export const retourStyle = {
   position: "fixed",
-  right: "6%",
-  transform: "translateX(20%)",
-  top: "6%",
+  right: "40px",
+  top: "80px",
 } as React.CSSProperties;
 
 export const boxStyle = {
@@ -19,23 +35,29 @@ export const boxStyle = {
   justifyContent: "space-between",
 } as React.CSSProperties;
 
-export const inputLabelStyle = { fontSize: "1.5rem" };
+export const inputLabelStyle = { fontSize: "2rem" };
 
-export const menuItemStyle = { fontSize: "1.5rem" };
+export const menuItemStyle = { fontSize: "2rem" };
 
 export const selectStyle = {
   width: "55%",
-  fontSize: "1.5rem",
+  fontSize: "2rem",
   backgroundColor: "rgba(0, 0, 0, 0.01)",
   boxShadow: "0 1px 1px rgba(0,0,0,0.1)",
+  borderBottomRightRadius: "2rem",
+  padding: "1rem",
   "&::before": {
-    borderBottomColor: "#ededed",
+    borderBottom: "none",
   },
   "&::after": {
     borderBottomColor: "grey",
+    maxWidth: "calc(100% - 2rem)",
   },
-  "&.Mui-focused": {
-    backgroundColor: "#fafafa",
+  "&:hover::before": {
+    maxWidth: "calc(100% - 2rem)",
+  },
+  "& .MuiSelect-select": {
+    backgroundColor: "transparent !important",
   },
 };
 
@@ -75,5 +97,3 @@ export const rightNavigationStyle = {
     fontSize: "5rem",
   },
 };
-
-export const iconButtonReturnStyle = { padding: 0 };

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 
 // eslint-disable-next-line import/order
 import {
@@ -18,37 +18,24 @@ import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
 import { useTranslation } from "react-i18next";
 
 import { styles } from "./style";
+import { CreateBoardProps } from "./types";
 import UniqueImagePicker from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import useImageHandler from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
-import { Board, BoardForm } from "~/models/board.model";
-import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+import { BoardForm } from "~/models/board.model";
 import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
 
-type Props = {
-  isOpen: boolean;
-  toggle: () => void;
-  boardToUpdate?: Board;
-  reset?: () => void;
-};
-
-export interface FormInputs {
-  title: string;
-  description: string;
-  enablePublic: boolean;
-  formSlug: string;
-}
-
-export const CreateBoard: FunctionComponent<Props> = ({
+export const CreateBoard: FC<CreateBoardProps> = ({
   isOpen,
   toggle,
   boardToUpdate,
   reset,
-}: Props) => {
+  parentFolderId,
+}) => {
   const { t } = useTranslation("magneto");
   const {
     cover: thumbnail,
@@ -62,7 +49,6 @@ export const CreateBoard: FunctionComponent<Props> = ({
     handleDeleteImage: handleDeleteImageBackground,
     fetchUrl: fetchBackgroundUrl,
   } = useImageHandler("");
-  const { currentFolder } = useFoldersNavigation();
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
@@ -80,7 +66,7 @@ export const CreateBoard: FunctionComponent<Props> = ({
   const setBoardFromForm = async (board: BoardForm) => {
     board.title = title;
     board.description = description;
-    board.folderId = currentFolder.id;
+    board.folderId = parentFolderId ?? "";
 
     if (thumbnailSrc != "" && thumbnail == "") {
       board.imageUrl = thumbnailSrc;
@@ -106,22 +92,6 @@ export const CreateBoard: FunctionComponent<Props> = ({
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
   };
-
-  const onSubmit = async (): Promise<void> => {
-    const board = new BoardForm();
-    await setBoardFromForm(board);
-
-    if (boardToUpdate != null) {
-      board.id = boardToUpdate.id;
-      updateBoard(board.toJSON());
-      if (reset != null) reset();
-    } else {
-      createBoard(board.toJSON());
-    }
-
-    resetFields();
-  };
-
   const resetFields = (): void => {
     if (boardToUpdate == null) {
       handleDeleteImageThumbnail();
@@ -136,6 +106,22 @@ export const CreateBoard: FunctionComponent<Props> = ({
       setBackgroundSrc("");
     }
     toggle();
+  };
+
+  const onSubmit = async (): Promise<void> => {
+    const board = new BoardForm();
+    await setBoardFromForm(board);
+
+    if (boardToUpdate) {
+      board.id = boardToUpdate.id;
+      updateBoard(board.toJSON());
+      if (reset != null) reset();
+      return resetFields();
+    }
+    if (parentFolderId) {
+      createBoard(board.toJSON());
+      return resetFields();
+    }
   };
 
   const updateKeywords = (event: React.ChangeEvent<HTMLInputElement>) => {

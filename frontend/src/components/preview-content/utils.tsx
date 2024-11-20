@@ -10,9 +10,11 @@ import { getVideoSource } from "../external-video-player/utils";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
+import { CardContentFile } from "../card-content-file/CardContentFile";
 
 export const displayPreviewContentByType = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
+  console.log(card);
 
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO: {
@@ -49,7 +51,7 @@ export const displayPreviewContentByType = (card: Card) => {
         />
       );
     case RESOURCE_TYPE.FILE:
-      return <CSVParser ressourceId={card.resourceId} />;
+      return <CardContentFile card={card} />;
     default:
       return null;
   }

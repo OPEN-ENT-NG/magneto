@@ -7,6 +7,7 @@ import { mdiCheckCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import {
   leftWrapperStyle,
@@ -20,11 +21,12 @@ import { Section } from "~/providers/BoardProvider/types";
 
 export const HeaderView: FC = () => {
   const { board } = useBoard();
+  const navigate = useNavigate();
   const { currentApp } = useOdeClient();
   const { t } = useTranslation("magneto");
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
-  const onClick = () => console.log("read clicked");
+  const onClick = () => navigate(`/board/${board.id}/read`);
 
   const boardHasCards = (): boolean => {
     return (

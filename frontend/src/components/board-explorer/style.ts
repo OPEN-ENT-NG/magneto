@@ -1,3 +1,8 @@
+export const contentStyle = {
+  paddingRight: "1.6rem",
+  paddingLeft: "15rem",
+};
+
 export const retourStyle = {
   position: "fixed",
   right: "6%",
@@ -34,7 +39,41 @@ export const selectStyle = {
   },
 };
 
-export const contentStyle = {
-  paddingRight: "1.6rem",
-  paddingLeft: "1.6rem",
+export const commentButtonWrapperStyle = {
+  position: "fixed",
+  bottom: "2rem",
+  right: "2rem",
+  zIndex: 1000,
 };
+
+export const leftNavigationStyle = {
+  position: "fixed",
+  left: "6%",
+  top: "50%",
+  backgroundColor: "white",
+  border: "1px solid #e0e0e0",
+  "&:hover": { backgroundColor: "white" },
+  width: "7rem",
+  height: "7rem",
+  boxShadow: "0 3px 5px rgba(0,0,0,0.1)",
+  "& .MuiSvgIcon-root": {
+    fontSize: "5rem",
+  },
+};
+
+export const rightNavigationStyle = {
+  position: "fixed",
+  right: "6%",
+  top: "50%",
+  backgroundColor: "white",
+  border: "1px solid #e0e0e0",
+  "&:hover": { backgroundColor: "white" },
+  width: "7rem",
+  height: "7rem",
+  boxShadow: "0 3px 5px rgba(0,0,0,0.1)",
+  "& .MuiSvgIcon-root": {
+    fontSize: "5rem",
+  },
+};
+
+export const iconButtonReturnStyle = { padding: 0 };

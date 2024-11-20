@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@edifice-ui/react";
 import {
   Box,
@@ -16,6 +16,7 @@ import { useBoard } from "~/providers/BoardProvider";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { useNavigate } from "react-router-dom";
 import { Section } from "~/providers/BoardProvider/types";
@@ -23,17 +24,21 @@ import { useTranslation } from "react-i18next";
 import { Card } from "~/models/card.model";
 import {
   boxStyle,
+  commentButtonWrapperStyle,
   contentStyle,
+  iconButtonReturnStyle,
   inputLabelStyle,
+  leftNavigationStyle,
   menuItemStyle,
   retourStyle,
+  rightNavigationStyle,
   selectStyle,
 } from "./style";
 import {
   commentButtonStyle,
   CommentContainer,
-  contentWrapper,
   modalBodyStyle,
+  StyledContentBox,
 } from "../Preview-modal/style";
 import { PreviewContent } from "../preview-content/PreviewContent";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
@@ -128,6 +133,25 @@ export const BoardExplorer: FC = () => {
     }
   };
 
+  const handleKeyNavigation = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft" && cardIndex > 0) {
+        navigatePage("prev");
+      } else if (event.key === "ArrowRight" && !isLastCardInBoard()) {
+        navigatePage("next");
+      }
+    },
+    [cardIndex, isLastCardInBoard, navigatePage],
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyNavigation);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyNavigation);
+    };
+  }, [handleKeyNavigation]);
+
   return (
     <>
       <GlobalStyles
@@ -171,27 +195,17 @@ export const BoardExplorer: FC = () => {
         onClick={navigateToView}
         style={retourStyle}
       >
-        {"<- Retour"}
+        <IconButton sx={iconButtonReturnStyle}>
+          <ArrowBackIcon sx={{ color: "white" }} />
+        </IconButton>
+        {"Retour"}
       </Button>
 
       <Box sx={contentStyle}>
         <Box sx={boxStyle}>
           {cardIndex > 0 && (
             <IconButton
-              sx={{
-                position: "fixed",
-                left: "6%",
-                top: "50%",
-                backgroundColor: "white",
-                border: "1px solid #e0e0e0",
-                "&:hover": { backgroundColor: "white" },
-                width: "7rem",
-                height: "7rem",
-                boxShadow: "0 3px 5px rgba(0,0,0,0.1)",
-                "& .MuiSvgIcon-root": {
-                  fontSize: "5rem",
-                },
-              }}
+              sx={leftNavigationStyle}
               onClick={() => navigatePage("prev")}
             >
               <ChevronLeftIcon sx={{ color: "black" }} />
@@ -199,20 +213,7 @@ export const BoardExplorer: FC = () => {
           )}
           {!isLastCardInBoard() && (
             <IconButton
-              sx={{
-                position: "fixed",
-                right: "6%",
-                top: "50%",
-                backgroundColor: "white",
-                border: "1px solid #e0e0e0",
-                "&:hover": { backgroundColor: "white" },
-                width: "7rem",
-                height: "7rem",
-                boxShadow: "0 3px 5px rgba(0,0,0,0.1)",
-                "& .MuiSvgIcon-root": {
-                  fontSize: "5rem",
-                },
-              }}
+              sx={rightNavigationStyle}
               onClick={() => navigatePage("next")}
             >
               <ChevronRightIcon sx={{ color: "black" }} />
@@ -221,22 +222,29 @@ export const BoardExplorer: FC = () => {
         </Box>
         <Box>
           <Box sx={modalBodyStyle}>
-            <Box sx={contentWrapper} data-scrollable="true">
+            <StyledContentBox
+              isCommentOpen={COMMENT_PANEL}
+              data-scrollable="true"
+            >
               {card && <PreviewContent card={card} />}
+            </StyledContentBox>
+            <Box sx={commentButtonWrapperStyle} ref={commentDivRef}>
+              <CommentContainer isVisible={COMMENT_PANEL} />
+              {board.canComment && !COMMENT_PANEL && (
+                <IconButton
+                  onClick={() =>
+                    toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)
+                  }
+                  aria-label="close"
+                  sx={commentButtonStyle}
+                >
+                  <Typography fontSize="inherit">
+                    {card?.nbOfComments}
+                  </Typography>
+                  <ForumOutlinedIcon fontSize="inherit" />
+                </IconButton>
+              )}
             </Box>
-            <CommentContainer isVisible={COMMENT_PANEL} />
-            {board.canComment && !COMMENT_PANEL && (
-              <IconButton
-                onClick={() =>
-                  toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)
-                }
-                aria-label="close"
-                sx={commentButtonStyle}
-              >
-                <Typography fontSize="inherit">{card?.nbOfComments}</Typography>
-                <ForumOutlinedIcon fontSize="inherit" />
-              </IconButton>
-            )}
           </Box>
           {card && COMMENT_PANEL && isRefReady && (
             <CommentPanel

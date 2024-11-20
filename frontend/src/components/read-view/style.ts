@@ -39,6 +39,10 @@ export const inputLabelStyle = { fontSize: "2rem" };
 
 export const menuItemStyle = { fontSize: "2rem" };
 
+export const blackColor = { color: "black" };
+
+export const whiteColor = { color: "white" };
+
 export const selectStyle = {
   width: "55%",
   fontSize: "2rem",

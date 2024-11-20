@@ -27,6 +27,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import {
+  blackColor,
   boxStyle,
   commentButtonWrapperStyle,
   contentStyle,
@@ -37,6 +38,7 @@ import {
   rightNavigationStyle,
   selectStyle,
   styledContentBox,
+  whiteColor,
 } from "./style";
 import { CommentPanel } from "../comment-panel/CommentPanel";
 import { PreviewContent } from "../preview-content/PreviewContent";
@@ -223,8 +225,8 @@ export const ReadView: FC = () => {
         onClick={navigateToView}
         style={retourStyle}
       >
-        <ArrowBackIcon sx={{ color: "white" }} />
-        {"Retour"}
+        <ArrowBackIcon sx={whiteColor} />
+        {t("magneto.previous")}
       </Button>
 
       <Box sx={contentStyle} data-scrollable="true">
@@ -234,7 +236,7 @@ export const ReadView: FC = () => {
               sx={leftNavigationStyle}
               onClick={() => navigatePage("prev")}
             >
-              <ChevronLeftIcon sx={{ color: "black" }} />
+              <ChevronLeftIcon sx={blackColor} />
             </IconButton>
           )}
           {!isLastCardInBoard() && (
@@ -242,7 +244,7 @@ export const ReadView: FC = () => {
               sx={rightNavigationStyle}
               onClick={() => navigatePage("next")}
             >
-              <ChevronRightIcon sx={{ color: "black" }} />
+              <ChevronRightIcon sx={blackColor} />
             </IconButton>
           )}
         </Box>

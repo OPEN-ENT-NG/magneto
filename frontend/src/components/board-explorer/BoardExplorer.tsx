@@ -1,51 +1,69 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
-import "./BoardExplorer.scss";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Button } from "@edifice-ui/react";
 import {
   Box,
   FormControl,
+  GlobalStyles,
   IconButton,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import { useBoard } from "~/providers/BoardProvider";
-import { useElapsedTime } from "~/hooks/useElapsedTime";
+
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import DOMPurify from "dompurify";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+
 import { useNavigate } from "react-router-dom";
 import { Section } from "~/providers/BoardProvider/types";
 import { useTranslation } from "react-i18next";
 import { Card } from "~/models/card.model";
-
-export const retourStyle = {
-  position: "fixed",
-  right: "6%",
-  transform: "translateX(20%)",
-  top: "6%",
-} as React.CSSProperties;
-
-export const boxStyle = {
-  padding: "1rem 0",
-  position: "relative",
-  overflow: "visible", // Permet au bouton de dépasser
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-} as React.CSSProperties;
+import {
+  boxStyle,
+  contentStyle,
+  inputLabelStyle,
+  menuItemStyle,
+  retourStyle,
+  selectStyle,
+} from "./style";
+import {
+  commentButtonStyle,
+  CommentContainer,
+  contentWrapper,
+  modalBodyStyle,
+} from "../Preview-modal/style";
+import { PreviewContent } from "../preview-content/PreviewContent";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { CommentPanel } from "../comment-panel/CommentPanel";
+import { useWindowResize } from "~/hooks/useWindowResize";
 
 export const BoardExplorer: FC = () => {
-  const { board } = useBoard();
+  const {
+    board,
+    displayModals: { COMMENT_PANEL },
+    toggleBoardModals,
+  } = useBoard();
   const navigate = useNavigate();
   const { t } = useTranslation("magneto");
+  const [isRefReady, setIsRefReady] = useState(false);
+  const commentDivRef = useWindowResize();
 
   const filteredSections = useMemo(() => {
     return board.sections.filter(
       (section) => section.cards && section.cards.length > 0,
     );
   }, [board]);
+
+  useEffect(() => {
+    if (COMMENT_PANEL && commentDivRef.current) {
+      setIsRefReady(true);
+    } else {
+      setIsRefReady(false);
+    }
+  }, [COMMENT_PANEL]);
 
   const navigateToView = () => {
     navigate(`/board/${board.id}/view`);
@@ -110,14 +128,23 @@ export const BoardExplorer: FC = () => {
     }
   };
 
-  const time = useElapsedTime(card?.modificationDate);
-
   return (
     <>
+      <GlobalStyles
+        styles={{
+          "main.container-fluid": {
+            width: " 65% !important",
+            maxWidth: "100% !important",
+            position: "relative",
+            paddingRight: "0 !important",
+            paddingLeft: "0 !important",
+          },
+        }}
+      />
       {filteredSections && section && (
         <FormControl size="medium" variant="filled" fullWidth>
-          <InputLabel id="select-label" sx={{ fontSize: "1.5rem" }}>
-            Section
+          <InputLabel id="select-label" sx={inputLabelStyle}>
+            {t("magneto.card.section")}
           </InputLabel>
           <Select
             labelId="select-section"
@@ -125,24 +152,10 @@ export const BoardExplorer: FC = () => {
             value={section?._id}
             onChange={handleSectionChange}
             label={t("magneto.card.section")}
-            sx={{
-              width: "55%",
-              fontSize: "1.5rem",
-              backgroundColor: "rgba(0, 0, 0, 0.01)",
-              boxShadow: "0 1px 1px rgba(0,0,0,0.1)",
-              "&::before": {
-                borderBottomColor: "#ededed",
-              },
-              "&::after": {
-                borderBottomColor: "grey",
-              },
-              "&.Mui-focused": {
-                backgroundColor: "#fafafa",
-              },
-            }}
+            sx={selectStyle}
           >
             {filteredSections.map((s: Section) => (
-              <MenuItem key={s._id} value={s._id} sx={{ fontSize: "1.5rem" }}>
+              <MenuItem key={s._id} value={s._id} sx={menuItemStyle}>
                 {s.title}
               </MenuItem>
             ))}
@@ -160,19 +173,9 @@ export const BoardExplorer: FC = () => {
       >
         {"<- Retour"}
       </Button>
-      <div
-        style={
-          {
-            paddingRight: "1.6rem",
-            paddingLeft: "1.6rem",
-          } as React.CSSProperties
-        }
-      >
-        <Box sx={boxStyle}>
-          <div>
-            <h1>Mon en-tête</h1>
-          </div>
 
+      <Box sx={contentStyle}>
+        <Box sx={boxStyle}>
           {cardIndex > 0 && (
             <IconButton
               sx={{
@@ -216,23 +219,34 @@ export const BoardExplorer: FC = () => {
             </IconButton>
           )}
         </Box>
-        <Box sx={{ marginBottom: "10rem" }}>
-          <span>
-            Crée par {card?.ownerName}, modifié par{" "}
-            {card?.lastModifierName ?? card?.ownerName}
-          </span>
-          <span> {time.label}</span>
-        </Box>
-        <Box sx={{ marginBottom: "10rem" }}>STUB CONTENT</Box>
-        <Box
-          dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(card?.description),
-          }}
-        />
         <Box>
-          <span>{card?.caption}</span>
+          <Box sx={modalBodyStyle}>
+            <Box sx={contentWrapper} data-scrollable="true">
+              {card && <PreviewContent card={card} />}
+            </Box>
+            <CommentContainer isVisible={COMMENT_PANEL} />
+            {board.canComment && !COMMENT_PANEL && (
+              <IconButton
+                onClick={() =>
+                  toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)
+                }
+                aria-label="close"
+                sx={commentButtonStyle}
+              >
+                <Typography fontSize="inherit">{card?.nbOfComments}</Typography>
+                <ForumOutlinedIcon fontSize="inherit" />
+              </IconButton>
+            )}
+          </Box>
+          {card && COMMENT_PANEL && isRefReady && (
+            <CommentPanel
+              cardId={card.id}
+              anchorEl={commentDivRef.current}
+              isInCardPreview
+            />
+          )}
         </Box>
-      </div>
+      </Box>
     </>
   );
 };

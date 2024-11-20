@@ -1,5 +1,10 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
+
 import { Button } from "@edifice-ui/react";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import {
   Box,
   FormControl,
@@ -11,17 +16,9 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { useBoard } from "~/providers/BoardProvider";
-
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
-import { useNavigate } from "react-router-dom";
-import { Section } from "~/providers/BoardProvider/types";
 import { useTranslation } from "react-i18next";
-import { Card } from "~/models/card.model";
+import { useNavigate } from "react-router-dom";
+
 import {
   boxStyle,
   commentButtonWrapperStyle,
@@ -34,16 +31,18 @@ import {
   rightNavigationStyle,
   selectStyle,
 } from "./style";
+import { CommentPanel } from "../comment-panel/CommentPanel";
+import { PreviewContent } from "../preview-content/PreviewContent";
 import {
   commentButtonStyle,
   CommentContainer,
   modalBodyStyle,
-  StyledContentBox,
 } from "../Preview-modal/style";
-import { PreviewContent } from "../preview-content/PreviewContent";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
-import { CommentPanel } from "../comment-panel/CommentPanel";
 import { useWindowResize } from "~/hooks/useWindowResize";
+import { Card } from "~/models/card.model";
+import { useBoard } from "~/providers/BoardProvider";
+import { Section } from "~/providers/BoardProvider/types";
 
 export const BoardExplorer: FC = () => {
   const {
@@ -222,12 +221,9 @@ export const BoardExplorer: FC = () => {
         </Box>
         <Box>
           <Box sx={modalBodyStyle}>
-            <StyledContentBox
-              isCommentOpen={COMMENT_PANEL}
-              data-scrollable="true"
-            >
+            <Box data-scrollable="true">
               {card && <PreviewContent card={card} />}
-            </StyledContentBox>
+            </Box>
             <Box sx={commentButtonWrapperStyle} ref={commentDivRef}>
               <CommentContainer isVisible={COMMENT_PANEL} />
               {board.canComment && !COMMENT_PANEL && (

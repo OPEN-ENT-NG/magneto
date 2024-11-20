@@ -7,6 +7,7 @@ import { mdiCheckCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import {
   leftWrapperStyle,
@@ -17,7 +18,6 @@ import {
 import { BoardDescription } from "../board-description/BoardDescription";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
-import { useNavigate } from "react-router-dom";
 
 export const HeaderView: FC = () => {
   const { board } = useBoard();

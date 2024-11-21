@@ -26,18 +26,6 @@ import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 
-export interface AppProps {
-  _id: string;
-  created: Date;
-  description: string;
-  map: string;
-  modified: Date;
-  name: string;
-  owner: { userId: string; displayName: string };
-  shared: any[];
-  thumbnail: string;
-}
-
 export const AppView: FC = () => {
   const { t } = useTranslation("magneto");
   const [isOpen, toggle] = useToggle(false);

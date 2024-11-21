@@ -49,6 +49,7 @@ import {
   useFavoriteCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
+import { CardDuplicateOrMoveModal } from "../card-duplicate-or-move-modal/CardDuplicateOrMove";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -235,9 +236,8 @@ export const BoardCard: FC<BoardCardProps> = memo(
       closeActiveCardAction,
     } = useBoard();
     const { t } = useTranslation("magneto");
-
     const [deleteCards] = useDeleteCardsMutation();
-
+    const isActiveCardId = activeCard?.id === card.id;
     const hasLockedCardRights = (): boolean => {
       const isCardOwner: boolean = card.ownerId == user?.userId;
       return isCardOwner || (card.locked ? hasManageRights() : hasEditRights());
@@ -409,9 +409,9 @@ export const BoardCard: FC<BoardCardProps> = memo(
         <MemoizedContent {...contentProps} />
         <MemoizedCardActions {...actionProps} />
 
-        {activeCard?.id == card.id && displayModals.DELETE_MODAL && (
+        {isActiveCardId && displayModals.DELETE_MODAL && (
           <MessageModal
-            isOpen={displayModals.DELETE_MODAL}
+            isOpen={isActiveCardId && displayModals.DELETE_MODAL}
             title={t("magneto.delete.cards")}
             onSubmit={() => {
               deleteMagnet();
@@ -424,7 +424,11 @@ export const BoardCard: FC<BoardCardProps> = memo(
             {t("magneto.delete.cards.message")}
           </MessageModal>
         )}
-
+        {isActiveCardId && displayModals.DUPLICATE_OR_MOVE && (
+          <CardDuplicateOrMoveModal
+            isOpen={isActiveCardId && displayModals.DUPLICATE_OR_MOVE}
+          ></CardDuplicateOrMoveModal>
+        )}
         {isOpen && dropdownRef.current && (
           <MemoizedDropDownList
             items={dropDownItemList}

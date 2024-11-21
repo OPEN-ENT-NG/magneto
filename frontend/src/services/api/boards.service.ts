@@ -1,5 +1,9 @@
 import { emptySplitApi } from "./emptySplitApi.service";
-import { IBoardsParamsRequest, IBoardPayload } from "~/models/board.model";
+import {
+  IBoardsParamsRequest,
+  IBoardPayload,
+  Boards,
+} from "~/models/board.model";
 
 export const boardsApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -119,6 +123,9 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         body: { boardIds: params.boardIds },
       }),
     }),
+    getAllBoardsEditable: builder.query<Boards, void>({
+      query: () => `boards/editable`,
+    }),
   }),
 });
 
@@ -134,4 +141,5 @@ export const {
   useDeleteBoardsMutation,
   useRestorePreDeleteBoardsMutation,
   useGetUrlQuery,
+  useGetAllBoardsEditableQuery,
 } = boardsApi;

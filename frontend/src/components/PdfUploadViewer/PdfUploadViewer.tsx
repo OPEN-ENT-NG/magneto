@@ -96,7 +96,6 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
               pageNumber={pageNumber}
               renderTextLayer={true}
               renderAnnotationLayer={true}
-              width={document.documentElement.clientWidth * 0.4}
               loading={
                 <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
                   <CircularProgress />

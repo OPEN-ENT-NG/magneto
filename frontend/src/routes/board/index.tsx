@@ -1,16 +1,20 @@
+import { ThemeProvider } from "@mui/material/styles";
 import { BoardView } from "~/components/board-view/BoardView";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { MediaLibraryProvider } from "~/providers/MediaLibraryProvider";
 import { SVGProvider } from "~/providers/SVGProvider";
+import theme from "~/themes/theme";
 
 export const App = () => {
   return (
-    <BoardProvider>
-      <SVGProvider>
-        <MediaLibraryProvider>
-          <BoardView />
-        </MediaLibraryProvider>
-      </SVGProvider>
-    </BoardProvider>
+    <ThemeProvider theme={theme}>
+      <BoardProvider>
+        <SVGProvider>
+          <MediaLibraryProvider>
+            <BoardView />
+          </MediaLibraryProvider>
+        </SVGProvider>
+      </BoardProvider>
+    </ThemeProvider>
   );
 };

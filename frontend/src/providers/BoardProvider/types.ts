@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
-import { RightRole } from "edifice-ts-client";
+import { RightRole, WorkspaceElement } from "edifice-ts-client";
 
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Board } from "~/models/board.model";
@@ -12,6 +12,7 @@ export interface BoardProviderProps {
 
 export type BoardContextType = {
   board: Board;
+  documents: WorkspaceElement[];
   zoomLevel: number;
   setZoomLevel: Dispatch<SetStateAction<number>>;
   zoomIn: () => void;

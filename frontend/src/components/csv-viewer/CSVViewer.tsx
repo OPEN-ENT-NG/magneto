@@ -23,6 +23,7 @@ const CSVParser: FC<CSVParserProps> = ({ ressourceId }) => {
   });
 
   useEffect(() => {
+    console.log(data);
     if (data) {
       setGridData(parseCSV(data));
     }

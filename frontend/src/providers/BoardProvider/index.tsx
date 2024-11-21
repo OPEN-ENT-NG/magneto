@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import { checkUserRight, useOdeClient } from "@edifice-ui/react";
-import { RightRole } from "edifice-ts-client";
+import { RightRole, WorkspaceElement } from "edifice-ts-client";
 import { useParams } from "react-router-dom";
 
 import {
@@ -25,6 +25,7 @@ import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
+import { useGetDocumentsQuery } from "~/services/api/workspace.service";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -44,6 +45,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     useState<DisplayModalsState>(initialDisplayModals);
   const { id = "" } = useParams();
   const { data: boardData, isLoading, isFetching } = useGetBoardDataQuery(id);
+  const { data: documentsData } = useGetDocumentsQuery("stub");
 
   const [boardRights, setBoardRights] = useState<Record<
     RightRole,
@@ -68,6 +70,11 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       ? new Board().build(boardData as IBoardItemResponse)
       : new Board();
   }, [boardData]);
+
+  const documents = useMemo(() => {
+    console.log(documentsData);
+    return documentsData ?? [];
+  }, [documentsData]);
 
   const prepareZoom = async () => {
     const zoom = await fetchZoomPreference();
@@ -121,6 +128,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const value = useMemo<BoardContextType>(
     () => ({
       board,
+      documents,
       zoomLevel,
       setZoomLevel,
       zoomIn,
@@ -141,7 +149,15 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       openActiveCardAction,
       closeActiveCardAction,
     }),
-    [board, zoomLevel, isLoading, boardRights, displayModals, isFileDragging],
+    [
+      board,
+      documents,
+      zoomLevel,
+      isLoading,
+      boardRights,
+      displayModals,
+      isFileDragging,
+    ],
   );
 
   return (

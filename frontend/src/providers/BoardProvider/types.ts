@@ -28,6 +28,8 @@ export type BoardContextType = {
   setIsFileDragging: Dispatch<SetStateAction<boolean>>;
   activeCard: Card | null;
   setActiveCard: Dispatch<SetStateAction<Card | null>>;
+  isModalDuplicate: boolean;
+  setIsModalDuplicate: Dispatch<SetStateAction<boolean>>;
   cleanActiveCard: () => void;
   openActiveCardAction: (card: Card, actionType: BOARD_MODAL_TYPE) => void;
   closeActiveCardAction: (actionType: BOARD_MODAL_TYPE) => void;
@@ -52,4 +54,5 @@ export interface DisplayModalsState {
   [BOARD_MODAL_TYPE.COMMENT_PANEL]: boolean;
   [BOARD_MODAL_TYPE.CARD_PREVIEW]: boolean;
   [BOARD_MODAL_TYPE.DELETE]: boolean;
+  [BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE]: boolean;
 }

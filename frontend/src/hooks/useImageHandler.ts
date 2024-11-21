@@ -1,45 +1,77 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
-import { odeServices } from "edifice-ts-client";
+import { MediaProps } from "~/components/board-view/types";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
-export default function useImageHandler(initialCover: string | Blob | File) {
-  const [cover, setCover] = useState<string | Blob | File>(initialCover);
+export const useImageHandler = (
+  defaultThumbnail: string,
+  defaultBackground: string,
+  pickerId: string,
+) => {
+  const [thumbnail, setThumbnail] = useState<MediaProps | null>(null);
+  const [background, setBackground] = useState<MediaProps | null>(null);
 
   useEffect(() => {
-    setCover(initialCover);
-  }, [initialCover]);
-
-  const handleUploadImage = (file: File) => setCover(file);
-
-  const handleDeleteImage = () => setCover("");
-
-  const fetchUrl = async (): Promise<string> => {
-    let blob: Blob = new Blob();
-    if (typeof cover === "string") {
-      blob = await odeServices.http().get(cover, {
-        responseType: "blob",
-      });
-    } else if (cover) {
-      blob = await odeServices.http().get(URL.createObjectURL(cover as Blob), {
-        responseType: "blob",
+    if (defaultThumbnail) {
+      setThumbnail({
+        type: MEDIA_LIBRARY_TYPE.IMAGE,
+        id: defaultThumbnail.split("/").pop() || "",
+        name: "",
+        application: "",
+        url: defaultThumbnail,
       });
     }
+    if (defaultBackground) {
+      setBackground({
+        type: MEDIA_LIBRARY_TYPE.IMAGE,
+        id: defaultBackground.split("/").pop() || "",
+        name: "",
+        application: "",
+        url: defaultBackground,
+      });
+    }
+  }, [defaultThumbnail, defaultBackground]);
 
-    const response = await odeServices.workspace().saveFile(blob, {
-      visibility: "protected",
-      application: "media-library",
-    });
+  const {
+    mediaLibraryRef,
+    mediaLibraryHandlers,
+    media,
+    handleClickMedia,
+    setMedia,
+  } = useMediaLibrary();
 
-    return (
-      "/workspace/document/" +
-      (response._id != null ? response._id : "undefined")
-    );
+  useEffect(() => {
+    if (media && pickerId) {
+      if (pickerId === "thumbnail") {
+        return setThumbnail(media);
+      }
+      if (pickerId === "background") {
+        return setBackground(media);
+      }
+    }
+  }, [media, pickerId]);
+
+  const handleUploadImage = () => {
+    handleClickMedia(MEDIA_LIBRARY_TYPE.IMAGE);
+  };
+
+  const handleDeleteThumbnail = () => {
+    setThumbnail(null);
+    setMedia(null);
+  };
+  const handleDeleteBackground = () => {
+    setBackground(null);
+    setMedia(null);
   };
 
   return {
-    cover,
+    thumbnail,
+    background,
     handleUploadImage,
-    handleDeleteImage,
-    fetchUrl,
+    handleDeleteThumbnail,
+    handleDeleteBackground,
+    mediaLibraryRef,
+    mediaLibraryHandlers,
   };
-}
+};

@@ -11,8 +11,7 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 
-import { BoardsNavigationProvider } from "./providers/BoardsNavigationProvider";
-import { FoldersNavigationProvider } from "./providers/FoldersNavigationProvider";
+import { MediaLibraryProvider } from "./providers/MediaLibraryProvider";
 import { router } from "./routes";
 import { setupStore } from "./store";
 import "~/i18n";
@@ -53,11 +52,9 @@ root.render(
         }}
       >
         <ThemeProvider>
-          <FoldersNavigationProvider>
-            <BoardsNavigationProvider>
-              <RouterProvider router={router} />
-            </BoardsNavigationProvider>
-          </FoldersNavigationProvider>
+          <MediaLibraryProvider>
+            <RouterProvider router={router} />
+          </MediaLibraryProvider>
         </ThemeProvider>
       </OdeClientProvider>
     </Provider>

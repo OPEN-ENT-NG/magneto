@@ -344,6 +344,7 @@ export const ToasterContainer = ({
           <CreateBoard
             isOpen={isCreateOpen}
             toggle={toggleCreate}
+            parentFolderId={currentFolder.id}
             boardToUpdate={selectedBoards[0]}
             reset={reset}
           />

@@ -52,9 +52,9 @@ root.render(
         }}
       >
         <ThemeProvider>
-            <MediaLibraryProvider>
-              <RouterProvider router={router} />
-            </MediaLibraryProvider>
+          <MediaLibraryProvider>
+            <RouterProvider router={router} />
+          </MediaLibraryProvider>
         </ThemeProvider>
       </OdeClientProvider>
     </Provider>

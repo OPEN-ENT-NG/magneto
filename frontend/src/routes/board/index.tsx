@@ -6,7 +6,7 @@ export const App = () => {
   return (
     <BoardProvider>
       <SVGProvider>
-          <BoardView />
+        <BoardView />
       </SVGProvider>
     </BoardProvider>
   );

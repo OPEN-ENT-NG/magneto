@@ -8,9 +8,11 @@ import {
   Grid,
   Input,
   Label,
+  MediaLibrary,
   Modal,
   Radio,
   TextArea,
+  useOdeClient,
 } from "@edifice-ui/react";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
@@ -19,11 +21,12 @@ import { useTranslation } from "react-i18next";
 
 import { styles } from "./style";
 import { CreateBoardProps } from "./types";
-import UniqueImagePicker from "../unique-image-picker/UniqueImagePicker";
+import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
-import useImageHandler from "~/hooks/useImageHandler";
+import { useImageHandler } from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { BoardForm } from "~/models/board.model";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
@@ -37,18 +40,9 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   parentFolderId,
 }) => {
   const { t } = useTranslation("magneto");
-  const {
-    cover: thumbnail,
-    handleUploadImage: handleUploadImageThumbnail,
-    handleDeleteImage: handleDeleteImageThumbnail,
-    fetchUrl: fetchThumbnailUrl,
-  } = useImageHandler("");
-  const {
-    cover: background,
-    handleUploadImage: handleUploadImageBackground,
-    handleDeleteImage: handleDeleteImageBackground,
-    fetchUrl: fetchBackgroundUrl,
-  } = useImageHandler("");
+  const { appCode } = useOdeClient();
+
+  const [activePickerId, setActivePickerId] = useState<string>("");
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
   const [title, setTitle] = useState("");
@@ -56,33 +50,30 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [disposition, setDisposition] = useState("free");
   const [tagsTextInput, setTagsTextInput] = useState("");
   const [tags, setTags] = useState([""]);
-  const [thumbnailSrc, setThumbnailSrc] = useState("");
-  const [backgroundSrc, setBackgroundSrc] = useState("");
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
-
+  const { setMedia, setIsCreateMagnetOpen } = useMediaLibrary();
   const { width } = useWindowDimensions();
+  const {
+    thumbnail,
+    background,
+    handleUploadImage,
+    handleDeleteThumbnail,
+    handleDeleteBackground,
+    mediaLibraryRef,
+    mediaLibraryHandlers,
+  } = useImageHandler(
+    boardToUpdate?.imageUrl ?? "",
+    boardToUpdate?.backgroundUrl ?? "",
+    activePickerId,
+  );
 
   const setBoardFromForm = async (board: BoardForm) => {
     board.title = title;
     board.description = description;
     board.folderId = parentFolderId ?? "";
-
-    if (thumbnailSrc != "" && thumbnail == "") {
-      board.imageUrl = thumbnailSrc;
-    } else if (thumbnail != "") {
-      await fetchThumbnailUrl().then((url) => {
-        board.imageUrl = url;
-      });
-    }
-
-    if (backgroundSrc != "" && background == "") {
-      board.backgroundUrl = backgroundSrc;
-    } else if (background != "") {
-      await fetchBackgroundUrl().then((url) => {
-        board.backgroundUrl = url;
-      });
-    }
+    board.imageUrl = thumbnail?.url ?? "";
+    board.backgroundUrl = background?.url ?? "";
 
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")
@@ -92,19 +83,22 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
   };
+
   const resetFields = (): void => {
     if (boardToUpdate == null) {
-      handleDeleteImageThumbnail();
-      handleDeleteImageBackground();
+      setActivePickerId("");
       setIsCommentChecked(false);
       setIsFavoriteChecked(false);
       setTitle("");
       setDescription("");
       setDisposition("free");
       setTagsTextInput("");
-      setThumbnailSrc("");
-      setBackgroundSrc("");
+      setMedia(null);
     }
+    handleDeleteThumbnail();
+    handleDeleteBackground();
+    //spraradrap, faire passer isCreateMagnetOpen autre part que dans le medialibrary provider
+    setIsCreateMagnetOpen(false);
     toggle();
   };
 
@@ -169,8 +163,6 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setDisposition(boardToUpdate.layoutType);
       setTagsTextInput(boardToUpdate.tagsTextInput);
       setTags(boardToUpdate.tags);
-      setThumbnailSrc(boardToUpdate.imageUrl);
-      setBackgroundSrc(boardToUpdate.backgroundUrl);
     }
   }, [boardToUpdate]);
 
@@ -202,25 +194,22 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                 <UniqueImagePicker
                   addButtonLabel="Add image"
                   deleteButtonLabel="Delete image"
-                  label="Upload an image"
-                  onUploadImage={handleUploadImageThumbnail}
-                  onDeleteImage={handleDeleteImageThumbnail}
-                  src={thumbnailSrc}
-                  onImageChange={(file) => {
-                    if (file) {
-                      handleUploadImageThumbnail(file);
-                    } else {
-                      handleDeleteImageThumbnail();
-                      setThumbnailSrc("");
-                    }
+                  id="thumbnail"
+                  onUploadImage={(id: string) => {
+                    setActivePickerId(id);
+                    handleUploadImage();
                   }}
+                  onDeleteImage={() => {
+                    handleDeleteThumbnail();
+                  }}
+                  src={thumbnail?.url}
+                  onImageChange={() => {}}
                 />
-                {(thumbnail == "" || thumbnail == null) &&
-                  thumbnailSrc == "" && (
-                    <div style={styles.errorText}>
-                      {t("magneto.board.manage.ask.image")}
-                    </div>
-                  )}
+                {thumbnail === null && (
+                  <div style={styles.errorText}>
+                    {t("magneto.board.manage.ask.image")}
+                  </div>
+                )}
               </Grid.Col>
               <Grid.Col
                 lg={width < 1280 ? "6" : "9"}
@@ -340,20 +329,18 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                       {t("magneto.board.background.title")}
                     </div>
                     <UniqueImagePicker
+                      id="background"
                       addButtonLabel="Add image"
                       deleteButtonLabel="Delete image"
-                      label="Upload an image"
-                      onUploadImage={handleUploadImageBackground}
-                      onDeleteImage={handleDeleteImageBackground}
-                      src={backgroundSrc}
-                      onImageChange={(file) => {
-                        if (file) {
-                          handleUploadImageBackground(file);
-                        } else {
-                          handleDeleteImageBackground();
-                          setBackgroundSrc("");
-                        }
+                      onUploadImage={(id: string) => {
+                        setActivePickerId(id);
+                        handleUploadImage();
                       }}
+                      onDeleteImage={() => {
+                        handleDeleteBackground();
+                      }}
+                      src={background?.url}
+                      onImageChange={() => {}}
                     />
                     <i style={styles.infoText}>
                       {t("magneto.board.background.warning")}
@@ -380,14 +367,19 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                 variant="filled"
                 style={styles.footerButton}
                 onClick={onSubmit}
-                disabled={
-                  (thumbnailSrc == "" && thumbnail == "") || title == ""
-                }
+                disabled={!thumbnail || title === ""}
               >
                 {boardToUpdate ? t("magneto.save") : t("magneto.create")}
               </Button>
             </div>
           </Modal.Footer>
+          <MediaLibrary
+            appCode={appCode}
+            ref={mediaLibraryRef}
+            multiple={false}
+            visibility="protected"
+            {...mediaLibraryHandlers}
+          />
         </Modal>
       )}
     </>

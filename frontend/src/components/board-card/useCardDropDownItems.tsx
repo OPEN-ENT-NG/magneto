@@ -27,7 +27,6 @@ export const useCardDropDownItems = (
   const { t } = useTranslation("magneto");
   const { openActiveCardAction, setIsModalDuplicate } = useBoard();
   const { setIsCreateMagnetOpen } = useMediaLibrary();
-  setIsCreateMagnetOpen(true);
 
   const icons = useMemo(
     () => ({
@@ -48,8 +47,10 @@ export const useCardDropDownItems = (
         setIsModalDuplicate(true);
         openActiveCardAction(card, BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);
       },
-
-      edit: () => openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW),
+      edit: () => {
+        setIsCreateMagnetOpen(true);
+        openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
+      },
       move: () => {
         setIsModalDuplicate(false);
         openActiveCardAction(card, BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);

@@ -57,6 +57,7 @@ import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
 import { Card } from "~/models/card.model";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -101,6 +102,11 @@ export const CreateMagnet: FC = () => {
     }
   };
 
+  const onCloseModalAndDeactivateCard = () => {
+    closeActiveCardAction(BOARD_MODAL_TYPE.CREATE_EDIT);
+    onCloseModal();
+  }
+
   const onCloseModal = () => {
     setTitle("");
     setCaption("");
@@ -126,7 +132,7 @@ export const CreateMagnet: FC = () => {
       ...(section?._id ? { sectionId: section._id } : {}),
     };
     await createCard(payload);
-    onCloseModal();
+    onCloseModalAndDeactivateCard();
   };
 
   useEffect(() => {
@@ -171,7 +177,7 @@ export const CreateMagnet: FC = () => {
     <>
       <Modal
         open={isCreateMagnetOpen}
-        onClose={() => onCloseModal()}
+        onClose={() => onCloseModalAndDeactivateCard()}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
         style={{ zIndex: 1000 }}
@@ -187,7 +193,7 @@ export const CreateMagnet: FC = () => {
               {isEditMagnet ? t("magneto.edit.card") : t("magneto.new.card")}
             </Typography>
             <IconButton
-              onClick={() => onCloseModal()}
+              onClick={() => onCloseModalAndDeactivateCard()}
               aria-label="close"
               sx={closeButtonStyle}
             >
@@ -302,7 +308,7 @@ export const CreateMagnet: FC = () => {
                 color="tertiary"
                 type="button"
                 variant="ghost"
-                onClick={() => onCloseModal()}
+                onClick={() => onCloseModalAndDeactivateCard()}
               >
                 {t("magneto.cancel")}
               </Button>

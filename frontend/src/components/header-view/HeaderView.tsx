@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import {
   leftWrapperStyle,
   mainWrapperStyle,
+  rightWrapperStyle,
   toastStyle,
   wrapperBoxStyle,
 } from "./style";
@@ -41,8 +42,10 @@ export const HeaderView: FC = () => {
     <AppHeader className="header-view">
       <Box sx={mainWrapperStyle}>
         <Box sx={wrapperBoxStyle}>
-          {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
           <Box sx={leftWrapperStyle}>
+            {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
+          </Box>
+          <Box sx={rightWrapperStyle}>
             <Box sx={toastStyle}>
               <Icon path={mdiCheckCircle} size={1} />
               <span>

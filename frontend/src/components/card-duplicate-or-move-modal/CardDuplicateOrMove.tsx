@@ -1,21 +1,27 @@
 import { FC, useState } from "react";
 
-import { LoadingScreen } from "@edifice-ui/react";
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { LoadingScreen, useToast } from "@edifice-ui/react";
+import { Autocomplete, Box, TextField } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
+import {
+  autocompleteInputStyles,
+  autocompleteLabelStyles,
+  autocompleteOptionStyles,
+  autocompleteStyles,
+  bodyModalWrapper,
+} from "./style";
 import { CardDuplicateOrMoveModalProps } from "./types";
-import { prepareI18nByModalType, transformAndSortBoards } from "./utils";
+import { prepareI18nByModalType, prepareSortedBoards } from "./utils";
 import { MessageModal } from "../message-modal/MessageModal";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { CardForm } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useGetAllBoardsEditableQuery } from "~/services/api/boards.service";
+import {
+  useDuplicateCardMutation,
+  useMoveCardMutation,
+} from "~/services/api/cards.service";
 
 export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
   isOpen,
@@ -24,50 +30,87 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
     refetchOnFocus: false,
     refetchOnReconnect: false,
   });
-  const { isModalDuplicate, closeActiveCardAction } = useBoard();
+  const { isModalDuplicate, closeActiveCardAction, board, activeCard } =
+    useBoard();
+  const [duplicate] = useDuplicateCardMutation();
+  const [move] = useMoveCardMutation();
+  const toast = useToast();
   const { t } = useTranslation("magneto");
-  const { title, label, button } = prepareI18nByModalType(isModalDuplicate);
-  const [inputValue, setInputValue] = useState("");
+  const { title, label, button, sucess, error } =
+    prepareI18nByModalType(isModalDuplicate);
+  const [inputValue, setInputValue] = useState(
+    isModalDuplicate ? board._id : "",
+  );
 
-  const sortedBoards = editableBoards
-    ? transformAndSortBoards(editableBoards.all)
-    : [];
-  
-  const displayedName =
-    sortedBoards.find((item) => inputValue === item.id)?.name ?? "";
+  const sortedBoards = prepareSortedBoards(
+    editableBoards,
+    isModalDuplicate,
+    board._id,
+  );
+  const handleSubmit = async () => {
+    if (!inputValue || !activeCard?.id) return;
 
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    const newValue = event.target.value;
-    setInputValue(newValue);
+    try {
+      isModalDuplicate
+        ? await duplicate({
+            boardId: inputValue,
+            cardIds: [activeCard.id],
+          })
+        : await move({
+            boardId: inputValue,
+            card: new CardForm().build(activeCard).toJSON(),
+          });
+      toast.success(t(sucess));
+      closeActiveCardAction(BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);
+    } catch (er) {
+      toast.error(t(error));
+    }
   };
-  
   return (
     <MessageModal
       submitButtonName={t(button)}
       title={t(title)}
       isOpen={isOpen}
       onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE)}
-      onSubmit={() => null}
+      disableSubmit={() => {
+        return !inputValue;
+      }}
+      onSubmit={handleSubmit}
     >
-      {sortedBoards.length ? (
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">{displayedName}</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={inputValue}
-            label="Age"
-            onChange={handleChange}
-          >
-            {sortedBoards.map((item) => (
-              <MenuItem value={item.id}>{item.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      ) : (
-        <LoadingScreen />
-      )}
-      {t(label)}
+      <Box sx={bodyModalWrapper}>
+        {t(label)}
+        {sortedBoards.length ? (
+          <Autocomplete
+            value={sortedBoards.find((item) => item.id === inputValue) || null}
+            onChange={(_, newValue) => {
+              setInputValue(newValue?.id || "");
+            }}
+            options={sortedBoards}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("magneto.board")}
+                InputLabelProps={{
+                  sx: autocompleteLabelStyles,
+                }}
+                inputProps={{
+                  ...params.inputProps,
+                  style: autocompleteInputStyles,
+                }}
+              />
+            )}
+            renderOption={(props, option) => (
+              <li {...props} style={autocompleteOptionStyles}>
+                {option.name}
+              </li>
+            )}
+            sx={autocompleteStyles}
+          />
+        ) : (
+          <LoadingScreen />
+        )}
+      </Box>
     </MessageModal>
   );
 };

@@ -1,6 +1,7 @@
 {
   "magneto.title": "Magnéto",
   "magneto.boards": "Tableaux",
+  "magneto.board": "Tableau",
   "magneto.my.boards": " Mes tableaux",
   "magneto.header.my.boards": "Magnéto / Mes tableaux",
   "magneto.create.board": "Créer un tableau",

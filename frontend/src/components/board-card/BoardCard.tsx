@@ -34,6 +34,7 @@ import { useResourceTypeDisplay } from "./useResourceTypeDisplay";
 import { CardComment } from "../card-comment/CardComment";
 import { CardCommentProps } from "../card-comment/types";
 import { CardContent } from "../card-content/CardContent";
+import { CardDuplicateOrMoveModal } from "../card-duplicate-or-move-modal/CardDuplicateOrMove";
 import { CardPayload } from "../create-magnet/types";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
@@ -49,7 +50,6 @@ import {
   useFavoriteCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
-import { CardDuplicateOrMoveModal } from "../card-duplicate-or-move-modal/CardDuplicateOrMove";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);

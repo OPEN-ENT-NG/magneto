@@ -38,6 +38,7 @@ export const useBoard = () => {
 
 export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [isFileDragging, setIsFileDragging] = useState<boolean>(false);
+  const [isModalDuplicate, setIsModalDuplicate] = useState<boolean>(false);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const [displayModals, setDisplayModals] =
@@ -137,11 +138,22 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       setIsFileDragging,
       activeCard,
       setActiveCard,
+      isModalDuplicate,
+      setIsModalDuplicate,
       cleanActiveCard,
       openActiveCardAction,
       closeActiveCardAction,
     }),
-    [board, zoomLevel, isLoading, boardRights, displayModals, isFileDragging],
+    [
+      board,
+      zoomLevel,
+      isLoading,
+      boardRights,
+      displayModals,
+      isFileDragging,
+      activeCard,
+      isModalDuplicate,
+    ],
   );
 
   return (

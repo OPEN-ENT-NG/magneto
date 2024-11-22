@@ -7,6 +7,7 @@ export const toastStyle = {
   fontSize: "1.20rem",
   borderRadius: ".5rem",
   color: "#2a9cc8",
+  textWrap: "nowrap",
 };
 
 export const mainWrapperStyle = {
@@ -19,6 +20,7 @@ export const mainWrapperStyle = {
 
 export const wrapperBoxStyle = {
   width: "100%",
+  maxWidth: "100%",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -26,9 +28,16 @@ export const wrapperBoxStyle = {
 };
 
 export const leftWrapperStyle = {
+  flex: "1 1 auto",
+  minWidth: 0,
+  maxWidth: "100%",
+};
+
+export const rightWrapperStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   boxSizing: "border-box",
-  gap: "3.5rem",
+  gap: "3rem",
+  flexShrink: 0,
 };

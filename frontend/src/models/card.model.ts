@@ -65,6 +65,19 @@ export interface IMetadata {
   extension: string;
 }
 
+export interface ICardPayload {
+  title: string;
+  description: string;
+  caption?: string;
+  locked: boolean;
+  resourceId: string;
+  resourceType: string;
+  resourceUrl: string;
+  boardId: string;
+  sectionId: string;
+  id: string;
+}
+
 export class CardForm {
   private _id: string;
   private _title: string;
@@ -222,6 +235,8 @@ export class CardForm {
       resourceType: this.resourceType,
       resourceUrl: this.resourceUrl,
       boardId: this.boardId,
+      sectionId: this.sectionId,
+      id: this.id,
     };
 
     if (this.sectionId && this.sectionId != "")

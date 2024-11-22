@@ -35,6 +35,7 @@ import { CardComment } from "../card-comment/CardComment";
 import { CardCommentProps } from "../card-comment/types";
 import { CardContent } from "../card-content/CardContent";
 import { CardDuplicateOrMoveModal } from "../card-duplicate-or-move-modal/CardDuplicateOrMove";
+import { CreateMagnet } from "../create-magnet/CreateMagnet";
 import { CardPayload } from "../create-magnet/types";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
@@ -429,6 +430,10 @@ export const BoardCard: FC<BoardCardProps> = memo(
             isOpen={isActiveCardId && displayModals.DUPLICATE_OR_MOVE}
           ></CardDuplicateOrMoveModal>
         )}
+        {activeCard?.id == card.id && displayModals.CREATE_EDIT && (
+          <CreateMagnet />
+        )}
+
         {isOpen && dropdownRef.current && (
           <MemoizedDropDownList
             items={dropDownItemList}

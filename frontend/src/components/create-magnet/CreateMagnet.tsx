@@ -56,6 +56,7 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
+import { Card } from "~/models/card.model";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -82,13 +83,18 @@ export const CreateMagnet: FC = () => {
     magnetType,
     handleClickMedia,
   } = useMediaLibrary();
+  const {
+    activeCard,
+    closeActiveCardAction,
+  } = useBoard();
+  const isEditMagnet = !!activeCard;
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
     const sectionTitle = event.target.value;
     const selectedSection = board.sections.find(
-      (sectionSelected) => sectionSelected.title === sectionTitle,
+      (sectionSelected: Section) => sectionSelected.title === sectionTitle,
     );
     if (selectedSection) {
       setSection(selectedSection);
@@ -178,7 +184,7 @@ export const CreateMagnet: FC = () => {
               component="h2"
               sx={titleStyle}
             >
-              {t("magneto.new.card")}
+              {isEditMagnet ? t("magneto.edit.card") : t("magneto.new.card")}
             </Typography>
             <IconButton
               onClick={() => onCloseModal()}
@@ -190,15 +196,15 @@ export const CreateMagnet: FC = () => {
           </Box>
           <Box sx={contentContainerStyle}>
             {magnetTypeHasFilePickerWorkspace && (
-              <FilePickerWorkspace
+              <FilePickerWorkspace //todo file
                 modifyFile={modifyFile}
                 addButtonLabel={"Change file"}
               />
             )}
-            {magnetTypeHasImage && (
+            {magnetTypeHasImage && ( //todo media library
               <ImageContainer media={media} handleClickMedia={modifyFile} />
             )}
-            {magnetTypeHasAudio && (
+            {magnetTypeHasAudio && ( //todo audio
               <Box sx={audioWrapperStyle}>
                 <audio controls preload="metadata" src={media.url}>
                   <source src={media.url} type={media.type} />
@@ -214,7 +220,7 @@ export const CreateMagnet: FC = () => {
                 />
               </Box>
             )}
-            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}
+            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />} //todo vid
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>

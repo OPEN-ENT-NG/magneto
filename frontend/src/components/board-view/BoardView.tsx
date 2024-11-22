@@ -154,7 +154,7 @@ export const BoardView: FC = () => {
           )}
         </BoardBodyWrapper>
 
-        <CreateMagnet open={magnetType === MENU_NOT_MEDIA_TYPE.TEXT} />
+        {!!activeCard && displayModals.CREATE_EDIT && <CreateMagnet />}
         {activeCard && displayModals.CARD_PREVIEW && <PreviewModal />}
         <BoardCreateMagnetMagnetModal
           open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}

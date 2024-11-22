@@ -11,7 +11,6 @@ import {
   Button,
   Tooltip,
   Combobox,
-  useOdeClient,
 } from "@edifice-ui/react";
 import { UseMutationResult } from "@tanstack/react-query";
 import {
@@ -76,9 +75,11 @@ interface ShareResourceModalProps {
    * onCancel handler to close ShareModal
    */
   onCancel: () => void;
+  appCode: string;
 }
 
 export default function ShareResourceModal({
+  appCode,
   isOpen,
   shareOptions,
   shareResource,
@@ -99,6 +100,7 @@ export default function ShareResourceModal({
     toggleRight,
     handleDeleteRow,
   } = useShare({
+    appCode,
     resourceId,
     resourceCreatorId,
     resourceRights,
@@ -116,6 +118,7 @@ export default function ShareResourceModal({
     handleSearchInputChange,
     handleSearchResultsChange,
   } = useSearch({
+    appCode,
     resourceId,
     resourceCreatorId,
     shareRights,
@@ -136,8 +139,6 @@ export default function ShareResourceModal({
   const { selectedBoards } = useBoardsNavigation();
 
   const { selectedFolders, folderData } = useFoldersNavigation();
-
-  const { appCode } = useOdeClient();
 
   const { t } = useTranslation("magneto");
 

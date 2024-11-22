@@ -1,12 +1,7 @@
 import { ChangeEvent, Dispatch, useEffect, useReducer } from "react";
 
 import { Bookmark } from "@edifice-ui/icons";
-import {
-  OptionListItemType,
-  useDebounce,
-  useIsAdml,
-  useOdeClient,
-} from "@edifice-ui/react";
+import { OptionListItemType, useDebounce, useIsAdml } from "@edifice-ui/react";
 import {
   ShareRight,
   ShareRightAction,
@@ -72,11 +67,13 @@ const defaultActions: ShareRightAction[] = [
 ];
 
 export const useSearch = ({
+  appCode,
   resourceId,
   resourceCreatorId,
   shareRights,
   shareDispatch,
 }: {
+  appCode: string;
   resourceId: ShareOptions["resourceCreatorId"];
   resourceCreatorId: ShareOptions["resourceCreatorId"];
   shareRights: ShareRightWithVisibles;
@@ -90,7 +87,6 @@ export const useSearch = ({
   );
 
   const { isAdml } = useIsAdml();
-  const { appCode } = useOdeClient();
 
   const { t } = useTranslation();
 

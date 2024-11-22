@@ -2,24 +2,34 @@ import { useMemo } from "react";
 
 import { useTranslation } from "react-i18next";
 
+const NOW = new Date();
+
+const formatTooltip = (date: Date) =>
+  date
+    .toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+    .replace(",", "");
+
+const formatDate = (date: Date) =>
+  date.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
+
 export const useElapsedTime = (dateString: string) => {
   const { t } = useTranslation("magneto");
 
   return useMemo(() => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    const tooltip = date
-      .toLocaleString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      })
-      .replace(",", "");
+    const diffInSeconds = Math.floor((NOW.getTime() - date.getTime()) / 1000);
+    const tooltip = formatTooltip(date);
 
     if (diffInSeconds < 60) {
       return {
@@ -61,11 +71,7 @@ export const useElapsedTime = (dateString: string) => {
     }
 
     return {
-      label: date.toLocaleString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-      }),
+      label: formatDate(date),
       tooltip,
     };
   }, [dateString]);

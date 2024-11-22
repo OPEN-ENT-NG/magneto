@@ -12,20 +12,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Run yarn install
+      
+      - name: Update .npmrc with token
+        run: |
+          sed -i 's|${TIPTAP_PRO_TOKEN}|${{ secrets.TIPTAP_PRO_TOKEN }}|g' .npmrc
         working-directory: ./frontend
+
+      - name: Run npm install
+        working-directory: ./frontend
+        run: pnpm install
         env:
           TIPTAP_PRO_TOKEN: ${{ secrets.TIPTAP_PRO_TOKEN }}
-        run: yarn install
-      - name: Run build node with Gulp
+
+      - name: Check Quality Code
         working-directory: ./frontend
-        run: node_modules/gulp/bin/gulp.js build
-      - name: Run build node sass
+        run: pnpm run format:check && pnpm run lint
+
+      - name: Run Build Vite
         working-directory: ./frontend
-        run: yarn run build:sass
-      - name: Run test
+        run: pnpm build
+
+      - name: Run tests
         working-directory: ./frontend
-        run: yarn test
+        run: pnpm test
 
   build-maven-test:
     runs-on: ubuntu-latest

@@ -5,10 +5,12 @@ import CSVParser from "../csv-viewer/CSVViewer";
 import FileInfos from "../file-infos/FileInfos";
 import { useFileSize } from "~/hooks/useFileSize";
 import { useBoard } from "~/providers/BoardProvider";
+import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const { documents } = useBoard();
-  console.log(documents);
+  const cardDocument = documents.find((doc) => doc._id === card.resourceId);
+
   const isOfficePdf = () => {
     const ext = ["doc", "ppt", "odt"];
     return ext.includes(card.metadata.extension);
@@ -19,6 +21,8 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     return ext.includes(card.metadata.extension);
   };
 
+  const extensionText = useFileExtensionDescription(card.metadata.extension);
+
   const size = useFileSize(card.metadata.size);
   const sizeString = size.value + size.unit;
 
@@ -26,9 +30,9 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     <>
       <FileInfos
         fileName={card.metadata.filename}
-        owner="Nom Prénom"
+        owner={cardDocument?.ownerName ?? ""}
         size={sizeString}
-        fileType={card.metadata.extension} //TODO : add a more complete string with description of the extension
+        fileType={extensionText} //TODO : add a more complete string with description of the extension
         onDownload={() => console.log("Télécharger le fichier")}
         onEdit={() => console.log("Ouvrir dans Open Office")}
         onImport={() => console.log("Importer un nouveau fichier")}

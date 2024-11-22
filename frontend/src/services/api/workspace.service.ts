@@ -13,7 +13,7 @@ export const workspaceApi = emptySplitWorkspace.injectEndpoints({
     }),
     getDocuments: builder.query<WorkspaceElement[], string>({
       query: () => ({
-        url: `documents?filter=owner&hierarchical=false&includeall=true`,
+        url: `documents?filter=all&hierarchical=true`,
         method: "GET",
       }),
       transformResponse: (response: any) => {

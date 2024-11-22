@@ -1,5 +1,6 @@
 import { emptySplitApi } from "./emptySplitApi.service";
 import {
+  ICardPayload,
   ICardsBoardParamsRequest,
   ICardsParamsRequest,
   ICardsResponse,
@@ -63,6 +64,17 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["BoardData"],
     }),
+    moveCard: builder.mutation({
+      query: ({ boardId, card }: { boardId: string; card: ICardPayload }) => ({
+        url: "card/move",
+        method: "POST",
+        body: {
+          boardId,
+          card,
+        },
+      }),
+      invalidatesTags: ["BoardData"],
+    }),
   }),
 });
 
@@ -75,4 +87,5 @@ export const {
   useDuplicateCardMutation,
   useFavoriteCardMutation,
   useDeleteCardsMutation,
+  useMoveCardMutation,
 } = cardsApi;

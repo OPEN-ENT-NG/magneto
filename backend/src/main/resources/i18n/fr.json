@@ -1,6 +1,7 @@
 {
   "magneto.title": "Magnéto",
   "magneto.boards": "Tableaux",
+  "magneto.board": "Tableau",
   "magneto.my.boards": " Mes tableaux",
   "magneto.header.my.boards": "Magnéto / Mes tableaux",
   "magneto.create.board": "Créer un tableau",
@@ -51,7 +52,9 @@
   "magneto.rename": "Renommer",
   "magneto.board.properties": "Propriétés du tableau",
   "magneto.board.move": "Déplacer le tableau",
+  "magneto.board.move.title": "Déplacer l'aimant sélectionné",
   "magneto.board.move.text": "Vers quel tableau souhaitez-vous déplacer cet aimant ?",
+  "magneto.board.duplicate.move.title": "Dupliquer l'aimant sélectionné",
   "magneto.board.duplicate.move.text": "Vers quel tableau souhaitez-vous dupliquer cet aimant ?",
   "magneto.board.tooltip.my.board": "Mon tableau",
   "magneto.board.tooltip.shared.board": "Tableau partagé",

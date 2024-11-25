@@ -13,6 +13,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useTranslation } from "react-i18next";
 import { useBoard } from "~/providers/BoardProvider";
+import ScriptLoader from "../script-loader/ScriptLoader";
+import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 
 const FileInfosStyled = styled(Card, {
   shouldForwardProp: (prop) => prop !== "isHorizontal",
@@ -84,6 +86,7 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
 }) => {
   const { t } = useTranslation("magneto");
   const { displayModals } = useBoard();
+  const { behaviours, isLoading } = useEntcoreBehaviours();
 
   // Utiliser le contexte MUI pour les points de rupture
   const isCommentPanelOpen = displayModals.COMMENT_PANEL;
@@ -99,6 +102,13 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
 
   return (
     <>
+      {behaviours && !isLoading && (
+        <div>
+          <h2>Behaviours chargés</h2>
+          {/* Utilisez behaviours ici */}
+          <pre>{JSON.stringify(behaviours, null, 2)}</pre>
+        </div>
+      )}
       <h1
         style={{
           paddingTop: "2rem",

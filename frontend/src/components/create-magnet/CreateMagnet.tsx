@@ -69,7 +69,7 @@ export const CreateMagnet: FC = () => {
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
   );
-  const [description] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
 
   const [createCard] = useCreateCardMutation();
@@ -145,10 +145,10 @@ export const CreateMagnet: FC = () => {
       setTitle(activeCard.title);
       setCaption(activeCard.caption);
       setLinkUrl(activeCard.resourceUrl);
+      setDescription(activeCard.description);
 
       //   const [description] = useState<string>("");
       //   const editorRef = useRef<Ed
-      // description: editorRef.current?.getContent("html") as string,
       //   resourceId: media?.id ?? "",
     } else if (media?.name) {
       if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
@@ -240,9 +240,9 @@ export const CreateMagnet: FC = () => {
                 />
               </Box>
             )}
-            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
-            //todo vid
-            {magnetTypeHasLink && (
+            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "} //todo vid
+            
+            {magnetTypeHasLink && ( //todo link
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>
                 <Input

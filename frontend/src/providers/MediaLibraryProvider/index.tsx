@@ -147,6 +147,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       isCreateMagnetOpen,
       setIsCreateMagnetOpen,
       magnetType,
+      setMagnetType,
       handleClickMenu,
       onClose,
     }),

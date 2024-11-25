@@ -59,7 +59,7 @@ import { useCreateCardMutation } from "~/services/api/cards.service";
 import { Card } from "~/models/card.model";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 
-export const CreateMagnet: FC = () => {
+export const CreateMagnet: FC = (card?: Card) => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { board } = useBoard();
@@ -86,9 +86,10 @@ export const CreateMagnet: FC = () => {
   } = useMediaLibrary();
   const {
     activeCard,
+    openActiveCardAction,
     closeActiveCardAction,
   } = useBoard();
-  const isEditMagnet = !!activeCard;
+  const isEditMagnet = !!card;
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -161,6 +162,8 @@ export const CreateMagnet: FC = () => {
 
   useEffect(() => {
     if (isCreateMagnetOpen) {
+      openActiveCardAction(card ?? new Card(), BOARD_MODAL_TYPE.CREATE_EDIT);
+
       setTimeout(() => {
         firstInputRef.current?.focus();
       }, 100);

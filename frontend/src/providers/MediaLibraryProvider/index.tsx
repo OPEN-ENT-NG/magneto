@@ -52,13 +52,11 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   const [magnetType, setMagnetType] = useState<MENU_NOT_MEDIA_TYPE | null>(
     null,
   );
-  const { card, openActiveCardAction } = useBoard();
 
   const handleClickMedia = (type: MediaLibraryType) => {
     setMagnetType(null);
     setMedia({ ...(media as MediaProps), type });
     mediaLibraryRef.current?.show(type);
-    openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
   };
 
   const handleClickMenu = (type: MENU_NOT_MEDIA_TYPE) => {
@@ -67,7 +65,6 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
     if (type === MENU_NOT_MEDIA_TYPE.TEXT) {
       setIsCreateMagnetOpen(true);
     }
-    openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
   };
 
   const onClose = () => {

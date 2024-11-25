@@ -432,7 +432,7 @@ export const BoardCard: FC<BoardCardProps> = memo(
           ></CardDuplicateOrMoveModal>
         )}
         {isActiveCardId && card.resourceType === RESOURCE_TYPE.TEXT && displayModals.CREATE_EDIT && (
-          <CreateMagnet />
+          <CreateMagnet card={card} />
         )}
 
         {isOpen && dropdownRef.current && (

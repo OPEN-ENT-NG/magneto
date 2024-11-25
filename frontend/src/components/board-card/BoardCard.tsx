@@ -52,6 +52,7 @@ import {
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -431,8 +432,8 @@ export const BoardCard: FC<BoardCardProps> = memo(
             isOpen={isActiveCardId && displayModals.DUPLICATE_OR_MOVE}
           ></CardDuplicateOrMoveModal>
         )}
-        {isActiveCardId && card.resourceType === RESOURCE_TYPE.TEXT && displayModals.CREATE_EDIT && (
-          <CreateMagnet card={card} />
+        {isActiveCardId && displayModals.CREATE_EDIT && (
+          <CreateMagnet open={card.resourceType === MENU_NOT_MEDIA_TYPE.TEXT} />
         )}
 
         {isOpen && dropdownRef.current && (

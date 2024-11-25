@@ -56,10 +56,9 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation } from "~/services/api/cards.service";
-import { Card } from "~/models/card.model";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 
-export const CreateMagnet: FC = (card?: Card) => {
+export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { board } = useBoard();
@@ -84,12 +83,9 @@ export const CreateMagnet: FC = (card?: Card) => {
     magnetType,
     handleClickMedia,
   } = useMediaLibrary();
-  const {
-    activeCard,
-    openActiveCardAction,
-    closeActiveCardAction,
-  } = useBoard();
-  const isEditMagnet = !!card;
+  const { activeCard, closeActiveCardAction } = useBoard();
+  const isEditMagnet = !!activeCard;
+  console.log("card", activeCard);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -106,7 +102,7 @@ export const CreateMagnet: FC = (card?: Card) => {
   const onCloseModalAndDeactivateCard = () => {
     closeActiveCardAction(BOARD_MODAL_TYPE.CREATE_EDIT);
     onCloseModal();
-  }
+  };
 
   const onCloseModal = () => {
     setTitle("");
@@ -125,9 +121,9 @@ export const CreateMagnet: FC = (card?: Card) => {
       boardId: board._id,
       caption: caption,
       description: editorRef.current?.getContent("html") as string,
-      locked: false,
+      locked: isEditMagnet ? activeCard.locked : false,
       resourceId: media?.id ?? "",
-      resourceType: magnetType ?? convertMediaTypeToResourceType(media?.type),
+      resourceType: getMagnetResourceType(),
       resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
       title: title,
       ...(section?._id ? { sectionId: section._id } : {}),
@@ -136,8 +132,25 @@ export const CreateMagnet: FC = (card?: Card) => {
     onCloseModalAndDeactivateCard();
   };
 
+  const getMagnetResourceType = (): string => {
+    if (isEditMagnet) {
+      return activeCard.resourceType;
+    } else {
+      return magnetType ?? convertMediaTypeToResourceType(media?.type);
+    }
+  };
+
   useEffect(() => {
-    if (media?.name) {
+    if (isEditMagnet) {
+      setTitle(activeCard.title);
+      setCaption(activeCard.caption);
+      setLinkUrl(activeCard.resourceUrl);
+
+      //   const [description] = useState<string>("");
+      //   const editorRef = useRef<Ed
+      // description: editorRef.current?.getContent("html") as string,
+      //   resourceId: media?.id ?? "",
+    } else if (media?.name) {
       if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
       if (magnetTypeHasLink) {
         setLinkUrl(media.url);
@@ -145,7 +158,7 @@ export const CreateMagnet: FC = (card?: Card) => {
       } else if (!magnetTypeHasVideo)
         setTitle(media.name.split(".").slice(0, -1).join("."));
     }
-  }, [media]);
+  }, [media, activeCard]);
 
   const magnetTypeHasFilePickerWorkspace =
     media && media.type === MEDIA_LIBRARY_TYPE.ATTACHMENT;
@@ -162,8 +175,6 @@ export const CreateMagnet: FC = (card?: Card) => {
 
   useEffect(() => {
     if (isCreateMagnetOpen) {
-      openActiveCardAction(card ?? new Card(), BOARD_MODAL_TYPE.CREATE_EDIT);
-
       setTimeout(() => {
         firstInputRef.current?.focus();
       }, 100);
@@ -229,7 +240,8 @@ export const CreateMagnet: FC = (card?: Card) => {
                 />
               </Box>
             )}
-            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />} //todo vid
+            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
+            //todo vid
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>
@@ -304,7 +316,6 @@ export const CreateMagnet: FC = (card?: Card) => {
                 </Select>
               </FormControlMUI>
             )}
-
             <Box sx={modalFooterStyle}>
               <Button
                 style={footerButtonStyle}

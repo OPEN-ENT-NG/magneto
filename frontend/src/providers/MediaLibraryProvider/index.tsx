@@ -17,7 +17,9 @@ import { WorkspaceElement } from "edifice-ts-client";
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { getMediaLibraryType } from "./utils";
 import { MediaProps } from "~/components/board-view/types";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary as useMediaLibraryHook } from "~/hooks/useMediaLibrary";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);
@@ -50,11 +52,13 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   const [magnetType, setMagnetType] = useState<MENU_NOT_MEDIA_TYPE | null>(
     null,
   );
+  const { card, openActiveCardAction } = useBoard();
 
   const handleClickMedia = (type: MediaLibraryType) => {
     setMagnetType(null);
     setMedia({ ...(media as MediaProps), type });
     mediaLibraryRef.current?.show(type);
+    openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
   };
 
   const handleClickMenu = (type: MENU_NOT_MEDIA_TYPE) => {
@@ -63,6 +67,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
     if (type === MENU_NOT_MEDIA_TYPE.TEXT) {
       setIsCreateMagnetOpen(true);
     }
+    openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
   };
 
   const onClose = () => {

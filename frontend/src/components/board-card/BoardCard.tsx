@@ -51,6 +51,7 @@ import {
   useFavoriteCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
+import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -425,12 +426,12 @@ export const BoardCard: FC<BoardCardProps> = memo(
             {t("magneto.delete.cards.message")}
           </MessageModal>
         )}
-        {isActiveCardId && displayModals.DUPLICATE_OR_MOVE && (
+        {isActiveCardId && card.resourceType !== RESOURCE_TYPE.TEXT && displayModals.DUPLICATE_OR_MOVE && (
           <CardDuplicateOrMoveModal
             isOpen={isActiveCardId && displayModals.DUPLICATE_OR_MOVE}
           ></CardDuplicateOrMoveModal>
         )}
-        {activeCard?.id == card.id && displayModals.CREATE_EDIT && (
+        {isActiveCardId && card.resourceType === RESOURCE_TYPE.TEXT && displayModals.CREATE_EDIT && (
           <CreateMagnet />
         )}
 

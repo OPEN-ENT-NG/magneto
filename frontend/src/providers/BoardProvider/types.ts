@@ -56,5 +56,4 @@ export interface DisplayModalsState {
   [BOARD_MODAL_TYPE.DELETE]: boolean;
   [BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE]: boolean;
   [BOARD_MODAL_TYPE.CREATE_EDIT]: boolean;
-  // [BOARD_MODAL_TYPE.CREATE_EDIT_TEXT]: boolean;
 }

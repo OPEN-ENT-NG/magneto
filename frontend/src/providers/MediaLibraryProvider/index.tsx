@@ -73,6 +73,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   };
 
   const updateLibraryMedia = () => {
+    console.log(libraryMedia);
     setMedia(null);
     if (libraryMedia) {
       if (libraryMedia.url) {
@@ -99,6 +100,15 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
         });
       } else {
         const mediaLib = libraryMedia as WorkspaceElement;
+        console.log({
+          type: (media as MediaProps)?.type ?? "",
+          id: mediaLib?._id || "",
+          name: mediaLib?.name || "",
+          application: "",
+          url: mediaLib?._id
+            ? `/workspace/document/${mediaLib?._id}`
+            : (libraryMedia as string),
+        });
         setMedia({
           type: (media as MediaProps)?.type ?? "",
           id: mediaLib?._id || "",

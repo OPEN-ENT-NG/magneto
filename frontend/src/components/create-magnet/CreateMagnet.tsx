@@ -59,6 +59,8 @@ import { useCreateCardMutation, useUpdateCardMutation } from "~/services/api/car
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
 import { MediaProps } from "../board-view/types";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -85,11 +87,11 @@ export const CreateMagnet: FC = () => {
     isCreateMagnetOpen,
     onClose,
     magnetType,
+    setMagnetType,
     handleClickMedia,
   } = useMediaLibrary();
   const { activeCard, closeActiveCardAction } = useBoard();
   const isEditMagnet = !!activeCard;
-  console.log("card", activeCard);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -123,6 +125,8 @@ export const CreateMagnet: FC = () => {
   };
 
   const onUpload = async () => {
+    console.log(media);
+    console.log(linkUrl);
     const payload: CardPayload = {
       boardId: board._id,
       caption: caption,
@@ -135,13 +139,14 @@ export const CreateMagnet: FC = () => {
       id: isEditMagnet ? activeCard.id : undefined,
       ...(section?._id ? { sectionId: section._id } : {}),
     };
+    console.log(payload);
     isEditMagnet ? await updateCard(payload) : await createCard(payload);
     onCloseModalAndDeactivateCard();
   };
 
   const getMagnetResourceType = (): string => {
     if (isEditMagnet) {
-      return convertResourceTypeToMediaType(activeCard.resourceType).toString();
+      return magnetType ?? convertResourceTypeToMediaType(activeCard.resourceType).toString();
     } else {
       return magnetType ?? convertMediaTypeToResourceType(media?.type);
     }
@@ -151,7 +156,7 @@ export const CreateMagnet: FC = () => {
      if (!isEditMagnet && media?.name) {
       if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
       if (magnetTypeHasLink) {
-        setLinkUrl(media.url);
+        setLinkUrl(media.url); // init if type link only
         setTitle(media.name.replace(/^(?:https?:\/\/(?:www\.)?|www\.)/, ""));
       } else if (!magnetTypeHasVideo)
         setTitle(media.name.split(".").slice(0, -1).join("."));
@@ -159,13 +164,15 @@ export const CreateMagnet: FC = () => {
   }, [media]);
 
   useEffect(() => {
+    console.log("media ?");
     if (isEditMagnet) {
       setTitle(activeCard.title);
       setCaption(activeCard.caption);
-      setLinkUrl(activeCard.resourceUrl);
+      // init if type link only
+      if (activeCard.resourceType === RESOURCE_TYPE.LINK) setLinkUrl(activeCard.resourceUrl); 
       setDescription(activeCard.description);
 
-      setMagnetType()
+      if(activeCard.resourceType === MENU_NOT_MEDIA_TYPE.TEXT) setMagnetType(MENU_NOT_MEDIA_TYPE.TEXT);
 
       setMedia({
         name: activeCard.metadata?.name,
@@ -246,7 +253,7 @@ export const CreateMagnet: FC = () => {
                     <source src={media.url} type={media.type} />
                   </audio>
                   {!isEditMagnet && <EdIconButton
-                    aria-label="Edit image"
+                    aria-label="Edit audio"
                     color="tertiary"
                     icon={<Edit />}
                     onClick={() => modifyFile(MEDIA_LIBRARY_TYPE.AUDIO)}

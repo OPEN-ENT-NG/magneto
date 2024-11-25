@@ -1,5 +1,5 @@
     {
-      "name": "fr.cgi~magneto~2.0-b2school-SNAPSHOT",
+      "name": "fr.cgi~magneto~2.0-SNAPSHOT",
       "config": {
         "main" : "fr.cgi.magneto.Magneto",
         "port" : 8205,

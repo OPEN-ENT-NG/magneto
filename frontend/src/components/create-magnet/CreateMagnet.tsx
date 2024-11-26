@@ -47,20 +47,19 @@ import {
 } from "./style";
 import { CardPayload } from "./types";
 import { convertMediaTypeToResourceType, convertResourceTypeToMediaType } from "./utils";
+import { MediaProps } from "../board-view/types";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";
 import { VideoPlayer } from "../video-player/VideoPlayer";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useCreateCardMutation, useUpdateCardMutation } from "~/services/api/cards.service";
-import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
-import { CardContentAudio } from "../card-content-audio/CardContentAudio";
-import { MediaProps } from "../board-view/types";
-import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
-import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -258,7 +257,7 @@ export const CreateMagnet: FC = () => {
                   />}
                 </Box>
               }
-            {magnetTypeHasVideo && <VideoPlayer modifyFile={onCloseModal} />}{" "}
+            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>

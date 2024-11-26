@@ -32,7 +32,6 @@
     </repositories>
     <properties>
         <toolsVersion>2.0.0-final</toolsVersion>
-        <junitVersion>5.1.0</junitVersion>
         <vertxCronTimer>2.0.0</vertxCronTimer>
         <powerMockVersion>2.0.2</powerMockVersion>
         <mockitoVersion>[2.0,3.0)</mockitoVersion>
@@ -78,12 +77,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junitVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.entcore</groupId>
             <artifactId>tests</artifactId>
             <version>${entCoreVersion}</version>
@@ -110,18 +103,6 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito2</artifactId>
-            <version>${powerMockVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powerMockVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-testng</artifactId>
             <version>${powerMockVersion}</version>
             <scope>test</scope>
         </dependency>

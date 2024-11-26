@@ -120,7 +120,6 @@ export const CreateMagnet: FC = () => {
   };
 
   const modifyFile = (type: MediaLibraryType) => {
-    onClose();
     handleClickMedia(type);
   };
 
@@ -236,7 +235,7 @@ export const CreateMagnet: FC = () => {
           <Box sx={contentContainerStyle}>
             {magnetTypeHasFilePickerWorkspace && (
               <FilePickerWorkspace
-                modifyFile={modifyFile}
+                modifyFile={onCloseModal}
                 addButtonLabel={"Change file"}
               />
             )}
@@ -259,7 +258,7 @@ export const CreateMagnet: FC = () => {
                   />}
                 </Box>
               }
-            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
+            {magnetTypeHasVideo && <VideoPlayer modifyFile={onCloseModal} />}{" "}
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>

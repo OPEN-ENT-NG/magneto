@@ -125,8 +125,6 @@ export const CreateMagnet: FC = () => {
   };
 
   const onUpload = async () => {
-    console.log(media);
-    console.log(linkUrl);
     const payload: CardPayload = {
       boardId: board._id,
       caption: caption,
@@ -139,14 +137,13 @@ export const CreateMagnet: FC = () => {
       id: isEditMagnet ? activeCard.id : undefined,
       ...(section?._id ? { sectionId: section._id } : {}),
     };
-    console.log(payload);
     isEditMagnet ? await updateCard(payload) : await createCard(payload);
     onCloseModalAndDeactivateCard();
   };
 
   const getMagnetResourceType = (): string => {
     if (isEditMagnet) {
-      return magnetType ?? convertResourceTypeToMediaType(activeCard.resourceType).toString();
+      return magnetType ?? activeCard.resourceType;
     } else {
       return magnetType ?? convertMediaTypeToResourceType(media?.type);
     }
@@ -164,7 +161,6 @@ export const CreateMagnet: FC = () => {
   }, [media]);
 
   useEffect(() => {
-    console.log("media ?");
     if (isEditMagnet) {
       setTitle(activeCard.title);
       setCaption(activeCard.caption);

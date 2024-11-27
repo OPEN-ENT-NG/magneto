@@ -32,7 +32,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
         fileName={card.metadata.filename}
         owner={cardDocument?.ownerName ?? ""}
         size={sizeString}
-        fileType={extensionText} //TODO : add a more complete string with description of the extension
+        fileType={extensionText}
         onDownload={() => console.log("Télécharger le fichier")}
         onEdit={() => console.log("Ouvrir dans Open Office")}
         onImport={() => console.log("Importer un nouveau fichier")}

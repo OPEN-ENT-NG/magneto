@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
+import { FileInfosStyled } from "./style";
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { useBoard } from "~/providers/BoardProvider";
-import { FileInfosStyled } from "./style";
 
 interface FileInfoCardProps {
   fileName: string;

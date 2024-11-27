@@ -55,7 +55,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
         boardIds: dragAndDropBoardsIds,
         folderId: dragAndDropTargetId,
       }).catch((e) => {
-        console.log(e);
+        console.error(e);
       });
     },
     [moveBoardsToFolder],

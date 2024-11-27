@@ -61,7 +61,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   }) || {};
 
   if (getCardsError) {
-    console.log("error");
+    console.error("error");
   } else if (getCardsLoading) {
     console.log("loading");
   } else if (myCardsResult?.all) {
@@ -71,7 +71,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   }
 
   if (getBoardsError) {
-    console.log("error");
+    console.error("error");
   } else if (getBoardsLoading) {
     console.log("loading");
   } else if (myBoardsResult?.all) {

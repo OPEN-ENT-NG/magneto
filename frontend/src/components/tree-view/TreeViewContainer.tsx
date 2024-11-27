@@ -242,7 +242,7 @@ export const TreeViewContainer: React.FunctionComponent<
       boardIds: dragAndDropBoardsIds,
       folderId: dragAndDropTargetId,
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
     });
   };
 

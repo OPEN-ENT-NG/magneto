@@ -76,36 +76,36 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
     setMedia(null);
     if (libraryMedia) {
       if (libraryMedia.url) {
-        const medialIb = libraryMedia as IExternalLink;
+        const mediaLib = libraryMedia as IExternalLink;
         setMedia({
           type: (media as MediaProps).type,
           id: "",
           application: "",
-          name: medialIb?.text || "",
-          url: medialIb?.url,
-          targetUrl: medialIb.target,
+          name: mediaLib?.text || "",
+          url: mediaLib?.url,
+          targetUrl: mediaLib.target,
         });
       } else if (libraryMedia.resources) {
-        const medialIb = libraryMedia as InternalLinkTabResult;
+        const mediaLib = libraryMedia as InternalLinkTabResult;
         setMedia({
           type: (media as MediaProps).type,
-          id: medialIb?.resources?.[0]?.assetId ?? "",
-          name: medialIb?.resources?.[0]?.name || "",
-          application: medialIb?.resources?.[0]?.application || "",
+          id: mediaLib?.resources?.[0]?.assetId ?? "",
+          name: mediaLib?.resources?.[0]?.name || "",
+          application: mediaLib?.resources?.[0]?.application || "",
           url:
-            medialIb.resources?.[0]?.path ??
-            `/${medialIb.resources?.[0]?.application}#/view/${medialIb.resources?.[0]?.assetId}`,
-          targetUrl: medialIb.target,
+            mediaLib.resources?.[0]?.path ??
+            `/${mediaLib.resources?.[0]?.application}#/view/${mediaLib.resources?.[0]?.assetId}`,
+          targetUrl: mediaLib.target,
         });
       } else {
-        const medialIb = libraryMedia as WorkspaceElement;
+        const mediaLib = libraryMedia as WorkspaceElement;
         setMedia({
           type: (media as MediaProps)?.type ?? "",
-          id: medialIb?._id || "",
-          name: medialIb?.name || "",
+          id: mediaLib?._id || "",
+          name: mediaLib?.name || "",
           application: "",
-          url: medialIb?._id
-            ? `/workspace/document/${medialIb?._id}`
+          url: mediaLib?._id
+            ? `/workspace/document/${mediaLib?._id}`
             : (libraryMedia as string),
         });
       }
@@ -147,6 +147,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       isCreateMagnetOpen,
       setIsCreateMagnetOpen,
       magnetType,
+      setMagnetType,
       handleClickMenu,
       onClose,
     }),

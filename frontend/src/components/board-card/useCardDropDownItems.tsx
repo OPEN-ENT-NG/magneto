@@ -15,6 +15,7 @@ import { DropDownListItem } from "../drop-down-list/types";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const useCardDropDownItems = (
   readOnly: boolean,
@@ -25,6 +26,7 @@ export const useCardDropDownItems = (
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
   const { openActiveCardAction, setIsModalDuplicate } = useBoard();
+  const { setIsCreateMagnetOpen } = useMediaLibrary();
 
   const icons = useMemo(
     () => ({
@@ -45,8 +47,10 @@ export const useCardDropDownItems = (
         setIsModalDuplicate(true);
         openActiveCardAction(card, BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);
       },
-
-      edit: () => null,
+      edit: () => {
+        setIsCreateMagnetOpen(true);
+        openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
+      },
       move: () => {
         setIsModalDuplicate(false);
         openActiveCardAction(card, BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);

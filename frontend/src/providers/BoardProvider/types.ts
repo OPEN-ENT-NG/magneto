@@ -55,4 +55,5 @@ export interface DisplayModalsState {
   [BOARD_MODAL_TYPE.CARD_PREVIEW]: boolean;
   [BOARD_MODAL_TYPE.DELETE]: boolean;
   [BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE]: boolean;
+  [BOARD_MODAL_TYPE.CREATE_EDIT]: boolean;
 }

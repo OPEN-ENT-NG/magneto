@@ -32,7 +32,7 @@ export const BoardPublicShareModal: FunctionComponent<props> = ({
       toggle();
       reset();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

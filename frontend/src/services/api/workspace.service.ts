@@ -1,6 +1,7 @@
 import {} from "~/models/comment.types";
-import { emptySplitWorkspace } from "./emptySplitWorkspace";
 import { WorkspaceElement } from "edifice-ts-client";
+
+import { emptySplitWorkspace } from "./emptySplitWorkspace";
 
 export const workspaceApi = emptySplitWorkspace.injectEndpoints({
   endpoints: (builder) => ({

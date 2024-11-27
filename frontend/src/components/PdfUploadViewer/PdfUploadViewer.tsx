@@ -1,8 +1,9 @@
 import { useState, FC } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
-import "pdfjs-dist/build/pdf.worker.min";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import "react-pdf/dist/esm/Page/TextLayer.css";
+
+import {
+  NavigateBefore as PreviousIcon,
+  NavigateNext as NextIcon,
+} from "@mui/icons-material";
 import {
   Box,
   Paper,
@@ -11,13 +12,14 @@ import {
   IconButton,
   CircularProgress,
 } from "@mui/material";
-import {
-  NavigateBefore as PreviousIcon,
-  NavigateNext as NextIcon,
-} from "@mui/icons-material";
-import { PDFUploadViewerProps } from "./types";
-import { documentBox, loadingBox, mainBox } from "./style";
 import { useTranslation } from "react-i18next";
+import { Document, Page, pdfjs } from "react-pdf";
+import "pdfjs-dist/build/pdf.worker.min";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+
+import { documentBox, loadingBox, mainBox } from "./style";
+import { PDFUploadViewerProps } from "./types";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 

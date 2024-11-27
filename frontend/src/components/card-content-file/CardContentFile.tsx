@@ -1,11 +1,12 @@
 import { FC } from "react";
+
 import { CardContentFileProps } from "./types";
-import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
 import CSVParser from "../csv-viewer/CSVViewer";
 import FileInfos from "../file-infos/FileInfos";
+import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
+import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
 import { useFileSize } from "~/hooks/useFileSize";
 import { useBoard } from "~/providers/BoardProvider";
-import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const { documents, displayModals } = useBoard();

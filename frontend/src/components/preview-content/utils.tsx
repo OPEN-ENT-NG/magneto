@@ -2,15 +2,14 @@ import { Box } from "@mui/material";
 
 import { redirect } from "../card-content/utils";
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
+import { CardContentFile } from "../card-content-file/CardContentFile";
 import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
-import CSVParser from "../csv-viewer/CSVViewer";
 import { ExternalVideoPlayer } from "../external-video-player/ExternalVideoPlayer";
 import { getVideoSource } from "../external-video-player/utils";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
-import { CardContentFile } from "../card-content-file/CardContentFile";
 
 export const displayPreviewContentByType = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;

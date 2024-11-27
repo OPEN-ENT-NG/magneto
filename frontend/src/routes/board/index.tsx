@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@mui/material/styles";
+
 import { BoardView } from "~/components/board-view/BoardView";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { SVGProvider } from "~/providers/SVGProvider";

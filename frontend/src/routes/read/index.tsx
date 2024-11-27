@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@mui/material/styles";
+
 import { ReadView } from "~/components/read-view/ReadView";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { SVGProvider } from "~/providers/SVGProvider";

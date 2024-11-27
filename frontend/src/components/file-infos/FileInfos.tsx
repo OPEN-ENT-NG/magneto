@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
-import { styled } from "@mui/material/styles";
+
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DownloadIcon from "@mui/icons-material/Download";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Card,
   CardContent,
@@ -8,12 +11,11 @@ import {
   Button,
   useMediaQuery,
 } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
-import EditIcon from "@mui/icons-material/Edit";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { styled } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import { useBoard } from "~/providers/BoardProvider";
+
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
+import { useBoard } from "~/providers/BoardProvider";
 
 const FileInfosStyled = styled(Card, {
   shouldForwardProp: (prop) => prop !== "isHorizontal",

@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import { checkUserRight, useOdeClient } from "@edifice-ui/react";
-import { RightRole, WorkspaceElement } from "edifice-ts-client";
+import { RightRole } from "edifice-ts-client";
 import { useParams } from "react-router-dom";
 
 import {

@@ -18,11 +18,9 @@ export const workspaceApi = emptySplitWorkspace.injectEndpoints({
         method: "GET",
       }),
       transformResponse: (response: any) => {
-        // Assurez-vous de parser le JSON si nécessaire
         const parsedResponse =
           typeof response === "string" ? JSON.parse(response) : response;
 
-        // Vérifiez et convertissez les données en tableau de WorkspaceElement
         return Array.isArray(parsedResponse) ? parsedResponse : [];
       },
     }),

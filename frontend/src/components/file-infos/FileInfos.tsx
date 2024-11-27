@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { useBoard } from "~/providers/BoardProvider";
+import { FileInfosStyled } from "./style";
 
 interface FileInfoCardProps {
   fileName: string;
@@ -23,8 +24,8 @@ interface FileInfoCardProps {
   onDownload: () => void;
   onEdit: () => void;
   onImport: () => void;
-  primaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35" | "xl35";
-  secondaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35" | "xl35";
+  primaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35";
+  secondaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35";
 }
 
 export const FileInfos: React.FC<FileInfoCardProps> = ({

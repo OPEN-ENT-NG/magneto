@@ -35,7 +35,6 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
         onEdit={() => console.log("Ouvrir dans Open Office")}
         onImport={() => console.log("Importer un nouveau fichier")}
         primaryBreakpoint={displayModals.CARD_PREVIEW ? "lg" : "lg35"}
-        secondaryBreakpoint={displayModals.CARD_PREVIEW ? "xl" : "xl35"}
       />
       {card.metadata.extension === "pdf" && (
         <PDFUploadViewer url={`/workspace/document/${card.resourceId}`} />

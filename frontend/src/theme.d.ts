@@ -6,6 +6,5 @@ declare module "@mui/material/styles" {
     lg: true;
     xl: true;
     lg35: true;
-    xl35: true;
   }
 }

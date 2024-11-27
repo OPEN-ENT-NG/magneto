@@ -11,7 +11,7 @@ export const useEntcoreBehaviours = () => {
 
       script1.onload = () => {
         const script2 = document.createElement("script");
-        script2.src = "/lool/public/js/behaviours.js?_=1732545009089";
+        script2.src = "/lool/public/js/behaviours.js";
 
         script2.onload = () => {
           if (window.entcore && window.entcore.Behaviours) {

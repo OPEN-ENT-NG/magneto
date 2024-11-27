@@ -42,6 +42,8 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { MessageModal } from "../message-modal/MessageModal";
 import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
@@ -51,8 +53,6 @@ import {
   useFavoriteCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
-import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
-import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 
 const MemoizedCardContent = memo(CardContent);
 const MemoizedDropDownList = memo(DropDownList);
@@ -427,11 +427,13 @@ export const BoardCard: FC<BoardCardProps> = memo(
             {t("magneto.delete.cards.message")}
           </MessageModal>
         )}
-        {isActiveCardId && card.resourceType !== RESOURCE_TYPE.TEXT && displayModals.DUPLICATE_OR_MOVE && (
-          <CardDuplicateOrMoveModal
-            isOpen={isActiveCardId && displayModals.DUPLICATE_OR_MOVE}
-          ></CardDuplicateOrMoveModal>
-        )}
+        {isActiveCardId &&
+          card.resourceType !== RESOURCE_TYPE.TEXT &&
+          displayModals.DUPLICATE_OR_MOVE && (
+            <CardDuplicateOrMoveModal
+              isOpen={isActiveCardId && displayModals.DUPLICATE_OR_MOVE}
+            ></CardDuplicateOrMoveModal>
+          )}
         {isActiveCardId && displayModals.CREATE_EDIT && (
           <CreateMagnet open={card.resourceType === MENU_NOT_MEDIA_TYPE.TEXT} />
         )}

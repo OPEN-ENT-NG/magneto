@@ -26,7 +26,7 @@ export const convertMediaTypeToResourceType = (
 
 export const convertResourceTypeToMediaType = (
   resourceType: string,
-):  MediaLibraryType => {
+): MediaLibraryType => {
   switch (resourceType) {
     case RESOURCE_TYPE.FILE:
       return MEDIA_LIBRARY_TYPE.ATTACHMENT;
@@ -50,5 +50,5 @@ export const convertResourceTypeToMediaType = (
       return "" as MediaLibraryType;
     default:
       return "" as MediaLibraryType;
-  }  
+  }
 };

@@ -46,7 +46,10 @@ import {
   audioWrapperStyle,
 } from "./style";
 import { CardPayload } from "./types";
-import { convertMediaTypeToResourceType, convertResourceTypeToMediaType } from "./utils";
+import {
+  convertMediaTypeToResourceType,
+  convertResourceTypeToMediaType,
+} from "./utils";
 import { MediaProps } from "../board-view/types";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
@@ -59,7 +62,10 @@ import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { useCreateCardMutation, useUpdateCardMutation } from "~/services/api/cards.service";
+import {
+  useCreateCardMutation,
+  useUpdateCardMutation,
+} from "~/services/api/cards.service";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -148,7 +154,7 @@ export const CreateMagnet: FC = () => {
   };
 
   useEffect(() => {
-     if (!isEditMagnet && media?.name) {
+    if (!isEditMagnet && media?.name) {
       if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
       if (magnetTypeHasLink) {
         setLinkUrl(media.url); // init if type link only
@@ -163,10 +169,12 @@ export const CreateMagnet: FC = () => {
       setTitle(activeCard.title);
       setCaption(activeCard.caption);
       // init if type link only
-      if (activeCard.resourceType === RESOURCE_TYPE.LINK) setLinkUrl(activeCard.resourceUrl); 
+      if (activeCard.resourceType === RESOURCE_TYPE.LINK)
+        setLinkUrl(activeCard.resourceUrl);
       setDescription(activeCard.description);
 
-      if(activeCard.resourceType === MENU_NOT_MEDIA_TYPE.TEXT) setMagnetType(MENU_NOT_MEDIA_TYPE.TEXT);
+      if (activeCard.resourceType === MENU_NOT_MEDIA_TYPE.TEXT)
+        setMagnetType(MENU_NOT_MEDIA_TYPE.TEXT);
 
       setMedia({
         name: activeCard.metadata?.name,
@@ -174,7 +182,7 @@ export const CreateMagnet: FC = () => {
         id: activeCard.resourceId,
         type: convertResourceTypeToMediaType(activeCard.resourceType),
       } as MediaProps);
-    } 
+    }
   }, [activeCard]);
 
   const magnetTypeHasFilePickerWorkspace =
@@ -234,19 +242,20 @@ export const CreateMagnet: FC = () => {
           <Box sx={contentContainerStyle}>
             {magnetTypeHasFilePickerWorkspace && (
               <FilePickerWorkspace
-                modifyFile={onCloseModal}
+                modifyFile={modifyFile}
                 addButtonLabel={"Change file"}
               />
             )}
             {magnetTypeHasImage && (
               <ImageContainer media={media} handleClickMedia={modifyFile} />
             )}
-            {magnetTypeHasAudio &&
-                <Box sx={audioWrapperStyle}>
-                  <audio controls preload="metadata" src={media.url}>
-                    <source src={media.url} type={media.type} />
-                  </audio>
-                  {!isEditMagnet && <EdIconButton
+            {magnetTypeHasAudio && (
+              <Box sx={audioWrapperStyle}>
+                <audio controls preload="metadata" src={media.url}>
+                  <source src={media.url} type={media.type} />
+                </audio>
+                {!isEditMagnet && (
+                  <EdIconButton
                     aria-label="Edit audio"
                     color="tertiary"
                     icon={<Edit />}
@@ -254,9 +263,10 @@ export const CreateMagnet: FC = () => {
                     type="button"
                     variant="ghost"
                     style={iconButtonStyle}
-                  />}
-                </Box>
-              }
+                  />
+                )}
+              </Box>
+            )}
             {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>

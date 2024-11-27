@@ -122,7 +122,7 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
           isDeleted: !!currentFolder.deleted,
         }));
       } else {
-        console.log("currentFolder undefined, try later or again");
+        console.error("currentFolder undefined, try later or again");
       }
     };
 

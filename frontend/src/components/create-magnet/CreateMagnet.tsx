@@ -46,16 +46,26 @@ import {
   audioWrapperStyle,
 } from "./style";
 import { CardPayload } from "./types";
-import { convertMediaTypeToResourceType } from "./utils";
+import {
+  convertMediaTypeToResourceType,
+  convertResourceTypeToMediaType,
+} from "./utils";
+import { MediaProps } from "../board-view/types";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";
 import { VideoPlayer } from "../video-player/VideoPlayer";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { useCreateCardMutation } from "~/services/api/cards.service";
+import {
+  useCreateCardMutation,
+  useUpdateCardMutation,
+} from "~/services/api/cards.service";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
@@ -68,42 +78,53 @@ export const CreateMagnet: FC = () => {
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
   );
-  const [description] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
 
   const [createCard] = useCreateCardMutation();
+  const [updateCard] = useUpdateCardMutation();
 
   const {
     mediaLibraryRef,
     mediaLibraryHandlers,
     media,
+    setMedia,
     isCreateMagnetOpen,
     onClose,
     magnetType,
+    setMagnetType,
     handleClickMedia,
   } = useMediaLibrary();
+  const { activeCard, closeActiveCardAction } = useBoard();
+  const isEditMagnet = !!activeCard;
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
     const sectionTitle = event.target.value;
     const selectedSection = board.sections.find(
-      (sectionSelected) => sectionSelected.title === sectionTitle,
+      (sectionSelected: Section) => sectionSelected.title === sectionTitle,
     );
     if (selectedSection) {
       setSection(selectedSection);
     }
   };
 
+  const onCloseModalAndDeactivateCard = () => {
+    closeActiveCardAction(BOARD_MODAL_TYPE.CREATE_EDIT);
+    onCloseModal();
+  };
+
   const onCloseModal = () => {
     setTitle("");
     setCaption("");
+    setLinkUrl("");
+    setDescription("");
     if (section !== null) setSection(board.sections[0]);
     onClose();
   };
 
   const modifyFile = (type: MediaLibraryType) => {
-    onCloseModal();
     handleClickMedia(type);
   };
 
@@ -112,27 +133,57 @@ export const CreateMagnet: FC = () => {
       boardId: board._id,
       caption: caption,
       description: editorRef.current?.getContent("html") as string,
-      locked: false,
+      locked: isEditMagnet ? activeCard.locked : false,
       resourceId: media?.id ?? "",
-      resourceType: magnetType ?? convertMediaTypeToResourceType(media?.type),
+      resourceType: getMagnetResourceType(),
       resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
       title: title,
+      id: isEditMagnet ? activeCard.id : undefined,
       ...(section?._id ? { sectionId: section._id } : {}),
     };
-    await createCard(payload);
-    onCloseModal();
+    isEditMagnet ? await updateCard(payload) : await createCard(payload);
+    onCloseModalAndDeactivateCard();
+  };
+
+  const getMagnetResourceType = (): string => {
+    if (isEditMagnet) {
+      return magnetType ?? activeCard.resourceType;
+    } else {
+      return magnetType ?? convertMediaTypeToResourceType(media?.type);
+    }
   };
 
   useEffect(() => {
-    if (media?.name) {
+    if (!isEditMagnet && media?.name) {
       if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
       if (magnetTypeHasLink) {
-        setLinkUrl(media.url);
+        setLinkUrl(media.url); // init if type link only
         setTitle(media.name.replace(/^(?:https?:\/\/(?:www\.)?|www\.)/, ""));
       } else if (!magnetTypeHasVideo)
         setTitle(media.name.split(".").slice(0, -1).join("."));
     }
   }, [media]);
+
+  useEffect(() => {
+    if (isEditMagnet) {
+      setTitle(activeCard.title);
+      setCaption(activeCard.caption);
+      // init if type link only
+      if (activeCard.resourceType === RESOURCE_TYPE.LINK)
+        setLinkUrl(activeCard.resourceUrl);
+      setDescription(activeCard.description);
+
+      if (activeCard.resourceType === MENU_NOT_MEDIA_TYPE.TEXT)
+        setMagnetType(MENU_NOT_MEDIA_TYPE.TEXT);
+
+      setMedia({
+        name: activeCard.metadata?.name,
+        url: activeCard.resourceUrl,
+        id: activeCard.resourceId,
+        type: convertResourceTypeToMediaType(activeCard.resourceType),
+      } as MediaProps);
+    }
+  }, [activeCard]);
 
   const magnetTypeHasFilePickerWorkspace =
     media && media.type === MEDIA_LIBRARY_TYPE.ATTACHMENT;
@@ -165,7 +216,7 @@ export const CreateMagnet: FC = () => {
     <>
       <Modal
         open={isCreateMagnetOpen}
-        onClose={() => onCloseModal()}
+        onClose={() => onCloseModalAndDeactivateCard()}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
         style={{ zIndex: 1000 }}
@@ -178,10 +229,10 @@ export const CreateMagnet: FC = () => {
               component="h2"
               sx={titleStyle}
             >
-              {t("magneto.new.card")}
+              {isEditMagnet ? t("magneto.edit.card") : t("magneto.new.card")}
             </Typography>
             <IconButton
-              onClick={() => onCloseModal()}
+              onClick={() => onCloseModalAndDeactivateCard()}
               aria-label="close"
               sx={closeButtonStyle}
             >
@@ -203,18 +254,20 @@ export const CreateMagnet: FC = () => {
                 <audio controls preload="metadata" src={media.url}>
                   <source src={media.url} type={media.type} />
                 </audio>
-                <EdIconButton
-                  aria-label="Edit image"
-                  color="tertiary"
-                  icon={<Edit />}
-                  onClick={() => modifyFile(MEDIA_LIBRARY_TYPE.AUDIO)}
-                  type="button"
-                  variant="ghost"
-                  style={iconButtonStyle}
-                />
+                {!isEditMagnet && (
+                  <EdIconButton
+                    aria-label="Edit audio"
+                    color="tertiary"
+                    icon={<Edit />}
+                    onClick={() => modifyFile(MEDIA_LIBRARY_TYPE.AUDIO)}
+                    type="button"
+                    variant="ghost"
+                    style={iconButtonStyle}
+                  />
+                )}
               </Box>
             )}
-            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}
+            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
             {magnetTypeHasLink && (
               <FormControl id="url" style={formControlStyle}>
                 <Label>{t("magneto.site.address")}</Label>
@@ -252,7 +305,6 @@ export const CreateMagnet: FC = () => {
             )}
             <FormControl id="description" style={formControlEditorStyle}>
               <Label>{t("magneto.create.board.description")}</Label>
-
               <Box sx={editorStyle}>
                 <Editor
                   id="postContent"
@@ -289,14 +341,13 @@ export const CreateMagnet: FC = () => {
                 </Select>
               </FormControlMUI>
             )}
-
             <Box sx={modalFooterStyle}>
               <Button
                 style={footerButtonStyle}
                 color="tertiary"
                 type="button"
                 variant="ghost"
-                onClick={() => onCloseModal()}
+                onClick={() => onCloseModalAndDeactivateCard()}
               >
                 {t("magneto.cancel")}
               </Button>

@@ -84,7 +84,7 @@ export const MoveBoard: FunctionComponent<props> = ({
       boardIds: dragAndDropBoardsIds,
       folderId: dragAndDropTargetId,
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
     });
   };
 
@@ -99,7 +99,7 @@ export const MoveBoard: FunctionComponent<props> = ({
       boardIds: selectedBoardsIds,
       folderId: targetFolderId,
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
     });
   };
 

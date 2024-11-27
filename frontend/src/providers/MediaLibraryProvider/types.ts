@@ -35,6 +35,7 @@ export type MediaLibraryContextType = {
   isCreateMagnetOpen: boolean;
   setIsCreateMagnetOpen: Dispatch<SetStateAction<boolean>>;
   magnetType: MENU_NOT_MEDIA_TYPE | null;
+  setMagnetType: Dispatch<SetStateAction<MENU_NOT_MEDIA_TYPE | null>>;
   handleClickMenu: (type: MENU_NOT_MEDIA_TYPE) => void;
   onClose: () => void;
 };

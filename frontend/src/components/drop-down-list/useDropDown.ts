@@ -14,7 +14,7 @@ export const useDropdown = () => {
   );
 
   const toggleDropdown = useCallback((id: string | null) => {
-    setOpenDropdownId((prevId) => (prevId === id ? null : id));
+    setOpenDropdownId((prevId: string | null) => (prevId === id ? null : id));
     ignoreNextClick.current = true;
   }, []);
 

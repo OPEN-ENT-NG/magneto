@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import {
   Card,
@@ -13,7 +13,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useTranslation } from "react-i18next";
 import { useBoard } from "~/providers/BoardProvider";
-import ScriptLoader from "../script-loader/ScriptLoader";
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 
 const FileInfosStyled = styled(Card, {
@@ -73,6 +72,8 @@ interface FileInfoCardProps {
   onDownload: () => void;
   onEdit: () => void;
   onImport: () => void;
+  primaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35" | "xl35";
+  secondaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35" | "xl35";
 }
 
 export const FileInfos: React.FC<FileInfoCardProps> = ({
@@ -83,32 +84,33 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
   onDownload,
   onEdit,
   onImport,
+  primaryBreakpoint = "lg",
+  secondaryBreakpoint = "xl",
 }) => {
   const { t } = useTranslation("magneto");
   const { displayModals } = useBoard();
-  const { behaviours, isLoading } = useEntcoreBehaviours();
+  const { behaviours } = useEntcoreBehaviours();
+
+  useEffect(() => {
+    console.log(behaviours);
+  }, [behaviours]);
 
   // Utiliser le contexte MUI pour les points de rupture
   const isCommentPanelOpen = displayModals.COMMENT_PANEL;
-  const isMediumOrLessScreen = useMediaQuery(
-    (theme: any) => theme.breakpoints.down("lg"), // correspond à la largeur sous 1280px
+
+  const isPrimaryBreakpoint = useMediaQuery((theme: any) =>
+    theme.breakpoints.down(primaryBreakpoint),
   );
-  const isLessThanXL = useMediaQuery((theme: any) =>
-    theme.breakpoints.down("xl"),
+
+  const isSecondaryBreakpoint = useMediaQuery((theme: any) =>
+    theme.breakpoints.down(secondaryBreakpoint),
   );
 
   const isHorizontal =
-    isMediumOrLessScreen || (isCommentPanelOpen && isLessThanXL);
+    isPrimaryBreakpoint || (isCommentPanelOpen && isSecondaryBreakpoint);
 
   return (
     <>
-      {behaviours && !isLoading && (
-        <div>
-          <h2>Behaviours chargés</h2>
-          {/* Utilisez behaviours ici */}
-          <pre>{JSON.stringify(behaviours, null, 2)}</pre>
-        </div>
-      )}
       <h1
         style={{
           paddingTop: "2rem",
@@ -123,13 +125,13 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
         <CardContent>
           <Box className={`text-content`}>
             <Typography variant="body2" color="text.secondary">
-              Propriétaire : <span>{owner}</span>
+              {t("magneto.board.owner")} : <span>{owner}</span>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Taille : <span>{size}</span>
+              {t("magneto.board.size")} : <span>{size}</span>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Type : <span>{fileType}</span>
+              {t("magneto.board.type")} : <span>{fileType}</span>
             </Typography>
           </Box>
           <Box className={`button-group`}>
@@ -139,7 +141,7 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
               onClick={onDownload}
             >
               <DownloadIcon sx={{ fontSize: 27 }} />
-              Télécharger
+              {t("magneto.board.download")}
             </Button>
             <Button
               className="download-btn"
@@ -147,7 +149,7 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
               onClick={onEdit}
             >
               <EditIcon />
-              Editer dans Open Office
+              {t("magneto.board.edit.open.office")}
             </Button>
             <Button
               className="download-btn"
@@ -155,7 +157,7 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
               onClick={onImport}
             >
               <CloudUploadIcon />
-              Importer un nouveau fichier
+              {t("magneto.board.import.file")}
             </Button>
           </Box>
         </CardContent>

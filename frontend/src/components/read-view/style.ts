@@ -1,5 +1,5 @@
 export const contentStyle = {
-  padding: "4rem 10rem",
+  padding: "2rem 2.5rem",
   height: "100%",
   maxHeight: "100%",
   overflowY: "auto",

@@ -1,10 +1,8 @@
 import { useState, FC } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-// Import correct du worker pour Vite
 import "pdfjs-dist/build/pdf.worker.min";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
-import "./PdfUploadViewer.scss";
 import {
   Box,
   Paper,
@@ -18,12 +16,15 @@ import {
   NavigateNext as NextIcon,
 } from "@mui/icons-material";
 import { PDFUploadViewerProps } from "./types";
+import { documentBox, loadingBox, mainBox } from "./style";
+import { useTranslation } from "react-i18next";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
+  const { t } = useTranslation("magneto");
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -38,56 +39,47 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: "lg", mx: "auto", p: 3 }}>
+    <Box sx={mainBox}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        justifyContent="center"
+        sx={{ pb: "2rem" }}
+      >
+        <IconButton
+          onClick={goToPreviousPage}
+          disabled={pageNumber <= 1}
+          color="primary"
+        >
+          <PreviousIcon />
+        </IconButton>
+
+        <Typography sx={{ fontSize: "1.4rem" }}>
+          Page {pageNumber} sur {numPages || "--"}
+        </Typography>
+
+        <IconButton
+          onClick={goToNextPage}
+          disabled={pageNumber >= (numPages || 1)}
+          color="primary"
+        >
+          <NextIcon />
+        </IconButton>
+      </Stack>
+
       <Paper sx={{ p: 3 }}>
-        {/* Navigation Controls */}
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          justifyContent="center"
-          sx={{ mb: 3 }}
-        >
-          <IconButton
-            onClick={goToPreviousPage}
-            disabled={pageNumber <= 1}
-            color="primary"
-          >
-            <PreviousIcon />
-          </IconButton>
-
-          <Typography>
-            Page {pageNumber} of {numPages || "--"}
-          </Typography>
-
-          <IconButton
-            onClick={goToNextPage}
-            disabled={pageNumber >= (numPages || 1)}
-            color="primary"
-          >
-            <NextIcon />
-          </IconButton>
-        </Stack>
-
-        {/* Document Viewer */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "500px",
-          }}
-        >
+        <Box sx={documentBox}>
           <Document
             file={url}
             onLoadSuccess={onDocumentLoadSuccess}
             error={
               <Typography color="error" sx={{ p: 2 }}>
-                An error occurred while loading the PDF!
+                {t("magneto.board.preview.pdf.error")}
               </Typography>
             }
             loading={
-              <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+              <Box sx={loadingBox}>
                 <CircularProgress />
               </Box>
             }
@@ -96,8 +88,9 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
               pageNumber={pageNumber}
               renderTextLayer={true}
               renderAnnotationLayer={true}
+              scale={1.6}
               loading={
-                <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+                <Box sx={loadingBox}>
                   <CircularProgress />
                 </Box>
               }

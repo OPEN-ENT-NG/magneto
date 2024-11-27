@@ -1,4 +1,4 @@
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   breakpoints: {
@@ -6,8 +6,10 @@ const theme = createTheme({
       xs: 0,
       sm: 600,
       md: 960,
-      lg: 1280, // "lg" correspond à 1280px
+      lg: 1280,
+      lg35: 1720,
       xl: 1920,
+      xl35: 2600,
     },
   },
 });

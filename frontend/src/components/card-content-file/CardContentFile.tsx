@@ -8,8 +8,10 @@ import { useBoard } from "~/providers/BoardProvider";
 import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
-  const { documents } = useBoard();
+  const { documents, displayModals } = useBoard();
   const cardDocument = documents.find((doc) => doc._id === card.resourceId);
+  const extensionText = useFileExtensionDescription(card.metadata.extension);
+  const size = useFileSize(card.metadata.size);
 
   const isOfficePdf = () => {
     const ext = ["doc", "ppt", "odt"];
@@ -21,21 +23,18 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     return ext.includes(card.metadata.extension);
   };
 
-  const extensionText = useFileExtensionDescription(card.metadata.extension);
-
-  const size = useFileSize(card.metadata.size);
-  const sizeString = size.value + size.unit;
-
   return (
     <>
       <FileInfos
         fileName={card.metadata.filename}
         owner={cardDocument?.ownerName ?? ""}
-        size={sizeString}
+        size={size.value + size.unit}
         fileType={extensionText}
         onDownload={() => console.log("Télécharger le fichier")}
         onEdit={() => console.log("Ouvrir dans Open Office")}
         onImport={() => console.log("Importer un nouveau fichier")}
+        primaryBreakpoint={displayModals.CARD_PREVIEW ? "lg" : "lg35"}
+        secondaryBreakpoint={displayModals.CARD_PREVIEW ? "xl" : "xl35"}
       />
       {card.metadata.extension === "pdf" && (
         <PDFUploadViewer url={`/workspace/document/${card.resourceId}`} />

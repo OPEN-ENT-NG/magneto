@@ -63,6 +63,8 @@
   "magneto.folder.rename": "Rename folder",
   "magneto.share": "Share",
   "magneto.board.owner": "Propriétaire",
+  "magneto.board.size": "Taille",
+  "magneto.board.type": "Type",
   "magneto.board.date.update": "Date de dernière modification",
   "magneto.public.share": "Share to the platform",
   "magneto.public.unshare": "Delete share from the platform",
@@ -224,5 +226,5 @@
   "magneto.share.heading.tooltip.message": "Vos favoris de partage s’affichent en priorité dans votre liste lorsque vous recherchez un groupe ou une personne, vous pouvez les retrouver dans l’annuaire.",
   "magneto.today": "Aujourd'hui",
   "magneto.yesterday": "Hier",
-   "magneto.previous": "Retour"
+  "magneto.previous": "Retour"
 }

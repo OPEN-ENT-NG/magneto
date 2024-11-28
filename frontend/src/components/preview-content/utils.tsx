@@ -2,9 +2,9 @@ import { Box } from "@mui/material";
 
 import { redirect } from "../card-content/utils";
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
+import { CardContentFile } from "../card-content-file/CardContentFile";
 import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
-import CSVParser from "../csv-viewer/CSVViewer";
 import { ExternalVideoPlayer } from "../external-video-player/ExternalVideoPlayer";
 import { getVideoSource } from "../external-video-player/utils";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
@@ -49,7 +49,7 @@ export const displayPreviewContentByType = (card: Card) => {
         />
       );
     case RESOURCE_TYPE.FILE:
-      return <CSVParser ressourceId={card.resourceId} />;
+      return <CardContentFile card={card} />;
     default:
       return null;
   }

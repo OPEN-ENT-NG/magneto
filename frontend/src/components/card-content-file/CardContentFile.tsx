@@ -15,7 +15,7 @@ import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const { documents, displayModals, hasEditRights } = useBoard();
-  const { behaviours, isLoading: isLoolLoading } = useEntcoreBehaviours();
+  const { behaviours, isInitialized } = useEntcoreBehaviours();
 
   const cardDocument = documents.find((doc) => doc._id === card.resourceId);
   const extensionText = useFileExtensionDescription(card.metadata.extension);
@@ -46,7 +46,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     const ext: string[] = ["doc", "ppt", "xls"];
     const isoffice: boolean = ext.includes(card.metadata.extension);
     const canBeOpenOnLool: boolean =
-      !isLoolLoading &&
+      isInitialized &&
       !behaviours?.applicationsBehaviours["lool"]?.failed &&
       behaviours?.applicationsBehaviours["lool"]?.canBeOpenOnLool(cardDocument);
 

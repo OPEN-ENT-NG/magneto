@@ -58,6 +58,10 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     const canBeOpenOnLool: boolean =
       !behaviours?.applicationsBehaviours["lool"]?.failed &&
       behaviours?.applicationsBehaviours["lool"]?.canBeOpenOnLool(cardDocument);
+    console.log("canBeOpenOnLool: ", canBeOpenOnLool);
+    console.log("isoffice: ", isoffice);
+    console.log("hasEditRights: ", hasEditRights());
+    console.log("canEditDocument: ", !!canEditDocument);
 
     return !!canEditDocument && hasEditRights() && isoffice && canBeOpenOnLool;
   };

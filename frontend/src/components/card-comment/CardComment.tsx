@@ -1,4 +1,4 @@
-import { FC, useState, KeyboardEvent } from "react";
+import { FC, useState, KeyboardEvent, memo, useCallback } from "react";
 
 import { useUser } from "@edifice-ui/react";
 import { mdiCommentOutline } from "@mdi/js";
@@ -25,29 +25,43 @@ import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useAddCommentMutation } from "~/services/api/comment.service";
 
-export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
+export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [addComment] = useAddCommentMutation();
   const { t } = useTranslation("magneto");
   const { avatar } = useUser();
   const { cardComment, nbOfComment, cardId } = commentData;
-
-  const time = useElapsedTime(cardComment.modificationDate);
   const { getAvatarURL } = useDirectory();
 
-  const handleSubmit = async (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && inputValue && cardId) {
-      try {
-        await addComment({
-          cardId: cardId,
-          content: inputValue,
-        }).unwrap();
-        setInputValue("");
-      } catch (error) {
-        console.error(error);
+  const time = useElapsedTime(cardComment?.modificationDate);
+
+  const handleSubmit = useCallback(
+    async (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter" && inputValue && cardId) {
+        try {
+          await addComment({
+            cardId: cardId,
+            content: inputValue,
+          }).unwrap();
+          setInputValue("");
+        } catch (error) {
+          console.error(error);
+        }
       }
-    }
-  };
+    },
+    [addComment, cardId, inputValue],
+  );
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputValue(e.target.value);
+    },
+    [],
+  );
+
+  const commentAvatar = cardComment
+    ? getAvatarURL(cardComment.ownerId, "user")
+    : "";
 
   return (
     <Box sx={containerStyle}>
@@ -60,10 +74,7 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
             </Typography>
           </Box>
           <Box sx={commentContentContainerStyle}>
-            <Avatar
-              sx={avatarStyle}
-              src={getAvatarURL(cardComment.ownerId, "user")}
-            ></Avatar>
+            <Avatar sx={avatarStyle} src={commentAvatar} />
             <Box sx={commentTextContainerStyle}>
               <Typography sx={userNameStyle}>
                 {cardComment.ownerName}
@@ -77,12 +88,12 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
         </>
       )}
       <Box sx={inputContainerStyle}>
-        <Avatar sx={avatarStyle} src={avatar}></Avatar>
+        <Avatar sx={avatarStyle} src={avatar} />
         <InputBase
           data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
           placeholder={t("magneto.add.comment")}
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleSubmit}
           fullWidth
           sx={inputBaseStyle}
@@ -90,4 +101,6 @@ export const CardComment: FC<CardCommentProps> = ({ commentData }) => {
       </Box>
     </Box>
   );
-};
+});
+
+CardComment.displayName = "CardComment";

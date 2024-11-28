@@ -11,7 +11,7 @@ import {
   CardBoxStyle,
   UlWrapper,
 } from "./style";
-import { BoardCard } from "../board-card/BoardCard";
+import BoardCard from "../board-card/BoardCard";
 import { CardWrapper } from "../cards-vertical-layout/style";
 import { CardDisplayProps } from "../cards-vertical-layout/types";
 import { DndSection } from "../dnd-section/DndSection";

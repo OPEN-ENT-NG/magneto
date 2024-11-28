@@ -5,7 +5,7 @@ import { rectSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { Box } from "@mui/material";
 
 import { LiWrapper, UlWrapper, mainWrapperProps } from "./style";
-import { BoardCard } from "../board-card/BoardCard";
+import BoardCard from "../board-card/BoardCard";
 import { CardDisplayProps } from "../cards-vertical-layout/types";
 import { useFreeLayoutCardDnD } from "~/hooks/dnd-hooks/useFreeLayoutCardDnD";
 import { Card } from "~/models/card.model";
@@ -20,12 +20,14 @@ const MemoizedCardItem = memo(
     displayProps,
     index,
     totalCards,
+    hasEditRights,
   }: {
     cardId: string;
     card: Card;
     displayProps: CardDisplayProps;
     index: number;
     totalCards: number;
+    hasEditRights: boolean;
   }) => (
     <LiWrapper
       key={cardId}
@@ -37,6 +39,7 @@ const MemoizedCardItem = memo(
         zoomLevel={displayProps.zoomLevel}
         canComment={displayProps.canComment}
         displayNbFavorites={displayProps.displayNbFavorites}
+        readOnly={hasEditRights}
       />
     </LiWrapper>
   ),
@@ -72,14 +75,14 @@ const MemoizedDragOverlay = memo(
         zoomLevel={displayProps.zoomLevel}
         canComment={displayProps.canComment}
         displayNbFavorites={displayProps.displayNbFavorites}
-        readOnly={!hasEditRights()}
+        readOnly={hasEditRights()}
       />
     );
   },
 );
 
 export const CardsFreeLayout: FC = () => {
-  const { board, zoomLevel } = useBoard();
+  const { board, zoomLevel, hasEditRights } = useBoard();
   const {
     updatedIds,
     activeItem,
@@ -125,6 +128,7 @@ export const CardsFreeLayout: FC = () => {
                 displayProps={displayProps}
                 index={index}
                 totalCards={updatedIds.length}
+                hasEditRights={!hasEditRights()}
               />
             ))}
           </UlWrapper>

@@ -72,7 +72,7 @@ export const useCardDropDownItems = (
         ? t("magneto.card.options.unlock")
         : t("magneto.card.options.lock"),
     }),
-    [t, isLocked],
+    [isLocked],
   );
 
   const menuItems = useMemo(
@@ -108,7 +108,7 @@ export const useCardDropDownItems = (
         OnClick: handlers.delete,
       },
     }),
-    [icons, labels, handlers],
+    [labels, handlers],
   );
 
   return useMemo(() => {

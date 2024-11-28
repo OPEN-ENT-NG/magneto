@@ -12,7 +12,7 @@ import {
   listStyle,
 } from "./style";
 import { InputValueState } from "./types";
-import { BoardCard } from "../board-card/BoardCard";
+import BoardCard from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";

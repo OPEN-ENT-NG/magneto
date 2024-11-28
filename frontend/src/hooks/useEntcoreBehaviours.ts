@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 export const useEntcoreBehaviours = () => {
   const [behaviours, setBehaviours] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const loadScripts = () => {
@@ -16,35 +15,8 @@ export const useEntcoreBehaviours = () => {
 
         script2.onload = () => {
           if (window.entcore && window.entcore.Behaviours) {
-            const initPromise = new Promise<void>((resolve, reject) => {
-              try {
-                const loolBehaviours =
-                  window.entcore.Behaviours.applicationsBehaviours["lool"];
-
-                if (typeof loolBehaviours.init === "function") {
-                  loolBehaviours.init();
-                }
-
-                // Resolve after initialization
-                resolve();
-              } catch (error) {
-                console.error("Initialization error:", error);
-                reject(error);
-              }
-            });
-
-            // Wait for initialization to complete
-            initPromise
-              .then(() => {
-                setIsInitialized(true);
-                setBehaviours(window.entcore.Behaviours);
-                setIsLoading(false);
-              })
-              .catch(() => {
-                setIsInitialized(false);
-                setBehaviours(window.entcore.Behaviours);
-                setIsLoading(false);
-              });
+            setBehaviours(window.entcore.Behaviours);
+            setIsLoading(false);
           }
         };
 
@@ -57,43 +29,10 @@ export const useEntcoreBehaviours = () => {
     if (!window.entcore) {
       loadScripts();
     } else {
-      const initPromise = new Promise<void>((resolve, reject) => {
-        try {
-          const loolBehaviours =
-            window.entcore.Behaviours.applicationsBehaviours["lool"];
-
-          if (typeof loolBehaviours.init === "function") {
-            loolBehaviours.init();
-          }
-
-          resolve();
-        } catch (error) {
-          console.error("Initialization error:", error);
-          reject(error);
-        }
-      });
-
-      // Wait for initialization to complete
-      initPromise
-        .then(() => {
-          setIsInitialized(true);
-          setBehaviours(window.entcore.Behaviours);
-          setIsLoading(false);
-        })
-        .catch(() => {
-          setIsInitialized(false);
-          setBehaviours(window.entcore.Behaviours);
-          setIsLoading(false);
-        });
+      setBehaviours(window.entcore.Behaviours);
+      setIsLoading(false);
     }
-
-    return () => {
-      const scripts = document.body.querySelectorAll(
-        'script[src*="ng-app.js"], script[src*="behaviours.js"]',
-      );
-      scripts.forEach((script) => script.remove());
-    };
   }, []);
 
-  return { behaviours, isLoading, isInitialized };
+  return { behaviours, isLoading };
 };

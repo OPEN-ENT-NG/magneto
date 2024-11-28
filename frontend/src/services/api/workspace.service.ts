@@ -1,4 +1,6 @@
 import {} from "~/models/comment.types";
+import { WorkspaceElement } from "edifice-ts-client";
+
 import { emptySplitWorkspace } from "./emptySplitWorkspace";
 
 export const workspaceApi = emptySplitWorkspace.injectEndpoints({
@@ -10,7 +12,19 @@ export const workspaceApi = emptySplitWorkspace.injectEndpoints({
         responseHandler: (response) => response.text(),
       }),
     }),
+    getDocuments: builder.query<WorkspaceElement[], string>({
+      query: () => ({
+        url: `documents?filter=all&hierarchical=true`,
+        method: "GET",
+      }),
+      transformResponse: (response: any) => {
+        const parsedResponse =
+          typeof response === "string" ? JSON.parse(response) : response;
+
+        return Array.isArray(parsedResponse) ? parsedResponse : [];
+      },
+    }),
   }),
 });
 
-export const { useGetRessourceQuery } = workspaceApi;
+export const { useGetRessourceQuery, useGetDocumentsQuery } = workspaceApi;

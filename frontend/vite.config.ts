@@ -14,26 +14,26 @@ export default ({ mode }: { mode: string }) => {
   // Proxy variables
   const headers = hasEnvFile
     ? {
-      "set-cookie": [
-        `oneSessionId=${envs.VITE_ONE_SESSION_ID}`,
-        `XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
-      ],
-      "Cache-Control": "public, max-age=300",
-    }
+        "set-cookie": [
+          `oneSessionId=${envs.VITE_ONE_SESSION_ID}`,
+          `XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
+        ],
+        "Cache-Control": "public, max-age=300",
+      }
     : {};
 
   const proxyObj = hasEnvFile
     ? {
-      target: envs.VITE_RECETTE,
-      changeOrigin: true,
-      headers: {
-        cookie: `oneSessionId=${envs.VITE_ONE_SESSION_ID};authenticated=true; XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
-      },
-    }
+        target: envs.VITE_RECETTE,
+        changeOrigin: true,
+        headers: {
+          cookie: `oneSessionId=${envs.VITE_ONE_SESSION_ID};authenticated=true; XSRF-TOKEN=${envs.VITE_XSRF_TOKEN}`,
+        },
+      }
     : {
-      target: envs.VITE_LOCALHOST || "http://localhost:8090",
-      changeOrigin: false,
-    };
+        target: envs.VITE_LOCALHOST || "http://localhost:8090",
+        changeOrigin: false,
+      };
 
   const proxy = {
     "/applications-list": proxyObj,
@@ -82,6 +82,10 @@ export default ({ mode }: { mode: string }) => {
     headers,
     open: true,
     strictPort: true,
+    mimeTypes: {
+      js: "application/javascript",
+      mjs: "application/javascript",
+    },
   };
 
   const test = {

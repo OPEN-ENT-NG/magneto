@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
 import { filesize } from "filesize";
 
@@ -15,7 +15,11 @@ import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const { documents, displayModals, hasEditRights } = useBoard();
-  const { behaviours } = useEntcoreBehaviours();
+  const { behaviours, isLoading } = useEntcoreBehaviours();
+
+  const initLool = async () => {
+    await behaviours.applicationsBehaviours["lool"].init();
+  };
 
   const cardDocument = documents.find((doc) => doc._id === card.resourceId);
   const extensionText = useFileExtensionDescription(card.metadata.extension);
@@ -24,8 +28,17 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   );
   const size = filesize(card.metadata.size);
 
+  useEffect(() => {
+    initLool();
+  }, [isLoading]);
+
   const isOfficePdf = () => {
-    const ext = [FILE_EXTENSION.DOC, FILE_EXTENSION.PPT, FILE_EXTENSION.ODT];
+    const ext = [
+      FILE_EXTENSION.DOC,
+      FILE_EXTENSION.DOCX,
+      FILE_EXTENSION.PPT,
+      FILE_EXTENSION.ODT,
+    ];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
@@ -43,7 +56,15 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   };
 
   const canEdit = (): boolean => {
-    const ext: string[] = ["doc", "ppt", "xls"];
+    if (behaviours?.applicationsBehaviours["lool"]?.provider === null)
+      return false;
+    const ext: string[] = [
+      FILE_EXTENSION.DOC,
+      FILE_EXTENSION.DOCX,
+      FILE_EXTENSION.PPT,
+      FILE_EXTENSION.ODT,
+      FILE_EXTENSION.XLS,
+    ];
     const isoffice: boolean = ext.includes(card.metadata.extension);
     const canBeOpenOnLool: boolean =
       !behaviours?.applicationsBehaviours["lool"]?.failed &&

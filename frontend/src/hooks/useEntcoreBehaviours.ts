@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export const useEntcoreBehaviours = () => {
-  const [behaviours, setBehaviours] = useState(null);
+  const [behaviours, setBehaviours] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

@@ -13,7 +13,6 @@ import { Card } from "~/models/card.model";
 
 export const displayPreviewContentByType = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
-  console.log(card);
 
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO: {

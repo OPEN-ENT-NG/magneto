@@ -73,7 +73,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   }, [boardData]);
 
   const documents = useMemo(() => {
-    console.log(documentsData);
     return documentsData ?? [];
   }, [documentsData]);
 

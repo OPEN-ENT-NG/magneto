@@ -2,26 +2,53 @@ import { FC } from "react";
 
 import { CardContentFileProps } from "./types";
 import CSVParser from "../csv-viewer/CSVViewer";
-import FileInfos from "../file-infos/FileInfos";
+import { FileInfos } from "../file-infos/FileInfos";
 import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
 import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
-import { useFileSize } from "~/hooks/useFileSize";
 import { useBoard } from "~/providers/BoardProvider";
+import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
+import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service";
+import { FILE_EXTENSION } from "~/core/enums/file-extension.enum";
+import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
+import { filesize } from "filesize";
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
-  const { documents, displayModals } = useBoard();
+  const { documents, displayModals, hasEditRights } = useBoard();
+  const { behaviours } = useEntcoreBehaviours();
+
   const cardDocument = documents.find((doc) => doc._id === card.resourceId);
   const extensionText = useFileExtensionDescription(card.metadata.extension);
-  const size = useFileSize(card.metadata.size);
+  const { currentData: canEditDocument } = useCanEditDocumentQuery(
+    card.resourceId,
+  );
+  const size = filesize(card.metadata.size);
 
   const isOfficePdf = () => {
-    const ext = ["doc", "ppt", "odt"];
-    return ext.includes(card.metadata.extension);
+    const ext = [FILE_EXTENSION.DOC, FILE_EXTENSION.PPT, FILE_EXTENSION.ODT];
+    return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
   const isOfficeExcelOrCsv = () => {
-    const ext = ["xls", "csv", "xlsx"];
-    return ext.includes(card.metadata.extension);
+    const ext = [FILE_EXTENSION.XLS, FILE_EXTENSION.CSV, FILE_EXTENSION.XLSX];
+    return ext.includes(card.metadata.extension as FILE_EXTENSION);
+  };
+
+  const download = () => {
+    window.open(`/workspace/document/${card.resourceId}`);
+  };
+
+  const edit = (): void => {
+    behaviours?.applicationsBehaviours["lool"]?.openOnLool(cardDocument);
+  };
+
+  const canEdit = (): boolean => {
+    const ext: string[] = ["doc", "ppt", "xls"];
+    const isoffice: boolean = ext.includes(card.metadata.extension);
+    const canBeOpenOnLool: boolean =
+      !behaviours?.applicationsBehaviours["lool"]?.failed &&
+      behaviours?.applicationsBehaviours["lool"]?.canBeOpenOnLool(cardDocument);
+
+    return !!canEditDocument && hasEditRights() && isoffice && canBeOpenOnLool;
   };
 
   return (
@@ -29,12 +56,16 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
       <FileInfos
         fileName={card.metadata.filename}
         owner={cardDocument?.ownerName ?? ""}
-        size={size.value + size.unit}
+        size={size}
         fileType={extensionText}
-        onDownload={() => console.log("Télécharger le fichier")}
-        onEdit={() => console.log("Ouvrir dans Open Office")}
-        onImport={() => console.log("Importer un nouveau fichier")}
-        primaryBreakpoint={displayModals.CARD_PREVIEW ? "lg" : "lg35"}
+        canDownload={hasEditRights()}
+        onDownload={download}
+        canEdit={canEdit()}
+        onEdit={edit}
+        onImport={() => {}}
+        primaryBreakpoint={
+          displayModals.CARD_PREVIEW ? ThemeBreakpoint.LG : ThemeBreakpoint.LG35
+        }
       />
       {card.metadata.extension === "pdf" && (
         <PDFUploadViewer url={`/workspace/document/${card.resourceId}`} />

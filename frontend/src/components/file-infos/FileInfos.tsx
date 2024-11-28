@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -13,8 +13,8 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { FileInfosStyled } from "./style";
-import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { useBoard } from "~/providers/BoardProvider";
+import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
 
 interface FileInfoCardProps {
   fileName: string;
@@ -22,10 +22,12 @@ interface FileInfoCardProps {
   size: string;
   fileType: string;
   onDownload: () => void;
+  canDownload: boolean;
   onEdit: () => void;
+  canEdit: boolean;
   onImport: () => void;
-  primaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35";
-  secondaryBreakpoint?: "xs" | "sm" | "md" | "lg" | "xl" | "lg35";
+  primaryBreakpoint?: ThemeBreakpoint;
+  secondaryBreakpoint?: ThemeBreakpoint;
 }
 
 export const FileInfos: React.FC<FileInfoCardProps> = ({
@@ -34,21 +36,18 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
   size,
   fileType,
   onDownload,
+  canDownload,
   onEdit,
+  canEdit,
   onImport,
   primaryBreakpoint = "lg",
   secondaryBreakpoint = "xl",
 }) => {
   const { t } = useTranslation("magneto");
   const { displayModals } = useBoard();
-  const { behaviours } = useEntcoreBehaviours();
 
-  useEffect(() => {
-    console.log(behaviours);
-  }, [behaviours]);
-
-  // Utiliser le contexte MUI pour les points de rupture
   const isCommentPanelOpen = displayModals.COMMENT_PANEL;
+  const isCreateEdit = displayModals.CREATE_EDIT;
 
   const isPrimaryBreakpoint = useMediaQuery((theme: any) =>
     theme.breakpoints.down(primaryBreakpoint),
@@ -87,35 +86,39 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
             </Typography>
           </Box>
           <Box className={`button-group`}>
-            <Button
-              className="download-btn"
-              variant="outlined"
-              onClick={onDownload}
-            >
-              <DownloadIcon sx={{ fontSize: 27 }} />
-              {t("magneto.board.download")}
-            </Button>
-            <Button
-              className="download-btn"
-              variant="outlined"
-              onClick={onEdit}
-            >
-              <EditIcon />
-              {t("magneto.board.edit.open.office")}
-            </Button>
-            <Button
-              className="download-btn"
-              variant="outlined"
-              onClick={onImport}
-            >
-              <CloudUploadIcon />
-              {t("magneto.board.import.file")}
-            </Button>
+            {canDownload && (
+              <Button
+                className="download-btn"
+                variant="outlined"
+                onClick={onDownload}
+              >
+                <DownloadIcon sx={{ fontSize: 27 }} />
+                {t("magneto.board.download")}
+              </Button>
+            )}
+            {canEdit && (
+              <Button
+                className="download-btn"
+                variant="outlined"
+                onClick={onEdit}
+              >
+                <EditIcon />
+                {t("magneto.board.edit.open.office")}
+              </Button>
+            )}
+            {isCreateEdit && (
+              <Button
+                className="download-btn"
+                variant="outlined"
+                onClick={onImport}
+              >
+                <CloudUploadIcon />
+                {t("magneto.board.import.file")}
+              </Button>
+            )}
           </Box>
         </CardContent>
       </FileInfosStyled>
     </>
   );
 };
-
-export default FileInfos;

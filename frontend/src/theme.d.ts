@@ -1,10 +1,7 @@
+import { ThemeBreakpoint } from "./core/enums/theme-breakpoints.enum";
+
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
-    xs: true;
-    sm: true;
-    md: true;
-    lg: true;
-    xl: true;
-    lg35: true;
+    [key in ThemeBreakpoint]: true;
   }
 }

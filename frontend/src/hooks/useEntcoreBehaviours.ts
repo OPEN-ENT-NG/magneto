@@ -15,8 +15,20 @@ export const useEntcoreBehaviours = () => {
 
         script2.onload = () => {
           if (window.entcore && window.entcore.Behaviours) {
-            setBehaviours(window.entcore.Behaviours);
-            setIsLoading(false);
+            const initPromise = new Promise<void>((resolve) => {
+              try {
+                window.entcore.Behaviours.applicationsBehaviours["lool"].init();
+                resolve();
+              } catch (error) {
+                console.error("Initialization error:", error);
+                resolve();
+              }
+            });
+
+            initPromise.then(() => {
+              setBehaviours(window.entcore.Behaviours);
+              setIsLoading(false);
+            });
           }
         };
 
@@ -29,9 +41,28 @@ export const useEntcoreBehaviours = () => {
     if (!window.entcore) {
       loadScripts();
     } else {
-      setBehaviours(window.entcore.Behaviours);
-      setIsLoading(false);
+      const initPromise = new Promise<void>((resolve) => {
+        try {
+          window.entcore.Behaviours.applicationsBehaviours["lool"].init();
+          resolve();
+        } catch (error) {
+          console.error("Initialization error:", error);
+          resolve();
+        }
+      });
+
+      initPromise.then(() => {
+        setBehaviours(window.entcore.Behaviours);
+        setIsLoading(false);
+      });
     }
+
+    return () => {
+      const scripts = document.body.querySelectorAll(
+        'script[src*="ng-app.js"], script[src*="behaviours.js"]',
+      );
+      scripts.forEach((script) => script.remove());
+    };
   }, []);
 
   return { behaviours, isLoading };

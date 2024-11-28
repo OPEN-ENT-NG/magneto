@@ -33,7 +33,12 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   }, [isLoading]);
 
   const isOfficePdf = () => {
-    const ext = [FILE_EXTENSION.DOC, FILE_EXTENSION.PPT, FILE_EXTENSION.ODT];
+    const ext = [
+      FILE_EXTENSION.DOC,
+      FILE_EXTENSION.DOCX,
+      FILE_EXTENSION.PPT,
+      FILE_EXTENSION.ODT,
+    ];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
@@ -53,15 +58,17 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const canEdit = (): boolean => {
     if (behaviours?.applicationsBehaviours["lool"]?.provider === null)
       return false;
-    const ext: string[] = ["doc", "ppt", "xls"];
+    const ext: string[] = [
+      FILE_EXTENSION.DOC,
+      FILE_EXTENSION.DOCX,
+      FILE_EXTENSION.PPT,
+      FILE_EXTENSION.ODT,
+      FILE_EXTENSION.XLS,
+    ];
     const isoffice: boolean = ext.includes(card.metadata.extension);
     const canBeOpenOnLool: boolean =
       !behaviours?.applicationsBehaviours["lool"]?.failed &&
       behaviours?.applicationsBehaviours["lool"]?.canBeOpenOnLool(cardDocument);
-    console.log("canBeOpenOnLool: ", canBeOpenOnLool);
-    console.log("isoffice: ", isoffice);
-    console.log("hasEditRights: ", hasEditRights());
-    console.log("canEditDocument: ", !!canEditDocument);
 
     return !!canEditDocument && hasEditRights() && isoffice && canBeOpenOnLool;
   };

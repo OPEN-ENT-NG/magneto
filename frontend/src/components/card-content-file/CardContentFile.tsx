@@ -1,16 +1,17 @@
 import { FC } from "react";
 
+import { filesize } from "filesize";
+
 import { CardContentFileProps } from "./types";
 import CSVParser from "../csv-viewer/CSVViewer";
 import { FileInfos } from "../file-infos/FileInfos";
 import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
-import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
-import { useBoard } from "~/providers/BoardProvider";
-import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
-import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service";
 import { FILE_EXTENSION } from "~/core/enums/file-extension.enum";
 import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
-import { filesize } from "filesize";
+import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
+import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
+import { useBoard } from "~/providers/BoardProvider";
+import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service";
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const { documents, displayModals, hasEditRights } = useBoard();

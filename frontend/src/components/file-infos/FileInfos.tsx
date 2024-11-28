@@ -13,8 +13,8 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { FileInfosStyled } from "./style";
-import { useBoard } from "~/providers/BoardProvider";
 import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
+import { useBoard } from "~/providers/BoardProvider";
 
 interface FileInfoCardProps {
   fileName: string;

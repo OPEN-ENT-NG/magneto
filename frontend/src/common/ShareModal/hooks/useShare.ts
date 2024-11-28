@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from "react";
 
-import { useOdeClient, useUser, useToast } from "@edifice-ui/react";
+import { useUser, useToast } from "@edifice-ui/react";
 import {
   odeServices,
   PutShareResponse,
@@ -32,6 +32,7 @@ interface UseShareResourceModalProps {
   shareResource?: ShareResourceMutation;
   onSuccess: () => void;
   setIsLoading: (value: boolean) => void;
+  appCode: string;
 }
 
 type State = {
@@ -76,6 +77,7 @@ function reducer(state: State, action: ShareAction) {
 }
 
 export default function useShare({
+  appCode,
   resourceId,
   resourceRights,
   resourceCreatorId,
@@ -83,7 +85,6 @@ export default function useShare({
   setIsLoading,
   onSuccess,
 }: UseShareResourceModalProps) {
-  const { appCode } = useOdeClient();
   const { user, avatar } = useUser();
 
   const toast = useToast();

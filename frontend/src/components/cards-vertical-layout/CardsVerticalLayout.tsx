@@ -12,7 +12,7 @@ import {
   mainWrapperProps,
 } from "./style";
 import { CardDisplayProps } from "./types";
-import { BoardCard } from "../board-card/BoardCard";
+import BoardCard from "../board-card/BoardCard";
 import { DndSection } from "../dnd-section/DndSection";
 import { SectionName } from "../section-name/SectionName";
 import { ActiveItemState, DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";

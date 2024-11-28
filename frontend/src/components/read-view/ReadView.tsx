@@ -58,14 +58,18 @@ export const ReadView: FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("magneto");
   const [isRefReady, setIsRefReady] = useState(false);
-  const commentDivRef =
-    useWindowResize() as MutableRefObject<HTMLElement | null>;
-
+  const [card, setCard] = useState<Card | null>(null);
+  const [cardIndex, setCardIndex] = useState(0);
   const filteredSections = useMemo(() => {
     return board.sections.filter(
       (section) => section.cards && section.cards.length > 0,
     );
   }, [board]);
+  const [section, setSection] = useState<Section | null>(
+    board.isLayoutFree() ? filteredSections[0] : null,
+  );
+  const commentDivRef =
+    useWindowResize() as MutableRefObject<HTMLElement | null>;
 
   useEffect(() => {
     if (COMMENT_PANEL && commentDivRef.current) {
@@ -85,15 +89,9 @@ export const ReadView: FC = () => {
       : filteredSections.flatMap((section) => section.cards || []);
   }, [board]);
 
-  const [card, setCard] = useState(initialCards[0]);
-  const [cardIndex, setCardIndex] = useState(0);
-  const [section, setSection] = useState<Section | null>(
-    board.isLayoutFree() ? filteredSections[0] : null,
-  );
-
   useEffect(() => {
-    setCard(initialCards[0]);
-  }, [initialCards]);
+    if (!card) setCard(initialCards[0]);
+  }, [board]);
 
   useEffect(() => {
     setSection(filteredSections[0]);

@@ -4,7 +4,7 @@ import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import { useTranslation } from "react-i18next";
 
 import { StyledGridBox } from "./style";
-import { BoardCard } from "../board-card/BoardCard";
+import BoardCard from "../board-card/BoardCard";
 import { EmptyState } from "../empty-state/EmptyState";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board } from "~/models/board.model";

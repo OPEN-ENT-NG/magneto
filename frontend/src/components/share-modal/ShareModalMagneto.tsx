@@ -1,6 +1,5 @@
 import { FunctionComponent } from "react";
 
-import { OdeClientProvider } from "@edifice-ui/react";
 import { useOdeClient } from "@edifice-ui/react";
 import { RightStringified } from "edifice-ts-client";
 
@@ -37,18 +36,13 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
   return (
     <>
       {isOpen && (
-        <OdeClientProvider
-          params={{
-            app: formatAppPath,
-          }}
-        >
-          <ShareModal
-            isOpen={isOpen}
-            shareOptions={shareOptions}
-            onCancel={handleShareClose}
-            onSuccess={handleShareSuccess}
-          />
-        </OdeClientProvider>
+        <ShareModal
+          appCode={formatAppPath}
+          isOpen={isOpen}
+          shareOptions={shareOptions}
+          onCancel={handleShareClose}
+          onSuccess={handleShareSuccess}
+        />
       )}
     </>
   );

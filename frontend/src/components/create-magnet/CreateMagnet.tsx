@@ -26,6 +26,7 @@ import {
   FormControl as FormControlMUI,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 
 import {
   modalContainerStyle,
@@ -67,7 +68,6 @@ import {
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
 import { workspaceApi } from "~/services/api/workspace.service";
-import { useDispatch } from "react-redux";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();

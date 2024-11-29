@@ -149,7 +149,6 @@ export const CreateMagnet: FC = () => {
       payload.resourceType === RESOURCE_TYPE.FILE &&
       documents.find((doc) => doc._id === payload.resourceId) === undefined
     ) {
-      console.log("HI");
       dispatchRTK(workspaceApi.util.invalidateTags(["Documents"]));
     }
     onCloseModalAndDeactivateCard();

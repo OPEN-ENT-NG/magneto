@@ -56,7 +56,10 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   };
 
   const canEdit = (): boolean => {
-    if (behaviours?.applicationsBehaviours["lool"]?.provider === null)
+    if (
+      behaviours?.applicationsBehaviours["lool"]?.provider === null ||
+      cardDocument === undefined
+    )
       return false;
     const ext: string[] = [
       FILE_EXTENSION.DOC,

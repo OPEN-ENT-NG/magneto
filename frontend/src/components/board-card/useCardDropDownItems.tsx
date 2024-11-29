@@ -22,7 +22,7 @@ export const useCardDropDownItems = (
   isLocked: boolean,
   lockOrUnlockMagnet: () => void,
   card: Card,
-  lockedAndNoRights?: boolean,
+  hasLockedCardRights?: boolean,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
   const { openActiveCardAction, setIsModalDuplicate } = useBoard();
@@ -112,15 +112,22 @@ export const useCardDropDownItems = (
   );
 
   return useMemo(() => {
-    if (lockedAndNoRights) return [menuItems.preview];
-    if (readOnly) return [menuItems.preview, menuItems.duplicate];
+    if (hasLockedCardRights)
+      return [
+        menuItems.preview,
+        menuItems.duplicate,
+        menuItems.edit,
+        menuItems.move,
+        menuItems.lock,
+        menuItems.delete,
+      ];
+    if (readOnly) return [menuItems.preview];
     return [
       menuItems.preview,
       menuItems.duplicate,
       menuItems.edit,
       menuItems.move,
-      menuItems.lock,
       menuItems.delete,
     ];
-  }, [lockedAndNoRights, readOnly, menuItems]);
+  }, [hasLockedCardRights, readOnly, menuItems]);
 };

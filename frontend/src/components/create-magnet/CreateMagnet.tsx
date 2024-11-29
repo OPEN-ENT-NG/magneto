@@ -66,11 +66,14 @@ import {
   useCreateCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
+import { workspaceApi } from "~/services/api/workspace.service";
+import { useDispatch } from "react-redux";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
-  const { board } = useBoard();
+  const { board, documents } = useBoard();
+  const dispatchRTK = useDispatch();
 
   const [title, setTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -142,6 +145,13 @@ export const CreateMagnet: FC = () => {
       ...(section?._id ? { sectionId: section._id } : {}),
     };
     isEditMagnet ? await updateCard(payload) : await createCard(payload);
+    if (
+      payload.resourceType === RESOURCE_TYPE.FILE &&
+      documents.find((doc) => doc._id === payload.resourceId) === undefined
+    ) {
+      console.log("HI");
+      dispatchRTK(workspaceApi.util.invalidateTags(["Documents"]));
+    }
     onCloseModalAndDeactivateCard();
   };
 

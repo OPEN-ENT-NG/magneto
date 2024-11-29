@@ -26,6 +26,7 @@ import {
   FormControl as FormControlMUI,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 
 import {
   modalContainerStyle,
@@ -66,11 +67,13 @@ import {
   useCreateCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
+import { workspaceApi } from "~/services/api/workspace.service";
 
 export const CreateMagnet: FC = () => {
   const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
-  const { board } = useBoard();
+  const { board, documents } = useBoard();
+  const dispatchRTK = useDispatch();
 
   const [title, setTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -142,6 +145,12 @@ export const CreateMagnet: FC = () => {
       ...(section?._id ? { sectionId: section._id } : {}),
     };
     isEditMagnet ? await updateCard(payload) : await createCard(payload);
+    if (
+      payload.resourceType === RESOURCE_TYPE.FILE &&
+      documents.find((doc) => doc._id === payload.resourceId) === undefined
+    ) {
+      dispatchRTK(workspaceApi.util.invalidateTags(["Documents"]));
+    }
     onCloseModalAndDeactivateCard();
   };
 

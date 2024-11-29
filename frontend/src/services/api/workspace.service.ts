@@ -17,6 +17,7 @@ export const workspaceApi = emptySplitWorkspace.injectEndpoints({
         url: `documents?filter=all&hierarchical=true`,
         method: "GET",
       }),
+      providesTags: ["Documents"],
       transformResponse: (response: any) => {
         const parsedResponse =
           typeof response === "string" ? JSON.parse(response) : response;

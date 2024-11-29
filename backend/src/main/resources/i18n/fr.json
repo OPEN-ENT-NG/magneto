@@ -139,7 +139,7 @@
   "magneto.move.cards.confirm": "L'aimant sélectionné a été déplacé avec succès.",
   "magneto.delete.cards.confirm": "Les aimants sélectionnés ont été supprimés avec succès.",
   "magneto.duplicate.boards.confirm": "Le tableau sélectionné a été dupliqué avec succès.",
-  "magneto.duplicate.cards.confirm": "Les aimants sélectionnés ont été dupliqués avec succès.",
+  "magneto.duplicate.cards.confirm": "L'aimant sélectionné a été dupliqué avec succès.",
   "magneto.delete.comment": "Supprimer le commentaire",
   "magneto.delete.comment.message": "Êtes-vous sûr(e) de vouloir supprimer définitivement le commentaire ?",
   "magneto.delete.comment.success": "Votre commentaire a été supprimé avec succès.",

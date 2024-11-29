@@ -2,13 +2,13 @@ import { FC, useEffect, DragEvent, useState } from "react";
 
 import "./BoardView.scss";
 
-import { LoadingScreen } from "@edifice-ui/react";
+import { LoadingScreen, MediaLibrary, useOdeClient } from "@edifice-ui/react";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
-import { GlobalStyles } from "@mui/material";
+import { Box, GlobalStyles } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { BoardBodyWrapper, BoardViewWrapper } from "./style";
+import { BoardBodyWrapper, BoardViewWrapper, mediaLibraryStyle } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { BoardCreateMagnetMagnetModal } from "../board-create-magnet-magnet-modal/BoardCreateMagnetMagnetModal";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
@@ -47,7 +47,14 @@ export const BoardView: FC = () => {
   } = useBoard();
   const headerHeight = useHeaderHeight();
   const [, setDragCounter] = useState<number>(0);
-  const { magnetType, onClose } = useMediaLibrary();
+  const {
+    magnetType,
+    onClose,
+    isCreateMagnetOpen,
+    mediaLibraryRef,
+    mediaLibraryHandlers,
+  } = useMediaLibrary();
+  const { appCode } = useOdeClient();
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -153,20 +160,17 @@ export const BoardView: FC = () => {
             </div>
           )}
         </BoardBodyWrapper>
-
-        <CreateMagnet open={magnetType === MENU_NOT_MEDIA_TYPE.TEXT} />
+        {isCreateMagnetOpen && <CreateMagnet />}
         {activeCard && displayModals.CARD_PREVIEW && <PreviewModal />}
         <BoardCreateMagnetMagnetModal
           open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
           onClose={onClose}
         />
-
         <CreateBoard
           isOpen={displayModals.PARAMETERS}
           toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
           boardToUpdate={board}
         />
-
         <div className="zoom-container">
           <ZoomComponent
             opacity={0.75}
@@ -178,6 +182,15 @@ export const BoardView: FC = () => {
           />
         </div>
       </BoardViewWrapper>
+      <Box sx={mediaLibraryStyle}>
+        <MediaLibrary
+          appCode={appCode}
+          ref={mediaLibraryRef}
+          multiple={false}
+          visibility="protected"
+          {...mediaLibraryHandlers}
+        />
+      </Box>
     </>
   );
 };

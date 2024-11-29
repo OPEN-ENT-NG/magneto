@@ -63,3 +63,8 @@ export const BoardBodyWrapper = styled("div")<{
   }
   return { ...layoutStyle, ...boardStyle };
 });
+
+export const mediaLibraryStyle = {
+  position: "fixed",
+  zIndex: 1100,
+};

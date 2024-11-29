@@ -9,8 +9,6 @@ import {
   FormControl,
   Input,
   Label,
-  MediaLibrary,
-  useOdeClient,
   MediaLibraryType,
 } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
@@ -40,7 +38,6 @@ import {
   formControlMUIStyle,
   inputLabelStyle,
   selectStyle,
-  mediaLibraryStyle,
   footerButtonStyle,
   menuItemStyle,
   formControlEditorStyle,
@@ -70,7 +67,6 @@ import {
 import { workspaceApi } from "~/services/api/workspace.service";
 
 export const CreateMagnet: FC = () => {
-  const { appCode } = useOdeClient();
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
   const dispatchRTK = useDispatch();
@@ -88,8 +84,6 @@ export const CreateMagnet: FC = () => {
   const [updateCard] = useUpdateCardMutation();
 
   const {
-    mediaLibraryRef,
-    mediaLibraryHandlers,
     media,
     setMedia,
     isCreateMagnetOpen,
@@ -222,166 +216,151 @@ export const CreateMagnet: FC = () => {
   }, [board.sections]);
 
   return (
-    <>
-      <Modal
-        open={isCreateMagnetOpen}
-        onClose={() => onCloseModalAndDeactivateCard()}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-        style={{ zIndex: 1000 }}
-      >
-        <Box sx={modalContainerStyle}>
-          <Box sx={headerStyle}>
-            <Typography
-              id="modal-title"
-              variant="h4"
-              component="h2"
-              sx={titleStyle}
-            >
-              {isEditMagnet ? t("magneto.edit.card") : t("magneto.new.card")}
-            </Typography>
-            <IconButton
-              onClick={() => onCloseModalAndDeactivateCard()}
-              aria-label="close"
-              sx={closeButtonStyle}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          </Box>
-          <Box sx={contentContainerStyle}>
-            {magnetTypeHasFilePickerWorkspace && (
-              <FilePickerWorkspace
-                modifyFile={modifyFile}
-                addButtonLabel={"Change file"}
-              />
-            )}
-            {magnetTypeHasImage && (
-              <ImageContainer media={media} handleClickMedia={modifyFile} />
-            )}
-            {magnetTypeHasAudio && (
-              <Box sx={audioWrapperStyle}>
-                <audio controls preload="metadata" src={media.url}>
-                  <source src={media.url} type={media.type} />
-                </audio>
-                {!isEditMagnet && (
-                  <EdIconButton
-                    aria-label="Edit audio"
-                    color="tertiary"
-                    icon={<Edit />}
-                    onClick={() => modifyFile(MEDIA_LIBRARY_TYPE.AUDIO)}
-                    type="button"
-                    variant="ghost"
-                    style={iconButtonStyle}
-                  />
-                )}
-              </Box>
-            )}
-            {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
-            {magnetTypeHasLink && (
-              <FormControl id="url" style={formControlStyle}>
-                <Label>{t("magneto.site.address")}</Label>
-                <Input
-                  ref={firstInputRef}
-                  value={linkUrl}
-                  size="md"
-                  type="text"
-                  onChange={(e) => setLinkUrl(e.target.value)}
+    <Modal
+      open={isCreateMagnetOpen}
+      onClose={() => onCloseModalAndDeactivateCard()}
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+      style={{ zIndex: 1000 }}
+    >
+      <Box sx={modalContainerStyle}>
+        <Box sx={headerStyle}>
+          <Typography
+            id="modal-title"
+            variant="h4"
+            component="h2"
+            sx={titleStyle}
+          >
+            {isEditMagnet ? t("magneto.edit.card") : t("magneto.new.card")}
+          </Typography>
+          <IconButton
+            onClick={() => onCloseModalAndDeactivateCard()}
+            aria-label="close"
+            sx={closeButtonStyle}
+          >
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+        </Box>
+        <Box sx={contentContainerStyle}>
+          {magnetTypeHasFilePickerWorkspace && (
+            <FilePickerWorkspace
+              modifyFile={modifyFile}
+              addButtonLabel={"Change file"}
+            />
+          )}
+          {magnetTypeHasImage && (
+            <ImageContainer media={media} handleClickMedia={modifyFile} />
+          )}
+          {magnetTypeHasAudio && (
+            <Box sx={audioWrapperStyle}>
+              <audio controls preload="metadata" src={media.url}>
+                <source src={media.url} type={media.type} />
+              </audio>
+              {!isEditMagnet && (
+                <EdIconButton
+                  aria-label="Edit audio"
+                  color="tertiary"
+                  icon={<Edit />}
+                  onClick={() => modifyFile(MEDIA_LIBRARY_TYPE.AUDIO)}
+                  type="button"
+                  variant="ghost"
+                  style={iconButtonStyle}
                 />
-              </FormControl>
-            )}
-            <FormControl id="title" style={formControlStyle}>
-              <Label>{t("magneto.card.title")}</Label>
+              )}
+            </Box>
+          )}
+          {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
+          {magnetTypeHasLink && (
+            <FormControl id="url" style={formControlStyle}>
+              <Label>{t("magneto.site.address")}</Label>
               <Input
-                ref={magnetTypeHasLink ? null : firstInputRef}
-                value={title}
-                placeholder={t("magneto.card.title")}
+                ref={firstInputRef}
+                value={linkUrl}
                 size="md"
                 type="text"
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => setLinkUrl(e.target.value)}
               />
             </FormControl>
-            {magnetTypeHasCaption && (
-              <FormControl id="caption" style={formControlStyle}>
-                <Label>{t("magneto.card.caption")}</Label>
-                <Input
-                  value={caption}
-                  placeholder={t("magneto.card.caption")}
-                  size="md"
-                  type="text"
-                  onChange={(e) => setCaption(e.target.value)}
-                />
-              </FormControl>
-            )}
-            <FormControl id="description" style={formControlEditorStyle}>
-              <Label>{t("magneto.create.board.description")}</Label>
-              <Box sx={editorStyle}>
-                <Editor
-                  id="postContent"
-                  content={description}
-                  mode="edit"
-                  ref={editorRef}
-                />
-              </Box>
+          )}
+          <FormControl id="title" style={formControlStyle}>
+            <Label>{t("magneto.card.title")}</Label>
+            <Input
+              ref={magnetTypeHasLink ? null : firstInputRef}
+              value={title}
+              placeholder={t("magneto.card.title")}
+              size="md"
+              type="text"
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </FormControl>
+          {magnetTypeHasCaption && (
+            <FormControl id="caption" style={formControlStyle}>
+              <Label>{t("magneto.card.caption")}</Label>
+              <Input
+                value={caption}
+                placeholder={t("magneto.card.caption")}
+                size="md"
+                type="text"
+                onChange={(e) => setCaption(e.target.value)}
+              />
             </FormControl>
-            {section && (
-              <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
-                <InputLabel
-                  id="input-section"
-                  shrink={true}
-                  sx={inputLabelStyle}
-                >
-                  {t("magneto.card.section")}
-                </InputLabel>
-                <Select
-                  labelId="select-section"
-                  id="select-section"
-                  value={section.title}
-                  onChange={handleSectionChange}
-                  label={t("magneto.card.section")}
-                  notched
-                  size="medium"
-                  sx={selectStyle}
-                >
-                  {board.sections.map((s: Section) => (
-                    <MenuItem key={s.title} value={s.title}>
-                      <Box sx={menuItemStyle}>{s.title}</Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControlMUI>
-            )}
-            <Box sx={modalFooterStyle}>
-              <Button
-                style={footerButtonStyle}
-                color="tertiary"
-                type="button"
-                variant="ghost"
-                onClick={() => onCloseModalAndDeactivateCard()}
-              >
-                {t("magneto.cancel")}
-              </Button>
-              <Button
-                style={footerButtonStyle}
-                color="primary"
-                type="submit"
-                variant="filled"
-                onClick={() => onUpload()}
-              >
-                {t("magneto.save")}
-              </Button>
+          )}
+          <FormControl id="description" style={formControlEditorStyle}>
+            <Label>{t("magneto.create.board.description")}</Label>
+            <Box sx={editorStyle}>
+              <Editor
+                id="postContent"
+                content={description}
+                mode="edit"
+                ref={editorRef}
+              />
             </Box>
+          </FormControl>
+          {section && (
+            <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
+              <InputLabel id="input-section" shrink={true} sx={inputLabelStyle}>
+                {t("magneto.card.section")}
+              </InputLabel>
+              <Select
+                labelId="select-section"
+                id="select-section"
+                value={section.title}
+                onChange={handleSectionChange}
+                label={t("magneto.card.section")}
+                notched
+                size="medium"
+                sx={selectStyle}
+              >
+                {board.sections.map((s: Section) => (
+                  <MenuItem key={s.title} value={s.title}>
+                    <Box sx={menuItemStyle}>{s.title}</Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControlMUI>
+          )}
+          <Box sx={modalFooterStyle}>
+            <Button
+              style={footerButtonStyle}
+              color="tertiary"
+              type="button"
+              variant="ghost"
+              onClick={() => onCloseModalAndDeactivateCard()}
+            >
+              {t("magneto.cancel")}
+            </Button>
+            <Button
+              style={footerButtonStyle}
+              color="primary"
+              type="submit"
+              variant="filled"
+              onClick={() => onUpload()}
+            >
+              {t("magneto.save")}
+            </Button>
           </Box>
         </Box>
-      </Modal>
-      <Box sx={mediaLibraryStyle}>
-        <MediaLibrary
-          appCode={appCode}
-          ref={mediaLibraryRef}
-          multiple={false}
-          visibility="protected"
-          {...mediaLibraryHandlers}
-        />
       </Box>
-    </>
+    </Modal>
   );
 };

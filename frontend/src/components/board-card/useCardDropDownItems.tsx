@@ -123,16 +123,12 @@ export const useCardDropDownItems = (
         menuItems.delete,
       ];
     if (isLocked)
-      return [
-        menuItems.preview,
-        menuItems.duplicate,
-        menuItems.move,
-      ];
+      return [menuItems.preview, menuItems.duplicate, menuItems.move];
     return [
       menuItems.preview,
       menuItems.duplicate,
       menuItems.edit,
       menuItems.move,
     ];
-  }, [isOwnerOrManager, readOnly, menuItems]);
+  }, [isOwnerOrManager, readOnly, menuItems, isLocked]);
 };

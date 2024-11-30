@@ -38,11 +38,9 @@ export const useBoardCard = (card: Card) => {
     () => ({
       isOpen: openDropdownId === card.id,
       isActiveCardId: activeCard?.id === card.id,
-      hasLockedCardRights: (() => {
+      isOwnerOrManager: (() => {
         const isCardOwner = card.ownerId === user?.userId;
-        return (
-          isCardOwner || (card.locked ? hasManageRights() : hasEditRights())
-        );
+        return isCardOwner || hasManageRights();
       })(),
     }),
     [

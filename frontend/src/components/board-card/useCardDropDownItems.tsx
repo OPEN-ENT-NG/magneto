@@ -112,6 +112,7 @@ export const useCardDropDownItems = (
   );
 
   return useMemo(() => {
+    if (readOnly) return [menuItems.preview];
     if (hasLockedCardRights)
       return [
         menuItems.preview,
@@ -121,7 +122,6 @@ export const useCardDropDownItems = (
         menuItems.lock,
         menuItems.delete,
       ];
-    if (readOnly) return [menuItems.preview];
     return [
       menuItems.preview,
       menuItems.duplicate,

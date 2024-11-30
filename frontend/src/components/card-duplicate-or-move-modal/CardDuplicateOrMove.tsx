@@ -69,6 +69,7 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
   return (
     <MessageModal
       submitButtonName={t(button)}
+      cancelButtonName={t("magneto.cancel")}
       title={t(title)}
       isOpen={isOpen}
       onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE)}

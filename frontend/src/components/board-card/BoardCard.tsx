@@ -48,7 +48,7 @@ const BoardCard: FC<BoardCardProps> = ({
     card.locked,
     lockOrUnlockMagnet,
     card,
-    card.locked ? !hasLockedCardRights : false,
+    hasLockedCardRights,
   );
 
   const sortableProps = useSortable({

@@ -43,7 +43,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   };
 
   const isOfficeExcelOrCsv = () => {
-    const ext = [FILE_EXTENSION.XLS, FILE_EXTENSION.CSV, FILE_EXTENSION.XLSX];
+    const ext = [FILE_EXTENSION.CSV];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 

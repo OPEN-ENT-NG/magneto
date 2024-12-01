@@ -1,35 +1,29 @@
-import { styled } from "@mui/material";
+import { Box, styled } from "@mui/material";
 
-export const BoardViewWrapper = styled("div")<{
-  layout: string;
-}>(({ layout }) => {
-  const boardStyle = {
-    display: "contents",
-  };
+import { BoardBodyWrapperProps, BoardViewWrapperProps } from "./types";
+import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 
-  let layoutStyle;
+export const BoardViewWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "layout",
+})<BoardViewWrapperProps>(({ layout }) => ({
+  display: "contents",
+  ...(layout === LAYOUT_TYPE.FREE && {
+    overflowY: "scroll",
+    overflowX: "hidden",
+  }),
+  ...(layout === LAYOUT_TYPE.VERTICAL && {
+    overflowX: "scroll",
+    overflowY: "hidden",
+  }),
+  ...(layout === LAYOUT_TYPE.HORIZONTAL && {
+    overflowY: "scroll",
+    overflowX: "hidden",
+  }),
+}));
 
-  switch (layout) {
-    case "free":
-      layoutStyle = { overflowY: "scroll", overflowX: "hidden" };
-      break;
-    case "vertical":
-      layoutStyle = { overflowX: "scroll", overflowY: "hidden" };
-      break;
-    case "horizontal":
-      layoutStyle = { overflowY: "scroll", overflowX: "hidden" };
-      break;
-    default:
-      layoutStyle = { overflowY: "scroll", overflowX: "hidden" };
-      break;
-  }
-  return { ...layoutStyle, ...boardStyle };
-});
-
-export const BoardBodyWrapper = styled("div")<{
-  layout: string;
-  headerHeight: number;
-}>(({ layout, headerHeight }) => {
+export const BoardBodyWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "layout" && prop !== "headerHeight",
+})<BoardBodyWrapperProps>(({ layout, headerHeight }) => {
   const boardStyle = {
     position: "relative",
     display: "flex",
@@ -37,30 +31,37 @@ export const BoardBodyWrapper = styled("div")<{
     borderBottom: "solid 1px $magneto-white-blue",
     backgroundSize: "cover",
     width: "100%",
-  };
+  } as const;
 
-  let layoutStyle;
+  let layoutStyle: { height: string; minHeight: string };
 
   switch (layout) {
-    case "free":
-      layoutStyle = { height: `100%`, minHeight: `100vh` };
-      break;
-    case "vertical":
+    case LAYOUT_TYPE.FREE:
       layoutStyle = {
-        height: `calc(100vh - ${headerHeight}px)`,
-        minHeight: `unset`,
+        height: "100%",
+        minHeight: "100vh",
       };
       break;
-    case "horizontal":
+    case LAYOUT_TYPE.VERTICAL:
       layoutStyle = {
-        height: `100%`,
+        height: `calc(100vh - ${headerHeight}px)`,
+        minHeight: "unset",
+      };
+      break;
+    case LAYOUT_TYPE.HORIZONTAL:
+      layoutStyle = {
+        height: "100%",
         minHeight: `calc(100vh - ${headerHeight}px)`,
       };
       break;
     default:
-      layoutStyle = { height: `100%`, minHeight: `100vh` };
+      layoutStyle = {
+        height: "100%",
+        minHeight: "100vh",
+      };
       break;
   }
+
   return { ...layoutStyle, ...boardStyle };
 });
 

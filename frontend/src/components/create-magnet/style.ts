@@ -150,11 +150,6 @@ export const footerButtonStyle = {
   marginLeft: "0",
 };
 
-export const mediaLibraryStyle = {
-  position: "fixed",
-  zIndex: 1100,
-};
-
 export const audioWrapperStyle = {
   width: "100%",
   height: "100%",

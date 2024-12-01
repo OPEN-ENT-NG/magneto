@@ -22,7 +22,7 @@ export const innerBox = {
 };
 
 export const flyingBox = {
-  position: "absolute",
+  position: "fixed",
   bottom: "20%",
   left: "50%",
   transform: "translateX(-50%)",

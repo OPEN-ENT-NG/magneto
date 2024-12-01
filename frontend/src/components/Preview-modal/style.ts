@@ -1,18 +1,16 @@
 import { Box, styled } from "@mui/material";
 
-interface ModalWrapperProps {
-  isCommentOpen?: boolean;
-}
+import { ModalWrapperProps } from "./types";
 
 export const ModalWrapper = styled(Box, {
   shouldForwardProp: (prop) => prop !== "isCommentOpen",
-})<ModalWrapperProps>(({ theme, isCommentOpen }) => ({
+})<ModalWrapperProps>(({ theme, isCommentOpen, isText }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "max-content",
-  minWidth: "80rem",
+  minWidth: isText ? "40rem" : "80rem",
   maxWidth: "80%",
   height: isCommentOpen ? "calc(100vh - 10rem)" : "fit-content",
   maxHeight: "calc(100vh - 10rem)",

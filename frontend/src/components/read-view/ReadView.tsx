@@ -94,14 +94,14 @@ export const ReadView: FC = () => {
   }, [board]);
 
   useEffect(() => {
-    setSection(filteredSections[0]);
+    if (!section) setSection(filteredSections[0]);
   }, [filteredSections]);
 
   const navigatePage = (direction: "next" | "prev") => {
     const newIndex = direction === "next" ? cardIndex + 1 : cardIndex - 1;
     const newCard = initialCards[newIndex];
 
-    if (board.isLayoutFree()) {
+    if (!board.isLayoutFree()) {
       const newSection = filteredSections.find((s) =>
         s.cards.some((card) => card.id === newCard.id),
       );

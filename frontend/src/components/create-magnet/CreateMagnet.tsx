@@ -136,7 +136,7 @@ export const CreateMagnet: FC = () => {
       resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
       title: title,
       id: isEditMagnet ? activeCard.id : undefined,
-      ...(section?._id ? { sectionId: section._id } : {}),
+      ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
     };
     isEditMagnet ? await updateCard(payload) : await createCard(payload);
     if (

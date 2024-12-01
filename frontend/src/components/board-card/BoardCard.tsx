@@ -28,7 +28,7 @@ const BoardCard: FC<BoardCardProps> = ({
     type,
     isOpen,
     isActiveCardId,
-    hasLockedCardRights,
+    isOwnerOrManager,
     dropdownRef,
     getAvatarURL,
     lockOrUnlockMagnet,
@@ -48,7 +48,7 @@ const BoardCard: FC<BoardCardProps> = ({
     card.locked,
     lockOrUnlockMagnet,
     card,
-    hasLockedCardRights,
+    isOwnerOrManager,
   );
 
   const sortableProps = useSortable({

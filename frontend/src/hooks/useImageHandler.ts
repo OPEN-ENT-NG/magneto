@@ -73,5 +73,7 @@ export const useImageHandler = (
     handleDeleteBackground,
     mediaLibraryRef,
     mediaLibraryHandlers,
+    setBackground,
+    setThumbnail,
   };
 };

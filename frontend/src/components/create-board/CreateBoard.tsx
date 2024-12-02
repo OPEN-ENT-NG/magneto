@@ -23,6 +23,7 @@ import { styles } from "./style";
 import { CreateBoardProps } from "./types";
 import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
+import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useImageHandler } from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { BoardForm } from "~/models/board.model";
@@ -62,6 +63,8 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     handleDeleteBackground,
     mediaLibraryRef,
     mediaLibraryHandlers,
+    setThumbnail,
+    setBackground,
   } = useImageHandler(
     boardToUpdate?.imageUrl ?? "",
     boardToUpdate?.backgroundUrl ?? "",
@@ -85,7 +88,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   };
 
   const resetFields = (): void => {
-    if (boardToUpdate == null) {
+    if (boardToUpdate === null) {
       setActivePickerId("");
       setIsCommentChecked(false);
       setIsFavoriteChecked(false);
@@ -163,8 +166,26 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setDisposition(boardToUpdate.layoutType);
       setTagsTextInput(boardToUpdate.tagsTextInput);
       setTags(boardToUpdate.tags);
+      if (boardToUpdate.imageUrl) {
+        setThumbnail({
+          type: MEDIA_LIBRARY_TYPE.IMAGE,
+          id: boardToUpdate.imageUrl.split("/").pop() || "",
+          name: "",
+          application: "",
+          url: boardToUpdate.imageUrl,
+        });
+      }
+      if (boardToUpdate.backgroundUrl) {
+        setBackground({
+          type: MEDIA_LIBRARY_TYPE.IMAGE,
+          id: boardToUpdate.backgroundUrl.split("/").pop() || "",
+          name: "",
+          application: "",
+          url: boardToUpdate.backgroundUrl,
+        });
+      }
     }
-  }, [boardToUpdate]);
+  }, [boardToUpdate,isOpen]);
 
   return (
     <>

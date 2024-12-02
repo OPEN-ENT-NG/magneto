@@ -185,7 +185,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
         });
       }
     }
-  }, [boardToUpdate,isOpen]);
+  }, [boardToUpdate, isOpen]);
 
   return (
     <>

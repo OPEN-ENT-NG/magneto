@@ -99,6 +99,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     }
   }, [boardData]);
 
+  const hasContribRights = (): boolean => {
+    return board.owner.userId === user?.userId || !!boardRights?.contrib;
+  };
+
   const hasEditRights = (): boolean => {
     return board.owner.userId === user?.userId || !!boardRights?.publish;
   };
@@ -137,6 +141,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isLoading,
       isFetching,
       boardRights,
+      hasContribRights,
       hasEditRights,
       hasManageRights,
       displayModals,

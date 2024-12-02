@@ -6,6 +6,7 @@ import { CardContentFileProps } from "./types";
 import CSVParser from "../csv-viewer/CSVViewer";
 import { FileInfos } from "../file-infos/FileInfos";
 import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
+import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
 import { FILE_EXTENSION } from "~/core/enums/file-extension.enum";
 import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
@@ -45,6 +46,21 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const isOfficeExcelOrCsv = () => {
     const ext = [FILE_EXTENSION.CSV];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
+  };
+
+  const isImage = () => {
+    const imageExtensions = [
+      FILE_EXTENSION.JPG,
+      FILE_EXTENSION.JPEG,
+      FILE_EXTENSION.PNG,
+      FILE_EXTENSION.GIF,
+      FILE_EXTENSION.BMP,
+      FILE_EXTENSION.TIFF,
+      FILE_EXTENSION.TIF,
+      FILE_EXTENSION.EPS,
+      FILE_EXTENSION.RAW,
+    ];
+    return imageExtensions.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
   const download = () => {
@@ -92,9 +108,10 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
           displayModals.CARD_PREVIEW ? ThemeBreakpoint.LG : ThemeBreakpoint.LG35
         }
       />
-      {card.metadata.extension === "pdf" && (
+      {card.metadata.extension === FILE_EXTENSION.PDF && (
         <PDFUploadViewer url={`/workspace/document/${card.resourceId}`} />
       )}
+      {isImage() && <PreviewContentImage ressourceUrl={card.resourceUrl} />}
       {isOfficePdf() && (
         <PDFUploadViewer
           url={`/workspace/document/preview/${card.resourceId}`}

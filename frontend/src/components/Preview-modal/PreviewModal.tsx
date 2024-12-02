@@ -15,7 +15,6 @@ import {
 import { CommentPanel } from "../comment-panel/CommentPanel";
 import { PreviewContent } from "../preview-content/PreviewContent";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
-import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { useWindowResize } from "~/hooks/useWindowResize";
 import { useBoard } from "~/providers/BoardProvider";
 
@@ -48,7 +47,6 @@ export const PreviewModal: FC = () => {
       <ModalWrapper
         ref={commentDivRef}
         isCommentOpen={COMMENT_PANEL}
-        isText={activeCard?.resourceType === RESOURCE_TYPE.TEXT}
       >
         <Box sx={modalBodyStyle}>
           <IconButton

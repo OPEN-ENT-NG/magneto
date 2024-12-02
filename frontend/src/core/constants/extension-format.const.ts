@@ -31,5 +31,6 @@ export const EXTENSION_FORMAT = {
     "wpl",
   ],
   SHEET: ["xlsx", "xlsm", "xlt", "xltx", "xltm", "ods", "csv", "tsv", "tab"],
+  SLIDE: ["ppt", "pptx"],
   PDF: ["pdf"],
 };

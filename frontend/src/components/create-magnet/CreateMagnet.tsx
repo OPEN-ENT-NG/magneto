@@ -49,6 +49,7 @@ import {
   convertResourceTypeToMediaType,
 } from "./utils";
 import { MediaProps } from "../board-view/types";
+import { CardContentFile } from "../card-content-file/CardContentFile";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";
@@ -242,12 +243,15 @@ export const CreateMagnet: FC = () => {
           </IconButton>
         </Box>
         <Box sx={contentContainerStyle}>
-          {magnetTypeHasFilePickerWorkspace && (
-            <FilePickerWorkspace
-              modifyFile={modifyFile}
-              addButtonLabel={"Change file"}
-            />
-          )}
+          {magnetTypeHasFilePickerWorkspace &&
+            (activeCard ? (
+              <CardContentFile card={activeCard} />
+            ) : (
+              <FilePickerWorkspace
+                modifyFile={modifyFile}
+                addButtonLabel={"Change file"}
+              />
+            ))}
           {magnetTypeHasImage && (
             <ImageContainer media={media} handleClickMedia={modifyFile} />
           )}

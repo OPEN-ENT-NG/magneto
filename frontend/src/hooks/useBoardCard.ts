@@ -25,6 +25,7 @@ export const useBoardCard = (card: Card) => {
     hasManageRights,
     activeCard,
     closeActiveCardAction,
+    openActiveCardAction,
   } = useBoard();
   const { user } = useUser();
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
@@ -87,6 +88,14 @@ export const useBoardCard = (card: Card) => {
     }
   }, [card.id, toggleDropdown]);
 
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW);
+    },
+    [card],
+  );
+
   const handleDropdownClose = useCallback(() => {
     toggleDropdown(null);
   }, [toggleDropdown]);
@@ -109,6 +118,7 @@ export const useBoardCard = (card: Card) => {
       handleFavoriteClick,
       registerDropdown,
       closeDropdown,
+      handleDoubleClick,
     }),
     [
       icon,
@@ -122,6 +132,7 @@ export const useBoardCard = (card: Card) => {
       handleFavoriteClick,
       registerDropdown,
       closeDropdown,
+      handleDoubleClick,
     ],
   );
 };

@@ -38,6 +38,7 @@ const BoardCard: FC<BoardCardProps> = ({
     handleFavoriteClick,
     registerDropdown,
     closeDropdown,
+    handleDoubleClick,
   } = useBoardCard(card);
 
   const { t } = useTranslation("magneto");
@@ -126,6 +127,7 @@ const BoardCard: FC<BoardCardProps> = ({
       zoomLevel={zoomLevel}
       isDragging={isDragging}
       ref={setNodeRef}
+      onDoubleClick={handleDoubleClick}
       style={style}
       {...(readOnly ? {} : { ...attributes, ...listeners })}
     >

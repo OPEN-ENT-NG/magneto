@@ -21,6 +21,7 @@ export type BoardContextType = {
   isLoading: boolean;
   isFetching: boolean;
   boardRights: Record<RightRole, boolean> | null;
+  hasContribRights: () => boolean;
   hasEditRights: () => boolean;
   hasManageRights: () => boolean;
   displayModals: DisplayModalsState;

@@ -44,10 +44,7 @@ export const PreviewModal: FC = () => {
       aria-labelledby="modal-card-preview"
       aria-describedby="modal-card-preview"
     >
-      <ModalWrapper
-        ref={commentDivRef}
-        isCommentOpen={COMMENT_PANEL}
-      >
+      <ModalWrapper ref={commentDivRef} isCommentOpen={COMMENT_PANEL}>
         <Box sx={modalBodyStyle}>
           <IconButton
             onClick={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}

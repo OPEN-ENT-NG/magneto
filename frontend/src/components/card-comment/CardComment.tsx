@@ -32,7 +32,6 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
   const { avatar } = useUser();
   const { cardComment, nbOfComment, cardId } = commentData;
 
-  if(!!cardComment.id) console.log("cardComment", cardComment);
   const { getAvatarURL } = useDirectory();
 
   const time = useElapsedTime(cardComment?.modificationDate);

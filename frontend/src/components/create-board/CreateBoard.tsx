@@ -80,6 +80,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     board.folderId = parentFolderId ?? "";
     board.imageUrl = thumbnail?.url ?? "";
     board.backgroundUrl = background?.url ?? "";
+    board.public = boardToUpdate?.isPublished ?? false;
 
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")

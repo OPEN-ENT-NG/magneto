@@ -83,6 +83,8 @@ const CommentPanelItemBase = memo(
       handleStartDeleting,
     );
 
+    console.log("commentPanelItem", comment);
+
     const dropdownRef = useRef<HTMLDivElement>(null);
     const inputWrapperRef = useRef<HTMLDivElement>(null);
     const commentWrapperRef = useRef<HTMLDivElement>(null);

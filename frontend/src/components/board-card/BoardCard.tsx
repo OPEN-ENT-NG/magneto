@@ -39,6 +39,8 @@ const BoardCard: FC<BoardCardProps> = ({
     registerDropdown,
     closeDropdown,
     handleDoubleClick,
+    hasContribRights,
+    hasEditRights,
   } = useBoardCard(card);
 
   const { t } = useTranslation("magneto");
@@ -50,6 +52,8 @@ const BoardCard: FC<BoardCardProps> = ({
     lockOrUnlockMagnet,
     card,
     isOwnerOrManager,
+    hasContribRights,
+    hasEditRights,
   );
 
   const sortableProps = useSortable({

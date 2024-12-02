@@ -26,6 +26,7 @@ export const useBoardCard = (card: Card) => {
     activeCard,
     closeActiveCardAction,
     openActiveCardAction,
+    hasContribRights,
   } = useBoard();
   const { user } = useUser();
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
@@ -37,6 +38,8 @@ export const useBoardCard = (card: Card) => {
 
   const states = useMemo(
     () => ({
+      hasEditRights: hasEditRights(),
+      hasContribRights: hasContribRights(),
       isOpen: openDropdownId === card.id,
       isActiveCardId: activeCard?.id === card.id,
       isOwnerOrManager: (() => {
@@ -53,6 +56,7 @@ export const useBoardCard = (card: Card) => {
       openDropdownId,
       hasManageRights,
       hasEditRights,
+      hasContribRights,
     ],
   );
 

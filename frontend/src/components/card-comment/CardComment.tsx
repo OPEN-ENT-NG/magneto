@@ -31,7 +31,6 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
   const { t } = useTranslation("magneto");
   const { avatar } = useUser();
   const { cardComment, nbOfComment, cardId } = commentData;
-
   const { getAvatarURL } = useDirectory();
 
   const time = useElapsedTime(cardComment?.modificationDate);

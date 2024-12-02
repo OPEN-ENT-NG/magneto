@@ -15,7 +15,7 @@ declare module "dompurify" {
 
 export const CardContentText: FC<CardContentTextProps> = ({ text }) => {
   const cleanHtml = DOMPurify.sanitize(text, {
-    ADD_TAGS: ["style"],
+    ADD_TAGS: ["style", "iframe"],
     ADD_ATTR: ["style"],
     ALLOWED_STYLES: [
       "color",

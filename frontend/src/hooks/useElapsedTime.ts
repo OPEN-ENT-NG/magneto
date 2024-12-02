@@ -2,8 +2,6 @@ import { useMemo } from "react";
 
 import { useTranslation } from "react-i18next";
 
-const NOW = new Date();
-
 const formatTooltip = (date: Date) =>
   date
     .toLocaleString("fr-FR", {
@@ -28,6 +26,7 @@ export const useElapsedTime = (dateString: string) => {
 
   return useMemo(() => {
     const date = new Date(dateString);
+    const NOW = new Date();
     const diffInSeconds = Math.floor((NOW.getTime() - date.getTime()) / 1000);
     const tooltip = formatTooltip(date);
 

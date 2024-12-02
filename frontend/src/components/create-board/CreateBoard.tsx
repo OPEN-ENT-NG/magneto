@@ -21,13 +21,13 @@ import { useTranslation } from "react-i18next";
 
 import { styles } from "./style";
 import { CreateBoardProps } from "./types";
+import { MediaProps } from "../board-view/types";
 import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useImageHandler } from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { BoardForm } from "~/models/board.model";
-import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
@@ -43,6 +43,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const { t } = useTranslation("magneto");
   const { appCode } = useOdeClient();
 
+  const [media, setMedia] = useState<MediaProps | null>(null);
   const [activePickerId, setActivePickerId] = useState<string>("");
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
@@ -53,7 +54,6 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [tags, setTags] = useState([""]);
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
-  const { setMedia, setIsCreateMagnetOpen } = useMediaLibrary();
   const { width } = useWindowDimensions();
   const {
     thumbnail,
@@ -65,10 +65,13 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     mediaLibraryHandlers,
     setThumbnail,
     setBackground,
+    libraryMedia,
   } = useImageHandler(
     boardToUpdate?.imageUrl ?? "",
     boardToUpdate?.backgroundUrl ?? "",
     activePickerId,
+    media,
+    setMedia,
   );
 
   const setBoardFromForm = async (board: BoardForm) => {
@@ -100,8 +103,6 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     }
     handleDeleteThumbnail();
     handleDeleteBackground();
-    //spraradrap, faire passer isCreateMagnetOpen autre part que dans le medialibrary provider
-    setIsCreateMagnetOpen(false);
     toggle();
   };
 
@@ -217,6 +218,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                   deleteButtonLabel="Delete image"
                   id="thumbnail"
                   onUploadImage={(id: string) => {
+                    setMedia(null);
                     setActivePickerId(id);
                     handleUploadImage();
                   }}
@@ -224,7 +226,8 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     handleDeleteThumbnail();
                   }}
                   src={thumbnail?.url}
-                  onImageChange={() => {}}
+                  libraryMedia={libraryMedia}
+                  mediaLibraryRef={mediaLibraryRef}
                 />
                 {thumbnail === null && (
                   <div style={styles.errorText}>
@@ -354,6 +357,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                       addButtonLabel="Add image"
                       deleteButtonLabel="Delete image"
                       onUploadImage={(id: string) => {
+                        setMedia(null);
                         setActivePickerId(id);
                         handleUploadImage();
                       }}
@@ -361,7 +365,8 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                         handleDeleteBackground();
                       }}
                       src={background?.url}
-                      onImageChange={() => {}}
+                      libraryMedia={libraryMedia}
+                      mediaLibraryRef={mediaLibraryRef}
                     />
                     <i style={styles.infoText}>
                       {t("magneto.board.background.warning")}

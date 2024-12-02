@@ -69,6 +69,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
     setMedia(null);
     setMagnetType(null);
     setIsCreateMagnetOpen(false);
+    setLibraryMedia(null);
     setWorkspaceElement(null);
   };
 

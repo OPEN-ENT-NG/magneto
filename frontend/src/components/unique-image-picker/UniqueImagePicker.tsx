@@ -11,12 +11,13 @@ interface UniqueImagePickerProps extends ComponentPropsWithRef<"input"> {
   addButtonLabel: string;
   deleteButtonLabel: string;
   src?: string;
+  libraryMedia: any;
+  mediaLibraryRef: any;
   app?: IWebApp | undefined;
   appCode?: string;
   className?: string;
   id: string;
   onUploadImage: (id: string) => void;
-  onImageChange: (file: File | null) => void;
   onDeleteImage: () => void;
 }
 
@@ -28,7 +29,6 @@ export const UniqueImagePicker: FC<UniqueImagePickerProps> = ({
   app,
   id,
   onUploadImage,
-  onImageChange,
   onDeleteImage,
 }) => {
   const [preview, setPreview] = useState<string>(src || "");
@@ -40,14 +40,9 @@ export const UniqueImagePicker: FC<UniqueImagePickerProps> = ({
     }
   }, [src]);
 
-  const handleClick = () => {
-    onUploadImage(id);
-  };
-
   const handleClean = () => {
     setPreview("");
     onDeleteImage();
-    onImageChange(null);
   };
 
   const classes = clsx("image-input", className);
@@ -59,7 +54,7 @@ export const UniqueImagePicker: FC<UniqueImagePickerProps> = ({
           aria-label={addButtonLabel}
           color="tertiary"
           icon={<Edit />}
-          onClick={handleClick}
+          onClick={() => onUploadImage(id)}
           type="button"
           variant="ghost"
         />

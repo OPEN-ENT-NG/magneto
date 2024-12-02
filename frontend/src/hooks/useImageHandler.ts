@@ -1,13 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction, Dispatch } from "react";
 
+import { WorkspaceElement } from "edifice-ts-client";
+
+import { useMediaLibrary } from "./useMediaLibrary";
 import { MediaProps } from "~/components/board-view/types";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
-import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const useImageHandler = (
   defaultThumbnail: string,
   defaultBackground: string,
   pickerId: string,
+  media: MediaProps | null,
+  setMedia: Dispatch<SetStateAction<MediaProps | null>>,
 ) => {
   const [thumbnail, setThumbnail] = useState<MediaProps | null>(null);
   const [background, setBackground] = useState<MediaProps | null>(null);
@@ -34,12 +38,27 @@ export const useImageHandler = (
   }, [defaultThumbnail, defaultBackground]);
 
   const {
-    mediaLibraryRef,
-    mediaLibraryHandlers,
-    media,
-    handleClickMedia,
-    setMedia,
+    ref: mediaLibraryRef,
+    libraryMedia,
+    setLibraryMedia,
+    ...mediaLibraryHandlers
   } = useMediaLibrary();
+
+  useEffect(() => {
+    if (libraryMedia) {
+      const medialIb = libraryMedia as WorkspaceElement;
+      setMedia({
+        type: "image",
+        id: medialIb?._id || "",
+        name: medialIb?.name || "",
+        application: "",
+        url: medialIb?._id
+          ? `/workspace/document/${medialIb?._id}`
+          : (libraryMedia as string),
+      });
+    }
+    setLibraryMedia(null);
+  }, [libraryMedia]);
 
   useEffect(() => {
     if (media && pickerId) {
@@ -49,11 +68,12 @@ export const useImageHandler = (
       if (pickerId === "background") {
         return setBackground(media);
       }
+      setMedia(null);
     }
   }, [media, pickerId]);
 
   const handleUploadImage = () => {
-    handleClickMedia(MEDIA_LIBRARY_TYPE.IMAGE);
+    mediaLibraryRef.current?.show(MEDIA_LIBRARY_TYPE.IMAGE);
   };
 
   const handleDeleteThumbnail = () => {
@@ -75,5 +95,6 @@ export const useImageHandler = (
     mediaLibraryHandlers,
     setBackground,
     setThumbnail,
+    libraryMedia,
   };
 };

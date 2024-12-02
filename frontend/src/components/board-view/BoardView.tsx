@@ -123,7 +123,7 @@ export const BoardView: FC = () => {
           "main.container-fluid": {
             padding: "0 !important",
             width: "100%",
-            marginLeft: hasEditRights() ? "8.1rem" : 0,
+            margin: hasEditRights() ? " 0 0 0 8.1rem" : "auto",
             maxWidth: "93%",
           },
         }}

@@ -98,7 +98,6 @@ const BoardCard: FC<BoardCardProps> = ({
   };
 
   const modalProps = {
-    ressourceType: card.resourceType,
     isActiveCardId,
     displayModals,
     deleteMagnet,

@@ -4,13 +4,13 @@ import { ModalWrapperProps } from "./types";
 
 export const ModalWrapper = styled(Box, {
   shouldForwardProp: (prop) => prop !== "isCommentOpen",
-})<ModalWrapperProps>(({ theme, isCommentOpen, isText }) => ({
+})<ModalWrapperProps>(({ theme, isCommentOpen }) => ({
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "max-content",
-  minWidth: isText ? "40rem" : "80rem",
+  minWidth: "80vw",
   maxWidth: "80%",
   height: isCommentOpen ? "calc(100vh - 10rem)" : "fit-content",
   maxHeight: "calc(100vh - 10rem)",

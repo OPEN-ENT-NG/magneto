@@ -103,9 +103,10 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
         onDownload={download}
         canEdit={canEdit()}
         onEdit={edit}
-        onImport={() => {}}
-        primaryBreakpoint={
-          displayModals.CARD_PREVIEW ? ThemeBreakpoint.LG : ThemeBreakpoint.LG35
+        secondaryBreakpoint={
+          displayModals.CARD_PREVIEW
+            ? ThemeBreakpoint.MDCOMMENT
+            : ThemeBreakpoint.MD
         }
       />
       {card.metadata.extension === FILE_EXTENSION.PDF && (

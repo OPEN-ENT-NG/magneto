@@ -26,6 +26,7 @@ import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
+import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -47,6 +48,15 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const { id = "" } = useParams();
   const { data: boardData, isLoading, isFetching } = useGetBoardDataQuery(id);
   const { data: documentsData } = useGetDocumentsQuery("stub");
+  const { behaviours, isLoading: isLoadingBehaviours } = useEntcoreBehaviours();
+
+  const initLool = async () => {
+    await behaviours.applicationsBehaviours["lool"].init();
+  };
+
+  useEffect(() => {
+    initLool();
+  }, [isLoadingBehaviours]);
 
   const [boardRights, setBoardRights] = useState<Record<
     RightRole,
@@ -155,6 +165,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       cleanActiveCard,
       openActiveCardAction,
       closeActiveCardAction,
+      behaviours,
     }),
     [
       board,
@@ -166,6 +177,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isFileDragging,
       activeCard,
       isModalDuplicate,
+      behaviours,
     ],
   );
 

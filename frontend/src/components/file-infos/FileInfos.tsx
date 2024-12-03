@@ -1,6 +1,5 @@
 import React from "react";
 
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
 import {
@@ -25,7 +24,6 @@ interface FileInfoCardProps {
   canDownload: boolean;
   onEdit: () => void;
   canEdit: boolean;
-  onImport: () => void;
   primaryBreakpoint?: ThemeBreakpoint;
   secondaryBreakpoint?: ThemeBreakpoint;
 }
@@ -39,15 +37,13 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
   canDownload,
   onEdit,
   canEdit,
-  onImport,
-  primaryBreakpoint = "lg",
-  secondaryBreakpoint = "xl",
+  primaryBreakpoint = ThemeBreakpoint.MD,
+  secondaryBreakpoint = ThemeBreakpoint.MDCOMMENT,
 }) => {
   const { t } = useTranslation("magneto");
   const { displayModals } = useBoard();
 
   const isCommentPanelOpen = displayModals.COMMENT_PANEL;
-  const isCreateEdit = displayModals.CREATE_EDIT;
 
   const isPrimaryBreakpoint = useMediaQuery((theme: any) =>
     theme.breakpoints.down(primaryBreakpoint),
@@ -104,16 +100,6 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
               >
                 <EditIcon />
                 {t("magneto.board.edit.open.office")}
-              </Button>
-            )}
-            {isCreateEdit && (
-              <Button
-                className="download-btn"
-                variant="outlined"
-                onClick={onImport}
-              >
-                <CloudUploadIcon />
-                {t("magneto.board.import.file")}
               </Button>
             )}
           </Box>

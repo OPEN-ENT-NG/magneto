@@ -22,6 +22,7 @@ import {
   updateZoomPreference,
 } from "./utils";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
@@ -47,6 +48,15 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const { id = "" } = useParams();
   const { data: boardData, isLoading, isFetching } = useGetBoardDataQuery(id);
   const { data: documentsData } = useGetDocumentsQuery("stub");
+  const { behaviours, isLoading: isLoadingBehaviours } = useEntcoreBehaviours();
+
+  const initLool = async () => {
+    await behaviours.applicationsBehaviours["lool"].init();
+  };
+
+  useEffect(() => {
+    initLool();
+  }, [isLoadingBehaviours]);
 
   const [boardRights, setBoardRights] = useState<Record<
     RightRole,
@@ -155,6 +165,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       cleanActiveCard,
       openActiveCardAction,
       closeActiveCardAction,
+      behaviours,
     }),
     [
       board,
@@ -166,6 +177,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       isFileDragging,
       activeCard,
       isModalDuplicate,
+      behaviours,
     ],
   );
 

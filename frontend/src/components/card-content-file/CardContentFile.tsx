@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 
 import { filesize } from "filesize";
 
@@ -9,18 +9,12 @@ import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
 import { FILE_EXTENSION } from "~/core/enums/file-extension.enum";
 import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
-import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
 import { useBoard } from "~/providers/BoardProvider";
 import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service";
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
-  const { documents, displayModals, hasEditRights } = useBoard();
-  const { behaviours, isLoading } = useEntcoreBehaviours();
-
-  const initLool = async () => {
-    await behaviours.applicationsBehaviours["lool"].init();
-  };
+  const { documents, displayModals, hasEditRights, behaviours } = useBoard();
 
   const cardDocument = documents.find((doc) => doc._id === card.resourceId);
   const extensionText = useFileExtensionDescription(card.metadata.extension);
@@ -28,10 +22,6 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     card.resourceId,
   );
   const size = filesize(card.metadata.size);
-
-  useEffect(() => {
-    initLool();
-  }, [isLoading]);
 
   const isOfficePdf = () => {
     const ext = [

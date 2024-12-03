@@ -35,6 +35,7 @@ export type BoardContextType = {
   cleanActiveCard: () => void;
   openActiveCardAction: (card: Card, actionType: BOARD_MODAL_TYPE) => void;
   closeActiveCardAction: (actionType: BOARD_MODAL_TYPE) => void;
+  behaviours: any;
 };
 
 export type Section = {

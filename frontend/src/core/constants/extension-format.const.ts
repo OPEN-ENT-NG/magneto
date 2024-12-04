@@ -30,7 +30,7 @@ export const EXTENSION_FORMAT = {
     "wma",
     "wpl",
   ],
-  SHEET: ["xlsx", "xlsm", "xlt", "xltx", "xltm", "ods", "csv", "tsv", "tab"],
+  SHEET: ["xlsx","xls", "xlsm", "xlt", "xltx", "xltm", "ods", "csv", "tsv", "tab"],
   SLIDE: ["ppt", "pptx"],
   PDF: ["pdf"],
 };

@@ -1,4 +1,5 @@
 import { useState, FC } from "react";
+
 import {
   NavigateBefore as PreviousIcon,
   NavigateNext as NextIcon,
@@ -17,8 +18,8 @@ import "pdfjs-dist/build/pdf.worker.min";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 
-import { PDFUploadViewerProps } from "./types";
 import { DocumentBox, loadingBox, mainBox } from "./style";
+import { PDFUploadViewerProps } from "./types";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
@@ -76,7 +77,7 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
         </IconButton>
       </Stack>
 
-      <Paper sx={{ p: 3 }}>
+      <Paper sx={{ p: 3, maxWidth: "100%", overflow: "hidden" }}>
         <DocumentBox isLandscape={isLandscape}>
           <Document
             file={url}

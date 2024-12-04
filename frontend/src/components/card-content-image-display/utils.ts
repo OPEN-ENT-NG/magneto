@@ -13,7 +13,7 @@ export const isPeerTubeUrl = (url: string): boolean => {
     const path = urlObj.pathname;
     return (
       path.includes("/w/") || path.includes("/videos/") || path.includes("/v/")
-    );
+    );   
   } catch {
     return false;
   }

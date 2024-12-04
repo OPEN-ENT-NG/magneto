@@ -112,9 +112,9 @@ export const useCardDropDownItems = (
     }),
     [labels, handlers],
   );
-
+  
   return useMemo(() => {
-    if (readOnly || (isLocked && !isOwnerOrManager)) {
+    if ((readOnly && !hasContribRights) || (isLocked && !isOwnerOrManager)) {
       return [menuItems.preview];
     }
 

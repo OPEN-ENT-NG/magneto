@@ -1,13 +1,13 @@
 import { Box, styled } from "@mui/material";
 
 export const mainBox = {
-  width: "100% + 1rem",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  mr: "auto",
-  ml: "auto",
-  py: 3,
+  margin: "0 auto",
+  padding: "1.5rem 0",
+  overflow: "hidden",
 };
 
 export const documentBox = {
@@ -15,9 +15,15 @@ export const documentBox = {
   justifyContent: "center",
   alignItems: "center",
   minHeight: "500px",
+  width: "100%",
+  overflow: "hidden",
 };
 
-export const loadingBox = { display: "flex", justifyContent: "center", p: 4 };
+export const loadingBox = {
+  display: "flex",
+  justifyContent: "center",
+  padding: "1rem",
+};
 
 export const DocumentBox = styled(Box)<{
   isLandscape: boolean;
@@ -25,6 +31,9 @@ export const DocumentBox = styled(Box)<{
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  width: "100%",
+  overflow: "hidden",
+
   ...(isLandscape
     ? {
         minHeight: "auto",
@@ -33,15 +42,19 @@ export const DocumentBox = styled(Box)<{
           display: "flex",
           justifyContent: "center",
           width: "100%",
+          overflow: "hidden",
         },
         "& .react-pdf__Page": {
-          maxWidth: "80%",
-          width: "80%",
+          maxWidth: "100%",
+          width: "100%",
           height: "auto !important",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          overflow: "hidden",
+
           "& .react-pdf__Page__canvas": {
+            maxWidth: "100% !important",
             width: "100% !important",
             height: "auto !important",
             objectFit: "contain",
@@ -51,5 +64,10 @@ export const DocumentBox = styled(Box)<{
       }
     : {
         minHeight: "500px",
+        width: "100%",
+        "& .react-pdf__Page": {
+          maxWidth: "100%",
+          overflow: "hidden",
+        },
       }),
 }));

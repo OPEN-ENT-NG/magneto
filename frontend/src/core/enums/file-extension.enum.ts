@@ -52,5 +52,6 @@ export enum FILE_EXTENSION {
   TAB = "tab",
   PDF = "pdf",
   PPT = "ppt",
+  PPTX = "pptx",
   XLS = "xls",
 }

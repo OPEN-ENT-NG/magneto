@@ -288,5 +288,7 @@
   "magneto.card.document.extension.TAB": "Fichier TAB (.tab)",
   "magneto.card.document.extension.PDF": "Fichier PDF (.pdf)",
   "magneto.card.document.extension.PPT": "Fichier PowerPoint (.ppt)",
-  "magneto.card.document.extension.XLS": "Fichier XLS (.xls)"
+  "magneto.card.document.extension.XLS": "Fichier XLS (.xls)",
+  "magneto.datagrid.rows.displayed": "{{from}}-{{to}} sur {{count}}",
+  "magneto.datagrid.rows.per.page": "Lignes par page :"
 }

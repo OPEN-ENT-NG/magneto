@@ -114,7 +114,7 @@ export const useCardDropDownItems = (
   );
 
   return useMemo(() => {
-    if (readOnly) {
+    if (readOnly || isLocked && !isOwnerOrManager) {
       return [menuItems.preview];
     }
 
@@ -129,10 +129,6 @@ export const useCardDropDownItems = (
       ];
     }
 
-    if (isLocked) {
-      return [menuItems.preview, menuItems.duplicate, menuItems.move];
-    }
-
     if (hasEditRights) {
       return [
         menuItems.preview,
@@ -145,6 +141,7 @@ export const useCardDropDownItems = (
     if (hasContribRights) {
       return [menuItems.preview, menuItems.duplicate];
     }
+
     return [menuItems.preview];
   }, [
     isOwnerOrManager,

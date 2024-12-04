@@ -18,7 +18,7 @@ import "pdfjs-dist/build/pdf.worker.min";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 
-import { documentBox, loadingBox, mainBox } from "./style";
+import { DocumentBox, loadingBox, mainBox } from "./style";
 import { PDFUploadViewerProps } from "./types";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
@@ -27,9 +27,16 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const { t } = useTranslation("magneto");
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+  };
+
+  const onPageLoadSuccess = (page: any) => {
+    const { width, height } = page;
+    setIsLandscape(width > height);
+    console.log(width > height);
   };
 
   const goToPreviousPage = () => {
@@ -70,8 +77,8 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
         </IconButton>
       </Stack>
 
-      <Paper sx={{ p: 3 }}>
-        <Box sx={documentBox}>
+      <Paper sx={{ p: 3, maxWidth: "100%", overflow: "hidden" }}>
+        <DocumentBox isLandscape={isLandscape}>
           <Document
             file={url}
             onLoadSuccess={onDocumentLoadSuccess}
@@ -90,7 +97,10 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
               pageNumber={pageNumber}
               renderTextLayer={true}
               renderAnnotationLayer={true}
-              scale={1.6}
+              scale={isLandscape ? 1 : 1.6}
+              onLoadSuccess={onPageLoadSuccess}
+              width={isLandscape ? window.innerWidth * 0.8 : undefined}
+              height={isLandscape ? window.innerHeight * 0.7 : undefined}
               loading={
                 <Box sx={loadingBox}>
                   <CircularProgress />
@@ -98,7 +108,7 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
               }
             />
           </Document>
-        </Box>
+        </DocumentBox>
       </Paper>
     </Box>
   );

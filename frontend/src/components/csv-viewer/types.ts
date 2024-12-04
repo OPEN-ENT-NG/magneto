@@ -1,7 +1,8 @@
 import { GridColDef } from "@mui/x-data-grid";
 
 export interface CSVParserProps {
-  ressourceId: string;
+  resourceId: string;
+  isCSV: boolean;
 }
 
 export interface GridDataType {
@@ -18,4 +19,9 @@ export enum PAGE_SIZE_OPTIONS {
   TEN = 10,
   TWENTY_FIVE = 25,
   FIFTY = 50,
+}
+
+export interface GridDataType {
+  rows: Array<{ id: number; [key: string]: string | number }>;
+  columns: GridColDef[];
 }

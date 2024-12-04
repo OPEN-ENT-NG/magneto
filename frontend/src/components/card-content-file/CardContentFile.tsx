@@ -29,12 +29,13 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
       FILE_EXTENSION.DOCX,
       FILE_EXTENSION.PPT,
       FILE_EXTENSION.ODT,
+      FILE_EXTENSION.PPTX,
     ];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
   const isOfficeExcelOrCsv = () => {
-    const ext = [FILE_EXTENSION.CSV];
+    const ext = [FILE_EXTENSION.CSV, FILE_EXTENSION.XLSX];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
@@ -108,7 +109,12 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
           url={`/workspace/document/preview/${card.resourceId}`}
         />
       )}
-      {isOfficeExcelOrCsv() && <CSVParser ressourceId={card.resourceId} />}
+      {isOfficeExcelOrCsv() && (
+        <CSVParser
+          resourceId={card.resourceId}
+          isCSV={card.metadata.extension === FILE_EXTENSION.CSV}
+        />
+      )}
     </>
   );
 };

@@ -114,11 +114,12 @@ export const useCardDropDownItems = (
   );
 
   return useMemo(() => {
-    if ((readOnly && !hasContribRights) || (isLocked && !isOwnerOrManager)) {
+    console.log()
+    if ((readOnly && !hasContribRights) || (isLocked && !hasEditRights)) {
       return [menuItems.preview];
     }
 
-    if (isOwnerOrManager) {
+    if (isOwnerOrManager && hasEditRights) {
       return [
         menuItems.preview,
         menuItems.duplicate,

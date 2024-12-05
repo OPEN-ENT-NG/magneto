@@ -134,10 +134,6 @@ export const useCardDropDownItems = (
         : [menuItems.preview];
     }
 
-    // console.log("hasContrib", hasContribRights);
-    // console.log("hasEditRights", hasEditRights);
-    // console.log("isOwnerOrManager", isOwnerOrManager);
-
     if (isManager || (isMagnetOwner && hasEditRights)) {
       return [
         menuItems.preview,

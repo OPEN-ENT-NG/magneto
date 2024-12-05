@@ -72,6 +72,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
       FILE_EXTENSION.DOC,
       FILE_EXTENSION.DOCX,
       FILE_EXTENSION.PPT,
+      FILE_EXTENSION.PPTX,
       FILE_EXTENSION.ODT,
       FILE_EXTENSION.XLS,
       FILE_EXTENSION.XLSX,

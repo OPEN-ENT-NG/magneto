@@ -14,7 +14,13 @@ import { useBoard } from "~/providers/BoardProvider";
 import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service";
 
 export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
-  const { documents, displayModals, hasEditRights, behaviours } = useBoard();
+  const {
+    documents,
+    displayModals,
+    hasEditRights,
+    hasContribRights,
+    behaviours,
+  } = useBoard();
 
   const cardDocument = documents.find((doc) => doc._id === card.resourceId);
   const extensionText = useFileExtensionDescription(card.metadata.extension);
@@ -100,7 +106,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
         owner={cardDocument?.ownerName ?? ""}
         size={size}
         fileType={extensionText}
-        canDownload={hasEditRights()}
+        canDownload={hasContribRights()}
         onDownload={download}
         canEdit={canEdit()}
         onEdit={edit}

@@ -42,10 +42,8 @@ export const useBoardCard = (card: Card) => {
       hasContribRights: hasContribRights(),
       isOpen: openDropdownId === card.id,
       isActiveCardId: activeCard?.id === card.id,
-      isOwnerOrManager: (() => {
-        const isCardOwner = card.ownerId === user?.userId;
-        return isCardOwner || hasManageRights();
-      })(),
+      isMagnetOwner: card.ownerId === user?.userId,
+      isManager: hasManageRights(),
     }),
     [
       card.id,

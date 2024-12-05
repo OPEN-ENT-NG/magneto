@@ -30,12 +30,18 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
       FILE_EXTENSION.PPT,
       FILE_EXTENSION.ODT,
       FILE_EXTENSION.PPTX,
+      FILE_EXTENSION.ODP,
     ];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
   const isOfficeExcelOrCsv = () => {
-    const ext = [FILE_EXTENSION.CSV, FILE_EXTENSION.XLSX, FILE_EXTENSION.XLS];
+    const ext = [
+      FILE_EXTENSION.CSV,
+      FILE_EXTENSION.XLSX,
+      FILE_EXTENSION.XLS,
+      FILE_EXTENSION.ODS,
+    ];
     return ext.includes(card.metadata.extension as FILE_EXTENSION);
   };
 
@@ -76,6 +82,8 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
       FILE_EXTENSION.ODT,
       FILE_EXTENSION.XLS,
       FILE_EXTENSION.XLSX,
+      FILE_EXTENSION.ODS,
+      FILE_EXTENSION.ODP,
     ];
     const isoffice: boolean = ext.includes(card.metadata.extension);
     const canBeOpenOnLool: boolean =

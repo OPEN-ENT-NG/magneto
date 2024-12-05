@@ -320,7 +320,7 @@ export const CreateMagnet: FC = () => {
               />
             </Box>
           </FormControl>
-          {section && (
+          {section && !isEditMagnet && (
             <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
               <InputLabel id="input-section" shrink={true} sx={inputLabelStyle}>
                 {t("magneto.card.section")}

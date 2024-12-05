@@ -9,6 +9,14 @@ export const useHeaderHeight = () => {
       if (header) {
         setHeaderHeight(header.clientHeight);
       }
+      const headerEdifice = document.querySelector(
+        "#root > .header:first-of-type",
+      );
+      if (headerEdifice) {
+        setHeaderHeight(
+          (headerHeight) => headerHeight + headerEdifice.clientHeight,
+        );
+      }
     };
 
     updateHeaderHeight();

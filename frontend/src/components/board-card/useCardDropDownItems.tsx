@@ -22,7 +22,8 @@ export const useCardDropDownItems = (
   isLocked: boolean,
   lockOrUnlockMagnet: () => void,
   card: Card,
-  isOwnerOrManager: boolean,
+  isMagnetOwner: boolean,
+  isManager: boolean,
   hasContribRights: boolean,
   hasEditRights: boolean,
 ): DropDownListItem[] => {
@@ -114,12 +115,30 @@ export const useCardDropDownItems = (
   );
 
   return useMemo(() => {
-    console.log()
-    if ((readOnly && !hasContribRights) || (isLocked && !hasEditRights)) {
+    if (readOnly && !hasContribRights) {
       return [menuItems.preview];
     }
 
-    if (isOwnerOrManager && hasEditRights) {
+    if (isLocked) {
+      return !hasEditRights ?
+      [menuItems.preview]
+      : (isMagnetOwner || isManager) ? 
+      [
+        menuItems.preview,
+        menuItems.duplicate,
+        menuItems.edit,
+        menuItems.move,
+        menuItems.lock,
+        menuItems.delete,
+      ] 
+      : [menuItems.preview];
+    }
+
+    // console.log("hasContrib", hasContribRights);
+    // console.log("hasEditRights", hasEditRights);
+    // console.log("isOwnerOrManager", isOwnerOrManager);
+
+    if (isManager || (isMagnetOwner && hasEditRights)) {
       return [
         menuItems.preview,
         menuItems.duplicate,
@@ -145,7 +164,8 @@ export const useCardDropDownItems = (
 
     return [menuItems.preview];
   }, [
-    isOwnerOrManager,
+    isMagnetOwner,
+    isManager,
     readOnly,
     menuItems,
     isLocked,

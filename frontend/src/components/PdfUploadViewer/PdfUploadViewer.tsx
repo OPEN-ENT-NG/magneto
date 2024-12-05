@@ -77,7 +77,7 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
         </IconButton>
       </Stack>
 
-      <Paper sx={{ p: 3, maxWidth: "100%", overflow: "hidden" }}>
+      <Paper sx={{ maxWidth: "100%", overflow: "hidden" }}>
         <DocumentBox isLandscape={isLandscape}>
           <Document
             file={url}

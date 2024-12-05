@@ -65,9 +65,15 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   };
 
   const { currentData: myBoardsResult, isFetching: myBoardsLoading } =
-    useGetBoardsQuery(boardsQuery);
-  const { currentData: myAllBoardsResult } =
-    useGetAllBoardsQuery(allBoardsQuery);
+    useGetBoardsQuery(boardsQuery, {
+      refetchOnMountOrArgChange: true,
+    });
+  const { currentData: myAllBoardsResult } = useGetAllBoardsQuery(
+    allBoardsQuery,
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   const updateRights = async () => {
     setSelectedBoardRights(await checkUserRight(selectedBoards[0].rights));

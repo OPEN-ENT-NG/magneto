@@ -120,18 +120,18 @@ export const useCardDropDownItems = (
     }
 
     if (isLocked) {
-      return !hasEditRights ?
-      [menuItems.preview]
-      : (isMagnetOwner || isManager) ? 
-      [
-        menuItems.preview,
-        menuItems.duplicate,
-        menuItems.edit,
-        menuItems.move,
-        menuItems.lock,
-        menuItems.delete,
-      ] 
-      : [menuItems.preview];
+      return !hasEditRights
+        ? [menuItems.preview]
+        : isMagnetOwner || isManager
+        ? [
+            menuItems.preview,
+            menuItems.duplicate,
+            menuItems.edit,
+            menuItems.move,
+            menuItems.lock,
+            menuItems.delete,
+          ]
+        : [menuItems.preview];
     }
 
     // console.log("hasContrib", hasContribRights);

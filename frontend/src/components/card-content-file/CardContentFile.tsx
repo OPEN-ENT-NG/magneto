@@ -74,6 +74,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
       FILE_EXTENSION.PPT,
       FILE_EXTENSION.ODT,
       FILE_EXTENSION.XLS,
+      FILE_EXTENSION.XLSX,
     ];
     const isoffice: boolean = ext.includes(card.metadata.extension);
     const canBeOpenOnLool: boolean =

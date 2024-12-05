@@ -54,4 +54,5 @@ export enum FILE_EXTENSION {
   PPT = "ppt",
   PPTX = "pptx",
   XLS = "xls",
+  ODP = "odp",
 }

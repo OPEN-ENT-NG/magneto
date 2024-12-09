@@ -1,5 +1,6 @@
 import React from "react";
 
+import { ThemeProvider } from "@cgi-learning-hub/theme";
 import {
   OdeClientProvider,
   ThemeProvider as ThemeProviderEdifice,
@@ -17,7 +18,6 @@ import { RouterProvider } from "react-router-dom";
 import { MediaLibraryProvider } from "./providers/MediaLibraryProvider";
 import { router } from "./routes";
 import { setupStore } from "./store";
-import { ThemeProvider } from "@cgi-learning-hub/theme";
 import "~/i18n";
 
 const rootElement = document.getElementById("root");

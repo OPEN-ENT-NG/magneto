@@ -32,7 +32,6 @@
     </repositories>
     <properties>
         <toolsVersion>2.0.0-final</toolsVersion>
-        <vertxCronTimer>2.0.0</vertxCronTimer>
         <powerMockVersion>2.0.2</powerMockVersion>
         <mockitoVersion>[2.0,3.0)</mockitoVersion>
         <entCoreVersion>6.0-SNAPSHOT</entCoreVersion>

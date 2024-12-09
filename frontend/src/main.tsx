@@ -1,6 +1,9 @@
 import React from "react";
 
-import { OdeClientProvider, ThemeProvider } from "@edifice-ui/react";
+import {
+  OdeClientProvider,
+  ThemeProvider as ThemeProviderEdifice,
+} from "@edifice-ui/react";
 import {
   QueryCache,
   QueryClient,
@@ -14,6 +17,7 @@ import { RouterProvider } from "react-router-dom";
 import { MediaLibraryProvider } from "./providers/MediaLibraryProvider";
 import { router } from "./routes";
 import { setupStore } from "./store";
+import { ThemeProvider } from "@cgi-learning-hub/theme";
 import "~/i18n";
 
 const rootElement = document.getElementById("root");
@@ -50,11 +54,13 @@ root.render(
           app: "magneto",
         }}
       >
-        <ThemeProvider>
-          <MediaLibraryProvider>
-            <RouterProvider router={router} />
-          </MediaLibraryProvider>
-        </ThemeProvider>
+        <ThemeProviderEdifice>
+          <ThemeProvider themeId="crna">
+            <MediaLibraryProvider>
+              <RouterProvider router={router} />
+            </MediaLibraryProvider>
+          </ThemeProvider>
+        </ThemeProviderEdifice>
       </OdeClientProvider>
     </Provider>
     <ReactQueryDevtools initialIsOpen={false} />

@@ -45,7 +45,9 @@
     ]
   },
   "dependencies": {
-    "@cgi-learning-hub/ui": "1.0.0",
+    "@cgi-learning-hub/icons": "develop",
+    "@cgi-learning-hub/theme": "develop",
+    "@cgi-learning-hub/ui": "develop",
     "@dnd-kit/core": "6.1.0",
     "@dnd-kit/sortable": "8.0.0",
     "@dnd-kit/utilities": "3.2.2",

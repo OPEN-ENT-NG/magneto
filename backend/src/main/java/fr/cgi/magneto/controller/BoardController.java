@@ -305,5 +305,26 @@ public class BoardController extends ControllerHelper {
         });
     }
 
-
+    @Get("/board/:boardId/notify")
+    @ApiDoc("Notify board shared users")
+    @ResourceFilter(ManageBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void notifyBoardUsers(HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            String boardId = request.getParam(Field.BOARDID);
+            boardService.getBoardSharedUsers(boardId)
+                    .onSuccess(usersIdsList -> {
+                        JsonObject params = new JsonObject();
+                        params.put(Field.BOARDURL, "/magneto#/board/view/")
+                        .put(Field.BOARDNAME, );
+                        timelineHelper.notifyTimeline(request, "magneto.notify_board", user, usersIdsList, params);
+                    })
+                    .onFailure(fail -> {
+                        String message = String.format("[Magneto@%s::notifyBoardUsers] Failed to notify users of board : %s",
+                                this.getClass().getSimpleName(), fail.getMessage());
+                        log.error(message);
+                        renderError(request);
+                    });
+        });
+    }
 }

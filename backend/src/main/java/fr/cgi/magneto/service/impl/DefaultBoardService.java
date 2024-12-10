@@ -419,6 +419,30 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
+    public Future<List<String>> getBoardSharedUsers(string boardId){
+        Promise<List<String>> promise = Promise.promise();
+        JsonObject query = this.getBoardById(boardId);
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
+            if (either.isLeft()) {
+                log.error("[Magneto@%s::getBoardSharedUsers] Failed to get all board shared users : %s", this.getClass().getSimpleName(),
+                        either.left().getValue());
+                promise.fail(either.left().getValue());
+            } else {
+                JsonArray shared = either.right().getValue()
+                        .getJsonArray(Field.SHARED, new JsonArray());
+
+                List<String> userIdsList = shared.stream()
+                        .filter(JsonObject.class::isInstance)
+                        .map(obj -> ((JsonObject) obj).getJsonObject("userId"))
+                        .distinct()
+                        .collect(Collectors.toList());
+                promise.complete();
+            }
+        }));
+        return promise.future();
+    }
+
+    @Override
     public Future<JsonObject> getAllBoards(UserInfos user, Integer page,
                                            String searchText, String folderId,
                                            boolean isPublic,
@@ -743,6 +767,16 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1));
+        return query.getAggregate();
+    }
+
+    private JsonObject getBoardById(String boardId) {
+        MongoQuery query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray().add(boardId))))
+                .project(new JsonObject()
+                        .put(Field._ID, 1)
+                        .put(Field.SHARED, 1));
         return query.getAggregate();
     }
 

@@ -64,6 +64,13 @@ public interface BoardService {
      */
     Future<List<Board>> getBoards(List<String> boardIds);
 
+    /**
+     * Get board title ans shared array by id
+     *
+     * @param boardId Board id to get data
+     * @return Future {@link Future <JsonArray>} containing the board title and its list of shared users and rights
+     */
+    Future<JsonObject> getBoardSharedUsers(String boardId);
 
     /**
      * Get all boards

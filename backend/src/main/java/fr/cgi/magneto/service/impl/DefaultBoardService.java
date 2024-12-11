@@ -419,8 +419,8 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
-    public Future<List<String>> getBoardSharedUsers(string boardId){
-        Promise<List<String>> promise = Promise.promise();
+    public Future<JsonObject> getBoardSharedUsers(String boardId){
+        Promise<JsonObject> promise = Promise.promise();
         JsonObject query = this.getBoardById(boardId);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
@@ -428,15 +428,11 @@ public class DefaultBoardService implements BoardService {
                         either.left().getValue());
                 promise.fail(either.left().getValue());
             } else {
-                JsonArray shared = either.right().getValue()
-                        .getJsonArray(Field.SHARED, new JsonArray());
-
-                List<String> userIdsList = shared.stream()
-                        .filter(JsonObject.class::isInstance)
-                        .map(obj -> ((JsonObject) obj).getJsonObject("userId"))
-                        .distinct()
-                        .collect(Collectors.toList());
-                promise.complete();
+                JsonArray result = either.right().getValue()
+                        .getJsonObject(Field.CURSOR, new JsonObject())
+                        .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+                        
+                promise.complete(result.getJsonObject(0));
             }
         }));
         return promise.future();
@@ -776,6 +772,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray().add(boardId))))
                 .project(new JsonObject()
                         .put(Field._ID, 1)
+                        .put(Field.TITLE, 1)
                         .put(Field.SHARED, 1));
         return query.getAggregate();
     }

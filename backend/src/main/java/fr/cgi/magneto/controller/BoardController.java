@@ -313,11 +313,18 @@ public class BoardController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, user -> {
             String boardId = request.getParam(Field.BOARDID);
             boardService.getBoardSharedUsers(boardId)
-                    .onSuccess(usersIdsList -> {
+                    .onSuccess(board -> {
                         JsonObject params = new JsonObject();
-                        params.put(Field.BOARDURL, "/magneto#/board/view/")
-                        .put(Field.BOARDNAME, );
-                        timelineHelper.notifyTimeline(request, "magneto.notify_board", user, usersIdsList, params);
+                        params.put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
+                        .put(Field.BOARDNAME, board.getString(Field.TITLE));
+
+                        List<String> userIdsList = board.getJsonArray(Field.SHARED).stream()
+                        .filter(JsonObject.class::isInstance)
+                        .map(obj -> ((JsonObject) obj).getString(Field.USERID))
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                        notification.notifyTimeline(request, "magneto.notify_board", user, userIdsList, params);
                     })
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::notifyBoardUsers] Failed to notify users of board : %s",

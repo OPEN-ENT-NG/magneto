@@ -232,4 +232,5 @@ public class Field {
     //notification Folder
     public static final String FOLDERTITLE = "folderTitle";
     public static final String FOLDERURL = "folderUrl";
+    public static final String BOARDNAME = "boardName";
 }

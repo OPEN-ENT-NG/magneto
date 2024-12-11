@@ -28,7 +28,10 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import { useDuplicateBoardMutation, useNotifyBoardUsersMutation } from "~/services/api/boards.service";
+import {
+  useDuplicateBoardMutation,
+  useNotifyBoardUsersMutation,
+} from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
 import { useUserRightsStore } from "~/stores";
 
@@ -380,18 +383,19 @@ export const ToasterContainer = ({
             hasSharedElement={hasSharedElement}
           />
           <MessageModal
-          isOpen={isNotifyOpen}
-          title={t("magneto.board.notify")}
-          onSubmit={() => { notifyBoardUsers(selectedBoardsIds[0]);
-            toggleNotify();
-           }}
-          submitButtonName={t("magneto.send")}
-          cancelButtonName={t("magneto.cancel")}
-          onClose={toggleNotify}
-        >
-          <span>{t("magneto.board.notify.text.1")}</span>
-          <span>{t("magneto.board.notify.text.2")}</span>
-        </MessageModal>
+            isOpen={isNotifyOpen}
+            title={t("magneto.board.notify")}
+            onSubmit={() => {
+              notifyBoardUsers(selectedBoardsIds[0]);
+              toggleNotify();
+            }}
+            submitButtonName={t("magneto.send")}
+            cancelButtonName={t("magneto.cancel")}
+            onClose={toggleNotify}
+          >
+            <span>{t("magneto.board.notify.text.1")}</span>
+            <span>{t("magneto.board.notify.text.2")}</span>
+          </MessageModal>
           {shareOptions && (
             <ShareModalMagneto
               isOpen={isShareBoard}

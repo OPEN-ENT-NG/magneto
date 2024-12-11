@@ -305,7 +305,7 @@ public class BoardController extends ControllerHelper {
         });
     }
 
-    @Get("/board/:boardId/notify")
+    @Post("/board/:boardId/notify")
     @ApiDoc("Notify board shared users")
     @ResourceFilter(ManageBoardRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)

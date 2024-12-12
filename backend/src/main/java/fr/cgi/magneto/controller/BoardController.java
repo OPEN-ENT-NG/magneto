@@ -305,13 +305,13 @@ public class BoardController extends ControllerHelper {
         });
     }
 
-    @Post("/board/:boardId/notify")
+    @Post("/board/:id/notify")
     @ApiDoc("Notify board shared users")
     @ResourceFilter(ManageBoardRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void notifyBoardUsers(HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
-            String boardId = request.getParam(Field.BOARDID);
+            String boardId = request.getParam(Field.ID);
             boardService.getBoardSharedUsers(boardId)
                     .onSuccess(board -> {
                         JsonObject params = new JsonObject();
@@ -325,6 +325,7 @@ public class BoardController extends ControllerHelper {
                         .collect(Collectors.toList());
 
                         notification.notifyTimeline(request, "magneto.notify_board", user, userIdsList, params);
+                        request.response().setStatusMessage(boardId).setStatusCode(200).end();
                     })
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::notifyBoardUsers] Failed to notify users of board : %s",

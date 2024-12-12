@@ -7,6 +7,7 @@ import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
+import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.security.*;
 import fr.cgi.magneto.service.*;
 import fr.wseduc.rs.*;
@@ -16,6 +17,7 @@ import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -26,6 +28,7 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.Trace;
 import org.entcore.common.user.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +45,8 @@ public class BoardController extends ControllerHelper {
     private final SectionService sectionService;
     private final CardService cardService;
     private final FolderService folderService;
+    private final ShareService magnetoShareService;
+    private final ShareBookMarkService shareBookMarkService;
 
 
     public BoardController(ServiceFactory serviceFactory) {
@@ -51,6 +56,8 @@ public class BoardController extends ControllerHelper {
         this.cardService = serviceFactory.cardService();
         this.folderService = serviceFactory.folderService();
         this.eventStore = EventStoreFactory.getFactory().getEventStore(Magneto.class.getSimpleName());
+        this.magnetoShareService = serviceFactory.shareService();
+        this.shareBookMarkService = serviceFactory.shareBookMarkService();
     }
 
     @Get("/boards")
@@ -318,14 +325,12 @@ public class BoardController extends ControllerHelper {
                         params.put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
                         .put(Field.BOARDNAME, board.getString(Field.TITLE));
 
-                        List<String> userIdsList = board.getJsonArray(Field.SHARED).stream()
-                        .filter(JsonObject.class::isInstance)
-                        .map(obj -> ((JsonObject) obj).getString(Field.USERID))
-                        .distinct()
-                        .collect(Collectors.toList());
-
-                        notification.notifyTimeline(request, "magneto.notify_board", user, userIdsList, params);
-                        request.response().setStatusMessage(boardId).setStatusCode(200).end();
+                        List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(board.getJsonArray(Field.SHARED));
+                        getUsersIdsToNotify(user, newSharedElem)
+                                .onSuccess(usersIdToShare -> {
+                                            notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, params);
+                                            request.response().setStatusMessage(boardId).setStatusCode(200).end();
+                                        });
                     })
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::notifyBoardUsers] Failed to notify users of board : %s",
@@ -334,5 +339,61 @@ public class BoardController extends ControllerHelper {
                         renderError(request);
                     });
         });
+    }
+
+    private Future<List<String>> getUsersIdsToNotify(UserInfos user, List<SharedElem> newSharedElem) {
+        List<String> usersIdToShare = new ArrayList<>();
+        Promise<List<String>> promise = Promise.promise();
+        List<Future<List<String>>> futures = new ArrayList<>();
+        newSharedElem.forEach(elem -> {
+            if (elem.getTypeId().equals(Field.USERID) && !elem.getId().equals(user.getUserId())) {
+                usersIdToShare.add(elem.getId());
+            }
+            if (elem.getTypeId().equals(Field.GROUPID)) {
+                futures.add(getGroupUsers(user, elem.getId()));
+            }
+            if (elem.getTypeId().equals(Field.BOOKMARKID)) {
+                shareBookMarkService.get(user.getUserId(), elem.getId()).onSuccess(event -> {
+                    if (event.containsKey(Field.MEMBERS) && !event.getJsonArray(Field.MEMBERS).isEmpty())
+                        futures.add(getBookmarkUserId(user, event.getJsonArray(Field.MEMBERS)));
+                });
+            }
+        });
+        return handlePromiseWithCompositeFuture(promise, futures, usersIdToShare);
+    }
+
+    private Future<List<String>> getBookmarkUserId(UserInfos user, JsonArray members) {
+        Promise<List<String>> promise = Promise.promise();
+        List<Future<List<String>>> futures = new ArrayList<>();
+        List<String> usersIdToShare = new ArrayList<>();
+        members.forEach(elem -> {
+            JsonObject elemJO = (JsonObject) elem;
+            if (elemJO.containsKey(Field.GROUP_TYPE)) {
+                if (elemJO.getJsonArray(Field.GROUP_TYPE).contains(Field.USER_2)) {
+                    usersIdToShare.add(elemJO.getString(Field.ID));
+                } else if (elemJO.getJsonArray(Field.GROUP_TYPE).contains(Field.GROUP)) {
+                    futures.add(getGroupUsers(user, elemJO.getString(Field.ID)));
+                }
+            }
+        });
+        return handlePromiseWithCompositeFuture(promise, futures, usersIdToShare);
+    }
+
+    private Future<List<String>> getGroupUsers(UserInfos user, String id) {
+        Promise<List<String>> promise = Promise.promise();
+        UserUtils.findUsersInProfilsGroups(id, eb, user.getUserId(), false, event ->
+                promise.complete(event.stream().map(elem -> ((JsonObject) elem).getString(Field.ID)).collect(Collectors.toList())));
+        return promise.future();
+    }
+
+    private Future<List<String>> handlePromiseWithCompositeFuture(Promise<List<String>> promise, List<Future<List<String>>> futures, List<String> usersIdToShare) {
+        if (!futures.isEmpty()) {
+            FutureHelper.all(futures).onSuccess(
+                    result -> promise.complete(result.list().stream().flatMap(elem -> ((List<String>) elem).stream()).collect(Collectors.toList()))
+            ).onFailure(error -> promise.fail(error.getMessage()));
+        } else {
+            promise.complete(usersIdToShare);
+        }
+        return promise.future();
     }
 }

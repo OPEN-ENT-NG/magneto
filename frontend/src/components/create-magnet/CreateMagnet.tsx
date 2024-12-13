@@ -49,6 +49,7 @@ import {
   convertResourceTypeToMediaType,
 } from "./utils";
 import { MediaProps } from "../board-view/types";
+import { CustomIframe } from "../card-content-board/CardContentBoard";
 import { CardContentFile } from "../card-content-file/CardContentFile";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
@@ -242,6 +243,7 @@ export const CreateMagnet: FC = () => {
             <CloseIcon fontSize="inherit" />
           </IconButton>
         </Box>
+        <CustomIframe src={"http://localhost:4200/#/board/de9b72ea-b1db-4ffa-9cb7-d4e032ec5fbb/view"} />
         <Box sx={contentContainerStyle}>
           {magnetTypeHasFilePickerWorkspace &&
             (activeCard ? (

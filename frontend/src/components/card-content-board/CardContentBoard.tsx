@@ -1,127 +1,46 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React from "react";
 
-interface CustomIframeProps {
-  src: string;
-  width?: number;
-  height?: number;
-}
+import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
-export const CustomIframe: React.FC<CustomIframeProps> = ({ 
-  src, 
-  width = 1500, 
-  height = 800 
+import { loadingContainerStyle, loadingTextStyle } from "./style";
+import { ScaledIframeProps } from "./types";
+import { useScaledIframe } from "./useScaledIframe";
+
+const ScaledIframe: React.FC<ScaledIframeProps> = ({
+  src,
+  width = 1920,
+  height = 1080,
 }) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [scale, setScale] = useState(1);
+  const {
+    iframeRef,
+    containerRef,
+    isLoading,
+    handleIframeLoad,
+    iframeStyle,
+    containerStyle,
+  } = useScaledIframe({ width, height });
 
-  const adjustIframeScale = useCallback(() => {
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-
-    try {
-      // Utiliser un délai pour s'assurer que le contenu est chargé
-      setTimeout(() => {
-        const iframeWindow = iframe.contentWindow;
-        const iframeDocument = iframe.contentDocument || iframeWindow?.document;
-        
-        if (!iframeDocument) return;
-
-        // Essayer différentes méthodes pour obtenir les dimensions
-        const contentWidth = Math.max(
-          iframeDocument.body?.scrollWidth || 0,
-          iframeDocument.documentElement?.scrollWidth || 0,
-          iframeWindow?.innerWidth || 0
-        );
-        
-        const contentHeight = Math.max(
-          iframeDocument.body?.scrollHeight || 0,
-          iframeDocument.documentElement?.scrollHeight || 0,
-          iframeWindow?.innerHeight || 0
-        );
-
-        // Calculer l'échelle
-        const scaleX = width / contentWidth;
-        const scaleY = height / contentHeight;
-        
-        // Prendre le zoom le plus petit, mais sans dépasser 1
-        const newScale = Math.min(scaleX, scaleY, 1);
-        
-        // Mettre à jour le state pour déclencher un re-render
-        setScale(newScale);
-
-        console.log('Iframe Scaling:', {
-          contentWidth, 
-          contentHeight, 
-          scaleX, 
-          scaleY, 
-          finalScale: newScale
-        });
-      }, 1000); // Délai plus long pour charger le contenu
-    } catch (error) {
-      console.error('Erreur de scaling de l\'iframe:', error);
-    }
-  }, [width, height]);
-
-  // Gérer le chargement et le scaling
-  const handleIframeLoad = useCallback(() => {
-    setIsLoaded(true);
-    adjustIframeScale();
-    
-    // Ajouter un écouteur de redimensionnement
-    window.addEventListener('resize', adjustIframeScale);
-    
-    return () => {
-      window.removeEventListener('resize', adjustIframeScale);
-    };
-  }, [adjustIframeScale]);
-
-  // Effet pour gérer l'événement de chargement
-  useEffect(() => {
-    const iframe = iframeRef.current;
-    if (iframe) {
-      iframe.addEventListener('load', handleIframeLoad);
-      
-      return () => {
-        iframe.removeEventListener('load', handleIframeLoad);
-      };
-    }
-  }, [handleIframeLoad]);
+  const { t } = useTranslation("magneto");
 
   return (
-    <div 
-      style={{ 
-        width: '100%', 
-        maxWidth: `${width}px`, 
-        height, 
-        overflow: 'hidden',
-        position: 'relative',
-      }}
-    >
+    <Box ref={containerRef} sx={containerStyle}>
       <iframe
         ref={iframeRef}
         src={src}
-        style={{
-          border: 'none',
-          width: '100%',
-          height: '100%',
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          pointerEvents: 'none',
-        }}
+        scrolling="no"
+        style={iframeStyle}
+        onLoad={handleIframeLoad}
+        title="Scaled content"
         sandbox="allow-scripts allow-same-origin allow-forms"
-        title="Scaled Iframe"
       />
-      {!isLoaded && (
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}>
-          Chargement...
-        </div>
+      {isLoading && (
+        <Box sx={loadingContainerStyle}>
+          <Box sx={loadingTextStyle}>{t("magneto.loading")}</Box>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
+
+export default ScaledIframe;

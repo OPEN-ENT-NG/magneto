@@ -27,6 +27,7 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { BoardCreateMagnetBoardModal } from "../board-create-magnet-board-modal/BoardCreateMagnetBoardModal";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -164,6 +165,10 @@ export const BoardView: FC = () => {
         {activeCard && displayModals.CARD_PREVIEW && <PreviewModal />}
         <BoardCreateMagnetMagnetModal
           open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
+          onClose={onClose}
+        />
+        <BoardCreateMagnetBoardModal
+          open={magnetType === MENU_NOT_MEDIA_TYPE.BOARD}
           onClose={onClose}
         />
         <CreateBoard

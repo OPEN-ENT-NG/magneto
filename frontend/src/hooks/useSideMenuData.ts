@@ -11,6 +11,7 @@ import {
   mdiPlayCircle,
 } from "@mdi/js";
 import Icon from "@mdi/react";
+import TableChartIcon from "@mui/icons-material/TableChart";
 import { useTranslation } from "react-i18next";
 
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
@@ -72,6 +73,13 @@ export const useSideMenuData = (): (
       name: t("magneto.card.type.card"),
       action: () => {
         handleClickMenu(MENU_NOT_MEDIA_TYPE.CARD);
+      },
+    },
+    {
+      icon: createElement(TableChartIcon),
+      name: t("magneto.board"),
+      action: () => {
+        handleClickMenu(MENU_NOT_MEDIA_TYPE.BOARD);
       },
     },
   );

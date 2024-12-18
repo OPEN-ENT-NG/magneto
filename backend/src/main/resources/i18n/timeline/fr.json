@@ -5,5 +5,7 @@
   "timeline.magneto.shared.link.board": "board link",
   "timeline.magneto.shared.link.folder": "folder link",
   "magneto.share_board": "Sharing a board",
-  "magneto.share_folder": "Sharing a folder"
+  "magneto.share_folder": "Sharing a folder",
+  "timeline.magneto.notify": "Des modifications ont été apportées au tableau ",
+  "timeline.magneto.notify.consult": ". Consultez-le !"
 }

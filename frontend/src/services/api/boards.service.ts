@@ -41,6 +41,12 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       }),
       providesTags: ["Boards"],
     }),
+    notifyBoardUsers: builder.mutation({
+      query: (idBoard: string) => ({
+        url: `board/${idBoard}/notify`,
+        method: "POST",
+      }),
+    }),
     getAllBoards: builder.query({
       query: (params: IBoardsParamsRequest) => {
         let urlParams: string =
@@ -142,4 +148,5 @@ export const {
   useRestorePreDeleteBoardsMutation,
   useGetUrlQuery,
   useGetAllBoardsEditableQuery,
+  useNotifyBoardUsersMutation,
 } = boardsApi;

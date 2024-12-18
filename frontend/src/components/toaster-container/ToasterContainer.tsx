@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
+import { MessageModal } from "../message-modal/MessageModal";
 import { MoveBoard } from "../move-board/MoveBoard";
 import { ShareModalMagneto } from "../share-modal/ShareModalMagneto";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
@@ -27,7 +28,10 @@ import { Board } from "~/models/board.model";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
-import { useDuplicateBoardMutation } from "~/services/api/boards.service";
+import {
+  useDuplicateBoardMutation,
+  useNotifyBoardUsersMutation,
+} from "~/services/api/boards.service";
 import { useActions } from "~/services/queries";
 import { useUserRightsStore } from "~/stores";
 
@@ -49,6 +53,7 @@ export const ToasterContainer = ({
   const canPublish = isActionAvailable("publish", actions);
 
   const [isCreateOpen, toggleCreate] = useToggle(false);
+  const [isNotifyOpen, toggleNotify] = useToggle(false);
   const [isMoveOpen, toggleMove] = useToggle(false);
   const [isMoveDelete, toggleDelete] = useToggle(false);
   const [isCreateFolder, toggleCreateFolder] = useToggle(false);
@@ -68,6 +73,7 @@ export const ToasterContainer = ({
     useBoardsNavigation();
   const { setUserRights } = useUserRightsStore.getState();
   const [duplicateBoard] = useDuplicateBoardMutation();
+  const [notifyBoardUsers] = useNotifyBoardUsersMutation();
 
   const restoreBoardsAndFolders = useRestoreBoardsAndFolders({
     selectedBoardsIds,
@@ -322,6 +328,19 @@ export const ToasterContainer = ({
                         {t("magneto.restore")}
                       </Button>
                     )}
+                    {selectedBoardsIds.length == 1 &&
+                      selectedFoldersIds.length == 0 &&
+                      selectedBoardRights != null &&
+                      selectedBoardRights.manager && (
+                        <Button
+                          type="button"
+                          color="primary"
+                          variant="filled"
+                          onClick={toggleNotify}
+                        >
+                          {t("magneto.board.notify")}
+                        </Button>
+                      )}
                     {!isPublic && allBoardsMine() && areFoldersMine() && (
                       <Button
                         type="button"
@@ -363,6 +382,20 @@ export const ToasterContainer = ({
             reset={reset}
             hasSharedElement={hasSharedElement}
           />
+          <MessageModal
+            isOpen={isNotifyOpen}
+            title={t("magneto.board.notify")}
+            onSubmit={() => {
+              notifyBoardUsers(selectedBoardsIds[0]);
+              toggleNotify();
+            }}
+            submitButtonName={t("magneto.send")}
+            cancelButtonName={t("magneto.cancel")}
+            onClose={toggleNotify}
+          >
+            <span>{t("magneto.board.notify.text.1")}</span>
+            <span>{t("magneto.board.notify.text.2")}</span>
+          </MessageModal>
           {shareOptions && (
             <ShareModalMagneto
               isOpen={isShareBoard}

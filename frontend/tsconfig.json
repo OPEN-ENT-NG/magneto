@@ -21,7 +21,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@cgi-learning-hub/icons": ["node_modules/@cgi-learning-hub/icons"],
+      "@cgi-learning-hub/theme": ["node_modules/@cgi-learning-hub/theme"],
+      "@cgi-learning-hub/ui": ["node_modules/@cgi-learning-hub/ui"]
     },
 
     /* Test */

@@ -128,7 +128,7 @@ export const BoardCreateMagnetBoardModal: FC<
               onClick={() => handleSubmit()}
               disabled={!inputValue.selectedBoardId}
             >
-              {t("magneto.card.options.duplicate")}
+              {t("magneto.add")}
             </Button>
           </Box>
         </Box>

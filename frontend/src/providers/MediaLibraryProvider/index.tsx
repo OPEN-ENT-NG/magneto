@@ -133,10 +133,6 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
     updateLibraryMedia();
   }, [libraryMedia, workspaceElement]);
 
-  useEffect(() => {
-    console.log(selectedBoardData);
-  }, [selectedBoardData]);
-
   const value = useMemo<MediaLibraryContextType>(
     () => ({
       workspaceElement,

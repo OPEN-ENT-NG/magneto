@@ -93,6 +93,8 @@ export const CreateMagnet: FC = () => {
     magnetType,
     setMagnetType,
     handleClickMedia,
+    selectedBoardData,
+    setSelectedBoardData,
   } = useMediaLibrary();
   const { activeCard, closeActiveCardAction } = useBoard();
   const isEditMagnet = !!activeCard;
@@ -120,6 +122,7 @@ export const CreateMagnet: FC = () => {
     setLinkUrl("");
     setDescription("");
     if (section !== null) setSection(board.sections[0]);
+    setSelectedBoardData(null);
     onClose();
   };
 
@@ -135,7 +138,11 @@ export const CreateMagnet: FC = () => {
       locked: isEditMagnet ? activeCard.locked : false,
       resourceId: media?.id ?? "",
       resourceType: getMagnetResourceType(),
-      resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
+      resourceUrl: selectedBoardData
+        ? selectedBoardData
+        : linkUrl
+        ? linkUrl
+        : media?.url ?? null,
       title: title,
       id: isEditMagnet ? activeCard.id : undefined,
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
@@ -180,6 +187,9 @@ export const CreateMagnet: FC = () => {
 
       if (activeCard.resourceType === MENU_NOT_MEDIA_TYPE.TEXT)
         setMagnetType(MENU_NOT_MEDIA_TYPE.TEXT);
+
+      if (activeCard.resourceType === MENU_NOT_MEDIA_TYPE.BOARD)
+        setMagnetType(MENU_NOT_MEDIA_TYPE.BOARD);
 
       setMedia({
         name: activeCard.metadata?.name,
@@ -244,11 +254,6 @@ export const CreateMagnet: FC = () => {
           </IconButton>
         </Box>
         <Box sx={contentContainerStyle}>
-          <ScaledIframe
-            src={
-              "http://localhost:4200/#/board/de9b72ea-b1db-4ffa-9cb7-d4e032ec5fbb/view"
-            }
-          />
           {magnetTypeHasFilePickerWorkspace &&
             (activeCard ? (
               <CardContentFile card={activeCard} />
@@ -260,6 +265,9 @@ export const CreateMagnet: FC = () => {
             ))}
           {magnetTypeHasImage && (
             <ImageContainer media={media} handleClickMedia={modifyFile} />
+          )}
+          {selectedBoardData !== null && (
+            <ScaledIframe src={`/magneto#/board/${selectedBoardData}/view`} />
           )}
           {magnetTypeHasAudio && (
             <Box sx={audioWrapperStyle}>

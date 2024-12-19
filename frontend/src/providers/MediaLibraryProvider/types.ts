@@ -38,4 +38,6 @@ export type MediaLibraryContextType = {
   setMagnetType: Dispatch<SetStateAction<MENU_NOT_MEDIA_TYPE | null>>;
   handleClickMenu: (type: MENU_NOT_MEDIA_TYPE) => void;
   onClose: () => void;
+  selectedBoardData: string | null;
+  setSelectedBoardData: (id: string | null) => void;
 };

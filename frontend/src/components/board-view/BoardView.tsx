@@ -168,8 +168,8 @@ export const BoardView: FC = () => {
           onClose={onClose}
         />
         <BoardCreateMagnetBoardModal
-          open={magnetType === MENU_NOT_MEDIA_TYPE.BOARD}
-          onClose={onClose}
+          open={displayModals.BOARD_SELECTION}
+          onClose={() => toggleBoardModals(BOARD_MODAL_TYPE.BOARD_SELECTION)}
         />
         <CreateBoard
           isOpen={displayModals.PARAMETERS}

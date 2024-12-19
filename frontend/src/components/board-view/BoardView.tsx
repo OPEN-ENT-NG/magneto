@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 
 import { BoardBodyWrapper, BoardViewWrapper, mediaLibraryStyle } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
+import { BoardCreateMagnetBoardModal } from "../board-create-magnet-board-modal/BoardCreateMagnetBoardModal";
 import { BoardCreateMagnetMagnetModal } from "../board-create-magnet-magnet-modal/BoardCreateMagnetMagnetModal";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
@@ -27,7 +28,6 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { BoardCreateMagnetBoardModal } from "../board-create-magnet-board-modal/BoardCreateMagnetBoardModal";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");

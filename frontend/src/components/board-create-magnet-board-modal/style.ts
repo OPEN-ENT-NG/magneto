@@ -120,13 +120,13 @@ export const listStyle = {
 };
 
 export const BoardCardWrapper = styled("div")<BoardCardWrapperProps>(({
-  isCardSelected = false,
+  isBoardSelected = false,
 }) => {
   const boardCardStyle = {
-    border: isCardSelected
+    border: isBoardSelected
       ? "0.2rem solid #CEEAF5"
       : "0.2rem solid transparent",
-    borderRadius: isCardSelected ? "10px" : "",
+    borderRadius: isBoardSelected ? "10px" : "",
   };
   return boardCardStyle;
 });

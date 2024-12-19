@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 
-import { Button, SearchBar, useToast } from "@edifice-ui/react";
+import { Button, SearchBar } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -20,17 +20,16 @@ import { initialInputvalue } from "./utils";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { BOARD_TABS_CONFIG } from "../tab-list/utils";
-import { useBoard } from "~/providers/BoardProvider";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
 export const BoardCreateMagnetBoardModal: FC<
   BoardCreateMagnetBoardModalProps
 > = ({ open, onClose }) => {
-  const { board } = useBoard();
   const [inputValue, setInputValue] =
     useState<InputValueState>(initialInputvalue);
   const { currentTab } = inputValue;
   const { t } = useTranslation("magneto");
-  const toast = useToast();
+  const { setIsCreateMagnetOpen, setSelectedBoardData } = useMediaLibrary();
 
   const handleTabChange = (newValue: CURRENTTAB_STATE) => {
     setInputValue((prevState) => ({
@@ -55,6 +54,9 @@ export const BoardCreateMagnetBoardModal: FC<
 
   const handleSubmit = async () => {
     if (inputValue.selectedBoardId) {
+      setSelectedBoardData(inputValue.selectedBoardId);
+      setIsCreateMagnetOpen(true);
+      onCloseModal();
     }
   };
 

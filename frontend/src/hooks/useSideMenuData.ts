@@ -80,6 +80,7 @@ export const useSideMenuData = (): (
       name: t("magneto.board"),
       action: () => {
         handleClickMenu(MENU_NOT_MEDIA_TYPE.BOARD);
+        toggleBoardModals(BOARD_MODAL_TYPE.BOARD_SELECTION);
       },
     },
   );

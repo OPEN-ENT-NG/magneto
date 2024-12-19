@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useState } from "react";
 
 import { Button, SearchBar, useToast } from "@edifice-ui/react";
 import CloseIcon from "@mui/icons-material/Close";
@@ -15,15 +15,12 @@ import {
   titleStyle,
 } from "./style";
 import { InputValueState, BoardCreateMagnetBoardModalProps } from "./types";
+import { useRenderContent } from "./useRenderContent";
 import { initialInputvalue } from "./utils";
-import { BoardList } from "../board-list/BoardList";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { BOARD_TABS_CONFIG } from "../tab-list/utils";
-import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useBoard } from "~/providers/BoardProvider";
-import { useGetAllBoardsQuery } from "~/services/api/boards.service";
-import { useDuplicateCardMutation } from "~/services/api/cards.service";
 
 export const BoardCreateMagnetBoardModal: FC<
   BoardCreateMagnetBoardModalProps
@@ -33,38 +30,21 @@ export const BoardCreateMagnetBoardModal: FC<
     useState<InputValueState>(initialInputvalue);
   const { currentTab } = inputValue;
   const { t } = useTranslation("magneto");
-  const [duplicateCard] = useDuplicateCardMutation();
   const toast = useToast();
-
-  const { data: myBoardsResult, isLoading: boardsLoading } =
-    useGetAllBoardsQuery({
-      isPublic: currentTab === CURRENTTAB_STATE.PUBLIC,
-      isShared: currentTab === CURRENTTAB_STATE.SHARED,
-      isDeleted: false,
-      sortBy: "modificationDate",
-      page: 0,
-    });
-
-  const boards = useMemo(() => {
-    return (
-      myBoardsResult?.all?.map((board: IBoardItemResponse) =>
-        new Board().build(board),
-      ) || []
-    );
-  }, [myBoardsResult]);
 
   const handleTabChange = (newValue: CURRENTTAB_STATE) => {
     setInputValue((prevState) => ({
       ...prevState,
       currentTab: newValue,
-      cardIds: [],
+      selectedBoardId: null,
     }));
   };
+
   const handleSearchChange = (newValue: string) => {
     setInputValue((prevState) => ({
       ...prevState,
       search: newValue,
-      cardIds: [],
+      selectedBoardId: null,
     }));
   };
 
@@ -74,18 +54,7 @@ export const BoardCreateMagnetBoardModal: FC<
   };
 
   const handleSubmit = async () => {
-    if (inputValue.cardIds) {
-      const magnetMagnetParams = {
-        boardId: board._id,
-        cardIds: inputValue.cardIds,
-      };
-      try {
-        await duplicateCard(magnetMagnetParams);
-        toast.success(t("magneto.duplicate.cards.confirm"));
-        onCloseModal();
-      } catch (err) {
-        console.error("failed to duplicate cards");
-      }
+    if (inputValue.selectedBoardId) {
     }
   };
 
@@ -141,12 +110,7 @@ export const BoardCreateMagnetBoardModal: FC<
           />
         </Box>
         <Box sx={contentContainerStyle}>
-          <BoardList
-            searchText={inputValue.search}
-            onDragAndDrop={() => {}}
-            boards={boards}
-            boardsLoading={boardsLoading}
-          />
+          {useRenderContent(inputValue, setInputValue)}
         </Box>
         <Box sx={modalFooterStyle}>
           <Box sx={duplicateButtonStyle}>
@@ -160,7 +124,7 @@ export const BoardCreateMagnetBoardModal: FC<
             </Button>
             <Button
               onClick={() => handleSubmit()}
-              disabled={!inputValue.cardIds?.length}
+              disabled={!inputValue.selectedBoardId}
             >
               {t("magneto.card.options.duplicate")}
             </Button>

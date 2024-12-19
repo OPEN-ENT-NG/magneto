@@ -1,50 +1,34 @@
 import { useEffect, useMemo, MouseEvent as ReactMouseEvent } from "react";
 
-import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
-import { Box, Button, Grid, List, ListItem, Typography } from "@mui/material";
+import { animated, useSpring } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
 
-import {
-  BoardCardWrapper,
-  boardTitleButton,
-  boardTitleStyle,
-  boardTitleWrapperStyle,
-  listStyle,
-} from "./style";
+import { BoardCardWrapper } from "./style";
 import { InputValueState } from "./types";
-import BoardCard from "../board-card/BoardCard";
-import { EmptyState } from "../empty-state/EmptyState";
+import { BoardItemLight } from "../board-item-light/BoardItemLight";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
-import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { Board, IBoardItemResponse } from "~/models/board.model";
-import { Card } from "~/models/card.model";
-import {
-  useDuplicateBoardMutation,
-  useGetAllBoardsQuery,
-} from "~/services/api/boards.service";
+import { useGetAllBoardsQuery } from "~/services/api/boards.service";
+import "./BoardList.scss";
 
 export const useRenderContent = (
   inputValue: InputValueState,
   setInputValue: React.Dispatch<React.SetStateAction<InputValueState>>,
 ) => {
   const { t } = useTranslation("magneto");
-  const { search, currentTab } = inputValue;
-  const zoomLevel = 2;
+  const { search, currentTab, selectedBoardId } = inputValue;
+  const springs = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+  });
+
   const { data: myBoardsResult } = useGetAllBoardsQuery({
     isPublic: currentTab === CURRENTTAB_STATE.PUBLIC,
     isShared: currentTab === CURRENTTAB_STATE.SHARED,
     isDeleted: false,
     sortBy: "modificationDate",
     page: 0,
-  });
-
-  const [duplicateBoard] = useDuplicateBoardMutation();
-
-  const duplicateBoardsAndToast = usePredefinedToasts({
-    func: duplicateBoard,
-    successMessage: t("magneto.duplicate.elements.confirm"),
-    failureMessage: t("magneto.duplicate.elements.error"),
   });
 
   const boards = useMemo(() => {
@@ -65,25 +49,27 @@ export const useRenderContent = (
 
   const updateSelectedMagnets = (
     event: ReactMouseEvent<HTMLDivElement>,
-    cardId: string,
+    boardId: string,
   ) => {
     if (!isSelectable(event.nativeEvent)) {
       event.preventDefault();
       return;
     }
 
-    let updatedSelectedBoards = inputValue.boardIds;
-
-    if (updatedSelectedBoards.find((magnetId: string) => magnetId == cardId)) {
-      const index = updatedSelectedBoards.indexOf(cardId, 0);
-      updatedSelectedBoards.splice(index, 1);
-    } else {
-      updatedSelectedBoards = [...updatedSelectedBoards, cardId];
-    }
-    setInputValue((prevState) => ({
-      ...prevState,
-      cardIds: updatedSelectedBoards,
-    }));
+    setInputValue((prevState: InputValueState): InputValueState => {
+      // Si le board cliqué est déjà sélectionné, on le désélectionne
+      if (prevState.selectedBoardId === boardId) {
+        return {
+          ...prevState,
+          selectedBoardId: null,
+        };
+      }
+      // Sinon, on sélectionne le nouveau board
+      return {
+        ...prevState,
+        selectedBoardId: boardId,
+      };
+    });
   };
 
   useEffect(() => {
@@ -100,75 +86,43 @@ export const useRenderContent = (
   }, []);
 
   const isBoardSelected = (boardId: string): boolean => {
-    return !!inputValue.boardIds.find(
-      (boardCardId: string) => boardCardId == boardId,
-    );
+    return selectedBoardId === boardId;
   };
 
-  if (isByBoards) {
-    return isOneMagnetInBoards ? (
-      <List sx={listStyle}>
-        {boardsWithCards.map(
-          (board: Board) =>
-            !!board.cards.length && (
-              <ListItem key={board._id}>
-                <Box width={"100%"}>
-                  <Box sx={boardTitleWrapperStyle}>
-                    <Typography sx={boardTitleStyle}>{board._title}</Typography>
-                    <Button
-                      sx={boardTitleButton}
-                      startIcon={<FileCopyOutlinedIcon />}
-                      onClick={() => duplicateBoardsAndToast(board._id)}
-                    >
-                      {t("magneto.cards.collection.board.duplicate")}
-                    </Button>
-                  </Box>
-                  <Grid container spacing={2} width="fit-content">
-                    {board.cards.map((card) => (
-                      <Grid item key={card.id}>
-                        <BoardCardWrapper
-                          isBoardSelected={isBoardSelected(card.id)}
-                          onClick={(event) => {
-                            updateSelectedMagnets(event, card.id);
-                          }}
-                        >
-                          <BoardCard
-                            card={card}
-                            zoomLevel={zoomLevel}
-                            readOnly={true}
-                          />
-                        </BoardCardWrapper>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              </ListItem>
-            ),
-        )}
-      </List>
-    ) : (
-      <EmptyState title={t("magneto.cards.empty.text")} />
-    );
-  } else {
-    return cardsData.length ? (
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Grid container spacing={2} p={".5rem"}>
-          {cardsData.map((card: Card) => (
-            <Grid item key={card.id}>
-              <BoardCardWrapper
-                isBoardSelected={isBoardSelected(card.id)}
-                onClick={(event) => {
-                  updateSelectedMagnets(event, card.id);
-                }}
-              >
-                <BoardCard card={card} zoomLevel={zoomLevel} readOnly={true} />
-              </BoardCardWrapper>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    ) : (
-      <EmptyState title={t("magneto.cards.empty.text")} />
-    );
-  }
+  return (
+    <>
+      {boards?.length > 0 && (
+        <animated.ul className="grid ps-0 list-unstyled mb-24">
+          {boards
+            .filter((board: Board) => {
+              if (search === "") {
+                return board;
+              }
+            })
+            .map((board: Board) => {
+              const { id } = board;
+              return (
+                <animated.li
+                  className="z-1 boardSizing"
+                  key={id}
+                  style={{
+                    position: "relative",
+                    ...springs,
+                  }}
+                >
+                  <BoardCardWrapper
+                    isBoardSelected={isBoardSelected(board.id)}
+                    onClick={(event) => {
+                      updateSelectedMagnets(event, board.id);
+                    }}
+                  >
+                    <BoardItemLight board={board} />
+                  </BoardCardWrapper>
+                </animated.li>
+              );
+            })}
+        </animated.ul>
+      )}
+    </>
+  );
 };

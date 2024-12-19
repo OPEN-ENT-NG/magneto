@@ -1,0 +1,72 @@
+ul.grid {
+  padding-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(
+    4,
+    minmax(0, 1fr)
+  ); /* Force equal width columns */
+  gap: 16px;
+  width: 100% !important;
+}
+
+li.boardSizing {
+  /* Remove any width constraints */
+  min-width: 0;
+
+  .card {
+    width: 100%;
+    padding: unset !important;
+    margin: unset !important;
+    display: flex;
+    flex-wrap: wrap !important;
+    flex-direction: column;
+    max-width: 100%; /* Ensure card doesn't overflow */
+
+    .board-number-magnets {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      svg {
+        color: #ffb600;
+        font-size: 14px;
+      }
+
+      svg + p {
+        font-size: 12px;
+        margin: 0;
+      }
+    }
+
+    .board-about {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      .board-about-left-content,
+      .board-about-right-content {
+        margin: 0 !important;
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+
+        .med-resource-card-text {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+.title {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.card-body {
+  width: 100%;
+  padding: 12px;
+}

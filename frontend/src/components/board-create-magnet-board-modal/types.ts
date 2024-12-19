@@ -8,9 +8,9 @@ export interface BoardCreateMagnetBoardModalProps {
 export interface InputValueState {
   search: string;
   currentTab: CURRENTTAB_STATE;
-  boardIds: string[];
+  selectedBoardId: string | null;
 }
 
 export interface BoardCardWrapperProps {
-  isCardSelected: boolean;
+  isBoardSelected: boolean;
 }

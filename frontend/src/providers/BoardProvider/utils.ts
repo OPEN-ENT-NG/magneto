@@ -15,6 +15,7 @@ export const initialDisplayModals: DisplayModalsState = {
   [BOARD_MODAL_TYPE.DELETE]: false,
   [BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE]: false,
   [BOARD_MODAL_TYPE.CREATE_EDIT]: false,
+  [BOARD_MODAL_TYPE.BOARD_SELECTION]: false,
 };
 
 export const prepareBoardsState = (

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, MouseEvent as ReactMouseEvent } from "react";
 
 import { animated, useSpring } from "@react-spring/web";
-import { useTranslation } from "react-i18next";
 
 import { BoardCardWrapper } from "./style";
 import { InputValueState } from "./types";
@@ -16,7 +15,6 @@ export const useRenderContent = (
   inputValue: InputValueState,
   setInputValue: React.Dispatch<React.SetStateAction<InputValueState>>,
 ) => {
-  const { t } = useTranslation("magneto");
   const { search, currentTab, selectedBoardId } = inputValue;
   const springs = useSpring({
     from: { opacity: 0 },

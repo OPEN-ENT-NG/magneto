@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface UrlBackgroundViewerProps {
   url: string;
@@ -9,17 +9,17 @@ interface UrlBackgroundViewerProps {
 export const UrlBackgroundViewer: React.FC<UrlBackgroundViewerProps> = ({
   url,
   width = 1920,
-  height = 1080
+  height = 1080,
 }) => {
   return (
-    <div 
+    <div
       style={{
-        width: '100%',
+        width: "100%",
         maxWidth: `${width}px`,
         height: `${height}px`,
         background: `url(${url}) no-repeat center center`,
-        backgroundSize: 'contain',
-        pointerEvents: 'none',
+        backgroundSize: "contain",
+        pointerEvents: "none",
       }}
     />
   );

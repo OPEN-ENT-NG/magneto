@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 
 import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import { loadingContainerStyle, loadingTextStyle } from "./style";
 import { ScaledIframeProps } from "./types";
 import { useScaledIframe } from "./useScaledIframe";
 
-const ScaledIframe: React.FC<ScaledIframeProps> = ({
+export const ScaledIframe: FC<ScaledIframeProps> = ({
   src,
   width = 1920,
   height = 1080,
@@ -42,5 +42,3 @@ const ScaledIframe: React.FC<ScaledIframeProps> = ({
     </Box>
   );
 };
-
-export default ScaledIframe;

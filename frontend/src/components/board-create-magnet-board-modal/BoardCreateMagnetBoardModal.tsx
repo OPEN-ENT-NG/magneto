@@ -47,7 +47,7 @@ export const BoardCreateMagnetBoardModal: FC<
     }));
   };
 
-  const onCloseModal = () => {
+  const handleClose = () => {
     setInputValue(initialInputvalue);
     onClose();
   };
@@ -56,7 +56,7 @@ export const BoardCreateMagnetBoardModal: FC<
     if (inputValue.selectedBoardId) {
       setSelectedBoardData(inputValue.selectedBoardId);
       setIsCreateMagnetOpen(true);
-      onCloseModal();
+      handleClose();
     }
   };
 
@@ -120,7 +120,7 @@ export const BoardCreateMagnetBoardModal: FC<
               color="tertiary"
               type="button"
               variant="ghost"
-              onClick={() => onCloseModal()}
+              onClick={() => handleClose()}
             >
               {t("magneto.cancel")}
             </Button>

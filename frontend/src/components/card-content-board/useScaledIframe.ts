@@ -1,19 +1,6 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 
-interface UseScaledIframeProps {
-  width?: number;
-  height?: number;
-}
-
-interface UseScaledIframeReturn {
-  iframeRef: React.RefObject<HTMLIFrameElement>;
-  containerRef: React.RefObject<HTMLDivElement>;
-  isLoading: boolean;
-  containerHeight: number;
-  handleIframeLoad: () => void;
-  iframeStyle: React.CSSProperties;
-  containerStyle: React.CSSProperties;
-}
+import { UseScaledIframeProps, UseScaledIframeReturn } from "./types";
 
 export const useScaledIframe = ({
   width = 1920,

@@ -16,7 +16,7 @@ export const ModalExplorer: React.FC = () => {
   const [swiperInstance, setSwiperInstance] = useState<any>();
   const [swiperProgress, setSwiperprogress] = useState<number>(0);
   const { isOpen, isOnboarding, setIsOpen, handleSavePreference } =
-    useOnboardingModal(true);
+    useOnboardingModal(PREF_EXPLORER_MODAL);
   const items = [
     {
       src: "magneto/public/img/onboarding_1.png",

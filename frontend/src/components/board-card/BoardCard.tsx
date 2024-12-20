@@ -134,6 +134,7 @@ const BoardCard: FC<BoardCardProps> = ({
       isDragging={isDragging}
       ref={setNodeRef}
       onDoubleClick={handleDoubleClick}
+      onClick={!hasContribRights ? handleDoubleClick : undefined}
       style={style}
       {...(readOnly ? {} : { ...attributes, ...listeners })}
     >

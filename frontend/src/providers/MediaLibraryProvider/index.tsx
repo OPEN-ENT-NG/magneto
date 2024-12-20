@@ -50,6 +50,9 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   const [magnetType, setMagnetType] = useState<MENU_NOT_MEDIA_TYPE | null>(
     null,
   );
+  const [selectedBoardData, setSelectedBoardData] = useState<string | null>(
+    null,
+  );
 
   const handleClickMedia = (type: MediaLibraryType) => {
     setMagnetType(null);
@@ -151,6 +154,8 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       setMagnetType,
       handleClickMenu,
       onClose,
+      selectedBoardData,
+      setSelectedBoardData,
     }),
     [
       mediaLibraryRef,
@@ -159,6 +164,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       isCreateMagnetOpen,
       magnetType,
       workspaceElement,
+      selectedBoardData,
     ],
   );
 

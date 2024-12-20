@@ -32,8 +32,13 @@ export const AppView: FC = () => {
   const [searchBarResetter, resetSearchBar] = useState(0);
   const { currentFolder, folders, setSelectedFoldersIds, setSelectedFolders } =
     useFoldersNavigation();
-  const { boards, selectedBoards, setSelectedBoards, setSelectedBoardsIds } =
-    useBoardsNavigation();
+  const {
+    boards,
+    selectedBoards,
+    setSelectedBoards,
+    setSelectedBoardsIds,
+    boardsLoading,
+  } = useBoardsNavigation();
   const [dragAndDropBoards, setDragAndDropBoards] = useState<Board[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalProps, setModalProps] = useState({
@@ -183,6 +188,8 @@ export const AppView: FC = () => {
             <BoardList
               searchText={searchText}
               onDragAndDrop={handleDragAndDropBoards}
+              boards={boards}
+              boardsLoading={boardsLoading}
             />
             <ToasterContainer
               reset={resetBoardsAndFolders}

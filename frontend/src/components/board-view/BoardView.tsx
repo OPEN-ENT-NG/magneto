@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 
 import { BoardBodyWrapper, BoardViewWrapper, mediaLibraryStyle } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
+import { BoardCreateMagnetBoardModal } from "../board-create-magnet-board-modal/BoardCreateMagnetBoardModal";
 import { BoardCreateMagnetMagnetModal } from "../board-create-magnet-magnet-modal/BoardCreateMagnetMagnetModal";
 import { CardsFreeLayout } from "../cards-free-layout/CardsFreeLayout";
 import { CardsHorizontalLayout } from "../cards-horizontal-layout/CardsHorizontalLayout";
@@ -165,6 +166,10 @@ export const BoardView: FC = () => {
         <BoardCreateMagnetMagnetModal
           open={magnetType === MENU_NOT_MEDIA_TYPE.CARD}
           onClose={onClose}
+        />
+        <BoardCreateMagnetBoardModal
+          open={displayModals.BOARD_SELECTION}
+          onClose={() => toggleBoardModals(BOARD_MODAL_TYPE.BOARD_SELECTION)}
         />
         <CreateBoard
           isOpen={displayModals.PARAMETERS}

@@ -1,11 +1,12 @@
 ul.grid {
-  padding-top: 15px;
+  padding-top: 1.5rem;
+  padding-right: 1.6rem;
   display: grid;
   grid-template-columns: repeat(
     4,
     minmax(0, 1fr)
   ); /* Force equal width columns */
-  gap: 16px;
+  gap: 1.6rem;
   width: 100% !important;
 }
 
@@ -29,11 +30,11 @@ li.boardSizing {
 
       svg {
         color: #ffb600;
-        font-size: 14px;
+        font-size: 1.4rem;
       }
 
       svg + p {
-        font-size: 12px;
+        font-size: 1.2rem;
         margin: 0;
       }
     }
@@ -51,7 +52,7 @@ li.boardSizing {
         align-items: center;
 
         .med-resource-card-text {
-          font-size: 12px;
+          font-size: 1.2rem;
         }
       }
     }
@@ -63,10 +64,10 @@ li.boardSizing {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .card-body {
   width: 100%;
-  padding: 12px;
+  padding: 1.2rem;
 }

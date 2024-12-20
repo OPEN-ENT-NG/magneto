@@ -7,4 +7,12 @@
 .mag-modal-explorer-image {
   max-width: 580px;
   max-height: 250px;
+  padding-bottom: 2rem;
+}
+#onboarding-modal-magneto .modal-body {
+  margin-block: 0 !important;
+
+  .swiper.swiper-horizontal {
+    padding-bottom: 1.5rem !important;
+  }
 }

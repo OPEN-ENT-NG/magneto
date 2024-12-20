@@ -50,7 +50,7 @@ export const ModalExplorer: React.FC = () => {
   return isOnboarding
     ? createPortal(
         <Modal
-          id="onboarding-modal"
+          id="onboarding-modal-magneto"
           size="md"
           isOpen={isOpen}
           focusId="nextButtonId"

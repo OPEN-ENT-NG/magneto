@@ -19,6 +19,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     displayModals,
     hasEditRights,
     hasContribRights,
+    hasManageRights,
     behaviours,
   } = useBoard();
 
@@ -70,6 +71,8 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     window.open(`/workspace/document/${card.resourceId}`);
   };
 
+  const canDownload = card.locked ? hasManageRights() : hasContribRights();
+
   const edit = (): void => {
     behaviours?.applicationsBehaviours["lool"]?.openOnLool(cardDocument);
   };
@@ -77,7 +80,8 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   const canEdit = (): boolean => {
     if (
       behaviours?.applicationsBehaviours["lool"]?.provider === null ||
-      cardDocument === undefined
+      cardDocument === undefined ||
+      (card.locked ? !hasManageRights() : !hasEditRights())
     )
       return false;
     const ext: string[] = [
@@ -96,7 +100,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
       !behaviours?.applicationsBehaviours["lool"]?.failed &&
       behaviours?.applicationsBehaviours["lool"]?.canBeOpenOnLool(cardDocument);
 
-    return !!canEditDocument && hasEditRights() && isoffice && canBeOpenOnLool;
+    return !!canEditDocument && isoffice && canBeOpenOnLool;
   };
 
   return (
@@ -106,7 +110,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
         owner={cardDocument?.ownerName ?? ""}
         size={size}
         fileType={extensionText}
-        canDownload={hasContribRights()}
+        canDownload={canDownload}
         onDownload={download}
         canEdit={canEdit()}
         onEdit={edit}

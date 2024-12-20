@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { Button, Image, Modal } from "@edifice-ui/react";
 import { createPortal } from "react-dom";
@@ -6,34 +6,19 @@ import { useTranslation } from "react-i18next";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
+import { ONBOARDING_EXPLORER_IMAGES } from "~/core/constants/onboarding.const";
 import { PREF_EXPLORER_MODAL } from "~/core/constants/preferences.const";
 import { useOnboardingModal } from "~/hooks/useOnboardingModal";
 
 import "./ModalExplorer.scss";
 
-export const ModalExplorer: React.FC = () => {
+export const ModalExplorer: FC = () => {
   const { t } = useTranslation("magneto");
   const [swiperInstance, setSwiperInstance] = useState<any>();
   const [swiperProgress, setSwiperprogress] = useState<number>(0);
   const { isOpen, isOnboarding, setIsOpen, handleSavePreference } =
     useOnboardingModal(PREF_EXPLORER_MODAL);
-  const items = [
-    {
-      src: "magneto/public/img/onboarding_1.png",
-      alt: t("magneto.modal.explorer.screen1.alt"),
-      text: t("magneto.modal.explorer.screen1.text"),
-    },
-    {
-      src: "/magneto/public/img/onboarding_2.svg",
-      alt: t("magneto.modal.explorer.screen2.alt"),
-      text: t("magneto.modal.explorer.screen2.text"),
-    },
-    {
-      src: "magneto/public/img/onboarding_3.png",
-      alt: t("magneto.modal.explorer.screen3.alt"),
-      text: t("magneto.modal.explorer.screen3.text"),
-    },
-  ];
+
   useEffect(() => {
     const link = document.createElement("link");
     link.href = "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css";
@@ -72,7 +57,7 @@ export const ModalExplorer: React.FC = () => {
                 clickable: true,
               }}
             >
-              {items.map((item, index) => {
+              {ONBOARDING_EXPLORER_IMAGES.map((item, index) => {
                 return (
                   <SwiperSlide
                     key={index}

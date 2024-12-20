@@ -49,7 +49,7 @@ import {
   convertResourceTypeToMediaType,
 } from "./utils";
 import { MediaProps } from "../board-view/types";
-import ScaledIframe from "../card-content-board/CardContentBoard";
+import { ScaledIframe } from "../card-content-board/CardContentBoard";
 import { CardContentFile } from "../card-content-file/CardContentFile";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";

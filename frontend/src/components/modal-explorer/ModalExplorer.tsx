@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import { PREF_EXPLORER_MODAL } from "~/core/const/preferences.const";
+import { PREF_EXPLORER_MODAL } from "~/core/constants/preferences.const";
 import { useOnboardingModal } from "~/hooks/useOnboardingModal";
 
 import "./ModalExplorer.scss";

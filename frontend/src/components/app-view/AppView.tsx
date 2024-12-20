@@ -16,6 +16,7 @@ import { FolderList } from "~/components/folder-list/FolderList";
 import { FolderTitle } from "~/components/folder-title/FolderTitle";
 import Header from "~/components/header/Header";
 import { MessageModal } from "~/components/message-modal/MessageModal";
+import { ModalExplorer } from "~/components/modal-explorer/ModalExplorer";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
 import adaptColumns from "~/hooks/useAdaptColumns";
@@ -122,6 +123,7 @@ export const AppView: FC = () => {
           modalProps={modalProps}
           onSetModalProps={setModalProps}
         />
+        <ModalExplorer />
         <Grid className="main-grid">
           <Grid.Col
             lg={width < 1280 ? "2" : "3"}

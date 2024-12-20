@@ -16,8 +16,12 @@ cp -R ../frontend/dist/* ./src/main/resources/
 
 # Create view directory and copy HTML files
 mkdir -p ./src/main/resources/view
+mkdir -p ./src/main/resources/public/img
 mv ./src/main/resources/*.html ./src/main/resources/view
 cp -R ./src/main/resources/notify ./src/main/resources/view/notify
+
+cp -R ../frontend/public/img/* ./src/main/resources/public/img
+echo 'Images copied !'
 
 # Copy angular dist @TODO MUST DELETE THIS INSTRUCTION WHEN IN PRODUCTION
 cp -R ./src/main/resources/angular-dist/* ./src/main/resources/public

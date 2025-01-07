@@ -82,7 +82,7 @@ export const CommentContainer = styled(Box)<{ isVisible: boolean }>(
 
 export const leftNavigationStyle = {
   position: "fixed",
-  left: "8.2%",
+  left: "calc((100vw - 80vw)/2 - 3.5rem)",
   top: "50%",
   transform: "translateY(-50%)",
   backgroundColor: "white",
@@ -94,12 +94,12 @@ export const leftNavigationStyle = {
   "& .MuiSvgIcon-root": {
     fontSize: "5rem",
   },
-  zIndex: 1500, // Supérieur au z-index de la Modal MUI
+  zIndex: 1500,
 };
 
 export const rightNavigationStyle = {
   position: "fixed",
-  right: "8.2%",
+  right: "calc((100vw - 80vw)/2 - 3.5rem)",
   top: "50%",
   transform: "translateY(-50%)",
   backgroundColor: "white",
@@ -111,5 +111,5 @@ export const rightNavigationStyle = {
   "& .MuiSvgIcon-root": {
     fontSize: "5rem",
   },
-  zIndex: 1500, // Supérieur au z-index de la Modal MUI
+  zIndex: 1500,
 };

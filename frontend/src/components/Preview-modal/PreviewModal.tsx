@@ -13,15 +13,12 @@ import {
   StyledContentBox,
   modalBodyStyle,
   ModalWrapper,
+  leftNavigationStyle,
+  rightNavigationStyle,
 } from "./style";
 import { CommentPanel } from "../comment-panel/CommentPanel";
 import { PreviewContent } from "../preview-content/PreviewContent";
-import {
-  blackColor,
-  boxStyle,
-  leftNavigationStyle,
-  rightNavigationStyle,
-} from "../read-view/style";
+import { blackColor } from "../read-view/style";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useWindowResize } from "~/hooks/useWindowResize";
 import { Card } from "~/models/card.model";
@@ -94,67 +91,78 @@ export const PreviewModal: FC = () => {
   }, [handleKeyNavigation]);
 
   return (
-    <Modal
-      open={CARD_PREVIEW}
-      onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
-      aria-labelledby="modal-card-preview"
-      aria-describedby="modal-card-preview"
-    >
-      <ModalWrapper ref={commentDivRef} isCommentOpen={COMMENT_PANEL}>
-        <Box sx={modalBodyStyle}>
-          <Box sx={boxStyle}>
-            {cardIndex > 0 && (
+    <Box sx={{ position: "relative" }}>
+      {/* La Modal MUI originale */}
+      <Modal
+        open={CARD_PREVIEW}
+        onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
+        aria-labelledby="modal-card-preview"
+        aria-describedby="modal-card-preview"
+      >
+        <ModalWrapper ref={commentDivRef} isCommentOpen={COMMENT_PANEL}>
+          <Box sx={modalBodyStyle}>
+            <IconButton
+              onClick={() =>
+                closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)
+              }
+              aria-label="close"
+              sx={closeButtonStyle}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+            <StyledContentBox
+              isCommentOpen={COMMENT_PANEL}
+              data-scrollable="true"
+            >
+              {activeCard && <PreviewContent card={activeCard} />}
+            </StyledContentBox>
+            <CommentContainer isVisible={COMMENT_PANEL} />
+            {canComment && !COMMENT_PANEL && (
               <IconButton
-                sx={leftNavigationStyle}
-                onClick={() => navigatePage("prev")}
+                onClick={() =>
+                  toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)
+                }
+                aria-label="close"
+                sx={commentButtonStyle}
               >
-                <ChevronLeftIcon sx={blackColor} />
-              </IconButton>
-            )}
-            {!isLastCardInBoard() && (
-              <IconButton
-                sx={rightNavigationStyle}
-                onClick={() => navigatePage("next")}
-              >
-                <ChevronRightIcon sx={blackColor} />
+                <Typography fontSize="inherit">
+                  {activeCard?.nbOfComments}
+                </Typography>
+                <ForumOutlinedIcon fontSize="inherit" />
               </IconButton>
             )}
           </Box>
-          <IconButton
-            onClick={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
-            aria-label="close"
-            sx={closeButtonStyle}
-          >
-            <CloseIcon fontSize="inherit" />
-          </IconButton>
-          <StyledContentBox
-            isCommentOpen={COMMENT_PANEL}
-            data-scrollable="true"
-          >
-            {activeCard && <PreviewContent card={activeCard} />}
-          </StyledContentBox>
-          <CommentContainer isVisible={COMMENT_PANEL} />
-          {canComment && !COMMENT_PANEL && (
+          {activeCard && COMMENT_PANEL && isRefReady && (
+            <CommentPanel
+              cardId={activeCard.id}
+              anchorEl={commentDivRef.current}
+              isInCardPreview
+            />
+          )}
+        </ModalWrapper>
+      </Modal>
+
+      {/* Les boutons de navigation en dehors de la Modal */}
+      {CARD_PREVIEW && ( // On les affiche seulement quand la modal est ouverte
+        <>
+          {cardIndex > 0 && (
             <IconButton
-              onClick={() => toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)}
-              aria-label="close"
-              sx={commentButtonStyle}
+              sx={leftNavigationStyle}
+              onClick={() => navigatePage("prev")}
             >
-              <Typography fontSize="inherit">
-                {activeCard?.nbOfComments}
-              </Typography>
-              <ForumOutlinedIcon fontSize="inherit" />
+              <ChevronLeftIcon sx={blackColor} />
             </IconButton>
           )}
-        </Box>
-        {activeCard && COMMENT_PANEL && isRefReady && (
-          <CommentPanel
-            cardId={activeCard.id}
-            anchorEl={commentDivRef.current}
-            isInCardPreview
-          />
-        )}
-      </ModalWrapper>
-    </Modal>
+          {!isLastCardInBoard() && (
+            <IconButton
+              sx={rightNavigationStyle}
+              onClick={() => navigatePage("next")}
+            >
+              <ChevronRightIcon sx={blackColor} />
+            </IconButton>
+          )}
+        </>
+      )}
+    </Box>
   );
 };

@@ -79,3 +79,37 @@ export const CommentContainer = styled(Box)<{ isVisible: boolean }>(
     },
   }),
 );
+
+export const leftNavigationStyle = {
+  position: "fixed",
+  left: "8.2%",
+  top: "50%",
+  transform: "translateY(-50%)",
+  backgroundColor: "white",
+  border: "1px solid #e0e0e0",
+  "&:hover": { backgroundColor: "white" },
+  width: "7rem",
+  height: "7rem",
+  boxShadow: "0 3px 5px rgba(0,0,0,0.1)",
+  "& .MuiSvgIcon-root": {
+    fontSize: "5rem",
+  },
+  zIndex: 1500, // Supérieur au z-index de la Modal MUI
+};
+
+export const rightNavigationStyle = {
+  position: "fixed",
+  right: "8.2%",
+  top: "50%",
+  transform: "translateY(-50%)",
+  backgroundColor: "white",
+  border: "1px solid #e0e0e0",
+  "&:hover": { backgroundColor: "white" },
+  width: "7rem",
+  height: "7rem",
+  boxShadow: "0 3px 5px rgba(0,0,0,0.1)",
+  "& .MuiSvgIcon-root": {
+    fontSize: "5rem",
+  },
+  zIndex: 1500, // Supérieur au z-index de la Modal MUI
+};

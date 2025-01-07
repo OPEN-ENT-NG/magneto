@@ -92,7 +92,6 @@ export const PreviewModal: FC = () => {
 
   return (
     <Box sx={{ position: "relative" }}>
-      {/* La Modal MUI originale */}
       <Modal
         open={CARD_PREVIEW}
         onClose={() => closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW)}
@@ -142,8 +141,7 @@ export const PreviewModal: FC = () => {
         </ModalWrapper>
       </Modal>
 
-      {/* Les boutons de navigation en dehors de la Modal */}
-      {CARD_PREVIEW && ( // On les affiche seulement quand la modal est ouverte
+      {CARD_PREVIEW && (
         <>
           {cardIndex > 0 && (
             <IconButton

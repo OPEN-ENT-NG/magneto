@@ -8,6 +8,7 @@ import {
   mdiMusicNote,
   mdiPlayCircle,
 } from "@mdi/js";
+import TableChartIcon from "@mui/icons-material/TableChart";
 
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 
@@ -40,6 +41,11 @@ export const useResourceTypeDisplay = (resourceType: string) => {
       case RESOURCE_TYPE.AUDIO: {
         icon = mdiMusicNote;
         type = "Audio";
+        break;
+      }
+      case RESOURCE_TYPE.BOARD: {
+        icon = mdiFileMultiple; //TODO : change to MUI TableIcon
+        type = "Tableau";
         break;
       }
       case RESOURCE_TYPE.FILE: {

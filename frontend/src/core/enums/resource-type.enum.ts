@@ -8,6 +8,7 @@ export enum RESOURCE_TYPE {
   FILE = "file",
   LINK = "link",
   CARD = "card",
+  BOARD = "board",
 
   EMBEDDER = "embedder",
   HYPERLINK = "hyperlink",

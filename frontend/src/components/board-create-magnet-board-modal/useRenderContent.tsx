@@ -88,7 +88,7 @@ export const useRenderContent = (
   };
 
   return (
-    <>
+    <div className="board-list-container">
       {boards?.length > 0 && (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
           {boards
@@ -121,6 +121,6 @@ export const useRenderContent = (
             })}
         </animated.ul>
       )}
-    </>
+    </div>
   );
 };

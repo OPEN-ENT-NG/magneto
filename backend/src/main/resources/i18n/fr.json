@@ -62,6 +62,7 @@
   "magneto.board.tooltip.my.board": "Mon tableau",
   "magneto.board.tooltip.shared.board": "Tableau partagé",
   "magneto.board.tooltip.public.board": "Tableau de la plateforme",
+  "magneto.board.see": "Voir le tableau",
   "magneto.card.locked.tooltip": "Partage en lecture seule",
   "magneto.board.keywords": "Mots-clés",
   "magneto.board.background.title": "Image d'arrière plan du tableau :",

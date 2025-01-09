@@ -99,12 +99,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     skip: !boardResourceIds?.length,
   });
 
-  console.log(boardImages);
-
-  useEffect(() => {
-    console.log("cc", boardImages);
-  }, [boardImages]);
-
   const documents = useMemo(() => {
     return documentsData ?? [];
   }, [documentsData]);
@@ -189,6 +183,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       openActiveCardAction,
       closeActiveCardAction,
       behaviours,
+      boardImages,
     }),
     [
       board,
@@ -201,6 +196,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       activeCard,
       isModalDuplicate,
       behaviours,
+      boardImages,
     ],
   );
 

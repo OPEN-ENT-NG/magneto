@@ -910,4 +910,42 @@ public class DefaultBoardService implements BoardService {
 
         return promise.future();
     }
+
+    @Override
+    public Future<JsonArray> getAllBoardImages(List<String> boardIds) {
+        Promise<JsonArray> promise = Promise.promise();
+
+        JsonObject query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds))))
+                .project(new JsonObject()
+                        .put(Field._ID, 1)
+                        .put(Field.IMAGEURL, 1))
+                .getAggregate();
+
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
+            if (either.isLeft()) {
+                log.error("[Magneto@%s::getAllBoardImages] Failed to get board images",
+                        this.getClass().getSimpleName(), either.left().getValue());
+                promise.fail(either.left().getValue());
+            } else {
+                JsonArray result = either.right().getValue()
+                        .getJsonObject(Field.CURSOR, new JsonObject())
+                        .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+
+                JsonArray boardImages = new JsonArray();
+                result.stream()
+                        .filter(JsonObject.class::isInstance)
+                        .map(JsonObject.class::cast)
+                        .forEach(board -> {
+                            boardImages.add(new JsonObject()
+                                    .put(Field._ID, board.getString(Field._ID))
+                                    .put(Field.IMAGEURL, board.getString(Field.IMAGEURL)));
+                        });
+                promise.complete(boardImages);
+            }
+        }));
+
+        return promise.future();
+    }
 }

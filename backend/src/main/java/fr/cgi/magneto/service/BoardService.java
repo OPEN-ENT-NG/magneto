@@ -6,6 +6,7 @@ import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
@@ -158,4 +159,12 @@ public interface BoardService {
     Future<List<String>> getOwnedBoardsIds(List<String> boardsIds,String userId );
 
     Future<List<Board>> getBoardsWithNbCards(List<String> resultIds);
+
+    /**
+     * Get all images of boards
+     *
+     * @param boardIds List of board identifiers
+     * @return Future {@link Future <JsonArray>} containing list of board identifiers and their image
+     */
+    Future<JsonArray> getAllBoardImages(List<String> boardIds);
 }

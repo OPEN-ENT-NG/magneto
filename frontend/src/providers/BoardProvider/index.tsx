@@ -26,6 +26,7 @@ import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
+import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
 
 const BoardContext = createContext<BoardContextType | null>(null);
@@ -81,6 +82,28 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       ? new Board().build(boardData as IBoardItemResponse)
       : new Board();
   }, [boardData]);
+
+  const boardResourceIds = useMemo(() => {
+    const cards = board?.isLayoutFree()
+      ? board.cards
+      : board.sections.flatMap((section) => section.cards || []);
+    if (!cards) return [];
+    return cards
+      .filter(
+        (card) => card.resourceType === "board" && card.resourceUrl !== null,
+      )
+      .map((card) => card.resourceUrl);
+  }, [board]);
+
+  const { data: boardImages } = useGetAllBoardImagesQuery(boardResourceIds, {
+    skip: !boardResourceIds?.length,
+  });
+
+  console.log(boardImages);
+
+  useEffect(() => {
+    console.log("cc", boardImages);
+  }, [boardImages]);
 
   const documents = useMemo(() => {
     return documentsData ?? [];

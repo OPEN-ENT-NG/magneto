@@ -132,6 +132,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
     getAllBoardsEditable: builder.query<Boards, void>({
       query: () => `boards/editable`,
     }),
+    getAllBoardImages: builder.query({
+      query: (boardIds: string[]) => ({
+        url: "boards/imageUrl",
+        method: "POST",
+        body: { boardIds: boardIds },
+      }),
+      providesTags: ["Boards"],
+    }),
   }),
 });
 
@@ -148,5 +156,6 @@ export const {
   useRestorePreDeleteBoardsMutation,
   useGetUrlQuery,
   useGetAllBoardsEditableQuery,
+  useGetAllBoardImagesQuery,
   useNotifyBoardUsersMutation,
 } = boardsApi;

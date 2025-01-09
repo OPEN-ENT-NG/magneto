@@ -53,8 +53,8 @@ export const BoardCreateMagnetBoardModal: FC<
   };
 
   const handleSubmit = async () => {
-    if (inputValue.selectedBoardId) {
-      setSelectedBoardData(inputValue.selectedBoardId);
+    if (inputValue.selectedBoard) {
+      setSelectedBoardData(inputValue.selectedBoard);
       setIsCreateMagnetOpen(true);
       handleClose();
     }
@@ -126,7 +126,7 @@ export const BoardCreateMagnetBoardModal: FC<
             </Button>
             <Button
               onClick={() => handleSubmit()}
-              disabled={!inputValue.selectedBoardId}
+              disabled={!inputValue.selectedBoard}
             >
               {t("magneto.add")}
             </Button>

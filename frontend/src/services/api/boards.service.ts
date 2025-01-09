@@ -49,10 +49,11 @@ export const boardsApi = emptySplitApi.injectEndpoints({
     }),
     getAllBoards: builder.query({
       query: (params: IBoardsParamsRequest) => {
+        console.log(params.searchText);
         let urlParams: string =
           `?isPublic=${params.isPublic}&isShared=${params.isShared}` +
           `&isDeleted=${params.isDeleted}&sortBy=${params.sortBy}` +
-          `&allFolders=true`;
+          `&searchText=${params.searchText}&allFolders=true`;
 
         if (params.page != null) {
           urlParams += `&page=${params.page}`;

@@ -15,19 +15,25 @@ export const useRenderContent = (
   inputValue: InputValueState,
   setInputValue: React.Dispatch<React.SetStateAction<InputValueState>>,
 ) => {
-  const { search, currentTab, selectedBoardId } = inputValue;
+  const { search, currentTab, selectedBoard } = inputValue;
   const springs = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
   });
 
-  const { data: myBoardsResult } = useGetAllBoardsQuery({
-    isPublic: currentTab === CURRENTTAB_STATE.PUBLIC,
-    isShared: currentTab === CURRENTTAB_STATE.SHARED,
-    isDeleted: false,
-    sortBy: "modificationDate",
-    page: 0,
-  });
+  const { data: myBoardsResult } = useGetAllBoardsQuery(
+    {
+      isPublic: currentTab === CURRENTTAB_STATE.PUBLIC,
+      isShared: currentTab === CURRENTTAB_STATE.SHARED,
+      searchText: search,
+      isDeleted: false,
+      sortBy: "modificationDate",
+      page: 0,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   const boards = useMemo(() => {
     return (
@@ -47,7 +53,7 @@ export const useRenderContent = (
 
   const updateSelectedMagnets = (
     event: ReactMouseEvent<HTMLDivElement>,
-    boardId: string,
+    board: Board,
   ) => {
     if (!isSelectable(event.nativeEvent)) {
       event.preventDefault();
@@ -56,16 +62,16 @@ export const useRenderContent = (
 
     setInputValue((prevState: InputValueState): InputValueState => {
       // Si le board cliqué est déjà sélectionné, on le désélectionne
-      if (prevState.selectedBoardId === boardId) {
+      if (prevState.selectedBoard?.id === board.id) {
         return {
           ...prevState,
-          selectedBoardId: null,
+          selectedBoard: null,
         };
       }
       // Sinon, on sélectionne le nouveau board
       return {
         ...prevState,
-        selectedBoardId: boardId,
+        selectedBoard: board,
       };
     });
   };
@@ -83,42 +89,35 @@ export const useRenderContent = (
     };
   }, []);
 
-  const isBoardSelected = (boardId: string): boolean => {
-    return selectedBoardId === boardId;
+  const isBoardSelected = (board: Board): boolean => {
+    return selectedBoard?.id === board.id;
   };
 
   return (
     <div className="board-list-container">
       {boards?.length > 0 && (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
-          {boards
-            .filter((board: Board) => {
-              if (search === "") {
-                return board;
-              }
-            })
-            .map((board: Board) => {
-              const { id } = board;
-              return (
-                <animated.li
-                  className="z-1 boardSizing"
-                  key={id}
-                  style={{
-                    position: "relative",
-                    ...springs,
+          {boards.map((board: Board) => {
+            return (
+              <animated.li
+                className="z-1 boardSizing"
+                key={board.id}
+                style={{
+                  position: "relative",
+                  ...springs,
+                }}
+              >
+                <BoardCardWrapper
+                  isBoardSelected={isBoardSelected(board)}
+                  onClick={(event) => {
+                    updateSelectedMagnets(event, board);
                   }}
                 >
-                  <BoardCardWrapper
-                    isBoardSelected={isBoardSelected(board.id)}
-                    onClick={(event) => {
-                      updateSelectedMagnets(event, board.id);
-                    }}
-                  >
-                    <BoardItemLight board={board} />
-                  </BoardCardWrapper>
-                </animated.li>
-              );
-            })}
+                  <BoardItemLight board={board} />
+                </BoardCardWrapper>
+              </animated.li>
+            );
+          })}
         </animated.ul>
       )}
     </div>

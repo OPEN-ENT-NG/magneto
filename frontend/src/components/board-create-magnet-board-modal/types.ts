@@ -1,4 +1,5 @@
 import { CURRENTTAB_STATE } from "../tab-list/types";
+import { Board } from "~/models/board.model";
 
 export interface BoardCreateMagnetBoardModalProps {
   open: boolean;
@@ -8,7 +9,7 @@ export interface BoardCreateMagnetBoardModalProps {
 export interface InputValueState {
   search: string;
   currentTab: CURRENTTAB_STATE;
-  selectedBoardId: string | null;
+  selectedBoard: Board | null;
 }
 
 export interface BoardCardWrapperProps {

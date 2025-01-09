@@ -139,7 +139,7 @@ export const CreateMagnet: FC = () => {
       resourceId: media?.id ?? "",
       resourceType: getMagnetResourceType(),
       resourceUrl: selectedBoardData
-        ? selectedBoardData
+        ? selectedBoardData.id
         : linkUrl
         ? linkUrl
         : media?.url ?? null,
@@ -175,6 +175,14 @@ export const CreateMagnet: FC = () => {
         setTitle(media.name.split(".").slice(0, -1).join("."));
     }
   }, [media]);
+
+  useEffect(() => {
+    console.log(selectedBoardData);
+    if (!isEditMagnet && selectedBoardData) {
+      setTitle(selectedBoardData.title);
+      setDescription(selectedBoardData.description);
+    }
+  }, [selectedBoardData]);
 
   useEffect(() => {
     if (isEditMagnet) {
@@ -267,7 +275,14 @@ export const CreateMagnet: FC = () => {
             <ImageContainer media={media} handleClickMedia={modifyFile} />
           )}
           {selectedBoardData !== null && (
-            <ScaledIframe src={`/magneto#/board/${selectedBoardData}/view`} />
+            <ScaledIframe
+              src={`/magneto#/board/${selectedBoardData._id}/view`}
+            />
+          )}
+          {activeCard?.resourceType === RESOURCE_TYPE.BOARD && (
+            <ScaledIframe
+              src={`/magneto#/board/${activeCard.resourceUrl}/view`}
+            />
           )}
           {magnetTypeHasAudio && (
             <Box sx={audioWrapperStyle}>

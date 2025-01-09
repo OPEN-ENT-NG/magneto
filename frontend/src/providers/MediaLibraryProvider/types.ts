@@ -10,6 +10,7 @@ import { WorkspaceElement } from "edifice-ts-client";
 
 import { MediaProps } from "~/components/board-view/types";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
+import { Board } from "~/models/board.model";
 
 export interface MediaLibraryProviderProps {
   children: ReactNode;
@@ -38,6 +39,6 @@ export type MediaLibraryContextType = {
   setMagnetType: Dispatch<SetStateAction<MENU_NOT_MEDIA_TYPE | null>>;
   handleClickMenu: (type: MENU_NOT_MEDIA_TYPE) => void;
   onClose: () => void;
-  selectedBoardData: string | null;
-  setSelectedBoardData: (id: string | null) => void;
+  selectedBoardData: Board | null;
+  setSelectedBoardData: (id: Board | null) => void;
 };

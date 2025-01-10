@@ -15,3 +15,20 @@ export const avatarStyle = {
   backgroundColor: "#FFD700",
   color: "#000",
 };
+
+export const buttonStyle = {
+  padding: "8px 16px",
+  fontSize: "1.4rem",
+  minWidth: "120px",
+  height: "36px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+export const typographyFooterStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 1,
+  fontSize: "1.6rem",
+};

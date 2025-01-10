@@ -335,7 +335,9 @@ public class Board implements Model<Board> {
                 .put(Field.CANCOMMENT, this.canComment())
                 .put(Field.DISPLAY_NB_FAVORITES, this.displayNbFavorites())
                 .put(Field.TAGS, this.tags())
-                .put(Field.RIGHTS, this.getRights());
+                .put(Field.RIGHTS, this.getRights())
+                .put(Field.NBCARDS, this.getNbCards())
+                .put(Field.NBCARDSSECTIONS, this.getNbCardsSections());
     }
 
     @Override

@@ -1,5 +1,6 @@
-import { FC, useEffect, useMemo } from "react";
+import { FC, useMemo } from "react";
 
+import { Button } from "@edifice-ui/react";
 import {
   mdiAccountCircle,
   mdiCalendarBlank,
@@ -8,11 +9,12 @@ import {
   mdiShareVariant,
 } from "@mdi/js";
 import Icon from "@mdi/react";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
-import { ViewButton } from "./style";
+import { buttonStyle, typographyFooterStyle } from "./style";
 import { BoardInfosFooterProps } from "./types";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board, IBoardItemResponse } from "~/models/board.model";
@@ -23,6 +25,7 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
     fontSize: "1.6rem",
   };
   const { t } = useTranslation("magneto");
+  const navigate = useNavigate();
 
   const { currentData: myBoardsResult } = useGetBoardsByIdsQuery([
     card.boardId,
@@ -33,10 +36,6 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
       ? new Board().build(myBoardsResult.all[0] as IBoardItemResponse)
       : new Board();
   }, [myBoardsResult]);
-
-  useEffect(() => {
-    console.log(board);
-  }, [board]);
 
   return (
     <Box sx={{ mt: 2 }}>
@@ -61,14 +60,7 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
           {board.isPublished && (
             <Stack direction="row" alignItems="center" spacing={1}>
               <Icon path={mdiEarth} size={1.5} />
-              <Typography
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  fontSize: "1.6rem",
-                }}
-              >
+              <Typography sx={typographyFooterStyle}>
                 {t("magneto.board.tooltip.public.board")}
               </Typography>
             </Stack>
@@ -78,14 +70,7 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
         <Stack direction="row" spacing={3}>
           <Stack direction="row" spacing={1} alignItems="center">
             <Icon path={mdiCalendarBlank} size={1.5} />
-            <Typography
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                fontSize: "1.6rem",
-              }}
-            >
+            <Typography sx={typographyFooterStyle}>
               {dayjs(board.modificationDate, {
                 locale: "fr",
                 format: "YYYY-MM-DD HH:mm:ss",
@@ -96,25 +81,30 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
           {board.shared.length && (
             <Stack direction="row" spacing={1} alignItems="center">
               <Icon path={mdiShareVariant} size={1.5} />
-              <Typography
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  fontSize: "1.6rem",
-                }}
-              >
+              <Typography sx={typographyFooterStyle}>
                 {t("magneto.board.tooltip.shared.board")}
               </Typography>
             </Stack>
           )}
         </Stack>
 
-        <Box>
-          <Button sx={ViewButton} variant="contained" onClick={() => {}}>
+        <Stack direction="row" alignItems="flex-start">
+          <Button
+            color="primary"
+            type="button"
+            variant="filled"
+            onClick={(e) => {
+              if (e.ctrlKey) {
+                window.open(`/board/${board.id}/view`, "_blank");
+              } else {
+                navigate(`/board/${board.id}/view`);
+              }
+            }}
+            style={buttonStyle}
+          >
             {t("magneto.board.see")}
           </Button>
-        </Box>
+        </Stack>
       </Stack>
     </Box>
   );

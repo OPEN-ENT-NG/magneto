@@ -67,8 +67,7 @@ export const PreviewModal: FC = () => {
   };
 
   const isLastCardInBoard = (): boolean => {
-    const cards = board.isLayoutFree() ? board.cards : initialCards;
-    return activeCard === cards[cards.length - 1];
+    return activeCard === initialCards[initialCards.length - 1];
   };
 
   const handleKeyNavigation = useCallback(

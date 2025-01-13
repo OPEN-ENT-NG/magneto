@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { IResource } from "edifice-ts-client";
+import { IResource } from "@edifice.io/client";
 
 interface UseThumbProps {
   selectedResource?: IResource;

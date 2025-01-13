@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { FC } from "react";
 
-import { Edit } from "@edifice-ui/icons";
+import { IconEdit } from "@edifice.io/react/icons";
 import { IconButton } from "@edifice-ui/react";
 import { Box } from "@mui/material";
 
@@ -35,7 +35,7 @@ export const VideoPlayer: FC<VideoPlayerProps> = ({ modifyFile }) => {
             <IconButton
               aria-label={"addButtonLabel"}
               color="tertiary"
-              icon={<Edit />}
+              icon={<IconEdit />}
               onClick={() => {
                 modifyFile(MEDIA_LIBRARY_TYPE.VIDEO);
               }}

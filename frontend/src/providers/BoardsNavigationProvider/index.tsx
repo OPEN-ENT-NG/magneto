@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import { checkUserRight } from "@edifice-ui/react";
-import { RightRole } from "edifice-ts-client";
+import { RightRole } from "@edifice.io/client";
 
 import {
   BoardsNavigationContextType,

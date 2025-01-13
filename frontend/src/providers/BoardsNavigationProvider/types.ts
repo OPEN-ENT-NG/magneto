@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
-import { RightRole } from "edifice-ts-client";
+import { RightRole } from "@edifice.io/client";
 
 import { Board } from "~/models/board.model";
 

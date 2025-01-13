@@ -1,4 +1,4 @@
-import { ID } from "edifice-ts-client";
+import { ID } from "@edifice.io/client";
 import { Link } from "react-router-dom";
 
 import "./index.css";

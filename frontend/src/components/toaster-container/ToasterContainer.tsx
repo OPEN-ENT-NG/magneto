@@ -5,7 +5,7 @@ import {
   ActionBar,
   isActionAvailable,
   useToggle,
-  useOdeClient,
+  useEdificeClient,
   checkUserRight,
 } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
@@ -86,7 +86,7 @@ export const ToasterContainer = ({
     leave: { opacity: 0, transform: "translateY(100%)" },
   });
 
-  const { user } = useOdeClient();
+  const { user } = useEdificeClient();
 
   const userId = user ? user?.userId : "";
 

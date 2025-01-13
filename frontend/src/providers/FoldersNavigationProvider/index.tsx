@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import { checkUserRight, TreeViewHandlers } from "@edifice-ui/react";
-import { RightRole } from "edifice-ts-client";
+import { RightRole } from "@edifice.io/client";
 import { useTranslation } from "react-i18next";
 
 import {

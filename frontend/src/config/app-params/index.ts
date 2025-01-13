@@ -5,7 +5,7 @@ import {
   type IAction,
   type IFilter,
   type IOrder,
-} from "edifice-ts-client";
+} from "@edifice.io/client";
 
 const rootElement = document.querySelector<HTMLElement>("[data-ode-app]");
 let _appParams: AppParams;

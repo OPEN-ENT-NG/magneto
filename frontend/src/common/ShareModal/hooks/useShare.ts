@@ -8,7 +8,7 @@ import {
   type ShareRightAction,
   type ShareRightActionDisplayName,
   type ShareRightWithVisibles,
-} from "edifice-ts-client";
+} from "@edifice.io/client";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 

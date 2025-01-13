@@ -54,7 +54,7 @@ export default ({ mode }: { mode: string }) => {
   const build = {
     assetsDir: "public",
     rollupOptions: {
-      external: ["edifice-ts-client"],
+      external: ["@edifice.io/client"],
       output: {
         manualChunks: {
           react: [
@@ -67,7 +67,7 @@ export default ({ mode }: { mode: string }) => {
           ],
         },
         paths: {
-          "edifice-ts-client": "/assets/js/edifice-ts-client/index.js",
+          "@edifice.io/client": "/assets/js/@edifice.io/client/index.js",
         },
       },
     },

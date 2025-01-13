@@ -1,10 +1,7 @@
 import React from "react";
 
 import { ThemeProvider } from "@cgi-learning-hub/theme";
-import {
-  OdeClientProvider,
-  ThemeProvider as ThemeProviderEdifice,
-} from "@edifice-ui/react";
+import { EdificeClientProvider, EdificeThemeProvider } from "@edifice-ui/react";
 import {
   QueryCache,
   QueryClient,
@@ -19,6 +16,7 @@ import { MediaLibraryProvider } from "./providers/MediaLibraryProvider";
 import { router } from "./routes";
 import { setupStore } from "./store";
 import "~/i18n";
+import "@edifice.io/bootstrap/dist/index.css";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement!);
@@ -49,19 +47,19 @@ const queryClient = new QueryClient({
 root.render(
   <QueryClientProvider client={queryClient}>
     <Provider store={store}>
-      <OdeClientProvider
+      <EdificeClientProvider
         params={{
           app: "magneto",
         }}
       >
-        <ThemeProviderEdifice>
+        <EdificeThemeProvider>
           <ThemeProvider themeId="crna">
             <MediaLibraryProvider>
               <RouterProvider router={router} />
             </MediaLibraryProvider>
           </ThemeProvider>
-        </ThemeProviderEdifice>
-      </OdeClientProvider>
+        </EdificeThemeProvider>
+      </EdificeClientProvider>
     </Provider>
     <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>,

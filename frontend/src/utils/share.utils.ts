@@ -1,4 +1,4 @@
-import { IUserInfo } from "edifice-ts-client";
+import { IUserInfo } from "@edifice.io/client";
 
 import { rights } from "~/config/index.ts";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";

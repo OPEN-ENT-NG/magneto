@@ -38,3 +38,8 @@ pnpm-lock.yaml
 
 # Turborepo
 .turbo
+
+#2.0.0
+*.tsbuildinfo
+.nx/cache
+.nx/workspace-data

@@ -7,7 +7,7 @@ import {
   memo,
 } from "react";
 
-import { useOdeClient, useToast } from "@edifice-ui/react";
+import { useEdificeClient, useToast } from "@edifice.io/react";
 import { mdiArrowUpCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -54,7 +54,7 @@ const CommentPanelItemBase = memo(
     } = props;
 
     const { getAvatarURL } = useDirectory();
-    const { user } = useOdeClient();
+    const { user } = useEdificeClient();
     const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
       useDropdown();
     const { t } = useTranslation("magneto");

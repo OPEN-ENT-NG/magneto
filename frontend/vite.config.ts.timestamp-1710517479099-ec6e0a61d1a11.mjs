@@ -47,7 +47,7 @@ var vite_config_default = ({ mode }) => {
   const build = {
     assetsDir: "public",
     rollupOptions: {
-      external: ["edifice-ts-client"],
+      external: ["@edifice.io/client"],
       output: {
         manualChunks: {
           react: [
@@ -60,7 +60,7 @@ var vite_config_default = ({ mode }) => {
           ],
         },
         paths: {
-          "edifice-ts-client": "/assets/js/edifice-ts-client/index.js",
+          "@edifice.io/client": "/assets/js/@edifice.io/client/index.js",
         },
       },
     },

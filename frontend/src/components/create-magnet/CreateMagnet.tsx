@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { FC, useEffect, useRef, useState } from "react";
 
-import { Editor, EditorRef } from "@edifice-ui/editor";
-import { Edit } from "@edifice-ui/icons";
+import { Editor, EditorRef } from "@edifice.io/react/editor";
+import { IconEdit } from "@edifice.io/react/icons";
 import {
   IconButton as EdIconButton,
   Button,
@@ -10,7 +10,7 @@ import {
   Input,
   Label,
   MediaLibraryType,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -291,9 +291,9 @@ export const CreateMagnet: FC = () => {
               </audio>
               {!isEditMagnet && (
                 <EdIconButton
-                  aria-label="Edit audio"
+                  aria-label="IconEdit audio"
                   color="tertiary"
-                  icon={<Edit />}
+                  icon={<IconEdit />}
                   onClick={() => modifyFile(MEDIA_LIBRARY_TYPE.AUDIO)}
                   type="button"
                   variant="ghost"

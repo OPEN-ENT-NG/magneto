@@ -1,4 +1,4 @@
-import { odeServices } from "edifice-ts-client";
+import { odeServices } from "@edifice.io/client";
 
 import { DisplayModalsState } from "./types";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";

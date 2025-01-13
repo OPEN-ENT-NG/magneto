@@ -8,12 +8,13 @@ import {
   Grid,
   Input,
   Label,
-  MediaLibrary,
   Modal,
   Radio,
   TextArea,
-  useOdeClient,
-} from "@edifice-ui/react";
+  useEdificeClient,
+} from "@edifice.io/react";
+
+import { MediaLibrary } from "@edifice.io/react/multimedia";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
@@ -41,7 +42,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   parentFolderId,
 }) => {
   const { t } = useTranslation("magneto");
-  const { appCode } = useOdeClient();
+  const { appCode } = useEdificeClient();
 
   const [media, setMedia] = useState<MediaProps | null>(null);
   const [activePickerId, setActivePickerId] = useState<string>("");

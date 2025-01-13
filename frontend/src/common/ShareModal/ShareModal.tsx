@@ -1,6 +1,10 @@
 import { ReactNode, useState } from "react";
 
-import { Bookmark, InfoCircle, RafterDown } from "@edifice-ui/icons";
+import {
+  IconBookmark,
+  IconInfoCircle,
+  IconRafterDown,
+} from "@edifice.io/react/icons";
 import {
   Modal,
   Heading,
@@ -11,14 +15,14 @@ import {
   Button,
   Tooltip,
   Combobox,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import { UseMutationResult } from "@tanstack/react-query";
 import {
   ID,
   PutShareResponse,
   RightStringified,
   ShareRight,
-} from "edifice-ts-client";
+} from "@edifice.io/client";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
@@ -246,9 +250,9 @@ export default function ShareResourceModal({
         <div className="mt-16">
           <Button
             color="tertiary"
-            leftIcon={<Bookmark />}
+            leftIcon={<IconBookmark />}
             rightIcon={
-              <RafterDown
+              <IconRafterDown
                 title={t("magneto.show")}
                 className="w-16 min-w-0"
                 style={{
@@ -284,7 +288,7 @@ export default function ShareResourceModal({
             message={t("magneto.share.heading.tooltip.message")}
             placement="top"
           >
-            <InfoCircle className="c-pointer" height="18" />
+            <IconInfoCircle className="c-pointer" height="18" />
           </Tooltip>
         </Heading>
         <div className="row">

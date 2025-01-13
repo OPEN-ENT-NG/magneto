@@ -11,8 +11,8 @@ import {
   IExternalLink,
   InternalLinkTabResult,
   MediaLibraryType,
-} from "@edifice-ui/react";
-import { WorkspaceElement } from "edifice-ts-client";
+} from "@edifice.io/react";
+import { WorkspaceElement } from "@edifice.io/client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { getMediaLibraryType } from "./utils";

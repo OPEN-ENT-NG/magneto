@@ -2,7 +2,8 @@ import { FC, useEffect, DragEvent, useState } from "react";
 
 import "./BoardView.scss";
 
-import { LoadingScreen, MediaLibrary, useOdeClient } from "@edifice-ui/react";
+import { LoadingScreen, useEdificeClient } from "@edifice.io/react";
+import { MediaLibrary } from "@edifice.io/react/multimedia";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Box, GlobalStyles } from "@mui/material";
@@ -55,7 +56,7 @@ export const BoardView: FC = () => {
     mediaLibraryRef,
     mediaLibraryHandlers,
   } = useMediaLibrary();
-  const { appCode } = useOdeClient();
+  const { appCode } = useEdificeClient();
 
   useEffect(() => {
     document.documentElement.style.setProperty(

@@ -1,14 +1,14 @@
 import { ChangeEvent, Dispatch, useEffect, useReducer } from "react";
 
-import { Bookmark } from "@edifice-ui/icons";
-import { OptionListItemType, useDebounce, useIsAdml } from "@edifice-ui/react";
+import { IconBookmark } from "@edifice.io/react/icons";
+import { OptionListItemType, useDebounce, useIsAdml } from "@edifice.io/react";
 import {
   ShareRight,
   ShareRightAction,
   ShareRightWithVisibles,
   ShareSubject,
   odeServices,
-} from "edifice-ts-client";
+} from "@edifice.io/client";
 import { useTranslation } from "react-i18next";
 
 import { ShareAction } from "./useShare";
@@ -157,7 +157,8 @@ export const useSearch = ({
             return {
               value: searchResult.id,
               label,
-              icon: searchResult.type === "sharebookmark" ? <Bookmark /> : null,
+              icon:
+                searchResult.type === "sharebookmark" ? <IconBookmark /> : null,
             };
           },
         );

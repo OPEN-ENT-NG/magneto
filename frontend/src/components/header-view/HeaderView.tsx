@@ -2,7 +2,12 @@ import { FC } from "react";
 
 import "./HeaderView.scss";
 
-import { AppHeader, Breadcrumb, Button, useOdeClient } from "@edifice-ui/react";
+import {
+  AppHeader,
+  Breadcrumb,
+  Button,
+  useEdificeClient,
+} from "@edifice.io/react";
 import { mdiCheckCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Box } from "@mui/material";
@@ -23,7 +28,7 @@ import { Section } from "~/providers/BoardProvider/types";
 export const HeaderView: FC = () => {
   const { board } = useBoard();
   const navigate = useNavigate();
-  const { currentApp } = useOdeClient();
+  const { currentApp } = useEdificeClient();
   const { t } = useTranslation("magneto");
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];

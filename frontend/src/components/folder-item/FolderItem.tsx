@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { Card, useOdeClient } from "@edifice-ui/react";
+import { Card, useEdificeClient } from "@edifice.io/react";
 import "./FolderItem.scss";
 import { mdiFolder, mdiFolderAccount } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -33,7 +33,7 @@ export const FolderItem: React.FunctionComponent<FolderListProps> = ({
   modalData,
   onSetModalData,
 }) => {
-  const { currentApp, user } = useOdeClient();
+  const { currentApp, user } = useEdificeClient();
   const [moveBoardsToFolder] = useMoveBoardsMutation();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [hasDrop, setHasDrop] = useState<boolean>(false);

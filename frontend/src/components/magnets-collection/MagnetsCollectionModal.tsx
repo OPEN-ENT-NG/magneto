@@ -1,6 +1,11 @@
 import React, { FunctionComponent, useState } from "react";
 
-import { Modal, SearchBar, useOdeClient, useToggle } from "@edifice-ui/react";
+import {
+  Modal,
+  SearchBar,
+  useEdificeClient,
+  useToggle,
+} from "@edifice.io/react";
 import { Switch } from "@mui/material";
 import { useSpring } from "@react-spring/web";
 import { useTranslation } from "react-i18next";
@@ -24,7 +29,7 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
   isOpen,
   toggle,
 }: props) => {
-  const { currentApp } = useOdeClient();
+  const { currentApp } = useEdificeClient();
   const { t } = useTranslation("magneto");
 
   const [searchText, setSearchText] = useState<string>("");

@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 
-import { Button, Modal } from "@edifice-ui/react";
+import { Button, Modal } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 import { BoardKeywordsInput } from "../board-keywords-input/BoardKeywordsInput";

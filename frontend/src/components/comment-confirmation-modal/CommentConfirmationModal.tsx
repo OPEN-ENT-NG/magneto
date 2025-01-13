@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import { Button } from "@edifice-ui/react";
+import { Button } from "@edifice.io/react";
 import { Modal, Paper, Typography, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 

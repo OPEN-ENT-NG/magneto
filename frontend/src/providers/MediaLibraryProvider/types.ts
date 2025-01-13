@@ -5,8 +5,8 @@ import {
   MediaLibraryResult,
   MediaLibraryType,
   TabsItemProps,
-} from "@edifice-ui/react";
-import { WorkspaceElement } from "edifice-ts-client";
+} from "@edifice.io/react";
+import { WorkspaceElement } from "@edifice.io/client";
 
 import { MediaProps } from "~/components/board-view/types";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";

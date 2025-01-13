@@ -1,7 +1,7 @@
 import { FunctionComponent, useState } from "react";
 
 // eslint-disable-next-line
-import { Button, Modal, TreeView, useOdeClient } from "@edifice-ui/react";
+import { Button, Modal, TreeView, useEdificeClient } from "@edifice.io/react";
 
 import { useTranslation } from "react-i18next";
 
@@ -32,7 +32,7 @@ export const MoveBoard: FunctionComponent<props> = ({
   onSetModalData,
 }: props) => {
   const { t } = useTranslation("magneto");
-  const { user } = useOdeClient();
+  const { user } = useEdificeClient();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const [moveBoards] = useMoveBoardsMutation();
   const [selectedFolderId, setSelectedFolderId] = useState<string>("");

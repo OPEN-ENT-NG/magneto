@@ -18,7 +18,7 @@ if [ "$#" -lt 1 ]; then
   echo "Usage: $0 <clean|init|localDep|build|install|watch>"
   echo "Example: $0 clean"
   echo "Example: $0 init"
-  echo "Example: $0 localDep Use this option to update the edifice-ts-client NPM dependency with a local version"
+  echo "Example: $0 localDep Use this option to update the @edifice.io/client NPM dependency with a local version"
   echo "Example: $0 build"
   echo "Example: $0 install"
   echo "Example: $0 [--springboard=recette] watch"
@@ -70,7 +70,7 @@ doInit () {
 
   if [ "$1" == "Dev" ]
   then
-    sed -i "s/%packageVersion%/link:..\/..\/edifice-ts-client\//" package.json
+    sed -i "s/%packageVersion%/link:..\/..\/@edifice.io/client\//" package.json
   else
     sed -i "s/%packageVersion%/${BRANCH_NAME}/" package.json
   fi
@@ -93,17 +93,17 @@ initDev() {
 
 # Install local dependencies as tarball (installing as folder creates symlinks which won't resolve in the docker container)
 localDep () {
-  if [ -e $PWD/../edifice-ts-client ]; then
-    rm -rf edifice-ts-client.tar edifice-ts-client.tar.gz
-    mkdir edifice-ts-client.tar && mkdir edifice-ts-client.tar/dist \
-      && cp -R $PWD/../edifice-ts-client/dist $PWD/../edifice-ts-client/package.json edifice-ts-client.tar
-    tar cfzh edifice-ts-client.tar.gz edifice-ts-client.tar
+  if [ -e $PWD/../@edifice.io/client ]; then
+    rm -rf @edifice.io/client.tar @edifice.io/client.tar.gz
+    mkdir @edifice.io/client.tar && mkdir @edifice.io/client.tar/dist \
+      && cp -R $PWD/../@edifice.io/client/dist $PWD/../@edifice.io/client/package.json @edifice.io/client.tar
+    tar cfzh @edifice.io/client.tar.gz @edifice.io/client.tar
     if [ "$NO_DOCKER" = "true" ] ; then
-      pnpm install --no-save edifice-ts-client.tar.gz
+      pnpm install --no-save @edifice.io/client.tar.gz
     else
-      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install --no-save edifice-ts-client.tar.gz"
+      docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm install --no-save @edifice.io/client.tar.gz"
     fi
-    rm -rf edifice-ts-client.tar edifice-ts-client.tar.gz
+    rm -rf @edifice.io/client.tar @edifice.io/client.tar.gz
   fi
 }
 

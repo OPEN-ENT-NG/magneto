@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from "react";
 
-import { useUser, useToast } from "@edifice-ui/react";
+import { useUser, useToast } from "@edifice.io/react";
 import {
   odeServices,
   PutShareResponse,
@@ -8,7 +8,7 @@ import {
   type ShareRightAction,
   type ShareRightActionDisplayName,
   type ShareRightWithVisibles,
-} from "edifice-ts-client";
+} from "@edifice.io/client";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 

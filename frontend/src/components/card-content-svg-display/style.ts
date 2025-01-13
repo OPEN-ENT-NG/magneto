@@ -1,4 +1,4 @@
-import { AppIcon } from "@edifice-ui/react";
+import { AppIcon } from "@edifice.io/react";
 import { Box, styled } from "@mui/material";
 
 import { IsPreviewProps } from "./types";

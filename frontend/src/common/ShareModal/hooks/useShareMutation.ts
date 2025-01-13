@@ -3,7 +3,7 @@ import {
   UseMutationResult,
   useMutation,
 } from "@tanstack/react-query";
-import { PutShareResponse, ShareRight, odeServices } from "edifice-ts-client";
+import { PutShareResponse, ShareRight, odeServices } from "@edifice.io/client";
 
 const useShareMutation = ({
   application,

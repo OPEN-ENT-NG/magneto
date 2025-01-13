@@ -3,11 +3,11 @@ import { useState } from "react";
 import {
   Button,
   ActionBar,
-  isActionAvailable,
   useToggle,
   useEdificeClient,
   checkUserRight,
 } from "@edifice.io/react";
+import { isActionAvailable } from "@edifice-ui/react";
 import { useTransition, animated } from "@react-spring/web";
 import { ShareOptions } from "node_modules/@edifice.io/react/dist/common/ShareModal/ShareModal";
 import { useTranslation } from "react-i18next";

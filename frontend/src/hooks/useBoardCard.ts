@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef } from "react";
 
-import { useUser } from "@edifice-ui/react";
+import { useUser } from "@edifice.io/react";
 
 import useDirectory from "./useDirectory";
 import { useResourceTypeDisplay } from "~/components/board-card/useResourceTypeDisplay";

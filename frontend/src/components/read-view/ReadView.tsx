@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { Button } from "@edifice-ui/react";
+import { Button } from "@edifice.io/react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";

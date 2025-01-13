@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { usePaths } from "@edifice-ui/react";
+import { usePaths } from "@edifice.io/react";
 
 import { SVGContextType, SVGProviderProps } from "./types";
 const SVGContext = createContext<SVGContextType | null>(null);

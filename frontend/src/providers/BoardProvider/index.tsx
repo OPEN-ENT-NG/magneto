@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { checkUserRight, useEdificeClient } from "@edifice-ui/react";
+import { checkUserRight, useEdificeClient } from "@edifice.io/react";
 import { RightRole } from "@edifice.io/client";
 import { useParams } from "react-router-dom";
 

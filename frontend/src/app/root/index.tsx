@@ -1,4 +1,4 @@
-import { LoadingScreen, Layout, useEdificeClient } from "@edifice-ui/react";
+import { LoadingScreen, Layout, useEdificeClient } from "@edifice.io/react";
 import { Outlet } from "react-router-dom";
 function Root() {
   const { init } = useEdificeClient();

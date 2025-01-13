@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
 
-import { useEdificeClient } from "@edifice-ui/react";
+import { useEdificeClient } from "@edifice.io/react";
 import { RightStringified } from "@edifice.io/client";
 
 import { ShareModal } from "~/common/ShareModal";

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ThemeProvider } from "@cgi-learning-hub/theme";
-import { EdificeClientProvider, EdificeThemeProvider } from "@edifice-ui/react";
+import { EdificeClientProvider, EdificeThemeProvider } from "@edifice.io/react";
 import {
   QueryCache,
   QueryClient,

@@ -13,7 +13,7 @@ import {
   Radio,
   TextArea,
   useEdificeClient,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";

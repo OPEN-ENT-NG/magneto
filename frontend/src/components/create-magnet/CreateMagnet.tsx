@@ -10,7 +10,7 @@ import {
   Input,
   Label,
   MediaLibraryType,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,

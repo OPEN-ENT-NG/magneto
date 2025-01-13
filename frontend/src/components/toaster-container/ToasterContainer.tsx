@@ -7,9 +7,9 @@ import {
   useToggle,
   useEdificeClient,
   checkUserRight,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import { useTransition, animated } from "@react-spring/web";
-import { ShareOptions } from "node_modules/@edifice-ui/react/dist/common/ShareModal/ShareModal";
+import { ShareOptions } from "node_modules/@edifice.io/react/dist/common/ShareModal/ShareModal";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 

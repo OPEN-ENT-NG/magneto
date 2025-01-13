@@ -1,7 +1,7 @@
 import { ChangeEvent, Dispatch, useEffect, useReducer } from "react";
 
 import { IconBookmark } from "@edifice.io/react/icons";
-import { OptionListItemType, useDebounce, useIsAdml } from "@edifice-ui/react";
+import { OptionListItemType, useDebounce, useIsAdml } from "@edifice.io/react";
 import {
   ShareRight,
   ShareRightAction,

@@ -1,9 +1,9 @@
 import { ComponentPropsWithRef, useEffect, useState, useRef, FC } from "react";
 
 import { IconDelete, IconEdit } from "@edifice.io/react/icons";
-import { IconButton } from "@edifice-ui/react";
-import { Avatar } from "@edifice-ui/react";
-import { AppIcon } from "@edifice-ui/react";
+import { IconButton } from "@edifice.io/react";
+import { Avatar } from "@edifice.io/react";
+import { AppIcon } from "@edifice.io/react";
 import clsx from "clsx";
 import { IWebApp } from "@edifice.io/client";
 

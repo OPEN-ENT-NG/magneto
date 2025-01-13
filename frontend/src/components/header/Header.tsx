@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { AppHeader, Button, useEdificeClient } from "@edifice-ui/react";
+import { AppHeader, Button, useEdificeClient } from "@edifice.io/react";
 import "./Header.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";

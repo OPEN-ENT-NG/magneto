@@ -1,6 +1,6 @@
 import { Dispatch, useId, useRef, useState } from "react";
 
-import { useToast, useToggle } from "@edifice-ui/react";
+import { useToast, useToggle } from "@edifice.io/react";
 import { ShareRightWithVisibles, odeServices } from "@edifice.io/client";
 import { useTranslation } from "react-i18next";
 

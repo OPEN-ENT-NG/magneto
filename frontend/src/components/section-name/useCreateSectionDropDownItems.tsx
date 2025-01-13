@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { useToast } from "@edifice-ui/react";
+import { useToast } from "@edifice.io/react";
 import { mdiEyeOff, mdiFileMultipleOutline, mdiDelete, mdiEye } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";

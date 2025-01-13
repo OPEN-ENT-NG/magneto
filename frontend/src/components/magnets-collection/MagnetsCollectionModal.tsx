@@ -5,7 +5,7 @@ import {
   SearchBar,
   useEdificeClient,
   useToggle,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import { Switch } from "@mui/material";
 import { useSpring } from "@react-spring/web";
 import { useTranslation } from "react-i18next";

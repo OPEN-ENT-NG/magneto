@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-import { checkUserRight, TreeViewHandlers } from "@edifice-ui/react";
+import { checkUserRight, TreeViewHandlers } from "@edifice.io/react";
 import { RightRole } from "@edifice.io/client";
 import { useTranslation } from "react-i18next";
 

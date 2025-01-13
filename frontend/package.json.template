@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@edifice.io/react/icons": "%packageVersion%",
-    "@edifice-ui/react": "%packageVersion%",
+    "@edifice.io/react": "%packageVersion%",
     "@edifice-wisemapping/editor": "0.7.3",
     "@react-spring/web": "9.7.3",
     "@tanstack/react-query": "4.36.1",

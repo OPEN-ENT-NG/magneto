@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from "react";
 
-import { useUser, useToast } from "@edifice-ui/react";
+import { useUser, useToast } from "@edifice.io/react";
 import {
   odeServices,
   PutShareResponse,

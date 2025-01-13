@@ -5,7 +5,7 @@ import {
   MediaLibraryResult,
   TabsItemProps,
   useWorkspaceFile,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import { WorkspaceElement } from "@edifice.io/client";
 
 export const useMediaLibrary = () => {

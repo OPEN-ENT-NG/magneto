@@ -1,4 +1,4 @@
-import { MediaLibraryType } from "@edifice-ui/react";
+import { MediaLibraryType } from "@edifice.io/react";
 
 export interface VideoPlayerProps {
   modifyFile: (type: MediaLibraryType) => void;

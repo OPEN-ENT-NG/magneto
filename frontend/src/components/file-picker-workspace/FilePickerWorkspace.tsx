@@ -1,5 +1,5 @@
 import { IconEdit } from "@edifice.io/react/icons";
-import { IconButton, MediaLibraryType } from "@edifice-ui/react";
+import { IconButton, MediaLibraryType } from "@edifice.io/react";
 import { Box, Typography } from "@mui/material";
 
 import {

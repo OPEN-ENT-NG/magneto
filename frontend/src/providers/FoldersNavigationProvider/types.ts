@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 
-import { TreeViewHandlers } from "@edifice-ui/react";
+import { TreeViewHandlers } from "@edifice.io/react";
 import { RightRole } from "@edifice.io/client";
 
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";

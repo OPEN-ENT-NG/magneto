@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { IconEdit } from "@edifice.io/react/icons";
-import { IconButton } from "@edifice-ui/react";
+import { IconButton } from "@edifice.io/react";
 import { Box } from "@mui/material";
 
 import { imageStyle, mainBoxStyle, StyledIconButtonBox } from "./style";

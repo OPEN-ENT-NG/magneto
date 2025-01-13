@@ -3,7 +3,7 @@ import {
   IconClose,
   IconRafterDown,
 } from "@edifice.io/react/icons";
-import { Avatar, Button, Checkbox, IconButton } from "@edifice-ui/react";
+import { Avatar, Button, Checkbox, IconButton } from "@edifice.io/react";
 import {
   ShareRight,
   ShareRightAction,

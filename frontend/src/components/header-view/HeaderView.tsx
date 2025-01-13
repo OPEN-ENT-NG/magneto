@@ -7,7 +7,7 @@ import {
   Breadcrumb,
   Button,
   useEdificeClient,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import { mdiCheckCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Box } from "@mui/material";

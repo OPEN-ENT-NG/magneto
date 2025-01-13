@@ -7,7 +7,7 @@ import {
   memo,
 } from "react";
 
-import { useEdificeClient, useToast } from "@edifice-ui/react";
+import { useEdificeClient, useToast } from "@edifice.io/react";
 import { mdiArrowUpCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 
-import { Card, useEdificeClient } from "@edifice-ui/react";
+import { Card, useEdificeClient } from "@edifice.io/react";
 import "./FolderItem.scss";
 import { mdiFolder, mdiFolderAccount } from "@mdi/js";
 import Icon from "@mdi/react";

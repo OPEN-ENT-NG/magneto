@@ -10,7 +10,7 @@ interface UserRightsState {
 
 /**
  * Basic store for managing "rights"
- * Use this store with `checkUserRight` utils from @edifice-ui/react
+ * Use this store with `checkUserRight` utils from @edifice.io/react
  * You can check rights in a react-router loader
  * And set userRights within the store to get a stable global state
  */

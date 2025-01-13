@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { useToast } from "@edifice-ui/react";
+import { useToast } from "@edifice.io/react";
 
 interface UsePredefinedToastsProps {
   func: (...args: any[]) => Promise<any>;

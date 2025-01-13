@@ -15,7 +15,7 @@ import {
   Button,
   Tooltip,
   Combobox,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import { UseMutationResult } from "@tanstack/react-query";
 import {
   ID,

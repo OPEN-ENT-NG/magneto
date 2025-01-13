@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, useEdificeClient, Tooltip } from "@edifice-ui/react";
+import { Card, useEdificeClient, Tooltip } from "@edifice.io/react";
 import {
   mdiAccountCircle,
   mdiCalendarBlank,

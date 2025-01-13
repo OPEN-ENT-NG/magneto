@@ -2,7 +2,7 @@
 import { FC } from "react";
 
 import { IconEdit } from "@edifice.io/react/icons";
-import { IconButton } from "@edifice-ui/react";
+import { IconButton } from "@edifice.io/react";
 import { Box } from "@mui/material";
 
 import { videoContainerStyle, videoStyle } from "./style";

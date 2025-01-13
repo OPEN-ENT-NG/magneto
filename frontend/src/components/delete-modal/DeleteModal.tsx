@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 
 import { useTranslation } from "react-i18next";
 // eslint-disable-next-line
-import { Button, Modal } from "@edifice-ui/react";
+import { Button, Modal } from "@edifice.io/react";
 
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";

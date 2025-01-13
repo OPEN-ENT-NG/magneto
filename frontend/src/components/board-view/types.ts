@@ -1,4 +1,4 @@
-import { MediaLibraryType } from "@edifice-ui/react";
+import { MediaLibraryType } from "@edifice.io/react";
 
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 

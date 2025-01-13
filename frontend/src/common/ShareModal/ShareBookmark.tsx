@@ -1,7 +1,7 @@
 import { Ref } from "react";
 
 import { IconSave } from "@edifice.io/react/icons";
-import { FormControl, Button } from "@edifice-ui/react";
+import { FormControl, Button } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 import { BookmarkProps } from "./hooks/useShareBookmark";

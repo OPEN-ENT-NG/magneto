@@ -1,4 +1,4 @@
-import { useEdificeClient, useOdeTheme, EmptyScreen } from "@edifice-ui/react";
+import { useEdificeClient, useOdeTheme, EmptyScreen } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 export default function EmptyScreenApp(): JSX.Element {

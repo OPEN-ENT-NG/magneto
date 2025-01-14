@@ -188,7 +188,7 @@ export const BoardView: FC = () => {
           />
         </div>
       </BoardViewWrapper>
-      <Box sx={mediaLibraryStyle}>
+      <Box sx={mediaLibraryStyle} id="media-library-magneto">
         <MediaLibrary
           appCode={appCode}
           ref={mediaLibraryRef}

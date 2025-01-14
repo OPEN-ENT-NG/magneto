@@ -53,3 +53,16 @@
     padding: $spacing-L;
   }
 }
+
+#media-library-magneto #media-library_ref {
+  max-height: fit-content;
+}
+
+#editor-magneto {
+  .dropzone-import-wrapper {
+    margin-top: 2rem !important;
+  }
+  #tabpanel-workspace .workspace {
+    min-height: unset !important;
+  }
+}

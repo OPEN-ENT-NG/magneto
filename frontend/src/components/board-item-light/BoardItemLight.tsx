@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Card, useOdeClient, Tooltip } from "@edifice-ui/react";
+import { Card, useEdificeClient, Tooltip } from "@edifice.io/react";
 import {
   mdiAccountCircle,
   mdiCalendarBlank,
@@ -35,7 +35,7 @@ interface BoardItemProps {
 export const BoardItemLight: React.FunctionComponent<BoardItemProps> = ({
   board,
 }) => {
-  const { user, currentApp } = useOdeClient();
+  const { user, currentApp } = useEdificeClient();
   const { t } = useTranslation("magneto");
 
   const userId = user ? user?.userId : "";

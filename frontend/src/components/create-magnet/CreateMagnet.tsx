@@ -340,7 +340,7 @@ export const CreateMagnet: FC = () => {
           )}
           <FormControl id="description" style={formControlEditorStyle}>
             <Label>{t("magneto.create.board.description")}</Label>
-            <Box sx={editorStyle}>
+            <Box sx={editorStyle} id="editor-magneto">
               <Editor
                 id="postContent"
                 content={description}

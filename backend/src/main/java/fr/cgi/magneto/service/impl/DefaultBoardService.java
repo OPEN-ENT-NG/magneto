@@ -745,6 +745,15 @@ public class DefaultBoardService implements BoardService {
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject()
                         .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds))))
+                .lookUp(CollectionsConstant.SECTION_COLLECTION, Field.SECTIONIDS, Field._ID, Field.SECTIONS)
+                .addFields(Field.NBCARDSSECTIONS, new JsonObject().put(Mongo.SUM, new JsonObject().put(
+                                        Mongo.MAP, new JsonObject()
+                                                .put(Mongo.INPUT, String.format("$%s", Field.SECTIONS))
+                                                .put(Mongo.AS, Field.SECTION)
+                                                .put(Mongo.IN_MAP, new JsonObject().put(Mongo.SIZE, String.format("$$%s.%s", Field.SECTION, Field.CARDIDS)))
+                                )
+                        )
+                )
                 .project(new JsonObject()
                         .put(Field._ID, 1)
                         .put(Field.TITLE, 1)
@@ -752,6 +761,8 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.BACKGROUNDURL, 1)
                         .put(Field.CREATIONDATE, 1)
                         .put(Field.SECTIONIDS, 1)
+                        .put(Field.NBCARDS, new JsonObject().put(Mongo.SIZE, String.format("$%s", Field.CARDIDS)))
+                        .put(Field.NBCARDSSECTIONS, 1)
                         .put(Field.CARDIDS, 1)
                         .put(Field.LAYOUTTYPE, 1)
                         .put(Field.MODIFICATIONDATE, 1)
@@ -905,6 +916,44 @@ public class DefaultBoardService implements BoardService {
                         .getJsonObject(Field.CURSOR, new JsonObject())
                         .getJsonArray(Field.FIRSTBATCH, new JsonArray());
                 promise.complete(ModelHelper.toList(result, Board.class));
+            }
+        }));
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<JsonArray> getAllBoardImages(List<String> boardIds) {
+        Promise<JsonArray> promise = Promise.promise();
+
+        JsonObject query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, new JsonObject().put(Mongo.IN, new JsonArray(boardIds))))
+                .project(new JsonObject()
+                        .put(Field._ID, 1)
+                        .put(Field.IMAGEURL, 1))
+                .getAggregate();
+
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
+            if (either.isLeft()) {
+                log.error("[Magneto@%s::getAllBoardImages] Failed to get board images",
+                        this.getClass().getSimpleName(), either.left().getValue());
+                promise.fail(either.left().getValue());
+            } else {
+                JsonArray result = either.right().getValue()
+                        .getJsonObject(Field.CURSOR, new JsonObject())
+                        .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+
+                JsonArray boardImages = new JsonArray();
+                result.stream()
+                        .filter(JsonObject.class::isInstance)
+                        .map(JsonObject.class::cast)
+                        .forEach(board -> {
+                            boardImages.add(new JsonObject()
+                                    .put(Field._ID, board.getString(Field._ID))
+                                    .put(Field.IMAGEURL, board.getString(Field.IMAGEURL)));
+                        });
+                promise.complete(boardImages);
             }
         }));
 

@@ -27,7 +27,7 @@ export const onClick = (card: Card) => {
   }
 };
 
-export const displayContentByType = (card: Card) => {
+export const displayContentByType = (card: Card, src?: string) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO:
@@ -51,5 +51,7 @@ export const displayContentByType = (card: Card) => {
           extension={card.metadata ? card.metadata.extension : ""}
         />
       );
+    case RESOURCE_TYPE.BOARD:
+      return <CardContentImageDisplay defaultImageSrc={src} />;
   }
 };

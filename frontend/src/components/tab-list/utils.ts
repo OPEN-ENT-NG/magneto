@@ -1,25 +1,46 @@
 import { useTranslation } from "react-i18next";
 
-import { CURRENTTAB_STATE } from "./types";
+import { CURRENTTAB_STATE, TabConfig } from "./types";
 
-export const useTabs = () => {
+export function useTabs(tabsConfig: TabConfig[]) {
   const { t } = useTranslation("magneto");
-  return [
-    {
-      tabValue: CURRENTTAB_STATE.MINE,
-      label: t("magneto.cards.collection.mine"),
-    },
-    {
-      tabValue: CURRENTTAB_STATE.SHARED,
-      label: t("magneto.cards.collection.shared"),
-    },
-    {
-      tabValue: CURRENTTAB_STATE.PUBLIC,
-      label: t("magneto.cards.collection.public"),
-    },
-    {
-      tabValue: CURRENTTAB_STATE.FAVORTIE,
-      label: t("magneto.cards.collection.favorite"),
-    },
-  ];
-};
+
+  return tabsConfig.map(({ tabValue, translationKey }) => ({
+    tabValue,
+    label: t(translationKey),
+  }));
+}
+
+export const DEFAULT_TABS_CONFIG: TabConfig[] = [
+  {
+    tabValue: CURRENTTAB_STATE.MINE,
+    translationKey: "magneto.cards.collection.mine",
+  },
+  {
+    tabValue: CURRENTTAB_STATE.SHARED,
+    translationKey: "magneto.cards.collection.shared",
+  },
+  {
+    tabValue: CURRENTTAB_STATE.PUBLIC,
+    translationKey: "magneto.cards.collection.public",
+  },
+  {
+    tabValue: CURRENTTAB_STATE.FAVORTIE,
+    translationKey: "magneto.cards.collection.favorite",
+  },
+];
+
+export const BOARD_TABS_CONFIG: TabConfig[] = [
+  {
+    tabValue: CURRENTTAB_STATE.MINE,
+    translationKey: "magneto.cards.collection.mine",
+  },
+  {
+    tabValue: CURRENTTAB_STATE.SHARED,
+    translationKey: "magneto.cards.collection.shared",
+  },
+  {
+    tabValue: CURRENTTAB_STATE.PUBLIC,
+    translationKey: "magneto.cards.collection.public",
+  },
+];

@@ -5,6 +5,7 @@ import { CardContentAudio } from "../card-content-audio/CardContentAudio";
 import { CardContentFile } from "../card-content-file/CardContentFile";
 import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
+import CardPreviewBoard from "../card-preview-board/CardPreviewBoard";
 import { ExternalVideoPlayer } from "../external-video-player/ExternalVideoPlayer";
 import { getVideoSource } from "../external-video-player/utils";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
@@ -50,6 +51,10 @@ export const displayPreviewContentByType = (card: Card) => {
       );
     case RESOURCE_TYPE.FILE:
       return <CardContentFile card={card} />;
+    case RESOURCE_TYPE.BOARD:
+      return (
+        <CardPreviewBoard src={`/magneto#/board/${card.resourceUrl}/view`} />
+      );
     default:
       return null;
   }

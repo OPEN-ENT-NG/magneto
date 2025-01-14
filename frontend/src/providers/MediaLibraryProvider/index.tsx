@@ -19,6 +19,7 @@ import { getMediaLibraryType } from "./utils";
 import { MediaProps } from "~/components/board-view/types";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useMediaLibrary as useMediaLibraryHook } from "~/hooks/useMediaLibrary";
+import { Board } from "~/models/board.model";
 
 const MediaLibraryContext = createContext<MediaLibraryContextType | null>(null);
 
@@ -48,6 +49,9 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
   const [media, setMedia] = useState<MediaProps | null>(null);
   const [isCreateMagnetOpen, setIsCreateMagnetOpen] = useState(false);
   const [magnetType, setMagnetType] = useState<MENU_NOT_MEDIA_TYPE | null>(
+    null,
+  );
+  const [selectedBoardData, setSelectedBoardData] = useState<Board | null>(
     null,
   );
 
@@ -151,6 +155,8 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       setMagnetType,
       handleClickMenu,
       onClose,
+      selectedBoardData,
+      setSelectedBoardData,
     }),
     [
       mediaLibraryRef,
@@ -159,6 +165,7 @@ export const MediaLibraryProvider: FC<MediaLibraryProviderProps> = ({
       isCreateMagnetOpen,
       magnetType,
       workspaceElement,
+      selectedBoardData,
     ],
   );
 

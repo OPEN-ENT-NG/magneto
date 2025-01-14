@@ -1,0 +1,71 @@
+.board-list-container {
+  ul.grid {
+    padding-top: 1.5rem;
+    padding-right: 1.6rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.6rem;
+    width: 100% !important;
+  }
+
+  li.boardSizing {
+    min-width: 0;
+
+    .card {
+      width: 100%;
+      padding: unset !important;
+      margin: unset !important;
+      display: flex;
+      flex-wrap: wrap !important;
+      flex-direction: column;
+      max-width: 100%;
+
+      .board-number-magnets {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+          color: #ffb600;
+          font-size: 1.4rem;
+        }
+
+        svg + p {
+          font-size: 1.2rem;
+          margin: 0;
+        }
+      }
+
+      .board-about {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .board-about-left-content,
+        .board-about-right-content {
+          margin: 0 !important;
+          display: flex;
+          gap: 0.4rem;
+          align-items: center;
+
+          .med-resource-card-text {
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+  }
+
+  .title {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.4rem;
+  }
+
+  .card-body {
+    width: 100%;
+    padding: 1.2rem;
+  }
+}

@@ -36,6 +36,7 @@ export type BoardContextType = {
   openActiveCardAction: (card: Card, actionType: BOARD_MODAL_TYPE) => void;
   closeActiveCardAction: (actionType: BOARD_MODAL_TYPE) => void;
   behaviours: any;
+  boardImages: any; //TODO : type
 };
 
 export type Section = {
@@ -59,4 +60,5 @@ export interface DisplayModalsState {
   [BOARD_MODAL_TYPE.DELETE]: boolean;
   [BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE]: boolean;
   [BOARD_MODAL_TYPE.CREATE_EDIT]: boolean;
+  [BOARD_MODAL_TYPE.BOARD_SELECTION]: boolean;
 }

@@ -49,6 +49,7 @@ import {
   convertResourceTypeToMediaType,
 } from "./utils";
 import { MediaProps } from "../board-view/types";
+import { ScaledIframe } from "../card-content-board/CardContentBoard";
 import { CardContentFile } from "../card-content-file/CardContentFile";
 import { FilePickerWorkspace } from "../file-picker-workspace/FilePickerWorkspace";
 import { iconButtonStyle } from "../file-picker-workspace/style";
@@ -92,6 +93,8 @@ export const CreateMagnet: FC = () => {
     magnetType,
     setMagnetType,
     handleClickMedia,
+    selectedBoardData,
+    setSelectedBoardData,
   } = useMediaLibrary();
   const { activeCard, closeActiveCardAction } = useBoard();
   const isEditMagnet = !!activeCard;
@@ -119,6 +122,7 @@ export const CreateMagnet: FC = () => {
     setLinkUrl("");
     setDescription("");
     if (section !== null) setSection(board.sections[0]);
+    setSelectedBoardData(null);
     onClose();
   };
 
@@ -134,7 +138,11 @@ export const CreateMagnet: FC = () => {
       locked: isEditMagnet ? activeCard.locked : false,
       resourceId: media?.id ?? "",
       resourceType: getMagnetResourceType(),
-      resourceUrl: linkUrl ? linkUrl : media?.url ?? null,
+      resourceUrl: selectedBoardData
+        ? selectedBoardData.id
+        : linkUrl
+        ? linkUrl
+        : media?.url ?? null,
       title: title,
       id: isEditMagnet ? activeCard.id : undefined,
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
@@ -169,6 +177,14 @@ export const CreateMagnet: FC = () => {
   }, [media]);
 
   useEffect(() => {
+    console.log(selectedBoardData);
+    if (!isEditMagnet && selectedBoardData) {
+      setTitle(selectedBoardData.title);
+      setDescription(selectedBoardData.description);
+    }
+  }, [selectedBoardData]);
+
+  useEffect(() => {
     if (isEditMagnet) {
       setTitle(activeCard.title);
       setCaption(activeCard.caption);
@@ -179,6 +195,9 @@ export const CreateMagnet: FC = () => {
 
       if (activeCard.resourceType === MENU_NOT_MEDIA_TYPE.TEXT)
         setMagnetType(MENU_NOT_MEDIA_TYPE.TEXT);
+
+      if (activeCard.resourceType === MENU_NOT_MEDIA_TYPE.BOARD)
+        setMagnetType(MENU_NOT_MEDIA_TYPE.BOARD);
 
       setMedia({
         name: activeCard.metadata?.name,
@@ -254,6 +273,16 @@ export const CreateMagnet: FC = () => {
             ))}
           {magnetTypeHasImage && (
             <ImageContainer media={media} handleClickMedia={modifyFile} />
+          )}
+          {selectedBoardData !== null && (
+            <ScaledIframe
+              src={`/magneto#/board/${selectedBoardData._id}/view`}
+            />
+          )}
+          {activeCard?.resourceType === RESOURCE_TYPE.BOARD && (
+            <ScaledIframe
+              src={`/magneto#/board/${activeCard.resourceUrl}/view`}
+            />
           )}
           {magnetTypeHasAudio && (
             <Box sx={audioWrapperStyle}>

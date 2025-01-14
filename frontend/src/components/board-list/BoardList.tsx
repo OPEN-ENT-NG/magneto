@@ -4,26 +4,22 @@ import { Loading } from "@edifice-ui/react";
 import { animated, useSpring } from "@react-spring/web";
 
 import "./BoardList.scss";
+import { BoardListProps } from "./types";
 import { isBoardInFilter } from "./utils";
 import { BoardItem } from "~/components/board-item/BoardItem";
 import { Board } from "~/models/board.model";
-import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
-
-type BoardListProps = {
-  onDragAndDrop: (board: Board) => void;
-  searchText: string;
-};
 
 export const BoardList: React.FunctionComponent<BoardListProps> = ({
   onDragAndDrop,
   searchText,
+  boards,
+  boardsLoading,
 }) => {
   const springs = useSpring({
     from: { opacity: 0 },
     to: { opacity: 1 },
   });
 
-  const { boards, boardsLoading } = useBoardsNavigation();
   const [isBoardDragged, setIsBoardDragged] = useState<boolean>(false);
 
   return (

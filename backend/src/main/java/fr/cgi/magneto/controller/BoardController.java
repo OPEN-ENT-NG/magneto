@@ -378,6 +378,20 @@ public class BoardController extends ControllerHelper {
         });
         return handlePromiseWithCompositeFuture(promise, futures, usersIdToShare);
     }
+    @Post("/boards/imageUrl")
+    @ApiDoc("Get imageUrl of boards")
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void getAllBoardImages(HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "boardsIds", boards ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    List<String> boardIds = boards.getJsonArray(Field.BOARDIDS).getList();
+                    boardService.getAllBoardImages(boardIds)
+                            .onFailure(err -> renderError(request))
+                            .onSuccess(result -> renderJson(request, result));
+                }));
+    }
+
 
     private Future<List<String>> getGroupUsers(UserInfos user, String id) {
         Promise<List<String>> promise = Promise.promise();

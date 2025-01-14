@@ -35,7 +35,7 @@ export const BoardCreateMagnetBoardModal: FC<
     setInputValue((prevState) => ({
       ...prevState,
       currentTab: newValue,
-      selectedBoardId: null,
+      selectedBoard: null,
     }));
   };
 
@@ -43,7 +43,7 @@ export const BoardCreateMagnetBoardModal: FC<
     setInputValue((prevState) => ({
       ...prevState,
       search: newValue,
-      selectedBoardId: null,
+      selectedBoard: null,
     }));
   };
 

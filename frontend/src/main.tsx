@@ -1,5 +1,6 @@
 import React from "react";
 
+import "@edifice.io/bootstrap/dist/index.css";
 import { ThemeProvider } from "@cgi-learning-hub/theme";
 import { EdificeClientProvider, EdificeThemeProvider } from "@edifice.io/react";
 import {

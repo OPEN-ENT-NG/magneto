@@ -1,7 +1,8 @@
 import { FunctionComponent, useState } from "react";
 
 // eslint-disable-next-line
-import { Button, Modal, TreeView, useEdificeClient } from "@edifice.io/react";
+import { Button, Modal, useEdificeClient } from "@edifice.io/react";
+import { TreeView } from "@edifice-ui/react";
 
 import { useTranslation } from "react-i18next";
 

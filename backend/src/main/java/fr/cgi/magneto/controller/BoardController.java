@@ -325,12 +325,18 @@ public class BoardController extends ControllerHelper {
                         params.put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
                         .put(Field.BOARDNAME, board.getString(Field.TITLE));
 
-                        List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(board.getJsonArray(Field.SHARED));
-                        getUsersIdsToNotify(user, newSharedElem)
-                                .onSuccess(usersIdToShare -> {
-                                            notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, params);
-                                            request.response().setStatusMessage(boardId).setStatusCode(200).end();
-                                        });
+                        System.out.println(board.getJsonArray(Field.SHARED));
+                        if (board.getJsonArray(Field.SHARED) == null){
+                            request.response().setStatusMessage(boardId).setStatusCode(200).end();
+                        }
+                        else {
+                            List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(board.getJsonArray(Field.SHARED));
+                            getUsersIdsToNotify(user, newSharedElem)
+                                    .onSuccess(usersIdToShare -> {
+                                        notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, params);
+                                        request.response().setStatusMessage(boardId).setStatusCode(200).end();
+                                    });
+                        }
                     })
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::notifyBoardUsers] Failed to notify users of board : %s",

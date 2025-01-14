@@ -148,12 +148,12 @@ const CardPreviewBoard: React.FC<CardPreviewBoardProps> = ({
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.button === 0) {
-      // Ferme d'abord la modale si la fonction onClose est fournie
+    if (e.ctrlKey || e.metaKey) {
+      window.open(src, "_blank");
+    } else if (e.button === 0) {
       if (onClose) {
         onClose();
       }
-      // Puis redirige vers la nouvelle URL
       window.location.href = src;
     }
   };

@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 
-import { Button, SearchBar } from "@edifice-ui/react";
+import { Button, SearchBar } from "@edifice.io/react";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";

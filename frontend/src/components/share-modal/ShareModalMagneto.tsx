@@ -1,7 +1,7 @@
 import { FunctionComponent } from "react";
 
-import { useEdificeClient } from "@edifice.io/react";
 import { RightStringified } from "@edifice.io/client";
+import { useEdificeClient } from "@edifice.io/react";
 
 import { ShareModal } from "~/common/ShareModal";
 import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";

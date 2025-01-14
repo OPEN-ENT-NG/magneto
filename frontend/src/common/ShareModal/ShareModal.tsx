@@ -1,10 +1,11 @@
 import { ReactNode, useState } from "react";
 
 import {
-  IconBookmark,
-  IconInfoCircle,
-  IconRafterDown,
-} from "@edifice.io/react/icons";
+  ID,
+  PutShareResponse,
+  RightStringified,
+  ShareRight,
+} from "@edifice.io/client";
 import {
   Modal,
   Heading,
@@ -16,13 +17,12 @@ import {
   Tooltip,
   Combobox,
 } from "@edifice.io/react";
-import { UseMutationResult } from "@tanstack/react-query";
 import {
-  ID,
-  PutShareResponse,
-  RightStringified,
-  ShareRight,
-} from "@edifice.io/client";
+  IconBookmark,
+  IconInfoCircle,
+  IconRafterDown,
+} from "@edifice.io/react/icons";
+import { UseMutationResult } from "@tanstack/react-query";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 

@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { FC, useEffect, useRef, useState } from "react";
 
-import { Editor, EditorRef } from "@edifice.io/react/editor";
-import { IconEdit } from "@edifice.io/react/icons";
 import {
   IconButton as EdIconButton,
   Button,
@@ -11,6 +9,8 @@ import {
   Label,
   MediaLibraryType,
 } from "@edifice.io/react";
+import { Editor, EditorRef } from "@edifice.io/react/editor";
+import { IconEdit } from "@edifice.io/react/icons";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,

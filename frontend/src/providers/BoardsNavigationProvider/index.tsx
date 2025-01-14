@@ -8,8 +8,8 @@ import {
   useState,
 } from "react";
 
-import { checkUserRight } from "@edifice.io/react";
 import { RightRole } from "@edifice.io/client";
+import { checkUserRight } from "@edifice.io/react";
 
 import {
   BoardsNavigationContextType,

@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
 
+import { WorkspaceElement } from "@edifice.io/client";
 import {
   MediaLibraryRef,
   MediaLibraryResult,
   TabsItemProps,
   useWorkspaceFile,
 } from "@edifice.io/react";
-import { WorkspaceElement } from "@edifice.io/client";
 
 export const useMediaLibrary = () => {
   const mediaLibraryRef = useRef<MediaLibraryRef>(null);

@@ -7,12 +7,12 @@ import {
   useState,
 } from "react";
 
+import { WorkspaceElement } from "@edifice.io/client";
 import {
   IExternalLink,
   InternalLinkTabResult,
   MediaLibraryType,
 } from "@edifice.io/react";
-import { WorkspaceElement } from "@edifice.io/client";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { getMediaLibraryType } from "./utils";

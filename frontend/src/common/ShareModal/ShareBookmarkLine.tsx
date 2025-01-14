@@ -1,15 +1,15 @@
 import {
-  IconBookmark,
-  IconClose,
-  IconRafterDown,
-} from "@edifice.io/react/icons";
-import { Avatar, Button, Checkbox, IconButton } from "@edifice.io/react";
-import {
   ShareRight,
   ShareRightAction,
   ShareRightActionDisplayName,
   ShareRightWithVisibles,
 } from "@edifice.io/client";
+import { Avatar, Button, Checkbox, IconButton } from "@edifice.io/react";
+import {
+  IconBookmark,
+  IconClose,
+  IconRafterDown,
+} from "@edifice.io/react/icons";
 import { useTranslation } from "react-i18next";
 
 import { hasRight } from "./utils/hasRight";

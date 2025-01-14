@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { FC } from "react";
 
-import { IconEdit } from "@edifice.io/react/icons";
 import { IconButton } from "@edifice.io/react";
+import { IconEdit } from "@edifice.io/react/icons";
 import { Box } from "@mui/material";
 
 import { videoContainerStyle, videoStyle } from "./style";

@@ -1,7 +1,5 @@
 import { ChangeEvent, Dispatch, useEffect, useReducer } from "react";
 
-import { IconBookmark } from "@edifice.io/react/icons";
-import { OptionListItemType, useDebounce, useIsAdml } from "@edifice.io/react";
 import {
   ShareRight,
   ShareRightAction,
@@ -9,6 +7,8 @@ import {
   ShareSubject,
   odeServices,
 } from "@edifice.io/client";
+import { OptionListItemType, useDebounce, useIsAdml } from "@edifice.io/react";
+import { IconBookmark } from "@edifice.io/react/icons";
 import { useTranslation } from "react-i18next";
 
 import { ShareAction } from "./useShare";

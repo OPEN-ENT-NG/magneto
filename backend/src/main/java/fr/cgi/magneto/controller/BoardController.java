@@ -325,7 +325,6 @@ public class BoardController extends ControllerHelper {
                         params.put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
                         .put(Field.BOARDNAME, board.getString(Field.TITLE));
 
-                        System.out.println(board.getJsonArray(Field.SHARED));
                         if (board.getJsonArray(Field.SHARED) == null){
                             request.response().setStatusMessage(boardId).setStatusCode(200).end();
                         }

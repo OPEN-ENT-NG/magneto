@@ -30,7 +30,9 @@ public class BoardTest {
             .put("shared", new JsonArray())
             .put("tags", new JsonArray())
             .put("rights", new JsonArray())
-            .put("displayNbFavorites", false);
+            .put("displayNbFavorites", false)
+            .put("nbCards", 0)
+            .put("nbCardsSections", 0);
 
     @Test
     public void testBoardHasBeenInstantiated(TestContext ctx) {

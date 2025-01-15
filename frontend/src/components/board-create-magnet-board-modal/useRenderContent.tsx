@@ -21,10 +21,21 @@ export const useRenderContent = (
     to: { opacity: 1 },
   });
 
+  console.log({
+    isPublic: currentTab === CURRENTTAB_STATE.PUBLIC,
+    isShared: currentTab === CURRENTTAB_STATE.SHARED,
+    isExclusivelyShared: currentTab === CURRENTTAB_STATE.SHARED,
+    searchText: search,
+    isDeleted: false,
+    sortBy: "modificationDate",
+    page: 0,
+  });
+
   const { data: myBoardsResult } = useGetAllBoardsQuery(
     {
       isPublic: currentTab === CURRENTTAB_STATE.PUBLIC,
       isShared: currentTab === CURRENTTAB_STATE.SHARED,
+      isExclusivelyShared: currentTab === CURRENTTAB_STATE.SHARED,
       searchText: search,
       isDeleted: false,
       sortBy: "modificationDate",

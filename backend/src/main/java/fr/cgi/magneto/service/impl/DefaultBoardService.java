@@ -442,15 +442,16 @@ public class DefaultBoardService implements BoardService {
     public Future<JsonObject> getAllBoards(UserInfos user, Integer page,
                                            String searchText, String folderId,
                                            boolean isPublic,
-                                           boolean isShared, boolean isDeleted, String sortBy, boolean allFolders) {
+                                           boolean isShared, boolean isExclusivelyShared, boolean isDeleted, String sortBy,
+                                           boolean allFolders) {
 
         Promise<JsonObject> promise = Promise.promise();
 
         Future<JsonArray> fetchAllBoardsFuture = fetchAllBoards(user, page, searchText, folderId, isPublic, isShared,
-                isDeleted, sortBy, false, allFolders);
+                isExclusivelyShared, isDeleted, sortBy, false, allFolders);
 
         Future<JsonArray> fetchAllBoardsCountFuture = fetchAllBoards(user, page, searchText, folderId, isPublic, isShared,
-                isDeleted, sortBy, true, allFolders);
+                isExclusivelyShared, isDeleted, sortBy, true, allFolders);
 
         CompositeFuture.all(fetchAllBoardsFuture, fetchAllBoardsCountFuture)
                 .onFailure(fail -> {
@@ -478,12 +479,12 @@ public class DefaultBoardService implements BoardService {
 
     private Future<JsonArray> fetchAllBoards(UserInfos user, Integer page,
                                              String searchText, String folderId,
-                                             boolean isPublic, boolean isShared, boolean isDeleted,
+                                             boolean isPublic, boolean isShared, boolean isExclusivelyShared, boolean isDeleted,
                                              String sortBy, boolean getCount, boolean allFolders) {
 
         Promise<JsonArray> promise = Promise.promise();
 
-        JsonObject query = this.getAllBoardsQuery(user, page, searchText, folderId, isPublic, isShared,
+        JsonObject query = this.getAllBoardsQuery(user, page, searchText, folderId, isPublic, isShared, isExclusivelyShared,
                 isDeleted, sortBy, getCount, allFolders);
 
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
@@ -527,7 +528,7 @@ public class DefaultBoardService implements BoardService {
 
     private JsonObject getAllBoardsQuery(UserInfos user, Integer page,
                                          String searchText, String folderId,
-                                         boolean isPublic, boolean isShared, boolean isDeleted,
+                                         boolean isPublic, boolean isShared, boolean isExclusivelyShared, boolean isDeleted,
                                          String sortBy, boolean getCount, boolean allFolders) {
 
         MongoQuery query = new MongoQuery(this.collection)
@@ -538,14 +539,21 @@ public class DefaultBoardService implements BoardService {
             query.match(new JsonObject()
                     .put(Field.PUBLIC, true));
         } else {
-            if (isShared) {
-                query.matchOr(new JsonArray()
-                        .add(new JsonObject().put(Field.OWNERID, user.getUserId()))
-                        .add(new JsonObject()
+            if (isShared || isExclusivelyShared) {
+                JsonArray arr = new JsonArray();
+                if (!isExclusivelyShared) {
+                    arr.add(new JsonObject().put(Field.OWNERID, user.getUserId()));
+                } else {
+                    query.match(new JsonObject().put(Field.OWNERID,
+                            new JsonObject().put(Mongo.NE, user.getUserId())));
+                }
+                arr.add(new JsonObject()
                                 .put(String.format("%s.%s", Field.SHARED, Field.USERID), new JsonObject().put(Mongo.IN,
                                         new JsonArray().add(user.getUserId()))))
-                        .add(new JsonObject()
-                                .put(String.format("%s.%s", Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.IN, user.getGroupsIds()))));
+                    .add(new JsonObject()
+                                .put(String.format("%s.%s", Field.SHARED, Field.GROUPID), new JsonObject().put(Mongo.IN, user.getGroupsIds())));
+
+                query.matchOr(arr);
             } else {
                 query.match(new JsonObject().put(Field.OWNERID, user.getUserId()));
             }

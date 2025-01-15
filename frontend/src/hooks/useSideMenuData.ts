@@ -24,6 +24,13 @@ import {
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
+const styleMUIButtons = {
+  width: "2.25rem",
+  height: "2.25rem",
+  display: "flex",
+  alignItems: "center",
+};
+
 export const useSideMenuData = (): (
   | SideMenuIconProp
   | SideMenuDividerProp
@@ -76,7 +83,9 @@ export const useSideMenuData = (): (
       },
     },
     {
-      icon: createElement(TableChartIcon),
+      icon: createElement(TableChartIcon, {
+        style: styleMUIButtons,
+      }),
       name: t("magneto.board"),
       action: () => {
         handleClickMenu(MENU_NOT_MEDIA_TYPE.BOARD);

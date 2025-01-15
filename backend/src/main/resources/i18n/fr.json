@@ -55,6 +55,8 @@
   "magneto.board.notify": "Notifier les utilisateurs",
   "magneto.board.notify.text.1": "Voulez-vous envoyer une notification aux utilisateurs à qui vous avez partagé le tableau ?",
   "magneto.board.notify.text.2": "Une notification leur sera envoyée dans leur fil d'actualité leur indiquant que des modifications ont été faites sur ce tableau.",
+  "magneto.board.notify.success": "Notification envoyée.",
+  "magneto.board.notify.error": "Échec lors de l'envoi de la notification.",
   "magneto.board.move.title": "Déplacer l'aimant sélectionné",
   "magneto.board.move.text": "Vers quel tableau souhaitez-vous déplacer cet aimant ?",
   "magneto.board.duplicate.move.title": "Dupliquer l'aimant sélectionné",

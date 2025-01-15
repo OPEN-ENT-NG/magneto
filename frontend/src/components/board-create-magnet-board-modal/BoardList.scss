@@ -68,4 +68,10 @@
     width: 100%;
     padding: 1.2rem;
   }
+
+  button[aria-label="Open Action Bar"] {
+    pointer-events: none !important;
+    opacity: 0 !important;
+    cursor: not-allowed !important;
+  }
 }

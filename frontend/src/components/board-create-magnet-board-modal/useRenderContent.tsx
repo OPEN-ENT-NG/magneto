@@ -1,14 +1,17 @@
 import { useEffect, useMemo, MouseEvent as ReactMouseEvent } from "react";
 
 import { animated, useSpring } from "@react-spring/web";
+import { useTranslation } from "react-i18next";
 
 import { BoardCardWrapper } from "./style";
 import { InputValueState } from "./types";
 import { BoardItemLight } from "../board-item-light/BoardItemLight";
+import { EmptyState } from "../empty-state/EmptyState";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useGetAllBoardsQuery } from "~/services/api/boards.service";
+
 import "./BoardList.scss";
 
 export const useRenderContent = (
@@ -21,15 +24,7 @@ export const useRenderContent = (
     to: { opacity: 1 },
   });
 
-  console.log({
-    isPublic: currentTab === CURRENTTAB_STATE.PUBLIC,
-    isShared: currentTab === CURRENTTAB_STATE.SHARED,
-    isExclusivelyShared: currentTab === CURRENTTAB_STATE.SHARED,
-    searchText: search,
-    isDeleted: false,
-    sortBy: "modificationDate",
-    page: 0,
-  });
+  const { t } = useTranslation("magneto");
 
   const { data: myBoardsResult } = useGetAllBoardsQuery(
     {
@@ -106,7 +101,15 @@ export const useRenderContent = (
 
   return (
     <div className="board-list-container">
-      {boards?.length > 0 && (
+      {!boards?.length ? (
+        <EmptyState
+          title={
+            !search.trim()
+              ? t("magneto.element.empty.text")
+              : t("magneto.search.no.result")
+          }
+        />
+      ) : (
         <animated.ul className="grid ps-0 list-unstyled mb-24">
           {boards.map((board: Board) => {
             return (

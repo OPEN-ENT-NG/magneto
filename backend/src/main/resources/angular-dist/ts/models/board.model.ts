@@ -37,7 +37,6 @@ export interface IBoardsParamsRequest {
   folderId?: string;
   isPublic: boolean;
   isShared: boolean;
-  isExclusivelyShared?: boolean;
   isDeleted: boolean;
   searchText?: string;
   sortBy: string;

@@ -7,12 +7,14 @@ export const modalContainerStyle = {
   top: "30%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "95rem",
+  width: "90%",
+  maxWidth: "95rem",
   bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: "1.6rem",
   display: "flex",
   height: "fit-content",
+  maxHeight: "90vh",
   flexDirection: "column",
   padding: "3.2rem 5.2rem 3.2rem 5.2rem",
 };
@@ -22,12 +24,13 @@ export const headerStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   marginBottom: "1rem",
+  flexWrap: "wrap",
 };
 
 export const titleStyle = {
   fontWeight: "bold",
   fontFamily: "Comfortaa",
-  fontSize: "2.2rem",
+  fontSize: "2.6rem",
 };
 
 export const closeButtonStyle = {
@@ -47,11 +50,14 @@ export const modalFooterStyle = {
   width: "100%",
   gap: "1rem",
   height: "100%",
+  flexWrap: "wrap",
 };
 
 export const submitButtonsStyle = {
   marginTop: "1.5rem",
   display: "inline-flex",
+  gap: "0.5rem",
+  flexWrap: "wrap",
 };
 
 export const StyledButton = styled(Button, {
@@ -87,8 +93,9 @@ export const contentContainerStyle = {
   display: "flex",
   flexDirection: "column",
   gap: "1rem",
-  marginTop: "1.4rem !important",
+  marginTop: "1.4rem  !important",
   overflowY: "auto",
+  maxHeight: "70vh",
   "&::-webkit-scrollbar": {
     width: "0.8rem",
     height: "0.8rem",

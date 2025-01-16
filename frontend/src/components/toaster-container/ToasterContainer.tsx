@@ -79,6 +79,11 @@ export const ToasterContainer = ({
     selectedBoardsIds,
     selectedFoldersIds,
   });
+  const notifyBoardUsersAndToast = usePredefinedToasts({
+    func: notifyBoardUsers,
+    successMessage: t("magneto.board.notify.success"),
+    failureMessage: t("magneto.board.notify.error"),
+  });
   const isToasterOpen = selectedBoards.length > 0 || selectedFolders.length > 0;
   const transition = useTransition(isToasterOpen, {
     from: { opacity: 0, transform: "translateY(100%)" },
@@ -328,7 +333,8 @@ export const ToasterContainer = ({
                         {t("magneto.restore")}
                       </Button>
                     )}
-                    {selectedBoardsIds.length == 1 &&
+                    {isMyBoards() &&
+                      selectedBoardsIds.length == 1 &&
                       selectedFoldersIds.length == 0 &&
                       selectedBoardRights != null &&
                       selectedBoardRights.manager && (
@@ -386,7 +392,7 @@ export const ToasterContainer = ({
             isOpen={isNotifyOpen}
             title={t("magneto.board.notify")}
             onSubmit={() => {
-              notifyBoardUsers(selectedBoardsIds[0]);
+              notifyBoardUsersAndToast(selectedBoardsIds[0]);
               toggleNotify();
             }}
             submitButtonName={t("magneto.send")}

@@ -33,14 +33,14 @@ export const DEFAULT_TABS_CONFIG: TabConfig[] = [
 export const BOARD_TABS_CONFIG: TabConfig[] = [
   {
     tabValue: CURRENTTAB_STATE.MINE,
-    translationKey: "magneto.cards.collection.mine",
+    translationKey: "magneto.my.boards",
   },
   {
     tabValue: CURRENTTAB_STATE.SHARED,
-    translationKey: "magneto.cards.collection.shared",
+    translationKey: "magneto.shared.boards",
   },
   {
     tabValue: CURRENTTAB_STATE.PUBLIC,
-    translationKey: "magneto.cards.collection.public",
+    translationKey: "magneto.lycee.connecte.boards",
   },
 ];

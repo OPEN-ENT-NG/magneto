@@ -71,11 +71,12 @@ public class BoardController extends ControllerHelper {
             String folderId = request.getParam(Field.FOLDERID);
             boolean isPublic = Boolean.parseBoolean(request.getParam(Field.ISPUBLIC));
             boolean isShared = Boolean.parseBoolean(request.getParam(Field.ISSHARED));
+            boolean isExclusivelyShared = Boolean.parseBoolean(request.getParam(Field.ISEXCLUSIVELYSHARED));
             boolean isDeleted = Boolean.parseBoolean(request.getParam(Field.ISDELETED));
             boolean allFolders = Boolean.parseBoolean(request.getParam(Field.ALLFOLDERS));
             String sortBy = request.getParam(Field.SORTBY);
             Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
-            boardService.getAllBoards(user, page, searchText, folderId, isPublic, isShared, isDeleted, sortBy, allFolders)
+            boardService.getAllBoards(user, page, searchText, folderId, isPublic, isShared, isExclusivelyShared, isDeleted, sortBy, allFolders)
                     .onSuccess(result -> renderJson(request, result))
                     .onFailure(fail -> {
                         String message = String.format("[Magneto@%s::getAllBoards] Failed to get all boards : %s",

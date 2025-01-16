@@ -154,7 +154,7 @@ public class BoardServiceTest {
         testUser.setUserId("ownerId");
 
         JsonObject query = Whitebox.invokeMethod(this.boardService, "getAllBoardsQuery", testUser, 0, "test", "folderId",
-                false, true, false, "name", true, false);
+                false, true, false, false, "name", true, false);
 
         ctx.assertEquals(expected, query);
     }

@@ -34,6 +34,7 @@ public class Field {
     public static final String RIGHTS = "rights";
     public static final String INHERITEDSHARES = "inheritedShares";
     public static final String ISSHARED = "isShared";
+    public static final String ISEXCLUSIVELYSHARED = "isExclusivelyShared";
     public static final String SORTBY = "sortBy";
     public static final String PAGE = "page";
     public static final String FROMSTARTPAGE = "fromStartPage";

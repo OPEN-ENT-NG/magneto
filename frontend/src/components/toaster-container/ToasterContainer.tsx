@@ -333,7 +333,8 @@ export const ToasterContainer = ({
                         {t("magneto.restore")}
                       </Button>
                     )}
-                    {selectedBoardsIds.length == 1 &&
+                    {isMyBoards() &&
+                      selectedBoardsIds.length == 1 &&
                       selectedFoldersIds.length == 0 &&
                       selectedBoardRights != null &&
                       selectedBoardRights.manager && (

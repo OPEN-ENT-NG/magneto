@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { Box } from "@mui/material";
+import { useBoard } from "~/providers/BoardProvider";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 
 interface CardPreviewBoardProps {
   src: string;
@@ -59,6 +61,7 @@ const CardPreviewBoard: React.FC<CardPreviewBoardProps> = ({
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [containerHeight, setContainerHeight] = useState(0);
+  const { closeActiveCardAction } = useBoard();
 
   const updateScale = () => {
     const iframe = iframeRef.current;
@@ -151,6 +154,7 @@ const CardPreviewBoard: React.FC<CardPreviewBoardProps> = ({
     if (e.ctrlKey || e.metaKey) {
       window.open(src, "_blank");
     } else if (e.button === 0) {
+      closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW);
       if (onClose) {
         onClose();
       }

@@ -1,9 +1,10 @@
 import { FC, useMemo } from "react";
 
-import { Button } from "@edifice.io/react";
+import { Button, useEdificeClient } from "@edifice.io/react";
 import {
   mdiAccountCircle,
   mdiCalendarBlank,
+  mdiCrown,
   mdiEarth,
   mdiMagnet,
   mdiShareVariant,
@@ -26,9 +27,10 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
   };
   const { t } = useTranslation("magneto");
   const navigate = useNavigate();
+  const { user } = useEdificeClient();
 
   const { currentData: myBoardsResult } = useGetBoardsByIdsQuery([
-    card.boardId,
+    card.resourceUrl,
   ]);
 
   const board = useMemo(() => {
@@ -37,21 +39,32 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
       : new Board();
   }, [myBoardsResult]);
 
+  const amIBoardOwner = board.owner.userId === user?.userId;
+
   return (
     <Box sx={{ mt: 2 }}>
       <Stack spacing={2}>
         <Stack direction="row" spacing={3}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Icon path={mdiAccountCircle} size={1.5} />
-            <Typography sx={typographyStyle}>
-              {t("magneto.board.owner")} : {board.owner.displayName}
-            </Typography>
-          </Stack>
+          {amIBoardOwner ? (
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Icon path={mdiCrown} size={1.5} />
+              <Typography sx={typographyStyle}>
+                {t("magneto.board.tooltip.my.board")}
+              </Typography>
+            </Stack>
+          ) : (
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Icon path={mdiAccountCircle} size={1.5} />
+              <Typography sx={typographyStyle}>
+                {t("magneto.board.owner")} : {board.owner.displayName}
+              </Typography>
+            </Stack>
+          )}
 
           <Stack direction="row" alignItems="center" spacing={1}>
             <Icon path={mdiMagnet} size={1.5} style={{ color: "#ffb600" }} />
             <Typography sx={typographyStyle}>
-              {board.layoutType == LAYOUT_TYPE.FREE
+              {board.layoutType === LAYOUT_TYPE.FREE
                 ? board.nbCards
                 : board.nbCardsSections}{" "}
               {t("magneto.magnets")}
@@ -71,14 +84,14 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
           <Stack direction="row" spacing={1} alignItems="center">
             <Icon path={mdiCalendarBlank} size={1.5} />
             <Typography sx={typographyFooterStyle}>
-              {dayjs(board.modificationDate, {
+              {dayjs(board.modificationDate ?? board.creationDate, {
                 locale: "fr",
                 format: "YYYY-MM-DD HH:mm:ss",
               }).format("DD MMMM YYYY")}
             </Typography>
           </Stack>
 
-          {board.shared.length && (
+          {!!board.shared.length && (
             <Stack direction="row" spacing={1} alignItems="center">
               <Icon path={mdiShareVariant} size={1.5} />
               <Typography sx={typographyFooterStyle}>
@@ -95,9 +108,9 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
             variant="filled"
             onClick={(e) => {
               if (e.ctrlKey) {
-                window.open(`/board/${board.id}/view`, "_blank");
+                window.open(`/board/${card.resourceId}/view`, "_blank");
               } else {
-                navigate(`/board/${board.id}/view`);
+                navigate(`/board/${card.resourceId}/view`);
               }
             }}
             style={buttonStyle}

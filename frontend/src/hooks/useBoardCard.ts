@@ -1,11 +1,13 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useRef, useMemo, useCallback } from "react";
 
 import { useUser } from "@edifice.io/react";
 
+import { useCardClickHandler } from "./useCardClickHandler";
 import useDirectory from "./useDirectory";
 import { useResourceTypeDisplay } from "~/components/board-card/useResourceTypeDisplay";
 import { useDropdown } from "~/components/drop-down-list/useDropDown";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import {
@@ -21,12 +23,12 @@ export const useBoardCard = (card: Card) => {
 
   const {
     board,
-    hasEditRights,
-    hasManageRights,
+    hasEditRights: hasEditRightsFn,
+    hasManageRights: hasManageRightsFn,
     activeCard,
     closeActiveCardAction,
     openActiveCardAction,
-    hasContribRights,
+    hasContribRights: hasContribRightsFn,
   } = useBoard();
   const { user } = useUser();
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
@@ -35,28 +37,6 @@ export const useBoardCard = (card: Card) => {
   const { getAvatarURL } = useDirectory();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const states = useMemo(
-    () => ({
-      hasEditRights: hasEditRights(),
-      hasContribRights: hasContribRights(),
-      isOpen: openDropdownId === card.id,
-      isActiveCardId: activeCard?.id === card.id,
-      isMagnetOwner: card.ownerId === user?.userId,
-      isManager: hasManageRights(),
-    }),
-    [
-      card.id,
-      card.ownerId,
-      card.locked,
-      activeCard?.id,
-      user?.userId,
-      openDropdownId,
-      hasManageRights,
-      hasEditRights,
-      hasContribRights,
-    ],
-  );
 
   const cardPayload = useMemo(
     () => ({
@@ -69,8 +49,63 @@ export const useBoardCard = (card: Card) => {
       resourceUrl: card.resourceUrl,
       title: card.title,
     }),
-    [card, board._id],
+    [
+      card.id,
+      card.caption,
+      card.description,
+      card.resourceId,
+      card.resourceType,
+      card.resourceUrl,
+      card.title,
+      board._id,
+    ],
   );
+
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW);
+    },
+    [card, openActiveCardAction],
+  );
+
+  const handleSimpleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (card.resourceType === RESOURCE_TYPE.BOARD) {
+        window.open(
+          `/magneto#/board/${card.resourceUrl}/view`,
+          "_blank",
+          "noopener,noreferrer",
+        );
+      }
+    },
+    [card.resourceType, card.resourceUrl],
+  );
+
+  const customClickHandler = useCardClickHandler(
+    handleSimpleClick,
+    handleDoubleClick,
+  );
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (hasContribRightsFn()) {
+        customClickHandler(e);
+      } else {
+        handleDoubleClick(e);
+      }
+    },
+    [hasContribRightsFn, customClickHandler, handleDoubleClick],
+  );
+
+  const handleToggleDropdown = useCallback(() => {
+    if (card.id) toggleDropdown(card.id);
+  }, [card.id, toggleDropdown]);
+
+  const handleDropdownClose = useCallback(() => {
+    toggleDropdown(null);
+  }, [toggleDropdown]);
 
   const lockOrUnlockMagnet = useCallback(async () => {
     await updateCard({
@@ -84,33 +119,42 @@ export const useBoardCard = (card: Card) => {
     closeActiveCardAction(BOARD_MODAL_TYPE.DELETE);
   }, [card.id, board.id, deleteCards, closeActiveCardAction]);
 
-  const handleToggleDropdown = useCallback(() => {
-    if (card.id) {
-      toggleDropdown(card.id);
-    }
-  }, [card.id, toggleDropdown]);
-
-  const handleDoubleClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW);
-    },
-    [card],
-  );
-
-  const handleDropdownClose = useCallback(() => {
-    toggleDropdown(null);
-  }, [toggleDropdown]);
-
   const handleFavoriteClick = useCallback(() => {
     favoriteCard({ cardId: card.id, isFavorite: card.liked });
   }, [card.id, card.liked, favoriteCard]);
+
+  const hasEditRights = useMemo(() => hasEditRightsFn(), [hasEditRightsFn]);
+  const hasContribRights = useMemo(
+    () => hasContribRightsFn(),
+    [hasContribRightsFn],
+  );
+  const hasManageRights = useMemo(
+    () => hasManageRightsFn(),
+    [hasManageRightsFn],
+  );
+  const isOpen = useMemo(
+    () => openDropdownId === card.id,
+    [openDropdownId, card.id],
+  );
+  const isActiveCardId = useMemo(
+    () => activeCard?.id === card.id,
+    [activeCard?.id, card.id],
+  );
+  const isMagnetOwner = useMemo(
+    () => card.ownerId === user?.userId,
+    [card.ownerId, user?.userId],
+  );
 
   return useMemo(
     () => ({
       icon,
       type,
-      ...states,
+      hasEditRights,
+      hasContribRights,
+      isOpen,
+      isActiveCardId,
+      isMagnetOwner,
+      isManager: hasManageRights,
       dropdownRef,
       getAvatarURL,
       lockOrUnlockMagnet,
@@ -120,12 +164,17 @@ export const useBoardCard = (card: Card) => {
       handleFavoriteClick,
       registerDropdown,
       closeDropdown,
-      handleDoubleClick,
+      handleClick,
     }),
     [
       icon,
       type,
-      states,
+      hasEditRights,
+      hasContribRights,
+      isOpen,
+      isActiveCardId,
+      isMagnetOwner,
+      hasManageRights,
       getAvatarURL,
       lockOrUnlockMagnet,
       deleteMagnet,
@@ -134,7 +183,7 @@ export const useBoardCard = (card: Card) => {
       handleFavoriteClick,
       registerDropdown,
       closeDropdown,
-      handleDoubleClick,
+      handleClick,
     ],
   );
 };

@@ -312,5 +312,7 @@
   "magneto.modal.explorer.screen2.alt": "Image écran 2",
   "magneto.modal.explorer.screen2.text": "Les performances de l’application ont augmenté ! Le déplacement des aimants dans les tableaux est plus fluide, rendant votre expérience plus agréable.",
   "magneto.modal.explorer.screen3.alt": "Image écran 3",
-  "magneto.modal.explorer.screen3.text": "Le fonctionnement de la vignette Tableau évolue. Un seul clic suffit pour accéder au contenu. Le menu d’action s’affiche en cliquant sur les 3 petits points."
+  "magneto.modal.explorer.screen3.text": "Le fonctionnement de la vignette Tableau évolue. Un seul clic suffit pour accéder au contenu. Le menu d’action s’affiche en cliquant sur les 3 petits points.",
+
+  "magnetoexplorer.shared.status.error": "Une erreur est survenue. Veuillez réessayer ultérieurement."
 }

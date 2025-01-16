@@ -2,3 +2,7 @@ body {
   min-width: inherit;
   width: auto;
 }
+
+.MuiBox-root:focus-visible {
+  outline: none;
+}

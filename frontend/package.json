@@ -55,6 +55,7 @@
     "@edifice.io/bootstrap": "2.0.4",
     "@edifice.io/client": "2.0.4",
     "@edifice.io/utilities": "2.0.4",
+    "@edifice.io/tiptap-extensions": "2.0.4",
     "@edifice-ui/react": "1.5.23",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",

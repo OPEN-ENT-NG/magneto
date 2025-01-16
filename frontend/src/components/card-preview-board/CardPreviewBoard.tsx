@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { Box } from "@mui/material";
-import { useBoard } from "~/providers/BoardProvider";
+
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { useBoard } from "~/providers/BoardProvider";
 
 interface CardPreviewBoardProps {
   src: string;

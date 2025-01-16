@@ -7,8 +7,8 @@ import {
   useState,
 } from "react";
 
-import { checkUserRight, useOdeClient } from "@edifice-ui/react";
-import { RightRole } from "edifice-ts-client";
+import { RightRole } from "@edifice.io/client";
+import { checkUserRight, useEdificeClient } from "@edifice.io/react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -63,7 +63,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     RightRole,
     boolean
   > | null>(null);
-  const { user } = useOdeClient();
+  const { user } = useEdificeClient();
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);

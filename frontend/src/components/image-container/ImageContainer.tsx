@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Edit } from "@edifice-ui/icons";
-import { IconButton } from "@edifice-ui/react";
+import { IconButton } from "@edifice.io/react";
+import { IconEdit } from "@edifice.io/react/icons";
 import { Box } from "@mui/material";
 
 import { imageStyle, mainBoxStyle, StyledIconButtonBox } from "./style";
@@ -54,9 +54,9 @@ export const ImageContainer = ({
       />
       <StyledIconButtonBox imageBounds={imageBounds}>
         <IconButton
-          aria-label="Edit image"
+          aria-label="IconEdit image"
           color="tertiary"
-          icon={<Edit />}
+          icon={<IconEdit />}
           onClick={() => handleClickMedia(MEDIA_LIBRARY_TYPE.IMAGE)}
           type="button"
           variant="ghost"

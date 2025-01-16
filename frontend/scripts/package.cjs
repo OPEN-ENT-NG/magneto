@@ -44,15 +44,15 @@ function generatePackage(content) {
 function generateDeps(content) {
   return {
     ...content.dependencies,
-    "@edifice-ui/icons": BRANCH,
-    "@edifice-ui/react": BRANCH,
+    "@edifice.io/react/icons": BRANCH,
+    "@edifice.io/react": BRANCH,
   };
 }
 
 function generateDevDeps(content) {
   return {
     ...content.devDependencies,
-    "edifice-ts-client": BRANCH,
+    "@edifice.io/client": BRANCH,
   };
 }
 

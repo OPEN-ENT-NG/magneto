@@ -1,6 +1,6 @@
 import { FC, useState, KeyboardEvent, memo, useCallback } from "react";
 
-import { useUser } from "@edifice-ui/react";
+import { useUser } from "@edifice.io/react";
 import { mdiCommentOutline } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Avatar, Box, InputBase, Typography } from "@mui/material";

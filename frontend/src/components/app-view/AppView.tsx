@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useState } from "react";
 
-import { Grid, useToggle, SearchBar } from "@edifice-ui/react";
+import { Grid, useToggle, SearchBar } from "@edifice.io/react";
 import { mdiFolder } from "@mdi/js";
 import Icon from "@mdi/react";
 import { DndProvider } from "react-dnd";

@@ -1,15 +1,15 @@
 import { useState } from "react";
 
+import { isActionAvailable } from "@edifice-ui/react";
 import {
   Button,
   ActionBar,
-  isActionAvailable,
   useToggle,
-  useOdeClient,
+  useEdificeClient,
   checkUserRight,
-} from "@edifice-ui/react";
+} from "@edifice.io/react";
 import { useTransition, animated } from "@react-spring/web";
-import { ShareOptions } from "node_modules/@edifice-ui/react/dist/common/ShareModal/ShareModal";
+import { ShareOptions } from "node_modules/@edifice.io/react/dist/common/ShareModal/ShareModal";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -86,7 +86,7 @@ export const ToasterContainer = ({
     leave: { opacity: 0, transform: "translateY(100%)" },
   });
 
-  const { user } = useOdeClient();
+  const { user } = useEdificeClient();
 
   const userId = user ? user?.userId : "";
 

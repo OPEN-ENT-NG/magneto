@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Loading } from "@edifice-ui/react";
+import { Loading } from "@edifice.io/react";
 import { animated, useSpring } from "@react-spring/web";
 
 import "./BoardList.scss";

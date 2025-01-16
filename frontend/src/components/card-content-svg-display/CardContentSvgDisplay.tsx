@@ -1,6 +1,7 @@
 import { FC } from "react";
 
-import { useOdeClient, useOdeIcons } from "@edifice-ui/react";
+import { useOdeIcons } from "@edifice-ui/react";
+import { useEdificeClient } from "@edifice.io/react";
 
 import { StyledAppIcon, StyledBoxSvg } from "./style";
 import { CardContentSvgDisplayProps } from "./types";
@@ -22,7 +23,7 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
 }) => {
   const { svgDoc } = useSVG();
   const { getIconCode } = useOdeIcons();
-  const { currentApp } = useOdeClient();
+  const { currentApp } = useEdificeClient();
 
   const getSvgByExtension = (extension: string): React.ReactElement => {
     const lowerExt = extension.toLowerCase();

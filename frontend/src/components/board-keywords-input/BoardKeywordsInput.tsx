@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 
-import { FormControl, Input, Label } from "@edifice-ui/react";
+import { FormControl, Input, Label } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 import { Board } from "~/models/board.model";

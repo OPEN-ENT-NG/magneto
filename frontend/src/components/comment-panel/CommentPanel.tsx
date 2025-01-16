@@ -1,6 +1,6 @@
 import { FC, useState, KeyboardEvent, useEffect, useRef } from "react";
 
-import { useUser } from "@edifice-ui/react";
+import { useUser } from "@edifice.io/react";
 import { mdiArrowUpCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import CloseIcon from "@mui/icons-material/Close";

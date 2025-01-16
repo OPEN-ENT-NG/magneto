@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
-import { RightRole, WorkspaceElement } from "edifice-ts-client";
+import { RightRole, WorkspaceElement } from "@edifice.io/client";
 
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { Board } from "~/models/board.model";

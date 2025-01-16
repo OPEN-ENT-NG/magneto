@@ -1,7 +1,7 @@
 import { FunctionComponent } from "react";
 
-import { useOdeClient } from "@edifice-ui/react";
-import { RightStringified } from "edifice-ts-client";
+import { RightStringified } from "@edifice.io/client";
+import { useEdificeClient } from "@edifice.io/react";
 
 import { ShareModal } from "~/common/ShareModal";
 import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
@@ -23,7 +23,7 @@ export const ShareModalMagneto: FunctionComponent<props> = ({
   shareOptions,
   resourceType,
 }: props) => {
-  const { appCode } = useOdeClient();
+  const { appCode } = useEdificeClient();
   const handleShareClose = (): void => {
     toggle();
   };

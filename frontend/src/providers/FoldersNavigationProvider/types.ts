@@ -1,7 +1,7 @@
 import { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 
-import { TreeViewHandlers } from "@edifice-ui/react";
-import { RightRole } from "edifice-ts-client";
+import { RightRole } from "@edifice.io/client";
+import { TreeViewHandlers } from "@edifice.io/react";
 
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderTreeNavItem } from "~/models/folder-tree.model";

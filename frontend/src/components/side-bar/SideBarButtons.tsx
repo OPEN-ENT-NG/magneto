@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Button, useOdeClient, useToggle } from "@edifice-ui/react";
+import { Button, useEdificeClient, useToggle } from "@edifice.io/react";
 import { mdiFolderPlus, mdiStar } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { useTranslation } from "react-i18next";
@@ -24,7 +24,7 @@ export const SideBarButtons: React.FunctionComponent<SideBarButtonsProps> = ({
   const [isCreateFolderOpen, toggleCreateFolderOpen] = useToggle(false);
   const [isMagnetsCollectionOpen, toggleMagnetsCollectionOpen] =
     useToggle(false);
-  const { user } = useOdeClient();
+  const { user } = useEdificeClient();
   const { currentFolder } = useFoldersNavigation();
   const [isFolderOwnerOrSharedWithRights, setIsFolderOwnerOrSharedWithRights] =
     useState<boolean>(false);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { AppHeader, Button, useOdeClient } from "@edifice-ui/react";
+import { AppHeader, Button, useEdificeClient } from "@edifice.io/react";
 import "./Header.scss";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
@@ -18,7 +18,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
   const { t } = useTranslation("magneto");
-  const { user } = useOdeClient();
+  const { user } = useEdificeClient();
   const { currentFolder } = useFoldersNavigation();
   const [isFolderOwnerOrSharedWithRights, setIsFolderOwnerOrSharedWithRights] =
     useState<boolean>(false);

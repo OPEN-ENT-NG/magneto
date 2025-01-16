@@ -1,11 +1,11 @@
 import { ComponentPropsWithRef, useEffect, useState, useRef, FC } from "react";
 
-import { Delete, Edit } from "@edifice-ui/icons";
-import { IconButton } from "@edifice-ui/react";
-import { Avatar } from "@edifice-ui/react";
-import { AppIcon } from "@edifice-ui/react";
+import { IWebApp } from "@edifice.io/client";
+import { IconButton } from "@edifice.io/react";
+import { Avatar } from "@edifice.io/react";
+import { AppIcon } from "@edifice.io/react";
+import { IconDelete, IconEdit } from "@edifice.io/react/icons";
 import clsx from "clsx";
-import { IWebApp } from "edifice-ts-client";
 
 interface UniqueImagePickerProps extends ComponentPropsWithRef<"input"> {
   addButtonLabel: string;
@@ -53,7 +53,7 @@ export const UniqueImagePicker: FC<UniqueImagePickerProps> = ({
         <IconButton
           aria-label={addButtonLabel}
           color="tertiary"
-          icon={<Edit />}
+          icon={<IconEdit />}
           onClick={() => onUploadImage(id)}
           type="button"
           variant="ghost"
@@ -62,7 +62,7 @@ export const UniqueImagePicker: FC<UniqueImagePickerProps> = ({
           aria-label={deleteButtonLabel}
           color="danger"
           disabled={!preview}
-          icon={<Delete width="20" height="20" />}
+          icon={<IconDelete width="20" height="20" />}
           onClick={handleClean}
           type="button"
           variant="ghost"

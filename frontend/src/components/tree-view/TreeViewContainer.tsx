@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./TreeViewContent.scss";
 
-import { TreeView, useOdeClient } from "@edifice-ui/react";
+import { TreeView } from "@edifice-ui/react";
+import { useEdificeClient } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 import { useGetFolderTypeData } from "./utils";
@@ -39,7 +40,7 @@ export const TreeViewContainer: React.FunctionComponent<
   const { t } = useTranslation("magneto");
 
   const [moveBoardsToFolder] = useMoveBoardsMutation();
-  const { user } = useOdeClient();
+  const { user } = useEdificeClient();
   const [userRights] = useState<UserRights>(new UserRights(user));
   const {
     folderObject,

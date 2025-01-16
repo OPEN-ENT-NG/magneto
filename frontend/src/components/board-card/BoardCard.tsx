@@ -39,7 +39,7 @@ const BoardCard: FC<BoardCardProps> = ({
     handleFavoriteClick,
     registerDropdown,
     closeDropdown,
-    handleDoubleClick,
+    handleClick,
     hasContribRights,
     hasEditRights,
   } = useBoardCard(card);
@@ -133,8 +133,7 @@ const BoardCard: FC<BoardCardProps> = ({
       zoomLevel={zoomLevel}
       isDragging={isDragging}
       ref={setNodeRef}
-      onDoubleClick={handleDoubleClick}
-      onClick={!hasContribRights ? handleDoubleClick : undefined}
+      onClick={handleClick}
       style={style}
       {...(readOnly ? {} : { ...attributes, ...listeners })}
     >

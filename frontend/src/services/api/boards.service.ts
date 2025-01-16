@@ -53,10 +53,18 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         let urlParams: string =
           `?isPublic=${params.isPublic}&isShared=${params.isShared}` +
           `&isDeleted=${params.isDeleted}&sortBy=${params.sortBy}` +
-          `&searchText=${params.searchText}&allFolders=true`;
+          `&allFolders=true`;
 
         if (params.page != null) {
           urlParams += `&page=${params.page}`;
+        }
+
+        if (
+          params.searchText !== undefined &&
+          params.searchText !== null &&
+          params.searchText !== ""
+        ) {
+          urlParams += `&searchText=${params.searchText}`;
         }
 
         return `boards${urlParams}`;

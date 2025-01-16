@@ -46,6 +46,7 @@ export interface IBoardsParamsRequest {
   searchText?: string;
   sortBy: string;
   page?: number;
+  allFolders?: boolean;
 }
 
 export interface IBoardPayload {

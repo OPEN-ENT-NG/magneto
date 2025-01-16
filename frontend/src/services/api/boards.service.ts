@@ -29,6 +29,10 @@ export const boardsApi = emptySplitApi.injectEndpoints({
           urlParams += `&searchText=${params.searchText}`;
         }
 
+        if (params.allFolders !== null) {
+          urlParams += `&allFolders=${params.allFolders}`;
+        }
+
         return `boards${urlParams}`;
       },
       providesTags: ["Boards"],

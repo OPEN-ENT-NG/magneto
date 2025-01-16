@@ -119,6 +119,7 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
           folderId: undefined,
           isPublic: !!currentFolder.isPublic,
           isDeleted: !!currentFolder.deleted,
+          allFolders: currentFolder.id === FOLDER_TYPE.PUBLIC_BOARDS,
         }));
       } else if (!!currentFolder && !!currentFolder.id) {
         setBoardsQuery((prevBoardsQuery: any) => ({

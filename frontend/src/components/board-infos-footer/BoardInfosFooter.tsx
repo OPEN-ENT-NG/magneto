@@ -16,8 +16,10 @@ import { useTranslation } from "react-i18next";
 
 import { buttonStyle, typographyFooterStyle } from "./style";
 import { BoardInfosFooterProps } from "./types";
+import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board, IBoardItemResponse } from "~/models/board.model";
+import { useBoard } from "~/providers/BoardProvider";
 import { useGetBoardsByIdsQuery } from "~/services/api/boards.service";
 
 export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
@@ -29,6 +31,7 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
   const { currentData: myBoardsResult } = useGetBoardsByIdsQuery([
     card.resourceUrl,
   ]);
+  const { closeActiveCardAction } = useBoard();
 
   const board = useMemo(() => {
     return myBoardsResult && myBoardsResult.all[0]
@@ -112,6 +115,7 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
               } else if (e.button === 0) {
                 window.location.href = `/magneto#/board/${card.resourceUrl}/view`;
               }
+              closeActiveCardAction(BOARD_MODAL_TYPE.CARD_PREVIEW);
             }}
             style={buttonStyle}
           >

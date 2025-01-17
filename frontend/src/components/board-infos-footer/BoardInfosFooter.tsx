@@ -13,7 +13,6 @@ import Icon from "@mdi/react";
 import { Box, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
 
 import { buttonStyle, typographyFooterStyle } from "./style";
 import { BoardInfosFooterProps } from "./types";
@@ -26,9 +25,7 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
     fontSize: "1.6rem",
   };
   const { t } = useTranslation("magneto");
-  const navigate = useNavigate();
   const { user } = useEdificeClient();
-
   const { currentData: myBoardsResult } = useGetBoardsByIdsQuery([
     card.resourceUrl,
   ]);
@@ -107,10 +104,13 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
             type="button"
             variant="filled"
             onClick={(e) => {
-              if (e.ctrlKey) {
-                window.open(`/board/${card.resourceId}/view`, "_blank");
-              } else {
-                navigate(`/board/${card.resourceId}/view`);
+              if (e.ctrlKey || e.metaKey) {
+                window.open(
+                  `/magneto#/board/${card.resourceUrl}/view`,
+                  "_blank",
+                );
+              } else if (e.button === 0) {
+                window.location.href = `/magneto#/board/${card.resourceUrl}/view`;
               }
             }}
             style={buttonStyle}

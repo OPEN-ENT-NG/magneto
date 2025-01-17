@@ -69,7 +69,7 @@
     padding: 1.2rem;
   }
 
-  button[aria-label="Open Action Bar"] {
+  #board-item-card .card-header > button:first-of-type {
     pointer-events: none !important;
     opacity: 0 !important;
     cursor: not-allowed !important;

@@ -45,7 +45,7 @@ export const BoardItemLight: React.FunctionComponent<BoardItemProps> = ({
   };
 
   return (
-    <Box className="board-item board">
+    <Box className="board-item board" id={"board-item-card"}>
       <Card app={currentApp!}>
         <Card.Body flexDirection={"column"}>
           <Card.Image

@@ -2,7 +2,7 @@ import { useRef, useMemo, useCallback } from "react";
 
 import { useUser } from "@edifice.io/react";
 
-import { useCardClickHandler } from "./useCardClickHandler";
+import { isClickable, useCardClickHandler } from "./useCardClickHandler";
 import useDirectory from "./useDirectory";
 import { useResourceTypeDisplay } from "~/components/board-card/useResourceTypeDisplay";
 import { useDropdown } from "~/components/drop-down-list/useDropDown";
@@ -90,6 +90,7 @@ export const useBoardCard = (card: Card) => {
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
+      if (!isClickable(e)) return;
       if (hasContribRightsFn()) {
         customClickHandler(e);
       } else {

@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 
 import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 
-const isClickable = (event: React.MouseEvent): boolean => {
+export const isClickable = (event: React.MouseEvent): boolean => {
   const element = event.target as Element;
   const isNonSelectable =
     element.closest(`[data-type="${POINTER_TYPES.NON_SELECTABLE}"]`) !== null;

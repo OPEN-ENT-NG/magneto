@@ -29,7 +29,7 @@ mv ./src/main/resources/public/view/magneto.html ./src/main/resources/view
 
 # Build .
 #./build.sh --no-docker clean build
-./build.sh clean build install publish
+./build.sh clean build install
 
 # Clean up - remove frontend/dist and backend/src/main/resources
 rm -rf ../frontend/dist

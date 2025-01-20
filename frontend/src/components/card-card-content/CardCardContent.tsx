@@ -13,12 +13,15 @@ const MemoizedCardContent = memo(CardContent);
 
 export const CardCardContent = memo(
   ({ title, zoomLevel, resourceType, card }: CardCardContentProps) => (
-    <StyledCardContent data-type={POINTER_TYPES.CARD_CONTENT}>
+    <StyledCardContent>
       <StyledContentTitleTypography zoomLevel={zoomLevel}>
         {title || <span>&nbsp;</span>}
       </StyledContentTitleTypography>
       {zoomLevel > 1 && (
-        <CardContentWrapper resourceType={resourceType}>
+        <CardContentWrapper
+          resourceType={resourceType}
+          data-type={POINTER_TYPES.CARD_CONTENT}
+        >
           <MemoizedCardContent card={card} />
         </CardContentWrapper>
       )}

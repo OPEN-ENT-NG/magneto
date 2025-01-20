@@ -33,6 +33,7 @@ import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
+import { Box } from "@mui/material";
 
 export const CreateBoard: FC<CreateBoardProps> = ({
   isOpen,
@@ -401,13 +402,16 @@ export const CreateBoard: FC<CreateBoardProps> = ({
               </Button>
             </div>
           </Modal.Footer>
-          <MediaLibrary
-            appCode={appCode}
-            ref={mediaLibraryRef}
-            multiple={false}
-            visibility="protected"
-            {...mediaLibraryHandlers}
-          />
+
+          <Box id="media-library-magneto">
+            <MediaLibrary
+              appCode={appCode}
+              ref={mediaLibraryRef}
+              multiple={false}
+              visibility="protected"
+              {...mediaLibraryHandlers}
+            />
+          </Box>
         </Modal>
       )}
     </>

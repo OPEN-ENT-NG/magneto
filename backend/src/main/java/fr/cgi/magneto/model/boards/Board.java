@@ -69,6 +69,8 @@ public class Board implements Model<Board> {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
             this.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
         }
+        if (board.containsKey(Field.NBCARDS))
+            this.nbCards = board.getInteger(Field.NBCARDS);
         if (board.containsKey(Field.NBCARDSSECTIONS))
             this.nbCardsSections = board.getInteger(Field.NBCARDSSECTIONS);
         this.rights = board.getJsonArray(Field.RIGHTS, new JsonArray());

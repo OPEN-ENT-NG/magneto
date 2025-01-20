@@ -336,6 +336,7 @@ export const ToasterContainer = ({
                     {isMyBoards() &&
                       selectedBoardsIds.length == 1 &&
                       selectedFoldersIds.length == 0 &&
+                      hasSharedElement &&
                       selectedBoardRights != null &&
                       selectedBoardRights.manager && (
                         <Button

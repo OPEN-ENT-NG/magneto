@@ -16,3 +16,7 @@
 .main-grid {
   flex-grow: 1;
 }
+
+#media-library-magneto #media-library_ref {
+  max-height: fit-content;
+}

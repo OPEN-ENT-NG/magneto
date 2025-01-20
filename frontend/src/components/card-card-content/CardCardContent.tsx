@@ -7,12 +7,13 @@ import {
 } from "./style";
 import { CardCardContentProps } from "./types";
 import { CardContent } from "../card-content/CardContent";
+import { POINTER_TYPES } from "~/core/constants/pointerTypes.const";
 
 const MemoizedCardContent = memo(CardContent);
 
 export const CardCardContent = memo(
   ({ title, zoomLevel, resourceType, card }: CardCardContentProps) => (
-    <StyledCardContent>
+    <StyledCardContent data-type={POINTER_TYPES.CARD_CONTENT}>
       <StyledContentTitleTypography zoomLevel={zoomLevel}>
         {title || <span>&nbsp;</span>}
       </StyledContentTitleTypography>

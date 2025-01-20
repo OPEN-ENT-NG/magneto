@@ -2,7 +2,11 @@ import { useRef, useMemo, useCallback } from "react";
 
 import { useUser } from "@edifice.io/react";
 
-import { isClickable, useCardClickHandler } from "./useCardClickHandler";
+import {
+  isClickable,
+  isInCardContent,
+  useCardClickHandler,
+} from "./useCardClickHandler";
 import useDirectory from "./useDirectory";
 import { useResourceTypeDisplay } from "~/components/board-card/useResourceTypeDisplay";
 import { useDropdown } from "~/components/drop-down-list/useDropDown";
@@ -72,7 +76,7 @@ export const useBoardCard = (card: Card) => {
   const handleSimpleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (card.resourceType === RESOURCE_TYPE.BOARD) {
+      if (card.resourceType === RESOURCE_TYPE.BOARD && isInCardContent(e)) {
         window.open(
           `/magneto#/board/${card.resourceUrl}/view`,
           "_blank",

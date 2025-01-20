@@ -9,6 +9,12 @@ export const isClickable = (event: React.MouseEvent): boolean => {
   const dropdownOpen = document.querySelector('[data-dropdown-open="true"]');
   return !isNonSelectable && !dropdownOpen;
 };
+export const isInCardContent = (event: React.MouseEvent): boolean => {
+  const element = event.target as Element;
+  const isCardContent =
+    element.closest(`[data-type="${POINTER_TYPES.CARD_CONTENT}"]`) !== null;
+  return isCardContent;
+};
 
 export const useCardClickHandler = (
   handleSimpleClick: (e: React.MouseEvent) => void,

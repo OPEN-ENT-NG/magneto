@@ -5,6 +5,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
+import debounce from "lodash/debounce";
 
 import {
   closeButtonStyle,
@@ -35,7 +36,8 @@ export const PreviewModal: FC = () => {
     setActiveCard,
   } = useBoard();
   const [isRefReady, setIsRefReady] = useState(false);
-  const [cardIndex, setCardIndex] = useState<number>(0);
+  const [localCardIndex, setLocalCardIndex] = useState<number>(0);
+  const [isNavigating, setIsNavigating] = useState(false);
   const commentDivRef = useWindowResize();
 
   useEffect(() => {
@@ -53,32 +55,51 @@ export const PreviewModal: FC = () => {
   }, [board]);
 
   useEffect(() => {
-    setCardIndex(
-      initialCards.findIndex(
+    if (!isNavigating) {
+      const newIndex = initialCards.findIndex(
         (selectedCard: Card) => selectedCard.id === activeCard?.id,
-      ),
-    );
-  }, [activeCard]);
+      );
+      setLocalCardIndex(newIndex);
+    }
+  }, [activeCard, initialCards, isNavigating]);
 
-  const navigatePage = (direction: "next" | "prev") => {
-    const newIndex = direction === "next" ? cardIndex + 1 : cardIndex - 1;
-    const newCard = initialCards[newIndex];
-    setActiveCard(newCard);
-  };
+  const debouncedNavigation = useCallback(
+    debounce((card: Card) => {
+      setActiveCard(card);
+      setIsNavigating(false);
+    }, 200),
+    [setActiveCard],
+  );
 
-  const isLastCardInBoard = (): boolean => {
-    return activeCard === initialCards[initialCards.length - 1];
-  };
+  const navigatePage = useCallback(
+    (direction: "next" | "prev") => {
+      setIsNavigating(true);
+      const newIndex =
+        direction === "next" ? localCardIndex + 1 : localCardIndex - 1;
+      setLocalCardIndex(newIndex);
+      const newCard = initialCards[newIndex];
+      debouncedNavigation(newCard);
+    },
+    [localCardIndex, initialCards, debouncedNavigation],
+  );
+
+  const isLastCardInBoard = useCallback((): boolean => {
+    return localCardIndex === initialCards.length - 1;
+  }, [localCardIndex, initialCards]);
 
   const handleKeyNavigation = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft" && cardIndex > 0) {
+      if (event.key === "ArrowLeft" && localCardIndex > 0 && !isNavigating) {
         navigatePage("prev");
-      } else if (event.key === "ArrowRight" && !isLastCardInBoard()) {
+      } else if (
+        event.key === "ArrowRight" &&
+        !isLastCardInBoard() &&
+        !isNavigating
+      ) {
         navigatePage("next");
       }
     },
-    [cardIndex, isLastCardInBoard, navigatePage],
+    [localCardIndex, isLastCardInBoard, navigatePage, isNavigating],
   );
 
   useEffect(() => {
@@ -142,7 +163,7 @@ export const PreviewModal: FC = () => {
 
       {CARD_PREVIEW && (
         <>
-          {cardIndex > 0 && (
+          {localCardIndex > 0 && (
             <IconButton
               sx={leftNavigationStyle}
               onClick={() => navigatePage("prev")}

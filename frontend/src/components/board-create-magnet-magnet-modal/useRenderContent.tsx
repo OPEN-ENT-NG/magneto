@@ -72,11 +72,11 @@ export const useRenderContent = (
         .filter((card: Card) => card.boardId === board._id)
         .sort((a: Card, b: Card) => {
           if (!isByFavorite) {
-            return a.title.localeCompare(b.title);
+            return (a.title ?? "").localeCompare(b.title ?? "");
           } else {
             if (a.liked === b.liked) {
               // Si les deux ont le même statut "liked", comparer par "title"
-              return a.title.localeCompare(b.title);
+              return (a.title ?? "").localeCompare(b.title ?? "");
             }
             // Placer "liked = true" avant "liked = false"
             return a.liked ? -1 : 1;
@@ -90,11 +90,11 @@ export const useRenderContent = (
       ?.map((card: ICardItemResponse) => new Card().build(card))
       .sort((a: Card, b: Card) => {
         if (!isByFavorite) {
-          return a.title.localeCompare(b.title);
+          return (a.title ?? "").localeCompare(b.title ?? "");
         } else {
           if (a.liked === b.liked) {
             // Si les deux ont le même statut "liked", comparer par "title"
-            return a.title.localeCompare(b.title);
+            return (a.title ?? "").localeCompare(b.title ?? "");
           }
           // Placer "liked = true" avant "liked = false"
           return a.liked ? -1 : 1;

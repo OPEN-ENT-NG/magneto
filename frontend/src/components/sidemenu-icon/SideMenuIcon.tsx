@@ -1,5 +1,7 @@
 import React from "react";
+
 import "./SideMenuIcon.scss";
+import { Box } from "@mui/material";
 
 interface SideMenuIconProps {
   icon: React.ReactNode;
@@ -14,16 +16,15 @@ export const SidemenuIcon: React.FC<SideMenuIconProps> = ({
 }) => {
   return (
     <>
-      <div
+      <Box
         role="button"
         className={`side-menu-icon`}
         onClick={action}
-        onKeyDown={action}
         tabIndex={0}
       >
-        <div className="side-menu-icon-img">{icon}</div>
+        <Box className="side-menu-icon-img">{icon}</Box>
         {name && <span className="side-menu-icon-text">{name}</span>}
-      </div>
+      </Box>
     </>
   );
 };

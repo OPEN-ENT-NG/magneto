@@ -21,11 +21,11 @@ export const prepareI18nByModalType = (isModalDuplicate: boolean) =>
 const transformAndSortBoards = (boards: Board[]): SimplifiedBoard[] => {
   return boards
     .map((board) => ({
-      name: board.title,
+      name: board.title ?? "",
       id: board._id,
     }))
     .sort((a, b) =>
-      a.name.localeCompare(b.name, undefined, {
+      (a.name ?? "").localeCompare(b.name ?? "", undefined, {
         numeric: true,
         sensitivity: "base",
       }),

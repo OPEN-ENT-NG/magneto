@@ -53,7 +53,6 @@ export const boardsApi = emptySplitApi.injectEndpoints({
     }),
     getAllBoards: builder.query({
       query: (params: IBoardsParamsRequest) => {
-        console.log(params.isExclusivelyShared);
         let urlParams: string =
           `?isPublic=${params.isPublic}&isShared=${params.isShared}` +
           `&isDeleted=${params.isDeleted}&sortBy=${params.sortBy}` +

@@ -57,8 +57,27 @@ const reorderWithLockedItems = (
 
   // Moving right to left
   if (oldIndex > newIndex) {
-    // Insert at the target position
-    result.splice(newIndex, 0, movedItem);
+    // Check if we're trying to move to position right after a locked item
+    if (lockedItems.has(items[newIndex])) {
+      console.log(
+        `Attempting to place item ${movedItem} right after locked item ${items[newIndex]}`,
+      );
+
+      const lockedIndex = result.indexOf(items[newIndex]);
+
+      // Get and remove the item that was after the locked item
+      const itemAfterLocked = result[lockedIndex - 1];
+      result.splice(lockedIndex - 1, 1);
+
+      // Insert moved item after original adjacent item
+      result.splice(lockedIndex - 1, 0, movedItem);
+
+      // Insert original adjacent item before locked item
+      result.splice(lockedIndex, 0, itemAfterLocked);
+    } else {
+      // Insert at the target position
+      result.splice(newIndex, 0, movedItem);
+    }
 
     // Push displaced items forward past any locked items
     for (let i = newIndex + 1; i < result.length; i++) {
@@ -82,32 +101,44 @@ const reorderWithLockedItems = (
   }
   // Moving left to right
   else {
-    result.splice(newIndex, 0, movedItem);
+    // Check if we're trying to move to position right after a locked item
+    if (lockedItems.has(items[newIndex])) {
+      console.log(
+        `Attempting to place item ${movedItem} right after locked item ${items[newIndex]}`,
+      );
 
-    // Push displaced items forward past any locked items
-    for (let i = newIndex + 1; i < result.length; i++) {
+      const lockedIndex = result.indexOf(items[newIndex]);
+
+      // Get and remove the item that was after the locked item
+      const itemAfterLocked = result[lockedIndex + 1];
+      result.splice(lockedIndex + 1, 1);
+
+      // Insert moved item after original adjacent item
+      result.splice(lockedIndex + 1, 0, movedItem);
+
+      // Insert original adjacent item before locked item
+      result.splice(lockedIndex, 0, itemAfterLocked);
+    } else {
+      // Insert at the target position
+      result.splice(newIndex, 0, movedItem);
+    }
+
+    // Push displaced items backward past any locked items
+    for (let i = newIndex - 1; i >= 0; i--) {
       if (lockedItems.has(result[i])) {
         // If we hit a locked item, find next available position
-        let availablePos = i + 1;
-        while (
-          availablePos < result.length &&
-          lockedItems.has(result[availablePos])
-        ) {
-          availablePos++;
+        let availablePos = i - 1;
+        while (availablePos >= 0 && lockedItems.has(result[availablePos])) {
+          availablePos--;
         }
 
-        if (availablePos < result.length) {
+        if (availablePos >= 0) {
           // Move the displaced item to the available position
-          const [itemToMove] = result.splice(i - 1, 1);
-          result.splice(availablePos - 1, 0, itemToMove);
+          const [itemToMove] = result.splice(i + 1, 1);
+          result.splice(availablePos + 1, 0, itemToMove);
         }
       }
     }
-  }
-
-  // Verify that locked items haven't moved from their original positions
-  if (!verifyLockedPositions(result, lockedItems, originalLockedPositions)) {
-    return items;
   }
 
   return result;

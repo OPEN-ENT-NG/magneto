@@ -1,17 +1,18 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
+
 import {
   DragEndEvent,
   DragStartEvent,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
+
 import { CustomPointerSensor } from "./customPointer";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useUpdateBoardMutation } from "~/services/api/boards.service";
 
-const getLockedPositions = (
+/*const getLockedPositions = (
   items: string[],
   lockedItems: Set<string>,
 ): Map<string, number> => {
@@ -36,7 +37,7 @@ const verifyLockedPositions = (
     }
   }
   return true;
-};
+};*/
 
 const reorderWithLockedItems = (
   items: string[],
@@ -44,9 +45,6 @@ const reorderWithLockedItems = (
   newIndex: number,
   lockedItems: Set<string>,
 ): string[] => {
-  // Store original positions of locked items
-  const originalLockedPositions = getLockedPositions(items, lockedItems);
-
   // If the moved item is locked, return original array
   if (lockedItems.has(items[oldIndex])) {
     return items;

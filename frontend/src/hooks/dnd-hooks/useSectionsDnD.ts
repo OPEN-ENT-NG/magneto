@@ -13,6 +13,10 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { useTranslation } from "react-i18next";
 
 import { CustomPointerSensor } from "./customPointer";
+import {
+  reorderWithLockedItems,
+  reorderWithLockedItemsArray,
+} from "./reorderUtils";
 import { ActiveItemState, DND_ITEM_TYPE } from "./types";
 import { createCardMap, createSectionMap } from "./utils";
 import { Board } from "~/models/board.model";
@@ -372,14 +376,20 @@ export const useSectionsDnD = (board: Board) => {
 
   const handleCardMoveWithinSection = useCallback(
     async (activeCardId: string, currentOverSection: Section, over: Over) => {
-      const newCardIds = arrayMove(
+      const lockedCards = currentOverSection.cards
+        .filter((card): card is typeof card & { locked: true } => card.locked)
+        .map((card) => card.id);
+
+      const newCardIds = reorderWithLockedItems(
         currentOverSection.cardIds,
         currentOverSection.cardIds.indexOf(activeCardId),
         over.id === currentOverSection._id
           ? currentOverSection.cardIds.length - 1
           : currentOverSection.cardIds.indexOf(over.id.toString()),
+        lockedCards,
       );
-      const newCards = arrayMove(
+
+      const newCards = reorderWithLockedItemsArray(
         currentOverSection.cards,
         currentOverSection.cards.findIndex((card) => card.id === activeCardId),
         over.id === currentOverSection._id
@@ -387,6 +397,7 @@ export const useSectionsDnD = (board: Board) => {
           : currentOverSection.cards.findIndex(
               (card) => card.id === over.id.toString(),
             ),
+        lockedCards,
       );
 
       setUpdatedSections((prev) =>
@@ -434,6 +445,7 @@ export const useSectionsDnD = (board: Board) => {
       }
 
       if (over.id === "new-section" || over.id === newMagnetOver[0]?.id) {
+        console.log("hey");
         setNewMagnetOver([]);
         return await handleNewSectionCreation(
           activeCardId,
@@ -446,6 +458,7 @@ export const useSectionsDnD = (board: Board) => {
         return;
       }
       if (originalActiveSection._id !== currentOverSection._id) {
+        console.log("hoy");
         return await handleCardMoveBetweenSections(
           activeCardId,
           originalActiveSection,

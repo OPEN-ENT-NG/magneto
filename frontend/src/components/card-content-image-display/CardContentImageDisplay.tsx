@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/media-has-caption */
 import { useState, useEffect, FC } from "react";
 
 import { CardMedia } from "@mui/material";

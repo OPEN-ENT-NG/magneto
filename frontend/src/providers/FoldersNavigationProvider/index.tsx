@@ -10,7 +10,11 @@ import {
 } from "react";
 
 import { RightRole } from "@edifice.io/client";
-import { checkUserRight, TreeViewHandlers } from "@edifice.io/react";
+import {
+  checkUserRight,
+  findPathById,
+  TreeViewHandlers,
+} from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -119,43 +123,51 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
   };
 
   const handleSelect = useCallback(
-    (folderId: string, folderType: FOLDER_TYPE | BasicFolder) => {
-      if (currentFolder.id === folderId) return;
+    (nodeId: string, folderType: FOLDER_TYPE | BasicFolder) => {
+      if (currentFolder.id === nodeId) return;
 
       setSelectedNodesIds((prevIds) => {
-        if (
-          prevIds.length === 1 &&
-          prevIds[0] === FOLDER_TYPE.MY_BOARDS &&
-          folderId ===
-            (FOLDER_TYPE.DELETED_BOARDS || FOLDER_TYPE.DELETED_BOARDS)
-        )
-          return [folderId, ""];
+        let parentIds = [];
 
-        const preparePrevIds = prevIds.reduce((acc: string[], id: string) => {
-          if (id !== "" && !acc.includes(id) && id !== folderId) {
-            return [...acc, id];
+        // Si c'est un dossier principal
+        if (Object.values(FOLDER_TYPE).includes(nodeId as FOLDER_TYPE)) {
+          parentIds = [nodeId];
+        } else {
+          // Pour les sous-dossiers, il faut déterminer le bon dossier racine
+          const rootFolder = (() => {
+            // Si le dossier est dans la corbeille
+            const folder = folderData.find((f) => f.id === nodeId);
+            if (folder?.deleted) {
+              return FOLDER_TYPE.DELETED_BOARDS;
+            }
+            // Si c'est un dossier public
+            if (folder?.isPublic) {
+              return FOLDER_TYPE.PUBLIC_BOARDS;
+            }
+            // Par défaut, c'est un dossier privé
+            return FOLDER_TYPE.MY_BOARDS;
+          })();
+
+          parentIds = [rootFolder, nodeId];
+          const ancestorsPath = findPathById(folderData, nodeId);
+          if (ancestorsPath.length > 0) {
+            parentIds = [rootFolder, ...ancestorsPath, nodeId];
           }
-          return acc;
-        }, []);
+        }
 
-        return [...preparePrevIds, folderId, ""];
+        return Array.from(new Set([...prevIds, ...parentIds]));
       });
 
       setCurrentFolder((prevFolder) => {
-        if (prevFolder.id === folderId) return prevFolder;
+        if (prevFolder.id === nodeId) return prevFolder;
 
         const newFolder = prepareFolder(
-          folderId,
+          nodeId,
           folderData,
           t(prepareFolderTitle(folderType)),
         );
 
-        handleFolderRefs(
-          folderId,
-          folderType,
-          folderData,
-          folderNavigationRefs,
-        );
+        handleFolderRefs(nodeId, folderType, folderData, folderNavigationRefs);
 
         return newFolder;
       });
@@ -172,7 +184,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
       if (selectedFoldersIds.includes(resource.id)) {
         setSelectedFoldersIds(
           selectedFoldersIds.filter(
-            (selectedResource: String) => selectedResource !== resource.id,
+            (selectedResource: string) => selectedResource !== resource.id,
           ),
         );
         setSelectedFolders(

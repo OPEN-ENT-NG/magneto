@@ -55,7 +55,6 @@ export default ({ mode }: { mode: string }) => {
   const build = {
     assetsDir: "public",
     rollupOptions: {
-      external: ["edifice-ts-client"],
       output: {
         manualChunks: {
           react: [
@@ -66,9 +65,6 @@ export default ({ mode }: { mode: string }) => {
             "react-hook-form",
             "react-hot-toast",
           ],
-        },
-        paths: {
-          "edifice-ts-client": "/assets/js/edifice-ts-client/index.js",
         },
       },
     },
@@ -103,6 +99,10 @@ export default ({ mode }: { mode: string }) => {
     test,
     resolve: {
       alias: {
+        "@cgi-learning-hub": resolve(
+          __dirname,
+          "node_modules/@cgi-learning-hub",
+        ),
         "@images": resolve(
           __dirname,
           "node_modules/@edifice.io/bootstrap/dist/images",

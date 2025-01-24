@@ -50,7 +50,9 @@ export class UserRights {
       const hasGroupShareRight: boolean =
         !!shareItem.groupId &&
         !!this.user.groupsIds.find((groupId: string) => {
-          shareItem.groupId == groupId && shareItem[shareRight] == true;
+          if (shareItem.groupId == groupId && shareItem[shareRight] == true) {
+            hasShareRight = true;
+          }
         });
 
       if (hasIndividualShareRight || hasGroupShareRight) hasShareRight = true;

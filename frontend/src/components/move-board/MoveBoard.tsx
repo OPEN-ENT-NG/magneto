@@ -1,7 +1,6 @@
 import { FunctionComponent, useState } from "react";
 
-// eslint-disable-next-line
-import { TreeView } from "@edifice-ui/react";
+import { TreeView } from "@edifice.io/react";
 import { Button, Modal, useEdificeClient } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
@@ -215,9 +214,11 @@ export const MoveBoard: FunctionComponent<props> = ({
               <TreeView
                 ref={folderNavigationRefs[FOLDER_TYPE.MY_BOARDS]}
                 data={datas || dataTree}
-                onTreeItemSelect={(item) => {
+                selectedNodeId={selectedFolderId}
+                onTreeItemClick={(item) => {
                   setSelectedFolderId(item);
                 }}
+                showIcon={true}
               />
             )}
           </Modal.Body>

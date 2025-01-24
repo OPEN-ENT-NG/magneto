@@ -1,7 +1,6 @@
 import { FC } from "react";
 
-import { useOdeIcons } from "@edifice-ui/react";
-import { useEdificeClient } from "@edifice.io/react";
+import { useEdificeClient, useEdificeIcons } from "@edifice.io/react";
 
 import { StyledAppIcon, StyledBoxSvg } from "./style";
 import { CardContentSvgDisplayProps } from "./types";
@@ -14,15 +13,13 @@ import { SheetIcon } from "../SVG/SheetIcon";
 import { TextIcon } from "../SVG/TextIcon";
 import { VideoIcon } from "../SVG/VideoIcon";
 import { EXTENSION_FORMAT } from "~/core/constants/extension-format.const";
-import { useSVG } from "~/providers/SVGProvider";
 
 export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
   extension,
   url,
   isPreview = false,
 }) => {
-  const { svgDoc } = useSVG();
-  const { getIconCode } = useOdeIcons();
+  const { getIconCode } = useEdificeIcons();
   const { currentApp } = useEdificeClient();
 
   const getSvgByExtension = (extension: string): React.ReactElement => {
@@ -41,14 +38,16 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
     if (lowerExt === "link") {
       const appName = extractFirstSegment(url ?? "");
       const icon = getIconCode(appName);
+      console.log({ url, appName, icon });
+
       return (
         <>
-          {svgDoc.getElementById(icon) ? (
+          {icon ? (
             <StyledAppIcon
               isPreview={isPreview}
               app={{
                 address: `/${appName}`,
-                icon: `${appName}-large`,
+                icon: appName,
                 name: `${capFirstLetter(appName)}`,
                 scope: [],
                 display: false,

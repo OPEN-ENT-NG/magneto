@@ -51,15 +51,17 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
     if (!inputValue || !activeCard?.id) return;
 
     try {
-      isModalDuplicate
-        ? await duplicate({
-            boardId: inputValue,
-            cardIds: [activeCard.id],
-          })
-        : await move({
-            boardId: inputValue,
-            card: new CardForm().build(activeCard).toJSON(),
-          });
+      if (isModalDuplicate) {
+        await duplicate({
+          boardId: inputValue,
+          cardIds: [activeCard.id],
+        });
+      } else {
+        await move({
+          boardId: inputValue,
+          card: new CardForm().build(activeCard).toJSON(),
+        });
+      }
       toast.success(t(sucess));
       closeActiveCardAction(BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);
     } catch (er) {

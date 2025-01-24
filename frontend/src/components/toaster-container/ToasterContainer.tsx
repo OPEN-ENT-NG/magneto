@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { isActionAvailable } from "@edifice-ui/react";
+import { isActionAvailable } from "@edifice.io/client";
 import {
   Button,
   ActionBar,
@@ -9,7 +9,6 @@ import {
   checkUserRight,
 } from "@edifice.io/react";
 import { useTransition, animated } from "@react-spring/web";
-import { ShareOptions } from "node_modules/@edifice.io/react/dist/common/ShareModal/ShareModal";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +18,7 @@ import { DeleteModal } from "../delete-modal/DeleteModal";
 import { MessageModal } from "../message-modal/MessageModal";
 import { MoveBoard } from "../move-board/MoveBoard";
 import { ShareModalMagneto } from "../share-modal/ShareModalMagneto";
+import { ShareOptions } from "~/common/ShareModal/ShareModal";
 import { CreateBoard } from "~/components/create-board/CreateBoard";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { RESOURCE_BIG_TYPE } from "~/core/enums/resource-big-type.enum";
@@ -216,6 +216,7 @@ export const ToasterContainer = ({
                           color="primary"
                           variant="filled"
                           onClick={() => {
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                             selectedBoardsIds.length == 1 //if we selected a board, open it, else open the folder
                               ? navigate(`/board/${selectedBoardsIds[0]}/view`)
                               : handleSelect(

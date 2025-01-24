@@ -4,7 +4,7 @@ import { SvgIconTypeMap } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { renderToString } from "react-dom/server";
 
-type MuiIconComponent = OverridableComponent<SvgIconTypeMap<{}, "svg">> & {
+type MuiIconComponent = OverridableComponent<SvgIconTypeMap<object, "svg">> & {
   muiName: string;
 };
 

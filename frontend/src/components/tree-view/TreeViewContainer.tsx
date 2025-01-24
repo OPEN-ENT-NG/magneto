@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./TreeViewContent.scss";
 
-import { TreeView } from "@edifice-ui/react";
+import { TreeView } from "@edifice.io/react";
 import { useEdificeClient } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
@@ -58,9 +58,14 @@ export const TreeViewContainer: React.FunctionComponent<
     e.stopPropagation();
     dispatch({ type: "SET_DROP_DEPTH", dropDepth: data.dropDepth + 1 });
   };
-  const handleDragLeave = (e: React.ChangeEvent<HTMLInputElement>) => {
-    removeFolderHighlight(e);
-
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    const targetElement = e.target
+      .closest("li[id^='treeitem-']")
+      ?.querySelector(".action-container");
+    if (targetElement) {
+      targetElement.classList.add(DRAG_AND_DROP_TYPE.NO_DRAG_OVER);
+      targetElement.classList.remove(DRAG_AND_DROP_TYPE.DRAG_OVER);
+    }
     e.preventDefault();
     e.stopPropagation();
     dispatch({ type: "SET_DROP_DEPTH", dropDepth: data.dropDepth - 1 });
@@ -68,33 +73,33 @@ export const TreeViewContainer: React.FunctionComponent<
     dispatch({ type: "SET_IN_DROP_ZONE", inDropZone: false });
   };
 
-  const removeFolderHighlight = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const targetElement = e.target.closest(".action-container");
+  const removeFolderHighlight = (e: React.DragEvent<HTMLDivElement>) => {
+    const targetElement = e.target
+      .closest("li[id^='treeitem-']")
+      ?.querySelector(".action-container");
     if (targetElement) {
       targetElement.classList.add(DRAG_AND_DROP_TYPE.NO_DRAG_OVER);
       targetElement.classList.remove(DRAG_AND_DROP_TYPE.DRAG_OVER);
     }
   };
 
-  const handleDragOver = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const targetElement = e.target.closest(".action-container");
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    const targetElement = e.target
+      .closest("li[id^='treeitem-']")
+      ?.querySelector(".action-container");
     if (targetElement) {
       targetElement.classList.add(DRAG_AND_DROP_TYPE.DRAG_OVER);
       targetElement.classList.remove(DRAG_AND_DROP_TYPE.NO_DRAG_OVER);
     }
-
     e.preventDefault();
     e.stopPropagation();
   };
 
   const handleDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (
-      !!e.target.closest("li")?.id &&
-      e.target.closest("li")?.id.startsWith("listitem") &&
-      !!e.target.closest("li")?.id.split("_")[1]
-    ) {
-      const targetFolderId = e.target.closest("li")?.id.split("_")[1];
-      const targetFolder: Folder = getFolderData(targetFolderId ?? "");
+    const liElement = e.target.closest("li[id^='treeitem-']");
+    if (liElement?.id) {
+      const targetFolderId = liElement.id.replace("treeitem-", "");
+      const targetFolder: Folder = getFolderData(targetFolderId);
       const dragAndDropBoard: Board = dragAndDropBoards[0] ?? new Board();
       const dragAndDropBoardsIds: string[] = dragAndDropBoards.map(
         (board: Board) => board._id,
@@ -270,13 +275,22 @@ export const TreeViewContainer: React.FunctionComponent<
 
   const datas = useGetFolderTypeData(folderType, folderObject);
 
+  const handleTreeItemClick = useCallback(
+    (nodeId: string) => {
+      handleSelect(nodeId, folderType);
+    },
+    [folderType, handleSelect],
+  );
+
   const handleTreeItemFold = useCallback(
-    (unfoldId: string) => {
-      setSelectedNodesIds((prevSelectedNodesIds) =>
-        unfoldId in FOLDER_TYPE
-          ? prevSelectedNodesIds.filter((id) => id !== unfoldId)
-          : prevSelectedNodesIds,
-      );
+    (foldId: string) => {
+      // Ne pas retirer l'ID du parent quand on clique sur un sous-dossier
+      setSelectedNodesIds((prevSelectedNodesIds) => {
+        if (foldId in FOLDER_TYPE) {
+          return prevSelectedNodesIds.filter((id) => id !== foldId);
+        }
+        return prevSelectedNodesIds;
+      });
       handleFolderRefs(
         currentFolder.id,
         folderType,
@@ -294,12 +308,25 @@ export const TreeViewContainer: React.FunctionComponent<
     ],
   );
 
+  const handleTreeItemUnfold = useCallback(
+    (unfoldId: string) => {
+      setSelectedNodesIds((prev) => {
+        // Garder l'ID du parent dans la liste des nœuds sélectionnés
+        if (!prev.includes(unfoldId)) {
+          return [...prev, unfoldId];
+        }
+        return prev;
+      });
+    },
+    [setSelectedNodesIds],
+  );
+
   useEffect(() => {
     const ref = folderNavigationRefs[folderType];
     if (ref.current && currentFolder.id) {
       ref.current.select(currentFolder.id);
     }
-  }, [currentFolder, folderType, folderNavigationRefs, handleTreeItemFold]);
+  }, [currentFolder.id, folderType, folderNavigationRefs]);
 
   return (
     <>
@@ -315,11 +342,12 @@ export const TreeViewContainer: React.FunctionComponent<
         <TreeView
           ref={folderNavigationRefs[folderType]}
           data={datas}
-          onTreeItemSelect={(item) => {
-            handleSelect(item, folderType);
-          }}
-          selectedNodesIds={selectedNodesIds}
+          selectedNodeId={currentFolder.id}
+          onTreeItemClick={handleTreeItemClick}
           onTreeItemFold={handleTreeItemFold}
+          onTreeItemUnfold={handleTreeItemUnfold}
+          expandedNodes={selectedNodesIds}
+          showIcon={true}
         />
       </div>
     </>

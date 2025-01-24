@@ -17,7 +17,6 @@ import { useGetAllCardsCollectionQuery } from "../../services/api/cards.service"
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card as CardModel, ICardItemResponse } from "~/models/card.model";
 import "./MagnetsCollectionModal.scss";
-import { SVGProvider } from "~/providers/SVGProvider/index.tsx";
 import { useGetAllBoardsQuery } from "~/services/api/boards.service";
 
 type props = {
@@ -136,25 +135,23 @@ export const MagnetsCollectionModal: FunctionComponent<props> = ({
               />
               {t("magneto.cards.collection.board.view")}
             </div>
-            <SVGProvider>
-              {switchBoard ? (
-                <FavoriteViewByBoard
-                  boardsWithCards={boardsWithCards}
-                  searchText={searchText}
-                  springs={springs}
-                  currentApp={currentApp}
-                  getBoardsLoading={getBoardsLoading}
-                />
-              ) : (
-                <FavoriteViewByCard
-                  cardsData={cardsData}
-                  searchText={searchText}
-                  springs={springs}
-                  currentApp={currentApp}
-                  getBoardsLoading={getBoardsLoading}
-                />
-              )}
-            </SVGProvider>
+            {switchBoard ? (
+              <FavoriteViewByBoard
+                boardsWithCards={boardsWithCards}
+                searchText={searchText}
+                springs={springs}
+                currentApp={currentApp}
+                getBoardsLoading={getBoardsLoading}
+              />
+            ) : (
+              <FavoriteViewByCard
+                cardsData={cardsData}
+                searchText={searchText}
+                springs={springs}
+                currentApp={currentApp}
+                getBoardsLoading={getBoardsLoading}
+              />
+            )}
           </Modal.Body>
         </Modal>
       )}

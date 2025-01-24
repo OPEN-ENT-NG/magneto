@@ -1,3 +1,41 @@
+# Compiled output
+dist
+dist-ssr
+tmp
+/out-tsc
+*.local
+
+# Dependencies
+node_modules
+*.lock
+pnpm-lock.yaml
+.pnpm-store
+
+# Environment files
+.env*
+.env
+.env.dev
+.env.prod
+.env.local
+*.tsbuildinfo
+*.vite.config.ts.timestamp-*
+
+# IDEs and editors
+.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # Logs
 logs
 *.log
@@ -6,35 +44,28 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+/libpeerconnection.log
+testem.log
 
-node_modules
-dist
-dist-ssr
-*.local
-.env*
-*.lock
+# Testing and coverage
+/coverage
+.lighthouseci
 
-pnpm-lock.yaml
+# Build tools
+/.sass-cache
+/connect.lock
+/typings
+.turbo
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Nx
+.nx/cache
+.nx/workspace-data
+
+# System Files
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-# Google Lighthouse
-.lighthouseci
-.pnpm-store
-
-.env
-.env.dev
-.env.prod
-.env.local
-
-# Turborepo
-.turbo

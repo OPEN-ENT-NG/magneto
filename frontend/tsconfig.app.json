@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "~/*": ["./src/*"],
+      "@cgi-learning-hub/icons": ["node_modules/@cgi-learning-hub/icons"],
+      "@cgi-learning-hub/theme": ["node_modules/@cgi-learning-hub/theme"],
+      "@cgi-learning-hub/ui": ["node_modules/@cgi-learning-hub/ui"],
+      "@images/*": ["node_modules/@edifice.io/bootstrap/dist/images/*"]
+    },
+
+    /* Test */
+    "types": [
+      "vite/client",
+      "vitest/globals",
+      "vitest/importMeta",
+      "vitest",
+      "@testing-library/jest-dom"
+    ]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "../old"]
+}

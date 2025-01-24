@@ -18,6 +18,7 @@ import { MediaLibrary } from "@edifice.io/react/multimedia";
 import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
 import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
 import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
+import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { styles } from "./style";
@@ -33,7 +34,6 @@ import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
-import { Box } from "@mui/material";
 
 export const CreateBoard: FC<CreateBoardProps> = ({
   isOpen,

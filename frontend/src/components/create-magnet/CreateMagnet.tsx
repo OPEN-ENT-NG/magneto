@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/media-has-caption */
 import { FC, useEffect, useRef, useState } from "react";
 
 import {
@@ -7,10 +6,10 @@ import {
   FormControl,
   Input,
   Label,
-  MediaLibraryType,
 } from "@edifice.io/react";
 import { Editor, EditorRef } from "@edifice.io/react/editor";
 import { IconEdit } from "@edifice.io/react/icons";
+import { MediaLibraryType } from "@edifice.io/react/multimedia";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -147,7 +146,11 @@ export const CreateMagnet: FC = () => {
       id: isEditMagnet ? activeCard.id : undefined,
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
     };
-    isEditMagnet ? await updateCard(payload) : await createCard(payload);
+    if (isEditMagnet) {
+      await updateCard(payload);
+    } else {
+      await createCard(payload);
+    }
     if (
       payload.resourceType === RESOURCE_TYPE.FILE &&
       documents.find((doc) => doc._id === payload.resourceId) === undefined

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/media-has-caption */
 import { FC } from "react";
 
 import { IconButton } from "@edifice.io/react";

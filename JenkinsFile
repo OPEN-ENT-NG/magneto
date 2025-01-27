@@ -2,20 +2,43 @@
 
 pipeline {
   agent any
-    stages {
+  stages {
+
     stage("Initialization") {
-        steps {
-            script {
-                def version = sh(returnStdout: true, script: 'docker compose -f backend/docker-compose.yml run --rm maven mvn $MVN_OPTS help:evaluate -Dexpression=project.version -q -DforceStdout')
-                buildName "${env.GIT_BRANCH.replace("origin/", "")}@${version}"
-            }
+      steps {
+        script {
+          def version = sh(returnStdout: true, script: 'cd backend && docker-compose run --rm maven mvn $MVN_OPTS help:evaluate -Dexpression=project.version -q -DforceStdout')
+          buildName "${env.GIT_BRANCH.replace("origin/", "")}@${version}"
         }
     }
-    stage('Build') {
-        steps {
-          checkout scm
-          sh './build.sh init clean install publish'
+    }
+
+    stage('Frontend React') {
+      steps {
+        dir('frontend') {
+          sh 'chmod +x build.sh && ./build.sh installDeps build'
         }
+      }
+    }
+
+    stage('Backend') {
+      steps {
+        dir('backend') {
+          sh 'cp -R ../frontend/dist/* ./src/main/resources/'
+          sh 'mkdir -p ./src/main/resources/view'
+          sh 'mkdir -p ./src/main/resources/public/template'
+          sh 'mkdir -p ./src/main/resources/public/img'
+          sh 'mkdir -p ./src/main/resources/public/js'
+          sh 'mv ./src/main/resources/*.html ./src/main/resources/view'
+          sh 'chmod +x build.sh && ./build.sh clean build publish'
+          sh 'rm -rf ../frontend/dist'
+        }
+      }
+    }
+  }
+  post {
+      cleanup {
+        sh 'cd backend && docker-compose down && cd ../frontend && docker-compose down'
       }
     }
 }

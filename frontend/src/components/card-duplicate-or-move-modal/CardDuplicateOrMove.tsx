@@ -64,7 +64,7 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
       }
       toast.success(t(sucess));
       closeActiveCardAction(BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);
-    } catch (er) {
+    } catch {
       toast.error(t(error));
     }
   };

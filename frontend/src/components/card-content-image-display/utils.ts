@@ -83,7 +83,7 @@ export const formatYoutubeUrl = (url: string): string => {
     const parsedUrl = new URL(url);
     const id = getYoutubeId(parsedUrl);
     return id ? VIDEO_PLATFORMS.youtube.replace("{id}", id) : "";
-  } catch (error) {
+  } catch {
     console.error("Invalid URL:", url);
     return "";
   }

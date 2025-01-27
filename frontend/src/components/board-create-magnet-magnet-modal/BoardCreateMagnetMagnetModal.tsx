@@ -80,7 +80,7 @@ export const BoardCreateMagnetMagnetModal: FC<
         await duplicateCard(magnetMagnetParams);
         toast.success(t("magneto.duplicate.cards.confirm"));
         onCloseModal();
-      } catch (err) {
+      } catch {
         console.error("failed to duplicate cards");
       }
     }

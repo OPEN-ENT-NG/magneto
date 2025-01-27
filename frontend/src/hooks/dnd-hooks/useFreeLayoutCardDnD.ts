@@ -88,7 +88,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
 
           await updateBoard(payload).unwrap();
         }
-      } catch (error) {
+      } catch {
         setUpdatedIds(validCardIds);
       } finally {
         setActiveItem(null);

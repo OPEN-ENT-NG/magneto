@@ -20,7 +20,7 @@ export const usePredefinedToasts = ({
       try {
         await func(parameter);
         toast.success(successMessage || "Operation successful!");
-      } catch (error) {
+      } catch {
         toast.error(failureMessage || "Operation failed!");
       }
     },

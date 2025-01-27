@@ -79,7 +79,7 @@ export const FileDropZone: FC<FileDropZoneProps> = ({ handleResetdrag }) => {
         application: "magneto",
       });
       setWorkspaceElement(newWorkspaceElement);
-    } catch (error) {
+    } catch {
       toast.error(t("magneto.dropzone.create.error"));
     }
   };

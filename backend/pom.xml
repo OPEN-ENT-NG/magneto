@@ -34,7 +34,7 @@
         <toolsVersion>2.0.0-final</toolsVersion>
         <powerMockVersion>2.0.2</powerMockVersion>
         <mockitoVersion>[2.0,3.0)</mockitoVersion>
-        <entCoreVersion>6.0-SNAPSHOT</entCoreVersion>
+        <entCoreVersion>6.1.0</entCoreVersion>
         <reflectionsVersion>0.10.2</reflectionsVersion>
         <gatlingHighchartsVersion>2.2.2</gatlingHighchartsVersion>
     </properties>

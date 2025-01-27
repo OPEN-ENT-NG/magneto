@@ -32,13 +32,9 @@ export const useFreeLayoutCardDnD = (board: Board) => {
   }, [board.cards]);
 
   const lockedCards = useMemo(() => {
-    const locked = new Set<string>();
-    board.cards.forEach((card) => {
-      if (card.locked) {
-        locked.add(card.id);
-      }
-    });
-    return locked;
+    return board.cards
+      .filter((card): card is typeof card & { locked: true } => card.locked)
+      .map((card) => card.id);
   }, [board.cards]);
 
   const sensors = useSensors(

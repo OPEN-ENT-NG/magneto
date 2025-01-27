@@ -1,3 +1,5 @@
+import { arrayMove } from "@dnd-kit/sortable";
+
 import { Card } from "~/models/card.model";
 
 const getItem = <T extends string | Card>(item: T): string => {
@@ -23,6 +25,16 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
   lockedItems: string[],
 ): T[] {
   console.log("Starting reorder:", { items, oldIndex, newIndex, lockedItems });
+
+  if (
+    lockedItems.length === 0 ||
+    !items
+      .slice(Math.min(oldIndex, newIndex), Math.max(oldIndex, newIndex) + 1)
+      .some((item) => lockedItems.includes(getItem(item)))
+  ) {
+    console.log("Simple move, no locked item in between");
+    return arrayMove(items, oldIndex, newIndex);
+  }
 
   // If the moved item is locked, return original array
   const itemId = getItem(items[oldIndex]);
@@ -81,7 +93,7 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
           availablePos++;
         }
 
-        if (availablePos < result.length) {
+        if (availablePos <= result.length) {
           // Move the displaced item to the available position
           const [itemToMove] = result.splice(i - 1, 1);
           result.splice(availablePos - 1, 0, itemToMove);

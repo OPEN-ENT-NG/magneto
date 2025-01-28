@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
 
 import { WorkspaceElement } from "@edifice.io/client";
+import { TabsItemProps, useWorkspaceFile } from "@edifice.io/react";
 import {
   MediaLibraryRef,
   MediaLibraryResult,
-  TabsItemProps,
-  useWorkspaceFile,
-} from "@edifice.io/react";
+} from "@edifice.io/react/multimedia";
 
 export const useMediaLibrary = () => {
   const mediaLibraryRef = useRef<MediaLibraryRef>(null);
@@ -22,17 +21,21 @@ export const useMediaLibrary = () => {
 
   const onSuccess = (result: MediaLibraryResult) => {
     let updatedMedia;
-
+    console.log("PASSE ICI", mediaLibraryRef.current?.type);
     switch (mediaLibraryRef.current?.type) {
       case "video": {
         if (typeof result === "object") {
           updatedMedia = result[0];
         } else {
+          console.log("passe1");
           const parser = new DOMParser();
           const doc = parser.parseFromString(result, "text/html");
           const element = doc.body.firstChild as HTMLBodyElement;
+          console.log("passe2");
 
           const href = element?.getAttribute("src");
+          console.log(href);
+
           mediaLibraryRef.current?.hide();
           updatedMedia = href;
         }
@@ -41,10 +44,12 @@ export const useMediaLibrary = () => {
       case "embedder": {
         const parser = new DOMParser();
         const doc = parser.parseFromString(result, "text/html");
-        const element = doc.body.firstChild as HTMLBodyElement;
-
-        const href = element?.getAttribute("src");
+        const elementWithSrc = doc.querySelector('[src]');
+        
+        const href = elementWithSrc?.getAttribute("src");
         mediaLibraryRef.current?.hide();
+        console.log("PASSE EMBEDER", href);
+        
         updatedMedia = href;
         break;
       }
@@ -67,6 +72,7 @@ export const useMediaLibrary = () => {
 
     mediaLibraryRef.current?.hide();
     setLibraryMedia(updatedMedia);
+    console.log("UPDATED MEDIA", updatedMedia);
   };
 
   const onTabChange = async (

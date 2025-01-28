@@ -1,4 +1,6 @@
-import { MediaLibraryType } from "@edifice.io/react";
+
+
+import { MediaLibraryType } from "@edifice.io/react/multimedia";
 
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";

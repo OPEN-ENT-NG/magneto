@@ -12,7 +12,7 @@ import {
   IExternalLink,
   InternalLinkTabResult,
   MediaLibraryType,
-} from "@edifice.io/react";
+} from "@edifice.io/react/multimedia";
 
 import { MediaLibraryContextType, MediaLibraryProviderProps } from "./types";
 import { getMediaLibraryType } from "./utils";

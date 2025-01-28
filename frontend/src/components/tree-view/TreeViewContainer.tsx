@@ -321,13 +321,6 @@ export const TreeViewContainer: React.FunctionComponent<
     [setSelectedNodesIds],
   );
 
-  useEffect(() => {
-    const ref = folderNavigationRefs[folderType];
-    if (ref.current && currentFolder.id) {
-      ref.current.select(currentFolder.id);
-    }
-  }, [currentFolder.id, folderType, folderNavigationRefs]);
-
   return (
     <>
       <div

@@ -35,6 +35,7 @@ export const ScaledIframe: FC<ScaledIframeProps> = ({
   return (
     <Box ref={containerRef} sx={containerStyle}>
       <iframe
+        className="isIframe"
         ref={iframeRef}
         src={src}
         scrolling="no"

@@ -189,7 +189,7 @@ const CardPreviewBoard: React.FC<CardPreviewBoardProps> = ({
       <iframe
         className="isIframe"
         ref={iframeRef}
-        src={"#502"}
+        src={src}
         scrolling="no"
         style={
           {

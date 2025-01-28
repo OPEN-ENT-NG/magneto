@@ -20,3 +20,8 @@
 #media-library-magneto #media-library_ref {
   max-height: fit-content;
 }
+.action-container .py-8[role="button"][aria-label="Ouvrir / Fermer"],
+.action-container .py-8.invisible[role="button"][aria-label="Ouvrir / Fermer"] {
+  width: 16px;
+  display: block;
+}

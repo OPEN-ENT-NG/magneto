@@ -3,10 +3,10 @@ import { Box } from "@mui/material";
 import { redirect } from "../card-content/utils";
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
 import { CardContentFile } from "../card-content-file/CardContentFile";
-import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
 import CardPreviewBoard from "../card-preview-board/CardPreviewBoard";
 import { ExternalVideoPlayer } from "../external-video-player/ExternalVideoPlayer";
+import { VIDEO_SOURCE } from "../external-video-player/types";
 import { getVideoSource } from "../external-video-player/utils";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
@@ -18,10 +18,11 @@ export const displayPreviewContentByType = (card: Card) => {
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO: {
       const videoSource = getVideoSource(card.resourceUrl);
-      return videoSource ? (
-        <ExternalVideoPlayer url={card.resourceUrl} source={videoSource} />
-      ) : (
-        <CardContentImageDisplay url={card.resourceUrl} />
+      return (
+        <ExternalVideoPlayer
+          url={card.resourceUrl}
+          source={videoSource ?? VIDEO_SOURCE.UNKNOWN}
+        />
       );
     }
     case RESOURCE_TYPE.LINK:

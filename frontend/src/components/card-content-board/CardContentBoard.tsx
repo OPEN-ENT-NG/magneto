@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
 import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -22,6 +22,15 @@ export const ScaledIframe: FC<ScaledIframeProps> = ({
   } = useScaledIframe({ width, height });
 
   const { t } = useTranslation("magneto");
+  //fix me better
+  useEffect(() => {
+    const toasterContainer = document.querySelector(".toaster-container");
+    const hasIframeClass = document.querySelector(".isIframe") !== null;
+
+    if (hasIframeClass && toasterContainer) {
+      toasterContainer.remove();
+    }
+  }, [src]);
 
   return (
     <Box ref={containerRef} sx={containerStyle}>

@@ -324,7 +324,12 @@ public class BoardController extends ControllerHelper {
                     .onSuccess(board -> {
                         JsonObject params = new JsonObject();
                         params.put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
-                        .put(Field.BOARDNAME, board.getString(Field.TITLE));
+                            .put(Field.BOARDNAME, board.getString(Field.TITLE))
+                        
+                        JsonObject pushNotif = new JsonObject()
+                            .put(Field.TITLE, "push.notif.magneto.notify.board")
+                            .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.notify.board.push.notif.body"));
+                        params.put(Field.PUSHNOTIF, pushNotif);
 
                         if (board.getJsonArray(Field.SHARED) == null){
                             request.response().setStatusMessage(boardId).setStatusCode(200).end();
@@ -333,7 +338,7 @@ public class BoardController extends ControllerHelper {
                             List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(board.getJsonArray(Field.SHARED));
                             getUsersIdsToNotify(user, newSharedElem)
                                     .onSuccess(usersIdToShare -> {
-                                        notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, params);
+                                        notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, params, true);
                                         request.response().setStatusMessage(boardId).setStatusCode(200).end();
                                     });
                         }

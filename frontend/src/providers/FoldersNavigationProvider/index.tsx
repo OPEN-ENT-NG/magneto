@@ -126,34 +126,36 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     (nodeId: string, folderType: FOLDER_TYPE | BasicFolder) => {
       if (currentFolder.id === nodeId) return;
 
-      // On définit les IDs à conserver
       setSelectedNodesIds((prevIds) => {
         let parentIds = [];
 
         // Si c'est un dossier principal
-        if (Object.values(FOLDER_TYPE).includes(nodeId as FOLDER_TYPE)) {
+        if (Object.values(FOLDER_TYPE).includes(nodeId)) {
           parentIds = [nodeId];
         } else {
-          // Pour les sous-dossiers, on détermine le bon dossier racine
+          // Pour les sous-dossiers, il faut déterminer le bon dossier racine
           const rootFolder = (() => {
+            // Si le dossier est dans la corbeille
             const folder = folderData.find((f) => f.id === nodeId);
-            if (folder?.deleted) return FOLDER_TYPE.DELETED_BOARDS;
-            if (folder?.isPublic) return FOLDER_TYPE.PUBLIC_BOARDS;
+            if (folder?.deleted) {
+              return FOLDER_TYPE.DELETED_BOARDS;
+            }
+            // Si c'est un dossier public
+            if (folder?.isPublic) {
+              return FOLDER_TYPE.PUBLIC_BOARDS;
+            }
+            // Par défaut, c'est un dossier privé
             return FOLDER_TYPE.MY_BOARDS;
           })();
 
-          // On récupère le chemin des ancêtres
+          parentIds = [rootFolder, nodeId];
           const ancestorsPath = findPathById(folderData, nodeId);
-          parentIds = [rootFolder, ...ancestorsPath, nodeId];
+          if (ancestorsPath.length > 0) {
+            parentIds = [rootFolder, ...ancestorsPath, nodeId];
+          }
         }
 
-        // On ne garde que les IDs qui sont dans le chemin actuel
-        return prevIds.filter(
-          (id) =>
-            parentIds.includes(id) ||
-            // Garde les autres dossiers racine ouverts
-            Object.values(FOLDER_TYPE).includes(id as FOLDER_TYPE),
-        );
+        return Array.from(new Set([...prevIds, ...parentIds]));
       });
 
       setCurrentFolder((prevFolder) => {

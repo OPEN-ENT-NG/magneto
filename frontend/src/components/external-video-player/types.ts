@@ -6,6 +6,7 @@ export enum VIDEO_SOURCE {
   VIMEO = "vimeo",
   DAILYMOTION = "dailymotion",
   PEERTUBE = "peertube",
+  UNKNOWN = "unknown",
 }
 
 export interface VideoPlayerProps extends Omit<ReactPlayerProps, "config"> {

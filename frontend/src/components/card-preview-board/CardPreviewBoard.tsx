@@ -162,6 +162,15 @@ const CardPreviewBoard: React.FC<CardPreviewBoardProps> = ({
       window.location.href = src;
     }
   };
+  //fix me better
+  useEffect(() => {
+    const toasterContainer = document.querySelector(".toaster-container");
+    const hasIframeClass = document.querySelector(".isIframe") !== null;
+
+    if (hasIframeClass && toasterContainer) {
+      toasterContainer.remove();
+    }
+  }, [src]);
 
   return (
     <Box
@@ -178,8 +187,9 @@ const CardPreviewBoard: React.FC<CardPreviewBoardProps> = ({
         onClick={handleOverlayClick}
       />
       <iframe
+        className="isIframe"
         ref={iframeRef}
-        src={src}
+        src={"#502"}
         scrolling="no"
         style={
           {

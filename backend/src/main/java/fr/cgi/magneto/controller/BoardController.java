@@ -324,7 +324,7 @@ public class BoardController extends ControllerHelper {
                     .onSuccess(board -> {
                         JsonObject params = new JsonObject();
                         params.put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
-                            .put(Field.BOARDNAME, board.getString(Field.TITLE))
+                            .put(Field.BOARDNAME, board.getString(Field.TITLE));
                         
                         JsonObject pushNotif = new JsonObject()
                             .put(Field.TITLE, "push.notif.magneto.notify.board")

@@ -1,4 +1,5 @@
 import { arrayMove } from "@dnd-kit/sortable";
+import { ConstructionOutlined } from "@mui/icons-material";
 
 import { Card } from "~/models/card.model";
 
@@ -24,7 +25,12 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
   newIndex: number,
   lockedItems: string[],
 ): T[] {
-  console.log("Starting reorder:", { items, oldIndex, newIndex, lockedItems });
+  console.log("Starting reorder:", {
+    items: [...items],
+    oldIndex,
+    newIndex,
+    lockedItems: [...lockedItems],
+  });
 
   if (
     lockedItems.length === 0 ||
@@ -44,8 +50,14 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
   }
 
   const result = [...items];
-  const [movedItem] = result.splice(oldIndex, 1);
-  console.log("Removed moved item:", { movedItem, currentArray: result });
+
+  const dummyItem =
+    typeof items[0] === "string"
+      ? ("dummy" as T)
+      : ({ id: "dummy", title: "Dummy Item" } as T);
+
+  const [movedItem] = result.splice(oldIndex, 1, dummyItem);
+  console.log("Removed moved item:", { movedItem, currentArray: [...result] });
 
   // Moving right to left
   if (oldIndex > newIndex) {
@@ -61,27 +73,32 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
       result.splice(lockedIndex - 1, 1);
       console.log("Removed item after locked:", {
         itemAfterLocked,
-        currentArray: result,
+        currentArray: [...result],
       });
 
       // Insert moved item after original adjacent item
       result.splice(lockedIndex - 1, 0, movedItem);
-      console.log("Inserted moved item:", { currentArray: result });
+      console.log("Inserted moved item:", { currentArray: [...result] });
 
       // Insert original adjacent item before locked item
       result.splice(lockedIndex, 0, itemAfterLocked);
-      console.log("Inserted original adjacent item:", { currentArray: result });
+      console.log("Inserted original adjacent item:", {
+        currentArray: [...result],
+      });
     } else {
       // Insert at the target position
       result.splice(newIndex, 0, movedItem);
-      console.log("Inserted at target position:", { currentArray: result });
+      console.log("Inserted at target position:", {
+        currentArray: [...result],
+      });
     }
 
     // Push displaced items forward past any locked items
-    for (let i = newIndex + 1; i < result.length; i++) {
+    for (let i = newIndex + 1; i <= oldIndex; i++) {
       if (lockedItems.includes(getItem(result[i]))) {
         console.log("Found locked item while pushing forward:", {
           lockedItem: result[i],
+          currentArray: [...result],
         });
 
         // If we hit a locked item, find next available position
@@ -96,12 +113,21 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
         if (availablePos <= result.length) {
           // Move the displaced item to the available position
           const [itemToMove] = result.splice(i - 1, 1);
-          result.splice(availablePos - 1, 0, itemToMove);
-          console.log("Moved displaced item:", {
-            itemToMove,
-            newPosition: availablePos - 1,
-            currentArray: result,
-          });
+          if (availablePos - 1 === oldIndex) {
+            // Replace temp item with the pushed item
+            result.splice(availablePos - 1, 1, itemToMove);
+            console.log("Replaced temp item with pushed item:", {
+              currentArray: [...result],
+            });
+          } else {
+            // Normal displacement
+            result.splice(availablePos - 1, 0, itemToMove);
+            console.log("Moved displaced item:", {
+              itemToMove,
+              newPosition: availablePos - 1,
+              currentArray: [...result],
+            });
+          }
         }
       }
     }
@@ -120,53 +146,98 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
       result.splice(lockedIndex + 1, 1);
       console.log("Removed item after locked:", {
         itemAfterLocked,
-        currentArray: result,
+        currentArray: [...result],
       });
 
       // Insert moved item after original adjacent item
       result.splice(lockedIndex + 1, 0, movedItem);
-      console.log("Inserted moved item:", { currentArray: result });
+      console.log("Inserted moved item:", { currentArray: [...result] });
 
       // Insert original adjacent item before locked item
       result.splice(lockedIndex, 0, itemAfterLocked);
-      console.log("Inserted original adjacent item:", { currentArray: result });
+      console.log("Inserted original adjacent item:", {
+        currentArray: [...result],
+      });
     } else {
       // Insert at the target position
       result.splice(newIndex, 0, movedItem);
-      console.log("Inserted at target position:", { currentArray: result });
+      console.log("Inserted at target position:", {
+        currentArray: [...result],
+      });
     }
 
     // Push displaced items backward past any locked items
-    for (let i = newIndex - 1; i >= 0; i--) {
+    for (let i = newIndex - 1; i >= oldIndex; i--) {
+      console.log(`Loop iteration - Current index: ${i}`, {
+        currentItem: result[i],
+        isLocked: lockedItems.includes(getItem(result[i])),
+        oldIndex,
+        newIndex,
+      });
+
       if (lockedItems.includes(getItem(result[i]))) {
         console.log("Found locked item while pushing backward:", {
           lockedItem: result[i],
+          currentIndex: i,
+          currentArray: [...result],
         });
 
         // If we hit a locked item, find next available position
         let availablePos = i - 1;
+        console.log(
+          "Starting search for available position from:",
+          availablePos,
+        );
+
         while (
-          availablePos >= 0 &&
+          availablePos > 0 &&
           lockedItems.includes(getItem(result[availablePos]))
         ) {
+          console.log(
+            `Position ${availablePos} is locked, checking previous position`,
+          );
           availablePos--;
         }
+
+        console.log("Found available position:", {
+          position: availablePos,
+          isValid: availablePos >= 0,
+        });
 
         if (availablePos >= 0) {
           // Move the displaced item to the available position
           const [itemToMove] = result.splice(i + 1, 1);
-          result.splice(availablePos + 1, 0, itemToMove);
-          console.log("Moved displaced item:", {
+          console.log("Removed displaced item:", {
             itemToMove,
-            newPosition: availablePos + 1,
-            currentArray: result,
+            removedFromIndex: i + 1,
+            currentArray: [...result],
           });
+
+          if (availablePos + 1 === oldIndex) {
+            // Replace temp item with the pushed item
+            result.splice(availablePos + 1, 1, itemToMove);
+            console.log("Replaced temp item with pushed item:", {
+              itemToMove,
+              replacementIndex: availablePos + 1,
+              currentArray: [...result],
+            });
+          } else {
+            // Normal displacement
+            result.splice(availablePos + 1, 0, itemToMove);
+            console.log("Moved displaced item:", {
+              itemToMove,
+              newPosition: availablePos + 1,
+              currentArray: [...result],
+            });
+          }
+        } else {
+          console.log("No valid position found for displaced item");
         }
       }
     }
   }
 
-  console.log("Final result:", result);
+  console.log("Final result:", [...result]);
   return result;
 }
 

@@ -160,7 +160,7 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
       });
     } else {
       // Insert at the target position
-      result.splice(newIndex, 0, movedItem);
+      result.splice(newIndex + 1, 0, movedItem);
       console.log("Inserted at target position:", {
         currentArray: [...result],
       });

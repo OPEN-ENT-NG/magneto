@@ -1,5 +1,4 @@
 import { arrayMove } from "@dnd-kit/sortable";
-import { ConstructionOutlined } from "@mui/icons-material";
 
 import { Card } from "~/models/card.model";
 
@@ -17,6 +16,79 @@ const findItemIndex = <T extends string | Card>(
   return (array as Card[]).findIndex(
     (item) => (item as Card).id === (searchItem as Card).id,
   );
+};
+
+const pushItemsBackwardPastLocks = <T extends string | Card>(
+  result: T[],
+  oldIndex: number,
+  newIndex: number,
+  lockedItems: string[],
+): void => {
+  for (let i = newIndex - 1; i >= oldIndex; i--) {
+    console.log(`Loop iteration - Current index: ${i}`, {
+      currentItem: result[i],
+      isLocked: lockedItems.includes(getItem(result[i])),
+      oldIndex,
+      newIndex,
+    });
+
+    if (lockedItems.includes(getItem(result[i]))) {
+      console.log("Found locked item while pushing backward:", {
+        lockedItem: result[i],
+        currentIndex: i,
+        currentArray: [...result],
+      });
+
+      // If we hit a locked item, find next available position
+      let availablePos = i - 1;
+      console.log("Starting search for available position from:", availablePos);
+
+      while (
+        availablePos > 0 &&
+        lockedItems.includes(getItem(result[availablePos]))
+      ) {
+        console.log(
+          `Position ${availablePos} is locked, checking previous position`,
+        );
+        availablePos--;
+      }
+
+      console.log("Found available position:", {
+        position: availablePos,
+        isValid: availablePos >= 0,
+      });
+
+      if (availablePos >= 0) {
+        // Move the displaced item to the available position
+        const [itemToMove] = result.splice(i + 1, 1);
+        console.log("Removed displaced item:", {
+          itemToMove,
+          removedFromIndex: i + 1,
+          currentArray: [...result],
+        });
+
+        if (availablePos + 1 === oldIndex) {
+          // Replace temp item with the pushed item
+          result.splice(availablePos + 1, 1, itemToMove);
+          console.log("Replaced temp item with pushed item:", {
+            itemToMove,
+            replacementIndex: availablePos + 1,
+            currentArray: [...result],
+          });
+        } else {
+          // Normal displacement
+          result.splice(availablePos + 1, 0, itemToMove);
+          console.log("Moved displaced item:", {
+            itemToMove,
+            newPosition: availablePos + 1,
+            currentArray: [...result],
+          });
+        }
+      } else {
+        console.log("No valid position found for displaced item");
+      }
+    }
+  }
 };
 
 function reorderWithLockedItemsGeneric<T extends string | Card>(
@@ -167,74 +239,7 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
     }
 
     // Push displaced items backward past any locked items
-    for (let i = newIndex - 1; i >= oldIndex; i--) {
-      console.log(`Loop iteration - Current index: ${i}`, {
-        currentItem: result[i],
-        isLocked: lockedItems.includes(getItem(result[i])),
-        oldIndex,
-        newIndex,
-      });
-
-      if (lockedItems.includes(getItem(result[i]))) {
-        console.log("Found locked item while pushing backward:", {
-          lockedItem: result[i],
-          currentIndex: i,
-          currentArray: [...result],
-        });
-
-        // If we hit a locked item, find next available position
-        let availablePos = i - 1;
-        console.log(
-          "Starting search for available position from:",
-          availablePos,
-        );
-
-        while (
-          availablePos > 0 &&
-          lockedItems.includes(getItem(result[availablePos]))
-        ) {
-          console.log(
-            `Position ${availablePos} is locked, checking previous position`,
-          );
-          availablePos--;
-        }
-
-        console.log("Found available position:", {
-          position: availablePos,
-          isValid: availablePos >= 0,
-        });
-
-        if (availablePos >= 0) {
-          // Move the displaced item to the available position
-          const [itemToMove] = result.splice(i + 1, 1);
-          console.log("Removed displaced item:", {
-            itemToMove,
-            removedFromIndex: i + 1,
-            currentArray: [...result],
-          });
-
-          if (availablePos + 1 === oldIndex) {
-            // Replace temp item with the pushed item
-            result.splice(availablePos + 1, 1, itemToMove);
-            console.log("Replaced temp item with pushed item:", {
-              itemToMove,
-              replacementIndex: availablePos + 1,
-              currentArray: [...result],
-            });
-          } else {
-            // Normal displacement
-            result.splice(availablePos + 1, 0, itemToMove);
-            console.log("Moved displaced item:", {
-              itemToMove,
-              newPosition: availablePos + 1,
-              currentArray: [...result],
-            });
-          }
-        } else {
-          console.log("No valid position found for displaced item");
-        }
-      }
-    }
+    pushItemsBackwardPastLocks(result, oldIndex, newIndex, lockedItems);
   }
 
   console.log("Final result:", [...result]);

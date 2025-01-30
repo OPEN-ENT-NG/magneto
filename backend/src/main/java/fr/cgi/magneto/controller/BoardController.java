@@ -325,8 +325,11 @@ public class BoardController extends ControllerHelper {
                         I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
 
                         JsonObject params = new JsonObject();
-                        params.put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
-                            .put(Field.BOARDNAME, board.getString(Field.TITLE));
+
+                        params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+                                .put(Field.USERNAME, user.getUsername())
+                                .put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
+                                .put(Field.BOARDNAME, board.getString(Field.TITLE));
                         
                         JsonObject pushNotif = new JsonObject()
                             .put(Field.TITLE, "push.notif.magneto.notify.board")
@@ -340,7 +343,7 @@ public class BoardController extends ControllerHelper {
                             List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(board.getJsonArray(Field.SHARED));
                             getUsersIdsToNotify(user, newSharedElem)
                                     .onSuccess(usersIdToShare -> {
-                                        notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, params);
+                                        notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, boardId, Field.TITLE, params, true);
                                         request.response().setStatusMessage(boardId).setStatusCode(200).end();
                                     });
                         }

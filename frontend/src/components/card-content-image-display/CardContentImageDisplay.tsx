@@ -24,23 +24,34 @@ export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
     if (url) fetchThumbnailUrl();
   }, [url, defaultImageSrc]);
 
+  const renderVideoContent = () => {
+    if (!url) return null;
+
+    if (url.startsWith("/workspace/")) {
+      return <video controls src={url} style={videoStyle}></video>;
+    }
+
+    if (imageUrl) {
+      return (
+        <CardMedia
+          component="img"
+          image={imageUrl}
+          alt="Video thumbnail"
+          sx={videoImgStyle}
+        />
+      );
+    }
+
+    return (
+      <StyledBoxSvg isPreview={false}>
+        <DefaultVideoThumbnail />
+      </StyledBoxSvg>
+    );
+  };
+
   return (
     <>
-      {!!url &&
-        (url.startsWith("/workspace/") ? (
-          <video controls src={url} style={videoStyle}></video>
-        ) : imageUrl ? (
-          <CardMedia
-            component="img"
-            image={imageUrl}
-            alt="Video thumbnail"
-            sx={videoImgStyle}
-          />
-        ) : (
-          <StyledBoxSvg isPreview={false}>
-            <DefaultVideoThumbnail />
-          </StyledBoxSvg>
-        ))}
+      {!!url && renderVideoContent()}
       {!!defaultImageSrc && (
         <CardMedia
           component="img"

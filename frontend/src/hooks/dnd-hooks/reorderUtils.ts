@@ -142,6 +142,10 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
 
       // Get and remove the item that was after the locked item
       const itemAfterLocked = result[lockedIndex - 1];
+      if (itemAfterLocked === undefined) {
+        console.log("Locked item is first in list, forbidden move");
+        return items;
+      }
       result.splice(lockedIndex - 1, 1);
       console.log("Removed item after locked:", {
         itemAfterLocked,
@@ -215,6 +219,10 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
 
       // Get and remove the item that was after the locked item
       const itemAfterLocked = result[lockedIndex + 1];
+      if (itemAfterLocked === undefined) {
+        console.log("Locked item is last in list, forbidden move");
+        return items;
+      }
       result.splice(lockedIndex + 1, 1);
       console.log("Removed item after locked:", {
         itemAfterLocked,

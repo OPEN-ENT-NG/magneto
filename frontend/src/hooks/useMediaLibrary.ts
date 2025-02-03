@@ -44,12 +44,12 @@ export const useMediaLibrary = () => {
       case "embedder": {
         const parser = new DOMParser();
         const doc = parser.parseFromString(result, "text/html");
-        const elementWithSrc = doc.querySelector('[src]');
-        
+        const elementWithSrc = doc.querySelector("[src]");
+
         const href = elementWithSrc?.getAttribute("src");
         mediaLibraryRef.current?.hide();
         console.log("PASSE EMBEDER", href);
-        
+
         updatedMedia = href;
         break;
       }

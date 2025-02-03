@@ -14,8 +14,8 @@ export const ExternalVideoPlayer: FC<VideoPlayerProps> = ({
   height = "100%",
   ...playerProps
 }) => {
-  console.log({url,source});
-  
+  console.log({ url, source });
+
   if (source === VIDEO_SOURCE.PEERTUBE) {
     return (
       <Box sx={videoPlayerWrapper}>
@@ -32,7 +32,7 @@ export const ExternalVideoPlayer: FC<VideoPlayerProps> = ({
   }
 
   if (source === VIDEO_SOURCE.DAILYMOTION) {
-    const videoId = getDailymotionId(url);  
+    const videoId = getDailymotionId(url);
     return (
       <Box sx={videoPlayerWrapper}>
         <iframe

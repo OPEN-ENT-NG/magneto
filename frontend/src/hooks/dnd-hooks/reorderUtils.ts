@@ -18,6 +18,34 @@ const findItemIndex = <T extends string | Card>(
   );
 };
 
+const checkLockedItemsMoved = <T extends string | Card>(
+  originalItems: T[],
+  movedItems: T[],
+  lockedItems: string[],
+): boolean => {
+  // If no locked items, return true (no movement)
+  if (lockedItems.length === 0) return true;
+
+  // Find original and final positions of locked items
+  for (const lockedItemId of lockedItems) {
+    const originalIndex = originalItems.findIndex(
+      (item) => getItem(item) === lockedItemId,
+    );
+
+    const finalIndex = movedItems.findIndex(
+      (item) => getItem(item) === lockedItemId,
+    );
+
+    // If locked item's position changed, return false
+    if (originalIndex !== finalIndex) {
+      return false;
+    }
+  }
+
+  // All locked items remained in their original positions
+  return true;
+};
+
 const pushItemsBackwardPastLocks = <T extends string | Card>(
   result: T[],
   oldIndex: number,
@@ -90,6 +118,88 @@ const pushItemsBackwardPastLocks = <T extends string | Card>(
     }
   }
 };
+
+function pushItemsForwardPastLocks<T extends string | Card>(
+  result: T[],
+  oldIndex: number,
+  newIndex: number,
+  endIndex: number,
+  lockedItems: string[],
+): void {
+  for (let i = newIndex + 1; i <= endIndex; i++) {
+    if (lockedItems.includes(getItem(result[i]))) {
+      console.log("Found locked item while pushing forward:", {
+        lockedItem: result[i],
+        currentArray: [...result],
+      });
+
+      // If we hit a locked item, find next available position
+      let availablePos = i + 1;
+      while (
+        availablePos < result.length &&
+        lockedItems.includes(getItem(result[availablePos]))
+      ) {
+        availablePos++;
+      }
+
+      if (availablePos <= result.length) {
+        // Move the displaced item to the available position
+        const [itemToMove] = result.splice(i - 1, 1);
+        if (availablePos - 1 === oldIndex) {
+          // Replace temp item with the pushed item
+          result.splice(availablePos - 1, 1, itemToMove);
+          console.log("Replaced temp item with pushed item:", {
+            currentArray: [...result],
+          });
+        } else {
+          // Normal displacement
+          result.splice(availablePos - 1, 0, itemToMove);
+          console.log("Moved displaced item:", {
+            itemToMove,
+            newPosition: availablePos - 1,
+            currentArray: [...result],
+          });
+        }
+      }
+    }
+  }
+}
+
+function pushItemsForwardPastLocksSimple<T extends string | Card>(
+  result: T[],
+  newIndex: number,
+  endIndex: number,
+  lockedItems: string[],
+): void {
+  for (let i = newIndex + 1; i <= endIndex; i++) {
+    if (lockedItems.includes(getItem(result[i]))) {
+      console.log("Found locked item while pushing forward:", {
+        lockedItem: result[i],
+        currentArray: [...result],
+      });
+
+      // If we hit a locked item, find next available position
+      let availablePos = i + 1;
+      while (
+        availablePos < result.length &&
+        lockedItems.includes(getItem(result[availablePos]))
+      ) {
+        availablePos++;
+      }
+
+      if (availablePos <= result.length) {
+        // Move the displaced item to the available position
+        const [itemToMove] = result.splice(i - 1, 1);
+        result.splice(availablePos - 1, 0, itemToMove);
+        console.log("Moved displaced item:", {
+          itemToMove,
+          newPosition: availablePos - 1,
+          currentArray: [...result],
+        });
+      }
+    }
+  }
+}
 
 function reorderWithLockedItemsGeneric<T extends string | Card>(
   items: T[],
@@ -170,43 +280,13 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
     }
 
     // Push displaced items forward past any locked items
-    for (let i = newIndex + 1; i <= oldIndex; i++) {
-      if (lockedItems.includes(getItem(result[i]))) {
-        console.log("Found locked item while pushing forward:", {
-          lockedItem: result[i],
-          currentArray: [...result],
-        });
-
-        // If we hit a locked item, find next available position
-        let availablePos = i + 1;
-        while (
-          availablePos < result.length &&
-          lockedItems.includes(getItem(result[availablePos]))
-        ) {
-          availablePos++;
-        }
-
-        if (availablePos <= result.length) {
-          // Move the displaced item to the available position
-          const [itemToMove] = result.splice(i - 1, 1);
-          if (availablePos - 1 === oldIndex) {
-            // Replace temp item with the pushed item
-            result.splice(availablePos - 1, 1, itemToMove);
-            console.log("Replaced temp item with pushed item:", {
-              currentArray: [...result],
-            });
-          } else {
-            // Normal displacement
-            result.splice(availablePos - 1, 0, itemToMove);
-            console.log("Moved displaced item:", {
-              itemToMove,
-              newPosition: availablePos - 1,
-              currentArray: [...result],
-            });
-          }
-        }
-      }
-    }
+    pushItemsForwardPastLocks(
+      result,
+      oldIndex,
+      newIndex,
+      oldIndex,
+      lockedItems,
+    );
   }
   // Moving left to right
   else {
@@ -254,6 +334,51 @@ function reorderWithLockedItemsGeneric<T extends string | Card>(
   return result;
 }
 
+function reorderOverSectionWithLockedItemsGeneric<T extends string | Card>(
+  items: T[],
+  oldIndex: number,
+  newIndex: number,
+  lockedItems: string[],
+): T[] {
+  console.log("Starting reorder:", {
+    items: [...items],
+    oldIndex,
+    newIndex,
+    lockedItems: [...lockedItems],
+  });
+
+  const movedOverSectionCards = arrayMove(items, oldIndex, newIndex);
+
+  if (
+    lockedItems.length === 0 ||
+    !movedOverSectionCards
+      .slice(newIndex, movedOverSectionCards.length - 1)
+      .some((item) => lockedItems.includes(getItem(item)))
+  ) {
+    console.log("Simple move, no locked item in between");
+    return movedOverSectionCards;
+  }
+
+  // If the moved item is locked, return original array
+  const itemId = getItem(movedOverSectionCards[oldIndex]);
+  if (lockedItems.includes(itemId)) {
+    console.log("Item is locked, returning original array");
+    return movedOverSectionCards;
+  }
+
+  const result = [...movedOverSectionCards];
+
+  pushItemsForwardPastLocksSimple(result, oldIndex, newIndex, lockedItems);
+
+  if (!checkLockedItemsMoved(items, movedOverSectionCards, lockedItems)) {
+    console.log("Locked items have changed, return original board");
+    return items;
+  }
+
+  console.log("Final result:", [...result]);
+  return result;
+}
+
 const reorderWithLockedItems = (
   items: string[],
   oldIndex: number,
@@ -269,4 +394,63 @@ const reorderWithLockedItemsArray = <T extends Card>(
   lockedItems: string[],
 ): T[] => reorderWithLockedItemsGeneric(items, oldIndex, newIndex, lockedItems);
 
-export { reorderWithLockedItems, reorderWithLockedItemsArray };
+const reorderOriginalSectionWithLockedItems = (
+  items: string[],
+  oldIndex: number,
+  newIndex: number,
+  lockedItems: string[],
+): string[] =>
+  reorderOriginalSectionWithLockedItemsGeneric(
+    items,
+    oldIndex,
+    newIndex,
+    lockedItems,
+  );
+
+const reorderOriginalSectionWithLockedItemsArray = <T extends Card>(
+  items: T[],
+  oldIndex: number,
+  newIndex: number,
+  lockedItems: string[],
+): T[] =>
+  reorderOriginalSectionWithLockedItemsGeneric(
+    items,
+    oldIndex,
+    newIndex,
+    lockedItems,
+  );
+
+const reorderOverSectionWithLockedItems = (
+  items: string[],
+  oldIndex: number,
+  newIndex: number,
+  lockedItems: string[],
+): string[] =>
+  reorderOverSectionWithLockedItemsGeneric(
+    items,
+    oldIndex,
+    newIndex,
+    lockedItems,
+  );
+
+const reorderOverSectionWithLockedItemsArray = <T extends Card>(
+  items: T[],
+  oldIndex: number,
+  newIndex: number,
+  lockedItems: string[],
+): T[] =>
+  reorderOverSectionWithLockedItemsGeneric(
+    items,
+    oldIndex,
+    newIndex,
+    lockedItems,
+  );
+
+export {
+  reorderWithLockedItems,
+  reorderWithLockedItemsArray,
+  reorderOriginalSectionWithLockedItems,
+  reorderOriginalSectionWithLockedItemsArray,
+  reorderOverSectionWithLockedItems,
+  reorderOverSectionWithLockedItemsArray,
+};

@@ -792,6 +792,7 @@ public class DefaultBoardService implements BoardService {
                 .project(new JsonObject()
                         .put(Field._ID, 1)
                         .put(Field.TITLE, 1)
+                        .put(Field.OWNERID, 1)
                         .put(Field.SHARED, 1));
         return query.getAggregate();
     }

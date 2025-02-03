@@ -343,6 +343,9 @@ public class BoardController extends ControllerHelper {
                             List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(board.getJsonArray(Field.SHARED));
                             getUsersIdsToNotify(user, newSharedElem)
                                     .onSuccess(usersIdToShare -> {
+                                        if (!board.getString(Field.OWNERID).equals(user.getUserId())) {
+                                            usersIdToShare.add(board.getString(Field.OWNERID));
+                                        }
                                         notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, boardId, Field.TITLE, params, true);
                                         request.response().setStatusMessage(boardId).setStatusCode(200).end();
                                     });

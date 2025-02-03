@@ -14,6 +14,10 @@ import { useTranslation } from "react-i18next";
 
 import { CustomPointerSensor } from "./customPointer";
 import {
+  reorderOriginalSectionWithLockedItems,
+  reorderOriginalSectionWithLockedItemsArray,
+  reorderOverSectionWithLockedItems,
+  reorderOverSectionWithLockedItemsArray,
   reorderWithLockedItems,
   reorderWithLockedItemsArray,
 } from "./reorderUtils";
@@ -319,16 +323,59 @@ export const useSectionsDnD = (board: Board) => {
       currentOverSection: Section,
       over: Over,
     ) => {
+      const lockedCards = currentOverSection.cards
+        .filter((card): card is typeof card & { locked: true } => card.locked)
+        .map((card) => card.id);
+
       const newOriginalSectionCardIds = originalActiveSection.cardIds.filter(
         (id) => id !== activeCardId,
       );
-      const newOverSectionCardIds = arrayMove(
+
+      /*const movedOriginalSectionCardIds = originalActiveSection.cardIds.filter(
+        (id) => id !== activeCardId,
+      );*/
+      /*
+      const newOriginalSectionCardIds = reorderOriginalSectionWithLockedItems(
+        originalActiveSection.cardIds,
+        originalActiveSection.cardIds.indexOf(activeCardId),
+        originalActiveSection.cardIds.indexOf(over.id.toString()),
+        lockedCards,
+      );
+
+      const newOriginalSectionCards =
+        reorderOriginalSectionWithLockedItemsArray(
+          originalActiveSection.cards,
+          originalActiveSection.cards.findIndex(
+            (card) => card.id === activeCardId,
+          ),
+          originalActiveSection.cards.findIndex(
+            (card) => card.id === over.id.toString(),
+          ),
+          lockedCards,
+        );*/
+
+      const newOverSectionCardIds = reorderOverSectionWithLockedItems(
         currentOverSection.cardIds,
         currentOverSection.cardIds.indexOf(activeCardId),
         over.id === currentOverSection._id
           ? currentOverSection.cardIds.length - 1
           : currentOverSection.cardIds.indexOf(over.id.toString()),
+        lockedCards,
       );
+
+      const newOverSectionCards = reorderOverSectionWithLockedItemsArray(
+        currentOverSection.cards,
+        currentOverSection.cards.findIndex((card) => card.id === activeCardId),
+        over.id === currentOverSection._id
+          ? currentOverSection.cards.length - 1
+          : currentOverSection.cards.findIndex(
+              (card) => card.id === over.id.toString(),
+            ),
+        lockedCards,
+      );
+
+      //TODO : FOR index TO size-1 : push elements
+      //if locked items moved : revert all changes (to both original and over sections)
 
       setUpdatedSections((prev) =>
         prev.map((section) => {
@@ -343,11 +390,7 @@ export const useSectionsDnD = (board: Board) => {
             return {
               ...section,
               cardIds: newOverSectionCardIds,
-              cards: newOverSectionCardIds.map(
-                (id) =>
-                  section.cards.find((card) => card.id === id) ||
-                  originalActiveSection.cards.find((card) => card.id === id)!,
-              ),
+              cards: newOverSectionCards,
             };
           }
           return section;

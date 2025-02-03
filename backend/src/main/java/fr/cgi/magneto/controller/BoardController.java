@@ -334,7 +334,7 @@ public class BoardController extends ControllerHelper {
                         JsonObject pushNotif = new JsonObject()
                             .put(Field.TITLE, "push.notif.magneto.notify.board")
                             .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.notify.board.push.notif.body"));
-                        params.put(Field.PUSHNOTIF, pushNotif);
+                        //params.put(Field.PUSHNOTIF, pushNotif);
 
                         if (board.getJsonArray(Field.SHARED) == null){
                             request.response().setStatusMessage(boardId).setStatusCode(200).end();

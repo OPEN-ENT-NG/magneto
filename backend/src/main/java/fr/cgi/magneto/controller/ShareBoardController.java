@@ -157,7 +157,7 @@ public class ShareBoardController extends ControllerHelper {
                                         JsonObject pushNotif = new JsonObject()
                                                 .put(Field.TITLE, "push.notif.magneto.share")
                                                 .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
-                                        params.put(Field.PUSHNOTIF, pushNotif);
+                                        //params.put(Field.PUSHNOTIF, pushNotif);
 
                                         List<String> ids = new ArrayList<>();
                                         ids.add(id);

@@ -18,8 +18,6 @@ export const displayPreviewContentByType = (card: Card) => {
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO: {
       const videoSource = getVideoSource(card.resourceUrl);
-      console.log(card);
-
       return (
         <ExternalVideoPlayer
           url={card.resourceUrl}

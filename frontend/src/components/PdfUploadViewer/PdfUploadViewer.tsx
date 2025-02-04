@@ -36,7 +36,6 @@ export const PDFUploadViewer: FC<PDFUploadViewerProps> = ({ url }) => {
   const onPageLoadSuccess = (page: any) => {
     const { width, height } = page;
     setIsLandscape(width > height);
-    console.log(width > height);
   };
 
   const goToPreviousPage = () => {

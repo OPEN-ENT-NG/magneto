@@ -38,7 +38,6 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
     if (lowerExt === "link") {
       const appName = extractFirstSegment(url ?? "");
       const icon = getIconCode(appName);
-      console.log({ url, appName, icon });
 
       return (
         <>

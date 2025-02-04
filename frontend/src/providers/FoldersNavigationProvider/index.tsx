@@ -126,6 +126,7 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
     (nodeId: string, folderType: FOLDER_TYPE | BasicFolder) => {
       if (currentFolder.id === nodeId) return;
 
+      // On définit les IDs à conserver
       setSelectedNodesIds((prevIds) => {
         let parentIds = [];
 
@@ -133,29 +134,26 @@ export const FoldersNavigationProvider: FC<FoldersNavigationProviderProps> = ({
         if (Object.values(FOLDER_TYPE).includes(nodeId)) {
           parentIds = [nodeId];
         } else {
-          // Pour les sous-dossiers, il faut déterminer le bon dossier racine
+          // Pour les sous-dossiers, on détermine le bon dossier racine
           const rootFolder = (() => {
-            // Si le dossier est dans la corbeille
             const folder = folderData.find((f) => f.id === nodeId);
-            if (folder?.deleted) {
-              return FOLDER_TYPE.DELETED_BOARDS;
-            }
-            // Si c'est un dossier public
-            if (folder?.isPublic) {
-              return FOLDER_TYPE.PUBLIC_BOARDS;
-            }
-            // Par défaut, c'est un dossier privé
+            if (folder?.deleted) return FOLDER_TYPE.DELETED_BOARDS;
+            if (folder?.isPublic) return FOLDER_TYPE.PUBLIC_BOARDS;
             return FOLDER_TYPE.MY_BOARDS;
           })();
 
-          parentIds = [rootFolder, nodeId];
+          // On récupère le chemin des ancêtres
           const ancestorsPath = findPathById(folderData, nodeId);
-          if (ancestorsPath.length > 0) {
-            parentIds = [rootFolder, ...ancestorsPath, nodeId];
-          }
+          parentIds = [rootFolder, ...ancestorsPath, nodeId];
         }
 
-        return Array.from(new Set([...prevIds, ...parentIds]));
+        // On ne garde que les IDs qui sont dans le chemin actuel
+        return prevIds.filter(
+          (id) =>
+            parentIds.includes(id) ||
+            // Garde les autres dossiers racine ouverts
+            Object.values(FOLDER_TYPE).includes(id as FOLDER_TYPE),
+        );
       });
 
       setCurrentFolder((prevFolder) => {

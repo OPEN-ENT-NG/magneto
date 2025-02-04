@@ -5,6 +5,8 @@ import { CardMedia } from "@mui/material";
 import { imgStyle, videoImgStyle, videoStyle } from "./style";
 import { CardContentImageDisplayProps } from "./types";
 import { getVideoThumbnailUrl } from "./utils";
+import { StyledBoxSvg } from "../card-content-svg-display/style";
+import { DefaultVideoThumbnail } from "../SVG/DefaultVideoThumbnail";
 
 export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
   url = "",
@@ -22,19 +24,34 @@ export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
     if (url) fetchThumbnailUrl();
   }, [url, defaultImageSrc]);
 
+  const renderVideoContent = () => {
+    if (!url) return null;
+
+    if (url.startsWith("/workspace/")) {
+      return <video controls src={url} style={videoStyle}></video>;
+    }
+
+    if (imageUrl) {
+      return (
+        <CardMedia
+          component="img"
+          image={imageUrl}
+          alt="Video thumbnail"
+          sx={videoImgStyle}
+        />
+      );
+    }
+
+    return (
+      <StyledBoxSvg isPreview={false}>
+        <DefaultVideoThumbnail />
+      </StyledBoxSvg>
+    );
+  };
+
   return (
     <>
-      {!!url &&
-        (url.startsWith("/workspace/") ? (
-          <video controls src={url} style={videoStyle}></video>
-        ) : (
-          <CardMedia
-            component="img"
-            image={imageUrl}
-            alt="Video thumbnail"
-            sx={videoImgStyle}
-          />
-        ))}
+      {!!url && renderVideoContent()}
       {!!defaultImageSrc && (
         <CardMedia
           component="img"

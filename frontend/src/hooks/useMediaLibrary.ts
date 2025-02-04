@@ -21,20 +21,16 @@ export const useMediaLibrary = () => {
 
   const onSuccess = (result: MediaLibraryResult) => {
     let updatedMedia;
-    console.log("PASSE ICI", mediaLibraryRef.current?.type);
     switch (mediaLibraryRef.current?.type) {
       case "video": {
         if (typeof result === "object") {
           updatedMedia = result[0];
         } else {
-          console.log("passe1");
           const parser = new DOMParser();
           const doc = parser.parseFromString(result, "text/html");
           const element = doc.body.firstChild as HTMLBodyElement;
-          console.log("passe2");
 
           const href = element?.getAttribute("src");
-          console.log(href);
 
           mediaLibraryRef.current?.hide();
           updatedMedia = href;
@@ -48,7 +44,6 @@ export const useMediaLibrary = () => {
 
         const href = elementWithSrc?.getAttribute("src");
         mediaLibraryRef.current?.hide();
-        console.log("PASSE EMBEDER", href);
 
         updatedMedia = href;
         break;
@@ -72,7 +67,6 @@ export const useMediaLibrary = () => {
 
     mediaLibraryRef.current?.hide();
     setLibraryMedia(updatedMedia);
-    console.log("UPDATED MEDIA", updatedMedia);
   };
 
   const onTabChange = async (

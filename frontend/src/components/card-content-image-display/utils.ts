@@ -47,7 +47,6 @@ export const formatPeerTubeUrl = async (url: string): Promise<string> => {
 };
 
 export const formatVimeoUrl = async (url: string) => {
-  console.log(url);
   const response = await fetch(VIDEO_PLATFORMS.vimeo + url);
   const data = await response.json();
   return data.thumbnail_url;

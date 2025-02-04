@@ -14,7 +14,6 @@ export const ExternalVideoPlayer: FC<VideoPlayerProps> = ({
   height = "100%",
   ...playerProps
 }) => {
-  console.log({ url, source });
 
   if (source === VIDEO_SOURCE.PEERTUBE) {
     return (

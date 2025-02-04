@@ -180,7 +180,6 @@ export const CreateMagnet: FC = () => {
   }, [media]);
 
   useEffect(() => {
-    console.log(selectedBoardData);
     if (!isEditMagnet && selectedBoardData) {
       setTitle(selectedBoardData.title);
       setDescription(selectedBoardData.description);

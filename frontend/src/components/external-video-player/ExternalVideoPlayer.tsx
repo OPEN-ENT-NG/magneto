@@ -14,7 +14,6 @@ export const ExternalVideoPlayer: FC<VideoPlayerProps> = ({
   height = "100%",
   ...playerProps
 }) => {
-
   if (source === VIDEO_SOURCE.PEERTUBE) {
     return (
       <Box sx={videoPlayerWrapper}>

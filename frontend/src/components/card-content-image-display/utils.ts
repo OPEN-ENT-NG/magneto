@@ -12,7 +12,10 @@ export const isPeerTubeUrl = (url: string): boolean => {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
     return (
-      path.includes("/w/") || path.includes("/videos/") || path.includes("/v/")
+      path.includes("/w/") ||
+      path.includes("/videos/") ||
+      path.includes("/video/") ||
+      path.includes("/v/")
     );
   } catch {
     return false;
@@ -25,21 +28,20 @@ export const formatPeerTubeUrl = async (url: string): Promise<string> => {
     const host = `${urlObj.protocol}//${urlObj.hostname}`;
     const pathSegments = urlObj.pathname.split("/").filter(Boolean);
     const id = pathSegments[pathSegments.length - 1];
-
     if (!id) {
-      throw new Error("Unable to extract PeerTube video ID");
+      throw new Error("Unable to extract video ID");
     }
 
-    const apiUrl = VIDEO_PLATFORMS.peertube
-      .replace("{host}", host)
-      .replace("{id}", id);
-
+    const apiUrl = `${host}/api/v1/videos/${id}`;
     const response = await fetch(apiUrl);
-    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
 
+    const data = await response.json();
     return `${host}${data.thumbnailPath}`;
   } catch (error) {
-    console.error("Error fetching PeerTube thumbnail:", error);
+    console.error("Error fetching video thumbnail:", error);
     return "";
   }
 };
@@ -50,9 +52,18 @@ export const formatVimeoUrl = async (url: string) => {
   return data.thumbnail_url;
 };
 
-export const formatDailymotionUrl = (url: string) => {
-  const id = url.split("/").pop();
-  if (id) return VIDEO_PLATFORMS.dailymotion.replace("{id}", id);
+export const formatDailymotionUrl = (url: string): string | undefined => {
+  const playerMatch = url.match(/[?&]video=([^&]+)/);
+  if (playerMatch) {
+    return VIDEO_PLATFORMS.dailymotion.replace("{id}", playerMatch[1]);
+  }
+
+  const pathId = url.split("/").pop()?.split("?")[0];
+  if (pathId) {
+    return VIDEO_PLATFORMS.dailymotion.replace("{id}", pathId);
+  }
+
+  return undefined;
 };
 
 const urlParsers: Record<string, UrlParser> = {
@@ -90,10 +101,12 @@ export const formatYoutubeUrl = (url: string): string => {
 };
 
 export const getVideoThumbnailUrl = async (url: string) => {
-  if (isPeerTubeUrl(url)) return formatPeerTubeUrl(url);
   if (url.includes("vimeo")) return formatVimeoUrl(url);
   if (url.includes("dailymotion")) return formatDailymotionUrl(url);
   if (url.includes("youtube.com") || url.includes("youtu.be"))
     return formatYoutubeUrl(url);
+  if (isPeerTubeUrl(url)) {
+    return formatPeerTubeUrl(url);
+  }
   return "";
 };

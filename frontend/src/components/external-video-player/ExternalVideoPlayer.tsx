@@ -5,6 +5,7 @@ import ReactPlayer from "react-player";
 
 import { iframeStyle, reactPlayerStyle, videoPlayerWrapper } from "./style";
 import { VIDEO_SOURCE, VideoPlayerProps } from "./types";
+import { getDailymotionId } from "./utils";
 
 export const ExternalVideoPlayer: FC<VideoPlayerProps> = ({
   url,
@@ -29,7 +30,7 @@ export const ExternalVideoPlayer: FC<VideoPlayerProps> = ({
   }
 
   if (source === VIDEO_SOURCE.DAILYMOTION) {
-    const videoId = url.split("/").pop();
+    const videoId = getDailymotionId(url);
     return (
       <Box sx={videoPlayerWrapper}>
         <iframe

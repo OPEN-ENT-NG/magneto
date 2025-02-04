@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
 
 import { WorkspaceElement } from "@edifice.io/client";
+import { TabsItemProps, useWorkspaceFile } from "@edifice.io/react";
 import {
   MediaLibraryRef,
   MediaLibraryResult,
-  TabsItemProps,
-  useWorkspaceFile,
-} from "@edifice.io/react";
+} from "@edifice.io/react/multimedia";
 
 export const useMediaLibrary = () => {
   const mediaLibraryRef = useRef<MediaLibraryRef>(null);
@@ -22,7 +21,6 @@ export const useMediaLibrary = () => {
 
   const onSuccess = (result: MediaLibraryResult) => {
     let updatedMedia;
-
     switch (mediaLibraryRef.current?.type) {
       case "video": {
         if (typeof result === "object") {
@@ -33,6 +31,7 @@ export const useMediaLibrary = () => {
           const element = doc.body.firstChild as HTMLBodyElement;
 
           const href = element?.getAttribute("src");
+
           mediaLibraryRef.current?.hide();
           updatedMedia = href;
         }
@@ -41,10 +40,11 @@ export const useMediaLibrary = () => {
       case "embedder": {
         const parser = new DOMParser();
         const doc = parser.parseFromString(result, "text/html");
-        const element = doc.body.firstChild as HTMLBodyElement;
+        const elementWithSrc = doc.querySelector("[src]");
 
-        const href = element?.getAttribute("src");
+        const href = elementWithSrc?.getAttribute("src");
         mediaLibraryRef.current?.hide();
+
         updatedMedia = href;
         break;
       }

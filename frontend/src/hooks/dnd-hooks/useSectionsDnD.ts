@@ -323,95 +323,96 @@ export const useSectionsDnD = (board: Board) => {
       currentOverSection: Section,
       over: Over,
     ) => {
-      const lockedCards = currentOverSection.cards
+      const lockedCardsOriginal = originalActiveSection.cards
         .filter((card): card is typeof card & { locked: true } => card.locked)
         .map((card) => card.id);
 
-      const newOriginalSectionCardIds = originalActiveSection.cardIds.filter(
-        (id) => id !== activeCardId,
-      );
+      const lockedCardsOver = currentOverSection.cards
+        .filter((card): card is typeof card & { locked: true } => card.locked)
+        .map((card) => card.id);
 
-      /*const movedOriginalSectionCardIds = originalActiveSection.cardIds.filter(
-        (id) => id !== activeCardId,
-      );*/
-      /*
       const newOriginalSectionCardIds = reorderOriginalSectionWithLockedItems(
         originalActiveSection.cardIds,
         originalActiveSection.cardIds.indexOf(activeCardId),
         originalActiveSection.cardIds.indexOf(over.id.toString()),
-        lockedCards,
+        lockedCardsOriginal,
+        activeCardId,
       );
 
-      const newOriginalSectionCards =
-        reorderOriginalSectionWithLockedItemsArray(
-          originalActiveSection.cards,
-          originalActiveSection.cards.findIndex(
-            (card) => card.id === activeCardId,
-          ),
-          originalActiveSection.cards.findIndex(
-            (card) => card.id === over.id.toString(),
-          ),
-          lockedCards,
-        );*/
-
-      const newOverSectionCardIds = reorderOverSectionWithLockedItems(
-        currentOverSection.cardIds,
-        currentOverSection.cardIds.indexOf(activeCardId),
-        over.id === currentOverSection._id
-          ? currentOverSection.cardIds.length - 1
-          : currentOverSection.cardIds.indexOf(over.id.toString()),
-        lockedCards,
-      );
-
-      const newOverSectionCards = reorderOverSectionWithLockedItemsArray(
-        currentOverSection.cards,
-        currentOverSection.cards.findIndex((card) => card.id === activeCardId),
-        over.id === currentOverSection._id
-          ? currentOverSection.cards.length - 1
-          : currentOverSection.cards.findIndex(
+      if (newOriginalSectionCardIds === originalActiveSection.cardIds) {
+        console.log("toastify error");
+      } else {
+        const newOriginalSectionCards =
+          reorderOriginalSectionWithLockedItemsArray(
+            originalActiveSection.cards,
+            originalActiveSection.cards.findIndex(
+              (card) => card.id === activeCardId,
+            ),
+            originalActiveSection.cards.findIndex(
               (card) => card.id === over.id.toString(),
             ),
-        lockedCards,
-      );
+            lockedCardsOriginal,
+            activeCardId,
+          );
 
-      //TODO : FOR index TO size-1 : push elements
-      //if locked items moved : revert all changes (to both original and over sections)
+        const newOverSectionCardIds = reorderOverSectionWithLockedItems(
+          currentOverSection.cardIds,
+          currentOverSection.cardIds.indexOf(activeCardId),
+          over.id === currentOverSection._id
+            ? currentOverSection.cardIds.length - 1
+            : currentOverSection.cardIds.indexOf(over.id.toString()),
+          lockedCardsOver,
+        );
 
-      setUpdatedSections((prev) =>
-        prev.map((section) => {
-          if (section._id === originalActiveSection._id) {
-            return {
-              ...section,
+        const newOverSectionCards = reorderOverSectionWithLockedItemsArray(
+          currentOverSection.cards,
+          currentOverSection.cards.findIndex(
+            (card) => card.id === activeCardId,
+          ),
+          over.id === currentOverSection._id
+            ? currentOverSection.cards.length - 1
+            : currentOverSection.cards.findIndex(
+                (card) => card.id === over.id.toString(),
+              ),
+          lockedCardsOver,
+        );
+
+        setUpdatedSections((prev) =>
+          prev.map((section) => {
+            if (section._id === originalActiveSection._id) {
+              return {
+                ...section,
+                cardIds: newOriginalSectionCardIds,
+                cards: newOriginalSectionCards,
+              };
+            }
+            if (section._id === currentOverSection._id) {
+              return {
+                ...section,
+                cardIds: newOverSectionCardIds,
+                cards: newOverSectionCards,
+              };
+            }
+            return section;
+          }),
+        );
+
+        try {
+          await Promise.all([
+            updateSection({
+              id: originalActiveSection._id,
+              boardId: board._id,
               cardIds: newOriginalSectionCardIds,
-              cards: section.cards.filter((card) => card.id !== activeCardId),
-            };
-          }
-          if (section._id === currentOverSection._id) {
-            return {
-              ...section,
+            }).unwrap(),
+            updateSection({
+              id: currentOverSection._id,
+              boardId: board._id,
               cardIds: newOverSectionCardIds,
-              cards: newOverSectionCards,
-            };
-          }
-          return section;
-        }),
-      );
-
-      try {
-        await Promise.all([
-          updateSection({
-            id: originalActiveSection._id,
-            boardId: board._id,
-            cardIds: newOriginalSectionCardIds,
-          }).unwrap(),
-          updateSection({
-            id: currentOverSection._id,
-            boardId: board._id,
-            cardIds: newOverSectionCardIds,
-          }).unwrap(),
-        ]);
-      } catch (error) {
-        console.error("Failed to update sections:", error);
+            }).unwrap(),
+          ]);
+        } catch (error) {
+          console.error("Failed to update sections:", error);
+        }
       }
     },
     [board._id, updateSection],

@@ -22,6 +22,7 @@ public class BoardPayloadTest {
             .put("modificationDate", "modificationDate")
             .put("deleted", false)
             .put("public", false)
+            .put("isLocked", false)
             .put("cardIds", new JsonArray())
             .put("sectionIds", new JsonArray());
 
@@ -31,6 +32,7 @@ public class BoardPayloadTest {
             .put("imageUrl", "imageUrl")
             .put("backgroundUrl", "backgroundUrl")
             .put("canComment", false)
+            .put("isLocked", false)
             .put("description", "description")
             .put("modificationDate", "modificationDate")
             .put("public", false);

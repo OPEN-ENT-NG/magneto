@@ -23,6 +23,7 @@ public class BoardTest {
             .put("sectionIds", new JsonArray())
             .putNull("creationDate")
             .put("deleted", false)
+            .put("isLocked", false)
             .put("public", false)
             .put("folderId", "folderId")
             .put("ownerId", "ownerId")

@@ -30,6 +30,9 @@
     "deleted": {
       "type": "boolean"
     },
+    "isLocked": {
+      "type": "boolean"
+    },
     "layoutType": {
       "type": "string"
     },

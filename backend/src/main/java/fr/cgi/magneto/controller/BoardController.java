@@ -423,32 +423,4 @@ public class BoardController extends ControllerHelper {
         }
         return promise.future();
     }
-
-    @Put("/board/:id/toggle-lock")
-    @ApiDoc("toggle lock on board")
-    @ResourceFilter(ManageBoardRight.class)
-    @SecuredAction(value = "", type = ActionType.RESOURCE)
-    public void toggleLock(HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, user -> {
-            String boardId = request.getParam(Field.ID);
-            boardService.getBoards(Collections.singletonList(boardId))
-                    .compose(boards -> {
-                        if (!boards.isEmpty()) {
-                            Board currentBoard = boards.get(0);
-                            BoardPayload updateBoard = new BoardPayload(currentBoard.toJson())
-                                    .setId(boardId)
-                                    .setLocked(!currentBoard.isLocked())
-                                    .setModificationDate(
-                                            DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
-                            return boardService.update(updateBoard);
-                        } else {
-                            return Future
-                                    .failedFuture(String.format("[Magneto%s::toggleLock] No board found with id %s",
-                                            this.getClass().getSimpleName(), boardId));
-                        }
-                    })
-                    .onFailure(err -> renderError(request))
-                    .onSuccess(result -> renderJson(request, new JsonObject()));
-        });
-    }
 }

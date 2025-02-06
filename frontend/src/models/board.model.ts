@@ -28,6 +28,7 @@ export interface IBoardItemResponse {
   ownerName: string;
   canComment: boolean;
   displayNbFavorites: boolean;
+  isLocked: boolean;
   rights: any[];
   cards: Card[];
 }
@@ -64,6 +65,7 @@ export interface IBoardPayload {
   layoutType?: LAYOUT_TYPE;
   canComment?: boolean;
   displayNbFavorites?: boolean;
+  isLocked?: boolean;
 }
 
 export interface SectionPayload {
@@ -100,6 +102,7 @@ export class BoardForm {
   private _layoutType: LAYOUT_TYPE;
   private _canComment: boolean;
   private _displayNbFavorites: boolean;
+  private _isLocked: boolean;
 
   constructor() {
     this._id = "";
@@ -116,6 +119,7 @@ export class BoardForm {
     this._tagsTextInput = "";
     this._canComment = false;
     this._displayNbFavorites = false;
+    this._isLocked = false;
   }
 
   build(board: Board): BoardForm {
@@ -133,6 +137,7 @@ export class BoardForm {
     this.displayNbFavorites = board.displayNbFavorites;
     this.cardIds = board.cardIds;
     this._sectionIds = board.sectionsIds;
+    this.isLocked = board.isLocked;
     return this;
   }
 
@@ -251,6 +256,14 @@ export class BoardForm {
     this._displayNbFavorites = value;
   }
 
+  get isLocked(): boolean {
+    return this._isLocked;
+  }
+
+  set isLocked(value: boolean) {
+    this._isLocked = value;
+  }
+
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;
   }
@@ -318,6 +331,10 @@ export class BoardForm {
       payload.displayNbFavorites = this.displayNbFavorites;
     }
 
+    if (this.isLocked != null) {
+      payload.isLocked = this.isLocked;
+    }
+
     return payload;
   }
 }
@@ -343,6 +360,7 @@ export class Board /*implements Shareable*/ {
   private _canComment: boolean;
   private _displayNbFavorites: boolean;
   private _cards: Card[];
+  private _isLocked: boolean;
 
   // Share resource properties
   public shared: any[];
@@ -374,6 +392,7 @@ export class Board /*implements Shareable*/ {
     this._canComment = false;
     this._displayNbFavorites = false;
     this._cards = [];
+    this._isLocked = false;
     return this;
   }
 
@@ -421,9 +440,16 @@ export class Board /*implements Shareable*/ {
     this._deleted = data.deleted;
     this._canComment = data.canComment;
     this._displayNbFavorites = data.displayNbFavorites;
+    this._isLocked = data.isLocked;
     return this;
   }
+  get isLocked(): boolean {
+    return this._isLocked;
+  }
 
+  set isLocked(value: boolean) {
+    this._isLocked = value;
+  }
   get id(): string {
     return this._id;
   }

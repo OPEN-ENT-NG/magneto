@@ -10,11 +10,13 @@ import {
 } from "@edifice.io/react";
 import { mdiCheckCircle } from "@mdi/js";
 import Icon from "@mdi/react";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import {
+  isLockedToastStyle,
   leftWrapperStyle,
   mainWrapperStyle,
   rightWrapperStyle,
@@ -51,6 +53,12 @@ export const HeaderView: FC = () => {
             {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
           </Box>
           <Box sx={rightWrapperStyle}>
+            {board.isLocked && (
+              <Box sx={isLockedToastStyle}>
+                <WarningAmberIcon color="warning" />
+                <span>{t("magneto.board.locked")}</span>
+              </Box>
+            )}
             <Box sx={toastStyle}>
               <Icon path={mdiCheckCircle} size={1} />
               <span>

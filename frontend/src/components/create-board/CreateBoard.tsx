@@ -49,6 +49,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [activePickerId, setActivePickerId] = useState<string>("");
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
+  const [isLockedChecked, setIsLockedChecked] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [disposition, setDisposition] = useState("free");
@@ -89,6 +90,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       board.layoutType = LAYOUT_TYPE.HORIZONTAL;
     else board.layoutType = LAYOUT_TYPE.FREE;
     board.canComment = isCommentChecked;
+    board.isLocked = isLockedChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
   };
@@ -98,6 +100,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setActivePickerId("");
       setIsCommentChecked(false);
       setIsFavoriteChecked(false);
+      setIsLockedChecked(false);
       setTitle("");
       setDescription("");
       setDisposition("free");
@@ -169,6 +172,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setDescription(boardToUpdate.description);
       setDisposition(boardToUpdate.layoutType);
       setTagsTextInput(boardToUpdate.tagsTextInput);
+      setIsLockedChecked(boardToUpdate.isLocked);
       setTags(boardToUpdate.tags);
       if (boardToUpdate.imageUrl) {
         setThumbnail({
@@ -291,6 +295,15 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                       onChange={() =>
                         setIsFavoriteChecked(
                           (isFavoriteChecked) => !isFavoriteChecked,
+                        )
+                      }
+                    />
+                    <Checkbox
+                      checked={isLockedChecked}
+                      label="Figer le position des aimants sur le tableau"
+                      onChange={() =>
+                        setIsLockedChecked(
+                          (prev) => !prev,
                         )
                       }
                     />

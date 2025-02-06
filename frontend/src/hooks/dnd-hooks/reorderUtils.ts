@@ -173,10 +173,10 @@ function pushItemsForwardPastLocksSimple<T extends string | Card>(
 ): void {
   for (let i = newIndex + 1; i <= endIndex; i++) {
     if (lockedItems.includes(getItem(result[i]))) {
-      /*console.log("Found locked item while pushing forward:", {
+      console.log("Found locked item while pushing forward:", {
         lockedItem: result[i],
         currentArray: [...result],
-      });*/
+      });
 
       // If we hit a locked item, find next available position
       let availablePos = i + 1;
@@ -191,11 +191,11 @@ function pushItemsForwardPastLocksSimple<T extends string | Card>(
         // Move the displaced item to the available position
         const [itemToMove] = result.splice(i - 1, 1);
         result.splice(availablePos - 1, 0, itemToMove);
-        /*console.log("Moved displaced item:", {
+        console.log("Moved displaced item:", {
           itemToMove,
           newPosition: availablePos - 1,
           currentArray: [...result],
-        });*/
+        });
       }
     }
   }
@@ -209,11 +209,11 @@ function pushItemsBackwardPastLocksSimple<T extends string | Card>(
 ): void {
   for (let i = newIndex - 1; i >= endIndex; i--) {
     if (lockedItems.includes(getItem(result[i]))) {
-      console.log("Found locked item while pushing backward:", {
+      /*console.log("Found locked item while pushing backward:", {
         lockedItem: result[i],
         currentIndex: i,
         currentArray: [...result],
-      });
+      });*/
 
       // If we hit a locked item, find next available position
       let availablePos = i - 1;
@@ -231,13 +231,13 @@ function pushItemsBackwardPastLocksSimple<T extends string | Card>(
 
         // Normal displacement
         result.splice(availablePos + 1, 0, itemToMove);
-        console.log("Moved displaced item:", {
+        /*console.log("Moved displaced item:", {
           itemToMove,
           newPosition: availablePos + 1,
           currentArray: [...result],
-        });
+        });*/
       } else {
-        console.log("No valid position found for displaced item");
+        //console.log("No valid position found for displaced item");
       }
     }
   }
@@ -382,12 +382,12 @@ function reorderOverSectionWithLockedItemsGeneric<T extends string | Card>(
   newIndex: number,
   lockedItems: string[],
 ): T[] {
-  /*console.log("Starting reorder:", {
+  console.log("Starting reorder:", {
     items: [...items],
     oldIndex,
     newIndex,
     lockedItems: [...lockedItems],
-  });*/
+  });
 
   const movedOverSectionCards = arrayMove(items, oldIndex, newIndex);
 
@@ -397,14 +397,14 @@ function reorderOverSectionWithLockedItemsGeneric<T extends string | Card>(
       .slice(newIndex, movedOverSectionCards.length - 1)
       .some((item) => lockedItems.includes(getItem(item)))
   ) {
-    //console.log("Simple move, no locked item in between");
+    console.log("Simple move, no locked item in between");
     return movedOverSectionCards;
   }
 
   // If the moved item is locked, return original array
   const itemId = getItem(movedOverSectionCards[oldIndex]);
   if (lockedItems.includes(itemId)) {
-    //console.log("Item is locked, returning original array");
+    console.log("Item is locked, returning original array");
     return movedOverSectionCards;
   }
 
@@ -419,11 +419,11 @@ function reorderOverSectionWithLockedItemsGeneric<T extends string | Card>(
   );
 
   if (!checkLockedItemsMoved(items, movedOverSectionCards, lockedItems)) {
-    //console.log("Locked items have changed, return original board");
+    console.log("Locked items have changed, return original board");
     return items;
   }
 
-  //console.log("Final result:", [...result]);
+  console.log("Final result:", [...result]);
   return result;
 }
 
@@ -434,25 +434,25 @@ function reorderOriginalSectionWithLockedItemsGeneric<T extends string | Card>(
   lockedItems: string[],
   activeCardId: string,
 ): T[] {
-  console.log("Starting reorder:", {
+  /*console.log("Starting reorder:", {
     items: [...items],
     oldIndex,
     newIndex,
     lockedItems: [...lockedItems],
-  });
+  });*/
 
   const movedOriginalSectionCards = items.filter(
     (item) => getItem(item) !== activeCardId,
   );
 
   if (lockedItems.includes(activeCardId)) {
-    console.log("Item is locked, returning original array");
+    //console.log("Item is locked, returning original array");
     return movedOriginalSectionCards;
   }
 
   const result = [...movedOriginalSectionCards];
 
-  console.log(result, oldIndex, newIndex, lockedItems);
+  //console.log(result, oldIndex, newIndex, lockedItems);
   pushItemsBackwardPastLocksSimple(
     result,
     result.length - 1,
@@ -461,11 +461,11 @@ function reorderOriginalSectionWithLockedItemsGeneric<T extends string | Card>(
   );
 
   if (!checkLockedItemsMoved(items, result, lockedItems)) {
-    console.log("Locked items have changed, return original board");
+    //console.log("Locked items have changed, return original board");
     return items;
   }
 
-  console.log("Final result:", [...result]);
+  //console.log("Final result:", [...result]);
   return result;
 }
 

@@ -323,6 +323,9 @@ export const useSectionsDnD = (board: Board) => {
       currentOverSection: Section,
       over: Over,
     ) => {
+      console.log("start, original:", originalActiveSection.cardIds);
+      console.log("start, over:", currentOverSection.cardIds);
+
       const lockedCardsOriginal = originalActiveSection.cards
         .filter((card): card is typeof card & { locked: true } => card.locked)
         .map((card) => card.id);
@@ -339,8 +342,57 @@ export const useSectionsDnD = (board: Board) => {
         activeCardId,
       );
 
-      if (newOriginalSectionCardIds === originalActiveSection.cardIds) {
-        console.log("toastify error");
+      if (
+        newOriginalSectionCardIds === originalActiveSection.cardIds ||
+        lockedCardsOver.includes(activeCardId)
+      ) {
+        console.log("toastify error, original:", originalActiveSection.cardIds);
+        console.log("toastify error, over:", currentOverSection.cardIds);
+        const currentOverSectionWithoutNewCard = {
+          ...currentOverSection,
+          cardIds: currentOverSection.cardIds.filter(
+            (item) => item !== activeCardId,
+          ),
+          cards: currentOverSection.cards.filter(
+            (item) => item.id !== activeCardId,
+          ),
+        };
+        setUpdatedSections((prev) =>
+          prev.map((section) => {
+            if (section._id === originalActiveSection._id) {
+              return {
+                ...section,
+                cardIds: originalActiveSection.cardIds,
+                cards: originalActiveSection.cards,
+              };
+            }
+            if (section._id === currentOverSection._id) {
+              return {
+                ...section,
+                cardIds: currentOverSectionWithoutNewCard.cardIds,
+                cards: currentOverSectionWithoutNewCard.cards,
+              };
+            }
+            return section;
+          }),
+        );
+
+        try {
+          await Promise.all([
+            updateSection({
+              id: originalActiveSection._id,
+              boardId: board._id,
+              cardIds: originalActiveSection.cardIds,
+            }).unwrap(),
+            updateSection({
+              id: currentOverSectionWithoutNewCard._id,
+              boardId: board._id,
+              cardIds: currentOverSectionWithoutNewCard.cardIds,
+            }).unwrap(),
+          ]);
+        } catch (error) {
+          console.error("Failed to update sections:", error);
+        }
       } else {
         const newOriginalSectionCards =
           reorderOriginalSectionWithLockedItemsArray(
@@ -396,7 +448,6 @@ export const useSectionsDnD = (board: Board) => {
             return section;
           }),
         );
-
         try {
           await Promise.all([
             updateSection({

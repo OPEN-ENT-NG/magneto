@@ -29,9 +29,21 @@ export const handleCardSize = (zoomLevel: number) => {
 
 export const StyledCard = styled(Card, {
   shouldForwardProp: (prop) =>
-    !["zoomLevel", "isDragging"].includes(prop as string),
-})<{ zoomLevel: number; isDragging: boolean }>(
-  ({ zoomLevel = 3, isDragging = false }) => ({
+    !["zoomLevel", "isDragging", "islockedBoard"].includes(prop as string),
+})<{ zoomLevel: number; isDragging: boolean; isLockedBoard: boolean }>(({
+  zoomLevel = 3,
+  isDragging = false,
+  isLockedBoard,
+}) => {
+  const LOCKED_CURSOR = "default ! important";
+  const DRAGGING_CURSOR = "grabbing";
+  const DEFAULT_CURSOR = "grab";
+  const cursor =
+    (isLockedBoard && LOCKED_CURSOR) ||
+    (isDragging && DRAGGING_CURSOR) ||
+    DEFAULT_CURSOR;
+
+  return {
     display: "flex",
     position: "relative",
     flexDirection: "column",
@@ -42,9 +54,9 @@ export const StyledCard = styled(Card, {
     width: handleCardSize(zoomLevel).width,
     height: handleCardSize(zoomLevel).height,
     opacity: isDragging ? "0.5" : "1",
-    cursor: isDragging ? "grabbing" : "grab",
-  }),
-);
+    cursor,
+  };
+});
 
 export const getTransformStyle = (
   transform: any,

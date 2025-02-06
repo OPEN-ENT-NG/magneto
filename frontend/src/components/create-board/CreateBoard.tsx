@@ -282,7 +282,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     </h5>
                     <Checkbox
                       checked={isCommentChecked}
-                      label="Permettre aux utilisateurs de commenter les aimants"
+                      label={t("magneto.board.allow.comments")}
                       onChange={() =>
                         setIsCommentChecked(
                           (IsCommentChecked) => !IsCommentChecked,
@@ -291,7 +291,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     />
                     <Checkbox
                       checked={isFavoriteChecked}
-                      label="Afficher le nombre de favoris sur les aimants"
+                      label={t("magneto.board.show.favorites")}
                       onChange={() =>
                         setIsFavoriteChecked(
                           (isFavoriteChecked) => !isFavoriteChecked,
@@ -300,16 +300,12 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     />
                     <Checkbox
                       checked={isLockedChecked}
-                      label="Figer le position des aimants sur le tableau"
-                      onChange={() =>
-                        setIsLockedChecked(
-                          (prev) => !prev,
-                        )
-                      }
+                      label={t("magneto.board.lock.position")}
+                      onChange={() => setIsLockedChecked((prev) => !prev)}
                     />
                   </div>
                   <div>
-                    <h5>Quelle disposition des aimants souhaitez-vous?</h5>
+                    <h5>{t("magneto.board.layout.choose")}</h5>
                     <div style={styles.layoutOptionsContainer}>
                       <div style={styles.layoutOption}>
                         <Radio

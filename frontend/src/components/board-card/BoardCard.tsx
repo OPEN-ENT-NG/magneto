@@ -42,6 +42,7 @@ const BoardCard: FC<BoardCardProps> = ({
     handleClick,
     hasContribRights,
     hasEditRights,
+    isLockedBoard,
   } = useBoardCard(card);
 
   const { t } = useTranslation("magneto");
@@ -135,7 +136,8 @@ const BoardCard: FC<BoardCardProps> = ({
       ref={setNodeRef}
       onClick={handleClick}
       style={style}
-      {...(readOnly ? {} : { ...attributes, ...listeners })}
+      isLockedBoard={isLockedBoard}
+      {...(readOnly || isLockedBoard ? {} : { ...attributes, ...listeners })}
     >
       <div ref={dropdownRef}>
         <CardHeader {...headerProps} />

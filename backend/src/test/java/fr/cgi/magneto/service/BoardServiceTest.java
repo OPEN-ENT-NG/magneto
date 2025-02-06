@@ -130,6 +130,7 @@ public class BoardServiceTest {
                "            \"imageUrl\":1,\n" +
                "            \"backgroundUrl\":1,\n" +
                "            \"canComment\":1,\n" +
+               "            \"isLocked\":1,\n" +
                "            \"displayNbFavorites\":1,\n" +
                "            \"nbCards\":1,\n" +
                "            \"nbCardsSections\":1,\n" +

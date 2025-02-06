@@ -9,6 +9,17 @@ export const toastStyle = {
   color: "#2a9cc8",
   textWrap: "nowrap",
 };
+export const isLockedToastStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: ".5rem",
+  background: "#FFF4E5",
+  padding: " .8rem .5rem",
+  fontSize: "1.20rem",
+  borderRadius: ".5rem",
+  color: "#734B13",
+  textWrap: "nowrap",
+};
 
 export const mainWrapperStyle = {
   padding: "1rem 2rem",

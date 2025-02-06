@@ -27,6 +27,7 @@ public class Board implements Model<Board> {
     private String modificationDate;
     private boolean isDeleted;
     private boolean isPublic;
+    private boolean isLocked;
     private String folderId;
     private List<Card> cards;
     private List<Section> sections;
@@ -38,7 +39,6 @@ public class Board implements Model<Board> {
     private int nbCardsSections;
     private JsonArray rights;
 
-
     @SuppressWarnings("unchecked")
     public Board(JsonObject board) {
         this._id = board.getString(Field._ID, null);
@@ -49,20 +49,21 @@ public class Board implements Model<Board> {
         this.owner = new User(board.getString(Field.OWNERID), board.getString(Field.OWNERNAME));
         this.shared = board.getJsonArray(Field.SHARED, new JsonArray());
         this.isPublic = board.getBoolean(Field.PUBLIC, false);
+        this.isLocked = board.getBoolean(Field.ISLOCKED, false);
         this.folderId = board.getString(Field.FOLDERID);
         this.modificationDate = board.getString(Field.MODIFICATIONDATE);
         this.layoutType = board.getString(Field.LAYOUTTYPE);
         this.canComment = board.getBoolean(Field.CANCOMMENT, false);
         this.displayNbFavorites = board.getBoolean(Field.DISPLAY_NB_FAVORITES, false);
         JsonArray sectionsArray = new JsonArray(((List<String>) board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList())
-                .stream()
-                .map(id -> new JsonObject().put(Field._ID, id))
-                .collect(Collectors.toList()));
+                        .stream()
+                        .map(id -> new JsonObject().put(Field._ID, id))
+                        .collect(Collectors.toList()));
         this.sections = ModelHelper.toList(sectionsArray, Section.class);
         JsonArray cardsArray = new JsonArray(((List<String>) board.getJsonArray(Field.CARDIDS, new JsonArray()).getList())
-                .stream()
-                .map(id -> new JsonObject().put(Field._ID, id))
-                .collect(Collectors.toList()));
+                        .stream()
+                        .map(id -> new JsonObject().put(Field._ID, id))
+                        .collect(Collectors.toList()));
         this.cards = ModelHelper.toList(cardsArray, Card.class);
         this.tags = board.getJsonArray(Field.TAGS, new JsonArray()).getList();
         if (this.getId() == null) {
@@ -175,7 +176,6 @@ public class Board implements Model<Board> {
         return this;
     }
 
-
     public boolean isDeleted() {
         return isDeleted;
     }
@@ -199,7 +199,7 @@ public class Board implements Model<Board> {
     }
 
     public List<String> cardIds() {
-       return this.cards().stream().map(Card::getId).collect(Collectors.toList());
+        return this.cards().stream().map(Card::getId).collect(Collectors.toList());
     }
 
     public Board setCards(List<Card> cards) {
@@ -248,6 +248,15 @@ public class Board implements Model<Board> {
 
     public Board setLayoutType(String layoutType) {
         this.layoutType = layoutType;
+        return this;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public Board setLocked(boolean isLocked) {
+        this.isLocked = isLocked;
         return this;
     }
 
@@ -329,6 +338,7 @@ public class Board implements Model<Board> {
                 .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.DELETED, this.isDeleted())
                 .put(Field.PUBLIC, this.isPublic())
+                .put(Field.ISLOCKED, this.isLocked())
                 .put(Field.FOLDERID, this.getFolderId())
                 .put(Field.OWNERID, this.getOwnerId())
                 .put(Field.OWNERNAME, this.getOwnerName())

@@ -23,6 +23,7 @@ public class BoardPayload implements Model<BoardPayload> {
     private String folderId;
     private String layoutType;
     private Boolean canComment;
+    private Boolean isLocked;
 
     private Boolean displayNbFavorites;
     private List<String> cardIds;
@@ -48,6 +49,7 @@ public class BoardPayload implements Model<BoardPayload> {
         this.ownerName = board.getString(Field.OWNERNAME);
         this.folderId = board.getString(Field.FOLDERID);
         this.layoutType = board.getString(Field.LAYOUTTYPE);
+        this.isLocked = board.getBoolean(Field.ISLOCKED, false);
         if (board.getBoolean(Field.CANCOMMENT) != null) {
             this.canComment = board.getBoolean(Field.CANCOMMENT, false);
         }
@@ -163,6 +165,15 @@ public class BoardPayload implements Model<BoardPayload> {
 
     public BoardPayload setCanComment(Boolean canComment) {
         this.canComment = canComment;
+        return this;
+    }
+
+    public Boolean isLocked() {
+        return isLocked;
+    }
+    
+    public BoardPayload setLocked(Boolean locked) {
+        this.isLocked = locked;
         return this;
     }
 
@@ -330,6 +341,7 @@ public class BoardPayload implements Model<BoardPayload> {
 
         json.put(Field.PUBLIC, this.isPublic());
         json.put(Field.MODIFICATIONDATE, this.getModificationDate());
+        json.put(Field.ISLOCKED, this.isLocked());
 
         // If create
         if (this.getId() == null) {
@@ -343,7 +355,6 @@ public class BoardPayload implements Model<BoardPayload> {
 
         return json;
     }
-
 
     @Override
     public BoardPayload model(JsonObject board) {

@@ -46,7 +46,7 @@ const BoardCard: FC<BoardCardProps> = ({
   } = useBoardCard(card);
 
   const { t } = useTranslation("magneto");
-  const { displayModals, closeActiveCardAction } = useBoard();
+  const { board, displayModals, closeActiveCardAction } = useBoard();
 
   const dropDownItemList = useCardDropDownItems(
     readOnly,
@@ -57,6 +57,7 @@ const BoardCard: FC<BoardCardProps> = ({
     isManager,
     hasContribRights,
     hasEditRights,
+    board,
   );
 
   const sortableProps = useSortable({

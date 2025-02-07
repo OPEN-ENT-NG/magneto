@@ -43,7 +43,11 @@ export const DropDownList: FC<DropDownListProps> = ({
       {items.map((item, index) => (
         <Box key={`option-${Date.now() + index}`}>
           {item.divider && <Divider />}
-          <MenuItem onClick={() => handleItemClick(item)} sx={menuItemStyle}>
+          <MenuItem
+            onClick={() => handleItemClick(item)}
+            sx={menuItemStyle}
+            disabled={item.disabled}
+          >
             <ListItemIcon sx={listItemIconStyle}>{item.primary}</ListItemIcon>
             <ListItemText primary={item.secondary} sx={listItemTextStyle} />
           </MenuItem>

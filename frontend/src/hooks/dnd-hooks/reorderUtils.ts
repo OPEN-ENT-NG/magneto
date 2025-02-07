@@ -1,6 +1,8 @@
 import { arrayMove } from "@dnd-kit/sortable";
+import { Board } from "~/models/board.model";
 
 import { Card } from "~/models/card.model";
+import { Section } from "~/providers/BoardProvider/types";
 
 const getItem = <T extends string | Card>(item: T): string => {
   return typeof item === "string" ? item : item.id;
@@ -468,6 +470,18 @@ function reorderOriginalSectionWithLockedItemsGeneric<T extends string | Card>(
   //console.log("Final result:", [...result]);
   return result;
 }
+
+export const canRemoveMagnet = (board: Board, cardId: string): boolean => {
+  const lastCard = board.isLayoutFree()
+    ? board.cards.at(-1)
+    : board.sections
+        ?.find((section: Section) =>
+          section.cards.find((card: Card) => card.id === cardId),
+        )
+        ?.cards.at(-1) || null;
+
+  return lastCard ? lastCard.locked && lastCard.id !== cardId : false;
+};
 
 const reorderWithLockedItems = (
   items: string[],

@@ -36,6 +36,9 @@ export const menuItemStyle = {
       fill: "white",
     },
   },
+  "&.Mui-disabled": {
+    opacity: 0.6,
+  },
 };
 
 export const listItemIconStyle = {

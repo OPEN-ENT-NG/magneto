@@ -10,6 +10,7 @@ import {
   Over,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useToast } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 import { CustomPointerSensor } from "./customPointer";
@@ -47,6 +48,7 @@ export const useSectionsDnD = (board: Board) => {
   const [updateBoard] = useUpdateBoardMutation();
   const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
+  const toast = useToast();
 
   useEffect(() => {
     setUpdatedSections(board.sections);
@@ -323,9 +325,6 @@ export const useSectionsDnD = (board: Board) => {
       currentOverSection: Section,
       over: Over,
     ) => {
-      console.log("start, original:", originalActiveSection.cardIds);
-      console.log("start, over:", currentOverSection.cardIds);
-
       const lockedCardsOriginal = originalActiveSection.cards
         .filter((card): card is typeof card & { locked: true } => card.locked)
         .map((card) => card.id);
@@ -346,8 +345,7 @@ export const useSectionsDnD = (board: Board) => {
         newOriginalSectionCardIds === originalActiveSection.cardIds ||
         lockedCardsOver.includes(activeCardId)
       ) {
-        console.log("toastify error, original:", originalActiveSection.cardIds);
-        console.log("toastify error, over:", currentOverSection.cardIds);
+        toast.error(t("magneto.dnd.locked.error"));
         const currentOverSectionWithoutNewCard = {
           ...currentOverSection,
           cardIds: currentOverSection.cardIds.filter(
@@ -483,6 +481,10 @@ export const useSectionsDnD = (board: Board) => {
           : currentOverSection.cardIds.indexOf(over.id.toString()),
         lockedCards,
       );
+
+      if (newCardIds === currentOverSection.cardIds) {
+        toast.error(t("magneto.dnd.locked.error"));
+      }
 
       const newCards = reorderWithLockedItemsArray(
         currentOverSection.cards,

@@ -5,6 +5,7 @@ export type DropDownListItem = {
   OnClick: () => void;
   divider?: boolean;
   disabled?: boolean;
+  tooltip?: string;
 };
 
 export type Position = "bottom-right" | "right-top";

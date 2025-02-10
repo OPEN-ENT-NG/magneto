@@ -1,6 +1,6 @@
 import { arrayMove } from "@dnd-kit/sortable";
-import { Board } from "~/models/board.model";
 
+import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { Section } from "~/providers/BoardProvider/types";
 

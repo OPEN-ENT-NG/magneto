@@ -103,6 +103,7 @@ export const useCardDropDownItems = (
         secondary: labels.move,
         OnClick: handlers.move,
         disabled: canRemoveMagnet(board, card.id),
+        tooltip: "magneto.card.move.disabled.tooltip",
       },
       lock: {
         primary: icons.lock,
@@ -114,6 +115,7 @@ export const useCardDropDownItems = (
         secondary: labels.delete,
         OnClick: handlers.delete,
         disabled: canRemoveMagnet(board, card.id),
+        tooltip: "magneto.card.delete.disabled.tooltip",
       },
     }),
     [labels, handlers],

@@ -336,7 +336,6 @@ export const useSectionsDnD = (board: Board) => {
       const newOriginalSectionCardIds = reorderOriginalSectionWithLockedItems(
         originalActiveSection.cardIds,
         originalActiveSection.cardIds.indexOf(activeCardId),
-        originalActiveSection.cardIds.indexOf(over.id.toString()),
         lockedCardsOriginal,
         activeCardId,
       );
@@ -397,9 +396,6 @@ export const useSectionsDnD = (board: Board) => {
             originalActiveSection.cards,
             originalActiveSection.cards.findIndex(
               (card) => card.id === activeCardId,
-            ),
-            originalActiveSection.cards.findIndex(
-              (card) => card.id === over.id.toString(),
             ),
             lockedCardsOriginal,
             activeCardId,

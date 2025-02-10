@@ -1,5 +1,6 @@
 import { FC } from "react";
 
+import { Tooltip } from "@edifice.io/react";
 import {
   Box,
   Divider,
@@ -8,6 +9,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   listItemIconStyle,
@@ -26,10 +28,24 @@ export const DropDownList: FC<DropDownListProps> = ({
   position = "bottom-right",
   menuOffset = 8,
 }) => {
+  const { t } = useTranslation("magneto");
+
   const handleItemClick = (item: DropDownListItem) => {
     item.OnClick();
     onClose();
   };
+
+  const renderMenuItem = (item: DropDownListItem) => (
+    <MenuItem
+      onClick={() => handleItemClick(item)}
+      sx={menuItemStyle}
+      disabled={item.disabled}
+    >
+      <ListItemIcon sx={listItemIconStyle}>{item.primary}</ListItemIcon>
+      <ListItemText primary={item.secondary} sx={listItemTextStyle} />
+    </MenuItem>
+  );
+
   return (
     <Menu
       anchorEl={anchorEl}
@@ -43,14 +59,14 @@ export const DropDownList: FC<DropDownListProps> = ({
       {items.map((item, index) => (
         <Box key={`option-${Date.now() + index}`}>
           {item.divider && <Divider />}
-          <MenuItem
-            onClick={() => handleItemClick(item)}
-            sx={menuItemStyle}
-            disabled={item.disabled}
-          >
-            <ListItemIcon sx={listItemIconStyle}>{item.primary}</ListItemIcon>
-            <ListItemText primary={item.secondary} sx={listItemTextStyle} />
-          </MenuItem>
+
+          {item.disabled && item.tooltip ? (
+            <Tooltip message={t(item.tooltip)} placement="bottom-start">
+              {renderMenuItem(item)}
+            </Tooltip>
+          ) : (
+            renderMenuItem(item)
+          )}
         </Box>
       ))}
     </Menu>

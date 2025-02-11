@@ -30,6 +30,7 @@ public class ServiceFactory {
     private final FolderService folderService;
     private final BoardService boardService;
     private final CardService cardService;
+    private SlideMappingService slideMappingService;
     private final Map<String, SecuredAction> securedActions;
     private final ShareNormalizer shareNormalizer;
 
@@ -89,6 +90,13 @@ public class ServiceFactory {
     public BoardAccessService boardViewService(){
         return new DefaultBoardAccessService(CollectionsConstant.BOARD_VIEW_COLLECTION,mongoDb);
     }
+
+    public SlideMappingService slideMappingService() {
+        if (this.slideMappingService == null) {
+            this.slideMappingService = new DefaultSlideMappingService(this);
+        }
+        return this.slideMappingService;
+     }
 
     public ShareService shareService() {
         return new DefaultShareService(mongoDb);

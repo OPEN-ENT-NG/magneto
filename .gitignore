@@ -5,6 +5,7 @@
 .project
 /.gradle
 /.settings
+.vscode
 .jshintrc
 .idea/
 node_modules

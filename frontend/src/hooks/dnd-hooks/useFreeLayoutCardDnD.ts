@@ -6,9 +6,9 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 
 import { CustomPointerSensor } from "./customPointer";
+import { reorderWithLockedItems } from "./reorderUtils";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useUpdateBoardMutation } from "~/services/api/boards.service";
@@ -29,6 +29,12 @@ export const useFreeLayoutCardDnD = (board: Board) => {
       map[card.id] = card;
     });
     return map;
+  }, [board.cards]);
+
+  const lockedCards = useMemo(() => {
+    return board.cards
+      .filter((card): card is typeof card & { locked: true } => card.locked)
+      .map((card) => card.id);
   }, [board.cards]);
 
   const sensors = useSensors(
@@ -75,7 +81,13 @@ export const useFreeLayoutCardDnD = (board: Board) => {
             return;
           }
 
-          const newUpdatedIds = arrayMove(updatedIds, oldIndex, newIndex);
+          const newUpdatedIds = reorderWithLockedItems(
+            updatedIds,
+            oldIndex,
+            newIndex,
+            lockedCards,
+          );
+
           setUpdatedIds(newUpdatedIds);
 
           const payload = {
@@ -94,7 +106,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
         setActiveItem(null);
       }
     },
-    [board, updatedIds, updateBoard, cardMap, validCardIds],
+    [board, updatedIds, updateBoard, cardMap, validCardIds, lockedCards],
   );
 
   const handleDragCancel = useCallback(() => {

@@ -13,6 +13,8 @@ import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { canRemoveMagnet } from "~/hooks/dnd-hooks/reorderUtils";
+import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -26,6 +28,7 @@ export const useCardDropDownItems = (
   isManager: boolean,
   hasContribRights: boolean,
   hasEditRights: boolean,
+  board: Board,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
   const { openActiveCardAction, setIsModalDuplicate } = useBoard();
@@ -99,6 +102,8 @@ export const useCardDropDownItems = (
         primary: icons.bookArrow,
         secondary: labels.move,
         OnClick: handlers.move,
+        disabled: canRemoveMagnet(board, card.id),
+        tooltip: "magneto.card.move.disabled.tooltip",
       },
       lock: {
         primary: icons.lock,
@@ -109,6 +114,8 @@ export const useCardDropDownItems = (
         primary: icons.delete,
         secondary: labels.delete,
         OnClick: handlers.delete,
+        disabled: canRemoveMagnet(board, card.id),
+        tooltip: "magneto.card.delete.disabled.tooltip",
       },
     }),
     [labels, handlers],

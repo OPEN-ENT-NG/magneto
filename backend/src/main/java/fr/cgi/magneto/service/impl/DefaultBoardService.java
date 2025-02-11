@@ -6,6 +6,7 @@ import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
+import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
@@ -592,6 +593,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.DELETED, 1)
                             .put(Field.CANCOMMENT, 1)
                             .put(Field.DISPLAY_NB_FAVORITES, 1)
+                            .put(Field.ISLOCKED, 1)
                     )
                     .unwind(Field.FOLDERID, true);
         }
@@ -624,7 +626,8 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.LAYOUTTYPE, 1)
                 .put(Field.PUBLIC, 1)
                 .put(Field.CANCOMMENT, 1)
-                .put(Field.DISPLAY_NB_FAVORITES, 1));
+                .put(Field.DISPLAY_NB_FAVORITES, 1)
+                .put(Field.ISLOCKED, 1));
         if (getCount) {
             query = query.count();
         } else {
@@ -781,7 +784,8 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.TAGS, 1)
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
-                        .put(Field.DISPLAY_NB_FAVORITES, 1));
+                        .put(Field.DISPLAY_NB_FAVORITES, 1)
+                        .put(Field.ISLOCKED, 1));
         return query.getAggregate();
     }
 
@@ -907,7 +911,8 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.TAGS, 1)
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
-                        .put(Field.DISPLAY_NB_FAVORITES, 1));
+                        .put(Field.DISPLAY_NB_FAVORITES, 1)
+                        .put(Field.ISLOCKED, 1));
         return query.getAggregate();
     }
 

@@ -10,9 +10,18 @@ import {
   Over,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useToast } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 
 import { CustomPointerSensor } from "./customPointer";
+import {
+  reorderOriginalSectionWithLockedItems,
+  reorderOriginalSectionWithLockedItemsArray,
+  reorderOverSectionWithLockedItems,
+  reorderOverSectionWithLockedItemsArray,
+  reorderWithLockedItems,
+  reorderWithLockedItemsArray,
+} from "./reorderUtils";
 import { ActiveItemState, DND_ITEM_TYPE } from "./types";
 import { createCardMap, createSectionMap } from "./utils";
 import { Board } from "~/models/board.model";
@@ -39,6 +48,7 @@ export const useSectionsDnD = (board: Board) => {
   const [updateBoard] = useUpdateBoardMutation();
   const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
+  const toast = useToast();
 
   useEffect(() => {
     setUpdatedSections(board.sections);
@@ -315,56 +325,139 @@ export const useSectionsDnD = (board: Board) => {
       currentOverSection: Section,
       over: Over,
     ) => {
-      const newOriginalSectionCardIds = originalActiveSection.cardIds.filter(
-        (id) => id !== activeCardId,
-      );
-      const newOverSectionCardIds = arrayMove(
-        currentOverSection.cardIds,
-        currentOverSection.cardIds.indexOf(activeCardId),
-        over.id === currentOverSection._id
-          ? currentOverSection.cardIds.length - 1
-          : currentOverSection.cardIds.indexOf(over.id.toString()),
+      const lockedCardsOriginal = originalActiveSection.cards
+        .filter((card): card is typeof card & { locked: true } => card.locked)
+        .map((card) => card.id);
+
+      const lockedCardsOver = currentOverSection.cards
+        .filter((card): card is typeof card & { locked: true } => card.locked)
+        .map((card) => card.id);
+
+      const newOriginalSectionCardIds = reorderOriginalSectionWithLockedItems(
+        originalActiveSection.cardIds,
+        originalActiveSection.cardIds.indexOf(activeCardId),
+        lockedCardsOriginal,
+        activeCardId,
       );
 
-      setUpdatedSections((prev) =>
-        prev.map((section) => {
-          if (section._id === originalActiveSection._id) {
-            return {
-              ...section,
-              cardIds: newOriginalSectionCardIds,
-              cards: section.cards.filter((card) => card.id !== activeCardId),
-            };
-          }
-          if (section._id === currentOverSection._id) {
-            return {
-              ...section,
-              cardIds: newOverSectionCardIds,
-              cards: newOverSectionCardIds.map(
-                (id) =>
-                  section.cards.find((card) => card.id === id) ||
-                  originalActiveSection.cards.find((card) => card.id === id)!,
+      if (
+        newOriginalSectionCardIds === originalActiveSection.cardIds ||
+        lockedCardsOver.includes(activeCardId)
+      ) {
+        toast.error(t("magneto.dnd.locked.error"));
+        const currentOverSectionWithoutNewCard = {
+          ...currentOverSection,
+          cardIds: currentOverSection.cardIds.filter(
+            (item) => item !== activeCardId,
+          ),
+          cards: currentOverSection.cards.filter(
+            (item) => item.id !== activeCardId,
+          ),
+        };
+        setUpdatedSections((prev) =>
+          prev.map((section) => {
+            if (section._id === originalActiveSection._id) {
+              return {
+                ...section,
+                cardIds: originalActiveSection.cardIds,
+                cards: originalActiveSection.cards,
+              };
+            }
+            if (section._id === currentOverSection._id) {
+              return {
+                ...section,
+                cardIds: currentOverSectionWithoutNewCard.cardIds,
+                cards: currentOverSectionWithoutNewCard.cards,
+              };
+            }
+            return section;
+          }),
+        );
+
+        try {
+          await Promise.all([
+            updateSection({
+              id: originalActiveSection._id,
+              boardId: board._id,
+              cardIds: originalActiveSection.cardIds,
+            }).unwrap(),
+            updateSection({
+              id: currentOverSectionWithoutNewCard._id,
+              boardId: board._id,
+              cardIds: currentOverSectionWithoutNewCard.cardIds,
+            }).unwrap(),
+          ]);
+        } catch (error) {
+          console.error("Failed to update sections:", error);
+        }
+      } else {
+        const newOriginalSectionCards =
+          reorderOriginalSectionWithLockedItemsArray(
+            originalActiveSection.cards,
+            originalActiveSection.cards.findIndex(
+              (card) => card.id === activeCardId,
+            ),
+            lockedCardsOriginal,
+            activeCardId,
+          );
+
+        const newOverSectionCardIds = reorderOverSectionWithLockedItems(
+          currentOverSection.cardIds,
+          currentOverSection.cardIds.indexOf(activeCardId),
+          over.id === currentOverSection._id
+            ? currentOverSection.cardIds.length - 1
+            : currentOverSection.cardIds.indexOf(over.id.toString()),
+          lockedCardsOver,
+        );
+
+        const newOverSectionCards = reorderOverSectionWithLockedItemsArray(
+          currentOverSection.cards,
+          currentOverSection.cards.findIndex(
+            (card) => card.id === activeCardId,
+          ),
+          over.id === currentOverSection._id
+            ? currentOverSection.cards.length - 1
+            : currentOverSection.cards.findIndex(
+                (card) => card.id === over.id.toString(),
               ),
-            };
-          }
-          return section;
-        }),
-      );
+          lockedCardsOver,
+        );
 
-      try {
-        await Promise.all([
-          updateSection({
-            id: originalActiveSection._id,
-            boardId: board._id,
-            cardIds: newOriginalSectionCardIds,
-          }).unwrap(),
-          updateSection({
-            id: currentOverSection._id,
-            boardId: board._id,
-            cardIds: newOverSectionCardIds,
-          }).unwrap(),
-        ]);
-      } catch (error) {
-        console.error("Failed to update sections:", error);
+        setUpdatedSections((prev) =>
+          prev.map((section) => {
+            if (section._id === originalActiveSection._id) {
+              return {
+                ...section,
+                cardIds: newOriginalSectionCardIds,
+                cards: newOriginalSectionCards,
+              };
+            }
+            if (section._id === currentOverSection._id) {
+              return {
+                ...section,
+                cardIds: newOverSectionCardIds,
+                cards: newOverSectionCards,
+              };
+            }
+            return section;
+          }),
+        );
+        try {
+          await Promise.all([
+            updateSection({
+              id: originalActiveSection._id,
+              boardId: board._id,
+              cardIds: newOriginalSectionCardIds,
+            }).unwrap(),
+            updateSection({
+              id: currentOverSection._id,
+              boardId: board._id,
+              cardIds: newOverSectionCardIds,
+            }).unwrap(),
+          ]);
+        } catch (error) {
+          console.error("Failed to update sections:", error);
+        }
       }
     },
     [board._id, updateSection],
@@ -372,14 +465,24 @@ export const useSectionsDnD = (board: Board) => {
 
   const handleCardMoveWithinSection = useCallback(
     async (activeCardId: string, currentOverSection: Section, over: Over) => {
-      const newCardIds = arrayMove(
+      const lockedCards = currentOverSection.cards
+        .filter((card): card is typeof card & { locked: true } => card.locked)
+        .map((card) => card.id);
+
+      const newCardIds = reorderWithLockedItems(
         currentOverSection.cardIds,
         currentOverSection.cardIds.indexOf(activeCardId),
         over.id === currentOverSection._id
           ? currentOverSection.cardIds.length - 1
           : currentOverSection.cardIds.indexOf(over.id.toString()),
+        lockedCards,
       );
-      const newCards = arrayMove(
+
+      if (newCardIds === currentOverSection.cardIds) {
+        toast.error(t("magneto.dnd.locked.error"));
+      }
+
+      const newCards = reorderWithLockedItemsArray(
         currentOverSection.cards,
         currentOverSection.cards.findIndex((card) => card.id === activeCardId),
         over.id === currentOverSection._id
@@ -387,6 +490,7 @@ export const useSectionsDnD = (board: Board) => {
           : currentOverSection.cards.findIndex(
               (card) => card.id === over.id.toString(),
             ),
+        lockedCards,
       );
 
       setUpdatedSections((prev) =>
@@ -434,6 +538,7 @@ export const useSectionsDnD = (board: Board) => {
       }
 
       if (over.id === "new-section" || over.id === newMagnetOver[0]?.id) {
+        console.log("hey");
         setNewMagnetOver([]);
         return await handleNewSectionCreation(
           activeCardId,
@@ -446,6 +551,7 @@ export const useSectionsDnD = (board: Board) => {
         return;
       }
       if (originalActiveSection._id !== currentOverSection._id) {
+        console.log("hoy");
         return await handleCardMoveBetweenSections(
           activeCardId,
           originalActiveSection,

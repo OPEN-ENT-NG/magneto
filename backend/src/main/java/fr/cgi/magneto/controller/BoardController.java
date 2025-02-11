@@ -4,7 +4,10 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
-import fr.cgi.magneto.helper.*;
+import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.helper.FutureHelper;
+import fr.cgi.magneto.helper.I18nHelper;
+import fr.cgi.magneto.helper.WorkflowHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.share.SharedElem;
@@ -26,7 +29,8 @@ import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.Trace;
-import org.entcore.common.user.*;
+import org.entcore.common.user.UserInfos;
+import org.entcore.common.user.UserUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -205,7 +209,7 @@ public class BoardController extends ControllerHelper {
                                     board.remove(Field.CANCOMMENT);
                                 }
                                 boolean hasDisplayNbFavoritesRight = WorkflowHelper.hasRight(user, Rights.DISPLAY_NB_FAVORITES);
-                                if(!hasDisplayNbFavoritesRight) {
+                                if (!hasDisplayNbFavoritesRight) {
                                     board.remove(Field.DISPLAY_NB_FAVORITES);
                                 }
                                 BoardPayload updateBoard = new BoardPayload(board)
@@ -336,10 +340,9 @@ public class BoardController extends ControllerHelper {
                             .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.notify.board.push.notif.body"));
                         // params.put(Field.PUSHNOTIF, pushNotif);
 
-                        if (board.getJsonArray(Field.SHARED) == null){
+                        if (board.getJsonArray(Field.SHARED) == null) {
                             request.response().setStatusMessage(boardId).setStatusCode(200).end();
-                        }
-                        else {
+                        } else {
                             List<SharedElem> newSharedElem = this.magnetoShareService.getSharedElemList(board.getJsonArray(Field.SHARED));
                             getUsersIdsToNotify(user, newSharedElem)
                                     .onSuccess(usersIdToShare -> {
@@ -394,6 +397,7 @@ public class BoardController extends ControllerHelper {
         });
         return handlePromiseWithCompositeFuture(promise, futures, usersIdToShare);
     }
+
     @Post("/boards/imageUrl")
     @ApiDoc("Get imageUrl of boards")
     @ResourceFilter(ViewRight.class)

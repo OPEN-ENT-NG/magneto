@@ -785,7 +785,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
-                        .put(Field.ISLOCKED, 1));
+                        .put(Field.ISLOCKED, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISLOCKED).add(false))));
         return query.getAggregate();
     }
 

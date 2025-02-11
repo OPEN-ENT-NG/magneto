@@ -36,6 +36,9 @@
     "displayNbFavorites": {
       "type": "boolean"
     },
+    "isLocked": {
+      "type": "boolean"
+    },
     "cardIds": {
       "type": "array",
       "items": {

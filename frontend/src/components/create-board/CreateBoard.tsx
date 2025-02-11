@@ -49,6 +49,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [activePickerId, setActivePickerId] = useState<string>("");
   const [isCommentChecked, setIsCommentChecked] = useState(false);
   const [isFavoriteChecked, setIsFavoriteChecked] = useState(false);
+  const [isLockedChecked, setIsLockedChecked] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [disposition, setDisposition] = useState("free");
@@ -89,6 +90,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       board.layoutType = LAYOUT_TYPE.HORIZONTAL;
     else board.layoutType = LAYOUT_TYPE.FREE;
     board.canComment = isCommentChecked;
+    board.isLocked = isLockedChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
   };
@@ -98,6 +100,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setActivePickerId("");
       setIsCommentChecked(false);
       setIsFavoriteChecked(false);
+      setIsLockedChecked(false);
       setTitle("");
       setDescription("");
       setDisposition("free");
@@ -169,6 +172,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setDescription(boardToUpdate.description);
       setDisposition(boardToUpdate.layoutType);
       setTagsTextInput(boardToUpdate.tagsTextInput);
+      setIsLockedChecked(boardToUpdate.isLocked);
       setTags(boardToUpdate.tags);
       if (boardToUpdate.imageUrl) {
         setThumbnail({
@@ -278,7 +282,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     </h5>
                     <Checkbox
                       checked={isCommentChecked}
-                      label="Permettre aux utilisateurs de commenter les aimants"
+                      label={t("magneto.board.allow.comments")}
                       onChange={() =>
                         setIsCommentChecked(
                           (IsCommentChecked) => !IsCommentChecked,
@@ -287,16 +291,21 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     />
                     <Checkbox
                       checked={isFavoriteChecked}
-                      label="Afficher le nombre de favoris sur les aimants"
+                      label={t("magneto.board.show.favorites")}
                       onChange={() =>
                         setIsFavoriteChecked(
                           (isFavoriteChecked) => !isFavoriteChecked,
                         )
                       }
                     />
+                    <Checkbox
+                      checked={isLockedChecked}
+                      label={t("magneto.board.lock.position")}
+                      onChange={() => setIsLockedChecked((prev) => !prev)}
+                    />
                   </div>
                   <div>
-                    <h5>Quelle disposition des aimants souhaitez-vous?</h5>
+                    <h5>{t("magneto.board.layout.choose")}</h5>
                     <div style={styles.layoutOptionsContainer}>
                       <div style={styles.layoutOption}>
                         <Radio

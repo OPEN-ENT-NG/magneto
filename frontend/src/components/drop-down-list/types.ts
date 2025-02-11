@@ -4,6 +4,8 @@ export type DropDownListItem = {
   secondary: ReactNode;
   OnClick: () => void;
   divider?: boolean;
+  disabled?: boolean;
+  tooltip?: string;
 };
 
 export type Position = "bottom-right" | "right-top";

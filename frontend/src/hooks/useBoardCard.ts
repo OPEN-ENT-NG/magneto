@@ -149,11 +149,13 @@ export const useBoardCard = (card: Card) => {
     () => card.ownerId === user?.userId,
     [card.ownerId, user?.userId],
   );
+  const isLockedBoard = useMemo(() => board.isLocked, [board.isLocked]);
 
   return useMemo(
     () => ({
       icon,
       type,
+      isLockedBoard,
       hasEditRights,
       hasContribRights,
       isOpen,
@@ -174,6 +176,7 @@ export const useBoardCard = (card: Card) => {
     [
       icon,
       type,
+      isLockedBoard,
       hasEditRights,
       hasContribRights,
       isOpen,

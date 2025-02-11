@@ -49,7 +49,9 @@ public class BoardPayload implements Model<BoardPayload> {
         this.ownerName = board.getString(Field.OWNERNAME);
         this.folderId = board.getString(Field.FOLDERID);
         this.layoutType = board.getString(Field.LAYOUTTYPE);
-        this.isLocked = board.getBoolean(Field.ISLOCKED, false);
+        if (board.getBoolean(Field.ISLOCKED) != null) {
+            this.isLocked = board.getBoolean(Field.ISLOCKED, false);
+        }
         if (board.getBoolean(Field.CANCOMMENT) != null) {
             this.canComment = board.getBoolean(Field.CANCOMMENT, false);
         }

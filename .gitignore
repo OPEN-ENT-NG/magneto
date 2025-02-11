@@ -7,6 +7,7 @@
 /.settings
 .jshintrc
 .idea/
+.vscode
 node_modules
 *.iml
 */build

@@ -85,6 +85,7 @@ export const CardsFreeLayout: FC = () => {
   const { board, zoomLevel, hasEditRights } = useBoard();
   const {
     updatedIds,
+    updatedIdsWithoutLocked,
     activeItem,
     cardMap,
     sensors,
@@ -117,7 +118,10 @@ export const CardsFreeLayout: FC = () => {
       onDragEnd={memoizedHandleDragEnd}
       onDragCancel={memoizedHandleDragCancel}
     >
-      <SortableContext items={updatedIds} strategy={rectSortingStrategy}>
+      <SortableContext
+        items={updatedIdsWithoutLocked}
+        strategy={rectSortingStrategy}
+      >
         <Box sx={mainWrapperProps}>
           <UlWrapper className="grid ps-0 list-unstyled mb-24 left-float">
             {updatedIds.map((cardId, index) => (

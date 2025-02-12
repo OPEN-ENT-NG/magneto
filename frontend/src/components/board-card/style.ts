@@ -29,17 +29,25 @@ export const handleCardSize = (zoomLevel: number) => {
 
 export const StyledCard = styled(Card, {
   shouldForwardProp: (prop) =>
-    !["zoomLevel", "isDragging", "isLockedBoard"].includes(prop as string),
-})<{ zoomLevel: number; isDragging: boolean; isLockedBoard: boolean }>(({
+    !["zoomLevel", "isDragging", "isLockedBoard", "isLocked"].includes(
+      prop as string,
+    ),
+})<{
+  zoomLevel: number;
+  isDragging: boolean;
+  isLockedBoard: boolean;
+  isLocked: boolean;
+}>(({
   zoomLevel = 3,
   isDragging = false,
   isLockedBoard = false,
+  isLocked = false,
 }) => {
   const LOCKED_CURSOR = "default !important";
   const DRAGGING_CURSOR = "grabbing";
   const DEFAULT_CURSOR = "grab";
   const cursor =
-    (isLockedBoard && LOCKED_CURSOR) ||
+    ((isLockedBoard || isLocked) && LOCKED_CURSOR) ||
     (isDragging && DRAGGING_CURSOR) ||
     DEFAULT_CURSOR;
 

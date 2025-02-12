@@ -50,6 +50,12 @@ export const useSectionsDnD = (board: Board) => {
   const { t } = useTranslation("magneto");
   const toast = useToast();
 
+  const lockedCardIds = useMemo(() => {
+    return updatedSections.flatMap((section) =>
+      section.cards.filter((card) => card.locked).map((card) => card.id),
+    );
+  }, [updatedSections]);
+
   useEffect(() => {
     setUpdatedSections(board.sections);
   }, [board.sections]);
@@ -631,10 +637,19 @@ export const useSectionsDnD = (board: Board) => {
     }
   }, [board._id, createSection, t, updatedSections.length]);
 
+  const updatedSectionsWithoutLocked = useMemo(() => {
+    return updatedSections.map((section) => ({
+      ...section,
+      cardIds: section.cardIds.filter((id) => !lockedCardIds.includes(id)),
+      cards: section.cards.filter((card) => !card.locked),
+    }));
+  }, [updatedSections, lockedCardIds]);
+
   return {
     newMagnetOver,
     activeItem,
     updatedSections,
+    lockedCardIds,
     sensors,
     handleDragStart,
     handleDragOver,

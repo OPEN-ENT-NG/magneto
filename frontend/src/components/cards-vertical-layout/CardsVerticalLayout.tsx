@@ -93,6 +93,7 @@ const MemoizedSection = memo(
     hasManageRights,
     isLast = false,
     isDraggable = true,
+    lockedCardIds,
   }: {
     section: Section;
     sectionNumber: number;
@@ -101,6 +102,7 @@ const MemoizedSection = memo(
     hasManageRights: boolean;
     isLast?: boolean;
     isDraggable?: boolean;
+    lockedCardIds: string[];
   }) => (
     <DndSection
       id={section._id}
@@ -116,7 +118,7 @@ const MemoizedSection = memo(
       </Box>
       <MemoizedCardsSection
         cards={section.cards}
-        cardIds={section.cardIds}
+        cardIds={section.cardIds.filter((id) => !lockedCardIds.includes(id))}
         displayProps={displayProps}
         hasEditRights={hasEditRights}
       />
@@ -169,6 +171,7 @@ export const CardsVerticalLayout: FC = () => {
   const {
     activeItem,
     updatedSections,
+    lockedCardIds,
     sensors,
     newMagnetOver,
     handleDragStart,
@@ -239,6 +242,7 @@ export const CardsVerticalLayout: FC = () => {
               displayProps={displayProps}
               hasEditRights={hasEditRights()}
               hasManageRights={hasManageRights()}
+              lockedCardIds={lockedCardIds}
             />
           ))}
 
@@ -251,6 +255,7 @@ export const CardsVerticalLayout: FC = () => {
               hasManageRights={hasManageRights()}
               isLast={true}
               isDraggable={false}
+              lockedCardIds={lockedCardIds}
             />
           )}
         </Box>

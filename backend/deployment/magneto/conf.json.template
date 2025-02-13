@@ -1,27 +1,27 @@
-{
-    "name": "fr.cgi~magneto~${magnetoVersion}",
-    "config": {
-        "main": "fr.cgi.magneto.Magneto",
-        "port": 8205,
-        "app-name": "Magneto",
-        "app-address": "/magneto",
-        "app-icon": "${host}/magneto/public/img/uni-magneto.png",
+    {
+      "name": "fr.cgi~magneto~${magnetoVersion}",
+      "config": {
+        "main" : "fr.cgi.magneto.Magneto",
+        "port" : 8205,
+        "app-name" : "Magneto",
+    	"app-address" : "/magneto",
+    	"app-icon" : "${host}/magneto/public/img/uni-magneto.png",
         "host": "${host}",
-        "ssl": $ssl,
+        "ssl" : $ssl,
         "auto-redeploy": false,
         "userbook-host": "${host}",
-        "integration-mode": "HTTP",
-        "app-registry.port": 8012,
-        "mode": "${mode}",
-        "entcore.port": 8009,
+        "integration-mode" : "HTTP",
+        "app-registry.port" : 8012,
+        "mode" : "${mode}",
+        "entcore.port" : 8009,
         "websocket-config": {
             "wsPort": 4404,
             "endpoint-proxy": "/magneto/eventbus"
         },
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},
-        "magnetoIsStandalone": ${magnetoIsStandalone},
+        "magnetoIsStandalone" : ${magnetoIsStandalone},
         "notif": {
             "notify_board_template": "${notifyBoardTemplate:-magneto.notify_board}"
         }
+      }
     }
-}

@@ -59,7 +59,10 @@ const pushItemsBackwardPastLocks = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex - 1; i >= oldIndex; i--) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i + 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i - 1;
 
@@ -94,7 +97,10 @@ const pushItemsForwardPastLocks = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex + 1; i <= endIndex; i++) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i - 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i + 1;
       while (
@@ -126,7 +132,10 @@ const pushItemsForwardPastLocksSimple = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex + 1; i <= endIndex; i++) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i - 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i + 1;
       while (
@@ -152,7 +161,10 @@ const pushItemsBackwardPastLocksSimple = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex - 1; i >= endIndex; i--) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i + 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i - 1;
 
@@ -190,8 +202,14 @@ const reorderWithLockedItemsGeneric = <T extends string | Card>(
   }
 
   // If the moved item is locked, return original array
-  const itemId = getItem(items[oldIndex]);
-  if (lockedItems.includes(itemId)) {
+  const itemIdToMove = getItem(items[oldIndex]);
+  if (lockedItems.includes(itemIdToMove)) {
+    return items;
+  }
+
+  // If the destination is locked, return original array
+  const itemIdWhereMove = getItem(items[newIndex]);
+  if (lockedItems.includes(itemIdWhereMove)) {
     return items;
   }
 
@@ -288,9 +306,14 @@ const reorderOverSectionWithLockedItemsGeneric = <T extends string | Card>(
   }
 
   // If the moved item is locked, return original array
-  const itemId = getItem(movedOverSectionCards[oldIndex]);
-  if (lockedItems.includes(itemId)) {
+  const itemIdToMove = getItem(movedOverSectionCards[oldIndex]);
+  if (lockedItems.includes(itemIdToMove)) {
     return movedOverSectionCards;
+  }
+
+  const itemIdWhereMove = getItem(movedOverSectionCards[newIndex]);
+  if (lockedItems.includes(itemIdWhereMove)) {
+    return items;
   }
 
   const result = [...movedOverSectionCards];

@@ -77,7 +77,7 @@
   "magneto.board.description.readmore": "Lire plus",
   "magneto.board.allow.comments": "Permettre aux utilisateurs de commenter les aimants",
   "magneto.board.show.favorites": "Afficher le nombre de favoris sur les aimants",
-  "magneto.board.lock.position": "Figer la position des aimants dans sur le tableau",
+  "magneto.board.lock.position": "Figer la position des aimants dans le tableau",
   "magneto.board.layout.choose": "Quelle disposition des aimants souhaitez-vous?",
   "magneto.duplicate": "Duplicate",
   "magneto.restore": "Restore",

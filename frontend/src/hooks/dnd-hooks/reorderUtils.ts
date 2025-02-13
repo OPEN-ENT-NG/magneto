@@ -263,7 +263,11 @@ const reorderWithLockedItemsGeneric = <T extends string | Card>(
     pushItemsBackwardPastLocks(result, oldIndex, newIndex, lockedItems);
   }
 
-  return result;
+  // Return new array without dummy items
+  return result.filter((item) => {
+    const id = getItem(item);
+    return id !== "dummy";
+  });
 };
 
 const reorderOverSectionWithLockedItemsGeneric = <T extends string | Card>(
@@ -302,7 +306,10 @@ const reorderOverSectionWithLockedItemsGeneric = <T extends string | Card>(
     return items;
   }
 
-  return result;
+  return result.filter((item) => {
+    const id = getItem(item);
+    return id !== "dummy";
+  });
 };
 
 const reorderOriginalSectionWithLockedItemsGeneric = <T extends string | Card>(
@@ -332,7 +339,10 @@ const reorderOriginalSectionWithLockedItemsGeneric = <T extends string | Card>(
     return items;
   }
 
-  return result;
+  return result.filter((item) => {
+    const id = getItem(item);
+    return id !== "dummy";
+  });
 };
 
 export const canRemoveMagnet = (board: Board, cardId: string): boolean => {

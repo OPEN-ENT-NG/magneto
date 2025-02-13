@@ -637,14 +637,6 @@ export const useSectionsDnD = (board: Board) => {
     }
   }, [board._id, createSection, t, updatedSections.length]);
 
-  const updatedSectionsWithoutLocked = useMemo(() => {
-    return updatedSections.map((section) => ({
-      ...section,
-      cardIds: section.cardIds.filter((id) => !lockedCardIds.includes(id)),
-      cards: section.cards.filter((card) => !card.locked),
-    }));
-  }, [updatedSections, lockedCardIds]);
-
   return {
     newMagnetOver,
     activeItem,

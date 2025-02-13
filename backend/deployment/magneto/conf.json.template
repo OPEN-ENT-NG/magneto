@@ -21,7 +21,7 @@
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},
         "magnetoIsStandalone" : ${magnetoIsStandalone},
         "notif": {
-            "notify_board_template": "${notifyBoardTemplate:-magneto.notify_board}"
+            "notify_board_template": "${notifyBoardTemplate}"
         }
       }
     }

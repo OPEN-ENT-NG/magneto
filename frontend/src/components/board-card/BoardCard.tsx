@@ -141,7 +141,7 @@ const BoardCard: FC<BoardCardProps> = ({
       ref={setNodeRef}
       onClick={handleClick}
       style={style}
-      isLockedBoard={isLockedBoard}
+      isLockedBoard={isLockedBoard||card.locked}
       {...(readOnly || isLockedBoard ? {} : { ...attributes, ...listeners })}
     >
       <div ref={dropdownRef}>

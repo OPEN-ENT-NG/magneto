@@ -1,6 +1,7 @@
 package fr.cgi.magneto.controller;
 
 import fr.cgi.magneto.Magneto;
+import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.core.constants.Actions;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
@@ -47,9 +48,10 @@ public class BoardController extends ControllerHelper {
     private final FolderService folderService;
     private final ShareService magnetoShareService;
     private final ShareBookMarkService shareBookMarkService;
+    private final MagnetoConfig config;
 
 
-    public BoardController(ServiceFactory serviceFactory) {
+    public BoardController(ServiceFactory serviceFactory, MagnetoConfig config) {
         this.boardService = serviceFactory.boardService();
         this.boardAccessService = serviceFactory.boardViewService();
         this.sectionService = serviceFactory.sectionService();
@@ -58,6 +60,7 @@ public class BoardController extends ControllerHelper {
         this.eventStore = EventStoreFactory.getFactory().getEventStore(Magneto.class.getSimpleName());
         this.magnetoShareService = serviceFactory.shareService();
         this.shareBookMarkService = serviceFactory.shareBookMarkService();
+        this.config = config;
     }
 
     @Get("/boards")
@@ -336,6 +339,8 @@ public class BoardController extends ControllerHelper {
                             .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.notify.board.push.notif.body"));
                         //params.put(Field.PUSHNOTIF, pushNotif);
 
+                        String notificationString = config.getNotifyBoardTemplate();
+
                         if (board.getJsonArray(Field.SHARED) == null){
                             request.response().setStatusMessage(boardId).setStatusCode(200).end();
                         }
@@ -346,7 +351,7 @@ public class BoardController extends ControllerHelper {
                                         if (!board.getString(Field.OWNERID).equals(user.getUserId())) {
                                             usersIdToShare.add(board.getString(Field.OWNERID));
                                         }
-                                        notification.notifyTimeline(request, "magneto.notify_board", user, usersIdToShare, boardId, Field.TITLE, params, true);
+                                        notification.notifyTimeline(request, notificationString, user, usersIdToShare, boardId, Field.TITLE, params, true);
                                         request.response().setStatusMessage(boardId).setStatusCode(200).end();
                                     });
                         }

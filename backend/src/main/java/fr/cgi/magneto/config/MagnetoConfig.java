@@ -10,8 +10,10 @@ public class MagnetoConfig {
     private final WebsocketConfig websocketConfig;
     private final Integer magnetoUpdateFrequency;
     private final Boolean magnetoStandalone;
+    private final String notifyBoardTemplate;
+    private static final String DEFAULT_NOTIFY_BOARD_TEMPLATE = "magneto.notify_board";
 
-    private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; //refresh every 10 seconds by default
+    private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; // refresh every 10 seconds by default
 
     public MagnetoConfig(JsonObject config) {
         this.host = config.getString(Field.HOST);
@@ -20,6 +22,8 @@ public class MagnetoConfig {
         final int tempFrequency = config.getInteger(Field.MAGNETO_UPDATE_FREQUENCY, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
         this.magnetoUpdateFrequency = Math.max(tempFrequency, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
         this.magnetoStandalone = config.getBoolean(Field.MAGNETO_STANDALONE_CONFIG, false);
+        JsonObject notifConfig = config.getJsonObject(Field.NOTIF, new JsonObject());
+        this.notifyBoardTemplate = notifConfig.getString(Field.NOTIFY_BOARD_TEMPLATE, DEFAULT_NOTIFY_BOARD_TEMPLATE);
     }
 
     public String host() {
@@ -40,6 +44,10 @@ public class MagnetoConfig {
 
     public Boolean getMagnetoStandalone() {
         return magnetoStandalone;
+    }
+
+    public String getNotifyBoardTemplate() {
+        return notifyBoardTemplate;
     }
 
     public static class WebsocketConfig {

@@ -217,6 +217,8 @@ public class Field {
 
     public static final String MAGNETO_UPDATE_FREQUENCY = "magnetoUpdateFrequency";
     public static final String MAGNETO_STANDALONE_CONFIG = "magneto-standalone";
+    public static final String NOTIF = "notif";
+    public static final String NOTIFY_BOARD_TEMPLATE = "notify_board_template";
     public static final String MAGNETO_STANDALONE = "magnetoStandalone";
     public static final String ISLIKED = "isLiked";
     public static final String DISPLAYED = "displayed";

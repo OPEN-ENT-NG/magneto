@@ -41,7 +41,7 @@ public class Magneto extends BaseServer {
         setRepositoryEvents(new MagnetoRepositoryEvents(vertx));
 
         addController(new MagnetoController(serviceFactory));
-        addController(new BoardController(serviceFactory));
+        addController(new BoardController(serviceFactory, magnetoConfig));
         addController(new CardController(serviceFactory));
         addController(new FolderController(serviceFactory));
         addController(new SectionController(serviceFactory));

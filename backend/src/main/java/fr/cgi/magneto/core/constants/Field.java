@@ -102,6 +102,7 @@ public class Field {
     public static final String RESOURCE_MAGNET = "magnet";
     public static final String RESOURCE_SECTION = "section";
     public static final String RESOURCEURL = "resourceUrl";
+    public static final String MAGNET_NUMBER = "magnetNumber";
     public static final String LASTMODIFIERID = "lastModifierId";
     public static final String LASTMODIFIERNAME = "lastModifierName";
     public static final String LASTCOMMENT = "lastComment";
@@ -234,4 +235,7 @@ public class Field {
     public static final String FOLDERTITLE = "folderTitle";
     public static final String FOLDERURL = "folderUrl";
     public static final String BOARDNAME = "boardName";
+
+    //EXPORT SLIDE
+    public static final String SLIDE_OBJECT = "slideObject";
 }

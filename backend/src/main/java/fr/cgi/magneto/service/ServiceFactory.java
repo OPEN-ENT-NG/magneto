@@ -30,6 +30,7 @@ public class ServiceFactory {
     private final FolderService folderService;
     private final BoardService boardService;
     private final CardService cardService;
+    private final ExportService exportService;
     private final Map<String, SecuredAction> securedActions;
     private final ShareNormalizer shareNormalizer;
 
@@ -46,6 +47,7 @@ public class ServiceFactory {
         this.folderService = new DefaultFolderService(CollectionsConstant.FOLDER_COLLECTION, mongoDb, this);
         this.cardService = new DefaultCardService(CollectionsConstant.CARD_COLLECTION, mongoDb, this);
         this.boardService = new DefaultBoardService(CollectionsConstant.BOARD_COLLECTION, mongoDb, this);
+        this.exportService = new DefaultExportService(this);
     }
 
     public MagnetoService magnetoServiceExample() {
@@ -79,6 +81,11 @@ public class ServiceFactory {
     public FolderService folderService() {
         return this.folderService;
     }
+
+    public ExportService exportService() {
+        return this.exportService;
+    }
+
     public WorkspaceService workSpaceService() {
         return new DefaultWorkspaceService(vertx, mongoDb);
     }

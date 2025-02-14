@@ -131,13 +131,17 @@ const BoardCard: FC<BoardCardProps> = ({
   return (
     <StyledCard
       data-dropdown-open={isOpen ? "true" : "false"}
-      data-type={DND_ITEM_TYPE.CARD}
+      data-type={
+        isLockedBoard || card.locked
+          ? DND_ITEM_TYPE.NON_DRAGGABLE
+          : DND_ITEM_TYPE.CARD
+      }
       zoomLevel={zoomLevel}
       isDragging={isDragging}
       ref={setNodeRef}
       onClick={handleClick}
       style={style}
-      isLockedBoard={isLockedBoard}
+      isLockedBoard={isLockedBoard || card.locked}
       {...(readOnly || isLockedBoard ? {} : { ...attributes, ...listeners })}
     >
       <div ref={dropdownRef}>

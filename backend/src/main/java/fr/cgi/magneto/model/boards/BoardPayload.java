@@ -340,10 +340,14 @@ public class BoardPayload implements Model<BoardPayload> {
         if(this.shared != null && !this.shared.isEmpty()){
             json.put(Field.SHARED,shared);
         }
+        
+        if (this.isLocked() != null) {
+            json.put(Field.ISLOCKED, this.isLocked());
+        }
 
         json.put(Field.PUBLIC, this.isPublic());
         json.put(Field.MODIFICATIONDATE, this.getModificationDate());
-        json.put(Field.ISLOCKED, this.isLocked());
+        
 
         // If create
         if (this.getId() == null) {

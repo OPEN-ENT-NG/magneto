@@ -237,5 +237,5 @@ public class Field {
     public static final String BOARDNAME = "boardName";
 
     //EXPORT SLIDE
-    public static final String SLIDE_OBJECT = "slideObject";
+    public static final String SLIDE_OBJECTS = "slideObjects";
 }

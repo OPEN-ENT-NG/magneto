@@ -51,15 +51,18 @@ public class DefaultExportService implements ExportService {
             log.error("[Magneto@%s::createSlideShowObject] Board is null", this.getClass().getSimpleName());
             return new JsonObject();
         }
-        Boolean isFreeLayout = board.getLayoutType() == Field.FREE;
-        // TODO conditionnel pour le magnet number sur le type de layout
+
         JsonObject slideShowData = new JsonObject().put(Field.TITLE, board.getTitle())
                 .put(Field.DESCRIPTION, board.getDescription()).put(Field.OWNERNAME, board.getOwnerName())
                 .put(Field.MODIFICATIONDATE, board.getModificationDate())
                 .put(Field.SHARED, board.getShared() != null && !board.getShared().isEmpty())
-                .put(Field.MAGNET_NUMBER, isFreeLayout ? board.getNbCards() : board.getNbCardsSections())
+                .put(Field.MAGNET_NUMBER, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections())
                 .put(Field.ISPUBLIC, board.isPublic())
-                .put(Field.SLIDE_OBJECT, new JsonArray());
+                .put(Field.SLIDE_OBJECTS, new JsonArray());
         return slideShowData;
+    }
+
+    private JSonObject createFreeLayoutSlideObjects (Board board){
+
     }
 }

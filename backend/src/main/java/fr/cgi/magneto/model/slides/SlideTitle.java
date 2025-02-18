@@ -1,9 +1,9 @@
 package fr.cgi.magneto.model.slides;
 
-public class SlideBoardTitle extends Slide {
+public class SlideTitle extends Slide {
     private final String title;
 
-    public SlideBoardTitle(String title) {
+    public SlideTitle(String title) {
         this.title = title;
     }
 

@@ -1,9 +1,8 @@
 package fr.cgi.magneto.model.slides;
 
-public class SlideBoardDescription extends Slide {
-    private final String description;
+public class SlideDescription extends Slide {
 
-    public SlideBoardDescription(String description) {
+    public SlideDescription(String description) {
         this.description = description;
     }
 

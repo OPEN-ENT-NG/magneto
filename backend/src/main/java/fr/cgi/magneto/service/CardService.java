@@ -29,11 +29,12 @@ public interface CardService {
     /**
      * Create a Card and adding it to section or not depending on layout
      *
-     * @param card Card to create {@link CardPayload}
-     * @param i18n I18nHelper Helper for I18n keys
+     * @param card      Card to create {@link CardPayload}
+     * @param i18n      I18nHelper Helper for I18n keys
+     * @param userInfos User Object containing user id and displayed name
      * @return Future {@link Future <JsonObject>} containing newly created card
      */
-    Future<JsonObject> createCardLayout(CardPayload card, I18nHelper i18n);
+    Future<JsonObject> createCardLayout(CardPayload card, I18nHelper i18n, UserInfos userInfos);
 
     /**
      * Update a card

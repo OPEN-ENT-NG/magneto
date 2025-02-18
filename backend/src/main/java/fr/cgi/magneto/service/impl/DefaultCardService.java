@@ -7,7 +7,10 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.excpetion.RessourceNotFoundException;
-import fr.cgi.magneto.helper.*;
+import fr.cgi.magneto.helper.I18nHelper;
+import fr.cgi.magneto.helper.ModelHelper;
+import fr.cgi.magneto.helper.PromiseHelper;
+import fr.cgi.magneto.helper.WorkspaceHelper;
 import fr.cgi.magneto.model.Metadata;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.Section;
@@ -71,12 +74,69 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
+    private Future<List<String>> createWithLocked(CardPayload card, String id, UserInfos user) {
+        Promise<List<String>> promise = Promise.promise();
+
+        SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+        List<Card> cards = new ArrayList<>();
+
+        this.serviceFactory.boardService().getBoards(Collections.singletonList(card.getBoardId()))
+                .compose(boards -> {
+                    Board board = boards.get(0);
+                    Promise<List<Card>> cardsPromise = Promise.promise();
+
+                    if (board.isLayoutFree()) {
+                        this.getAllCardsByBoard(board, user)
+                                .onSuccess(cardsPromise::complete)
+                                .onFailure(cardsPromise::fail);
+                    } else {
+                        this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
+                                .compose(sections -> this.fetchAllCardsBySection(sections.get(0), 0, user))
+                                .onSuccess(cardsPromise::complete)
+                                .onFailure(cardsPromise::fail);
+                    }
+
+                    return cardsPromise.future()
+                            .compose(cardsResult -> {
+                                cards.addAll(cardsResult);
+                                for (int i = 0; i < cards.size(); i++) {
+                                    if (cards.get(i).isLocked()) {
+                                        sortedPositions.put(i, cards.get(i).getId());
+                                    }
+                                }
+                                return this.create(card, id);
+                            })
+                            .compose(createdCard -> {
+                                List<String> notLockedCards = cards.stream()
+                                        .filter(c -> !c.isLocked())
+                                        .map(Card::getId)
+                                        .collect(Collectors.toList());
+
+                                notLockedCards.add(0, id);
+
+                                sortedPositions.forEach((originalPosition, lockedCard) -> {
+                                    if (originalPosition < notLockedCards.size()) {
+                                        notLockedCards.add(originalPosition, lockedCard);
+                                    } else {
+                                        notLockedCards.add(lockedCard);
+                                    }
+                                });
+
+                                return Future.succeededFuture(notLockedCards);
+                            });
+                })
+                .onSuccess(promise::complete)
+                .onFailure(error -> promise.fail(error.getMessage()));
+
+        return promise.future();
+    }
+
     @Override
-    public Future<JsonObject> createCardLayout(CardPayload cardPayload, I18nHelper i18n) {
+    public Future<JsonObject> createCardLayout(CardPayload cardPayload, I18nHelper i18n, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
         String newId = UUID.randomUUID().toString();
 
-        Future<JsonObject> createCardFuture = this.create(cardPayload, newId);
+        Future<List<String>> createCardFuture = this.createWithLocked(cardPayload, newId, user);
         Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(cardPayload.getBoardId()));
         Future<List<Section>> getSectionsFuture = this.serviceFactory.sectionService().getSectionsByBoardId(cardPayload.getBoardId());
         Future<JsonObject> syncDocumentRightsFuture = this.syncDocumentRights(cardPayload.getBoardId(),
@@ -90,7 +150,7 @@ public class DefaultCardService implements CardService {
 
                         // Check if layout is free = We add cards directly in cardIds property of board
                         if (boardPayload.isLayoutFree()) {
-                            boardPayload.addCards(Collections.singletonList(newId));
+                            boardPayload.setCardIds(createCardFuture.result());
                         } else {
                             if (cardPayload.getSectionId() != null && !getSectionsFuture.result().isEmpty()) {
                                 // If layout is section = We update the section selected, and we add new card id into it
@@ -101,7 +161,7 @@ public class DefaultCardService implements CardService {
                                         .orElse(null);
                                 if (updatedSection != null) {
                                     SectionPayload updateSection = new SectionPayload(updatedSection.toJson());
-                                    updateSection.addCardIds(Collections.singletonList(newId));
+                                    updateSection.setCardIds(createCardFuture.result());
                                     createCardFutures.add(this.serviceFactory.sectionService().update(updateSection));
                                 } else {
                                     String message = String.format("[Magneto%s::createCardLayout] " +
@@ -548,7 +608,7 @@ public class DefaultCardService implements CardService {
         cardPayload.setBoardId(boardId);
         cardPayload.setParentId(card.getId());
         cardPayload.setFavoriteList(new ArrayList<>());
-        this.create(cardPayload, newId)
+        this.createWithLocked(cardPayload, newId, user)
                 .compose(createCardResult -> {
                     promise.complete(newId);
                     return Future.succeededFuture();

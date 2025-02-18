@@ -156,7 +156,7 @@ public class CardController extends ControllerHelper {
                             .setOwnerId(user.getUserId())
                             .setOwnerName(user.getUsername());
                     I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
-                    this.cardService.createCardLayout(cardPayload, i18nHelper)
+                    this.cardService.createCardLayout(cardPayload, i18nHelper, user)
                             .onFailure(err -> renderError(request))
                             .onSuccess(result -> {
                                 eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()

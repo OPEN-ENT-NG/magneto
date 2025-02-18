@@ -131,6 +131,93 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
+    private Future<List<String>> createMultipleWithLocked(List<CardPayload> cardPayloads, UserInfos user) {
+        Promise<List<String>> promise = Promise.promise();
+
+        // Validate input
+        if (cardPayloads == null || cardPayloads.isEmpty()) {
+            return Future.failedFuture("Card payloads list cannot be null or empty");
+        }
+
+        // All cards should be in the same board
+        String boardId = cardPayloads.get(0).getBoardId();
+        if (!cardPayloads.stream().allMatch(card -> card.getBoardId().equals(boardId))) {
+            return Future.failedFuture("All cards must be duplicated to the same board");
+        }
+
+        SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+        List<Card> cards = new ArrayList<>();
+
+        this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
+                .compose(boards -> {
+                    Board board = boards.get(0);
+                    Promise<List<Card>> cardsPromise = Promise.promise();
+
+                    if (board.isLayoutFree()) {
+                        this.getAllCardsByBoard(board, user)
+                                .onSuccess(cardsPromise::complete)
+                                .onFailure(cardsPromise::fail);
+                    } else {
+                        this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
+                                .compose(sections -> this.fetchAllCardsBySection(sections.get(0), 0, user))
+                                .onSuccess(cardsPromise::complete)
+                                .onFailure(cardsPromise::fail);
+                    }
+
+                    return cardsPromise.future()
+                            .compose(cardsResult -> {
+                                cards.addAll(cardsResult);
+                                for (int i = 0; i < cards.size(); i++) {
+                                    if (cards.get(i).isLocked()) {
+                                        sortedPositions.put(i, cards.get(i).getId());
+                                    }
+                                }
+
+                                // Create a list to track future results for all card creation operations
+                                List<Future<JsonObject>> createFutures = new ArrayList<>();
+                                for (CardPayload payload : cardPayloads) {
+                                    createFutures.add(this.create(payload, payload.getId()));
+                                }
+
+                                return CompositeFuture.all(createFutures.stream().collect(Collectors.toList()))
+                                        .map(cf -> {
+                                            List<Card> createdCards = new ArrayList<>();
+                                            for (int i = 0; i < cf.size(); i++) {
+                                                createdCards.add(cf.resultAt(i));
+                                            }
+                                            return createdCards;
+                                        });
+                            })
+                            .compose(createdCards -> {
+                                List<String> notLockedCards = cards.stream()
+                                        .filter(c -> !c.isLocked())
+                                        .map(Card::getId)
+                                        .collect(Collectors.toList());
+
+                                // Add all newly created card IDs at the beginning
+                                List<String> newCardIds = cardPayloads.stream()
+                                        .map(CardPayload::getId)
+                                        .collect(Collectors.toList());
+                                notLockedCards.addAll(0, newCardIds);
+
+                                // Restore locked cards to their original positions
+                                sortedPositions.forEach((originalPosition, lockedCard) -> {
+                                    if (originalPosition < notLockedCards.size()) {
+                                        notLockedCards.add(originalPosition, lockedCard);
+                                    } else {
+                                        notLockedCards.add(lockedCard);
+                                    }
+                                });
+
+                                return Future.succeededFuture(notLockedCards);
+                            });
+                })
+                .onSuccess(promise::complete)
+                .onFailure(error -> promise.fail(error.getMessage()));
+
+        return promise.future();
+    }
+
     @Override
     public Future<JsonObject> createCardLayout(CardPayload cardPayload, I18nHelper i18n, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
@@ -544,22 +631,18 @@ public class DefaultCardService implements CardService {
 
     private Future<JsonObject> duplicateCardsFuture(String boardId, List<Card> cards, SectionPayload section, Board boardResult, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
-        List<Future> duplicateFutures = new ArrayList<>();
+        List<CardPayload> cardPayloads = new ArrayList<>();
         for (Card card : cards) {
-            duplicateFutures.add(duplicateCard(boardId, card, user));
+            cardPayloads.add(createPayloadForDuplication(boardId, card, user));
         }
 
-        CompositeFuture.all(duplicateFutures)
+        createMultipleWithLocked(cardPayloads, user)
                 .compose(result -> {
                     BoardPayload boardPayload = new BoardPayload(boardResult.toJson());
-                    List<String> newCardIds = new ArrayList<>();
-                    for (Future duplicateFuture : duplicateFutures) {
-                        newCardIds.add(String.valueOf(duplicateFuture.result()));
-                    }
 
                     // Check if board layout is free = we duplicate cards directly in the board
                     if (boardPayload.isLayoutFree()) {
-                        boardPayload.addCards(newCardIds);
+                        boardPayload.setCardIds(result);
                         return this.updateBoard(boardPayload);
                     } else {
                         // If board layout is section = we retrieve the first section, or we take the section given in parameters,
@@ -569,7 +652,7 @@ public class DefaultCardService implements CardService {
                                     SectionPayload sectionToUpdate = new SectionPayload();
                                     if (section != null) {
                                         sectionToUpdate = section;
-                                        sectionToUpdate.addCardIds(newCardIds);
+                                        sectionToUpdate.setCardIds(result);
                                         return this.serviceFactory.sectionService().update(sectionToUpdate);
                                     } else {
                                         Section firstSection = sections
@@ -578,7 +661,7 @@ public class DefaultCardService implements CardService {
                                                 .findFirst()
                                                 .orElse(null);
                                         if (firstSection != null) {
-                                            firstSection.addCardIds(newCardIds);
+                                            firstSection.setCardIds(result);
                                             return this.serviceFactory.sectionService().update(new SectionPayload(firstSection.toJson()));
                                         } else {
                                             String message = String.format("[Magneto@%s::duplicateCardsFuture] Failed to duplicate card in section : no sections found",
@@ -598,22 +681,16 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<String> duplicateCard(String boardId, Card card, UserInfos user) {
-        Promise<String> promise = Promise.promise();
+    private CardPayload createPayloadForDuplication(String boardId, Card card, UserInfos user) {
         CardPayload cardPayload = new CardPayload(card.toJson());
         String newId = UUID.randomUUID().toString();
-        cardPayload.setId(null);
+        cardPayload.setId(newId);
         cardPayload.setOwnerId(user.getUserId());
         cardPayload.setOwnerName(user.getUsername());
         cardPayload.setBoardId(boardId);
         cardPayload.setParentId(card.getId());
         cardPayload.setFavoriteList(new ArrayList<>());
-        this.createWithLocked(cardPayload, newId, user)
-                .compose(createCardResult -> {
-                    promise.complete(newId);
-                    return Future.succeededFuture();
-                });
-        return promise.future();
+        return cardPayload;
     }
 
     private Future<List<Card>> setMetadataCards(List<Card> cards) {

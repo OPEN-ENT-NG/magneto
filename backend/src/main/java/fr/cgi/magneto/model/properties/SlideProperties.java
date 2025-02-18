@@ -11,7 +11,7 @@ public class SlideProperties {
 
     private String ownerName;
     private String modificationDate;
-    private Integer magnetNumber;
+    private Integer resourceNumber;
     private Boolean isShare;
     private Boolean isPublic;
 
@@ -61,8 +61,8 @@ public class SlideProperties {
             return this;
         }
 
-        public Builder magnetNumber(Integer magnetNumber) {
-            properties.magnetNumber = magnetNumber;
+        public Builder resourceNumber(Integer resourceNumber) {
+            properties.resourceNumber = resourceNumber;
             return this;
         }
 
@@ -125,7 +125,7 @@ public class SlideProperties {
     private boolean isValidForBoard() {
         return ownerName != null
                 && modificationDate != null
-                && magnetNumber != null
+                && resourceNumber != null
                 && isShare != null
                 && isPublic != null;
     }
@@ -159,8 +159,8 @@ public class SlideProperties {
         return modificationDate;
     }
 
-    public Integer getMagnetNumber() {
-        return magnetNumber;
+    public Integer getresourceNumber() {
+        return resourceNumber;
     }
 
     public Boolean getIsShare() {

@@ -2,6 +2,8 @@ package fr.cgi.magneto.service.impl;
 
 import java.util.Collections;
 
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.entcore.common.user.UserInfos;
 
 import fr.cgi.magneto.core.constants.Field;
@@ -30,8 +32,8 @@ public class DefaultExportService implements ExportService {
     }
 
     @Override
-    public Future<JsonObject> exportBoardToPPTX(String boardId, UserInfos user) {
-        Promise<JsonObject> promise = Promise.promise();
+    public Future<XMLSlideShow> exportBoardToPPTX(String boardId, UserInfos user) {
+        Promise<XMLSlideShow> promise = Promise.promise();
 
         serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
                 .compose(boards -> {
@@ -41,9 +43,10 @@ public class DefaultExportService implements ExportService {
                                         this.getClass().getSimpleName(), boardId));
                     }
                     Board board = boards.get(0);
-                    return Future.succeededFuture(createSlideShowObject(board));
+                    JsonObject slideShow = createSlideShowObject(board);
+                    return createFreeLayoutSlideObjects(board, user, slideShow);
                 })
-                .onSuccess((promise::complete))
+                .onSuccess(promise::complete)
                 .onFailure(err -> {
                     String message = String.format("[Magneto@%s::exportBoardToPptx] Failed to export board",
                             this.getClass().getSimpleName());
@@ -69,23 +72,25 @@ public class DefaultExportService implements ExportService {
         return slideShowData;
     }
 
-    private Future<JsonObject> createFreeLayoutSlideObjects(Board board, UserInfos user, JsonObject slideShowData) {
+    private Future<XMLSlideShow> createFreeLayoutSlideObjects(Board board, UserInfos user, JsonObject slideShowData) {
+        XMLSlideShow ppt = new XMLSlideShow();
+        ppt.setPageSize(new java.awt.Dimension(1280, 720));
+        
         return serviceFactory.cardService().getAllCardsByBoard(board, user)
                 .map(cards -> {
-                    JsonArray slideObjects = new JsonArray();
                     SlideFactory slideFactory = new SlideFactory();
-
                     for (Card card : cards) {
                         try {
-                            slideObjects.add(createSlideFromCard(card, slideFactory, slideShowData));
+                            Slide slide = createSlideFromCard(card, slideFactory, slideShowData);
+                            XSLFSlide apacheSlide = (XSLFSlide) slide.createApacheSlide();
+                            ppt.createSlide().importContent(apacheSlide);
                         } catch (IllegalArgumentException e) {
                             log.error(String.format(
                                     "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
                                     this.getClass().getSimpleName(), card.getId(), e.getMessage()));
                         }
                     }
-
-                    return slideShowData.put(Field.SLIDE_OBJECTS, slideObjects);
+                    return ppt;
                 });
     }
 
@@ -94,10 +99,13 @@ public class DefaultExportService implements ExportService {
                 .title(card.getTitle())
                 .description(card.getDescription());
 
-        SlideResourceType resourceType = SlideResourceType.valueOf(card.getResourceType());
+        SlideResourceType resourceType = SlideResourceType.fromString(card.getResourceType());
         switch (resourceType) {
             case DEFAULT:
             case TEXT:
+                propertiesBuilder
+                        .title(card.getTitle())
+                        .description(card.getDescription());
                 break;
             case FILE:
             case PDF:

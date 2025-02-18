@@ -1,6 +1,7 @@
 package fr.cgi.magneto.controller;
 
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.user.UserUtils;
 
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.service.ExportService;
@@ -22,8 +23,10 @@ public class ExportController extends ControllerHelper {
     @ApiDoc("Export board to PPTX")
     public void exportBoardToPPTX(HttpServerRequest request) {
         String boardId = request.getParam(Field.BOARDID);
-        exportService.exportBoardToPPTX(boardId)
-                .onFailure(err -> renderError(request))
-                .onSuccess(result -> renderJson(request, result));
+        UserUtils.getUserInfos(eb, request, user -> {
+            exportService.exportBoardToPPTX(boardId,user)
+                    .onFailure(err -> renderError(request))
+                    .onSuccess(result -> renderJson(request, result));
+        });
     }
 }

@@ -2,6 +2,8 @@ package fr.cgi.magneto.service.impl;
 
 import java.util.Collections;
 
+import org.entcore.common.user.UserInfos;
+
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
@@ -28,7 +30,7 @@ public class DefaultExportService implements ExportService {
     }
 
     @Override
-    public Future<JsonObject> exportBoardToPPTX(String boardId) {
+    public Future<JsonObject> exportBoardToPPTX(String boardId, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
 
         serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
@@ -67,74 +69,15 @@ public class DefaultExportService implements ExportService {
         return slideShowData;
     }
 
-    private JsonObject createFreeLayoutSlideObjects(Board board) {
-        JsonObject slideShow = new JsonObject();
-        JsonArray slideObjects = new JsonArray();
-
-        // Get cards from board and process them
-        serviceFactory.cardService().getAllCardsByBoard(board, null)
-                .compose(cards -> {
+    private Future<JsonObject> createFreeLayoutSlideObjects(Board board, UserInfos user, JsonObject slideShowData) {
+        return serviceFactory.cardService().getAllCardsByBoard(board, user)
+                .map(cards -> {
+                    JsonArray slideObjects = new JsonArray();
                     SlideFactory slideFactory = new SlideFactory();
 
                     for (Card card : cards) {
                         try {
-                            // Build properties based on card type
-                            SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
-                                    .title(card.getTitle())
-                                    .description(card.getDescription());
-
-                            // Set specific properties based on resource type
-                            SlideResourceType resourceType = SlideResourceType.valueOf(card.getResourceType());
-                            switch (resourceType) {
-                                case TEXT:
-                                    propertiesBuilder
-                                            .title(card.getTitle())
-                                            .description(card.getDescription())
-                                            .content(card.getCaption()); // Pour le TEXT, on utilise le caption comme
-                                                                         // contenu
-                                    break;
-
-                                case FILE:
-                                case PDF:
-                                    propertiesBuilder
-                                            .url(card.getResourceUrl())
-                                            .fileName(card.getMetadata() != null ? card.getMetadata().getFilename()
-                                                    : "");
-                                    break;
-
-                                case LINK:
-                                case HYPERLINK:
-                                case EMBEDDER:
-                                    propertiesBuilder
-                                            .title(card.getTitle())
-                                            .url(card.getResourceUrl());
-                                    break;
-
-                                case IMAGE:
-                                case VIDEO:
-                                case AUDIO:
-                                    propertiesBuilder
-                                            .url(card.getResourceUrl())
-                                            .fileName(card.getMetadata() != null ? card.getMetadata().getFilename()
-                                                    : "");
-                                    break;
-
-                                case BOARD:
-                                    propertiesBuilder
-                                            .ownerName(board.getOwnerName())
-                                            .modificationDate(board.getModificationDate())
-                                            .magnetNumber(board.getNbCards())
-                                            .isShare(!board.getShared().isEmpty())
-                                            .isPublic(board.isPublic());
-                                    break;
-                            }
-
-                            // Create slide using factory
-                            Slide slide = slideFactory.createSlide(resourceType, propertiesBuilder.build());
-
-                            // Add slide to array
-                            slideObjects.add(slide.toJson());
-
+                            slideObjects.add(createSlideFromCard(card, slideFactory, slideShowData));
                         } catch (IllegalArgumentException e) {
                             log.error(String.format(
                                     "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
@@ -142,10 +85,49 @@ public class DefaultExportService implements ExportService {
                         }
                     }
 
-                    slideShow.put("slideObjects", slideObjects);
-                    return Future.succeededFuture(slideShow);
+                    return slideShowData.put(Field.SLIDE_OBJECTS, slideObjects);
                 });
+    }
 
-        return slideShow;
+    private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData) {
+        SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
+                .title(card.getTitle())
+                .description(card.getDescription());
+
+        SlideResourceType resourceType = SlideResourceType.valueOf(card.getResourceType());
+        switch (resourceType) {
+            case DEFAULT:
+            case TEXT:
+                break;
+            case FILE:
+            case PDF:
+            case SHEET:
+                propertiesBuilder
+                        .url(card.getResourceUrl())
+                        .fileName(card.getMetadata() != null ? card.getMetadata().getFilename() : "");
+                break;
+            case LINK:
+            case HYPERLINK:
+            case EMBEDDER:
+                propertiesBuilder.url(card.getResourceUrl());
+                break;
+            case IMAGE:
+            case VIDEO:
+            case AUDIO:
+                propertiesBuilder
+                        .url(card.getResourceUrl())
+                        .fileName(card.getMetadata() != null ? card.getMetadata().getFilename() : "");
+                break;
+            case BOARD:
+                propertiesBuilder
+                        .ownerName(slideShowData.getString(Field.OWNERNAME))
+                        .modificationDate(slideShowData.getString(Field.MODIFICATIONDATE))
+                        .resourceNumber(slideShowData.getInteger(Field.MAGNET_NUMBER))
+                        .isShare(slideShowData.getBoolean(Field.SHARED))
+                        .isPublic(slideShowData.getBoolean(Field.ISPUBLIC));
+                break;
+        }
+
+        return slideFactory.createSlide(resourceType, propertiesBuilder.build());
     }
 }

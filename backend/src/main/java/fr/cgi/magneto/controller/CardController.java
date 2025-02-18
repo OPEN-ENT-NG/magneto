@@ -276,11 +276,11 @@ public class CardController extends ControllerHelper {
                                 // Add cards in current board
                                 if (currentBoard.isLayoutFree()) {
                                     // Add cards ids to new board if free
-                                    this.addCards(updateCard, updateBoardsFutures, currentBoard);
+                                    cardService.addCardWithLocked(updateCard, updateBoardsFutures, currentBoard);
                                 } else {
                                     // Add cards ids to new board for section
                                     String defaultTitle = i18nHelper.translate("magneto.section.default.title");
-                                    this.addCardsLayout(updateCard, getSectionFuture, updateBoardsFutures, currentBoard, defaultTitle);
+                                    cardService.addCardSectionWithLocked(updateCard, getSectionFuture, updateBoardsFutures, currentBoard, defaultTitle);
                                 }
 
                                 // Remove cards in old board

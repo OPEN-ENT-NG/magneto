@@ -27,6 +27,25 @@ public interface CardService {
     Future<JsonObject> create(CardPayload card, String id);
 
     /**
+     * Add a card to a board (with locked items logic)
+     *
+     * @param updateCard          Card to insert {@link CardPayload}
+     * @param updateBoardsFutures List of futures for the parent to resolve
+     * @param currentBoard        Board where we are inserting a card
+     */
+    void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard);
+
+    /**
+     * Add a card to a section (with locked items logic)
+     *
+     * @param updateCard          Card to insert {@link CardPayload}
+     * @param updateBoardsFutures List of futures for the parent to resolve
+     * @param currentBoard        Board where we are inserting a card
+     */
+    void addCardSectionWithLocked(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
+                                  Board currentBoard, String defaultTitle);
+
+    /**
      * Create a Card and adding it to section or not depending on layout
      *
      * @param card      Card to create {@link CardPayload}

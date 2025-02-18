@@ -3,7 +3,12 @@ package fr.cgi.magneto.service.impl;
 import java.util.Collections;
 
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.enums.SlideResourceType;
+import fr.cgi.magneto.factory.SlideFactory;
 import fr.cgi.magneto.model.boards.Board;
+import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.properties.SlideProperties;
+import fr.cgi.magneto.model.slides.Slide;
 import fr.cgi.magneto.service.ExportService;
 import fr.cgi.magneto.service.ServiceFactory;
 import io.vertx.core.Future;
@@ -62,7 +67,85 @@ public class DefaultExportService implements ExportService {
         return slideShowData;
     }
 
-    private JSonObject createFreeLayoutSlideObjects (Board board){
+    private JsonObject createFreeLayoutSlideObjects(Board board) {
+        JsonObject slideShow = new JsonObject();
+        JsonArray slideObjects = new JsonArray();
 
+        // Get cards from board and process them
+        serviceFactory.cardService().getAllCardsByBoard(board, null)
+                .compose(cards -> {
+                    SlideFactory slideFactory = new SlideFactory();
+
+                    for (Card card : cards) {
+                        try {
+                            // Build properties based on card type
+                            SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
+                                    .title(card.getTitle())
+                                    .description(card.getDescription());
+
+                            // Set specific properties based on resource type
+                            SlideResourceType resourceType = SlideResourceType.valueOf(card.getResourceType());
+                            switch (resourceType) {
+                                case TEXT:
+                                    propertiesBuilder
+                                            .title(card.getTitle())
+                                            .description(card.getDescription())
+                                            .content(card.getCaption()); // Pour le TEXT, on utilise le caption comme
+                                                                         // contenu
+                                    break;
+
+                                case FILE:
+                                case PDF:
+                                    propertiesBuilder
+                                            .url(card.getResourceUrl())
+                                            .fileName(card.getMetadata() != null ? card.getMetadata().getFilename()
+                                                    : "");
+                                    break;
+
+                                case LINK:
+                                case HYPERLINK:
+                                case EMBEDDER:
+                                    propertiesBuilder
+                                            .title(card.getTitle())
+                                            .url(card.getResourceUrl());
+                                    break;
+
+                                case IMAGE:
+                                case VIDEO:
+                                case AUDIO:
+                                    propertiesBuilder
+                                            .url(card.getResourceUrl())
+                                            .fileName(card.getMetadata() != null ? card.getMetadata().getFilename()
+                                                    : "");
+                                    break;
+
+                                case BOARD:
+                                    propertiesBuilder
+                                            .ownerName(board.getOwnerName())
+                                            .modificationDate(board.getModificationDate())
+                                            .magnetNumber(board.getNbCards())
+                                            .isShare(!board.getShared().isEmpty())
+                                            .isPublic(board.isPublic());
+                                    break;
+                            }
+
+                            // Create slide using factory
+                            Slide slide = slideFactory.createSlide(resourceType, propertiesBuilder.build());
+
+                            // Add slide to array
+                            slideObjects.add(slide.toJson());
+
+                        } catch (IllegalArgumentException e) {
+                            log.error(String.format(
+                                    "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
+                                    this.getClass().getSimpleName(), card.getId(), e.getMessage()));
+                        }
+                    }
+
+                    slideShow.put("slideObjects", slideObjects);
+                    return Future.succeededFuture(slideShow);
+                });
+
+        return slideShow;
     }
 }

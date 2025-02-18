@@ -3,7 +3,7 @@ package fr.cgi.magneto.model.slides;
 public class SlideText extends Slide {
     private final String text;
 
-    public SlideText(String text) {
+    public SlideText(String title, String description, String text) {
         this.text = text;
     }
 

@@ -1,9 +1,9 @@
 package fr.cgi.magneto.service;
 
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.entcore.common.user.UserInfos;
 
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 
 public interface ExportService {
 
@@ -13,5 +13,5 @@ public interface ExportService {
      * @param boardId Board identifier
      * @return Future {@link Future<JsonObject>} containing board id
      */
-    Future<JsonObject> exportBoardToPPTX(String boardId, UserInfos user);
+    Future<XMLSlideShow> exportBoardToPPTX(String boardId, UserInfos user);
 }

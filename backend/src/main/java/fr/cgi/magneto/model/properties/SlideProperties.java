@@ -107,7 +107,7 @@ public class SlideProperties {
     }
 
     private boolean isValidForText() {
-        return title != null && content != null;
+        return title != null && description != null;
     }
 
     private boolean isValidForFile() {
@@ -159,7 +159,7 @@ public class SlideProperties {
         return modificationDate;
     }
 
-    public Integer getresourceNumber() {
+    public Integer getResourceNumber() {
         return resourceNumber;
     }
 

@@ -13,7 +13,7 @@ public class SlideFactory {
 
         switch (type) {
             case TEXT:
-                return new SlideText(properties.getTitle(), properties.getDescription(), properties.getContent());
+                return new SlideText(properties.getTitle(), properties.getDescription());
             case FILE:
             case PDF:
                 return new SlideFile(properties.getUrl(), properties.getFileName());
@@ -30,7 +30,7 @@ public class SlideFactory {
                         properties.getTitle(), properties.getDescription(),
                         properties.getOwnerName(),
                         properties.getModificationDate(),
-                        properties.getMagnetNumber(),
+                        properties.getResourceNumber(),
                         properties.getIsShare(),
                         properties.getIsPublic());
             default:

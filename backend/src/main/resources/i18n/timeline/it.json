@@ -1,8 +1,17 @@
 {
-  "push.notif.magneto.share": "Magneto: Share board",
-  "push.notif.magneto.share.folder": "Magneto: Share folder",
-  "timeline.magneto.shared": "has given you access to a new board",
-  "timeline.magneto.shared.link.folder": "folder link",
+  "magneto": "Magnéto",
+
+  "magneto.notifying_board": "Notifying all board users",
+  "push.notif.magneto.notifying.board": "Magneto: Notify board users",
+  "timeline.magneto.notifying": "Des modifications ont été apportées au tableau ",
+  "timeline.magneto.notifying.consult": "Consultez-le !",
+
   "magneto.share_board": "Sharing a board",
-  "magneto.share_folder": "Sharing a folder"
+  "push.notif.magneto.share": "Magneto: Share board",
+  "timeline.magneto.shared.link.board": "board link",
+  "timeline.magneto.shared": "has given you access to a new board",
+
+  "magneto.share_folder": "Sharing a folder",
+  "push.notif.magneto.share.folder": "Magneto: Share folder",
+  "timeline.magneto.shared.link.folder": "folder link"
 }

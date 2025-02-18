@@ -334,7 +334,7 @@ export const ToasterContainer = ({
                         {t("magneto.restore")}
                       </Button>
                     )}
-                    {/* {isMyBoards() &&
+                    {isMyBoards() &&
                       selectedBoardsIds.length == 1 &&
                       selectedFoldersIds.length == 0 &&
                       hasSharedElement &&
@@ -348,7 +348,7 @@ export const ToasterContainer = ({
                         >
                           {t("magneto.board.notify")}
                         </Button>
-                      )} */}
+                      )}
                     {!isPublic && allBoardsMine() && areFoldersMine() && (
                       <Button
                         type="button"

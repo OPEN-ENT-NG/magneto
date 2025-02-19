@@ -85,7 +85,11 @@ public class DefaultCardService implements CardService {
                     if (board.isLayoutFree()) {
                         this.getAllCardsByBoard(board, 0, user, false)
                                 .onSuccess(result -> cardsPromise.complete(result.getJsonArray(Field.ALL).getList()))
-                                .onFailure(cardsPromise::fail);
+                                .onFailure(fail -> {
+                                    String message = String.format("[Magneto@%s::getAllCardsByBoardId] Failed to get all cards",
+                                            this.getClass().getSimpleName());
+                                    log.error(message);
+                                });
                     } else {
                         this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
                                 .compose(sections -> this.fetchAllCardsBySection(sections.get(0), 0, user))
@@ -153,7 +157,11 @@ public class DefaultCardService implements CardService {
                     if (board.isLayoutFree()) {
                         this.getAllCardsByBoard(board, 0, user, false)
                                 .onSuccess(result -> cardsPromise.complete(result.getJsonArray(Field.ALL).getList()))
-                                .onFailure(cardsPromise::fail);
+                                .onFailure(fail -> {
+                                    String message = String.format("[Magneto@%s::getAllCardsByBoardId] Failed to get all cards",
+                                            this.getClass().getSimpleName());
+                                    log.error(message);
+                                });
                     } else {
                         this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
                                 .compose(sections -> this.fetchAllCardsBySection(sections.get(0), 0, user))

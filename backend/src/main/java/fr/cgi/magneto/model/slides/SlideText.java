@@ -29,16 +29,12 @@ public class SlideText extends Slide {
 
     @Override
     public Object createApacheSlide() {
-        // Créer un nouveau slide
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
-        // Ajouter le titre
         SlideHelper.createTitle(slide, title);
-        // Créer une zone de texte pour le contenu principal
         XSLFTextBox contentBox = SlideHelper.createContent(slide);
 
-        // Parser le HTML
         Document doc = Jsoup.parse(description);
         processHtmlContent(contentBox, doc.body());
 
@@ -46,7 +42,6 @@ public class SlideText extends Slide {
     }
 
     private void processHtmlContent(XSLFTextBox textBox, Element element) {
-        // Créer un paragraphe initial si nécessaire
         if (textBox.getTextParagraphs().isEmpty()) {
             textBox.addNewTextParagraph();
         }
@@ -57,11 +52,9 @@ public class SlideText extends Slide {
                 XSLFTextParagraph para = textBox.addNewTextParagraph();
                 XSLFTextRun run = para.addNewTextRun();
     
-                // Appliquer les styles
                 processStyle(elem, para, run);
     
-                // Récupérer le texte de l'élément
-                String text = elem.text().trim(); // On utilise text() au lieu de ownText()
+                String text = elem.text().trim();
                 if (!text.isEmpty()) {
                     run.setText(text);
                 }

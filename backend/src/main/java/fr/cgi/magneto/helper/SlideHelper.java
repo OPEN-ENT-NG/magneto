@@ -5,35 +5,48 @@ import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFTextBox;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
+import org.apache.poi.xslf.usermodel.XSLFTextShape;
+import org.apache.poi.sl.usermodel.Placeholder;
+import org.apache.poi.sl.usermodel.PlaceholderDetails;
 import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
 
 public class SlideHelper {
-    private static final int MARGIN_LEFT = 50;
-    private static final int MARGIN_TOP_TITLE = 20;
-    private static final int MARGIN_TOP_CONTENT = 140;
-    private static final int WIDTH = 1280;
-    private static final int TITLE_HEIGHT = 80;
-    private static final int CONTENT_HEIGHT = 620;
-    private static final double FONT_SIZE_TITLE = 32.0;
+    private static final int MARGIN_LEFT = 140;
+    private static final int MARGIN_TOP_TITLE = 40;
+    private static final int WIDTH = 1000;
+
+    private static final int TITLE_HEIGHT = 70;
+    private static final Double TITLE_FONT_SIZE = 44.0;
+    private static final String TITLE_FONT_FAMILY = "Comfortaa";
+
+    private static final int CONTENT_HEIGHT = 520;
+    private static final int CONTENT_MARGIN_TOP = 140;
 
     public static XSLFTextBox createTitle(XSLFSlide slide, String title) {
-        XSLFTextBox titleBox = slide.createTextBox();
-        titleBox.setAnchor(new Rectangle(MARGIN_LEFT, MARGIN_TOP_TITLE, WIDTH, TITLE_HEIGHT));
+        XSLFTextShape titleShape = slide.createTextBox();
+        titleShape.setAnchor(new Rectangle(MARGIN_LEFT, MARGIN_TOP_TITLE, WIDTH, TITLE_HEIGHT));
 
-        XSLFTextParagraph titlePara = titleBox.addNewTextParagraph();
-        titlePara.setTextAlign(TextAlign.CENTER);
+        PlaceholderDetails phDetails = titleShape.getPlaceholderDetails();
+        if (phDetails != null) {
+            phDetails.setPlaceholder(Placeholder.TITLE);
+        }
 
-        XSLFTextRun titleRun = titlePara.addNewTextRun();
-        titleRun.setText(title);
-        titleRun.setFontSize(FONT_SIZE_TITLE);
-        titleRun.setBold(true);
+        titleShape.clearText();
+        titleShape.setText(title);
 
-        return titleBox;
+        XSLFTextParagraph para = titleShape.getTextParagraphs().get(0);
+        para.setTextAlign(TextAlign.LEFT);
+        
+        XSLFTextRun run = para.getTextRuns().get(0);
+        run.setFontSize(TITLE_FONT_SIZE);
+
+        return (XSLFTextBox) titleShape;
     }
+
 
     public static XSLFTextBox createContent(XSLFSlide slide) {
         XSLFTextBox contentBox = slide.createTextBox();
-        contentBox.setAnchor(new Rectangle(MARGIN_LEFT, MARGIN_TOP_CONTENT, WIDTH, CONTENT_HEIGHT));
+        contentBox.setAnchor(new Rectangle(MARGIN_LEFT, CONTENT_MARGIN_TOP, WIDTH, CONTENT_HEIGHT));
         return contentBox;
     }
 }

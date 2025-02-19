@@ -36,7 +36,7 @@ public class SlideText extends Slide {
         // Ajouter le titre
         SlideHelper.createTitle(slide, title);
         // Créer une zone de texte pour le contenu principal
-       XSLFTextBox contentBox = SlideHelper.createContent(slide);
+        XSLFTextBox contentBox = SlideHelper.createContent(slide);
 
         // Parser le HTML
         Document doc = Jsoup.parse(description);
@@ -46,77 +46,25 @@ public class SlideText extends Slide {
     }
 
     private void processHtmlContent(XSLFTextBox textBox, Element element) {
+        // Créer un paragraphe initial si nécessaire
+        if (textBox.getTextParagraphs().isEmpty()) {
+            textBox.addNewTextParagraph();
+        }
+    
         for (Node node : element.childNodes()) {
-            if (node instanceof TextNode) {
-                // Traiter le texte simple
-                String text = ((TextNode) node).text().trim();
-                if (!text.isEmpty()) {
-                    XSLFTextParagraph para = textBox.addNewTextParagraph();
-                    XSLFTextRun run = para.addNewTextRun();
-                    run.setText(text);
-                    run.setFontSize(12.0);
-                }
-            } else if (node instanceof Element) {
+            if (node instanceof Element) {
                 Element elem = (Element) node;
                 XSLFTextParagraph para = textBox.addNewTextParagraph();
                 XSLFTextRun run = para.addNewTextRun();
-
-                // Appliquer le style en fonction de la balise HTML
-                switch (elem.tagName().toLowerCase()) {
-                    case "h1":
-                        run.setFontSize(20.0);
-                        run.setBold(true);
-                        para.setIndentLevel(0);
-                        break;
-                    case "h2":
-                        run.setFontSize(18.0);
-                        run.setBold(true);
-                        para.setIndentLevel(1);
-                        break;
-                    case "h3":
-                        run.setFontSize(16.0);
-                        run.setBold(true);
-                        para.setIndentLevel(2);
-                        break;
-                    case "b":
-                    case "strong":
-                        run.setBold(true);
-                        break;
-                    case "i":
-                    case "em":
-                        run.setItalic(true);
-                        break;
-                    case "u":
-                        run.setUnderlined(true);
-                        break;
-                    case "p":
-                        para.setSpaceBefore(10.0);
-                        para.setSpaceAfter(10.0);
-                        break;
-                    case "ul":
-                        para.setIndentLevel(1);
-                        para.setBullet(true);
-                        break;
-                    case "ol":
-                        para.setIndentLevel(1);
-                        para.setBulletAutoNumber(AutoNumberingScheme.arabicPeriod, 1);
-                        break;
-                    case "li":
-                        para.setIndentLevel(1);
-                        break;
+    
+                // Appliquer les styles
+                processStyle(elem, para, run);
+    
+                // Récupérer le texte de l'élément
+                String text = elem.text().trim(); // On utilise text() au lieu de ownText()
+                if (!text.isEmpty()) {
+                    run.setText(text);
                 }
-
-                // Traiter les styles CSS inline
-                String style = elem.attr("style");
-                if (!style.isEmpty()) {
-                    processInlineStyles(run, style);
-                }
-
-                // Traiter le contenu de l'élément
-                run.setText(elem.ownText());
-
-                // Traiter récursivement les enfants
-                processHtmlContent(textBox, elem);
             }
         }
     }
@@ -160,6 +108,56 @@ public class SlideText extends Slide {
                         break;
                 }
             }
+        }
+    }
+
+    private void processStyle(Element elem, XSLFTextParagraph para, XSLFTextRun run) {
+        switch (elem.tagName().toLowerCase()) {
+            case "h1":
+                run.setFontSize(20.0);
+                run.setBold(true);
+                para.setIndentLevel(0);
+                break;
+            case "h2":
+                run.setFontSize(18.0);
+                run.setBold(true);
+                para.setIndentLevel(1);
+                break;
+            case "h3":
+                run.setFontSize(16.0);
+                run.setBold(true);
+                para.setIndentLevel(2);
+                break;
+            case "b":
+            case "strong":
+                run.setBold(true);
+                break;
+            case "i":
+            case "em":
+                run.setItalic(true);
+                break;
+            case "u":
+                run.setUnderlined(true);
+                break;
+            case "p":
+                para.setSpaceBefore(10.0);
+                para.setSpaceAfter(10.0);
+                break;
+            case "ul":
+                para.setIndentLevel(1);
+                para.setBullet(true);
+                break;
+            case "ol":
+                para.setIndentLevel(1);
+                para.setBulletAutoNumber(AutoNumberingScheme.arabicPeriod, 1);
+                break;
+            case "li":
+                para.setIndentLevel(1);
+                break;
+        }
+        String style = elem.attr("style");
+        if (!style.isEmpty()) {
+            processInlineStyles(run, style);
         }
     }
 }

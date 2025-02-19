@@ -7,6 +7,7 @@ public class SlideProperties {
     private String description;
     private String content;
     private String url;
+    private String ext;
     private String fileName;
 
     private String ownerName;
@@ -42,6 +43,11 @@ public class SlideProperties {
 
         public Builder url(String url) {
             properties.url = url;
+            return this;
+        }
+
+        public Builder ext(String ext) {
+            properties.ext = ext;
             return this;
         }
 
@@ -119,7 +125,8 @@ public class SlideProperties {
     }
 
     private boolean isValidForMedia() {
-        return url != null;
+        return title != null && description != null && ext != null &&
+                url != null;
     }
 
     private boolean isValidForBoard() {
@@ -145,6 +152,10 @@ public class SlideProperties {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getExt() {
+        return ext;
     }
 
     public String getFileName() {

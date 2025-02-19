@@ -1,6 +1,11 @@
 package fr.cgi.magneto.helper;
 
 import java.awt.Rectangle;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.apache.poi.xslf.usermodel.XSLFPictureData;
+import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFTextBox;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
@@ -48,5 +53,10 @@ public class SlideHelper {
         XSLFTextBox contentBox = slide.createTextBox();
         contentBox.setAnchor(new Rectangle(MARGIN_LEFT, CONTENT_MARGIN_TOP, WIDTH, CONTENT_HEIGHT));
         return contentBox;
+    }
+
+    public static XSLFPictureShape createImage(XSLFSlide slide, String resourceUrl){
+        byte[] pictureData = Files.readAllBytes(Paths.get(resourceUrl));
+        XSLFPictureData pic = slide.addPicture(pictureData);
     }
 }

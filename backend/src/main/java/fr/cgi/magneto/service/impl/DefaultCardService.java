@@ -223,6 +223,7 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
+    @Override
     public void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard, UserInfos user) {
 
 
@@ -268,6 +269,7 @@ public class DefaultCardService implements CardService {
                         fail.getMessage()));
     }
 
+    @Override
     public void removeCardWithLocked(JsonObject moveCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user) {
         BoardPayload boardToUpdate = new BoardPayload(getOldBoardFuture.result().get(0).toJson());
         boardToUpdate.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -303,6 +305,7 @@ public class DefaultCardService implements CardService {
                         fail.getMessage()));
     }
 
+    @Override
     public void addCardSectionWithLocked(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
                                          Board currentBoard, String defaultTitle, UserInfos user) {
 
@@ -354,6 +357,7 @@ public class DefaultCardService implements CardService {
         updateBoardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));
     }
 
+    @Override
     public void removeCardSectionWithLocked(CardPayload updateCard, String oldBoardId, Future<List<Section>> getOldSectionFuture, List<Future> updateBoardsFutures,
                                             Board currentBoard, UserInfos user) {
 
@@ -398,6 +402,80 @@ public class DefaultCardService implements CardService {
         } else {
             updateBoardsFutures.add(Future.failedFuture(String.format("[Magneto%s::moveCard] " +
                     "No section found with for board with id %s", this.getClass().getSimpleName(), oldBoardId)));
+        }
+    }
+
+    @Override
+    public void deleteCardsWithLocked(List<String> cardIds, Future<List<Section>> getSectionFuture, Board currentBoard, List<Future> removeCardsFutures, UserInfos user) {
+        // Remove cards from board
+        BoardPayload boardToUpdate = new BoardPayload()
+                .setId(currentBoard.getId())
+                .setPublic(currentBoard.isPublic())
+                .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+
+        this.getAllCardsByBoard(currentBoard, 0, user, false)
+                .onSuccess(result -> {
+                    List<Card> cards = result.getJsonArray(Field.ALL).getList();
+                    SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+                    for (int i = 0; i < cards.size(); i++) {
+                        if (cards.get(i).isLocked() && !cardIds.contains(cards.get(i).getId())) {
+                            sortedPositions.put(i, cards.get(i).getId());
+                        }
+                    }
+                    List<String> notLockedCards = cards.stream()
+                            .filter(c -> !c.isLocked() && !cardIds.contains(c.getId()))
+                            .map(Card::getId)
+                            .collect(Collectors.toList());
+
+                    sortedPositions.forEach((originalPosition, lockedCard) -> {
+                        if (originalPosition < notLockedCards.size()) {
+                            notLockedCards.add(originalPosition, lockedCard);
+                        } else {
+                            notLockedCards.add(lockedCard);
+                        }
+                    });
+
+                    boardToUpdate.setCardIds(notLockedCards);
+
+                    removeCardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));
+
+                })
+                .onFailure(fail -> log.error("[Magneto@%s::addCardWithLocked] Failed to get board cards", this.getClass().getSimpleName(),
+                        fail.getMessage()));
+
+        // Remove cards from section
+        if (!getSectionFuture.result().isEmpty()) {
+            getSectionFuture.result().forEach((section) -> {
+                if (section.getCardIds().stream().anyMatch(cardIds::contains)) {
+                    this.fetchAllCardsBySection(section, 0, user)
+                            .onSuccess(cards -> {
+                                SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+                                for (int i = 0; i < cards.size(); i++) {
+                                    if (cards.get(i).isLocked() && !cardIds.contains(cards.get(i).getId())) {
+                                        sortedPositions.put(i, cards.get(i).getId());
+                                    }
+                                }
+                                List<String> notLockedCards = cards.stream()
+                                        .filter(c -> !c.isLocked() && !cardIds.contains(c.getId()))
+                                        .map(Card::getId)
+                                        .collect(Collectors.toList());
+
+                                sortedPositions.forEach((originalPosition, lockedCard) -> {
+                                    if (originalPosition < notLockedCards.size()) {
+                                        notLockedCards.add(originalPosition, lockedCard);
+                                    } else {
+                                        notLockedCards.add(lockedCard);
+                                    }
+                                });
+                                SectionPayload sectionPayload = new SectionPayload(section.toJson())
+                                        .setCardIds(notLockedCards);
+
+                                removeCardsFutures.add(this.serviceFactory.sectionService().update(sectionPayload));
+                            })
+                            .onFailure(fail -> log.error("[Magneto@%s::addCardSectionWithLocked] Failed to get section cards", this.getClass().getSimpleName(),
+                                    fail.getMessage()));
+                }
+            });
         }
     }
 

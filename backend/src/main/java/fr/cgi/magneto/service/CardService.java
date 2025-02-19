@@ -52,6 +52,8 @@ public interface CardService {
     void removeCardSectionWithLocked(CardPayload updateCard, String oldBoardId, Future<List<Section>> getOldSectionFuture, List<Future> updateBoardsFutures,
                                      Board currentBoard, UserInfos user);
 
+    void deleteCardsWithLocked(List<String> cardIds, Future<List<Section>> getSectionFuture, Board currentBoard, List<Future> removeCardsFutures, UserInfos user);
+
     /**
      * Create a Card and adding it to section or not depending on layout
      *

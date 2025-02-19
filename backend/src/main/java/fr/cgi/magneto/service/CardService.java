@@ -32,8 +32,9 @@ public interface CardService {
      * @param updateCard          Card to insert {@link CardPayload}
      * @param updateBoardsFutures List of futures for the parent to resolve
      * @param currentBoard        Board where we are inserting a card
+     * @param user                User Object containing user id and displayed name
      */
-    void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard);
+    void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard, UserInfos user);
 
     /**
      * Add a card to a section (with locked items logic)
@@ -41,9 +42,10 @@ public interface CardService {
      * @param updateCard          Card to insert {@link CardPayload}
      * @param updateBoardsFutures List of futures for the parent to resolve
      * @param currentBoard        Board where we are inserting a card
+     * @param user                User Object containing user id and displayed name
      */
     void addCardSectionWithLocked(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
-                                  Board currentBoard, String defaultTitle);
+                                  Board currentBoard, String defaultTitle, UserInfos user);
 
     /**
      * Create a Card and adding it to section or not depending on layout

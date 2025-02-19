@@ -215,63 +215,52 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    public void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard) {
+    public void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard, UserInfos user) {
 
-        SortedMap<Integer, String> sortedPositions = new TreeMap<>();
-        for (int i = 0; i < currentBoard.cards().size(); i++) {
-            if (currentBoard.cards().get(i).isLocked()) {
-                sortedPositions.put(i, currentBoard.cards().get(i).getId());
-            }
-        }
-        List<String> notLockedCards = currentBoard.cards().stream()
-                .filter(c -> !c.isLocked())
-                .map(Card::getId)
-                .collect(Collectors.toList());
 
-        notLockedCards.add(0, updateCard.getId());
-
-        sortedPositions.forEach((originalPosition, lockedCard) -> {
-            if (originalPosition < notLockedCards.size()) {
-                notLockedCards.add(originalPosition, lockedCard);
-            } else {
-                notLockedCards.add(lockedCard);
-            }
-        });
         BoardPayload boardToUpdate = new BoardPayload()
                 .setId(currentBoard.getId())
                 .setCardIds(currentBoard.cards()
                         .stream()
                         .map(Card::getId)
                         .collect(Collectors.toList()))
-                .setCardIds(notLockedCards)
                 .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
 
-        updateBoardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));
+
+        this.getAllCardsByBoard(currentBoard, user)
+                .onSuccess(cards -> {
+                    SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+                    for (int i = 0; i < cards.size(); i++) {
+                        if (cards.get(i).isLocked()) {
+                            sortedPositions.put(i, cards.get(i).getId());
+                        }
+                    }
+                    List<String> notLockedCards = cards.stream()
+                            .filter(c -> !c.isLocked())
+                            .map(Card::getId)
+                            .collect(Collectors.toList());
+
+                    notLockedCards.add(0, updateCard.getId());
+
+                    sortedPositions.forEach((originalPosition, lockedCard) -> {
+                        if (originalPosition < notLockedCards.size()) {
+                            notLockedCards.add(originalPosition, lockedCard);
+                        } else {
+                            notLockedCards.add(lockedCard);
+                        }
+                    });
+
+                    boardToUpdate.setCardIds(notLockedCards);
+
+                    updateBoardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));
+
+                })
+                .onFailure(fail -> log.error("[Magneto@%s::addCardWithLocked] Failed to get board cards", this.getClass().getSimpleName(),
+                        fail.getMessage()));
     }
 
     public void addCardSectionWithLocked(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
-                                         Board currentBoard, String defaultTitle) {
-
-        SortedMap<Integer, String> sortedPositions = new TreeMap<>();
-        for (int i = 0; i < currentBoard.cards().size(); i++) {
-            if (currentBoard.cards().get(i).isLocked()) {
-                sortedPositions.put(i, currentBoard.cards().get(i).getId());
-            }
-        }
-        List<String> notLockedCards = currentBoard.cards().stream()
-                .filter(c -> !c.isLocked())
-                .map(Card::getId)
-                .collect(Collectors.toList());
-
-        notLockedCards.add(0, updateCard.getId());
-
-        sortedPositions.forEach((originalPosition, lockedCard) -> {
-            if (originalPosition < notLockedCards.size()) {
-                notLockedCards.add(originalPosition, lockedCard);
-            } else {
-                notLockedCards.add(lockedCard);
-            }
-        });
+                                         Board currentBoard, String defaultTitle, UserInfos user) {
 
         // Update modification date from board
         BoardPayload boardToUpdate = new BoardPayload()
@@ -286,11 +275,36 @@ public class DefaultCardService implements CardService {
             boardToUpdate.addSection(newId);
             updateBoardsFutures.add(this.serviceFactory.sectionService().create(sectionToCreate, newId));
         } else {
-            Section sectionToUpdate = getSectionFuture.result().get(0);
-            sectionToUpdate = sectionToUpdate
-                    .setId(currentBoard.sections().get(0).getId()) // no rights to remove all section, so we can always check get(0)
-                    .addCardIds(notLockedCards);
-            updateBoardsFutures.add(this.serviceFactory.sectionService().update(new SectionPayload(sectionToUpdate.toJson())));
+            this.fetchAllCardsBySection(getSectionFuture.result().get(0), 0, user)
+                    .onSuccess(cards -> {
+                        Section sectionToUpdate = getSectionFuture.result().get(0);
+                        SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+                        for (int i = 0; i < cards.size(); i++) {
+                            if (cards.get(i).isLocked()) {
+                                sortedPositions.put(i, cards.get(i).getId());
+                            }
+                        }
+                        List<String> notLockedCards = cards.stream()
+                                .filter(c -> !c.isLocked())
+                                .map(Card::getId)
+                                .collect(Collectors.toList());
+
+                        notLockedCards.add(0, updateCard.getId());
+
+                        sortedPositions.forEach((originalPosition, lockedCard) -> {
+                            if (originalPosition < notLockedCards.size()) {
+                                notLockedCards.add(originalPosition, lockedCard);
+                            } else {
+                                notLockedCards.add(lockedCard);
+                            }
+                        });
+                        sectionToUpdate = sectionToUpdate
+                                .setId(currentBoard.sections().get(0).getId()) // no rights to remove all section, so we can always check get(0)
+                                .setCardIds(notLockedCards);
+                        updateBoardsFutures.add(this.serviceFactory.sectionService().update(new SectionPayload(sectionToUpdate.toJson())));
+                    })
+                    .onFailure(fail -> log.error("[Magneto@%s::addCardSectionWithLocked] Failed to get section cards", this.getClass().getSimpleName(),
+                            fail.getMessage()));
         }
 
         updateBoardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));

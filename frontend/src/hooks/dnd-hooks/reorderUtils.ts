@@ -175,7 +175,7 @@ const pushItemsBackwardPastLocksSimple = <T extends string | Card>(
         availablePos--;
       }
 
-      if (availablePos >= 0) {
+      if (availablePos >= -1) {
         // Move the displaced item to the available position
         const [itemToMove] = result.splice(i + 1, 1);
 
@@ -299,7 +299,7 @@ const reorderOverSectionWithLockedItemsGeneric = <T extends string | Card>(
   if (
     lockedItems.length === 0 ||
     !movedOverSectionCards
-      .slice(newIndex, movedOverSectionCards.length - 1)
+      .slice(newIndex, movedOverSectionCards.length)
       .some((item) => lockedItems.includes(getItem(item)))
   ) {
     return movedOverSectionCards;

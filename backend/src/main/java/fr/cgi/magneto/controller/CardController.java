@@ -286,10 +286,10 @@ public class CardController extends ControllerHelper {
                                 // Remove cards in old board
                                 if (oldBoard.isLayoutFree()) {
                                     // Remove cards ids from old board
-                                    this.removeCards(moveCard, getOldBoardFuture, updateBoardsFutures);
+                                    cardService.removeCardWithLocked(moveCard, getOldBoardFuture, updateBoardsFutures, user);
                                 } else {
                                     // Remove cards ids from old board for section
-                                    this.removeCardsLayout(updateCard, oldBoardId, getOldSectionFuture, updateBoardsFutures, currentBoard);
+                                    cardService.removeCardSectionWithLocked(updateCard, oldBoardId, getOldSectionFuture, updateBoardsFutures, currentBoard, user);
                                 }
                                 return CompositeFuture.all(updateBoardsFutures);
                             } else {

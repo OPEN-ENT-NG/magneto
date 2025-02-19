@@ -36,6 +36,8 @@ public interface CardService {
      */
     void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard, UserInfos user);
 
+    void removeCardWithLocked(JsonObject moveCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user);
+
     /**
      * Add a card to a section (with locked items logic)
      *
@@ -46,6 +48,9 @@ public interface CardService {
      */
     void addCardSectionWithLocked(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
                                   Board currentBoard, String defaultTitle, UserInfos user);
+
+    void removeCardSectionWithLocked(CardPayload updateCard, String oldBoardId, Future<List<Section>> getOldSectionFuture, List<Future> updateBoardsFutures,
+                                     Board currentBoard, UserInfos user);
 
     /**
      * Create a Card and adding it to section or not depending on layout

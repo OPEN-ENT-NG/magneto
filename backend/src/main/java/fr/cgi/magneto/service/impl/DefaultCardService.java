@@ -83,8 +83,8 @@ public class DefaultCardService implements CardService {
                     Promise<List<Card>> cardsPromise = Promise.promise();
 
                     if (board.isLayoutFree()) {
-                        this.getAllCardsByBoard(board, user)
-                                .onSuccess(cardsPromise::complete)
+                        this.getAllCardsByBoard(board, 0, user, false)
+                                .onSuccess(result -> cardsPromise.complete(result.getJsonArray(Field.ALL).getList()))
                                 .onFailure(cardsPromise::fail);
                     } else {
                         this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
@@ -151,8 +151,8 @@ public class DefaultCardService implements CardService {
                     Promise<List<Card>> cardsPromise = Promise.promise();
 
                     if (board.isLayoutFree()) {
-                        this.getAllCardsByBoard(board, user)
-                                .onSuccess(cardsPromise::complete)
+                        this.getAllCardsByBoard(board, 0, user, false)
+                                .onSuccess(result -> cardsPromise.complete(result.getJsonArray(Field.ALL).getList()))
                                 .onFailure(cardsPromise::fail);
                     } else {
                         this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
@@ -227,8 +227,9 @@ public class DefaultCardService implements CardService {
                 .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
 
 
-        this.getAllCardsByBoard(currentBoard, user)
-                .onSuccess(cards -> {
+        this.getAllCardsByBoard(currentBoard, 0, user, false)
+                .onSuccess(result -> {
+                    List<Card> cards = result.getJsonArray(Field.ALL).getList();
                     SortedMap<Integer, String> sortedPositions = new TreeMap<>();
                     for (int i = 0; i < cards.size(); i++) {
                         if (cards.get(i).isLocked()) {
@@ -241,6 +242,41 @@ public class DefaultCardService implements CardService {
                             .collect(Collectors.toList());
 
                     notLockedCards.add(0, updateCard.getId());
+
+                    sortedPositions.forEach((originalPosition, lockedCard) -> {
+                        if (originalPosition < notLockedCards.size()) {
+                            notLockedCards.add(originalPosition, lockedCard);
+                        } else {
+                            notLockedCards.add(lockedCard);
+                        }
+                    });
+
+                    boardToUpdate.setCardIds(notLockedCards);
+
+                    updateBoardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));
+
+                })
+                .onFailure(fail -> log.error("[Magneto@%s::addCardWithLocked] Failed to get board cards", this.getClass().getSimpleName(),
+                        fail.getMessage()));
+    }
+
+    public void removeCardWithLocked(JsonObject moveCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user) {
+        BoardPayload boardToUpdate = new BoardPayload(getOldBoardFuture.result().get(0).toJson());
+        boardToUpdate.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+
+        this.getAllCardsByBoard(getOldBoardFuture.result().get(0), 0, user, false)
+                .onSuccess(result -> {
+                    List<Card> cards = result.getJsonArray(Field.ALL).getList();
+                    SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+                    for (int i = 0; i < cards.size(); i++) {
+                        if (cards.get(i).isLocked()) {
+                            sortedPositions.put(i, cards.get(i).getId());
+                        }
+                    }
+                    List<String> notLockedCards = cards.stream()
+                            .filter(c -> !c.isLocked() && !c.getId().equals(moveCard.getJsonObject(Field.CARD).getString(Field.ID)))
+                            .map(Card::getId)
+                            .collect(Collectors.toList());
 
                     sortedPositions.forEach((originalPosition, lockedCard) -> {
                         if (originalPosition < notLockedCards.size()) {
@@ -308,6 +344,53 @@ public class DefaultCardService implements CardService {
         }
 
         updateBoardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));
+    }
+
+    public void removeCardSectionWithLocked(CardPayload updateCard, String oldBoardId, Future<List<Section>> getOldSectionFuture, List<Future> updateBoardsFutures,
+                                            Board currentBoard, UserInfos user) {
+
+        // Update modification date from board
+        BoardPayload boardToUpdate = new BoardPayload()
+                .setId(currentBoard.getId())
+                .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+
+        Section sectionToUpdate = getOldSectionFuture.result()
+                .stream()
+                .filter(section -> section.getCardIds().contains(updateCard.getId()))
+                .findFirst()
+                .orElse(null);
+        if (sectionToUpdate != null) {
+
+            this.fetchAllCardsBySection(sectionToUpdate, 0, user)
+                    .onSuccess(cards -> {
+                        SortedMap<Integer, String> sortedPositions = new TreeMap<>();
+                        for (int i = 0; i < cards.size(); i++) {
+                            if (cards.get(i).isLocked()) {
+                                sortedPositions.put(i, cards.get(i).getId());
+                            }
+                        }
+                        List<String> notLockedCards = cards.stream()
+                                .filter(c -> !c.isLocked() && !c.getId().equals(updateCard.getId()))
+                                .map(Card::getId)
+                                .collect(Collectors.toList());
+
+                        sortedPositions.forEach((originalPosition, lockedCard) -> {
+                            if (originalPosition < notLockedCards.size()) {
+                                notLockedCards.add(originalPosition, lockedCard);
+                            } else {
+                                notLockedCards.add(lockedCard);
+                            }
+                        });
+                        sectionToUpdate.setCardIds(notLockedCards);
+                        updateBoardsFutures.add(this.serviceFactory.sectionService().update(new SectionPayload(sectionToUpdate.toJson())));
+                        updateBoardsFutures.add(this.serviceFactory.boardService().update(boardToUpdate));
+                    })
+                    .onFailure(fail -> log.error("[Magneto@%s::addCardSectionWithLocked] Failed to get section cards", this.getClass().getSimpleName(),
+                            fail.getMessage()));
+        } else {
+            updateBoardsFutures.add(Future.failedFuture(String.format("[Magneto%s::moveCard] " +
+                    "No section found with for board with id %s", this.getClass().getSimpleName(), oldBoardId)));
+        }
     }
 
     @Override

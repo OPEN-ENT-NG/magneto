@@ -16,15 +16,16 @@ public class SlideFactory {
                 return new SlideText(properties.getTitle(), properties.getDescription());
             case FILE:
             case PDF:
-                return new SlideFile(properties.getUrl(), properties.getFileName());
+                return new SlideFile(properties.getResourceUrl(), properties.getFileName());
             case LINK:
             case HYPERLINK:
             case EMBEDDER:
-                return new SlideLink(properties.getUrl());
+                return new SlideLink(properties.getResourceUrl());
             case IMAGE:
             case VIDEO:
             case AUDIO:
-                return new SlideMedia(properties.getUrl(), properties.getFileName());
+                return new SlideMedia(properties.getTitle(), properties.getCaption(),
+                        properties.getResourceData(), properties.getExtension());
             case BOARD:
                 return new SlideBoard(
                         properties.getTitle(), properties.getDescription(),

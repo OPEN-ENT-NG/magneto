@@ -1,9 +1,7 @@
 package fr.cgi.magneto.model.slides;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 
-import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
 import org.apache.poi.sl.usermodel.AutoNumberingScheme;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -14,13 +12,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 
 import fr.cgi.magneto.helper.SlideHelper;
 
 public class SlideText extends Slide {
-    private final String title;
-    private final String description;
 
     public SlideText(String title, String description) {
         this.title = title;
@@ -45,15 +40,15 @@ public class SlideText extends Slide {
         if (textBox.getTextParagraphs().isEmpty()) {
             textBox.addNewTextParagraph();
         }
-    
+
         for (Node node : element.childNodes()) {
             if (node instanceof Element) {
                 Element elem = (Element) node;
                 XSLFTextParagraph para = textBox.addNewTextParagraph();
                 XSLFTextRun run = para.addNewTextRun();
-    
+
                 processStyle(elem, para, run);
-    
+
                 String text = elem.text().trim();
                 if (!text.isEmpty()) {
                     run.setText(text);

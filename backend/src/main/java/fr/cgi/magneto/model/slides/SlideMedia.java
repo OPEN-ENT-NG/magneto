@@ -1,16 +1,33 @@
 package fr.cgi.magneto.model.slides;
 
-public class SlideMedia extends Slide {
-    private final String fileUrl;
-    private final String fileName;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+import fr.cgi.magneto.helper.SlideHelper;
 
-    public SlideMedia(String fileUrl, String fileName) {
-        this.fileUrl = fileUrl;
-        this.fileName = fileName;
+
+public class SlideMedia extends Slide {
+
+    private byte[] resourceData;
+    private final String fileExtension;
+
+    public SlideMedia(String title, String description, byte[] resourceData,
+            String fileExtension) {
+        this.title = title;
+        this.description = description;
+        this.resourceData = resourceData;
+        this.fileExtension = fileExtension;
     }
 
     @Override
     public Object createApacheSlide() {
-        return null;
+
+        XMLSlideShow ppt = new XMLSlideShow();
+        XSLFSlide slide = ppt.createSlide();
+
+        SlideHelper.createTitle(slide, title);
+        SlideHelper.createImage(slide, resourceData, fileExtension);
+        SlideHelper.createLegend(slide, description);
+
+        return slide;
     }
 }

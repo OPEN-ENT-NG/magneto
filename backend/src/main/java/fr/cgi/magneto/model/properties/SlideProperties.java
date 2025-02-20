@@ -5,10 +5,13 @@ import fr.cgi.magneto.core.enums.SlideResourceType;
 public class SlideProperties {
     private String title;
     private String description;
+    private String caption;
     private String content;
-    private String url;
-    private String ext;
+    private String resourceUrl;
+    private String resourceId;
+    private String extension;
     private String fileName;
+    private byte[] resourceData;
 
     private String ownerName;
     private String modificationDate;
@@ -36,23 +39,38 @@ public class SlideProperties {
             return this;
         }
 
+        public Builder caption(String caption) {
+            properties.caption = caption;
+            return this;
+        }
+
         public Builder content(String content) {
             properties.content = content;
             return this;
         }
 
-        public Builder url(String url) {
-            properties.url = url;
+        public Builder resourceUrl(String resourceUrl) {
+            properties.resourceUrl = resourceUrl;
             return this;
         }
 
-        public Builder ext(String ext) {
-            properties.ext = ext;
+        public Builder resourceId(String resourceId) {
+            properties.resourceId = resourceId;
+            return this;
+        }
+
+        public Builder extension(String extension) {
+            properties.extension = extension;
             return this;
         }
 
         public Builder fileName(String fileName) {
             properties.fileName = fileName;
+            return this;
+        }
+
+        public Builder resourceData(byte[] resourceData) {
+            properties.resourceData = resourceData;
             return this;
         }
 
@@ -117,16 +135,15 @@ public class SlideProperties {
     }
 
     private boolean isValidForFile() {
-        return fileName != null && url != null;
+        return fileName != null && resourceUrl != null;
     }
 
     private boolean isValidForLink() {
-        return url != null && title != null;
+        return resourceUrl != null && title != null;
     }
 
     private boolean isValidForMedia() {
-        return title != null && description != null && ext != null &&
-                url != null;
+        return title != null && caption != null && extension != null && resourceData != null;
     }
 
     private boolean isValidForBoard() {
@@ -146,20 +163,33 @@ public class SlideProperties {
         return description;
     }
 
+    public String getCaption() {
+        return caption;
+    }
+
+
     public String getContent() {
         return content;
     }
 
-    public String getUrl() {
-        return url;
+    public String getResourceUrl() {
+        return resourceUrl;
     }
 
-    public String getExt() {
-        return ext;
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public String getExtension() {
+        return extension;
     }
 
     public String getFileName() {
         return fileName;
+    }
+
+    public byte[] getResourceData() {
+        return resourceData;
     }
 
     public String getOwnerName() {

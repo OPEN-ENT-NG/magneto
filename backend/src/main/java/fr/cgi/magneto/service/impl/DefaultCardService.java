@@ -179,19 +179,14 @@ public class DefaultCardService implements CardService {
                                 }
 
                                 // Create a list to track future results for all card creation operations
-                                List<Future<JsonObject>> createFutures = new ArrayList<>();
-                                for (CardPayload payload : cardPayloads) {
-                                    createFutures.add(this.create(payload, payload.getId()));
-                                }
+                                List<Future> createFutures = cardPayloads.stream()
+                                        .map(payload -> this.create(
+                                                new CardPayload(payload).setId(null),
+                                                payload.getId()
+                                        ))
+                                        .collect(Collectors.toList());
 
-                                return CompositeFuture.all(createFutures.stream().collect(Collectors.toList()))
-                                        .map(cf -> {
-                                            List<Card> createdCards = new ArrayList<>();
-                                            for (int i = 0; i < cf.size(); i++) {
-                                                createdCards.add(cf.resultAt(i));
-                                            }
-                                            return createdCards;
-                                        });
+                                return CompositeFuture.all(createFutures);
                             })
                             .compose(createdCards -> {
                                 List<String> notLockedCards = cards.stream()
@@ -840,6 +835,22 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
+    public Future<JsonObject> duplicateSection(String boardId, List<Card> cards, SectionPayload section, UserInfos user) {
+        Promise<JsonObject> promise = Promise.promise();
+        this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
+                .compose(boardResult -> {
+                    if (!boardResult.isEmpty()) {
+                        return duplicateSectionFuture(boardId, cards, section, boardResult.get(0), user);
+                    } else {
+                        return Future.failedFuture(String.format("[Magneto%s::duplicateCards] " +
+                                "No board found with id %s", this.getClass().getSimpleName(), boardId));
+                    }
+                })
+                .onSuccess(promise::complete)
+                .onFailure(promise::fail);
+        return promise.future();
+    }
+
     public Future<JsonObject> updateBoard(BoardPayload board) {
         if (board == null) {
             String message = String.format("[Magneto@%s::updateBoard] Failed to update board",
@@ -938,6 +949,80 @@ public class DefaultCardService implements CardService {
                     String message = String.format("[Magneto@%s::duplicateCardsFuture] Failed to duplicate cards : %s",
                             this.getClass().getSimpleName(), fail.getMessage());
                     promise.fail(message);
+                });
+        return promise.future();
+    }
+
+    private Future<JsonObject> duplicateSectionFuture(String boardId, List<Card> cards, SectionPayload section, Board boardResult, UserInfos user) {
+        Promise<JsonObject> promise = Promise.promise();
+        List<Future> duplicateFutures = new ArrayList<>();
+        for (Card card : cards) {
+            duplicateFutures.add(sectionDuplicationCard(boardId, card, user));
+        }
+
+        CompositeFuture.all(duplicateFutures)
+                .compose(result -> {
+                    BoardPayload boardPayload = new BoardPayload(boardResult.toJson());
+                    List<String> newCardIds = new ArrayList<>();
+                    for (Future duplicateFuture : duplicateFutures) {
+                        newCardIds.add(String.valueOf(duplicateFuture.result()));
+                    }
+
+                    // Check if board layout is free = we duplicate cards directly in the board
+                    if (boardPayload.isLayoutFree()) {
+                        boardPayload.addCards(newCardIds);
+                        return this.updateBoard(boardPayload);
+                    } else {
+                        // If board layout is section = we retrieve the first section, or we take the section given in parameters,
+                        // and we add cards in the section
+                        return this.serviceFactory.sectionService().getSectionsByBoardId(boardId)
+                                .compose(sections -> {
+                                    SectionPayload sectionToUpdate = new SectionPayload();
+                                    if (section != null) {
+                                        sectionToUpdate = section;
+                                        sectionToUpdate.addCardIds(newCardIds);
+                                        return this.serviceFactory.sectionService().update(sectionToUpdate);
+                                    } else {
+                                        Section firstSection = sections
+                                                .stream()
+                                                .filter(sectionResult -> sectionResult.getId().equals(boardPayload.getSectionIds().get(0)))
+                                                .findFirst()
+                                                .orElse(null);
+                                        if (firstSection != null) {
+                                            firstSection.addCardIds(newCardIds);
+                                            return this.serviceFactory.sectionService().update(new SectionPayload(firstSection.toJson()));
+                                        } else {
+                                            String message = String.format("[Magneto@%s::duplicateCardsFuture] Failed to duplicate card in section : no sections found",
+                                                    this.getClass().getSimpleName());
+                                            return Future.failedFuture(message);
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .onSuccess(promise::complete)
+                .onFailure(fail -> {
+                    String message = String.format("[Magneto@%s::duplicateCardsFuture] Failed to duplicate cards : %s",
+                            this.getClass().getSimpleName(), fail.getMessage());
+                    promise.fail(message);
+                });
+        return promise.future();
+    }
+
+    private Future<String> sectionDuplicationCard(String boardId, Card card, UserInfos user) {
+        Promise<String> promise = Promise.promise();
+        CardPayload cardPayload = new CardPayload(card.toJson());
+        String newId = UUID.randomUUID().toString();
+        cardPayload.setId(null);
+        cardPayload.setOwnerId(user.getUserId());
+        cardPayload.setOwnerName(user.getUsername());
+        cardPayload.setBoardId(boardId);
+        cardPayload.setParentId(card.getId());
+        cardPayload.setFavoriteList(new ArrayList<>());
+        this.create(cardPayload, newId)
+                .compose(createCardResult -> {
+                    promise.complete(newId);
+                    return Future.succeededFuture();
                 });
         return promise.future();
     }

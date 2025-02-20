@@ -167,10 +167,21 @@ public interface CardService {
 
     /**
      * Update the list of favorite for a card, adding or deleting the a user from it
-     * @param cardId The id of the card we want to update
+     *
+     * @param cardId   The id of the card we want to update
      * @param favorite The new favorite status
-     * @param user    {@link UserInfos} User info
+     * @param user     {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing the id of the updated card
      */
     Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user);
+
+    /**
+     * Duplicate a section (mainly its cards)
+     *
+     * @param boardId     The id of the card we want to update
+     * @param cardsFilter The new favorite status
+     * @param user        {@link UserInfos} User info
+     * @return Future {@link Future <JsonObject>} containing the id of the updated card
+     */
+    Future<JsonObject> duplicateSection(String boardId, List<Card> cardsFilter, SectionPayload setId, UserInfos user);
 }

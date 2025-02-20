@@ -92,7 +92,12 @@ public class DefaultCardService implements CardService {
                                 });
                     } else {
                         this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
-                                .compose(sections -> this.fetchAllCardsBySection(sections.get(0), 0, user))
+                                .compose(sections -> {
+                                    if (card.getSectionId() == null || sections.isEmpty()) {
+                                        return Future.succeededFuture(new ArrayList<>());
+                                    }
+                                    return this.fetchAllCardsBySection(sections.get(0), 0, user);
+                                })
                                 .onSuccess(cardsPromise::complete)
                                 .onFailure(cardsPromise::fail);
                     }

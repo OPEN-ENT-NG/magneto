@@ -6,6 +6,7 @@ import fr.cgi.magneto.model.Model;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -53,6 +54,29 @@ public class CardPayload implements Model<CardPayload> {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
         }
         this.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+    }
+
+    public CardPayload(CardPayload other) {
+        this.id = other.id;
+        this.title = other.title;
+        this.resourceId = other.resourceId;
+        this.resourceType = other.resourceType;
+        this.resourceUrl = other.resourceUrl;
+        this.description = other.description;
+        this.ownerId = other.ownerId;
+        this.ownerName = other.ownerName;
+        this.lastModifierId = other.lastModifierId;
+        this.lastModifierName = other.lastModifierName;
+        this.creationDate = other.creationDate;
+        this.modificationDate = other.modificationDate;
+        this.caption = other.caption;
+        this.isLocked = other.isLocked;
+        this.parentId = other.parentId;
+        this.boardId = other.boardId;
+        this.sectionId = other.sectionId;
+        // Create a new list to avoid sharing the reference
+        this.favoriteList = other.favoriteList != null ?
+                new ArrayList<>(other.favoriteList) : new ArrayList<>();
     }
 
     public String getId() {

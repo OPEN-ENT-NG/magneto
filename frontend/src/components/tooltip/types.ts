@@ -17,4 +17,5 @@ export interface TooltipProps {
     | "top-end"
     | "top-start"
     | "top";
+  arrow?: boolean;
 }

@@ -117,8 +117,13 @@ export const useFreeLayoutCardDnD = (board: Board) => {
     return updatedIds.filter((id) => cardMap[id]);
   }, [updatedIds, cardMap]);
 
+  const updatedIdsWithoutLocked = useMemo(() => {
+    return safeUpdatedIds.filter((id) => !lockedCards.includes(id));
+  }, [safeUpdatedIds, lockedCards]);
+
   return {
     updatedIds: safeUpdatedIds,
+    updatedIdsWithoutLocked,
     activeItem,
     cardMap,
     sensors,

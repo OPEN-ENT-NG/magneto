@@ -50,6 +50,12 @@ export const useSectionsDnD = (board: Board) => {
   const { t } = useTranslation("magneto");
   const toast = useToast();
 
+  const lockedCardIds = useMemo(() => {
+    return updatedSections.flatMap((section) =>
+      section.cards.filter((card) => card.locked).map((card) => card.id),
+    );
+  }, [updatedSections]);
+
   useEffect(() => {
     setUpdatedSections(board.sections);
   }, [board.sections]);
@@ -275,9 +281,26 @@ export const useSectionsDnD = (board: Board) => {
         page: 0,
       };
 
-      const newOriginalSectionCardIds = originalActiveSection.cardIds.filter(
-        (id) => id !== activeCardId,
+      const lockedCardsOriginal = originalActiveSection.cards
+        .filter((card): card is typeof card & { locked: true } => card.locked)
+        .map((card) => card.id);
+
+      const newOriginalSectionCardIds = reorderOriginalSectionWithLockedItems(
+        originalActiveSection.cardIds,
+        originalActiveSection.cardIds.indexOf(activeCardId),
+        lockedCardsOriginal,
+        activeCardId,
       );
+
+      const newOriginalSectionCards =
+        reorderOriginalSectionWithLockedItemsArray(
+          originalActiveSection.cards,
+          originalActiveSection.cards.findIndex(
+            (card) => card.id === activeCardId,
+          ),
+          lockedCardsOriginal,
+          activeCardId,
+        );
 
       setUpdatedSections((prev) => [
         ...prev.map((section) =>
@@ -285,7 +308,7 @@ export const useSectionsDnD = (board: Board) => {
             ? {
                 ...section,
                 cardIds: newOriginalSectionCardIds,
-                cards: section.cards.filter((card) => card.id !== activeCardId),
+                cards: newOriginalSectionCards,
               }
             : section,
         ),
@@ -635,6 +658,7 @@ export const useSectionsDnD = (board: Board) => {
     newMagnetOver,
     activeItem,
     updatedSections,
+    lockedCardIds,
     sensors,
     handleDragStart,
     handleDragOver,

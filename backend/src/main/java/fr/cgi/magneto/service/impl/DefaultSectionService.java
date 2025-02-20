@@ -288,7 +288,7 @@ public class DefaultSectionService implements SectionService {
                     .setBoardId(boardId)
                     .setCardIds(new ArrayList<>());
             duplicateFutures.add(duplicateSection(sectionPayload, newId));
-            duplicateFutures.add(this.serviceFactory.cardService().duplicateCards(boardId, cardsFilter, sectionPayload.setId(newId), user));
+            duplicateFutures.add(this.serviceFactory.cardService().duplicateSection(boardId, cardsFilter, sectionPayload.setId(newId), user));
         }
 
         CompositeFuture.all(duplicateFutures)

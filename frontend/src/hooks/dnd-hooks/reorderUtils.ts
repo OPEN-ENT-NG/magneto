@@ -59,7 +59,10 @@ const pushItemsBackwardPastLocks = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex - 1; i >= oldIndex; i--) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i + 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i - 1;
 
@@ -94,7 +97,10 @@ const pushItemsForwardPastLocks = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex + 1; i <= endIndex; i++) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i - 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i + 1;
       while (
@@ -126,7 +132,10 @@ const pushItemsForwardPastLocksSimple = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex + 1; i <= endIndex; i++) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i - 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i + 1;
       while (
@@ -152,7 +161,10 @@ const pushItemsBackwardPastLocksSimple = <T extends string | Card>(
   lockedItems: string[],
 ): void => {
   for (let i = newIndex - 1; i >= endIndex; i--) {
-    if (lockedItems.includes(getItem(result[i]))) {
+    if (
+      lockedItems.includes(getItem(result[i])) &&
+      !lockedItems.includes(getItem(result[i + 1]))
+    ) {
       // If we hit a locked item, find next available position
       let availablePos = i - 1;
 
@@ -163,7 +175,7 @@ const pushItemsBackwardPastLocksSimple = <T extends string | Card>(
         availablePos--;
       }
 
-      if (availablePos >= 0) {
+      if (availablePos >= -1) {
         // Move the displaced item to the available position
         const [itemToMove] = result.splice(i + 1, 1);
 
@@ -190,8 +202,14 @@ const reorderWithLockedItemsGeneric = <T extends string | Card>(
   }
 
   // If the moved item is locked, return original array
-  const itemId = getItem(items[oldIndex]);
-  if (lockedItems.includes(itemId)) {
+  const itemIdToMove = getItem(items[oldIndex]);
+  if (lockedItems.includes(itemIdToMove)) {
+    return items;
+  }
+
+  // If the destination is locked, return original array
+  const itemIdWhereMove = getItem(items[newIndex]);
+  if (lockedItems.includes(itemIdWhereMove)) {
     return items;
   }
 
@@ -263,7 +281,11 @@ const reorderWithLockedItemsGeneric = <T extends string | Card>(
     pushItemsBackwardPastLocks(result, oldIndex, newIndex, lockedItems);
   }
 
-  return result;
+  // Return new array without dummy items
+  return result.filter((item) => {
+    const id = getItem(item);
+    return id !== "dummy";
+  });
 };
 
 const reorderOverSectionWithLockedItemsGeneric = <T extends string | Card>(
@@ -277,16 +299,21 @@ const reorderOverSectionWithLockedItemsGeneric = <T extends string | Card>(
   if (
     lockedItems.length === 0 ||
     !movedOverSectionCards
-      .slice(newIndex, movedOverSectionCards.length - 1)
+      .slice(newIndex, movedOverSectionCards.length)
       .some((item) => lockedItems.includes(getItem(item)))
   ) {
     return movedOverSectionCards;
   }
 
   // If the moved item is locked, return original array
-  const itemId = getItem(movedOverSectionCards[oldIndex]);
-  if (lockedItems.includes(itemId)) {
+  const itemIdToMove = getItem(movedOverSectionCards[oldIndex]);
+  if (lockedItems.includes(itemIdToMove)) {
     return movedOverSectionCards;
+  }
+
+  const itemIdWhereMove = getItem(movedOverSectionCards[newIndex]);
+  if (lockedItems.includes(itemIdWhereMove)) {
+    return items;
   }
 
   const result = [...movedOverSectionCards];
@@ -302,7 +329,10 @@ const reorderOverSectionWithLockedItemsGeneric = <T extends string | Card>(
     return items;
   }
 
-  return result;
+  return result.filter((item) => {
+    const id = getItem(item);
+    return id !== "dummy";
+  });
 };
 
 const reorderOriginalSectionWithLockedItemsGeneric = <T extends string | Card>(
@@ -332,7 +362,10 @@ const reorderOriginalSectionWithLockedItemsGeneric = <T extends string | Card>(
     return items;
   }
 
-  return result;
+  return result.filter((item) => {
+    const id = getItem(item);
+    return id !== "dummy";
+  });
 };
 
 export const canRemoveMagnet = (board: Board, cardId: string): boolean => {

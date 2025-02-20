@@ -9,9 +9,11 @@ export const Tooltip: FC<TooltipProps> = ({
   title,
   placement,
   width = "20rem",
+  arrow = false,
 }) => {
   return (
     <TooltipMUI
+      arrow={arrow}
       title={title}
       {...(placement && { placement })}
       TransitionProps={{

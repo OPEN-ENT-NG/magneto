@@ -1,6 +1,5 @@
 import { FC } from "react";
 
-import { Tooltip } from "@edifice.io/react";
 import {
   Box,
   Divider,
@@ -19,6 +18,7 @@ import {
 } from "./style";
 import { DropDownListItem, DropDownListProps } from "./types";
 import { getAnchorOrigin, getTransformOrigin } from "./utils";
+import { Tooltip } from "../tooltip/Tooltip";
 
 export const DropDownList: FC<DropDownListProps> = ({
   items,
@@ -61,8 +61,8 @@ export const DropDownList: FC<DropDownListProps> = ({
           {item.divider && <Divider />}
 
           {item.disabled && item.tooltip ? (
-            <Tooltip message={t(item.tooltip)} placement="bottom-start">
-              {renderMenuItem(item)}
+            <Tooltip title={t(item.tooltip)} arrow>
+              <span>{renderMenuItem(item)}</span>
             </Tooltip>
           ) : (
             renderMenuItem(item)

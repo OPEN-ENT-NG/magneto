@@ -27,13 +27,42 @@ public interface CardService {
     Future<JsonObject> create(CardPayload card, String id);
 
     /**
+     * Add a card to a board (with locked items logic)
+     *
+     * @param updateCard          Card to insert {@link CardPayload}
+     * @param updateBoardsFutures List of futures for the parent to resolve
+     * @param currentBoard        Board where we are inserting a card
+     * @param user                User Object containing user id and displayed name
+     */
+    void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard, UserInfos user);
+
+    void removeCardWithLocked(JsonObject moveCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user);
+
+    /**
+     * Add a card to a section (with locked items logic)
+     *
+     * @param updateCard          Card to insert {@link CardPayload}
+     * @param updateBoardsFutures List of futures for the parent to resolve
+     * @param currentBoard        Board where we are inserting a card
+     * @param user                User Object containing user id and displayed name
+     */
+    void addCardSectionWithLocked(CardPayload updateCard, Future<List<Section>> getSectionFuture, List<Future> updateBoardsFutures,
+                                  Board currentBoard, String defaultTitle, UserInfos user);
+
+    void removeCardSectionWithLocked(CardPayload updateCard, String oldBoardId, Future<List<Section>> getOldSectionFuture, List<Future> updateBoardsFutures,
+                                     Board currentBoard, UserInfos user);
+
+    void deleteCardsWithLocked(List<String> cardIds, Future<List<Section>> getSectionFuture, Board currentBoard, List<Future> removeCardsFutures, UserInfos user);
+
+    /**
      * Create a Card and adding it to section or not depending on layout
      *
-     * @param card Card to create {@link CardPayload}
-     * @param i18n I18nHelper Helper for I18n keys
+     * @param card      Card to create {@link CardPayload}
+     * @param i18n      I18nHelper Helper for I18n keys
+     * @param userInfos User Object containing user id and displayed name
      * @return Future {@link Future <JsonObject>} containing newly created card
      */
-    Future<JsonObject> createCardLayout(CardPayload card, I18nHelper i18n);
+    Future<JsonObject> createCardLayout(CardPayload card, I18nHelper i18n, UserInfos userInfos);
 
     /**
      * Update a card
@@ -138,10 +167,21 @@ public interface CardService {
 
     /**
      * Update the list of favorite for a card, adding or deleting the a user from it
-     * @param cardId The id of the card we want to update
+     *
+     * @param cardId   The id of the card we want to update
      * @param favorite The new favorite status
-     * @param user    {@link UserInfos} User info
+     * @param user     {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing the id of the updated card
      */
     Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user);
+
+    /**
+     * Duplicate a section (mainly its cards)
+     *
+     * @param boardId     The id of the card we want to update
+     * @param cardsFilter The new favorite status
+     * @param user        {@link UserInfos} User info
+     * @return Future {@link Future <JsonObject>} containing the id of the updated card
+     */
+    Future<JsonObject> duplicateSection(String boardId, List<Card> cardsFilter, SectionPayload setId, UserInfos user);
 }

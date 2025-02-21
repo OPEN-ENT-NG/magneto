@@ -218,7 +218,8 @@ public class DefaultExportService implements ExportService {
                 String fileExtension = documentData != null ? (String) documentData.get("extension") : "";
                 propertiesBuilder
                         .extension(fileExtension)
-                        .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null);
+                        .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
+                        .caption(card.getCaption());
                 break;
             case BOARD:
                 propertiesBuilder

@@ -153,7 +153,8 @@ public class DefaultExportService implements ExportService {
                     SlideFactory slideFactory = new SlideFactory();
 
                     // TITRE
-                    ppt.createSlide().importContent(createTitleSlide(board));
+                    XSLFSlide titleApacheSlide = createTitleSlide(board);
+                    ppt.createSlide().importContent(titleApacheSlide);
 
                     // Utiliser l'ordre des cartes du Board
                     for (Card boardCard : board.cards()) {
@@ -189,8 +190,9 @@ public class DefaultExportService implements ExportService {
         XSLFSlide slide = ppt.createSlide();
 
         SlideHelper.createTitle(slide, board.getTitle(), 70, 70.0, TextParagraph.TextAlign.CENTER);
-
-        return getBoardDocuments(Collections.singletonList(board.getImageUrl()))
+        String imageUrl = board.getImageUrl();
+        String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+        return getBoardDocuments(Collections.singletonList(imageId))
                 .compose(docs -> {
                     if (!docs.isEmpty()) {
                         Map<String, Object> documentData = docs.get(0);

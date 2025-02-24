@@ -1,20 +1,12 @@
 package fr.cgi.magneto.helper;
 
-import java.awt.Rectangle;
-
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFPictureData;
-import org.apache.poi.xslf.usermodel.XSLFPictureShape;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
-import org.apache.poi.xslf.usermodel.XSLFTextShape;
-
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
 import org.apache.poi.sl.usermodel.Placeholder;
 import org.apache.poi.sl.usermodel.PlaceholderDetails;
 import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
+import org.apache.poi.xslf.usermodel.*;
+
+import java.awt.*;
 
 public class SlideHelper {
     private static final int MARGIN_LEFT = 140;
@@ -34,9 +26,10 @@ public class SlideHelper {
 
     private static final int IMAGE_CONTENT_HEIGHT = 480;
 
-    public static XSLFTextBox createTitle(XSLFSlide slide, String title) {
+    public static XSLFTextBox createTitle(XSLFSlide slide, String title, int titleHeight, Double titleFontSize,
+                                          TextAlign titleTextAlign) {
         XSLFTextShape titleShape = slide.createTextBox();
-        titleShape.setAnchor(new Rectangle(MARGIN_LEFT, MARGIN_TOP_TITLE, WIDTH, TITLE_HEIGHT));
+        titleShape.setAnchor(new Rectangle(MARGIN_LEFT, MARGIN_TOP_TITLE, WIDTH, titleHeight));
 
         PlaceholderDetails phDetails = titleShape.getPlaceholderDetails();
         if (phDetails != null) {
@@ -47,10 +40,10 @@ public class SlideHelper {
         titleShape.setText(title);
 
         XSLFTextParagraph para = titleShape.getTextParagraphs().get(0);
-        para.setTextAlign(TextAlign.LEFT);
+        para.setTextAlign(titleTextAlign);
 
         XSLFTextRun run = para.getTextRuns().get(0);
-        run.setFontSize(TITLE_FONT_SIZE);
+        run.setFontSize(titleFontSize);
 
         return (XSLFTextBox) titleShape;
     }

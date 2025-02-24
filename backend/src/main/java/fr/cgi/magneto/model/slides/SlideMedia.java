@@ -1,8 +1,9 @@
 package fr.cgi.magneto.model.slides;
 
+import fr.cgi.magneto.helper.SlideHelper;
+import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
-import fr.cgi.magneto.helper.SlideHelper;
 
 public class SlideMedia extends Slide {
 
@@ -24,7 +25,7 @@ public class SlideMedia extends Slide {
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
-        SlideHelper.createTitle(slide, title);
+        SlideHelper.createTitle(slide, title, 70, 44.0, TextParagraph.TextAlign.LEFT);
         SlideHelper.createImage(slide, resourceData, fileExtension);
         SlideHelper.createLegend(slide, caption);
 

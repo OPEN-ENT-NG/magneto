@@ -1,19 +1,15 @@
 package fr.cgi.magneto.model.slides;
 
-import java.awt.Color;
-
+import fr.cgi.magneto.helper.SlideHelper;
 import org.apache.poi.sl.usermodel.AutoNumberingScheme;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
+import org.apache.poi.sl.usermodel.TextParagraph;
+import org.apache.poi.xslf.usermodel.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
-import fr.cgi.magneto.helper.SlideHelper;
+import java.awt.*;
 
 public class SlideText extends Slide {
 
@@ -27,7 +23,7 @@ public class SlideText extends Slide {
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
-        SlideHelper.createTitle(slide, title);
+        SlideHelper.createTitle(slide, title, 70, 44.0, TextParagraph.TextAlign.LEFT);
         XSLFTextBox contentBox = SlideHelper.createContent(slide);
 
         Document doc = Jsoup.parse(description);

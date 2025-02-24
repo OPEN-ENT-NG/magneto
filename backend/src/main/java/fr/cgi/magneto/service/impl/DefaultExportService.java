@@ -51,9 +51,9 @@ public class DefaultExportService implements ExportService {
                     return serviceFactory.boardService()
                             .getAllDocumentIds(boardId, user)
                             .compose(documentIds -> {
-                                if (documentIds.isEmpty()) {
-                                    return Future.succeededFuture(new ArrayList<>());
-                                }
+                                String imageUrl = board.getImageUrl();
+                                String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                                documentIds.add(imageId);
                                 return getBoardDocuments(documentIds);
                             })
                             .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents))
@@ -153,7 +153,7 @@ public class DefaultExportService implements ExportService {
                     SlideFactory slideFactory = new SlideFactory();
 
                     // TITRE
-                    XSLFSlide titleApacheSlide = createTitleSlide(board);
+                    XSLFSlide titleApacheSlide = createTitleSlide(board, documents);
                     ppt.createSlide().importContent(titleApacheSlide);
 
                     // Utiliser l'ordre des cartes du Board
@@ -185,31 +185,26 @@ public class DefaultExportService implements ExportService {
                 });
     }
 
-    private XSLFSlide createTitleSlide(Board board) {
+    private XSLFSlide createTitleSlide(Board board, List<Map<String, Object>> documents) {
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
         SlideHelper.createTitle(slide, board.getTitle(), 70, 70.0, TextParagraph.TextAlign.CENTER);
+
         String imageUrl = board.getImageUrl();
         String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-        return getBoardDocuments(Collections.singletonList(imageId))
-                .compose(docs -> {
-                    if (!docs.isEmpty()) {
-                        Map<String, Object> documentData = docs.get(0);
-                        if (documentData != null) {
-                            Buffer documentBuffer = (Buffer) documentData.get("buffer");
-                            String fileExtension = (String) documentData.get("extension");
-                            if (documentBuffer != null) {
-                                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension);
-                            }
-                        }
-                    }
-                    return Future.succeededFuture(slide);
-                })
-                .recover(err -> {
-                    return Future.succeededFuture(slide);
-                })
-                .result();
+        Map<String, Object> documentData = documents.stream()
+                .filter(doc -> imageId.equals(doc.get("documentId")))
+                .findFirst()
+                .orElse(null);
+        if (documentData != null) {
+            Buffer documentBuffer = (Buffer) documentData.get("buffer");
+            String fileExtension = (String) documentData.get("extension");
+            if (documentBuffer != null) {
+                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension);
+            }
+        }
+        return slide;
     }
 
     private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData,

@@ -1,5 +1,7 @@
 package fr.cgi.magneto.service.impl;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.openxml4j.opc.PackagePartName;
+import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.entcore.common.user.UserInfos;
@@ -162,6 +168,39 @@ public class DefaultExportService implements ExportService {
                                 Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
                                 XSLFSlide apacheSlide = (XSLFSlide) slide.createApacheSlide();
                                 ppt.createSlide().importContent(apacheSlide);
+                                log.info("Slide added to the slideshow for card: " + cardId);
+                                OPCPackage pptPackage = ppt.getPackage();
+
+                                // Copier tous les fichiers du dossier "/ppt/media/" de apacheSlide à ppt
+                                for (PackagePart part : apacheSlide.getSlideShow().getPackage().getParts()) {
+                                    if (part.getPartName().getName().startsWith("/ppt/media/")) {
+                                        PackagePartName newPartName = PackagingURIHelper
+                                                .createPartName(part.getPartName().getName());
+
+                                        if (!pptPackage.containPart(newPartName)) {
+                                            pptPackage.createPart(newPartName, part.getContentType());
+                                            try (InputStream is = part.getInputStream();
+                                                    OutputStream os = pptPackage.getPart(newPartName)
+                                                            .getOutputStream()) {
+                                                byte[] buffer = new byte[4096];
+                                                int bytesRead;
+                                                while ((bytesRead = is.read(buffer)) != -1) {
+                                                    os.write(buffer, 0, bytesRead);
+                                                }
+                                            }
+                                            log.info("Media file copied from apacheSlide to ppt: "
+                                                    + part.getPartName().getName());
+                                        } else {
+                                            log.info("Media file already exists in ppt: "
+                                                    + part.getPartName().getName());
+                                        }
+                                    }
+                                }
+                                // Inspecter le contenu du package après l'ajout de la diapositive
+                                log.info("Package parts after adding slide:");
+                                for (PackagePart part : ppt.getPackage().getParts()) {
+                                    log.info("- " + part.getPartName());
+                                }
                             } catch (Exception e) {
                                 String message = String.format(
                                         "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
@@ -214,8 +253,14 @@ public class DefaultExportService implements ExportService {
                 }
                 Map<String, Object> documentData = documentMap.get(card.getResourceId());
 
+                System.out.println("Document data found for resource ID " + card.getResourceId() + ": " +
+                        (documentData != null ? "yes" : "no"));
+
                 Buffer documentBuffer = documentData != null ? (Buffer) documentData.get("buffer") : null;
                 String fileExtension = documentData != null ? (String) documentData.get("extension") : "";
+
+                System.out.println("Final extension: " + fileExtension);
+                System.out.println("Buffer present: " + (documentBuffer != null));
                 propertiesBuilder
                         .extension(fileExtension)
                         .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)

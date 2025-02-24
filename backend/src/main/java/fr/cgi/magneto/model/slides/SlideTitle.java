@@ -1,5 +1,7 @@
 package fr.cgi.magneto.model.slides;
 
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+
 public class SlideTitle extends Slide {
     private final String title;
 
@@ -8,7 +10,7 @@ public class SlideTitle extends Slide {
     }
 
     @Override
-    public Object createApacheSlide() {
+    public Object createApacheSlide(XSLFSlide newSlide) {
         return null;
     }
 }

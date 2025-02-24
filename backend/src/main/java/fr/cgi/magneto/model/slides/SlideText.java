@@ -20,17 +20,16 @@ public class SlideText extends Slide {
     }
 
     @Override
-    public Object createApacheSlide() {
-        XMLSlideShow ppt = new XMLSlideShow();
-        XSLFSlide slide = ppt.createSlide();
+    public Object createApacheSlide(XSLFSlide newSlide) {
 
-        SlideHelper.createTitle(slide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE, TextParagraph.TextAlign.LEFT);
-        XSLFTextBox contentBox = SlideHelper.createContent(slide);
+        SlideHelper.createTitle(newSlide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE,
+                TextParagraph.TextAlign.LEFT);
+        XSLFTextBox contentBox = SlideHelper.createContent(newSlide);
 
         Document doc = Jsoup.parse(description);
         processHtmlContent(contentBox, doc.body());
 
-        return slide;
+        return newSlide;
     }
 
     private void processHtmlContent(XSLFTextBox textBox, Element element) {

@@ -5,6 +5,8 @@ public class Slideshow {
     public static final int MARGIN_LEFT = 140;
     public static final int MARGIN_TOP_TITLE = 40;
     public static final int WIDTH = 1000;
+    public static final int SLIDE_HEIGHT = 720;
+    public static final int SLIDE_WIDTH = 1280;
 
     // Constantes pour les titres
     public static final int TITLE_HEIGHT = 70;

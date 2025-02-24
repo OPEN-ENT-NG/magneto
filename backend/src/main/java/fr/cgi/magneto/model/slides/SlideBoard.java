@@ -1,5 +1,7 @@
 package fr.cgi.magneto.model.slides;
 
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+
 public class SlideBoard extends Slide {
     private final String ownerName;
     private final String modificationDate;
@@ -19,7 +21,7 @@ public class SlideBoard extends Slide {
     }
 
     @Override
-    public Object createApacheSlide() {
+    public Object createApacheSlide(XSLFSlide newSlide) {
         return null;
     }
 }

@@ -18,8 +18,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.apache.poi.sl.usermodel.TextParagraph;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.*;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
@@ -189,7 +188,21 @@ public class DefaultExportService implements ExportService {
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
-        SlideHelper.createTitle(slide, board.getTitle(), 70, 70.0, TextParagraph.TextAlign.CENTER);
+        SlideHelper.createTitle(slide, board.getTitle(), 100, 100.0, TextParagraph.TextAlign.CENTER);
+
+        XSLFTextBox textBox = SlideHelper.createContent(slide);
+
+        XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
+        paragraph.setTextAlign(TextParagraph.TextAlign.CENTER);
+        XSLFTextRun textRun = paragraph.addNewTextRun();
+        textRun.setText("Créé par " + board.getOwnerName() + ",");
+        textRun.setFontSize(36.0);
+
+        XSLFTextParagraph paragraph2 = textBox.addNewTextParagraph();
+        paragraph2.setTextAlign(TextParagraph.TextAlign.CENTER);
+        XSLFTextRun textRun2 = paragraph2.addNewTextRun();
+        textRun2.setText("mis à jour le " + board.getModificationDate());
+        textRun2.setFontSize(36.0);
 
         String imageUrl = board.getImageUrl();
         String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
@@ -201,7 +214,7 @@ public class DefaultExportService implements ExportService {
             Buffer documentBuffer = (Buffer) documentData.get("buffer");
             String fileExtension = (String) documentData.get("extension");
             if (documentBuffer != null) {
-                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension);
+                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, 300);
             }
         }
         return slide;

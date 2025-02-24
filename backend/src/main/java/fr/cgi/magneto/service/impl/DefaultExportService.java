@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackagePartName;
+import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -167,35 +168,9 @@ public class DefaultExportService implements ExportService {
                             try {
                                 Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
                                 XSLFSlide apacheSlide = (XSLFSlide) slide.createApacheSlide();
-                                ppt.createSlide().importContent(apacheSlide);
-                                log.info("Slide added to the slideshow for card: " + cardId);
-                                OPCPackage pptPackage = ppt.getPackage();
-
-                                // Copier tous les fichiers du dossier "/ppt/media/" de apacheSlide à ppt
-                                for (PackagePart part : apacheSlide.getSlideShow().getPackage().getParts()) {
-                                    if (part.getPartName().getName().startsWith("/ppt/media/")) {
-                                        PackagePartName newPartName = PackagingURIHelper
-                                                .createPartName(part.getPartName().getName());
-
-                                        if (!pptPackage.containPart(newPartName)) {
-                                            pptPackage.createPart(newPartName, part.getContentType());
-                                            try (InputStream is = part.getInputStream();
-                                                    OutputStream os = pptPackage.getPart(newPartName)
-                                                            .getOutputStream()) {
-                                                byte[] buffer = new byte[4096];
-                                                int bytesRead;
-                                                while ((bytesRead = is.read(buffer)) != -1) {
-                                                    os.write(buffer, 0, bytesRead);
-                                                }
-                                            }
-                                            log.info("Media file copied from apacheSlide to ppt: "
-                                                    + part.getPartName().getName());
-                                        } else {
-                                            log.info("Media file already exists in ppt: "
-                                                    + part.getPartName().getName());
-                                        }
-                                    }
-                                }
+                                XSLFSlide newSlide = ppt.createSlide();
+                                newSlide.importContent(apacheSlide);
+                                copyMediaPartsAndRelationships(apacheSlide, newSlide);
                                 // Inspecter le contenu du package après l'ajout de la diapositive
                                 log.info("Package parts after adding slide:");
                                 for (PackagePart part : ppt.getPackage().getParts()) {
@@ -277,5 +252,41 @@ public class DefaultExportService implements ExportService {
         }
 
         return slideFactory.createSlide(resourceType, propertiesBuilder.build());
+    }
+
+    private void copyMediaPartsAndRelationships(XSLFSlide sourceSlide, XSLFSlide destinationSlide) {
+        try {
+            // Récupérer les packages source et destination
+            OPCPackage sourcePackage = sourceSlide.getSlideShow().getPackage();
+            OPCPackage destPackage = destinationSlide.getSlideShow().getPackage();
+
+            // Copier les parties média avec leurs relations
+            for (PackagePart sourcePart : sourcePackage.getParts()) {
+                // Filtrer uniquement les parties média
+                if (sourcePart.getPartName().getName().startsWith("/ppt/media/")) {
+                    PackagePartName newPartName = PackagingURIHelper.createPartName(sourcePart.getPartName().getName());
+
+                    // Vérifier si la partie n'existe pas déjà
+                    if (!destPackage.containPart(newPartName)) {
+                        // Créer la nouvelle partie
+                        PackagePart newPart = destPackage.createPart(newPartName, sourcePart.getContentType());
+
+                        // Copier le contenu
+                        try (InputStream is = sourcePart.getInputStream();
+                                OutputStream os = newPart.getOutputStream()) {
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = is.read(buffer)) != -1) {
+                                os.write(buffer, 0, bytesRead);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Gestion de l'erreur
+            System.err.println("Erreur lors de la copie des parties média : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

@@ -198,7 +198,14 @@ public class SlideHelper {
             // Lier le texte à la relation audio
             XSLFHyperlink hyperlink = textRun.createHyperlink();
             hyperlink.setAddress("#" + audioRelationship.getId());
-
+            
+            // Debugging
+            System.out.println("DEBUG HYPERLINK:");
+            System.out.println("Hyperlink Address: #" + audioRelationship.getId());
+            System.out.println("Audio Filename: " + audioFileName);
+            System.out.println("Audio Part Name: " + audioPartName);
+            System.out.println("Relationship Type: " + audioRelationship.getRelationshipType());
+            System.out.println("Target URI: " + audioRelationship.getTargetURI());
             // Sauvegarder les modifications dans le package
             opcPackage.flush();
             System.out.println("Package mis à jour avec succès");

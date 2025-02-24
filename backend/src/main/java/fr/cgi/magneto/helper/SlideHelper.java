@@ -24,7 +24,7 @@ public class SlideHelper {
     private static final int CONTENT_HEIGHT = 520;
     private static final int CONTENT_MARGIN_TOP = 140;
 
-    private static final int IMAGE_CONTENT_HEIGHT = 480;
+    private static final int IMAGE_CONTENT_HEIGHT = 250;
 
     public static XSLFTextBox createTitle(XSLFSlide slide, String title, int titleHeight, Double titleFontSize,
                                           TextAlign titleTextAlign) {
@@ -75,7 +75,7 @@ public class SlideHelper {
         return contentBox;
     }
 
-    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String extension) {
+    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String extension, int contentMarginTop) {
         XMLSlideShow ppt = slide.getSlideShow();
 
         XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromExtension(extension));
@@ -93,7 +93,7 @@ public class SlideHelper {
         }
 
         int x = MARGIN_LEFT + (WIDTH - newWidth) / 2;
-        int y = CONTENT_MARGIN_TOP + (IMAGE_CONTENT_HEIGHT - newHeight) / 2;
+        int y = contentMarginTop + (IMAGE_CONTENT_HEIGHT - newHeight) / 2;
 
         XSLFPictureShape shape = slide.createPicture(pic);
         shape.setAnchor(new Rectangle(x, y, newWidth, newHeight));

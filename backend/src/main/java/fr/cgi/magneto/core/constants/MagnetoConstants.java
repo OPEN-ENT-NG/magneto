@@ -25,6 +25,7 @@ public class MagnetoConstants {
     public static final Double CONTENT_FONT_SIZE = 36.0;
 
     // Constantes pour les images
-    public static final int IMAGE_CONTENT_HEIGHT = 250;
+    public static final int MAIN_IMAGE_CONTENT_HEIGHT = 400;
+    public static final int IMAGE_CONTENT_HEIGHT = 480;
 
 }

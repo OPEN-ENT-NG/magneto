@@ -216,7 +216,7 @@ public class DefaultExportService implements ExportService {
             Buffer documentBuffer = (Buffer) documentData.get("buffer");
             String fileExtension = (String) documentData.get("extension");
             if (documentBuffer != null) {
-                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, MagnetoConstants.MAIN_CONTENT_MARGIN_TOP);
+                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, MagnetoConstants.MAIN_CONTENT_MARGIN_TOP, MagnetoConstants.MAIN_IMAGE_CONTENT_HEIGHT);
             }
         }
         return slide;

@@ -60,7 +60,7 @@ public class SlideHelper {
         return contentBox;
     }
 
-    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String extension, int contentMarginTop) {
+    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String extension, int contentMarginTop, int imageContentHeight) {
         XMLSlideShow ppt = slide.getSlideShow();
 
         XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromExtension(extension));
@@ -69,16 +69,16 @@ public class SlideHelper {
         double imgRatio = (double) imgSize.width / imgSize.height;
 
         int newWidth, newHeight;
-        if (imgRatio > (double) MagnetoConstants.WIDTH / MagnetoConstants.IMAGE_CONTENT_HEIGHT) {
+        if (imgRatio > (double) MagnetoConstants.WIDTH / imageContentHeight) {
             newWidth = MagnetoConstants.WIDTH;
             newHeight = (int) (MagnetoConstants.WIDTH / imgRatio);
         } else {
-            newHeight = MagnetoConstants.IMAGE_CONTENT_HEIGHT;
-            newWidth = (int) (MagnetoConstants.IMAGE_CONTENT_HEIGHT * imgRatio);
+            newHeight = imageContentHeight;
+            newWidth = (int) (imageContentHeight * imgRatio);
         }
 
         int x = MagnetoConstants.MARGIN_LEFT + (MagnetoConstants.WIDTH - newWidth) / 2;
-        int y = contentMarginTop + (MagnetoConstants.IMAGE_CONTENT_HEIGHT - newHeight) / 2;
+        int y = contentMarginTop + (imageContentHeight - newHeight) / 2;
 
         XSLFPictureShape shape = slide.createPicture(pic);
         shape.setAnchor(new Rectangle(x, y, newWidth, newHeight));

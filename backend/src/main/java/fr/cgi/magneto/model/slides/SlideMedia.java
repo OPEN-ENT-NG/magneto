@@ -27,7 +27,7 @@ public class SlideMedia extends Slide {
         XSLFSlide slide = ppt.createSlide();
 
         SlideHelper.createTitle(slide, title, MagnetoConstants.TITLE_HEIGHT, MagnetoConstants.TITLE_FONT_SIZE, TextParagraph.TextAlign.LEFT);
-        SlideHelper.createImage(slide, resourceData, fileExtension, MagnetoConstants.CONTENT_MARGIN_TOP);
+        SlideHelper.createImage(slide, resourceData, fileExtension, MagnetoConstants.CONTENT_MARGIN_TOP, MagnetoConstants.IMAGE_CONTENT_HEIGHT);
         SlideHelper.createLegend(slide, caption);
 
         return slide;

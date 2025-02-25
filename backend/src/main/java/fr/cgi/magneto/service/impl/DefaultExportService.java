@@ -1,8 +1,10 @@
 package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.MagnetoConstants;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
+import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.SlideHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
@@ -34,7 +36,7 @@ public class DefaultExportService implements ExportService {
     }
 
     @Override
-    public Future<XMLSlideShow> exportBoardToPPTX(String boardId, UserInfos user) {
+    public Future<XMLSlideShow> exportBoardToPPTX(String boardId, UserInfos user, I18nHelper i18nHelper) {
         return serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
                 .compose(boards -> {
                     if (boards.isEmpty()) {
@@ -55,7 +57,7 @@ public class DefaultExportService implements ExportService {
                                 documentIds.add(imageId);
                                 return getBoardDocuments(documentIds);
                             })
-                            .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents))
+                            .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents, i18nHelper))
                             .onFailure(err -> {
                                 String message = String.format(
                                         "[Magneto@%s::exportBoardToPptx] Failed to get documents: %s",
@@ -139,7 +141,7 @@ public class DefaultExportService implements ExportService {
     }
 
     private Future<XMLSlideShow> createFreeLayoutSlideObjects(Board board, UserInfos user,
-            JsonObject slideShowData, List<Map<String, Object>> documents) {
+                                                              JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
@@ -152,7 +154,7 @@ public class DefaultExportService implements ExportService {
                     SlideFactory slideFactory = new SlideFactory();
 
                     // TITRE
-                    XSLFSlide titleApacheSlide = createTitleSlide(board, documents);
+                    XSLFSlide titleApacheSlide = createTitleSlide(board, documents, i18nHelper);
                     ppt.createSlide().importContent(titleApacheSlide);
 
                     // Utiliser l'ordre des cartes du Board
@@ -184,25 +186,25 @@ public class DefaultExportService implements ExportService {
                 });
     }
 
-    private XSLFSlide createTitleSlide(Board board, List<Map<String, Object>> documents) {
+    private XSLFSlide createTitleSlide(Board board, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
-        SlideHelper.createTitle(slide, board.getTitle(), 100, 100.0, TextParagraph.TextAlign.CENTER);
+        SlideHelper.createTitle(slide, board.getTitle(), MagnetoConstants.MAIN_TITLE_HEIGHT, MagnetoConstants.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
 
         XSLFTextBox textBox = SlideHelper.createContent(slide);
 
         XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
         paragraph.setTextAlign(TextParagraph.TextAlign.CENTER);
         XSLFTextRun textRun = paragraph.addNewTextRun();
-        textRun.setText("Créé par " + board.getOwnerName() + ",");
-        textRun.setFontSize(36.0);
+        textRun.setText(i18nHelper.translate("magneto.slideshow.created.by") + board.getOwnerName() + ",");
+        textRun.setFontSize(MagnetoConstants.CONTENT_FONT_SIZE);
 
         XSLFTextParagraph paragraph2 = textBox.addNewTextParagraph();
         paragraph2.setTextAlign(TextParagraph.TextAlign.CENTER);
         XSLFTextRun textRun2 = paragraph2.addNewTextRun();
-        textRun2.setText("mis à jour le " + board.getModificationDate());
-        textRun2.setFontSize(36.0);
+        textRun2.setText(i18nHelper.translate("magneto.slideshow.updated.the") + board.getModificationDate());
+        textRun2.setFontSize(MagnetoConstants.CONTENT_FONT_SIZE);
 
         String imageUrl = board.getImageUrl();
         String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
@@ -214,7 +216,7 @@ public class DefaultExportService implements ExportService {
             Buffer documentBuffer = (Buffer) documentData.get("buffer");
             String fileExtension = (String) documentData.get("extension");
             if (documentBuffer != null) {
-                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, 300);
+                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, MagnetoConstants.MAIN_CONTENT_MARGIN_TOP);
             }
         }
         return slide;

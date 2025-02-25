@@ -117,13 +117,14 @@ public class DefaultExportService implements ExportService {
                         String fileExtension = filename.contains(".")
                                 ? filename.substring(filename.lastIndexOf(".") + 1)
                                 : "";
-
+                        JsonObject metadata = document.getJsonObject("metadata", new JsonObject());
                         return Future.<Void>future(promise -> {
                             serviceFactory.storage().readFile(fileId, buffer -> {
                                 if (buffer != null) {
                                     Map<String, Object> docInfo = new HashMap<>();
                                     docInfo.put("documentId", documentId);
                                     docInfo.put("buffer", buffer);
+                                    docInfo.put("contentType", metadata.getString("content-type", ""));
                                     docInfo.put("extension", fileExtension);
                                     documents.add(docInfo);
                                     promise.complete();
@@ -230,12 +231,12 @@ public class DefaultExportService implements ExportService {
                         (documentData != null ? "yes" : "no"));
 
                 Buffer documentBuffer = documentData != null ? (Buffer) documentData.get("buffer") : null;
-                String fileExtension = documentData != null ? (String) documentData.get("extension") : "";
+                String contentType = documentData != null ? (String) documentData.get("contentType") : "";
 
-                System.out.println("Final extension: " + fileExtension);
+                System.out.println("Final contentType: " + contentType);
                 System.out.println("Buffer present: " + (documentBuffer != null));
                 propertiesBuilder
-                        .extension(fileExtension)
+                        .contentType(contentType)
                         .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
                         .caption(card.getCaption());
                 break;
@@ -250,42 +251,5 @@ public class DefaultExportService implements ExportService {
         }
 
         return slideFactory.createSlide(resourceType, propertiesBuilder.build());
-    }
-
-    private void copyMediaPartsAndRelationships(XSLFSlide sourceSlide, XSLFSlide destinationSlide) {
-        try {
-            // Récupérer les packages source et destination
-            OPCPackage sourcePackage = sourceSlide.getSlideShow().getPackage();
-            OPCPackage destPackage = destinationSlide.getSlideShow().getPackage();
-
-            // Copier les parties média avec leurs relations
-            for (PackagePart sourcePart : sourcePackage.getParts()) {
-                // Filtrer uniquement les parties média
-                if (sourcePart.getPartName().getName().startsWith("/ppt/media/")) {
-                    PackagePartName newPartName = PackagingURIHelper.createPartName(sourcePart.getPartName().getName());
-
-                    // Vérifier si la partie n'existe pas déjà
-                    if (!destPackage.containPart(newPartName)) {
-                        // Créer la nouvelle partie
-                        PackagePart newPart = destPackage.createPart(newPartName, sourcePart.getContentType());
-
-                        // Copier le contenu
-                        try (InputStream is = sourcePart.getInputStream();
-                                OutputStream os = newPart.getOutputStream()) {
-                            byte[] buffer = new byte[4096];
-                            int bytesRead;
-                            while ((bytesRead = is.read(buffer)) != -1) {
-                                os.write(buffer, 0, bytesRead);
-                            }
-                        }
-
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // Gestion de l'erreur
-            System.err.println("Erreur lors de la copie des parties média : " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 }

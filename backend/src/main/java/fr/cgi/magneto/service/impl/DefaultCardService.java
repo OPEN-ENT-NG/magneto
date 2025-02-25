@@ -96,7 +96,11 @@ public class DefaultCardService implements CardService {
                                     if (card.getSectionId() == null || sections.isEmpty()) {
                                         return Future.succeededFuture(new ArrayList<>());
                                     }
-                                    return this.fetchAllCardsBySection(sections.get(0), 0, user);
+                                    Section section = sections.stream()
+                                            .filter(s -> s.getId().equals(card.getSectionId()))
+                                            .findFirst()
+                                            .orElse(null);
+                                    return this.fetchAllCardsBySection(section, 0, user);
                                 })
                                 .onSuccess(cardsPromise::complete)
                                 .onFailure(cardsPromise::fail);

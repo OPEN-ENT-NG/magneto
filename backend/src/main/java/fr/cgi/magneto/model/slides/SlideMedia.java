@@ -53,7 +53,7 @@ public class SlideMedia extends Slide {
      }
 
     @Override
-    public Object createApacheSlide() {
+    public Object createApacheSlide(XSLFSlide newSlide) {
         // Log au début de la création de la slide
         System.out.println("\nStarting createApacheSlide:");
         System.out.println("Title: " + title);
@@ -61,22 +61,21 @@ public class SlideMedia extends Slide {
         System.out.println("Resource data size: " + (resourceData != null ? resourceData.length : "null") + " bytes");
         System.out.println("File extension: " + fileExtension);
 
-        XMLSlideShow ppt = new XMLSlideShow();
-        XSLFSlide slide = ppt.createSlide();
 
-        SlideHelper.createTitle(slide, title);
+
+        SlideHelper.createTitle(newSlide, title);
         switch (mediaType) {
             case AUDIO:
                 System.out.println("Creating audio slide...");
-                SlideHelper.createAudio(slide, resourceData, fileExtension);
+                SlideHelper.createAudio(newSlide, resourceData, fileExtension);
                 break;
             default:
                 System.out.println("Creating image slide...");
-                SlideHelper.createImage(slide, resourceData, fileExtension);
+                SlideHelper.createImage(newSlide, resourceData, fileExtension);
         }
-        SlideHelper.createLegend(slide, caption);
+        SlideHelper.createLegend(newSlide, caption);
 
         System.out.println("Slide creation completed.");
-        return slide;
+        return newSlide;
     }
 }

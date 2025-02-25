@@ -167,10 +167,8 @@ public class DefaultExportService implements ExportService {
                         if (card != null) {
                             try {
                                 Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
-                                XSLFSlide apacheSlide = (XSLFSlide) slide.createApacheSlide();
                                 XSLFSlide newSlide = ppt.createSlide();
-                                newSlide.importContent(apacheSlide);
-                                copyMediaPartsAndRelationships(apacheSlide, newSlide);
+                                slide.createApacheSlide(newSlide);
                                 // Inspecter le contenu du package après l'ajout de la diapositive
                                 log.info("Package parts after adding slide:");
                                 for (PackagePart part : ppt.getPackage().getParts()) {
@@ -280,6 +278,7 @@ public class DefaultExportService implements ExportService {
                                 os.write(buffer, 0, bytesRead);
                             }
                         }
+
                     }
                 }
             }

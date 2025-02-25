@@ -1,10 +1,18 @@
 package fr.cgi.magneto.helper;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import javax.imageio.ImageIO;
+import javax.xml.namespace.QName;
 
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFHyperlink;
@@ -15,7 +23,21 @@ import org.apache.poi.xslf.usermodel.XSLFTextBox;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import static org.apache.poi.openxml4j.opc.PackageRelationshipTypes.CORE_PROPERTIES_ECMA376_NS;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTHyperlink;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTApplicationNonVisualDrawingProps;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTExtension;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTPicture;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTSlide;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTTLCommonMediaNodeData;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTTLCommonTimeNodeData;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTTimeNodeList;
+import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeIndefinite;
+import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeNodeFillType;
+import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeNodeRestartType;
+import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeNodeType;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.openxml4j.opc.PackagePartName;
@@ -126,99 +148,171 @@ public class SlideHelper {
         return shape;
     }
 
-    public static XSLFTextBox createAudio(XSLFSlide slide, byte[] audioData, String extension) {
-        System.out.println("Début de la fonction createAudio");
-
-        // Validation des paramètres d'entrée
-        if (slide == null || audioData == null || audioData.length == 0 || extension == null || extension.isEmpty()) {
-            System.err.println("Paramètres invalides");
-            return null;
-        }
-
-        System.out.println("Taille des données audio : " + audioData.length + " octets");
-        System.out.println("Extension du fichier : " + extension);
-
-        // Déterminer le type MIME en fonction de l'extension
-        String mimeType;
-        switch (extension.toLowerCase()) {
-            case "mp3":
-                mimeType = "audio/mpeg";
-                break;
-            case "wav":
-                mimeType = "audio/wav";
-                break;
-            case "m4a":
-                mimeType = "audio/mp4";
-                break;
-            default:
-                System.err.println("Format audio non supporté : " + extension);
-                return null;
-        }
-
-        System.out.println("Type MIME déterminé : " + mimeType);
-
-        // Générer un nom de fichier unique pour l'audio
-        String audioFileName = "audio_" + System.currentTimeMillis() + "." + extension;
-        System.out.println("Nom de fichier généré : " + audioFileName);
-
+    public static XSLFPictureShape createAudio(XSLFSlide slide, byte[] audioData, String extension) {
+        System.out.println("=== DÉBUT CRÉATION AUDIO ===");
         try {
-            // Obtenir le package OPC pour accéder au package PowerPoint
+            // Générer un nom pour le fichier audio
+            String audioFileName = "audio_" + System.currentTimeMillis() + "." + extension;
+            System.out.println("Nom fichier audio généré: " + audioFileName);
+    
+            // Déterminer le type MIME
+            String mimeType;
+            switch (extension.toLowerCase()) {
+                case "mp3":
+                    mimeType = "audio/mpeg";
+                    break;
+                case "wav":
+                    mimeType = "audio/wav";
+                    break;
+                case "m4a":
+                    mimeType = "audio/mp4";
+                    break;
+                default:
+                    System.out.println("Extension non supportée: " + extension);
+                    return null;
+            }
+            System.out.println("Type MIME: " + mimeType);
+    
+            // Créer et stocker le fichier audio
             XMLSlideShow ppt = slide.getSlideShow();
             OPCPackage opcPackage = ppt.getPackage();
-
-            // Créer le chemin du fichier audio dans le package
+            System.out.println("Package récupéré: " + opcPackage);
+    
             PackagePartName audioPartName = PackagingURIHelper.createPartName("/ppt/media/" + audioFileName);
-            System.out.println("Chemin créé pour le fichier audio : " + audioPartName);
-
-            // Créer la partie audio dans le package PowerPoint
+            System.out.println("Chemin audio créé: " + audioPartName);
+            
             PackagePart audioPart = opcPackage.createPart(audioPartName, mimeType);
-            System.out.println("Partie audio créée dans le package PowerPoint");
-
-            // Écrire les données audio dans la partie du package
+            System.out.println("Partie audio créée: " + audioPart);
+    
             try (OutputStream out = audioPart.getOutputStream()) {
                 out.write(audioData);
+                System.out.println("Données audio écrites: " + audioData.length + " octets");
             }
-            System.out.println("Données audio écrites dans le fichier");
-
-            // Créer la relation entre le slide et le fichier audio
-            PackageRelationship audioRelationship = slide.getPackagePart().addRelationship(
-                    audioPartName, TargetMode.INTERNAL,
+    
+            // Obtenir la partie du slide
+            PackagePart pp = slide.getPackagePart();
+            System.out.println("Partie du slide: " + pp);
+    
+            // Créer deux relations vers le fichier audio
+            System.out.println("Création des relations...");
+            PackageRelationship prsEmbed = pp.addRelationship(
+                    audioPart.getPartName(), TargetMode.INTERNAL,
+                    "http://schemas.microsoft.com/office/2007/relationships/media");
+            System.out.println("Relation média créée: " + prsEmbed.getId() + " -> " + prsEmbed.getTargetURI());
+    
+            PackageRelationship prsExec = pp.addRelationship(
+                    audioPart.getPartName(), TargetMode.INTERNAL,
                     "http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio");
-            System.out.println("Relation audio ajoutée avec ID : " + audioRelationship.getId());
-
-            // Créer une zone de texte pour afficher un lien vers l'audio
-            XSLFTextBox audioTextBox = slide.createTextBox();
-            audioTextBox.setAnchor(new Rectangle(100, 100, 200, 50)); // Position et taille de la zone de texte
-
-            // Ajouter un paragraphe et un lien hypertexte sur le texte de la zone
-            XSLFTextParagraph paragraph = audioTextBox.addNewTextParagraph();
-            XSLFTextRun textRun = paragraph.addNewTextRun();
-            textRun.setText("▶ Play Audio");
-
-            // Lier le texte à la relation audio
-            XSLFHyperlink hyperlink = textRun.createHyperlink();
-            hyperlink.setAddress("#" + audioRelationship.getId());
+            System.out.println("Relation audio créée: " + prsExec.getId() + " -> " + prsExec.getTargetURI());
+    
+            // Créer l'icône de lecture
+            System.out.println("Création de l'icône...");
+            byte[] iconData = getAudioIcon();
+            System.out.println("Icône générée: " + (iconData != null ? iconData.length : 0) + " octets");
             
-            // Debugging
-            System.out.println("DEBUG HYPERLINK:");
-            System.out.println("Hyperlink Address: #" + audioRelationship.getId());
-            System.out.println("Audio Filename: " + audioFileName);
-            System.out.println("Audio Part Name: " + audioPartName);
-            System.out.println("Relationship Type: " + audioRelationship.getRelationshipType());
-            System.out.println("Target URI: " + audioRelationship.getTargetURI());
-            // Sauvegarder les modifications dans le package
-            opcPackage.flush();
-            System.out.println("Package mis à jour avec succès");
-
-            // Vérifier la structure du package après ajout du fichier audio
-            for (PackagePart part : opcPackage.getParts()) {
-                System.out.println("Partie du package : " + part.getPartName());
+            XSLFPictureData snap = ppt.addPicture(iconData, PictureType.PNG);
+            System.out.println("Image ajoutée au PPT: " + snap.getFileName());
+            
+            XSLFPictureShape pic = slide.createPicture(snap);
+            System.out.println("Forme image créée, ID: " + pic.getShapeId());
+            pic.setAnchor(new Rectangle(50, 50, 100, 100));
+    
+            // Configurer les propriétés de l'image pour le média
+            System.out.println("Configuration du XML...");
+            CTPicture xpic = (CTPicture) pic.getXmlObject();
+            System.out.println("XML de l'image récupéré");
+            
+            CTHyperlink link = xpic.getNvPicPr().getCNvPr().addNewHlinkClick();
+            link.setId("");
+            link.setAction("ppaction://media");
+            System.out.println("Lien hypertexte configuré: " + link.getAction());
+    
+            // Ajouter les propriétés audio
+            CTApplicationNonVisualDrawingProps nvPr = xpic.getNvPicPr().getNvPr();
+            nvPr.addNewAudioFile().setLink(prsExec.getId());
+            System.out.println("Propriété audioFile configurée avec ID: " + prsExec.getId());
+    
+            // Ajouter l'extension média
+            CTExtension ext = nvPr.addNewExtLst().addNewExt();
+            ext.setUri("{DAA4B4D4-6D71-4841-9C94-3DE7FCFB9230}");
+            System.out.println("Extension ajoutée avec URI: " + ext.getUri());
+    
+            // Configurer l'élément p14:media
+            String p14Ns = "http://schemas.microsoft.com/office/powerpoint/2010/main";
+            try (XmlCursor cur = ext.newCursor()) {
+                cur.toEndToken();
+                System.out.println("Curseur positionné à la fin de l'extension");
+                cur.beginElement(new QName(p14Ns, "media", "p14"));
+                System.out.println("Élément p14:media créé");
+                cur.insertNamespace("p14", p14Ns);
+                cur.insertNamespace("r", CORE_PROPERTIES_ECMA376_NS);
+                System.out.println("Namespaces p14 et r insérés");
+                
+                // CHANGEMENT: Utiliser embed au lieu de link
+                System.out.println("Tentative d'insertion de l'attribut embed avec ID: " + prsEmbed.getId());
+                cur.insertAttributeWithValue(
+                    new QName(CORE_PROPERTIES_ECMA376_NS, "embed"), 
+                    prsEmbed.getId());
+                System.out.println("Attribut embed inséré");
             }
-
-            System.out.println("Fonction createAudio terminée avec succès");
-            return audioTextBox;
+    
+            // S'assurer que le blipFill utilise le bon ID pour l'image
+            System.out.println("Vérification de la référence de l'image...");
+            String imageRelId = slide.getRelationId(snap);
+            if (imageRelId != null) {
+                xpic.getBlipFill().getBlip().setEmbed(imageRelId);
+                System.out.println("BlipFill configuré avec ID d'image: " + imageRelId);
+            } else {
+                System.out.println("Avertissement: Impossible de trouver la relation pour l'image");
+            }
+    
+            // Ajouter la section timing - CRUCIAL
+            System.out.println("Ajout des informations de timing...");
+            CTSlide xslide = slide.getXmlObject();
+            CTTimeNodeList ctnl;
+    
+            if (!xslide.isSetTiming()) {
+                System.out.println("Timing non défini, création...");
+                CTTLCommonTimeNodeData ctn = xslide.addNewTiming().addNewTnLst().addNewPar().addNewCTn();
+                // CHANGEMENT: Ajouter ID au nœud temporel racine
+                ctn.setId(1);
+                ctn.setDur(STTLTimeIndefinite.INDEFINITE);
+                ctn.setRestart(STTLTimeNodeRestartType.NEVER);
+                ctn.setNodeType(STTLTimeNodeType.TM_ROOT);
+                System.out.println("Timing root créé avec ID: 1");
+                ctnl = ctn.addNewChildTnLst();
+                System.out.println("Liste des nœuds enfants créée");
+            } else {
+                System.out.println("Timing déjà défini, récupération...");
+                ctnl = xslide.getTiming().getTnLst().getParArray(0).getCTn().getChildTnLst();
+            }
+    
+            // Utiliser addNewAudio() au lieu de addNewVideo()
+            System.out.println("Ajout du nœud audio...");
+            CTTLCommonMediaNodeData cmedia = ctnl.addNewAudio().addNewCMediaNode();
+            cmedia.setVol(80000);
+            System.out.println("Volume configuré: 80000");
+            
+            CTTLCommonTimeNodeData ctn = cmedia.addNewCTn();
+            // CHANGEMENT: Ajouter ID au nœud temporel audio
+            ctn.setId(2);
+            ctn.setFill(STTLTimeNodeFillType.HOLD);
+            ctn.setDisplay(false);
+            System.out.println("Propriétés du nœud temporel configurées avec ID: 2");
+            
+            ctn.addNewStCondLst().addNewCond().setDelay(STTLTimeIndefinite.INDEFINITE);
+            System.out.println("Condition de démarrage ajoutée");
+            
+            cmedia.addNewTgtEl().addNewSpTgt().setSpid(pic.getShapeId());
+            System.out.println("Cible du média configurée avec ID: " + pic.getShapeId());
+    
+            // Afficher le XML pour le débogage
+            System.out.println("XML final du slide: " + xslide);
+    
+            System.out.println("=== CRÉATION AUDIO TERMINÉE AVEC SUCCÈS ===");
+            return pic;
         } catch (Exception e) {
-            System.err.println("Erreur lors de l'ajout de l'audio : " + e.getMessage());
+            System.out.println("=== ERREUR LORS DE LA CRÉATION AUDIO ===");
             e.printStackTrace();
             return null;
         }
@@ -237,5 +331,51 @@ public class SlideHelper {
         }
 
         return PictureType.PNG;
+    }
+
+    private static byte[] getAudioIcon() {
+        try {
+            // Créer une image de 100x100 pixels avec un fond transparent
+            BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+
+            // Obtenir le contexte graphique
+            Graphics2D g2d = image.createGraphics();
+
+            // Activer l'antialiasing pour des bords plus lisses
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Dessiner un cercle comme fond (bleu clair)
+            g2d.setColor(new Color(0, 120, 215, 240));
+            g2d.fillOval(5, 5, 90, 90);
+
+            // Dessiner un triangle de lecture (blanc)
+            g2d.setColor(Color.WHITE);
+            int[] xPoints = { 35, 70, 35 };
+            int[] yPoints = { 30, 50, 70 };
+            g2d.fillPolygon(xPoints, yPoints, 3);
+
+            // Libérer les ressources
+            g2d.dispose();
+
+            // Convertir l'image en tableau de bytes (PNG)
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            // En cas d'erreur, retourner un tableau d'octets minimal pour un fichier PNG
+            // (Cela créera une image minuscule mais valide)
+            return new byte[] {
+                    (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
+                    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08,
+                    0x02, 0x00, 0x00, 0x00, (byte) 0x90, 0x77, 0x53, (byte) 0xDE, 0x00, 0x00, 0x00,
+                    0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, (byte) 0xD7, 0x63, (byte) 0xF8, (byte) 0xCF,
+                    (byte) 0xC0, 0x00, 0x00, 0x03, 0x01, 0x01, 0x00, (byte) 0x18, (byte) 0xDD, (byte) 0x8D,
+                    (byte) 0xB0, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, (byte) 0xAE, 0x42,
+                    0x60, (byte) 0x82
+            };
+        }
     }
 }

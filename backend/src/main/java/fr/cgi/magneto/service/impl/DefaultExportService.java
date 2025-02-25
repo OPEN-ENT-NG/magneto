@@ -1,20 +1,9 @@
 package fr.cgi.magneto.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.entcore.common.user.UserInfos;
-
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
+import fr.cgi.magneto.helper.SlideHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.properties.SlideProperties;
@@ -28,6 +17,12 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.poi.sl.usermodel.TextParagraph;
+import org.apache.poi.xslf.usermodel.*;
+import org.entcore.common.user.UserInfos;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DefaultExportService implements ExportService {
 
@@ -55,9 +50,9 @@ public class DefaultExportService implements ExportService {
                     return serviceFactory.boardService()
                             .getAllDocumentIds(boardId, user)
                             .compose(documentIds -> {
-                                if (documentIds.isEmpty()) {
-                                    return Future.succeededFuture(new ArrayList<>());
-                                }
+                                String imageUrl = board.getImageUrl();
+                                String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                                documentIds.add(imageId);
                                 return getBoardDocuments(documentIds);
                             })
                             .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents))
@@ -97,47 +92,50 @@ public class DefaultExportService implements ExportService {
         List<Future> futures = new ArrayList<>();
 
         for (String documentId : documentIds) {
-            Future<Void> future = serviceFactory.workSpaceService().getDocument(documentId)
-                    .compose(document -> {
-                        String fileId = document.getString("file");
-                        if (fileId == null) {
-                            log.warn("File ID is null for document: " + documentId);
-                            return Future.succeededFuture();
-                        }
-
-                        String filename = document.getJsonObject("metadata", new JsonObject())
-                                .getString("filename", "");
-                        String fileExtension = filename.contains(".")
-                                ? filename.substring(filename.lastIndexOf(".") + 1)
-                                : "";
-
-                        return Future.<Void>future(promise -> {
-                            serviceFactory.storage().readFile(fileId, buffer -> {
-                                if (buffer != null) {
-                                    Map<String, Object> docInfo = new HashMap<>();
-                                    docInfo.put("documentId", documentId);
-                                    docInfo.put("buffer", buffer);
-                                    docInfo.put("extension", fileExtension);
-                                    documents.add(docInfo);
-                                    promise.complete();
-                                } else {
-                                    log.warn("Could not read file for document: " + documentId);
-                                    promise.complete();
-                                }
-                            });
-                        });
-                    })
-                    .recover(err -> {
-                        log.warn("Error processing document " + documentId + ": " + err.getMessage());
-                        return Future.succeededFuture();
-                    });
-
+            Future<Void> future = fetchDocumentFile(documentId, documents);
             futures.add(future);
         }
 
         return CompositeFuture.all(futures)
                 .map(v -> documents)
                 .otherwiseEmpty();
+    }
+
+    private Future<Void> fetchDocumentFile(String documentId, List<Map<String, Object>> documents) {
+        return serviceFactory.workSpaceService().getDocument(documentId)
+                .compose(document -> {
+                    String fileId = document.getString("file");
+                    if (fileId == null) {
+                        log.warn("File ID is null for document: " + documentId);
+                        return Future.succeededFuture();
+                    }
+
+                    String filename = document.getJsonObject("metadata", new JsonObject())
+                            .getString("filename", "");
+                    String fileExtension = filename.contains(".")
+                            ? filename.substring(filename.lastIndexOf(".") + 1)
+                            : "";
+
+                    return Future.<Void>future(promise -> {
+                        serviceFactory.storage().readFile(fileId, buffer -> {
+                            if (buffer != null) {
+                                Map<String, Object> docInfo = new HashMap<>();
+                                docInfo.put("documentId", documentId);
+                                docInfo.put("buffer", buffer);
+                                docInfo.put("extension", fileExtension);
+                                documents.add(docInfo);
+                                promise.complete();
+                            } else {
+                                log.warn("Could not read file for document: " + documentId);
+                                promise.complete();
+                            }
+                        });
+                    });
+                })
+                .recover(err -> {
+                    log.warn("Error processing document " + documentId + ": " + err.getMessage());
+                    return Future.succeededFuture();
+                });
     }
 
     private Future<XMLSlideShow> createFreeLayoutSlideObjects(Board board, UserInfos user,
@@ -152,6 +150,10 @@ public class DefaultExportService implements ExportService {
                             .collect(Collectors.toMap(Card::getId, card -> card));
 
                     SlideFactory slideFactory = new SlideFactory();
+
+                    // TITRE
+                    XSLFSlide titleApacheSlide = createTitleSlide(board, documents);
+                    ppt.createSlide().importContent(titleApacheSlide);
 
                     // Utiliser l'ordre des cartes du Board
                     for (Card boardCard : board.cards()) {
@@ -182,8 +184,44 @@ public class DefaultExportService implements ExportService {
                 });
     }
 
+    private XSLFSlide createTitleSlide(Board board, List<Map<String, Object>> documents) {
+        XMLSlideShow ppt = new XMLSlideShow();
+        XSLFSlide slide = ppt.createSlide();
+
+        SlideHelper.createTitle(slide, board.getTitle(), 100, 100.0, TextParagraph.TextAlign.CENTER);
+
+        XSLFTextBox textBox = SlideHelper.createContent(slide);
+
+        XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
+        paragraph.setTextAlign(TextParagraph.TextAlign.CENTER);
+        XSLFTextRun textRun = paragraph.addNewTextRun();
+        textRun.setText("Créé par " + board.getOwnerName() + ",");
+        textRun.setFontSize(36.0);
+
+        XSLFTextParagraph paragraph2 = textBox.addNewTextParagraph();
+        paragraph2.setTextAlign(TextParagraph.TextAlign.CENTER);
+        XSLFTextRun textRun2 = paragraph2.addNewTextRun();
+        textRun2.setText("mis à jour le " + board.getModificationDate());
+        textRun2.setFontSize(36.0);
+
+        String imageUrl = board.getImageUrl();
+        String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+        Map<String, Object> documentData = documents.stream()
+                .filter(doc -> imageId.equals(doc.get("documentId")))
+                .findFirst()
+                .orElse(null);
+        if (documentData != null) {
+            Buffer documentBuffer = (Buffer) documentData.get("buffer");
+            String fileExtension = (String) documentData.get("extension");
+            if (documentBuffer != null) {
+                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, 300);
+            }
+        }
+        return slide;
+    }
+
     private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData,
-            List<Map<String, Object>> documents) {
+                                      List<Map<String, Object>> documents) {
         SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
                 .title(card.getTitle())
                 .description(card.getDescription());

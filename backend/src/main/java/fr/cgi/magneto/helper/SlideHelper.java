@@ -1,20 +1,12 @@
 package fr.cgi.magneto.helper;
 
-import java.awt.Rectangle;
-
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFPictureData;
-import org.apache.poi.xslf.usermodel.XSLFPictureShape;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
-import org.apache.poi.xslf.usermodel.XSLFTextShape;
-
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
 import org.apache.poi.sl.usermodel.Placeholder;
 import org.apache.poi.sl.usermodel.PlaceholderDetails;
 import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
+import org.apache.poi.xslf.usermodel.*;
+
+import java.awt.*;
 
 public class SlideHelper {
     private static final int MARGIN_LEFT = 140;
@@ -32,11 +24,12 @@ public class SlideHelper {
     private static final int CONTENT_HEIGHT = 520;
     private static final int CONTENT_MARGIN_TOP = 140;
 
-    private static final int IMAGE_CONTENT_HEIGHT = 480;
+    private static final int IMAGE_CONTENT_HEIGHT = 250;
 
-    public static XSLFTextBox createTitle(XSLFSlide slide, String title) {
+    public static XSLFTextBox createTitle(XSLFSlide slide, String title, int titleHeight, Double titleFontSize,
+                                          TextAlign titleTextAlign) {
         XSLFTextShape titleShape = slide.createTextBox();
-        titleShape.setAnchor(new Rectangle(MARGIN_LEFT, MARGIN_TOP_TITLE, WIDTH, TITLE_HEIGHT));
+        titleShape.setAnchor(new Rectangle(MARGIN_LEFT, MARGIN_TOP_TITLE, WIDTH, titleHeight));
 
         PlaceholderDetails phDetails = titleShape.getPlaceholderDetails();
         if (phDetails != null) {
@@ -47,10 +40,10 @@ public class SlideHelper {
         titleShape.setText(title);
 
         XSLFTextParagraph para = titleShape.getTextParagraphs().get(0);
-        para.setTextAlign(TextAlign.LEFT);
+        para.setTextAlign(titleTextAlign);
 
         XSLFTextRun run = para.getTextRuns().get(0);
-        run.setFontSize(TITLE_FONT_SIZE);
+        run.setFontSize(titleFontSize);
 
         return (XSLFTextBox) titleShape;
     }
@@ -82,7 +75,7 @@ public class SlideHelper {
         return contentBox;
     }
 
-    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String extension) {
+    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String extension, int contentMarginTop) {
         XMLSlideShow ppt = slide.getSlideShow();
 
         XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromExtension(extension));
@@ -100,7 +93,7 @@ public class SlideHelper {
         }
 
         int x = MARGIN_LEFT + (WIDTH - newWidth) / 2;
-        int y = CONTENT_MARGIN_TOP + (IMAGE_CONTENT_HEIGHT - newHeight) / 2;
+        int y = contentMarginTop + (IMAGE_CONTENT_HEIGHT - newHeight) / 2;
 
         XSLFPictureShape shape = slide.createPicture(pic);
         shape.setAnchor(new Rectangle(x, y, newWidth, newHeight));

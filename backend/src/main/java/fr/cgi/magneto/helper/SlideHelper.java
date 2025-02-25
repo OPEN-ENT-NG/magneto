@@ -194,11 +194,11 @@ public class SlideHelper {
             System.out.println("Icône générée: " + (iconData != null ? iconData.length : 0) + " octets");
 
             XSLFPictureData snap = ppt.addPicture(iconData, PictureType.PNG);
+
             System.out.println("Image ajoutée au PPT: " + snap.getFileName());
 
-            XSLFPictureShape pic = slide.createPicture(snap);
+            XSLFPictureShape pic = createAndPositionMediaIcon(slide, iconData);
             System.out.println("Forme image créée, ID: " + pic.getShapeId());
-            pic.setAnchor(new Rectangle(50, 50, 100, 100));
 
             // Configurer les propriétés de l'image pour le média
             System.out.println("Configuration du XML...");
@@ -341,6 +341,31 @@ public class SlideHelper {
                 System.out.println("Content type non reconnu: " + contentType + ", utilisation de PNG par défaut");
                 return PictureType.PNG;
         }
+    }
+
+    private static XSLFPictureShape createAndPositionMediaIcon(XSLFSlide slide, byte[] iconData) {
+        System.out.println("Création et positionnement de l'icône audio...");
+
+        XMLSlideShow ppt = slide.getSlideShow();
+        XSLFPictureData snap = ppt.addPicture(iconData, PictureType.PNG);
+        System.out.println("Image ajoutée au PPT: " + snap.getFileName());
+
+        XSLFPictureShape pic = slide.createPicture(snap);
+        System.out.println("Forme image créée, ID: " + pic.getShapeId());
+
+        // Définir une taille plus grande
+        int iconWidth = 150;
+        int iconHeight = 150;
+
+        // Calculer la position verticale centrée
+        int y = (SLIDE_HEIGHT - iconHeight) / 2; // Centre vertical
+
+        // Utiliser le MARGIN_LEFT existant pour l'alignement horizontal
+        pic.setAnchor(new Rectangle(MARGIN_LEFT, y, iconWidth, iconHeight));
+        System.out.println("Position de l'icône ajustée: x=" + MARGIN_LEFT + ", y=" + y +
+                ", width=" + iconWidth + ", height=" + iconHeight);
+
+        return pic;
     }
 
     private static byte[] getAudioIcon() {

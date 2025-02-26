@@ -135,6 +135,7 @@ public class Field {
     public static final String CHARSET = "charset";
     public static final String SIZE = "size";
     public static final String METADATA = "metadata";
+    public static final String CONTENTTYPE = "contentType";
     public static final String INDEX = "index";
 
     public static final String PROFILURI = "profilUri";

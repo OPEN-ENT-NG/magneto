@@ -1,6 +1,8 @@
 package fr.cgi.magneto.helper;
 
 import fr.cgi.magneto.core.constants.Slideshow;
+import fr.cgi.magneto.model.slides.SlideMedia;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -45,16 +47,14 @@ import org.apache.poi.sl.usermodel.PictureData.PictureType;
 import org.apache.poi.sl.usermodel.Placeholder;
 import org.apache.poi.sl.usermodel.PlaceholderDetails;
 import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
-import org.apache.poi.xslf.usermodel.*;
-
-import java.awt.*;
 
 public class SlideHelper {
-    
+
     public static XSLFTextBox createTitle(XSLFSlide slide, String title, int titleHeight, Double titleFontSize,
-                                          TextAlign titleTextAlign) {
+            TextAlign titleTextAlign) {
         XSLFTextShape titleShape = slide.createTextBox();
-        titleShape.setAnchor(new Rectangle(Slideshow.MARGIN_LEFT, Slideshow.MARGIN_TOP_TITLE, Slideshow.WIDTH, titleHeight));
+        titleShape.setAnchor(
+                new Rectangle(Slideshow.MARGIN_LEFT, Slideshow.MARGIN_TOP_TITLE, Slideshow.WIDTH, titleHeight));
 
         PlaceholderDetails phDetails = titleShape.getPlaceholderDetails();
         if (phDetails != null) {
@@ -96,11 +96,13 @@ public class SlideHelper {
 
     public static XSLFTextBox createContent(XSLFSlide slide) {
         XSLFTextBox contentBox = slide.createTextBox();
-        contentBox.setAnchor(new Rectangle(Slideshow.MARGIN_LEFT, Slideshow.CONTENT_MARGIN_TOP, Slideshow.WIDTH, Slideshow.CONTENT_HEIGHT));
+        contentBox.setAnchor(new Rectangle(Slideshow.MARGIN_LEFT, Slideshow.CONTENT_MARGIN_TOP, Slideshow.WIDTH,
+                Slideshow.CONTENT_HEIGHT));
         return contentBox;
     }
 
-    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String fileContentType, int contentMarginTop, int imageContentHeight) {
+    public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String fileContentType,
+            int contentMarginTop, int imageContentHeight) {
         XMLSlideShow ppt = slide.getSlideShow();
 
         XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromContentType(fileContentType));
@@ -126,305 +128,120 @@ public class SlideHelper {
         return shape;
     }
 
-    public static XSLFPictureShape createAudio(XSLFSlide slide, byte[] audioData, String fileContentType) {
-        System.out.println("=== DÉBUT CRÉATION AUDIO ===");
-        String extension = getExtensionFromContentType(fileContentType);
-        try {
-            // Générer un nom pour le fichier audio
-            String audioFileName = "audio_" + System.currentTimeMillis() + "." + extension;
-            System.out.println("Nom fichier audio généré: " + audioFileName);
+    public static XSLFPictureShape createMedia(XSLFSlide slide, byte[] mediaData, String fileContentType,
+            SlideMedia.MediaType mediaType) {
 
-            // Créer et stocker le fichier audio
+        if (mediaType != SlideMedia.MediaType.AUDIO && mediaType != SlideMedia.MediaType.VIDEO) {
+            throw new IllegalArgumentException("Type de média non supporté: " + mediaType);
+        }
+
+        boolean isAudio = mediaType == SlideMedia.MediaType.AUDIO;
+        String extension = getExtensionFromContentType(fileContentType);
+
+        try {
+            // Générer un nom pour le fichier média
+            String mediaTypeStr = isAudio ? Slideshow.MEDIA_TYPE_AUDIO : Slideshow.MEDIA_TYPE_VIDEO;
+            String mediaFileName = mediaTypeStr + "_" + System.currentTimeMillis() + "." + extension;
+
+            // Créer et stocker le fichier média
             XMLSlideShow ppt = slide.getSlideShow();
             OPCPackage opcPackage = ppt.getPackage();
-            System.out.println("Package récupéré: " + opcPackage);
 
-            PackagePartName audioPartName = PackagingURIHelper.createPartName("/ppt/media/" + audioFileName);
-            System.out.println("Chemin audio créé: " + audioPartName);
+            PackagePartName mediaPartName = PackagingURIHelper
+                    .createPartName(Slideshow.MEDIA_PATH_PREFIX + mediaFileName);
+            PackagePart mediaPart = opcPackage.createPart(mediaPartName, fileContentType);
 
-            PackagePart audioPart = opcPackage.createPart(audioPartName, fileContentType);
-            System.out.println("Partie audio créée: " + audioPart);
-
-            try (OutputStream out = audioPart.getOutputStream()) {
-                out.write(audioData);
-                System.out.println("Données audio écrites: " + audioData.length + " octets");
+            try (OutputStream out = mediaPart.getOutputStream()) {
+                out.write(mediaData);
             }
 
             // Obtenir la partie du slide
             PackagePart pp = slide.getPackagePart();
-            System.out.println("Partie du slide: " + pp);
 
-            // Créer deux relations vers le fichier audio
-            System.out.println("Création des relations...");
+            // Créer deux relations vers le fichier média
             PackageRelationship prsEmbed = pp.addRelationship(
-                    audioPart.getPartName(), TargetMode.INTERNAL,
-                    "http://schemas.microsoft.com/office/2007/relationships/media");
-            System.out.println("Relation média créée: " + prsEmbed.getId() + " -> " + prsEmbed.getTargetURI());
+                    mediaPart.getPartName(), TargetMode.INTERNAL,
+                    Slideshow.RELATIONSHIP_MEDIA);
 
+            String execRelationship = isAudio ? Slideshow.RELATIONSHIP_AUDIO : Slideshow.RELATIONSHIP_VIDEO;
             PackageRelationship prsExec = pp.addRelationship(
-                    audioPart.getPartName(), TargetMode.INTERNAL,
-                    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/audio");
-            System.out.println("Relation audio créée: " + prsExec.getId() + " -> " + prsExec.getTargetURI());
+                    mediaPart.getPartName(), TargetMode.INTERNAL,
+                    execRelationship);
 
-            // Créer l'icône de lecture
-            System.out.println("Création de l'icône...");
-            byte[] iconData = getAudioIcon();
-            System.out.println("Icône générée: " + (iconData != null ? iconData.length : 0) + " octets");
-
+            // Créer l'icône ou la miniature
+            byte[] iconData = isAudio ? getAudioIcon() : getVideoThumbnail(mediaData, extension);
             XSLFPictureData snap = ppt.addPicture(iconData, PictureType.PNG);
 
-            System.out.println("Image ajoutée au PPT: " + snap.getFileName());
-
-            XSLFPictureShape pic = createAndPositionMediaIcon(slide, iconData);
-            System.out.println("Forme image créée, ID: " + pic.getShapeId());
+            XSLFPictureShape pic = isAudio ? createAndPositionMediaIcon(slide, iconData)
+                    : createAndPositionVideoThumbnail(slide, iconData);
 
             // Configurer les propriétés de l'image pour le média
-            System.out.println("Configuration du XML...");
             CTPicture xpic = (CTPicture) pic.getXmlObject();
-            System.out.println("XML de l'image récupéré");
 
             CTHyperlink link = xpic.getNvPicPr().getCNvPr().addNewHlinkClick();
             link.setId("");
-            link.setAction("ppaction://media");
-            System.out.println("Lien hypertexte configuré: " + link.getAction());
+            link.setAction(Slideshow.ACTION_MEDIA);
 
-            // Ajouter les propriétés audio
+            // Ajouter les propriétés au média
             CTApplicationNonVisualDrawingProps nvPr = xpic.getNvPicPr().getNvPr();
-            nvPr.addNewAudioFile().setLink(prsExec.getId());
-            System.out.println("Propriété audioFile configurée avec ID: " + prsExec.getId());
+            if (isAudio) {
+                nvPr.addNewAudioFile().setLink(prsExec.getId());
+            } else {
+                nvPr.addNewVideoFile().setLink(prsExec.getId());
+            }
 
             // Ajouter l'extension média
             CTExtension ext = nvPr.addNewExtLst().addNewExt();
-            ext.setUri("{DAA4B4D4-6D71-4841-9C94-3DE7FCFB9230}");
-            System.out.println("Extension ajoutée avec URI: " + ext.getUri());
+            ext.setUri(Slideshow.EXTENSION_URI_MEDIA);
 
             // Configurer l'élément p14:media
-            String p14Ns = "http://schemas.microsoft.com/office/powerpoint/2010/main";
             try (XmlCursor cur = ext.newCursor()) {
                 cur.toEndToken();
-                System.out.println("Curseur positionné à la fin de l'extension");
-                cur.beginElement(new QName(p14Ns, "media", "p14"));
-                System.out.println("Élément p14:media créé");
-                cur.insertNamespace("p14", p14Ns);
+                cur.beginElement(new QName(Slideshow.NAMESPACE_POWERPOINT_2010, "media", "p14"));
+                cur.insertNamespace("p14", Slideshow.NAMESPACE_POWERPOINT_2010);
                 cur.insertNamespace("r", CORE_PROPERTIES_ECMA376_NS);
-                System.out.println("Namespaces p14 et r insérés");
-
-                // CHANGEMENT: Utiliser embed au lieu de link
-                System.out.println("Tentative d'insertion de l'attribut embed avec ID: " + prsEmbed.getId());
                 cur.insertAttributeWithValue(
                         new QName(CORE_PROPERTIES_ECMA376_NS, "embed"),
                         prsEmbed.getId());
-                System.out.println("Attribut embed inséré");
             }
 
             // S'assurer que le blipFill utilise le bon ID pour l'image
-            System.out.println("Vérification de la référence de l'image...");
             String imageRelId = slide.getRelationId(snap);
             if (imageRelId != null) {
                 xpic.getBlipFill().getBlip().setEmbed(imageRelId);
-                System.out.println("BlipFill configuré avec ID d'image: " + imageRelId);
-            } else {
-                System.out.println("Avertissement: Impossible de trouver la relation pour l'image");
             }
 
             // Ajouter la section timing - CRUCIAL
-            System.out.println("Ajout des informations de timing...");
             CTSlide xslide = slide.getXmlObject();
             CTTimeNodeList ctnl;
 
             if (!xslide.isSetTiming()) {
-                System.out.println("Timing non défini, création...");
                 CTTLCommonTimeNodeData ctn = xslide.addNewTiming().addNewTnLst().addNewPar().addNewCTn();
-                // CHANGEMENT: Ajouter ID au nœud temporel racine
-                ctn.setId(1);
+                ctn.setId(Slideshow.TIMING_ROOT_ID);
                 ctn.setDur(STTLTimeIndefinite.INDEFINITE);
                 ctn.setRestart(STTLTimeNodeRestartType.NEVER);
                 ctn.setNodeType(STTLTimeNodeType.TM_ROOT);
-                System.out.println("Timing root créé avec ID: 1");
                 ctnl = ctn.addNewChildTnLst();
-                System.out.println("Liste des nœuds enfants créée");
             } else {
-                System.out.println("Timing déjà défini, récupération...");
                 ctnl = xslide.getTiming().getTnLst().getParArray(0).getCTn().getChildTnLst();
             }
 
-            // Utiliser addNewAudio() au lieu de addNewVideo()
-            System.out.println("Ajout du nœud audio...");
-            CTTLCommonMediaNodeData cmedia = ctnl.addNewAudio().addNewCMediaNode();
-            cmedia.setVol(80000);
-            System.out.println("Volume configuré: 80000");
+            // Ajouter le nœud média approprié (audio ou vidéo)
+            CTTLCommonMediaNodeData cmedia = isAudio ? ctnl.addNewAudio().addNewCMediaNode()
+                    : ctnl.addNewVideo().addNewCMediaNode();
+            cmedia.setVol(Slideshow.MEDIA_VOLUME);
 
             CTTLCommonTimeNodeData ctn = cmedia.addNewCTn();
-            // CHANGEMENT: Ajouter ID au nœud temporel audio
-            ctn.setId(2);
+            ctn.setId(Slideshow.TIMING_MEDIA_ID);
             ctn.setFill(STTLTimeNodeFillType.HOLD);
             ctn.setDisplay(false);
-            System.out.println("Propriétés du nœud temporel configurées avec ID: 2");
 
             ctn.addNewStCondLst().addNewCond().setDelay(STTLTimeIndefinite.INDEFINITE);
-            System.out.println("Condition de démarrage ajoutée");
 
             cmedia.addNewTgtEl().addNewSpTgt().setSpid(pic.getShapeId());
-            System.out.println("Cible du média configurée avec ID: " + pic.getShapeId());
 
-            // Afficher le XML pour le débogage
-            System.out.println("XML final du slide: " + xslide);
-
-            System.out.println("=== CRÉATION AUDIO TERMINÉE AVEC SUCCÈS ===");
             return pic;
         } catch (Exception e) {
-            System.out.println("=== ERREUR LORS DE LA CRÉATION AUDIO ===");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static XSLFPictureShape createVideo(XSLFSlide slide, byte[] videoData, String fileContentType) {
-        System.out.println("=== DÉBUT CRÉATION VIDÉO ===");
-        String extension = getExtensionFromContentType(fileContentType);
-        try {
-            // Générer un nom pour le fichier vidéo
-            String videoFileName = "video_" + System.currentTimeMillis() + "." + extension;
-            System.out.println("Nom fichier vidéo généré: " + videoFileName);
-
-            // Créer et stocker le fichier vidéo
-            XMLSlideShow ppt = slide.getSlideShow();
-            OPCPackage opcPackage = ppt.getPackage();
-            System.out.println("Package récupéré: " + opcPackage);
-
-            PackagePartName videoPartName = PackagingURIHelper.createPartName("/ppt/media/" + videoFileName);
-            System.out.println("Chemin vidéo créé: " + videoPartName);
-
-            PackagePart videoPart = opcPackage.createPart(videoPartName, fileContentType);
-            System.out.println("Partie vidéo créée: " + videoPart);
-
-            try (OutputStream out = videoPart.getOutputStream()) {
-                out.write(videoData);
-                System.out.println("Données vidéo écrites: " + videoData.length + " octets");
-            }
-
-            // Obtenir la partie du slide
-            PackagePart pp = slide.getPackagePart();
-            System.out.println("Partie du slide: " + pp);
-
-            // Créer deux relations vers le fichier vidéo
-            System.out.println("Création des relations...");
-            PackageRelationship prsEmbed = pp.addRelationship(
-                    videoPart.getPartName(), TargetMode.INTERNAL,
-                    "http://schemas.microsoft.com/office/2007/relationships/media");
-            System.out.println("Relation média créée: " + prsEmbed.getId() + " -> " + prsEmbed.getTargetURI());
-
-            PackageRelationship prsExec = pp.addRelationship(
-                    videoPart.getPartName(), TargetMode.INTERNAL,
-                    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/video");
-            System.out.println("Relation vidéo créée: " + prsExec.getId() + " -> " + prsExec.getTargetURI());
-
-            // Créer une miniature de la vidéo
-            System.out.println("Création de la miniature...");
-            byte[] thumbnailData = getVideoThumbnail(videoData, extension);
-            System.out.println("Miniature générée: " + (thumbnailData != null ? thumbnailData.length : 0) + " octets");
-
-            XSLFPictureData snap = ppt.addPicture(thumbnailData, PictureType.PNG);
-            System.out.println("Image ajoutée au PPT: " + snap.getFileName());
-
-            // Positionner la miniature vidéo dans le slide
-            XSLFPictureShape pic = createAndPositionVideoThumbnail(slide, thumbnailData);
-            System.out.println("Forme image créée, ID: " + pic.getShapeId());
-
-            // Configurer les propriétés de l'image pour le média
-            System.out.println("Configuration du XML...");
-            CTPicture xpic = (CTPicture) pic.getXmlObject();
-            System.out.println("XML de l'image récupéré");
-
-            CTHyperlink link = xpic.getNvPicPr().getCNvPr().addNewHlinkClick();
-            link.setId("");
-            link.setAction("ppaction://media");
-            System.out.println("Lien hypertexte configuré: " + link.getAction());
-
-            // Ajouter les propriétés vidéo
-            CTApplicationNonVisualDrawingProps nvPr = xpic.getNvPicPr().getNvPr();
-            // Pour vidéo, utiliser videoFile au lieu de audioFile
-            nvPr.addNewVideoFile().setLink(prsExec.getId());
-            System.out.println("Propriété videoFile configurée avec ID: " + prsExec.getId());
-
-            // Ajouter l'extension média
-            CTExtension ext = nvPr.addNewExtLst().addNewExt();
-            ext.setUri("{DAA4B4D4-6D71-4841-9C94-3DE7FCFB9230}");
-            System.out.println("Extension ajoutée avec URI: " + ext.getUri());
-
-            // Configurer l'élément p14:media
-            String p14Ns = "http://schemas.microsoft.com/office/powerpoint/2010/main";
-            try (XmlCursor cur = ext.newCursor()) {
-                cur.toEndToken();
-                System.out.println("Curseur positionné à la fin de l'extension");
-                cur.beginElement(new QName(p14Ns, "media", "p14"));
-                System.out.println("Élément p14:media créé");
-                cur.insertNamespace("p14", p14Ns);
-                cur.insertNamespace("r", CORE_PROPERTIES_ECMA376_NS);
-                System.out.println("Namespaces p14 et r insérés");
-
-                System.out.println("Tentative d'insertion de l'attribut embed avec ID: " + prsEmbed.getId());
-                cur.insertAttributeWithValue(
-                        new QName(CORE_PROPERTIES_ECMA376_NS, "embed"),
-                        prsEmbed.getId());
-                System.out.println("Attribut embed inséré");
-            }
-
-            // S'assurer que le blipFill utilise le bon ID pour l'image
-            System.out.println("Vérification de la référence de l'image...");
-            String imageRelId = slide.getRelationId(snap);
-            if (imageRelId != null) {
-                xpic.getBlipFill().getBlip().setEmbed(imageRelId);
-                System.out.println("BlipFill configuré avec ID d'image: " + imageRelId);
-            } else {
-                System.out.println("Avertissement: Impossible de trouver la relation pour l'image");
-            }
-
-            // Ajouter la section timing - CRUCIAL
-            System.out.println("Ajout des informations de timing...");
-            CTSlide xslide = slide.getXmlObject();
-            CTTimeNodeList ctnl;
-
-            if (!xslide.isSetTiming()) {
-                System.out.println("Timing non défini, création...");
-                CTTLCommonTimeNodeData ctn = xslide.addNewTiming().addNewTnLst().addNewPar().addNewCTn();
-                ctn.setId(1);
-                ctn.setDur(STTLTimeIndefinite.INDEFINITE);
-                ctn.setRestart(STTLTimeNodeRestartType.NEVER);
-                ctn.setNodeType(STTLTimeNodeType.TM_ROOT);
-                System.out.println("Timing root créé avec ID: 1");
-                ctnl = ctn.addNewChildTnLst();
-                System.out.println("Liste des nœuds enfants créée");
-            } else {
-                System.out.println("Timing déjà défini, récupération...");
-                ctnl = xslide.getTiming().getTnLst().getParArray(0).getCTn().getChildTnLst();
-            }
-
-            // Pour vidéo, utiliser addNewVideo() au lieu de addNewAudio()
-            System.out.println("Ajout du nœud vidéo...");
-            CTTLCommonMediaNodeData cmedia = ctnl.addNewVideo().addNewCMediaNode();
-            cmedia.setVol(80000); // Garder le volume comme pour l'audio
-            System.out.println("Volume configuré: 80000");
-
-            CTTLCommonTimeNodeData ctn = cmedia.addNewCTn();
-            ctn.setId(2);
-            ctn.setFill(STTLTimeNodeFillType.HOLD);
-            ctn.setDisplay(false);
-            System.out.println("Propriétés du nœud temporel configurées avec ID: 2");
-
-            ctn.addNewStCondLst().addNewCond().setDelay(STTLTimeIndefinite.INDEFINITE);
-            System.out.println("Condition de démarrage ajoutée");
-
-            cmedia.addNewTgtEl().addNewSpTgt().setSpid(pic.getShapeId());
-            System.out.println("Cible du média configurée avec ID: " + pic.getShapeId());
-
-            // Afficher le XML pour le débogage
-            System.out.println("XML final du slide: " + xslide);
-
-            System.out.println("=== CRÉATION VIDÉO TERMINÉE AVEC SUCCÈS ===");
-            return pic;
-        } catch (Exception e) {
-            System.out.println("=== ERREUR LORS DE LA CRÉATION VIDÉO ===");
             e.printStackTrace();
             return null;
         }
@@ -438,49 +255,45 @@ public class SlideHelper {
         String lowerContentType = contentType.toLowerCase();
 
         switch (lowerContentType) {
-            case "image/jpeg":
-            case "image/jpg":
+            case Slideshow.CONTENT_TYPE_IMAGE_JPEG:
+            case Slideshow.CONTENT_TYPE_IMAGE_JPG:
                 return PictureType.JPEG;
-            case "image/png":
+            case Slideshow.CONTENT_TYPE_IMAGE_PNG:
                 return PictureType.PNG;
-            case "image/gif":
+            case Slideshow.CONTENT_TYPE_IMAGE_GIF:
                 return PictureType.GIF;
-            case "image/tiff":
+            case Slideshow.CONTENT_TYPE_IMAGE_TIFF:
                 return PictureType.TIFF;
-            case "image/x-emf":
+            case Slideshow.CONTENT_TYPE_IMAGE_X_EMF:
                 return PictureType.EMF;
-            case "image/x-wmf":
+            case Slideshow.CONTENT_TYPE_IMAGE_X_WMF:
                 return PictureType.WMF;
-            case "image/x-pict":
+            case Slideshow.CONTENT_TYPE_IMAGE_X_PICT:
                 return PictureType.PICT;
-            case "image/dib":
+            case Slideshow.CONTENT_TYPE_IMAGE_DIB:
                 return PictureType.DIB;
-            case "image/x-eps":
+            case Slideshow.CONTENT_TYPE_IMAGE_X_EPS:
                 return PictureType.EPS;
-            case "image/x-ms-bmp":
-            case "image/bmp":
+            case Slideshow.CONTENT_TYPE_IMAGE_X_MS_BMP:
+            case Slideshow.CONTENT_TYPE_IMAGE_BMP:
                 return PictureType.BMP;
-            case "image/x-wpg":
+            case Slideshow.CONTENT_TYPE_IMAGE_X_WPG:
                 return PictureType.WPG;
-            case "image/vnd.ms-photo":
+            case Slideshow.CONTENT_TYPE_IMAGE_VND_MS_PHOTO:
                 return PictureType.WDP;
-            case "image/svg+xml":
+            case Slideshow.CONTENT_TYPE_IMAGE_SVG_XML:
                 return PictureType.SVG;
             default:
-                System.out.println("Content type non reconnu: " + contentType + ", utilisation de PNG par défaut");
                 return PictureType.PNG;
         }
     }
 
     private static XSLFPictureShape createAndPositionMediaIcon(XSLFSlide slide, byte[] iconData) {
-        System.out.println("Création et positionnement de l'icône audio...");
 
         XMLSlideShow ppt = slide.getSlideShow();
         XSLFPictureData snap = ppt.addPicture(iconData, PictureType.PNG);
-        System.out.println("Image ajoutée au PPT: " + snap.getFileName());
 
         XSLFPictureShape pic = slide.createPicture(snap);
-        System.out.println("Forme image créée, ID: " + pic.getShapeId());
 
         // Définir une taille plus grande
         int iconWidth = 150;
@@ -491,79 +304,62 @@ public class SlideHelper {
 
         // Utiliser le MARGIN_LEFT existant pour l'alignement horizontal
         pic.setAnchor(new Rectangle(Slideshow.MARGIN_LEFT, y, iconWidth, iconHeight));
-        System.out.println("Position de l'icône ajustée: x=" + Slideshow.MARGIN_LEFT + ", y=" + y +
-                ", width=" + iconWidth + ", height=" + iconHeight);
 
         return pic;
     }
 
     private static byte[] getAudioIcon() {
         try {
-            // Créer une image de 100x100 pixels avec un fond transparent
-            BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage image = new BufferedImage(
+                    Slideshow.AUDIO_ICON_WIDTH,
+                    Slideshow.AUDIO_ICON_HEIGHT,
+                    BufferedImage.TYPE_INT_ARGB);
 
-            // Obtenir le contexte graphique
             Graphics2D g2d = image.createGraphics();
 
-            // Activer l'antialiasing pour des bords plus lisses
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            // Dessiner un cercle comme fond (bleu clair)
-            g2d.setColor(new Color(0, 120, 215, 240));
-            g2d.fillOval(5, 5, 90, 90);
+            g2d.setColor(Slideshow.AUDIO_ICON_BACKGROUND_COLOR);
+            g2d.fillOval(
+                    Slideshow.AUDIO_ICON_CIRCLE_X,
+                    Slideshow.AUDIO_ICON_CIRCLE_Y,
+                    Slideshow.AUDIO_ICON_CIRCLE_WIDTH,
+                    Slideshow.AUDIO_ICON_CIRCLE_HEIGHT);
 
-            // Dessiner un triangle de lecture (blanc)
-            g2d.setColor(Color.WHITE);
-            int[] xPoints = { 35, 70, 35 };
-            int[] yPoints = { 30, 50, 70 };
-            g2d.fillPolygon(xPoints, yPoints, 3);
+            g2d.setColor(Slideshow.AUDIO_ICON_PLAY_COLOR);
+            g2d.fillPolygon(
+                    Slideshow.AUDIO_ICON_TRIANGLE_X,
+                    Slideshow.AUDIO_ICON_TRIANGLE_Y,
+                    Slideshow.AUDIO_ICON_TRIANGLE_X.length);
 
             // Libérer les ressources
             g2d.dispose();
 
             // Convertir l'image en tableau de bytes (PNG)
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", baos);
+            ImageIO.write(image, Slideshow.AUDIO_ICON_FORMAT, baos);
             return baos.toByteArray();
 
         } catch (IOException e) {
             e.printStackTrace();
-
-            // En cas d'erreur, retourner un tableau d'octets minimal pour un fichier PNG
-            // (Cela créera une image minuscule mais valide)
-            return new byte[] {
-                    (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-                    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08,
-                    0x02, 0x00, 0x00, 0x00, (byte) 0x90, 0x77, 0x53, (byte) 0xDE, 0x00, 0x00, 0x00,
-                    0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, (byte) 0xD7, 0x63, (byte) 0xF8, (byte) 0xCF,
-                    (byte) 0xC0, 0x00, 0x00, 0x03, 0x01, 0x01, 0x00, (byte) 0x18, (byte) 0xDD, (byte) 0x8D,
-                    (byte) 0xB0, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, (byte) 0xAE, 0x42,
-                    0x60, (byte) 0x82
-            };
+            return Slideshow.FALLBACK_PNG;
         }
     }
 
     private static XSLFPictureShape createAndPositionVideoThumbnail(XSLFSlide slide, byte[] thumbnailData) {
-        System.out.println("Création et positionnement de la miniature vidéo...");
 
         XMLSlideShow ppt = slide.getSlideShow();
         XSLFPictureData snap = ppt.addPicture(thumbnailData, PictureType.PNG);
-        System.out.println("Image ajoutée au PPT: " + snap.getFileName());
 
         XSLFPictureShape pic = slide.createPicture(snap);
-        System.out.println("Forme image créée, ID: " + pic.getShapeId());
 
-        // Définir une taille adaptée pour la vidéo
         int videoWidth = 640;
-        int videoHeight = 360; // Format 16:9 standard
+        int videoHeight = 360;
 
-        // Calculer la position centrée
         int x = (Slideshow.SLIDE_WIDTH - videoWidth) / 2; // Centre horizontal
         int y = (Slideshow.SLIDE_HEIGHT - videoHeight) / 2; // Centre vertical
 
         pic.setAnchor(new Rectangle(x, y, videoWidth, videoHeight));
-        System.out.println("Position de la miniature ajustée: x=" + x + ", y=" + y +
-                ", width=" + videoWidth + ", height=" + videoHeight);
 
         return pic;
     }
@@ -573,8 +369,11 @@ public class SlideHelper {
             // Dans un cas réel, on extrairait une image de la vidéo ici
             // Pour cet exemple, nous allons simplement créer une vignette générique
 
-            // Créer une image de 640x360 pixels (format 16:9)
-            BufferedImage image = new BufferedImage(640, 360, BufferedImage.TYPE_INT_RGB);
+            // Créer une image au format 16:9
+            BufferedImage image = new BufferedImage(
+                    Slideshow.VIDEO_THUMBNAIL_WIDTH,
+                    Slideshow.VIDEO_THUMBNAIL_HEIGHT,
+                    BufferedImage.TYPE_INT_RGB);
 
             // Obtenir le contexte graphique
             Graphics2D g2d = image.createGraphics();
@@ -583,36 +382,47 @@ public class SlideHelper {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             // Remplir le fond avec un dégradé bleu foncé
-            g2d.setColor(new Color(20, 20, 50));
-            g2d.fillRect(0, 0, 640, 360);
+            g2d.setColor(Slideshow.VIDEO_BACKGROUND_COLOR);
+            g2d.fillRect(0, 0, Slideshow.VIDEO_THUMBNAIL_WIDTH, Slideshow.VIDEO_THUMBNAIL_HEIGHT);
 
             // Dessiner un symbole de lecture au centre
-            g2d.setColor(new Color(255, 255, 255, 180));
-            int centerX = 640 / 2;
-            int centerY = 360 / 2;
-            int radius = 50;
+            g2d.setColor(Slideshow.VIDEO_PLAY_BUTTON_COLOR);
+            int centerX = Slideshow.VIDEO_THUMBNAIL_WIDTH / 2;
+            int centerY = Slideshow.VIDEO_THUMBNAIL_HEIGHT / 2;
+            int radius = Slideshow.VIDEO_PLAY_BUTTON_RADIUS;
             g2d.fillOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
 
             // Triangle de lecture
-            g2d.setColor(new Color(20, 20, 50));
-            int[] xPoints = { centerX - 15, centerX + 25, centerX - 15 };
-            int[] yPoints = { centerY - 25, centerY, centerY + 25 };
+            g2d.setColor(Slideshow.VIDEO_BACKGROUND_COLOR);
+            int[] xPoints = {
+                    centerX - Slideshow.VIDEO_PLAY_TRIANGLE_OFFSET_X,
+                    centerX + Slideshow.VIDEO_PLAY_TRIANGLE_OFFSET_X2,
+                    centerX - Slideshow.VIDEO_PLAY_TRIANGLE_OFFSET_X
+            };
+            int[] yPoints = {
+                    centerY - Slideshow.VIDEO_PLAY_TRIANGLE_OFFSET_Y,
+                    centerY,
+                    centerY + Slideshow.VIDEO_PLAY_TRIANGLE_OFFSET_Y
+            };
             g2d.fillPolygon(xPoints, yPoints, 3);
 
             // Ajouter le texte "VIDÉO"
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
+            g2d.setColor(Slideshow.VIDEO_TEXT_COLOR);
+            g2d.setFont(new java.awt.Font(
+                    Slideshow.VIDEO_THUMBNAIL_FONT,
+                    Slideshow.VIDEO_THUMBNAIL_FONT_STYLE,
+                    Slideshow.VIDEO_THUMBNAIL_FONT_SIZE));
             java.awt.FontMetrics fm = g2d.getFontMetrics();
-            String text = "VIDÉO";
+            String text = Slideshow.VIDEO_THUMBNAIL_TEXT;
             int textWidth = fm.stringWidth(text);
-            g2d.drawString(text, centerX - textWidth / 2, centerY + 80);
+            g2d.drawString(text, centerX - textWidth / 2, centerY + Slideshow.VIDEO_TEXT_Y_OFFSET);
 
             // Libérer les ressources
             g2d.dispose();
 
             // Convertir l'image en tableau de bytes (PNG)
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", baos);
+            ImageIO.write(image, Slideshow.VIDEO_THUMBNAIL_FORMAT, baos);
             return baos.toByteArray();
 
         } catch (IOException e) {
@@ -624,17 +434,19 @@ public class SlideHelper {
     private static byte[] getDefaultThumbnail() {
         try {
             // Créer une image simple par défaut
-            BufferedImage image = new BufferedImage(320, 180, BufferedImage.TYPE_INT_RGB);
+            BufferedImage image = new BufferedImage(Slideshow.THUMBNAIL_WIDTH, Slideshow.THUMBNAIL_HEIGHT,
+                    BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = image.createGraphics();
             g2d.setColor(Color.DARK_GRAY);
-            g2d.fillRect(0, 0, 320, 180);
+            g2d.fillRect(0, 0, Slideshow.THUMBNAIL_WIDTH, Slideshow.THUMBNAIL_HEIGHT);
             g2d.setColor(Color.WHITE);
-            g2d.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 18));
-            g2d.drawString("Video Preview", 100, 90);
+            g2d.setFont(new java.awt.Font(Slideshow.THUMBNAIL_FONT, Slideshow.THUMBNAIL_FONT_STYLE,
+                    Slideshow.THUMBNAIL_FONT_SIZE));
+            g2d.drawString(Slideshow.THUMBNAIL_DEFAULT_TEXT, Slideshow.THUMBNAIL_TEXT_X, Slideshow.THUMBNAIL_TEXT_Y);
             g2d.dispose();
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", baos);
+            ImageIO.write(image, Slideshow.THUMBNAIL_FORMAT, baos);
             return baos.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
@@ -644,58 +456,53 @@ public class SlideHelper {
 
     private static String getExtensionFromContentType(String contentType) {
         if (contentType == null) {
-            return "mp4"; // Par défaut général
+            return Slideshow.DEFAULT_VIDEO_EXTENSION;
         }
 
         String lowerContentType = contentType.toLowerCase();
 
-        // Types audio
         switch (lowerContentType) {
             // Types audio
-            case "audio/mpeg":
-            case "audio/mp3":
-                return "mp3";
-            case "audio/wav":
-            case "audio/x-wav":
-                return "wav";
-            case "audio/mp4":
-            case "audio/x-m4a":
-                return "m4a";
-            case "audio/ogg":
-                return "ogg";
+            case Slideshow.CONTENT_TYPE_AUDIO_MPEG:
+            case Slideshow.CONTENT_TYPE_AUDIO_MP3:
+                return Slideshow.EXT_MP3;
+            case Slideshow.CONTENT_TYPE_AUDIO_WAV:
+            case Slideshow.CONTENT_TYPE_AUDIO_X_WAV:
+                return Slideshow.EXT_WAV;
+            case Slideshow.CONTENT_TYPE_AUDIO_MP4:
+            case Slideshow.CONTENT_TYPE_AUDIO_X_M4A:
+                return Slideshow.EXT_M4A;
+            case Slideshow.CONTENT_TYPE_AUDIO_OGG:
+                return Slideshow.EXT_OGG;
 
             // Types vidéo
-            case "video/mp4":
-                return "mp4";
-            case "video/mpeg":
-                return "mpg";
-            case "video/x-ms-wmv":
-                return "wmv";
-            case "video/quicktime":
-                return "mov";
-            case "video/x-matroska":
-                return "mkv";
-            case "video/webm":
-                return "webm";
-            case "video/x-flv":
-                return "flv";
-            case "video/3gpp":
-                return "3gp";
-            case "video/avi":
-            case "video/x-msvideo":
-                return "avi";
+            case Slideshow.CONTENT_TYPE_VIDEO_MP4:
+                return Slideshow.EXT_MP4;
+            case Slideshow.CONTENT_TYPE_VIDEO_MPEG:
+                return Slideshow.EXT_MPG;
+            case Slideshow.CONTENT_TYPE_VIDEO_X_MS_WMV:
+                return Slideshow.EXT_WMV;
+            case Slideshow.CONTENT_TYPE_VIDEO_QUICKTIME:
+                return Slideshow.EXT_MOV;
+            case Slideshow.CONTENT_TYPE_VIDEO_X_MATROSKA:
+                return Slideshow.EXT_MKV;
+            case Slideshow.CONTENT_TYPE_VIDEO_WEBM:
+                return Slideshow.EXT_WEBM;
+            case Slideshow.CONTENT_TYPE_VIDEO_X_FLV:
+                return Slideshow.EXT_FLV;
+            case Slideshow.CONTENT_TYPE_VIDEO_3GPP:
+                return Slideshow.EXT_3GP;
+            case Slideshow.CONTENT_TYPE_VIDEO_AVI:
+            case Slideshow.CONTENT_TYPE_VIDEO_X_MSVIDEO:
+                return Slideshow.EXT_AVI;
 
             default:
-                // Déterminer le type de média par préfixe
-                if (lowerContentType.startsWith("audio/")) {
-                    System.out.println("Type audio non reconnu: " + contentType + ", utilisation de .mp3 par défaut");
-                    return "mp3";
-                } else if (lowerContentType.startsWith("video/")) {
-                    System.out.println("Type vidéo non reconnu: " + contentType + ", utilisation de .mp4 par défaut");
-                    return "mp4";
+                if (lowerContentType.startsWith(Slideshow.CONTENT_TYPE_AUDIO)) {
+                    return Slideshow.DEFAULT_AUDIO_EXTENSION;
+                } else if (lowerContentType.startsWith(Slideshow.CONTENT_TYPE_VIDEO)) {
+                    return Slideshow.DEFAULT_VIDEO_EXTENSION;
                 } else {
-                    System.out.println("Type de média non reconnu: " + contentType);
-                    return null; // Retourner null pour les types non reconnus
+                    return null;
                 }
         }
     }

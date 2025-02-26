@@ -1,20 +1,13 @@
 package fr.cgi.magneto.service.impl;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.entcore.common.user.UserInfos;
@@ -40,7 +33,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.*;
-import java.util.*;
 
 public class DefaultExportService implements ExportService {
 
@@ -129,14 +121,14 @@ public class DefaultExportService implements ExportService {
                         return Future.succeededFuture();
                     }
 
-                    JsonObject metadata = document.getJsonObject("metadata", new JsonObject());
+                    JsonObject metadata = document.getJsonObject(Field.METADATA, new JsonObject());
                     return Future.<Void>future(promise -> {
                         serviceFactory.storage().readFile(fileId, buffer -> {
                             if (buffer != null) {
                                 Map<String, Object> docInfo = new HashMap<>();
                                 docInfo.put(Field.DOCUMENTID, documentId);
                                 docInfo.put(Field.BUFFER, buffer);
-                                docInfo.put("contentType", metadata.getString("content-type", ""));
+                                docInfo.put(Field.CONTENTTYPE, metadata.getString(Field.CONTENT_TYPE, ""));
                                 documents.add(docInfo);
                                 promise.complete();
                             } else {
@@ -272,14 +264,9 @@ public class DefaultExportService implements ExportService {
                 }
                 Map<String, Object> documentData = documentMap.get(card.getResourceId());
 
-                System.out.println("Document data found for resource ID " + card.getResourceId() + ": " +
-                        (documentData != null ? "yes" : "no"));
-
                 Buffer documentBuffer = documentData != null ? (Buffer) documentData.get("buffer") : null;
                 String contentType = documentData != null ? (String) documentData.get("contentType") : "";
 
-                System.out.println("Final contentType: " + contentType);
-                System.out.println("Buffer present: " + (documentBuffer != null));
                 propertiesBuilder
                         .contentType(contentType)
                         .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)

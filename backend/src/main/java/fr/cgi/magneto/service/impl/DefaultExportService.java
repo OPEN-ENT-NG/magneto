@@ -1,17 +1,5 @@
 package fr.cgi.magneto.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.entcore.common.user.UserInfos;
-
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.core.enums.SlideResourceType;
@@ -32,8 +20,13 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.*;
+import org.entcore.common.user.UserInfos;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DefaultExportService implements ExportService {
 
@@ -204,8 +197,8 @@ public class DefaultExportService implements ExportService {
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
         // TITRE
-        XSLFSlide titleApacheSlide = createTitleSlide(board, documents, i18nHelper);
-        ppt.createSlide().importContent(titleApacheSlide);
+        XSLFSlide newTitleSlide = ppt.createSlide();
+        createTitleSlide(newTitleSlide, board, documents, i18nHelper);
 
         SlideFactory slideFactory = new SlideFactory();
 
@@ -220,8 +213,8 @@ public class DefaultExportService implements ExportService {
                             if (card != null) {
                                 try {
                                     Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
-                                    XSLFSlide apacheSlide = (XSLFSlide) slide.createApacheSlide();
-                                    ppt.createSlide().importContent(apacheSlide);
+                                    XSLFSlide newSlide = ppt.createSlide();
+                                    slide.createApacheSlide(newSlide);
                                 } catch (Exception e) {
                                     String message = String.format(
                                             "[Magneto@%s::createSectionLayoutSlideObjects] Failed to create slide for card %s: %s",

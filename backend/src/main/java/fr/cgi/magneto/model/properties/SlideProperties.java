@@ -9,9 +9,9 @@ public class SlideProperties {
     private String content;
     private String resourceUrl;
     private String resourceId;
-    private String extension;
     private String fileName;
     private byte[] resourceData;
+    private String contentType;
 
     private String ownerName;
     private String modificationDate;
@@ -59,8 +59,8 @@ public class SlideProperties {
             return this;
         }
 
-        public Builder extension(String extension) {
-            properties.extension = extension;
+        public Builder contentType(String contentType) {
+            properties.contentType = contentType;
             return this;
         }
 
@@ -143,7 +143,7 @@ public class SlideProperties {
     }
 
     private boolean isValidForMedia() {
-        return title != null && caption != null && extension != null && resourceData != null;
+        return title != null && caption != null && contentType != null && resourceData != null;
     }
 
     private boolean isValidForBoard() {
@@ -180,8 +180,8 @@ public class SlideProperties {
         return resourceId;
     }
 
-    public String getExtension() {
-        return extension;
+    public String getContentType() {
+        return contentType;
     }
 
     public String getFileName() {

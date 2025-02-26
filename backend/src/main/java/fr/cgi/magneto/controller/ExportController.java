@@ -1,5 +1,11 @@
 package fr.cgi.magneto.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.user.UserUtils;
+
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.service.ExportService;
@@ -9,11 +15,6 @@ import fr.wseduc.rs.Get;
 import fr.wseduc.webutils.I18n;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import org.entcore.common.controller.ControllerHelper;
-import org.entcore.common.user.UserUtils;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 public class ExportController extends ControllerHelper {
     private final ExportService exportService;

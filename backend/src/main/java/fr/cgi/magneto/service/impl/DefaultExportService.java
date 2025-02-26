@@ -1,5 +1,17 @@
 package fr.cgi.magneto.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.entcore.common.user.UserInfos;
+
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.core.enums.SlideResourceType;
@@ -21,10 +33,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.*;
-import org.entcore.common.user.UserInfos;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class DefaultExportService implements ExportService {
 
@@ -57,7 +65,8 @@ public class DefaultExportService implements ExportService {
                                 documentIds.add(imageId);
                                 return getBoardDocuments(documentIds);
                             })
-                            .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents, i18nHelper))
+                            .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents,
+                                    i18nHelper))
                             .onFailure(err -> {
                                 String message = String.format(
                                         "[Magneto@%s::exportBoardToPptx] Failed to get documents: %s",
@@ -112,19 +121,14 @@ public class DefaultExportService implements ExportService {
                         return Future.succeededFuture();
                     }
 
-                    String filename = document.getJsonObject(Field.METADATA, new JsonObject())
-                            .getString(Field.FILENAME, "");
-                    String fileExtension = filename.contains(".")
-                            ? filename.substring(filename.lastIndexOf(".") + 1)
-                            : "";
-
+                    JsonObject metadata = document.getJsonObject(Field.METADATA, new JsonObject());
                     return Future.<Void>future(promise -> {
                         serviceFactory.storage().readFile(fileId, buffer -> {
                             if (buffer != null) {
                                 Map<String, Object> docInfo = new HashMap<>();
                                 docInfo.put(Field.DOCUMENTID, documentId);
                                 docInfo.put(Field.BUFFER, buffer);
-                                docInfo.put(Field.EXTENSION, fileExtension);
+                                docInfo.put(Field.CONTENTTYPE, metadata.getString(Field.CONTENT_TYPE, ""));
                                 documents.add(docInfo);
                                 promise.complete();
                             } else {
@@ -141,7 +145,7 @@ public class DefaultExportService implements ExportService {
     }
 
     private Future<XMLSlideShow> createFreeLayoutSlideObjects(Board board, UserInfos user,
-                                                              JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
+            JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
@@ -154,8 +158,8 @@ public class DefaultExportService implements ExportService {
                     SlideFactory slideFactory = new SlideFactory();
 
                     // TITRE
-                    XSLFSlide titleApacheSlide = createTitleSlide(board, documents, i18nHelper);
-                    ppt.createSlide().importContent(titleApacheSlide);
+                    XSLFSlide newTitleSlide = ppt.createSlide();
+                    createTitleSlide(newTitleSlide, board, documents, i18nHelper);
 
                     // Utiliser l'ordre des cartes du Board
                     for (Card boardCard : board.cards()) {
@@ -164,8 +168,13 @@ public class DefaultExportService implements ExportService {
                         if (card != null) {
                             try {
                                 Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
-                                XSLFSlide apacheSlide = (XSLFSlide) slide.createApacheSlide();
-                                ppt.createSlide().importContent(apacheSlide);
+                                XSLFSlide newSlide = ppt.createSlide();
+                                slide.createApacheSlide(newSlide);
+                                // Inspecter le contenu du package après l'ajout de la diapositive
+                                log.info("Package parts after adding slide:");
+                                for (PackagePart part : ppt.getPackage().getParts()) {
+                                    log.info("- " + part.getPartName());
+                                }
                             } catch (Exception e) {
                                 String message = String.format(
                                         "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
@@ -186,13 +195,13 @@ public class DefaultExportService implements ExportService {
                 });
     }
 
-    private XSLFSlide createTitleSlide(Board board, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
-        XMLSlideShow ppt = new XMLSlideShow();
-        XSLFSlide slide = ppt.createSlide();
+    private XSLFSlide createTitleSlide(XSLFSlide newTitleSlide, Board board, List<Map<String, Object>> documents,
+            I18nHelper i18nHelper) {
 
-        SlideHelper.createTitle(slide, board.getTitle(), Slideshow.MAIN_TITLE_HEIGHT, Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
+        SlideHelper.createTitle(newTitleSlide, board.getTitle(), Slideshow.MAIN_TITLE_HEIGHT,
+                Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
 
-        XSLFTextBox textBox = SlideHelper.createContent(slide);
+        XSLFTextBox textBox = SlideHelper.createContent(newTitleSlide);
 
         XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
         paragraph.setTextAlign(TextParagraph.TextAlign.CENTER);
@@ -216,14 +225,15 @@ public class DefaultExportService implements ExportService {
             Buffer documentBuffer = (Buffer) documentData.get(Field.BUFFER);
             String fileExtension = (String) documentData.get(Field.EXTENSION);
             if (documentBuffer != null) {
-                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, Slideshow.MAIN_CONTENT_MARGIN_TOP, Slideshow.MAIN_IMAGE_CONTENT_HEIGHT);
+                SlideHelper.createImage(newTitleSlide, documentBuffer.getBytes(), fileExtension,
+                        Slideshow.MAIN_CONTENT_MARGIN_TOP, Slideshow.MAIN_IMAGE_CONTENT_HEIGHT);
             }
         }
-        return slide;
+        return newTitleSlide;
     }
 
     private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData,
-                                      List<Map<String, Object>> documents) {
+            List<Map<String, Object>> documents) {
         SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
                 .title(card.getTitle())
                 .description(card.getDescription());
@@ -250,14 +260,15 @@ public class DefaultExportService implements ExportService {
             case AUDIO:
                 Map<String, Map<String, Object>> documentMap = new HashMap<>();
                 for (Map<String, Object> doc : documents) {
-                    documentMap.put((String) doc.get("documentId"), doc);
+                    documentMap.put((String) doc.get(Field.DOCUMENTID), doc);
                 }
                 Map<String, Object> documentData = documentMap.get(card.getResourceId());
 
-                Buffer documentBuffer = documentData != null ? (Buffer) documentData.get("buffer") : null;
-                String fileExtension = documentData != null ? (String) documentData.get("extension") : "";
+                Buffer documentBuffer = documentData != null ? (Buffer) documentData.get(Field.BUFFER) : null;
+                String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
+
                 propertiesBuilder
-                        .extension(fileExtension)
+                        .contentType(contentType)
                         .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
                         .caption(card.getCaption());
                 break;

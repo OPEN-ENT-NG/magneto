@@ -20,17 +20,16 @@ public class SlideText extends Slide {
     }
 
     @Override
-    public Object createApacheSlide() {
-        XMLSlideShow ppt = new XMLSlideShow();
-        XSLFSlide slide = ppt.createSlide();
+    public Object createApacheSlide(XSLFSlide newSlide) {
 
-        SlideHelper.createTitle(slide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE, TextParagraph.TextAlign.LEFT);
-        XSLFTextBox contentBox = SlideHelper.createContent(slide);
+        SlideHelper.createTitle(newSlide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE,
+                TextParagraph.TextAlign.LEFT);
+        XSLFTextBox contentBox = SlideHelper.createContent(newSlide);
 
         Document doc = Jsoup.parse(description);
         processHtmlContent(contentBox, doc.body());
 
-        return slide;
+        return newSlide;
     }
 
     private void processHtmlContent(XSLFTextBox textBox, Element element) {
@@ -63,31 +62,31 @@ public class SlideText extends Slide {
                 String value = parts[1].trim();
 
                 switch (property) {
-                    case "color":
+                    case Slideshow.CSS_COLOR:
                         try {
                             run.setFontColor(Color.decode(value));
                         } catch (NumberFormatException ignored) {
                         }
                         break;
-                    case "font-size":
+                    case Slideshow.CSS_FONT_SIZE:
                         try {
                             String size = value.replaceAll("[^0-9]", "");
                             run.setFontSize(Double.parseDouble(size));
                         } catch (NumberFormatException ignored) {
                         }
                         break;
-                    case "text-decoration":
-                        if (value.contains("underline")) {
+                    case Slideshow.CSS_TEXT_DECORATION:
+                        if (value.contains(Slideshow.VALUE_UNDERLINE)) {
                             run.setUnderlined(true);
                         }
                         break;
-                    case "font-weight":
-                        if (value.equals("bold") || value.equals("700")) {
+                    case Slideshow.CSS_FONT_WEIGHT:
+                        if (value.equals(Slideshow.VALUE_BOLD) || value.equals(Slideshow.VALUE_BOLD_WEIGHT)) {
                             run.setBold(true);
                         }
                         break;
-                    case "font-style":
-                        if (value.equals("italic")) {
+                    case Slideshow.CSS_FONT_STYLE:
+                        if (value.equals(Slideshow.VALUE_ITALIC)) {
                             run.setItalic(true);
                         }
                         break;
@@ -98,49 +97,49 @@ public class SlideText extends Slide {
 
     private void processStyle(Element elem, XSLFTextParagraph para, XSLFTextRun run) {
         switch (elem.tagName().toLowerCase()) {
-            case "h1":
-                run.setFontSize(20.0);
+            case Slideshow.TAG_H1:
+                run.setFontSize(Slideshow.H1_FONT_SIZE);
                 run.setBold(true);
-                para.setIndentLevel(0);
+                para.setIndentLevel(Slideshow.H1_INDENT_LEVEL);
                 break;
-            case "h2":
-                run.setFontSize(18.0);
+            case Slideshow.TAG_H2:
+                run.setFontSize(Slideshow.H2_FONT_SIZE);
                 run.setBold(true);
-                para.setIndentLevel(1);
+                para.setIndentLevel(Slideshow.H2_INDENT_LEVEL);
                 break;
-            case "h3":
-                run.setFontSize(16.0);
+            case Slideshow.TAG_H3:
+                run.setFontSize(Slideshow.H3_FONT_SIZE);
                 run.setBold(true);
-                para.setIndentLevel(2);
+                para.setIndentLevel(Slideshow.H3_INDENT_LEVEL);
                 break;
-            case "b":
-            case "strong":
+            case Slideshow.TAG_BOLD:
+            case Slideshow.TAG_STRONG:
                 run.setBold(true);
                 break;
-            case "i":
-            case "em":
+            case Slideshow.TAG_ITALIC:
+            case Slideshow.TAG_EM:
                 run.setItalic(true);
                 break;
-            case "u":
+            case Slideshow.TAG_UNDERLINE:
                 run.setUnderlined(true);
                 break;
-            case "p":
-                para.setSpaceBefore(10.0);
-                para.setSpaceAfter(10.0);
+            case Slideshow.TAG_PARAGRAPH:
+                para.setSpaceBefore(Slideshow.PARAGRAPH_SPACE_BEFORE);
+                para.setSpaceAfter(Slideshow.PARAGRAPH_SPACE_AFTER);
                 break;
-            case "ul":
-                para.setIndentLevel(1);
+            case Slideshow.TAG_UNORDERED_LIST:
+                para.setIndentLevel(Slideshow.LIST_INDENT_LEVEL);
                 para.setBullet(true);
                 break;
-            case "ol":
-                para.setIndentLevel(1);
+            case Slideshow.TAG_ORDERED_LIST:
+                para.setIndentLevel(Slideshow.LIST_INDENT_LEVEL);
                 para.setBulletAutoNumber(AutoNumberingScheme.arabicPeriod, 1);
                 break;
-            case "li":
-                para.setIndentLevel(1);
+            case Slideshow.TAG_LIST_ITEM:
+                para.setIndentLevel(Slideshow.LIST_INDENT_LEVEL);
                 break;
         }
-        String style = elem.attr("style");
+        String style = elem.attr(Slideshow.CSS_STYLE);
         if (!style.isEmpty()) {
             processInlineStyles(run, style);
         }

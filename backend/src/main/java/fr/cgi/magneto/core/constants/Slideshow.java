@@ -7,12 +7,15 @@ public class Slideshow {
     public static final int MARGIN_LEFT = 140;
     public static final int MARGIN_TOP_TITLE = 40;
     public static final int WIDTH = 1000;
+    public static final String DEFAULT_FONT = "Roboto";
     public static final int SLIDE_HEIGHT = 720;
     public static final int SLIDE_WIDTH = 1280;
 
     // Constantes pour les titres
     public static final int TITLE_HEIGHT = 70;
     public static final Double TITLE_FONT_SIZE = 44.0;
+    public static final int DESCRIPTION_TITLE_HEIGHT = 75;
+    public static final Double DESCRIPTION_TITLE_FONT_SIZE = 55.0;
     public static final int MAIN_TITLE_HEIGHT = 100;
     public static final Double MAIN_TITLE_FONT_SIZE = 100.0;
 
@@ -27,6 +30,7 @@ public class Slideshow {
     public static final int CONTENT_MARGIN_TOP = 140;
     public static final int MAIN_CONTENT_MARGIN_TOP = 300;
     public static final Double CONTENT_FONT_SIZE = 36.0;
+    public static final Double DESCRIPTION_FONT_SIZE = 24.0;
 
     // Constantes pour les images
     public static final int MAIN_IMAGE_CONTENT_HEIGHT = 400;

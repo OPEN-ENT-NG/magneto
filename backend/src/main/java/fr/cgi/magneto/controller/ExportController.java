@@ -3,10 +3,6 @@ package fr.cgi.magneto.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserUtils;
 

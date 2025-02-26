@@ -90,7 +90,7 @@ export const ReadView: FC = () => {
   }, [board]);
 
   useEffect(() => {
-    if (!card)return setCard(initialCards[0]);
+    if (!card) return setCard(initialCards[0]);
   }, [board]);
 
   useEffect(() => {

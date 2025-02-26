@@ -238,4 +238,6 @@ public class Field {
 
     //EXPORT SLIDE
     public static final String SLIDE_OBJECTS = "slideObjects";
+    public static final String BUFFER = "buffer";
+    public static final String FILE = "file";
 }

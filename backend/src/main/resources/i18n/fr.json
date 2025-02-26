@@ -224,6 +224,8 @@
   "magneto.dropzone.overlay.solution": "Veuillez importer un <b>fichier</b>",
   "magneto.dropzone.overlay.action": "J'ai compris",
   "magneto.shared.push.notif.body": "a partagé avec vous un nouveau tableau",
+  "magneto.slideshow.created.by": "Créé par ",
+  "magneto.slideshow.updated.the": "mis à jour le ",
   "magneto.notify.board.push.notif.body": "vous notifie de changements sur un tableau",
   "magneto.loading": "Chargement",
   "magneto.zoom": "Zoom",

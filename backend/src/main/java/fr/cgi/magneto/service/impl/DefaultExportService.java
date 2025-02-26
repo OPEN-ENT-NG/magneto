@@ -260,12 +260,12 @@ public class DefaultExportService implements ExportService {
             case AUDIO:
                 Map<String, Map<String, Object>> documentMap = new HashMap<>();
                 for (Map<String, Object> doc : documents) {
-                    documentMap.put((String) doc.get("documentId"), doc);
+                    documentMap.put((String) doc.get(Field.DOCUMENTID), doc);
                 }
                 Map<String, Object> documentData = documentMap.get(card.getResourceId());
 
-                Buffer documentBuffer = documentData != null ? (Buffer) documentData.get("buffer") : null;
-                String contentType = documentData != null ? (String) documentData.get("contentType") : "";
+                Buffer documentBuffer = documentData != null ? (Buffer) documentData.get(Field.BUFFER) : null;
+                String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
 
                 propertiesBuilder
                         .contentType(contentType)

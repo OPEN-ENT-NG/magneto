@@ -1,6 +1,6 @@
 package fr.cgi.magneto.model.slides;
 
-import fr.cgi.magneto.core.constants.MagnetoConstants;
+import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.helper.SlideHelper;
 import org.apache.poi.sl.usermodel.AutoNumberingScheme;
 import org.apache.poi.sl.usermodel.TextParagraph;
@@ -24,7 +24,7 @@ public class SlideText extends Slide {
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
-        SlideHelper.createTitle(slide, title, MagnetoConstants.TITLE_HEIGHT, MagnetoConstants.TITLE_FONT_SIZE, TextParagraph.TextAlign.LEFT);
+        SlideHelper.createTitle(slide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE, TextParagraph.TextAlign.LEFT);
         XSLFTextBox contentBox = SlideHelper.createContent(slide);
 
         Document doc = Jsoup.parse(description);

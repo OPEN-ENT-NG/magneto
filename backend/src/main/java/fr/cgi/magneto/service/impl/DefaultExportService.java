@@ -1,7 +1,7 @@
 package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.constants.Field;
-import fr.cgi.magneto.core.constants.MagnetoConstants;
+import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
 import fr.cgi.magneto.helper.I18nHelper;
@@ -106,14 +106,14 @@ public class DefaultExportService implements ExportService {
     private Future<Void> fetchDocumentFile(String documentId, List<Map<String, Object>> documents) {
         return serviceFactory.workSpaceService().getDocument(documentId)
                 .compose(document -> {
-                    String fileId = document.getString("file");
+                    String fileId = document.getString(Field.FILE);
                     if (fileId == null) {
                         log.warn("File ID is null for document: " + documentId);
                         return Future.succeededFuture();
                     }
 
-                    String filename = document.getJsonObject("metadata", new JsonObject())
-                            .getString("filename", "");
+                    String filename = document.getJsonObject(Field.METADATA, new JsonObject())
+                            .getString(Field.FILENAME, "");
                     String fileExtension = filename.contains(".")
                             ? filename.substring(filename.lastIndexOf(".") + 1)
                             : "";
@@ -122,9 +122,9 @@ public class DefaultExportService implements ExportService {
                         serviceFactory.storage().readFile(fileId, buffer -> {
                             if (buffer != null) {
                                 Map<String, Object> docInfo = new HashMap<>();
-                                docInfo.put("documentId", documentId);
-                                docInfo.put("buffer", buffer);
-                                docInfo.put("extension", fileExtension);
+                                docInfo.put(Field.DOCUMENTID, documentId);
+                                docInfo.put(Field.BUFFER, buffer);
+                                docInfo.put(Field.EXTENSION, fileExtension);
                                 documents.add(docInfo);
                                 promise.complete();
                             } else {
@@ -190,7 +190,7 @@ public class DefaultExportService implements ExportService {
         XMLSlideShow ppt = new XMLSlideShow();
         XSLFSlide slide = ppt.createSlide();
 
-        SlideHelper.createTitle(slide, board.getTitle(), MagnetoConstants.MAIN_TITLE_HEIGHT, MagnetoConstants.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
+        SlideHelper.createTitle(slide, board.getTitle(), Slideshow.MAIN_TITLE_HEIGHT, Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
 
         XSLFTextBox textBox = SlideHelper.createContent(slide);
 
@@ -198,25 +198,25 @@ public class DefaultExportService implements ExportService {
         paragraph.setTextAlign(TextParagraph.TextAlign.CENTER);
         XSLFTextRun textRun = paragraph.addNewTextRun();
         textRun.setText(i18nHelper.translate("magneto.slideshow.created.by") + board.getOwnerName() + ",");
-        textRun.setFontSize(MagnetoConstants.CONTENT_FONT_SIZE);
+        textRun.setFontSize(Slideshow.CONTENT_FONT_SIZE);
 
         XSLFTextParagraph paragraph2 = textBox.addNewTextParagraph();
         paragraph2.setTextAlign(TextParagraph.TextAlign.CENTER);
         XSLFTextRun textRun2 = paragraph2.addNewTextRun();
         textRun2.setText(i18nHelper.translate("magneto.slideshow.updated.the") + board.getModificationDate());
-        textRun2.setFontSize(MagnetoConstants.CONTENT_FONT_SIZE);
+        textRun2.setFontSize(Slideshow.CONTENT_FONT_SIZE);
 
         String imageUrl = board.getImageUrl();
         String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
         Map<String, Object> documentData = documents.stream()
-                .filter(doc -> imageId.equals(doc.get("documentId")))
+                .filter(doc -> imageId.equals(doc.get(Field.DOCUMENTID)))
                 .findFirst()
                 .orElse(null);
         if (documentData != null) {
-            Buffer documentBuffer = (Buffer) documentData.get("buffer");
-            String fileExtension = (String) documentData.get("extension");
+            Buffer documentBuffer = (Buffer) documentData.get(Field.BUFFER);
+            String fileExtension = (String) documentData.get(Field.EXTENSION);
             if (documentBuffer != null) {
-                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, MagnetoConstants.MAIN_CONTENT_MARGIN_TOP, MagnetoConstants.MAIN_IMAGE_CONTENT_HEIGHT);
+                SlideHelper.createImage(slide, documentBuffer.getBytes(), fileExtension, Slideshow.MAIN_CONTENT_MARGIN_TOP, Slideshow.MAIN_IMAGE_CONTENT_HEIGHT);
             }
         }
         return slide;

@@ -1,6 +1,6 @@
 package fr.cgi.magneto.helper;
 
-import fr.cgi.magneto.core.constants.MagnetoConstants;
+import fr.cgi.magneto.core.constants.Slideshow;
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
 import org.apache.poi.sl.usermodel.Placeholder;
 import org.apache.poi.sl.usermodel.PlaceholderDetails;
@@ -14,7 +14,7 @@ public class SlideHelper {
     public static XSLFTextBox createTitle(XSLFSlide slide, String title, int titleHeight, Double titleFontSize,
                                           TextAlign titleTextAlign) {
         XSLFTextShape titleShape = slide.createTextBox();
-        titleShape.setAnchor(new Rectangle(MagnetoConstants.MARGIN_LEFT, MagnetoConstants.MARGIN_TOP_TITLE, MagnetoConstants.WIDTH, titleHeight));
+        titleShape.setAnchor(new Rectangle(Slideshow.MARGIN_LEFT, Slideshow.MARGIN_TOP_TITLE, Slideshow.WIDTH, titleHeight));
 
         PlaceholderDetails phDetails = titleShape.getPlaceholderDetails();
         if (phDetails != null) {
@@ -37,9 +37,9 @@ public class SlideHelper {
         XSLFTextBox legendShape = slide.createTextBox();
 
         int slideHeight = slide.getSlideShow().getPageSize().height;
-        int legendY = slideHeight - MagnetoConstants.LEGEND_HEIGHT - MagnetoConstants.LEGEND_MARGIN_BOTTOM;
+        int legendY = slideHeight - Slideshow.LEGEND_HEIGHT - Slideshow.LEGEND_MARGIN_BOTTOM;
 
-        legendShape.setAnchor(new Rectangle(MagnetoConstants.MARGIN_LEFT, legendY, MagnetoConstants.WIDTH, MagnetoConstants.LEGEND_HEIGHT));
+        legendShape.setAnchor(new Rectangle(Slideshow.MARGIN_LEFT, legendY, Slideshow.WIDTH, Slideshow.LEGEND_HEIGHT));
 
         legendShape.clearText();
         legendShape.setText(legendText);
@@ -48,15 +48,15 @@ public class SlideHelper {
         para.setTextAlign(TextAlign.LEFT);
 
         XSLFTextRun run = para.getTextRuns().get(0);
-        run.setFontSize(MagnetoConstants.LEGEND_FONT_SIZE);
-        run.setFontFamily(MagnetoConstants.LEGEND_FONT_FAMILY);
+        run.setFontSize(Slideshow.LEGEND_FONT_SIZE);
+        run.setFontFamily(Slideshow.LEGEND_FONT_FAMILY);
 
         return legendShape;
     }
 
     public static XSLFTextBox createContent(XSLFSlide slide) {
         XSLFTextBox contentBox = slide.createTextBox();
-        contentBox.setAnchor(new Rectangle(MagnetoConstants.MARGIN_LEFT, MagnetoConstants.CONTENT_MARGIN_TOP, MagnetoConstants.WIDTH, MagnetoConstants.CONTENT_HEIGHT));
+        contentBox.setAnchor(new Rectangle(Slideshow.MARGIN_LEFT, Slideshow.CONTENT_MARGIN_TOP, Slideshow.WIDTH, Slideshow.CONTENT_HEIGHT));
         return contentBox;
     }
 
@@ -69,15 +69,15 @@ public class SlideHelper {
         double imgRatio = (double) imgSize.width / imgSize.height;
 
         int newWidth, newHeight;
-        if (imgRatio > (double) MagnetoConstants.WIDTH / imageContentHeight) {
-            newWidth = MagnetoConstants.WIDTH;
-            newHeight = (int) (MagnetoConstants.WIDTH / imgRatio);
+        if (imgRatio > (double) Slideshow.WIDTH / imageContentHeight) {
+            newWidth = Slideshow.WIDTH;
+            newHeight = (int) (Slideshow.WIDTH / imgRatio);
         } else {
             newHeight = imageContentHeight;
             newWidth = (int) (imageContentHeight * imgRatio);
         }
 
-        int x = MagnetoConstants.MARGIN_LEFT + (MagnetoConstants.WIDTH - newWidth) / 2;
+        int x = Slideshow.MARGIN_LEFT + (Slideshow.WIDTH - newWidth) / 2;
         int y = contentMarginTop + (imageContentHeight - newHeight) / 2;
 
         XSLFPictureShape shape = slide.createPicture(pic);

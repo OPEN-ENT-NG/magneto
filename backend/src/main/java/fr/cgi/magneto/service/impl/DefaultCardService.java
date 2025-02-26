@@ -807,6 +807,22 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
+    @Override
+    public Future<List<Card>> getAllCardsBySectionSimple(Section section, Integer page, UserInfos user) {
+        Promise<List<Card>> promise = Promise.promise();
+
+        fetchAllCardsBySection(section, page, user)
+                .compose(this::setMetadataCards)
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
+                })
+                .onSuccess(promise::complete);
+        
+        return promise.future();
+    }
+
     public Future<List<Card>> getAllCardsByCreationDate(StatisticsPayload statisticsPayload) {
         Promise<List<Card>> promise = Promise.promise();
 

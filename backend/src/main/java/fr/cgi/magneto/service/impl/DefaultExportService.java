@@ -18,6 +18,7 @@ import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.SlideHelper;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.properties.SlideProperties;
@@ -65,8 +66,10 @@ public class DefaultExportService implements ExportService {
                                 documentIds.add(imageId);
                                 return getBoardDocuments(documentIds);
                             })
-                            .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents,
-                                    i18nHelper))
+                            .compose(documents -> board.isLayoutFree()
+                                    ? createFreeLayoutSlideObjects(board, user, slideShow, documents,
+                                    i18nHelper)
+                                    : createSectionLayoutSlideObjects(board, user, slideShow, documents, i18nHelper))
                             .onFailure(err -> {
                                 String message = String.format(
                                         "[Magneto@%s::exportBoardToPptx] Failed to get documents: %s",
@@ -149,6 +152,9 @@ public class DefaultExportService implements ExportService {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
+        // TITRE
+        XSLFSlide newTitleSlide = ppt.createSlide();
+        createTitleSlide(newTitleSlide, board, documents, i18nHelper);
         return serviceFactory.cardService().getAllCardsByBoard(board, user)
                 .map(fetchedCards -> {
                     // Créer une map des cartes récupérées pour un accès rapide
@@ -156,10 +162,6 @@ public class DefaultExportService implements ExportService {
                             .collect(Collectors.toMap(Card::getId, card -> card));
 
                     SlideFactory slideFactory = new SlideFactory();
-
-                    // TITRE
-                    XSLFSlide newTitleSlide = ppt.createSlide();
-                    createTitleSlide(newTitleSlide, board, documents, i18nHelper);
 
                     // Utiliser l'ordre des cartes du Board
                     for (Card boardCard : board.cards()) {
@@ -183,6 +185,52 @@ public class DefaultExportService implements ExportService {
                             }
                         } else {
                             log.warn(String.format("Card %s from board not found in fetched cards", cardId));
+                        }
+                    }
+                    return ppt;
+                })
+                .onFailure(err -> {
+                    String message = String.format(
+                            "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slides: %s",
+                            this.getClass().getSimpleName(), err.getMessage());
+                    log.error(message);
+                });
+    }
+
+
+    private Future<XMLSlideShow> createSectionLayoutSlideObjects(Board board, UserInfos user,
+                                                                 JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
+        XMLSlideShow ppt = new XMLSlideShow();
+        ppt.setPageSize(new java.awt.Dimension(1280, 720));
+
+        // TITRE
+        XSLFSlide titleApacheSlide = createTitleSlide(board, documents, i18nHelper);
+        ppt.createSlide().importContent(titleApacheSlide);
+
+        SlideFactory slideFactory = new SlideFactory();
+
+        return this.serviceFactory.sectionService().createSectionWithCards(board, user)
+                .map(sections -> {
+                    for (Section section : sections) {
+                        // TITRE SECTION
+                        XSLFSlide sectionApacheSlide = ppt.createSlide();
+                        SlideHelper.createTitle(sectionApacheSlide, section.getTitle(), Slideshow.MAIN_TITLE_HEIGHT, Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
+
+                        for (Card card : section.getCards()) {
+                            if (card != null) {
+                                try {
+                                    Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
+                                    XSLFSlide apacheSlide = (XSLFSlide) slide.createApacheSlide();
+                                    ppt.createSlide().importContent(apacheSlide);
+                                } catch (Exception e) {
+                                    String message = String.format(
+                                            "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
+                                            this.getClass().getSimpleName(), card.getId(), e.getMessage());
+                                    log.error(message);
+                                }
+                            } else {
+                                log.warn(String.format("Card %s from board not found in fetched cards", card.getId()));
+                            }
                         }
                     }
                     return ppt;

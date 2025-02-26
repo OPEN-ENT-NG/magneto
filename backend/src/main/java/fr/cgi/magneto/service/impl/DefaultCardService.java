@@ -814,7 +814,7 @@ public class DefaultCardService implements CardService {
         fetchAllCardsBySection(section, page, user)
                 .compose(this::setMetadataCards)
                 .onFailure(fail -> {
-                    log.error("[Magneto@%s::getAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName(),
+                    log.error("[Magneto@%s::getAllCardsBySectionSimple] Failed to get section cards", this.getClass().getSimpleName(),
                             fail.getMessage());
                     promise.fail(fail.getMessage());
                 })

@@ -224,7 +224,7 @@ public class DefaultExportService implements ExportService {
                                     ppt.createSlide().importContent(apacheSlide);
                                 } catch (Exception e) {
                                     String message = String.format(
-                                            "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
+                                            "[Magneto@%s::createSectionLayoutSlideObjects] Failed to create slide for card %s: %s",
                                             this.getClass().getSimpleName(), card.getId(), e.getMessage());
                                     log.error(message);
                                 }
@@ -237,7 +237,7 @@ public class DefaultExportService implements ExportService {
                 })
                 .onFailure(err -> {
                     String message = String.format(
-                            "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slides: %s",
+                            "[Magneto@%s::createSectionLayoutSlideObjects] Failed to create slides: %s",
                             this.getClass().getSimpleName(), err.getMessage());
                     log.error(message);
                 });

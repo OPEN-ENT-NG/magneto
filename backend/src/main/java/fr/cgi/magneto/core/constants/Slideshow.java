@@ -181,6 +181,14 @@ public class Slideshow {
     public static final Color VIDEO_PLAY_BUTTON_COLOR = new Color(255, 255, 255, 180);
     public static final Color VIDEO_TEXT_COLOR = Color.WHITE;
 
+    // Constantes pour les dimensions d'icônes standard
+    public static final int ICON_WIDTH = 150;
+    public static final int ICON_HEIGHT = 150;
+
+    // Constantes pour les dimensions vidéo standard (16:9)
+    public static final int VIDEO_DISPLAY_WIDTH = 640;
+    public static final int VIDEO_DISPLAY_HEIGHT = 360;
+
     // Constantes pour l'icône audio
     public static final int AUDIO_ICON_WIDTH = 100;
     public static final int AUDIO_ICON_HEIGHT = 100;

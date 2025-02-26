@@ -296,8 +296,8 @@ public class SlideHelper {
         XSLFPictureShape pic = slide.createPicture(snap);
 
         // Définir une taille plus grande
-        int iconWidth = 150;
-        int iconHeight = 150;
+        int iconWidth = Slideshow.ICON_WIDTH;
+        int iconHeight = Slideshow.ICON_HEIGHT;
 
         // Calculer la position verticale centrée
         int y = (Slideshow.SLIDE_HEIGHT - iconHeight) / 2; // Centre vertical
@@ -353,8 +353,8 @@ public class SlideHelper {
 
         XSLFPictureShape pic = slide.createPicture(snap);
 
-        int videoWidth = 640;
-        int videoHeight = 360;
+        int videoWidth = Slideshow.VIDEO_DISPLAY_WIDTH;
+        int videoHeight = Slideshow.VIDEO_DISPLAY_HEIGHT;
 
         int x = (Slideshow.SLIDE_WIDTH - videoWidth) / 2; // Centre horizontal
         int y = (Slideshow.SLIDE_HEIGHT - videoHeight) / 2; // Centre vertical

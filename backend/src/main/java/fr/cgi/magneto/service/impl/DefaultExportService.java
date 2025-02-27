@@ -22,7 +22,8 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.sl.usermodel.TextParagraph;
-import org.apache.poi.xslf.usermodel.*;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
@@ -145,16 +146,17 @@ public class DefaultExportService implements ExportService {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
+        SlideFactory slideFactory = new SlideFactory();
+
         // TITRE
+        Slide titleSlide = createTitleSlide(board, slideFactory, documents, i18nHelper);
         XSLFSlide newTitleSlide = ppt.createSlide();
-        createTitleSlide(newTitleSlide, board, documents, i18nHelper);
+        titleSlide.createApacheSlide(newTitleSlide);
         return serviceFactory.cardService().getAllCardsByBoard(board, user)
                 .map(fetchedCards -> {
                     // Créer une map des cartes récupérées pour un accès rapide
                     Map<String, Card> cardMap = fetchedCards.stream()
                             .collect(Collectors.toMap(Card::getId, card -> card));
-
-                    SlideFactory slideFactory = new SlideFactory();
 
                     //DESCRIPTION
                     XSLFSlide descriptionApacheSlide = createDescriptionSlide(board, i18nHelper);
@@ -200,11 +202,12 @@ public class DefaultExportService implements ExportService {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
-        // TITRE
-        XSLFSlide newTitleSlide = ppt.createSlide();
-        createTitleSlide(newTitleSlide, board, documents, i18nHelper);
-
         SlideFactory slideFactory = new SlideFactory();
+
+        // TITRE
+        Slide titleSlide = createTitleSlide(board, slideFactory, documents, i18nHelper);
+        XSLFSlide newTitleSlide = ppt.createSlide();
+        titleSlide.createApacheSlide(newTitleSlide);
 
         return this.serviceFactory.sectionService().createSectionWithCards(board, user)
                 .map(sections -> {
@@ -238,62 +241,6 @@ public class DefaultExportService implements ExportService {
                             this.getClass().getSimpleName(), err.getMessage());
                     log.error(message);
                 });
-    }
-
-    private XSLFSlide createTitleSlide(XSLFSlide newTitleSlide, Board board, List<Map<String, Object>> documents,
-            I18nHelper i18nHelper) {
-
-        SlideHelper.createTitle(newTitleSlide, board.getTitle(), Slideshow.MAIN_TITLE_HEIGHT,
-                Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
-
-        XSLFTextBox textBox = SlideHelper.createContent(newTitleSlide);
-
-        XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
-        paragraph.setTextAlign(TextParagraph.TextAlign.CENTER);
-        XSLFTextRun textRun = paragraph.addNewTextRun();
-        textRun.setText(i18nHelper.translate("magneto.slideshow.created.by") + board.getOwnerName() + ",");
-        textRun.setFontSize(Slideshow.CONTENT_FONT_SIZE);
-
-        XSLFTextParagraph paragraph2 = textBox.addNewTextParagraph();
-        paragraph2.setTextAlign(TextParagraph.TextAlign.CENTER);
-        XSLFTextRun textRun2 = paragraph2.addNewTextRun();
-        textRun2.setText(i18nHelper.translate("magneto.slideshow.updated.the") + board.getModificationDate());
-        textRun2.setFontSize(Slideshow.CONTENT_FONT_SIZE);
-
-        String imageUrl = board.getImageUrl();
-        String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-        Map<String, Object> documentData = documents.stream()
-                .filter(doc -> imageId.equals(doc.get(Field.DOCUMENTID)))
-                .findFirst()
-                .orElse(null);
-        if (documentData != null) {
-            Buffer documentBuffer = (Buffer) documentData.get(Field.BUFFER);
-            String fileExtension = (String) documentData.get(Field.EXTENSION);
-            if (documentBuffer != null) {
-                SlideHelper.createImage(newTitleSlide, documentBuffer.getBytes(), fileExtension,
-                        Slideshow.MAIN_CONTENT_MARGIN_TOP, Slideshow.MAIN_IMAGE_CONTENT_HEIGHT);
-            }
-        }
-        return newTitleSlide;
-    }
-
-    private XSLFSlide createDescriptionSlide(Board board, I18nHelper i18nHelper) {
-        XMLSlideShow ppt = new XMLSlideShow();
-        XSLFSlide slide = ppt.createSlide();
-
-        SlideHelper.createTitle(slide, i18nHelper.translate("magneto.create.board.description"),
-                Slideshow.DESCRIPTION_TITLE_HEIGHT, Slideshow.DESCRIPTION_TITLE_FONT_SIZE, TextParagraph.TextAlign.LEFT);
-
-        XSLFTextBox textBox = SlideHelper.createContent(slide);
-
-        XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
-        paragraph.setTextAlign(TextParagraph.TextAlign.LEFT);
-        XSLFTextRun textRun = paragraph.addNewTextRun();
-        textRun.setText(board.getDescription());
-        textRun.setFontSize(Slideshow.DESCRIPTION_FONT_SIZE);
-        textRun.setFontFamily(Slideshow.DEFAULT_FONT);
-
-        return slide;
     }
 
     private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData,
@@ -347,5 +294,30 @@ public class DefaultExportService implements ExportService {
         }
 
         return slideFactory.createSlide(resourceType, propertiesBuilder.build());
+    }
+
+    private Slide createTitleSlide(Board board, SlideFactory slideFactory, List<Map<String, Object>> documents,
+                                   I18nHelper i18nHelper) {
+        SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
+                .title(board.getTitle())
+                .description(board.getDescription());
+
+        String imageUrl = board.getImageUrl();
+        String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+        Map<String, Object> documentData = documents.stream()
+                .filter(doc -> imageId.equals(doc.get(Field.DOCUMENTID)))
+                .findFirst()
+                .orElse(null);
+        Buffer documentBuffer = (Buffer) documentData.get(Field.BUFFER);
+        String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
+
+        propertiesBuilder
+                .ownerName(board.getOwnerName())
+                .modificationDate(board.getModificationDate())
+                .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
+                .contentType(contentType)
+                .i18nHelper(i18nHelper);
+
+        return slideFactory.createSlide(SlideResourceType.TITLE, propertiesBuilder.build());
     }
 }

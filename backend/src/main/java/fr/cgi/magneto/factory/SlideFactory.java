@@ -1,8 +1,8 @@
 package fr.cgi.magneto.factory;
 
 import fr.cgi.magneto.core.enums.SlideResourceType;
-import fr.cgi.magneto.model.slides.*;
 import fr.cgi.magneto.model.properties.SlideProperties;
+import fr.cgi.magneto.model.slides.*;
 
 public class SlideFactory {
 
@@ -12,6 +12,10 @@ public class SlideFactory {
         }
 
         switch (type) {
+            case TITLE:
+                return new SlideTitle(properties.getTitle(), properties.getDescription(), properties.getOwnerName(),
+                        properties.getModificationDate(), properties.getResourceData(), properties.getContentType(),
+                        properties.getI18nHelper());
             case TEXT:
                 return new SlideText(properties.getTitle(), properties.getDescription());
             case FILE:

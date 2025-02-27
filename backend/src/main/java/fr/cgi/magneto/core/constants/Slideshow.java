@@ -30,11 +30,13 @@ public class Slideshow {
     public static final int CONTENT_MARGIN_TOP = 140;
     public static final int MAIN_CONTENT_MARGIN_TOP = 300;
     public static final Double CONTENT_FONT_SIZE = 36.0;
+    public static final int SLIDE_BOARD_CONTENT_MARGIN_TOP = 450;
     public static final Double DESCRIPTION_FONT_SIZE = 24.0;
 
     // Constantes pour les images
     public static final int MAIN_IMAGE_CONTENT_HEIGHT = 400;
     public static final int IMAGE_CONTENT_HEIGHT = 480;
+    public static final int BOARD_IMAGE_CONTENT_HEIGHT = 250;
 
     // Constantes content_type prefixes
     public static final String CONTENT_TYPE_AUDIO = "audio/";

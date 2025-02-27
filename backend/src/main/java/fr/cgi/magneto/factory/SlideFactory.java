@@ -38,7 +38,11 @@ public class SlideFactory {
                         properties.getModificationDate(),
                         properties.getResourceNumber(),
                         properties.getIsShare(),
-                        properties.getIsPublic());
+                        properties.getIsPublic(),
+                        properties.getCaption(),
+                        properties.getLink(),
+                        properties.getContentType(), properties.getResourceData(), properties.getI18ns());
+
             default:
                 throw new IllegalArgumentException("Unsupported slide type: " + type);
         }

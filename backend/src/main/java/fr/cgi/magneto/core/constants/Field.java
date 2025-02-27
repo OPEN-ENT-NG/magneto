@@ -89,7 +89,6 @@ public class Field {
     public static final String CURSOR = "cursor";
     public static final String FIRSTBATCH = "firstBatch";
 
-
     // CARD FIELD
 
     public static final String BOARDID = "boardId";
@@ -124,7 +123,6 @@ public class Field {
     public static final String OK = "ok";
 
     public static final String NUMBER = "number";
-
 
     // METADATA FIELD
 
@@ -189,7 +187,7 @@ public class Field {
 
     public static final String BOARDURL = "boardUrl";
 
-    //Import Export
+    // Import Export
     public static final String RAPPORT = "rapport";
 
     public static final String RESSOURCE_NUMBER = "resourcesNumber";
@@ -212,7 +210,7 @@ public class Field {
     public static final String USER_2 = "User";
     public static final String USERIDS = "userIds";
 
-    //FAVORITE
+    // FAVORITE
     public static final String FAVORITE = "favorite";
     public static final String FAVORITE_LIST = "favoriteList";
     public static final String ISFAVORITE = "isFavorite";
@@ -232,13 +230,14 @@ public class Field {
     public static final String GROUP_TYPE = "groupType";
     public static final String GROUP = "Group";
     public static final String MEMBERS = "members";
-    //notification Folder
+    // notification Folder
     public static final String FOLDERTITLE = "folderTitle";
     public static final String FOLDERURL = "folderUrl";
     public static final String BOARDNAME = "boardName";
 
-    //EXPORT SLIDE
+    // EXPORT SLIDE
     public static final String SLIDE_OBJECTS = "slideObjects";
+    public static final String BOARD_IMAGE_ID = "boardImageId";
     public static final String BUFFER = "buffer";
     public static final String FILE = "file";
 }

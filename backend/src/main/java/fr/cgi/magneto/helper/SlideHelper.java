@@ -1,7 +1,9 @@
 package fr.cgi.magneto.helper;
 
+import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.model.slides.SlideMedia;
+import io.vertx.core.json.JsonObject;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -16,6 +18,7 @@ import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFHyperlink;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -102,7 +105,7 @@ public class SlideHelper {
     }
 
     public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String fileContentType,
-            int contentMarginTop, int imageContentHeight) {
+            int contentMarginTop, int imageContentHeight, Boolean alignLeft) {
         XMLSlideShow ppt = slide.getSlideShow();
 
         XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromContentType(fileContentType));
@@ -119,13 +122,91 @@ public class SlideHelper {
             newWidth = (int) (imageContentHeight * imgRatio);
         }
 
-        int x = Slideshow.MARGIN_LEFT + (Slideshow.WIDTH - newWidth) / 2;
+        int x = alignLeft ? Slideshow.MARGIN_LEFT : Slideshow.MARGIN_LEFT + (Slideshow.WIDTH - newWidth) / 2;
         int y = contentMarginTop + (imageContentHeight - newHeight) / 2;
 
         XSLFPictureShape shape = slide.createPicture(pic);
         shape.setAnchor(new Rectangle(x, y, newWidth, newHeight));
 
         return shape;
+    }
+
+    public static XSLFTextBox createLink(XSLFSlide slide, String url) {
+        // Créer une zone de texte pour le lien
+        XSLFTextBox linkBox = slide.createTextBox();
+        int linkPositionY = Slideshow.MARGIN_TOP_TITLE + Slideshow.TITLE_HEIGHT + 10;
+        // Positionner la zone de texte en utilisant les constantes existantes
+
+        linkBox.setAnchor(new Rectangle(
+                Slideshow.MARGIN_LEFT,
+                linkPositionY,
+                Slideshow.WIDTH,
+                50));
+
+        // Créer un paragraphe pour le texte du lien
+        XSLFTextParagraph paragraph = linkBox.addNewTextParagraph();
+        paragraph.setTextAlign(TextAlign.LEFT);
+
+        // Créer un TextRun avec l'URL comme texte affiché
+        XSLFTextRun textRun = paragraph.addNewTextRun();
+        textRun.setText(url);
+        textRun.setFontSize(Slideshow.CONTENT_FONT_SIZE);
+        textRun.setFontColor(new Color(0, 0, 255)); // Bleu pour indiquer un lien
+        textRun.setUnderlined(true); // Souligné pour indiquer un lien
+
+        // Utiliser XSLFHyperlink pour créer le lien
+        XSLFHyperlink hyperlink = textRun.createHyperlink();
+        hyperlink.setAddress(url);
+
+        return linkBox;
+    }
+
+    public static XSLFTextBox createBoardInfoList(XSLFSlide slide, String ownerName, String modificationDate,
+            int resourceNumber,
+            boolean isShare, boolean isPublic, JsonObject i18ns) {
+        // Créer une zone de texte pour la liste
+        XSLFTextBox infoBox = slide.createTextBox();
+
+        int listPositionY = Slideshow.MAIN_CONTENT_MARGIN_TOP;
+        infoBox.setAnchor(
+                new Rectangle(Slideshow.WIDTH - Slideshow.MARGIN_LEFT * 2, listPositionY, Slideshow.WIDTH, 200));
+
+        XSLFTextParagraph paragraph1 = infoBox.addNewTextParagraph();
+        paragraph1.setSpaceBefore(0.0);
+        XSLFTextRun textRun1 = paragraph1.addNewTextRun();
+        textRun1.setText("• " + i18ns.getString(CollectionsConstant.I18N_SLIDESHOW_OWNER) + ownerName);
+        textRun1.setFontSize(Slideshow.CONTENT_FONT_SIZE);
+
+        if (modificationDate != null && !modificationDate.isEmpty()) {
+            XSLFTextParagraph paragraphDate = infoBox.addNewTextParagraph();
+            XSLFTextRun textRunDate = paragraphDate.addNewTextRun();
+            textRunDate.setText(
+                    "• " + i18ns.getString(CollectionsConstant.I18N_SLIDESHOW_UPDATED) + formatDate(modificationDate));
+            textRunDate.setFontSize(Slideshow.CONTENT_FONT_SIZE);
+        }
+
+        XSLFTextParagraph paragraph2 = infoBox.addNewTextParagraph();
+        XSLFTextRun textRun2 = paragraph2.addNewTextRun();
+        textRun2.setText("• " + resourceNumber + " " + i18ns.getString(CollectionsConstant.I18N_SLIDESHOW_MAGNETS));
+        textRun2.setFontSize(Slideshow.CONTENT_FONT_SIZE);
+
+        // 3. Tableau partagé (si applicable)
+        if (isShare) {
+            XSLFTextParagraph paragraph3 = infoBox.addNewTextParagraph();
+            XSLFTextRun textRun3 = paragraph3.addNewTextRun();
+            textRun3.setText("• " + i18ns.getString(CollectionsConstant.I18N_SLIDESHOW_SHARED));
+            textRun3.setFontSize(Slideshow.CONTENT_FONT_SIZE);
+        }
+
+        // 4. Tableau de la plateforme
+        if (isPublic) {
+            XSLFTextParagraph paragraph4 = infoBox.addNewTextParagraph();
+            XSLFTextRun textRun4 = paragraph4.addNewTextRun();
+            textRun4.setText("• " + i18ns.getString(CollectionsConstant.I18N_SLIDESHOW_PLATFORM));
+            textRun4.setFontSize(Slideshow.CONTENT_FONT_SIZE);
+        }
+
+        return infoBox;
     }
 
     public static XSLFPictureShape createMedia(XSLFSlide slide, byte[] mediaData, String fileContentType,
@@ -504,6 +585,23 @@ public class SlideHelper {
                 } else {
                     return null;
                 }
+        }
+    }
+
+    private static String formatDate(String dateString) {
+        if (dateString == null || dateString.isEmpty()) {
+            return "";
+        }
+
+        try {
+            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
+
+            java.util.Date date = inputFormat.parse(dateString);
+            return outputFormat.format(date);
+        } catch (java.text.ParseException e) {
+            return dateString;
         }
     }
 }

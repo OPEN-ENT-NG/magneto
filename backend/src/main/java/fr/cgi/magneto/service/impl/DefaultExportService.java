@@ -156,6 +156,10 @@ public class DefaultExportService implements ExportService {
 
                     SlideFactory slideFactory = new SlideFactory();
 
+                    //DESCRIPTION
+                    XSLFSlide descriptionApacheSlide = createDescriptionSlide(board, i18nHelper);
+                    ppt.createSlide().importContent(descriptionApacheSlide);
+
                     // Utiliser l'ordre des cartes du Board
                     for (Card boardCard : board.cards()) {
                         String cardId = boardCard.getId();
@@ -271,6 +275,25 @@ public class DefaultExportService implements ExportService {
             }
         }
         return newTitleSlide;
+    }
+
+    private XSLFSlide createDescriptionSlide(Board board, I18nHelper i18nHelper) {
+        XMLSlideShow ppt = new XMLSlideShow();
+        XSLFSlide slide = ppt.createSlide();
+
+        SlideHelper.createTitle(slide, i18nHelper.translate("magneto.create.board.description"),
+                Slideshow.DESCRIPTION_TITLE_HEIGHT, Slideshow.DESCRIPTION_TITLE_FONT_SIZE, TextParagraph.TextAlign.LEFT);
+
+        XSLFTextBox textBox = SlideHelper.createContent(slide);
+
+        XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
+        paragraph.setTextAlign(TextParagraph.TextAlign.LEFT);
+        XSLFTextRun textRun = paragraph.addNewTextRun();
+        textRun.setText(board.getDescription());
+        textRun.setFontSize(Slideshow.DESCRIPTION_FONT_SIZE);
+        textRun.setFontFamily(Slideshow.DEFAULT_FONT);
+
+        return slide;
     }
 
     private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData,

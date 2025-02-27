@@ -152,15 +152,17 @@ public class DefaultExportService implements ExportService {
         Slide titleSlide = createTitleSlide(board, slideFactory, documents, i18nHelper);
         XSLFSlide newTitleSlide = ppt.createSlide();
         titleSlide.createApacheSlide(newTitleSlide);
+
+        // DESCRIPTION
+        Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
+        XSLFSlide newDescriptionSlide = ppt.createSlide();
+        descriptionSlide.createApacheSlide(newDescriptionSlide);
+
         return serviceFactory.cardService().getAllCardsByBoard(board, user)
                 .map(fetchedCards -> {
                     // Créer une map des cartes récupérées pour un accès rapide
                     Map<String, Card> cardMap = fetchedCards.stream()
                             .collect(Collectors.toMap(Card::getId, card -> card));
-
-                    //DESCRIPTION
-                    XSLFSlide descriptionApacheSlide = createDescriptionSlide(board, i18nHelper);
-                    ppt.createSlide().importContent(descriptionApacheSlide);
 
                     // Utiliser l'ordre des cartes du Board
                     for (Card boardCard : board.cards()) {
@@ -196,7 +198,6 @@ public class DefaultExportService implements ExportService {
                 });
     }
 
-
     private Future<XMLSlideShow> createSectionLayoutSlideObjects(Board board, UserInfos user,
                                                                  JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
         XMLSlideShow ppt = new XMLSlideShow();
@@ -208,6 +209,11 @@ public class DefaultExportService implements ExportService {
         Slide titleSlide = createTitleSlide(board, slideFactory, documents, i18nHelper);
         XSLFSlide newTitleSlide = ppt.createSlide();
         titleSlide.createApacheSlide(newTitleSlide);
+
+        // DESCRIPTION
+        Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
+        XSLFSlide newDescriptionSlide = ppt.createSlide();
+        descriptionSlide.createApacheSlide(newDescriptionSlide);
 
         return this.serviceFactory.sectionService().createSectionWithCards(board, user)
                 .map(sections -> {
@@ -312,12 +318,20 @@ public class DefaultExportService implements ExportService {
         String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
 
         propertiesBuilder
-                .ownerName(board.getOwnerName())
-                .modificationDate(board.getModificationDate())
+                .ownerName(i18nHelper.translate("magneto.slideshow.created.by") + board.getOwnerName() + ",")
+                .modificationDate(i18nHelper.translate("magneto.slideshow.updated.the") + board.getModificationDate())
                 .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
-                .contentType(contentType)
-                .i18nHelper(i18nHelper);
+                .contentType(contentType);
 
         return slideFactory.createSlide(SlideResourceType.TITLE, propertiesBuilder.build());
+    }
+
+    private Slide createDescriptionSlide(Board board, SlideFactory slideFactory,
+                                   I18nHelper i18nHelper) {
+        SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
+                .title(i18nHelper.translate("magneto.create.board.description"))
+                .description(board.getDescription());
+
+        return slideFactory.createSlide(SlideResourceType.DESCRIPTION, propertiesBuilder.build());
     }
 }

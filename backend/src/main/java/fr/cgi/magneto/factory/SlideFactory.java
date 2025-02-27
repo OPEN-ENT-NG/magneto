@@ -14,8 +14,9 @@ public class SlideFactory {
         switch (type) {
             case TITLE:
                 return new SlideTitle(properties.getTitle(), properties.getDescription(), properties.getOwnerName(),
-                        properties.getModificationDate(), properties.getResourceData(), properties.getContentType(),
-                        properties.getI18nHelper());
+                        properties.getModificationDate(), properties.getResourceData(), properties.getContentType());
+            case DESCRIPTION:
+                return new SlideDescription(properties.getTitle(), properties.getDescription());
             case TEXT:
                 return new SlideText(properties.getTitle(), properties.getDescription());
             case FILE:

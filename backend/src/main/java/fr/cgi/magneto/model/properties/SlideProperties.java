@@ -26,7 +26,7 @@ public class SlideProperties {
 
     private boolean isValidForTitle() {
         return title != null && description != null && ownerName != null && modificationDate != null
-                && resourceData != null && i18nHelper != null && contentType != null;
+                && resourceData != null && contentType != null;
     }
 
     public boolean isValidForType(SlideResourceType type) {
@@ -36,6 +36,8 @@ public class SlideProperties {
         switch (type) {
             case TITLE:
                 return isValidForTitle();
+            case DESCRIPTION:
+                return isValidForDescription();
             case TEXT:
                 return isValidForText();
             case FILE:
@@ -58,6 +60,10 @@ public class SlideProperties {
 
     public I18nHelper getI18nHelper() {
         return i18nHelper;
+    }
+
+    private boolean isValidForDescription() {
+        return title != null && description != null;
     }
 
     private boolean isValidForText() {

@@ -1,7 +1,6 @@
 package fr.cgi.magneto.model.slides;
 
 import fr.cgi.magneto.core.constants.Slideshow;
-import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.SlideHelper;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -16,16 +15,14 @@ public class SlideTitle extends Slide {
     private final String modificationDate;
     private final byte[] resourceData;
     private final String contentType;
-    private final I18nHelper i18nHelper;
 
     public SlideTitle(String title, String description, String ownerName, String modificationDate, byte[] resourceData,
-                      String contentType, I18nHelper i18nHelper) {
+                      String contentType) {
         this.title = title;
         this.description = description;
         this.ownerName = ownerName;
         this.modificationDate = modificationDate;
         this.resourceData = resourceData;
-        this.i18nHelper = i18nHelper;
         this.contentType = contentType;
     }
 
@@ -40,13 +37,13 @@ public class SlideTitle extends Slide {
         XSLFTextParagraph paragraph = textBox.addNewTextParagraph();
         paragraph.setTextAlign(TextParagraph.TextAlign.CENTER);
         XSLFTextRun textRun = paragraph.addNewTextRun();
-        textRun.setText(i18nHelper.translate("magneto.slideshow.created.by") + ownerName + ",");
+        textRun.setText(ownerName);
         textRun.setFontSize(Slideshow.CONTENT_FONT_SIZE);
 
         XSLFTextParagraph paragraph2 = textBox.addNewTextParagraph();
         paragraph2.setTextAlign(TextParagraph.TextAlign.CENTER);
         XSLFTextRun textRun2 = paragraph2.addNewTextRun();
-        textRun2.setText(i18nHelper.translate("magneto.slideshow.updated.the") + modificationDate);
+        textRun2.setText(modificationDate);
         textRun2.setFontSize(Slideshow.CONTENT_FONT_SIZE);
 
         SlideHelper.createImage(newSlide, resourceData, contentType,

@@ -32,22 +32,41 @@ public class SlideText extends Slide {
         return newSlide;
     }
 
+    private static boolean isBodyEmptyOrContainsEmptyParagraph(Element body) {
+        // Vérifier si le body est vide
+        if (body.children().isEmpty()) {
+            return true;
+        }
+
+        // Vérifier si le body ne contient qu'une balise <p></p> vide
+        if (body.children().size() == 1) {
+            Element child = body.child(0);
+            if (child.tagName().equals("p") && child.html().trim().isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void processHtmlContent(XSLFTextBox textBox, Element element) {
         if (textBox.getTextParagraphs().isEmpty()) {
             textBox.addNewTextParagraph();
         }
 
-        for (Node node : element.childNodes()) {
-            if (node instanceof Element) {
-                Element elem = (Element) node;
-                XSLFTextParagraph para = textBox.addNewTextParagraph();
-                XSLFTextRun run = para.addNewTextRun();
+        if (!isBodyEmptyOrContainsEmptyParagraph(element)) {
+            for (Node node : element.childNodes()) {
+                if (node instanceof Element) {
+                    Element elem = (Element) node;
+                    XSLFTextParagraph para = textBox.addNewTextParagraph();
+                    XSLFTextRun run = para.addNewTextRun();
 
-                processStyle(elem, para, run);
+                    processStyle(elem, para, run);
 
-                String text = elem.text().trim();
-                if (!text.isEmpty()) {
-                    run.setText(text);
+                    String text = elem.text().trim();
+                    if (!text.isEmpty()) {
+                        run.setText(text);
+                    }
                 }
             }
         }

@@ -1,23 +1,12 @@
 package fr.cgi.magneto.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.entcore.common.user.UserInfos;
-
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.SlideHelper;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.properties.SlideProperties;
@@ -31,8 +20,13 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.*;
+import org.entcore.common.user.UserInfos;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DefaultExportService implements ExportService {
 
@@ -65,8 +59,10 @@ public class DefaultExportService implements ExportService {
                                 documentIds.add(imageId);
                                 return getBoardDocuments(documentIds);
                             })
-                            .compose(documents -> createFreeLayoutSlideObjects(board, user, slideShow, documents,
-                                    i18nHelper))
+                            .compose(documents -> board.isLayoutFree()
+                                    ? createFreeLayoutSlideObjects(board, user, slideShow, documents,
+                                    i18nHelper)
+                                    : createSectionLayoutSlideObjects(board, user, slideShow, documents, i18nHelper))
                             .onFailure(err -> {
                                 String message = String.format(
                                         "[Magneto@%s::exportBoardToPptx] Failed to get documents: %s",
@@ -149,6 +145,9 @@ public class DefaultExportService implements ExportService {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
+        // TITRE
+        XSLFSlide newTitleSlide = ppt.createSlide();
+        createTitleSlide(newTitleSlide, board, documents, i18nHelper);
         return serviceFactory.cardService().getAllCardsByBoard(board, user)
                 .map(fetchedCards -> {
                     // Créer une map des cartes récupérées pour un accès rapide
@@ -156,10 +155,6 @@ public class DefaultExportService implements ExportService {
                             .collect(Collectors.toMap(Card::getId, card -> card));
 
                     SlideFactory slideFactory = new SlideFactory();
-
-                    // TITRE
-                    XSLFSlide newTitleSlide = ppt.createSlide();
-                    createTitleSlide(newTitleSlide, board, documents, i18nHelper);
 
                     // Utiliser l'ordre des cartes du Board
                     for (Card boardCard : board.cards()) {
@@ -190,6 +185,52 @@ public class DefaultExportService implements ExportService {
                 .onFailure(err -> {
                     String message = String.format(
                             "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slides: %s",
+                            this.getClass().getSimpleName(), err.getMessage());
+                    log.error(message);
+                });
+    }
+
+
+    private Future<XMLSlideShow> createSectionLayoutSlideObjects(Board board, UserInfos user,
+                                                                 JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
+        XMLSlideShow ppt = new XMLSlideShow();
+        ppt.setPageSize(new java.awt.Dimension(1280, 720));
+
+        // TITRE
+        XSLFSlide newTitleSlide = ppt.createSlide();
+        createTitleSlide(newTitleSlide, board, documents, i18nHelper);
+
+        SlideFactory slideFactory = new SlideFactory();
+
+        return this.serviceFactory.sectionService().createSectionWithCards(board, user)
+                .map(sections -> {
+                    for (Section section : sections) {
+                        // TITRE SECTION
+                        XSLFSlide sectionApacheSlide = ppt.createSlide();
+                        SlideHelper.createTitle(sectionApacheSlide, section.getTitle(), Slideshow.MAIN_TITLE_HEIGHT, Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
+
+                        for (Card card : section.getCards()) {
+                            if (card != null) {
+                                try {
+                                    Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
+                                    XSLFSlide newSlide = ppt.createSlide();
+                                    slide.createApacheSlide(newSlide);
+                                } catch (Exception e) {
+                                    String message = String.format(
+                                            "[Magneto@%s::createSectionLayoutSlideObjects] Failed to create slide for card %s: %s",
+                                            this.getClass().getSimpleName(), card.getId(), e.getMessage());
+                                    log.error(message);
+                                }
+                            } else {
+                                log.warn(String.format("Card %s from board not found in fetched cards", card.getId()));
+                            }
+                        }
+                    }
+                    return ppt;
+                })
+                .onFailure(err -> {
+                    String message = String.format(
+                            "[Magneto@%s::createSectionLayoutSlideObjects] Failed to create slides: %s",
                             this.getClass().getSimpleName(), err.getMessage());
                     log.error(message);
                 });

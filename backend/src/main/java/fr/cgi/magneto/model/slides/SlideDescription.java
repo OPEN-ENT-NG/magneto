@@ -10,9 +10,9 @@ import org.apache.poi.xslf.usermodel.XSLFTextRun;
 
 public class SlideDescription extends Slide {
 
-    public SlideDescription(String description, String title) {
-        this.description = description;
+    public SlideDescription(String title, String description) {
         this.title = title;
+        this.description = description;
     }
 
     @Override

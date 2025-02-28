@@ -1,6 +1,7 @@
 package fr.cgi.magneto.model.properties;
 
 import fr.cgi.magneto.core.enums.SlideResourceType;
+import fr.cgi.magneto.helper.I18nHelper;
 
 public class SlideProperties {
     private String title;
@@ -12,6 +13,7 @@ public class SlideProperties {
     private String fileName;
     private byte[] resourceData;
     private String contentType;
+    private I18nHelper i18nHelper;
 
     private String ownerName;
     private String modificationDate;
@@ -22,87 +24,9 @@ public class SlideProperties {
     private SlideProperties() {
     }
 
-    public static class Builder {
-        private final SlideProperties properties;
-
-        public Builder() {
-            properties = new SlideProperties();
-        }
-
-        public Builder title(String title) {
-            properties.title = title;
-            return this;
-        }
-
-        public Builder description(String description) {
-            properties.description = description;
-            return this;
-        }
-
-        public Builder caption(String caption) {
-            properties.caption = caption;
-            return this;
-        }
-
-        public Builder content(String content) {
-            properties.content = content;
-            return this;
-        }
-
-        public Builder resourceUrl(String resourceUrl) {
-            properties.resourceUrl = resourceUrl;
-            return this;
-        }
-
-        public Builder resourceId(String resourceId) {
-            properties.resourceId = resourceId;
-            return this;
-        }
-
-        public Builder contentType(String contentType) {
-            properties.contentType = contentType;
-            return this;
-        }
-
-        public Builder fileName(String fileName) {
-            properties.fileName = fileName;
-            return this;
-        }
-
-        public Builder resourceData(byte[] resourceData) {
-            properties.resourceData = resourceData;
-            return this;
-        }
-
-        // Propriétés spécifiques board
-        public Builder ownerName(String ownerName) {
-            properties.ownerName = ownerName;
-            return this;
-        }
-
-        public Builder modificationDate(String modificationDate) {
-            properties.modificationDate = modificationDate;
-            return this;
-        }
-
-        public Builder resourceNumber(Integer resourceNumber) {
-            properties.resourceNumber = resourceNumber;
-            return this;
-        }
-
-        public Builder isShare(Boolean isShare) {
-            properties.isShare = isShare;
-            return this;
-        }
-
-        public Builder isPublic(Boolean isPublic) {
-            properties.isPublic = isPublic;
-            return this;
-        }
-
-        public SlideProperties build() {
-            return properties;
-        }
+    private boolean isValidForTitle() {
+        return title != null && description != null && ownerName != null && modificationDate != null
+                && resourceData != null && contentType != null;
     }
 
     public boolean isValidForType(SlideResourceType type) {
@@ -110,6 +34,10 @@ public class SlideProperties {
             return false;
 
         switch (type) {
+            case TITLE:
+                return isValidForTitle();
+            case DESCRIPTION:
+                return isValidForDescription();
             case TEXT:
                 return isValidForText();
             case FILE:
@@ -128,6 +56,14 @@ public class SlideProperties {
             default:
                 return false;
         }
+    }
+
+    public I18nHelper getI18nHelper() {
+        return i18nHelper;
+    }
+
+    private boolean isValidForDescription() {
+        return title != null && description != null;
     }
 
     private boolean isValidForText() {
@@ -210,5 +146,93 @@ public class SlideProperties {
 
     public Boolean getIsPublic() {
         return isPublic;
+    }
+
+    public static class Builder {
+        private final SlideProperties properties;
+
+        public Builder() {
+            properties = new SlideProperties();
+        }
+
+        public Builder title(String title) {
+            properties.title = title;
+            return this;
+        }
+
+        public Builder description(String description) {
+            properties.description = description;
+            return this;
+        }
+
+        public Builder caption(String caption) {
+            properties.caption = caption;
+            return this;
+        }
+
+        public Builder content(String content) {
+            properties.content = content;
+            return this;
+        }
+
+        public Builder resourceUrl(String resourceUrl) {
+            properties.resourceUrl = resourceUrl;
+            return this;
+        }
+
+        public Builder resourceId(String resourceId) {
+            properties.resourceId = resourceId;
+            return this;
+        }
+
+        public Builder contentType(String contentType) {
+            properties.contentType = contentType;
+            return this;
+        }
+
+        public Builder fileName(String fileName) {
+            properties.fileName = fileName;
+            return this;
+        }
+
+        public Builder resourceData(byte[] resourceData) {
+            properties.resourceData = resourceData;
+            return this;
+        }
+
+        // Propriétés spécifiques board
+        public Builder ownerName(String ownerName) {
+            properties.ownerName = ownerName;
+            return this;
+        }
+
+        public Builder modificationDate(String modificationDate) {
+            properties.modificationDate = modificationDate;
+            return this;
+        }
+
+        public Builder resourceNumber(Integer resourceNumber) {
+            properties.resourceNumber = resourceNumber;
+            return this;
+        }
+
+        public Builder isShare(Boolean isShare) {
+            properties.isShare = isShare;
+            return this;
+        }
+
+        public Builder isPublic(Boolean isPublic) {
+            properties.isPublic = isPublic;
+            return this;
+        }
+
+        public Builder i18nHelper(I18nHelper i18nHelper) {
+            properties.i18nHelper = i18nHelper;
+            return this;
+        }
+
+        public SlideProperties build() {
+            return properties;
+        }
     }
 }

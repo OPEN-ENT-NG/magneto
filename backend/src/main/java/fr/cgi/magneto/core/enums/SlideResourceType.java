@@ -1,6 +1,8 @@
 package fr.cgi.magneto.core.enums;
 
 public enum SlideResourceType {
+    TITLE("title"),
+    DESCRIPTION("description"),
     TEXT("text"),
     IMAGE("image"),
     VIDEO("video"),

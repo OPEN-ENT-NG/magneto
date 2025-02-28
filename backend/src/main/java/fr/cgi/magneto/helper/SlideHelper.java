@@ -4,52 +4,25 @@ import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.model.slides.SlideMedia;
 import io.vertx.core.json.JsonObject;
+import org.apache.poi.openxml4j.opc.*;
+import org.apache.poi.sl.usermodel.PictureData.PictureType;
+import org.apache.poi.sl.usermodel.Placeholder;
+import org.apache.poi.sl.usermodel.PlaceholderDetails;
+import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
+import org.apache.poi.xslf.usermodel.*;
+import org.apache.xmlbeans.XmlCursor;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTHyperlink;
+import org.openxmlformats.schemas.presentationml.x2006.main.*;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import javax.imageio.ImageIO;
+import javax.xml.namespace.QName;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.imageio.ImageIO;
-import javax.xml.namespace.QName;
-
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFHyperlink;
-import org.apache.poi.xslf.usermodel.XSLFPictureData;
-import org.apache.poi.xslf.usermodel.XSLFPictureShape;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
-import org.apache.poi.xslf.usermodel.XSLFTextShape;
-import org.apache.xmlbeans.XmlCursor;
 import static org.apache.poi.openxml4j.opc.PackageRelationshipTypes.CORE_PROPERTIES_ECMA376_NS;
-import org.openxmlformats.schemas.drawingml.x2006.main.CTHyperlink;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTApplicationNonVisualDrawingProps;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTExtension;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTPicture;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTSlide;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTTLCommonMediaNodeData;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTTLCommonTimeNodeData;
-import org.openxmlformats.schemas.presentationml.x2006.main.CTTimeNodeList;
-import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeIndefinite;
-import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeNodeFillType;
-import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeNodeRestartType;
-import org.openxmlformats.schemas.presentationml.x2006.main.STTLTimeNodeType;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageRelationship;
-import org.apache.poi.openxml4j.opc.PackagingURIHelper;
-import org.apache.poi.openxml4j.opc.TargetMode;
-import org.apache.poi.sl.usermodel.PictureData.PictureType;
-import org.apache.poi.sl.usermodel.Placeholder;
-import org.apache.poi.sl.usermodel.PlaceholderDetails;
-import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
 
 public class SlideHelper {
 

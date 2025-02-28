@@ -1,16 +1,5 @@
 package fr.cgi.magneto.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.entcore.common.user.UserInfos;
-
-import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.MagnetoPaths;
@@ -33,7 +22,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -230,20 +218,25 @@ public class DefaultExportService implements ExportService {
                         XSLFSlide sectionApacheSlide = ppt.createSlide();
                         SlideHelper.createTitle(sectionApacheSlide, section.getTitle(), Slideshow.MAIN_TITLE_HEIGHT, Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
 
+                        // Créer un Future initial qui réussit immédiatement
+                        Future<Void> cardProcessingFuture = Future.succeededFuture();
+
+                        // Traiter les cartes en séquence en chaînant les Futures
                         for (Card card : section.getCards()) {
                             if (card != null) {
-                                try {
-                                    Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
-                                    XSLFSlide newSlide = ppt.createSlide();
-                                    slide.createApacheSlide(newSlide);
-                                } catch (Exception e) {
-                                    String message = String.format(
-                                            "[Magneto@%s::createSectionLayoutSlideObjects] Failed to create slide for card %s: %s",
-                                            this.getClass().getSimpleName(), card.getId(), e.getMessage());
-                                    log.error(message);
-                                }
-                            } else {
-                                log.warn(String.format("Card %s from board not found in fetched cards", card.getId()));
+                                // Capture la variable pour l'utiliser dans la lambda
+                                final Card finalCard = card;
+
+                                // Ajouter cette carte à la chaîne de traitements
+                                cardProcessingFuture = cardProcessingFuture.compose(v -> {
+                                    try {
+                                        return processCardResourceType(finalCard, slideFactory, slideShowData, documents,
+                                                ppt, i18nHelper);
+                                    } catch (Exception e) {
+                                        log.error("Failed to process card: " + finalCard.getId(), e);
+                                        return Future.succeededFuture(); // Continue avec la prochaine carte
+                                    }
+                                });
                             }
                         }
                     }
@@ -257,7 +250,7 @@ public class DefaultExportService implements ExportService {
                 });
     }
 
-    private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData,
+    private Slide createSlideFromCard(Card card, SlideFactory slideFactory,
             List<Map<String, Object>> documents, JsonObject referencedBoardData, I18nHelper i18nHelper) {
         SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
                 .title(card.getTitle())
@@ -364,7 +357,7 @@ public class DefaultExportService implements ExportService {
 
                         String imageUrl = referencedBoard.getImageUrl();
                         if (imageUrl == null || imageUrl.isEmpty()) {
-                            Slide slide = createSlideFromCard(card, slideFactory, slideShowData,
+                            Slide slide = createSlideFromCard(card, slideFactory,
                                     documents, referencedSlideShow, i18nHelper);
                             XSLFSlide newSlide = ppt.createSlide();
                             slide.createApacheSlide(newSlide);
@@ -380,14 +373,14 @@ public class DefaultExportService implements ExportService {
                         if (!imageExists) {
                             return fetchDocumentFile(imageId, documents)
                                     .compose(v -> {
-                                        Slide slide = createSlideFromCard(card, slideFactory, slideShowData,
+                                        Slide slide = createSlideFromCard(card, slideFactory,
                                                 documents, referencedSlideShow, i18nHelper);
                                         XSLFSlide newSlide = ppt.createSlide();
                                         slide.createApacheSlide(newSlide);
                                         return Future.succeededFuture();
                                     });
                         } else {
-                            Slide slide = createSlideFromCard(card, slideFactory, slideShowData,
+                            Slide slide = createSlideFromCard(card, slideFactory,
                                     documents, referencedSlideShow, i18nHelper);
                             XSLFSlide newSlide = ppt.createSlide();
                             slide.createApacheSlide(newSlide);
@@ -395,7 +388,7 @@ public class DefaultExportService implements ExportService {
                         }
                     });
         } else {
-            Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents, null, i18nHelper);
+            Slide slide = createSlideFromCard(card, slideFactory, documents, null, i18nHelper);
             XSLFSlide newSlide = ppt.createSlide();
             slide.createApacheSlide(newSlide);
             return Future.succeededFuture();

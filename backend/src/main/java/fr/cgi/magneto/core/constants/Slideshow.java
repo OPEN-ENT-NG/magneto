@@ -1,6 +1,6 @@
 package fr.cgi.magneto.core.constants;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class Slideshow {
     // Constantes de mise en page générales
@@ -37,6 +37,8 @@ public class Slideshow {
     public static final int MAIN_IMAGE_CONTENT_HEIGHT = 400;
     public static final int IMAGE_CONTENT_HEIGHT = 480;
     public static final int BOARD_IMAGE_CONTENT_HEIGHT = 250;
+    public static final int SVG_CONTENT_HEIGHT = 250;
+    public static final int SVG_CONTENT_WIDTH = 175;
 
     // Constantes content_type prefixes
     public static final String CONTENT_TYPE_AUDIO = "audio/";

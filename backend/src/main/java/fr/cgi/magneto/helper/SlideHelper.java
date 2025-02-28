@@ -99,7 +99,21 @@ public class SlideHelper {
         int y = contentMarginTop + (imageContentHeight - newHeight) / 2;
 
         XSLFPictureShape shape = slide.createPicture(pic);
-        shape.setAnchor(new Rectangle(x, y, newWidth, newHeight));
+        shape.setAnchor(new Rectangle(x, y, 200, newHeight));
+
+        return shape;
+    }
+
+    public static XSLFPictureShape createImageWidthHeight(XSLFSlide slide, byte[] pictureData, String fileContentType,
+                                               int contentMarginTop, int imageContentHeight, int imageContentWidth, Boolean alignLeft) {
+        XMLSlideShow ppt = slide.getSlideShow();
+
+        XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromContentType(fileContentType));
+
+        int x = alignLeft ? Slideshow.MARGIN_LEFT : Slideshow.MARGIN_LEFT + (Slideshow.WIDTH - imageContentWidth) / 2;
+
+        XSLFPictureShape shape = slide.createPicture(pic);
+        shape.setAnchor(new Rectangle(x, contentMarginTop, imageContentWidth, imageContentHeight));
 
         return shape;
     }

@@ -22,11 +22,14 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.entcore.common.user.UserInfos;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -279,7 +282,25 @@ public class DefaultExportService implements ExportService {
             case LINK:
             case HYPERLINK:
             case EMBEDDER:
-                propertiesBuilder.resourceUrl(card.getResourceUrl());
+                try {
+                    ClassLoader classLoader = getClass().getClassLoader();
+                    InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
+
+                    if (inputStream != null) {
+                        byte[] svgData = IOUtils.toByteArray(inputStream);
+
+                        propertiesBuilder
+                                .resourceUrl(card.getResourceUrl())
+                                .caption(card.getCaption())
+                                .resourceData(svgData)
+                                .contentType("image/svg+xml");
+                    } else {
+                        log.warn("SVG file not found in resources");
+                        // Traitement alternatif si le fichier n'est pas trouvé
+                    }
+                } catch (IOException e) {
+                    log.error("Failed to load SVG file", e);
+                }
                 break;
             case IMAGE:
             case VIDEO:

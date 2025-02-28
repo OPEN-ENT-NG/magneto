@@ -25,7 +25,7 @@ public class SlideFactory {
             case LINK:
             case HYPERLINK:
             case EMBEDDER:
-                return new SlideLink(properties.getResourceUrl());
+                return new SlideLink(properties.getTitle(), properties.getDescription(), properties.getResourceUrl(), properties.getCaption(), properties.getResourceData(), properties.getContentType());
             case IMAGE:
             case VIDEO:
             case AUDIO:

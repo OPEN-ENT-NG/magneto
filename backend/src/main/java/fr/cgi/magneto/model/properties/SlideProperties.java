@@ -1,8 +1,8 @@
 package fr.cgi.magneto.model.properties;
 
 import fr.cgi.magneto.core.enums.SlideResourceType;
-import io.vertx.core.json.JsonObject;
 import fr.cgi.magneto.helper.I18nHelper;
+import io.vertx.core.json.JsonObject;
 
 public class SlideProperties {
     private String title;
@@ -163,12 +163,10 @@ public class SlideProperties {
         return i18nHelper;
     }
 
-    private boolean isValidForDescription() {
-        return title != null && description != null;
-    }
+    private boolean isValidForDescription() { return title != null; }
 
     private boolean isValidForText() {
-        return title != null && description != null;
+        return title != null;
     }
 
     private boolean isValidForFile() {
@@ -176,7 +174,7 @@ public class SlideProperties {
     }
 
     private boolean isValidForLink() {
-        return resourceUrl != null && title != null;
+        return resourceUrl != null && title != null && caption != null && resourceData != null && contentType != null;
     }
 
     private boolean isValidForMedia() {

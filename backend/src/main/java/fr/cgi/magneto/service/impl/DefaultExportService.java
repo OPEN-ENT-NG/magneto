@@ -212,35 +212,43 @@ public class DefaultExportService implements ExportService {
         descriptionSlide.createApacheSlide(newDescriptionSlide);
 
         return this.serviceFactory.sectionService().createSectionWithCards(board, user)
-                .map(sections -> {
+                .compose(sections -> {
+                    // Créer un Future initial qui réussit immédiatement
+                    Future<XMLSlideShow> processingFuture = Future.succeededFuture(ppt);
+
+                    // Traiter chaque section et ses cartes séquentiellement
                     for (Section section : sections) {
-                        // TITRE SECTION
-                        XSLFSlide sectionApacheSlide = ppt.createSlide();
-                        SlideHelper.createTitle(sectionApacheSlide, section.getTitle(), Slideshow.MAIN_TITLE_HEIGHT, Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
+                        processingFuture = processingFuture.compose(currentPpt -> {
+                            // TITRE SECTION
+                            XSLFSlide sectionApacheSlide = currentPpt.createSlide();
+                            SlideHelper.createTitle(sectionApacheSlide, section.getTitle(),
+                                    Slideshow.MAIN_TITLE_HEIGHT,
+                                    Slideshow.MAIN_TITLE_FONT_SIZE,
+                                    TextParagraph.TextAlign.CENTER);
 
-                        // Créer un Future initial qui réussit immédiatement
-                        Future<Void> cardProcessingFuture = Future.succeededFuture();
+                            // Future pour le traitement séquentiel des cartes de cette section
+                            Future<XMLSlideShow> sectionFuture = Future.succeededFuture(currentPpt);
 
-                        // Traiter les cartes en séquence en chaînant les Futures
-                        for (Card card : section.getCards()) {
-                            if (card != null) {
-                                // Capture la variable pour l'utiliser dans la lambda
-                                final Card finalCard = card;
-
-                                // Ajouter cette carte à la chaîne de traitements
-                                cardProcessingFuture = cardProcessingFuture.compose(v -> {
-                                    try {
-                                        return processCardResourceType(finalCard, slideFactory, slideShowData, documents,
-                                                ppt, i18nHelper);
-                                    } catch (Exception e) {
-                                        log.error("Failed to process card: " + finalCard.getId(), e);
-                                        return Future.succeededFuture(); // Continue avec la prochaine carte
-                                    }
-                                });
+                            for (Card card : section.getCards()) {
+                                if (card != null) {
+                                    final Card finalCard = card;
+                                    sectionFuture = sectionFuture.compose(pptInProgress ->
+                                            processCardResourceType(finalCard, slideFactory, slideShowData,
+                                                    documents, pptInProgress, i18nHelper)
+                                                    .map(v -> pptInProgress) // Retourne toujours la présentation
+                                                    .recover(err -> {
+                                                        log.error("Failed to process card: " + finalCard.getId(), err);
+                                                        return Future.succeededFuture(pptInProgress); // Continue avec la prochaine carte
+                                                    })
+                                    );
+                                }
                             }
-                        }
+
+                            return sectionFuture;
+                        });
                     }
-                    return ppt;
+
+                    return processingFuture;
                 })
                 .onFailure(err -> {
                     String message = String.format(

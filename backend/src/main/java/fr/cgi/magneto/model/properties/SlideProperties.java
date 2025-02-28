@@ -170,7 +170,7 @@ public class SlideProperties {
     }
 
     private boolean isValidForFile() {
-        return fileName != null && resourceUrl != null;
+        return fileName != null && resourceUrl != null && title != null && caption != null;
     }
 
     private boolean isValidForLink() {

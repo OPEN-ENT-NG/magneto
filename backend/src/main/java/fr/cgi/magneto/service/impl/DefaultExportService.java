@@ -275,9 +275,25 @@ public class DefaultExportService implements ExportService {
             case FILE:
             case PDF:
             case SHEET:
-                propertiesBuilder
-                        .resourceUrl(card.getResourceUrl())
-                        .fileName(card.getMetadata() != null ? card.getMetadata().getFilename() : "");
+                try {
+                    ClassLoader classLoader = getClass().getClassLoader();
+                    InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
+                    //TODO : récupérer le bon SVG selon le type de fichier (cf ce qui est fait en front)
+
+                    if (inputStream != null) {
+                        byte[] svgData = IOUtils.toByteArray(inputStream);
+
+                        propertiesBuilder
+                                .fileName(card.getMetadata() != null ? card.getMetadata().getFilename() : "")
+                                .caption(card.getCaption())
+                                .resourceData(svgData); //TODO : mettre contenttype?
+                    } else {
+                        log.warn("SVG file not found in resources");
+                        // Traitement alternatif si le fichier n'est pas trouvé
+                    }
+                } catch (IOException e) {
+                    log.error("Failed to load SVG file", e);
+                }
                 break;
             case LINK:
             case HYPERLINK:

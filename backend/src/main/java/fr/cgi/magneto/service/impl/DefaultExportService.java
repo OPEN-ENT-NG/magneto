@@ -1,6 +1,8 @@
 package fr.cgi.magneto.service.impl;
 
+import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.MagnetoPaths;
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
@@ -20,7 +22,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -159,42 +160,37 @@ public class DefaultExportService implements ExportService {
         descriptionSlide.createApacheSlide(newDescriptionSlide);
 
         return serviceFactory.cardService().getAllCardsByBoard(board, user)
-                .map(fetchedCards -> {
-                    // Créer une map des cartes récupérées pour un accès rapide
+                .compose(fetchedCards -> {
                     Map<String, Card> cardMap = fetchedCards.stream()
                             .collect(Collectors.toMap(Card::getId, card -> card));
 
-                    // Utiliser l'ordre des cartes du Board
+                    // Créer un Future initial qui réussit immédiatement
+                    Future<Void> cardProcessingFuture = Future.succeededFuture();
+
+                    // Traiter les cartes en séquence en chaînant les Futures
                     for (Card boardCard : board.cards()) {
                         String cardId = boardCard.getId();
                         Card card = cardMap.get(cardId);
+
                         if (card != null) {
-                            try {
-                                Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
-                                XSLFSlide newSlide = ppt.createSlide();
-                                slide.createApacheSlide(newSlide);
-                                // Inspecter le contenu du package après l'ajout de la diapositive
-                                log.info("Package parts after adding slide:");
-                                for (PackagePart part : ppt.getPackage().getParts()) {
-                                    log.info("- " + part.getPartName());
+                            // Capture la variable pour l'utiliser dans la lambda
+                            final Card finalCard = card;
+
+                            // Ajouter cette carte à la chaîne de traitements
+                            cardProcessingFuture = cardProcessingFuture.compose(v -> {
+                                try {
+                                    return processCardResourceType(finalCard, slideFactory, slideShowData, documents,
+                                            ppt, i18nHelper);
+                                } catch (Exception e) {
+                                    log.error("Failed to process card: " + finalCard.getId(), e);
+                                    return Future.succeededFuture(); // Continue avec la prochaine carte
                                 }
-                            } catch (Exception e) {
-                                String message = String.format(
-                                        "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slide for card %s: %s",
-                                        this.getClass().getSimpleName(), cardId, e.getMessage());
-                                log.error(message);
-                            }
-                        } else {
-                            log.warn(String.format("Card %s from board not found in fetched cards", cardId));
+                            });
                         }
                     }
-                    return ppt;
-                })
-                .onFailure(err -> {
-                    String message = String.format(
-                            "[Magneto@%s::createFreeLayoutSlideObjects] Failed to create slides: %s",
-                            this.getClass().getSimpleName(), err.getMessage());
-                    log.error(message);
+
+                    // Retourner le ppt une fois que toutes les cartes ont été traitées
+                    return cardProcessingFuture.map(v -> ppt);
                 });
     }
 
@@ -216,30 +212,43 @@ public class DefaultExportService implements ExportService {
         descriptionSlide.createApacheSlide(newDescriptionSlide);
 
         return this.serviceFactory.sectionService().createSectionWithCards(board, user)
-                .map(sections -> {
-                    for (Section section : sections) {
-                        // TITRE SECTION
-                        XSLFSlide sectionApacheSlide = ppt.createSlide();
-                        SlideHelper.createTitle(sectionApacheSlide, section.getTitle(), Slideshow.MAIN_TITLE_HEIGHT, Slideshow.MAIN_TITLE_FONT_SIZE, TextParagraph.TextAlign.CENTER);
+                .compose(sections -> {
+                    // Créer un Future initial qui réussit immédiatement
+                    Future<XMLSlideShow> processingFuture = Future.succeededFuture(ppt);
 
-                        for (Card card : section.getCards()) {
-                            if (card != null) {
-                                try {
-                                    Slide slide = createSlideFromCard(card, slideFactory, slideShowData, documents);
-                                    XSLFSlide newSlide = ppt.createSlide();
-                                    slide.createApacheSlide(newSlide);
-                                } catch (Exception e) {
-                                    String message = String.format(
-                                            "[Magneto@%s::createSectionLayoutSlideObjects] Failed to create slide for card %s: %s",
-                                            this.getClass().getSimpleName(), card.getId(), e.getMessage());
-                                    log.error(message);
+                    // Traiter chaque section et ses cartes séquentiellement
+                    for (Section section : sections) {
+                        processingFuture = processingFuture.compose(currentPpt -> {
+                            // TITRE SECTION
+                            XSLFSlide sectionApacheSlide = currentPpt.createSlide();
+                            SlideHelper.createTitle(sectionApacheSlide, section.getTitle(),
+                                    Slideshow.MAIN_TITLE_HEIGHT,
+                                    Slideshow.MAIN_TITLE_FONT_SIZE,
+                                    TextParagraph.TextAlign.CENTER);
+
+                            // Future pour le traitement séquentiel des cartes de cette section
+                            Future<XMLSlideShow> sectionFuture = Future.succeededFuture(currentPpt);
+
+                            for (Card card : section.getCards()) {
+                                if (card != null) {
+                                    final Card finalCard = card;
+                                    sectionFuture = sectionFuture.compose(pptInProgress ->
+                                            processCardResourceType(finalCard, slideFactory, slideShowData,
+                                                    documents, pptInProgress, i18nHelper)
+                                                    .map(v -> pptInProgress) // Retourne toujours la présentation
+                                                    .recover(err -> {
+                                                        log.error("Failed to process card: " + finalCard.getId(), err);
+                                                        return Future.succeededFuture(pptInProgress); // Continue avec la prochaine carte
+                                                    })
+                                    );
                                 }
-                            } else {
-                                log.warn(String.format("Card %s from board not found in fetched cards", card.getId()));
                             }
-                        }
+
+                            return sectionFuture;
+                        });
                     }
-                    return ppt;
+
+                    return processingFuture;
                 })
                 .onFailure(err -> {
                     String message = String.format(
@@ -249,8 +258,8 @@ public class DefaultExportService implements ExportService {
                 });
     }
 
-    private Slide createSlideFromCard(Card card, SlideFactory slideFactory, JsonObject slideShowData,
-            List<Map<String, Object>> documents) {
+    private Slide createSlideFromCard(Card card, SlideFactory slideFactory,
+            List<Map<String, Object>> documents, JsonObject referencedBoardData, I18nHelper i18nHelper) {
         SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
                 .title(card.getTitle())
                 .description(card.getDescription());
@@ -290,16 +299,122 @@ public class DefaultExportService implements ExportService {
                         .caption(card.getCaption());
                 break;
             case BOARD:
-                propertiesBuilder
-                        .ownerName(slideShowData.getString(Field.OWNERNAME))
-                        .modificationDate(slideShowData.getString(Field.MODIFICATIONDATE))
-                        .resourceNumber(slideShowData.getInteger(Field.MAGNET_NUMBER))
-                        .isShare(slideShowData.getBoolean(Field.SHARED))
-                        .isPublic(slideShowData.getBoolean(Field.ISPUBLIC));
+                if (referencedBoardData != null) {
+                    JsonObject i18nValues = new JsonObject()
+                            .put(CollectionsConstant.I18N_SLIDESHOW_OWNER,
+                                    i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_OWNER))
+                            .put(CollectionsConstant.I18N_SLIDESHOW_UPDATED,
+                                    i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_UPDATED))
+                            .put(CollectionsConstant.I18N_SLIDESHOW_MAGNETS,
+                                    i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_MAGNETS))
+                            .put(CollectionsConstant.I18N_SLIDESHOW_SHARED,
+                                    i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_SHARED))
+                            .put(CollectionsConstant.I18N_SLIDESHOW_PLATFORM,
+                                    i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_PLATFORM));
+
+                    String boardImageId = referencedBoardData.getString(Field.BOARD_IMAGE_ID, "");
+
+                    // Créer une map pour un accès rapide aux documents par ID
+                    Map<String, Map<String, Object>> boardDocumentMap = new HashMap<>();
+                    for (Map<String, Object> doc : documents) {
+                        boardDocumentMap.put((String) doc.get(Field.DOCUMENTID), doc);
+                    }
+
+                    // Récupérer les données de l'image
+                    Map<String, Object> imageDocumentData = boardDocumentMap.get(boardImageId);
+                    Buffer imageBuffer = null;
+                    String imageContentType = "";
+
+                    if (imageDocumentData != null) {
+                        imageBuffer = (Buffer) imageDocumentData.get(Field.BUFFER);
+                        imageContentType = (String) imageDocumentData.get(Field.CONTENTTYPE);
+                    }
+
+                    propertiesBuilder
+                            .title(referencedBoardData.getString(Field.TITLE))
+                            .description(referencedBoardData.getString(Field.DESCRIPTION))
+                            .caption(card.getCaption())
+                            .ownerName(referencedBoardData.getString(Field.OWNERNAME))
+                            .modificationDate(referencedBoardData.getString(Field.MODIFICATIONDATE))
+                            .resourceNumber(referencedBoardData.getInteger(Field.MAGNET_NUMBER))
+                            .isShare(referencedBoardData.getBoolean(Field.SHARED))
+                            .link(processBoardUrl(card.getResourceUrl()))
+                            .contentType(imageContentType)
+                            .resourceData(imageBuffer != null ? imageBuffer.getBytes() : null)
+                            .isPublic(referencedBoardData.getBoolean(Field.ISPUBLIC))
+                            .i18ns(i18nValues);
+                }
                 break;
         }
 
         return slideFactory.createSlide(resourceType, propertiesBuilder.build());
+    }
+
+    private Future<Void> processCardResourceType(Card card, SlideFactory slideFactory, JsonObject slideShowData,
+            List<Map<String, Object>> documents, XMLSlideShow ppt, I18nHelper i18nHelper) {
+        if (SlideResourceType.BOARD.getValue().equals(card.getResourceType())) {
+            return serviceFactory.boardService()
+                    .getBoards(Collections.singletonList(card.getResourceUrl()))
+                    .compose(boards -> {
+                        if (boards.isEmpty()) {
+                            return Future.succeededFuture();
+                        }
+
+                        Board referencedBoard = boards.get(0);
+                        JsonObject referencedSlideShow = createSlideShowObject(referencedBoard);
+
+                        String imageUrl = referencedBoard.getImageUrl();
+                        if (imageUrl == null || imageUrl.isEmpty()) {
+                            Slide slide = createSlideFromCard(card, slideFactory,
+                                    documents, referencedSlideShow, i18nHelper);
+                            XSLFSlide newSlide = ppt.createSlide();
+                            slide.createApacheSlide(newSlide);
+                            return Future.succeededFuture();
+                        }
+
+                        String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                        referencedSlideShow.put(Field.BOARD_IMAGE_ID, imageId);
+
+                        boolean imageExists = documents.stream()
+                                .anyMatch(doc -> imageId.equals(doc.get(Field.DOCUMENTID)));
+
+                        if (!imageExists) {
+                            return fetchDocumentFile(imageId, documents)
+                                    .compose(v -> {
+                                        Slide slide = createSlideFromCard(card, slideFactory,
+                                                documents, referencedSlideShow, i18nHelper);
+                                        XSLFSlide newSlide = ppt.createSlide();
+                                        slide.createApacheSlide(newSlide);
+                                        return Future.succeededFuture();
+                                    });
+                        } else {
+                            Slide slide = createSlideFromCard(card, slideFactory,
+                                    documents, referencedSlideShow, i18nHelper);
+                            XSLFSlide newSlide = ppt.createSlide();
+                            slide.createApacheSlide(newSlide);
+                            return Future.succeededFuture();
+                        }
+                    });
+        } else {
+            Slide slide = createSlideFromCard(card, slideFactory, documents, null, i18nHelper);
+            XSLFSlide newSlide = ppt.createSlide();
+            slide.createApacheSlide(newSlide);
+            return Future.succeededFuture();
+        }
+    }
+
+    private String processBoardUrl(String boardId) {
+        if (boardId == null || boardId.isEmpty()) {
+            return "";
+        }
+
+        String baseUrl = serviceFactory.magnetoConfig().host();
+
+        if (!baseUrl.endsWith("/")) {
+            baseUrl += "/";
+        }
+
+        return baseUrl + MagnetoPaths.MAGNETO_BOARD + boardId + MagnetoPaths.VIEW;
     }
 
     private Slide createTitleSlide(Board board, SlideFactory slideFactory, List<Map<String, Object>> documents,

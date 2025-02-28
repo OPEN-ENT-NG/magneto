@@ -47,7 +47,7 @@ public class SlideTitle extends Slide {
         textRun2.setFontSize(Slideshow.CONTENT_FONT_SIZE);
 
         SlideHelper.createImage(newSlide, resourceData, contentType,
-                Slideshow.MAIN_CONTENT_MARGIN_TOP, Slideshow.MAIN_IMAGE_CONTENT_HEIGHT);
+                Slideshow.MAIN_CONTENT_MARGIN_TOP, Slideshow.MAIN_IMAGE_CONTENT_HEIGHT, false);
 
         return newSlide;
 

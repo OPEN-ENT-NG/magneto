@@ -33,6 +33,8 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
+
 public class DefaultExportService implements ExportService {
 
     protected static final Logger log = LoggerFactory.getLogger(DefaultExportService.class);
@@ -275,9 +277,28 @@ public class DefaultExportService implements ExportService {
             case FILE:
             case PDF:
             case SHEET:
-                propertiesBuilder
-                        .resourceUrl(card.getResourceUrl())
-                        .fileName(card.getMetadata() != null ? card.getMetadata().getFilename() : "");
+                try {
+                    String svgSource = loadResourceForExtension(card.getMetadata().getExtension());
+                    ClassLoader classLoader = getClass().getClassLoader();
+                    InputStream inputStream = classLoader.getResourceAsStream(svgSource);
+
+                    if (inputStream != null) {
+                        byte[] svgData = IOUtils.toByteArray(inputStream);
+                        String fileNameString = i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_FILENAME)
+                                + (card.getMetadata() != null ? card.getMetadata().getFilename() : "")
+                                + "\nLe fichier est disponible dans le dossier « Fichiers liés » de l'archive.";
+                        propertiesBuilder
+                                .fileNameString(fileNameString)
+                                .caption(card.getCaption())
+                                .resourceData(svgData)
+                                .contentType("image/svg+xml");
+                    } else {
+                        log.warn("SVG file not found in resources");
+                        // Traitement alternatif si le fichier n'est pas trouvé
+                    }
+                } catch (IOException e) {
+                    log.error("Failed to load SVG file", e);
+                }
                 break;
             case LINK:
             case HYPERLINK:

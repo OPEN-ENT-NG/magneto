@@ -230,6 +230,7 @@
   "magneto.slideshow.magnets": "aimants",
   "magneto.slideshow.shared": "Tableau partagé",
   "magneto.slideshow.platform": "Tableau de la plateforme",
+  "magneto.slideshow.filename": "Fichier : ",
   "magneto.notify.board.push.notif.body": "vous notifie de changements sur un tableau",
   "magneto.loading": "Chargement",
   "magneto.zoom": "Zoom",

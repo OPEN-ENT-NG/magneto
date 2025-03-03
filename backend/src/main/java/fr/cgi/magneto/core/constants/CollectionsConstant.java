@@ -11,6 +11,7 @@ public class CollectionsConstant {
     public static final String I18N_SLIDESHOW_MAGNETS = "magneto.slideshow.magnets";
     public static final String I18N_SLIDESHOW_SHARED = "magneto.slideshow.shared";
     public static final String I18N_SLIDESHOW_PLATFORM = "magneto.slideshow.platform";
+    public static final String I18N_SLIDESHOW_FILENAME = "magneto.slideshow.filename";
 
     public static final String WORKSPACE_DOCUMENTS = "documents";
 }

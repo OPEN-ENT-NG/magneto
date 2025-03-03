@@ -4,6 +4,7 @@ import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.MagnetoPaths;
 import fr.cgi.magneto.core.constants.Slideshow;
+import fr.cgi.magneto.core.enums.FileFormatManager;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
 import fr.cgi.magneto.helper.I18nHelper;
@@ -32,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static fr.cgi.magneto.core.enums.FileFormatManager.getFormatFromExtension;
 
 public class DefaultExportService implements ExportService {
 
@@ -277,6 +280,7 @@ public class DefaultExportService implements ExportService {
             case SHEET:
                 try {
                     ClassLoader classLoader = getClass().getClassLoader();
+                    FileFormatManager.FileFormat format = getFormatFromExtension(card.getMetadata().getExtension());
                     InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
                     //TODO : récupérer le bon SVG selon le type de fichier (cf ce qui est fait en front)
 

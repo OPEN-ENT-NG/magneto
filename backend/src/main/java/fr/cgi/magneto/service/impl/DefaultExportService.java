@@ -4,7 +4,6 @@ import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.MagnetoPaths;
 import fr.cgi.magneto.core.constants.Slideshow;
-import fr.cgi.magneto.core.enums.FileFormatManager;
 import fr.cgi.magneto.core.enums.SlideResourceType;
 import fr.cgi.magneto.factory.SlideFactory;
 import fr.cgi.magneto.helper.I18nHelper;
@@ -34,7 +33,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static fr.cgi.magneto.core.enums.FileFormatManager.getFormatFromExtension;
+import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
 
 public class DefaultExportService implements ExportService {
 
@@ -279,18 +278,20 @@ public class DefaultExportService implements ExportService {
             case PDF:
             case SHEET:
                 try {
+                    String svgSource = loadResourceForExtension(card.getMetadata().getExtension());
                     ClassLoader classLoader = getClass().getClassLoader();
-                    FileFormatManager.FileFormat format = getFormatFromExtension(card.getMetadata().getExtension());
-                    InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
-                    //TODO : récupérer le bon SVG selon le type de fichier (cf ce qui est fait en front)
+                    InputStream inputStream = classLoader.getResourceAsStream(svgSource);
 
                     if (inputStream != null) {
                         byte[] svgData = IOUtils.toByteArray(inputStream);
-
+                        String fileNameString = i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_FILENAME)
+                                + (card.getMetadata() != null ? card.getMetadata().getFilename() : "")
+                                + "\nLe fichier est disponible dans le dossier « Fichiers liés » de l'archive.";
                         propertiesBuilder
-                                .fileName(card.getMetadata() != null ? card.getMetadata().getFilename() : "")
+                                .fileNameString(fileNameString)
                                 .caption(card.getCaption())
-                                .resourceData(svgData); //TODO : mettre contenttype?
+                                .resourceData(svgData)
+                                .contentType("image/svg+xml");
                     } else {
                         log.warn("SVG file not found in resources");
                         // Traitement alternatif si le fichier n'est pas trouvé

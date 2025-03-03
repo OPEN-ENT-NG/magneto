@@ -21,7 +21,7 @@ public class SlideFactory {
                 return new SlideText(properties.getTitle(), properties.getDescription());
             case FILE:
             case PDF:
-                return new SlideFile(properties.getFileName(), properties.getCaption(), properties.getResourceData());
+                return new SlideFile(properties.getTitle(), properties.getDescription(), properties.getFileNameString(), properties.getCaption(), properties.getResourceData(), properties.getContentType());
             case LINK:
             case HYPERLINK:
             case EMBEDDER:

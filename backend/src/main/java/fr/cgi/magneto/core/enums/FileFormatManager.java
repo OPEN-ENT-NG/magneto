@@ -1,9 +1,6 @@
 package fr.cgi.magneto.core.enums;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,7 +28,7 @@ public class FileFormatManager {
      * @return le contenu de la ressource sous forme de byte[]
      * @throws IOException si une erreur se produit lors du chargement
      */
-    public static byte[] loadResourceForExtension(String extension) throws IOException {
+    public static String loadResourceForExtension(String extension) throws IOException {
         if (extension == null || extension.isEmpty()) {
             throw new IllegalArgumentException("L'extension ne peut pas être null ou vide");
         }
@@ -57,20 +54,13 @@ public class FileFormatManager {
             case PDF:
                 resourcePath = "img/extension/pdf.svg";
                 break;
-
             case TEXT:
             default:
                 resourcePath = "img/extension/default.svg";
                 break;
         }
 
-        // Obtention du InputStream à partir de la ressource
-        InputStream inputStream = FileFormatManager.class.getResourceAsStream(resourcePath);
-        if (inputStream == null) {
-            throw new IOException("Ressource non trouvée: " + resourcePath);
-        }
-
-        return IOUtils.toByteArray(inputStream);
+        return resourcePath;
     }
 
     /**
@@ -83,7 +73,7 @@ public class FileFormatManager {
         VIDEO(Arrays.asList("3g2", "3gp", "avi", "flv", "h264", "m4v", "mkv", "mov", "mp4",
                 "mpg", "mpeg", "rm", "swf", "vob", "wmv")),
         AUDIO(Arrays.asList("aif", "cda", "mid", "midi", "mp3", "mpa", "ogg", "wav", "wma", "wpl")),
-        SHEET(Arrays.asList("xlsx", "xlsm", "xlt", "xltx", "xltm", "ods", "csv", "tsv", "tab")),
+        SHEET(Arrays.asList("xlsx", "xls", "xlsm", "xlt", "xltx", "xltm", "ods", "csv", "tsv", "tab")),
         PDF(Arrays.asList("pdf"));
 
         private final List<String> extensions;

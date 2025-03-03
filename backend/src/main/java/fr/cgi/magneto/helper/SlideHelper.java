@@ -11,6 +11,8 @@ import org.apache.poi.sl.usermodel.PlaceholderDetails;
 import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
 import org.apache.poi.xslf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTHyperlink;
 import org.openxmlformats.schemas.presentationml.x2006.main.*;
 
@@ -47,6 +49,22 @@ public class SlideHelper {
         run.setFontSize(titleFontSize);
 
         return (XSLFTextBox) titleShape;
+    }
+
+    public static void addNotes(XSLFSlide newSlide, String description) {
+        Document doc = Jsoup.parse(description);
+        doc.select("style").remove();
+        String text = doc.text();
+
+        XSLFNotes note = newSlide.getSlideShow().getNotesSlide(newSlide);
+
+        // insert text
+        for (XSLFTextShape shape : note.getPlaceholders()) {
+            if (shape.getTextType() == Placeholder.BODY) {
+                shape.setText(text);
+                break;
+            }
+        }
     }
 
     public static XSLFTextBox createLegend(XSLFSlide slide, String legendText) {

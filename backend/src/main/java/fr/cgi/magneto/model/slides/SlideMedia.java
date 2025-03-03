@@ -59,6 +59,8 @@ public class SlideMedia extends Slide {
         }
         SlideHelper.createLegend(newSlide, caption);
 
+        SlideHelper.addNotes(newSlide, description);
+
         return newSlide;
     }
 }

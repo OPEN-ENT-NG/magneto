@@ -30,6 +30,8 @@ public class SlideLink extends Slide {
                 Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);
         SlideHelper.createLegend(newSlide, caption);
 
+        SlideHelper.addNotes(newSlide, description);
+
         return newSlide;
     }
 }

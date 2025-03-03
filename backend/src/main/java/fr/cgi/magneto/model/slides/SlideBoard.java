@@ -1,11 +1,10 @@
 package fr.cgi.magneto.model.slides;
 
-import org.apache.poi.sl.usermodel.TextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.helper.SlideHelper;
 import io.vertx.core.json.JsonObject;
+import org.apache.poi.sl.usermodel.TextParagraph;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
 
 public class SlideBoard extends Slide {
     private final String ownerName;
@@ -47,6 +46,8 @@ public class SlideBoard extends Slide {
         SlideHelper.createBoardInfoList(newSlide, ownerName, modificationDate, resourceNumber, isShare, isPublic,
                 i18ns);
         SlideHelper.createLegend(newSlide, caption);
+
+        SlideHelper.addNotes(newSlide, description);
 
         return newSlide;
     }

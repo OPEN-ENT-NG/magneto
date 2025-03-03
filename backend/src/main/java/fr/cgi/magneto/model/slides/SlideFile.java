@@ -2,11 +2,11 @@ package fr.cgi.magneto.model.slides;
 
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.helper.SlideHelper;
+import org.apache.poi.sl.usermodel.Placeholder;
 import org.apache.poi.sl.usermodel.TextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
+import org.apache.poi.xslf.usermodel.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public class SlideFile extends Slide {
     private final String filenameString;
@@ -40,6 +40,20 @@ public class SlideFile extends Slide {
         SlideHelper.createImageWidthHeight(newSlide, fileSvg, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
                 Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);
         SlideHelper.createLegend(newSlide, caption);
+
+        Document doc = Jsoup.parse(description);
+        doc.select("style").remove();
+        String text = doc.text();
+
+        XSLFNotes note = newSlide.getSlideShow().getNotesSlide(newSlide);
+
+        // insert text
+        for (XSLFTextShape shape : note.getPlaceholders()) {
+            if (shape.getTextType() == Placeholder.BODY) {
+                shape.setText(text);
+                break;
+            }
+        }
 
         return newSlide;
     }

@@ -17,7 +17,9 @@ import fr.cgi.magneto.service.ExportService;
 import fr.cgi.magneto.service.ServiceFactory;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -28,10 +30,13 @@ import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.entcore.common.user.UserInfos;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
 
@@ -45,17 +50,21 @@ public class DefaultExportService implements ExportService {
     }
 
     @Override
-    public Future<XMLSlideShow> exportBoardToPPTX(String boardId, UserInfos user, I18nHelper i18nHelper) {
-        return serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
+    public Future<ByteArrayOutputStream> exportBoardToArchive(String boardId, UserInfos user, I18nHelper i18nHelper) {
+        Promise<ByteArrayOutputStream> promise = Promise.promise();
+
+        serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
                 .compose(boards -> {
                     if (boards.isEmpty()) {
-                        String message = String.format("[Magneto@%s::exportBoardToPptx] No board found with id %s",
+                        String message = String.format("[Magneto@%s::exportBoardToArchive] No board found with id %s",
                                 this.getClass().getSimpleName(), boardId);
                         log.error(message, new Throwable(message));
                         return Future.failedFuture(message);
                     }
                     Board board = boards.get(0);
                     JsonObject slideShow = createSlideShowObject(board);
+
+                    List<Map<String, Object>> documents = new ArrayList<>();
 
                     // D'abord on récupère les documents
                     return serviceFactory.boardService()
@@ -66,21 +75,99 @@ public class DefaultExportService implements ExportService {
                                 documentIds.add(imageId);
                                 return getBoardDocuments(documentIds);
                             })
-                            .compose(documents -> board.isLayoutFree()
-                                    ? createFreeLayoutSlideObjects(board, user, slideShow, documents,
-                                    i18nHelper)
-                                    : createSectionLayoutSlideObjects(board, user, slideShow, documents, i18nHelper))
+                            .compose(docs -> {
+                                documents.addAll(docs);
+                                return board.isLayoutFree()
+                                        ? createFreeLayoutSlideObjects(board, user, slideShow, documents, i18nHelper)
+                                        : createSectionLayoutSlideObjects(board, user, slideShow, documents, i18nHelper);
+                            })
+                            .compose(pptx -> {
+                                try {
+                                    // Créer l'archive ZIP
+                                    ByteArrayOutputStream archiveOutputStream = new ByteArrayOutputStream();
+                                    ZipOutputStream zipOutputStream = new ZipOutputStream(archiveOutputStream);
+
+                                    // Ajouter le PPTX à la racine de l'archive
+                                    ZipEntry pptxEntry = new ZipEntry("presentation.pptx");
+                                    zipOutputStream.putNextEntry(pptxEntry);
+                                    ByteArrayOutputStream pptxOutputStream = new ByteArrayOutputStream();
+                                    pptx.write(pptxOutputStream);
+                                    zipOutputStream.write(pptxOutputStream.toByteArray());
+                                    zipOutputStream.closeEntry();
+
+                                    // Ajouter chaque document dans le dossier "Documents"
+                                    for (Map<String, Object> doc : documents) {
+                                        // Déterminer l'extension de fichier basée sur le contentType
+                                        String fileName = "Documents/" + doc.get(Field.FILENAME);
+
+                                        ZipEntry docEntry = new ZipEntry(fileName);
+                                        zipOutputStream.putNextEntry(docEntry);
+
+                                        BufferImpl buffer = (BufferImpl) doc.get(Field.BUFFER);
+                                        byte[] bytes = buffer.getBytes();
+
+                                        zipOutputStream.write(bytes);
+                                        zipOutputStream.closeEntry();
+                                    }
+
+                                    zipOutputStream.close();
+                                    return Future.succeededFuture(archiveOutputStream);
+                                } catch (Exception e) {
+                                    String message = String.format("[Magneto@%s::exportBoardToArchive] Failed to create archive: %s",
+                                            this.getClass().getSimpleName(), e.getMessage());
+                                    log.error(message, e);
+                                    return Future.failedFuture(message);
+                                }
+                            })
+                            .onSuccess(promise::complete)
                             .onFailure(err -> {
                                 String message = String.format(
-                                        "[Magneto@%s::exportBoardToPptx] Failed to get documents: %s",
+                                        "[Magneto@%s::exportBoardToArchive] Failed to get documents: %s",
                                         this.getClass().getSimpleName(), err.getMessage());
                                 log.error(message);
+                                promise.fail(message);
                             });
                 })
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::exportBoardToPptx] Failed to export board: %s",
+                    String message = String.format("[Magneto@%s::exportBoardToArchive] Failed to export board: %s",
                             this.getClass().getSimpleName(), err.getMessage());
                     log.error(message);
+                    promise.fail(message);
+                });
+
+        return promise.future();
+    }
+
+    private Future<Void> fetchDocumentFile(String documentId, List<Map<String, Object>> documents) {
+        return serviceFactory.workSpaceService().getDocument(documentId)
+                .compose(document -> {
+                    String fileId = document.getString(Field.FILE);
+                    if (fileId == null) {
+                        log.warn("File ID is null for document: " + documentId);
+                        return Future.succeededFuture();
+                    }
+
+                    JsonObject metadata = document.getJsonObject(Field.METADATA, new JsonObject());
+                    return Future.<Void>future(promise -> {
+                        serviceFactory.storage().readFile(fileId, buffer -> {
+                            if (buffer != null) {
+                                Map<String, Object> docInfo = new HashMap<>();
+                                docInfo.put(Field.DOCUMENTID, documentId);
+                                docInfo.put(Field.BUFFER, buffer);
+                                docInfo.put(Field.CONTENTTYPE, metadata.getString(Field.CONTENT_TYPE, ""));
+                                docInfo.put(Field.FILENAME, metadata.getString(Field.FILENAME, ""));
+                                documents.add(docInfo);
+                                promise.complete();
+                            } else {
+                                log.warn("Could not read file for document: " + documentId);
+                                promise.complete();
+                            }
+                        });
+                    });
+                })
+                .recover(err -> {
+                    log.warn("Error processing document " + documentId + ": " + err.getMessage());
+                    return Future.succeededFuture();
                 });
     }
 
@@ -113,38 +200,6 @@ public class DefaultExportService implements ExportService {
         return CompositeFuture.all(futures)
                 .map(v -> documents)
                 .otherwiseEmpty();
-    }
-
-    private Future<Void> fetchDocumentFile(String documentId, List<Map<String, Object>> documents) {
-        return serviceFactory.workSpaceService().getDocument(documentId)
-                .compose(document -> {
-                    String fileId = document.getString(Field.FILE);
-                    if (fileId == null) {
-                        log.warn("File ID is null for document: " + documentId);
-                        return Future.succeededFuture();
-                    }
-
-                    JsonObject metadata = document.getJsonObject(Field.METADATA, new JsonObject());
-                    return Future.<Void>future(promise -> {
-                        serviceFactory.storage().readFile(fileId, buffer -> {
-                            if (buffer != null) {
-                                Map<String, Object> docInfo = new HashMap<>();
-                                docInfo.put(Field.DOCUMENTID, documentId);
-                                docInfo.put(Field.BUFFER, buffer);
-                                docInfo.put(Field.CONTENTTYPE, metadata.getString(Field.CONTENT_TYPE, ""));
-                                documents.add(docInfo);
-                                promise.complete();
-                            } else {
-                                log.warn("Could not read file for document: " + documentId);
-                                promise.complete();
-                            }
-                        });
-                    });
-                })
-                .recover(err -> {
-                    log.warn("Error processing document " + documentId + ": " + err.getMessage());
-                    return Future.succeededFuture();
-                });
     }
 
     private Future<XMLSlideShow> createFreeLayoutSlideObjects(Board board, UserInfos user,

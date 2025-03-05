@@ -79,6 +79,31 @@ public class DefaultSectionService implements SectionService {
     }
 
     @Override
+    public Future<List<Section>> createSectionWithCards(Board board, UserInfos user) {
+        Promise<List<Section>> promise = Promise.promise();
+
+        List<Section> sections = new ArrayList<>();
+        this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
+                .compose(sectionsResult -> {
+                    sections.addAll(sectionsResult);
+                    List<Future> futures = new ArrayList<>();
+                    for (Section section : sections) {
+                        Future<List<Card>> cardsFuture = this.serviceFactory.cardService().getAllCardsBySectionSimple(section, 0, user);
+                        futures.add(cardsFuture.map(cards -> {
+                            section.setCards(cards);
+                            return section;
+                        }));
+                    }
+                    return CompositeFuture.all(futures);
+                })
+                .compose(compositeFuture -> Future.succeededFuture(sections))
+                .onSuccess(promise::complete)
+                .onFailure(promise::fail);
+
+        return promise.future();
+    }
+
+    @Override
     public Future<List<Section>> getSectionsByBoard(Board board, boolean isReadOnly) {
         Promise<List<Section>> promise = Promise.promise();
         JsonObject query = this.getAllSectionsByBoardQuery(board);

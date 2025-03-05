@@ -54,7 +54,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
     setShouldFetch(true);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data) {
       const blob = new Blob([data], {
         type: "application/zip",
@@ -76,7 +76,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   }, [data]);
 
   // Gestion des erreurs
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       console.error("Erreur lors de l'export:", error);
       setShouldFetch(false);

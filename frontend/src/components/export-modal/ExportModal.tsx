@@ -170,7 +170,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
 
         <Box sx={modalFooterStyle}>
           <Button variant="text" color="primary" size="medium" sx={buttonStyle}>
-            Annuler
+            {t("magneto.cancel")}
           </Button>
           <Button
             variant="contained"
@@ -179,7 +179,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
             sx={buttonStyle}
             onClick={handleExport}
           >
-            Télécharger
+            {t("magneto.board.download")}
           </Button>
         </Box>
       </Box>

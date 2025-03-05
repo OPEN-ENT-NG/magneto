@@ -41,6 +41,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
+import static fr.cgi.magneto.helper.SlideHelper.generateUniqueFileName;
 import static fr.cgi.magneto.model.slides.SlideText.isDescriptionEmptyOrContainsEmptyParagraph;
 
 public class DefaultExportService implements ExportService {
@@ -98,12 +99,23 @@ public class DefaultExportService implements ExportService {
                                     zipOutputStream.write(pptxOutputStream.toByteArray());
                                     zipOutputStream.closeEntry();
 
-                                    // Ajouter chaque document dans le dossier "Documents"
-                                    for (Map<String, Object> doc : documents) {
+                                    // Ajouter chaque document dans le dossier "Fichiers Liés"
+                                    Set<String> usedFileNames = new HashSet<>();
+                                    //On filtre les documents en double
+                                    List<Map<String, Object>> uniqueDocuments = new ArrayList<>(documents.stream()
+                                            .collect(Collectors.toMap(
+                                                    doc -> (String) doc.get(Field.FILENAME),  // clé
+                                                    doc -> doc,                               // valeur
+                                                    (doc1, doc2) -> doc1                      // en cas de doublon, garde le premier
+                                            ))
+                                            .values());
+                                    for (Map<String, Object> doc : uniqueDocuments) {
                                         // Déterminer l'extension de fichier basée sur le contentType
-                                        String fileName = "Fichiers Liés/" + doc.get(Field.FILENAME);
+                                        String originalFileName = (String) doc.get(Field.FILENAME);
+                                        String uniqueFileName = generateUniqueFileName(usedFileNames, originalFileName);
+                                        String fullPath = "Fichiers Liés/" + uniqueFileName;
 
-                                        ZipEntry docEntry = new ZipEntry(fileName);
+                                        ZipEntry docEntry = new ZipEntry(fullPath);
                                         zipOutputStream.putNextEntry(docEntry);
 
                                         BufferImpl buffer = (BufferImpl) doc.get(Field.BUFFER);

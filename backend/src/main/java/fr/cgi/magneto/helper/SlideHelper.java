@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 
 import static org.apache.poi.openxml4j.opc.PackageRelationshipTypes.CORE_PROPERTIES_ECMA376_NS;
 
@@ -614,5 +615,35 @@ public class SlideHelper {
         } catch (java.text.ParseException e) {
             return dateString;
         }
+    }
+
+    public static String generateUniqueFileName(Set<String> usedFileNames, String originalFileName) {
+        if (!usedFileNames.contains(originalFileName)) {
+            usedFileNames.add(originalFileName);
+            return originalFileName;
+        }
+
+        String fileNameWithoutExtension = getFileNameWithoutExtension(originalFileName);
+        String extension = getFileExtension(originalFileName);
+
+        int counter = 1;
+        String uniqueFileName;
+        do {
+            uniqueFileName = fileNameWithoutExtension + " (" + counter + ")." + extension;
+            counter++;
+        } while (usedFileNames.contains(uniqueFileName));
+
+        usedFileNames.add(uniqueFileName);
+        return uniqueFileName;
+    }
+
+    private static String getFileNameWithoutExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        return (dotIndex == -1) ? fileName : fileName.substring(0, dotIndex);
+    }
+
+    private static String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
     }
 }

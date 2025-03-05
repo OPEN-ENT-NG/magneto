@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { BoardPublicShareModal } from "../board-public-share-modal/BoardPublicShareModal";
 import { CreateFolder } from "../create-folder/CreateFolder";
 import { DeleteModal } from "../delete-modal/DeleteModal";
+import { ExportModal } from "../export-modal/ExportModal";
 import { MessageModal } from "../message-modal/MessageModal";
 import { MoveBoard } from "../move-board/MoveBoard";
 import { ShareModalMagneto } from "../share-modal/ShareModalMagneto";
@@ -55,6 +56,7 @@ export const ToasterContainer = ({
   const [isCreateOpen, toggleCreate] = useToggle(false);
   const [isNotifyOpen, toggleNotify] = useToggle(false);
   const [isMoveOpen, toggleMove] = useToggle(false);
+  const [isExportOpen, toggleExport] = useToggle(false);
   const [isMoveDelete, toggleDelete] = useToggle(false);
   const [isCreateFolder, toggleCreateFolder] = useToggle(false);
   const [isShareFolder, toggleShareFolder] = useToggle(false);
@@ -349,6 +351,18 @@ export const ToasterContainer = ({
                           {t("magneto.board.notify")}
                         </Button>
                       )}
+                    {selectedBoardsIds.length == 1 &&
+                      selectedBoardRights != null &&
+                      selectedBoardRights.contrib && (
+                        <Button
+                          type="button"
+                          color="primary"
+                          variant="filled"
+                          onClick={toggleExport}
+                        >
+                          {t("magneto.export")}
+                        </Button>
+                      )}
                     {!isPublic && allBoardsMine() && areFoldersMine() && (
                       <Button
                         type="button"
@@ -390,6 +404,9 @@ export const ToasterContainer = ({
             reset={reset}
             hasSharedElement={hasSharedElement}
           />
+          {isExportOpen && (
+            <ExportModal isOpen={isExportOpen} onClose={toggleExport} />
+          )}
           <MessageModal
             isOpen={isNotifyOpen}
             title={t("magneto.board.notify")}

@@ -147,6 +147,16 @@ public interface CardService {
     Future<JsonObject> getAllCardsBySection(Section section, Integer page, UserInfos user);
 
     /**
+     * Get all cards by section, without the count and returning the list directly
+     *
+     * @param section Section object
+     * @param page    Page number
+     * @param user    {@link UserInfos} User info
+     * @return Future {@link Future <List<Card>>} containing the cards corresponding to the board identifier
+     */
+    Future<List<Card>> getAllCardsBySectionSimple(Section section, Integer page, UserInfos user);
+
+    /**
      * Duplicate cards
      *
      * @param boardId Board identifiers

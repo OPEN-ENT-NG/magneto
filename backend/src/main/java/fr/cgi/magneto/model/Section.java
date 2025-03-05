@@ -1,6 +1,7 @@
 package fr.cgi.magneto.model;
 
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.model.cards.Card;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -13,6 +14,7 @@ public class Section implements Model {
     private List<String> cardIds;
     private String boardId;
     private Boolean displayed;
+    private List<Card> cards;
 
     @SuppressWarnings("unchecked")
     public Section(JsonObject section) {
@@ -22,6 +24,8 @@ public class Section implements Model {
         this.boardId = section.getString(Field.BOARDID);
         if (section.containsKey(Field.DISPLAYED))
             this.displayed = section.getBoolean(Field.DISPLAYED);
+        if (section.containsKey(Field.CARDS))
+            this.cards = section.getJsonArray(Field.CARDS).getList();
     }
 
     public Section() {
@@ -87,6 +91,15 @@ public class Section implements Model {
         this.displayed = displayed;
     }
 
+    public List<Card> getCards() {
+        return cards;
+    }
+
+    public Section setCards(List<Card> cards) {
+        this.cards = cards;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject()
@@ -96,6 +109,8 @@ public class Section implements Model {
                 .put(Field.BOARDID, this.getBoardId());
         if (this.displayed != null)
             json.put(Field.DISPLAYED, this.getDisplayed());
+        if (this.cards != null)
+            json.put(Field.CARDS, this.getCards());
         return json;
     }
 

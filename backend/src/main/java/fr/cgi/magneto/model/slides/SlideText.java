@@ -4,7 +4,10 @@ import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.helper.SlideHelper;
 import org.apache.poi.sl.usermodel.AutoNumberingScheme;
 import org.apache.poi.sl.usermodel.TextParagraph;
-import org.apache.poi.xslf.usermodel.*;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.XSLFTextBox;
+import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
+import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,6 +50,10 @@ public class SlideText extends Slide {
         }
 
         return false;
+    }
+
+    public static boolean isDescriptionEmptyOrContainsEmptyParagraph(String description) {
+        return isBodyEmptyOrContainsEmptyParagraph(Jsoup.parse(description).body());
     }
 
     private void processHtmlContent(XSLFTextBox textBox, Element element) {

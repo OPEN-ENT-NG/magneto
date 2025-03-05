@@ -96,28 +96,34 @@ public class SlideHelper {
     }
 
     public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String fileContentType,
-            int contentMarginTop, int imageContentHeight, Boolean alignLeft) {
+                                               int contentMarginTop, int imageContentHeight, Boolean alignLeft) {
         XMLSlideShow ppt = slide.getSlideShow();
 
         XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromContentType(fileContentType));
 
         java.awt.Dimension imgSize = pic.getImageDimension();
-        double imgRatio = (double) imgSize.width / imgSize.height;
 
-        int newWidth, newHeight;
-        if (imgRatio > (double) Slideshow.WIDTH / imageContentHeight) {
-            newWidth = Slideshow.WIDTH;
-            newHeight = (int) (Slideshow.WIDTH / imgRatio);
-        } else {
-            newHeight = imageContentHeight;
-            newWidth = (int) (imageContentHeight * imgRatio);
-        }
+        int availableWidth = Slideshow.WIDTH;
 
-        int x = alignLeft ? Slideshow.MARGIN_LEFT : Slideshow.MARGIN_LEFT + (Slideshow.WIDTH - newWidth) / 2;
+        // Calculer les dimensions tout en préservant le ratio
+        double scaleFactor = Math.min(
+                (double) availableWidth / imgSize.width,
+                (double) imageContentHeight / imgSize.height
+        );
+
+        int newWidth = (int) (imgSize.width * scaleFactor);
+        int newHeight = (int) (imgSize.height * scaleFactor);
+
+        // Calculer la position X en fonction de l'alignement
+        int x = alignLeft ?
+                Slideshow.MARGIN_LEFT :
+                Slideshow.MARGIN_LEFT + (availableWidth - newWidth) / 2;
+
+        // Centrer verticalement dans l'espace alloué
         int y = contentMarginTop + (imageContentHeight - newHeight) / 2;
 
         XSLFPictureShape shape = slide.createPicture(pic);
-        shape.setAnchor(new Rectangle(x, y, 200, newHeight));
+        shape.setAnchor(new Rectangle(x, y, newWidth, newHeight));
 
         return shape;
     }
@@ -174,7 +180,7 @@ public class SlideHelper {
 
         int listPositionY = Slideshow.MAIN_CONTENT_MARGIN_TOP;
         infoBox.setAnchor(
-                new Rectangle(Slideshow.WIDTH - Slideshow.MARGIN_LEFT * 2, listPositionY, Slideshow.WIDTH, 200));
+                new Rectangle(Slideshow.WIDTH - Slideshow.MARGIN_LEFT * 5, listPositionY, Slideshow.BOARD_TEXT_WIDTH, 200));
 
         XSLFTextParagraph paragraph1 = infoBox.addNewTextParagraph();
         paragraph1.setSpaceBefore(0.0);

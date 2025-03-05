@@ -33,12 +33,15 @@ import org.entcore.common.user.UserInfos;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
+import static fr.cgi.magneto.model.slides.SlideText.isDescriptionEmptyOrContainsEmptyParagraph;
 
 public class DefaultExportService implements ExportService {
 
@@ -88,7 +91,7 @@ public class DefaultExportService implements ExportService {
                                     ZipOutputStream zipOutputStream = new ZipOutputStream(archiveOutputStream);
 
                                     // Ajouter le PPTX à la racine de l'archive
-                                    ZipEntry pptxEntry = new ZipEntry("presentation.pptx");
+                                    ZipEntry pptxEntry = new ZipEntry(board.getTitle() + ".pptx");
                                     zipOutputStream.putNextEntry(pptxEntry);
                                     ByteArrayOutputStream pptxOutputStream = new ByteArrayOutputStream();
                                     pptx.write(pptxOutputStream);
@@ -98,7 +101,7 @@ public class DefaultExportService implements ExportService {
                                     // Ajouter chaque document dans le dossier "Documents"
                                     for (Map<String, Object> doc : documents) {
                                         // Déterminer l'extension de fichier basée sur le contentType
-                                        String fileName = "Documents/" + doc.get(Field.FILENAME);
+                                        String fileName = "Fichiers Liés/" + doc.get(Field.FILENAME);
 
                                         ZipEntry docEntry = new ZipEntry(fileName);
                                         zipOutputStream.putNextEntry(docEntry);
@@ -214,10 +217,12 @@ public class DefaultExportService implements ExportService {
         XSLFSlide newTitleSlide = ppt.createSlide();
         titleSlide.createApacheSlide(newTitleSlide);
 
-        // DESCRIPTION
-        Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
-        XSLFSlide newDescriptionSlide = ppt.createSlide();
-        descriptionSlide.createApacheSlide(newDescriptionSlide);
+        // DESCRIPTION SI NON VIDE
+        if (!isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())){
+            Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
+            XSLFSlide newDescriptionSlide = ppt.createSlide();
+            descriptionSlide.createApacheSlide(newDescriptionSlide);
+        }
 
         return serviceFactory.cardService().getAllCardsByBoard(board, user)
                 .compose(fetchedCards -> {
@@ -266,10 +271,12 @@ public class DefaultExportService implements ExportService {
         XSLFSlide newTitleSlide = ppt.createSlide();
         titleSlide.createApacheSlide(newTitleSlide);
 
-        // DESCRIPTION
-        Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
-        XSLFSlide newDescriptionSlide = ppt.createSlide();
-        descriptionSlide.createApacheSlide(newDescriptionSlide);
+        // DESCRIPTION SI NON VIDE
+        if (!isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())){
+            Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
+            XSLFSlide newDescriptionSlide = ppt.createSlide();
+            descriptionSlide.createApacheSlide(newDescriptionSlide);
+        }
 
         return this.serviceFactory.sectionService().createSectionWithCards(board, user)
                 .compose(sections -> {
@@ -341,7 +348,7 @@ public class DefaultExportService implements ExportService {
                         byte[] svgData = IOUtils.toByteArray(inputStream);
                         String fileNameString = i18nHelper.translate(CollectionsConstant.I18N_SLIDESHOW_FILENAME)
                                 + (card.getMetadata() != null ? card.getMetadata().getFilename() : "")
-                                + "\nLe fichier est disponible dans le dossier « Fichiers liés » de l'archive.";
+                                + "\nLe fichier est disponible dans le dossier « Fichiers liés ».";
                         propertiesBuilder
                                 .fileNameString(fileNameString)
                                 .caption(card.getCaption())
@@ -358,42 +365,33 @@ public class DefaultExportService implements ExportService {
             case LINK:
             case HYPERLINK:
             case EMBEDDER:
-                try {
-                    ClassLoader classLoader = getClass().getClassLoader();
-                    InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
-
-                    if (inputStream != null) {
-                        byte[] svgData = IOUtils.toByteArray(inputStream);
-
-                        propertiesBuilder
-                                .resourceUrl(card.getResourceUrl())
-                                .caption(card.getCaption())
-                                .resourceData(svgData)
-                                .contentType("image/svg+xml");
-                    } else {
-                        log.warn("SVG file not found in resources");
-                        // Traitement alternatif si le fichier n'est pas trouvé
-                    }
-                } catch (IOException e) {
-                    log.error("Failed to load SVG file", e);
-                }
+                buildLink(card, propertiesBuilder);
                 break;
             case IMAGE:
             case VIDEO:
             case AUDIO:
-                Map<String, Map<String, Object>> documentMap = new HashMap<>();
-                for (Map<String, Object> doc : documents) {
-                    documentMap.put((String) doc.get(Field.DOCUMENTID), doc);
+                //EMBEDDED LINK
+                if (card.getResourceId() == null || card.getResourceId().isEmpty()){
+                    card.setResourceType(SlideResourceType.EMBEDDER.getValue());
+                    resourceType = SlideResourceType.fromString(card.getResourceType());
+                    buildLink(card, propertiesBuilder);
                 }
-                Map<String, Object> documentData = documentMap.get(card.getResourceId());
+                else {
+                    //MEDIA
+                    Map<String, Map<String, Object>> documentMap = new HashMap<>();
+                    for (Map<String, Object> doc : documents) {
+                        documentMap.put((String) doc.get(Field.DOCUMENTID), doc);
+                    }
+                    Map<String, Object> documentData = documentMap.get(card.getResourceId());
 
-                Buffer documentBuffer = documentData != null ? (Buffer) documentData.get(Field.BUFFER) : null;
-                String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
+                    Buffer documentBuffer = documentData != null ? (Buffer) documentData.get(Field.BUFFER) : null;
+                    String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
 
-                propertiesBuilder
-                        .contentType(contentType)
-                        .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
-                        .caption(card.getCaption());
+                    propertiesBuilder
+                            .contentType(contentType)
+                            .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
+                            .caption(card.getCaption());
+                }
                 break;
             case BOARD:
                 if (referencedBoardData != null) {
@@ -445,6 +443,28 @@ public class DefaultExportService implements ExportService {
         }
 
         return slideFactory.createSlide(resourceType, propertiesBuilder.build());
+    }
+
+    private void buildLink(Card card, SlideProperties.Builder propertiesBuilder) {
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
+
+            if (inputStream != null) {
+                byte[] svgData = IOUtils.toByteArray(inputStream);
+
+                propertiesBuilder
+                        .resourceUrl(card.getResourceUrl())
+                        .caption(card.getCaption())
+                        .resourceData(svgData)
+                        .contentType("image/svg+xml");
+            } else {
+                log.warn("SVG file not found in resources");
+                // Traitement alternatif si le fichier n'est pas trouvé
+            }
+        } catch (IOException e) {
+            log.error("Failed to load SVG file", e);
+        }
     }
 
     private Future<Void> processCardResourceType(Card card, SlideFactory slideFactory, JsonObject slideShowData,
@@ -529,9 +549,23 @@ public class DefaultExportService implements ExportService {
         Buffer documentBuffer = (Buffer) documentData.get(Field.BUFFER);
         String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
 
+        // Format the modification date to dd/MM/yyyy
+        String formattedModificationDate = "";
+        try {
+            // Parse the original date string
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            // Format to the desired output
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+            Date parsedDate = inputFormat.parse(board.getModificationDate());
+            formattedModificationDate = outputFormat.format(parsedDate);
+        } catch (ParseException e) {
+            formattedModificationDate = board.getModificationDate();
+        }
+
         propertiesBuilder
                 .ownerName(i18nHelper.translate("magneto.slideshow.created.by") + board.getOwnerName() + ",")
-                .modificationDate(i18nHelper.translate("magneto.slideshow.updated.the") + board.getModificationDate())
+                .modificationDate(i18nHelper.translate("magneto.slideshow.updated.the") + formattedModificationDate)
                 .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
                 .contentType(contentType);
 

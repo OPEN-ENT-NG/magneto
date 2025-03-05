@@ -14,7 +14,6 @@ export const tabStyle = {
   maxHeight: "50px",
   paddingBottom: 0,
   fontSize: "1.6rem",
-  fontWeight: 700,
   lineHeight: 2.4,
   "& .MuiTab-iconWrapper": {
     display: "flex",
@@ -38,8 +37,7 @@ export const exportTitleStyle = {
 
 export const exportContentStyle = {
   marginY: "1.5rem",
-  fontWeight: 500,
-  color: "#000000",
+  color: "text.primary",
   fontSize: "1.6rem",
 };
 
@@ -54,7 +52,7 @@ export const alertListStyle = {
   paddingLeft: "2rem",
   margin: 0,
   fontSize: "1.4rem",
-  color: "#000000",
+  color: "text.primary",
   fontWeight: 400,
 };
 

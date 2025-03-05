@@ -4,9 +4,9 @@ import java.awt.*;
 
 public class Slideshow {
     // Constantes de mise en page générales
-    public static final int MARGIN_LEFT = 140;
+    public static final int MARGIN_LEFT = 80;
     public static final int MARGIN_TOP_TITLE = 40;
-    public static final int WIDTH = 1000;
+    public static final int WIDTH = 1120;
     public static final String DEFAULT_FONT = "Roboto";
     public static final int SLIDE_HEIGHT = 720;
     public static final int SLIDE_WIDTH = 1280;
@@ -32,6 +32,7 @@ public class Slideshow {
     public static final Double CONTENT_FONT_SIZE = 36.0;
     public static final int SLIDE_BOARD_CONTENT_MARGIN_TOP = 450;
     public static final Double DESCRIPTION_FONT_SIZE = 24.0;
+    public static final int BOARD_TEXT_WIDTH = 500;
 
     // Constantes pour les images
     public static final int MAIN_IMAGE_CONTENT_HEIGHT = 400;

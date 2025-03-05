@@ -24,7 +24,7 @@ public class SlideBoard extends Slide {
         this.title = title;
         this.description = description;
         this.ownerName = ownerName;
-        this.modificationDate = modificationDate;
+        this.modificationDate =  modificationDate;
         this.resourceNumber = resourceNumber;
         this.caption = caption;
         this.isShare = isShare;

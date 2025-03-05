@@ -47,7 +47,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
 
   const [shouldFetch, setShouldFetch] = useState(false);
 
-  const { data, error } = useExportBoardQuery(selectedBoardsIds[0], {
+  const { data, error, isLoading } = useExportBoardQuery(selectedBoardsIds[0], {
     skip: !shouldFetch,
   });
   const handleExport = () => {
@@ -126,7 +126,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           <Box>
             {tabValue === 0 && (
               <Box>
-                <Typography variant="h6" sx={exportTitleStyle}>
+                <Typography variant="h2" sx={exportTitleStyle}>
                   {t("magneto.export.modal.format")}
                 </Typography>
                 <Typography sx={exportContentStyle}>
@@ -169,7 +169,13 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
         </Box>
 
         <Box sx={modalFooterStyle}>
-          <Button variant="text" color="primary" size="medium" sx={buttonStyle}>
+          <Button
+            variant="text"
+            color="primary"
+            size="medium"
+            sx={buttonStyle}
+            onClick={onClose}
+          >
             {t("magneto.cancel")}
           </Button>
           <Button
@@ -178,6 +184,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
             size="medium"
             sx={buttonStyle}
             onClick={handleExport}
+            loading={isLoading}
           >
             {t("magneto.board.download")}
           </Button>

@@ -457,10 +457,13 @@ public class SlideHelper {
     }
 
     private static byte[] getVideoThumbnail(byte[] videoData, String extension) {
-        try {
             // Dans un cas réel, on extrairait une image de la vidéo ici
             // Pour cet exemple, nous allons simplement créer une vignette générique
+        return getDefaultThumbnail();
+    }
 
+    public static byte[] getDefaultThumbnail() {
+        try {
             // Créer une image au format 16:9
             BufferedImage image = new BufferedImage(
                     Slideshow.VIDEO_THUMBNAIL_WIDTH,
@@ -519,30 +522,26 @@ public class SlideHelper {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return getDefaultThumbnail();
-        }
-    }
+            try {
+                // Créer une image simple par défaut
+                BufferedImage image = new BufferedImage(Slideshow.THUMBNAIL_WIDTH, Slideshow.THUMBNAIL_HEIGHT,
+                        BufferedImage.TYPE_INT_RGB);
+                Graphics2D g2d = image.createGraphics();
+                g2d.setColor(Color.DARK_GRAY);
+                g2d.fillRect(0, 0, Slideshow.THUMBNAIL_WIDTH, Slideshow.THUMBNAIL_HEIGHT);
+                g2d.setColor(Color.WHITE);
+                g2d.setFont(new java.awt.Font(Slideshow.THUMBNAIL_FONT, Slideshow.THUMBNAIL_FONT_STYLE,
+                        Slideshow.THUMBNAIL_FONT_SIZE));
+                g2d.drawString(Slideshow.THUMBNAIL_DEFAULT_TEXT, Slideshow.THUMBNAIL_TEXT_X, Slideshow.THUMBNAIL_TEXT_Y);
+                g2d.dispose();
 
-    private static byte[] getDefaultThumbnail() {
-        try {
-            // Créer une image simple par défaut
-            BufferedImage image = new BufferedImage(Slideshow.THUMBNAIL_WIDTH, Slideshow.THUMBNAIL_HEIGHT,
-                    BufferedImage.TYPE_INT_RGB);
-            Graphics2D g2d = image.createGraphics();
-            g2d.setColor(Color.DARK_GRAY);
-            g2d.fillRect(0, 0, Slideshow.THUMBNAIL_WIDTH, Slideshow.THUMBNAIL_HEIGHT);
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new java.awt.Font(Slideshow.THUMBNAIL_FONT, Slideshow.THUMBNAIL_FONT_STYLE,
-                    Slideshow.THUMBNAIL_FONT_SIZE));
-            g2d.drawString(Slideshow.THUMBNAIL_DEFAULT_TEXT, Slideshow.THUMBNAIL_TEXT_X, Slideshow.THUMBNAIL_TEXT_Y);
-            g2d.dispose();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, Slideshow.THUMBNAIL_FORMAT, baos);
-            return baos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new byte[0];
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(image, Slideshow.THUMBNAIL_FORMAT, baos);
+                return baos.toByteArray();
+            } catch (IOException e2) {
+                e2.printStackTrace();
+                return new byte[0];
+            }
         }
     }
 

@@ -31,6 +31,21 @@ export const titleStyle = {
   fontWeight: "bold",
   fontFamily: "Comfortaa",
   fontSize: "2.6rem",
+  padding: "3rem 0 0 3rem",
+};
+
+export const actionStyle = {
+  paddingRight: "3rem",
+};
+
+export const dialogStyle = {
+  "& .MuiDialog-paper": {
+    width: "90%",
+    maxWidth: "95rem",
+  },
+  "& .MuiSvgIcon-root.css-4uxqju-MuiSvgIcon-root": {
+    fontSize: "2.4rem",
+  },
 };
 
 export const closeButtonStyle = {

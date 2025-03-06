@@ -40,9 +40,9 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static fr.cgi.magneto.core.constants.Slideshow.FALLBACK_PNG;
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
 import static fr.cgi.magneto.helper.SlideHelper.generateUniqueFileName;
+import static fr.cgi.magneto.helper.SlideHelper.getDefaultThumbnail;
 import static fr.cgi.magneto.model.slides.SlideText.isDescriptionEmptyOrContainsEmptyParagraph;
 
 public class DefaultExportService implements ExportService {
@@ -489,7 +489,7 @@ public class DefaultExportService implements ExportService {
 
             if (inputStream != null) {
 
-                byte[] svgData = isFallback ? FALLBACK_PNG : IOUtils.toByteArray(inputStream);
+                byte[] svgData = isFallback ? getDefaultThumbnail() : IOUtils.toByteArray(inputStream);
 
                 propertiesBuilder
                         .resourceUrl(card.getResourceUrl().startsWith("/") ? serviceFactory.magnetoConfig().host() + card.getResourceUrl() : card.getResourceUrl())

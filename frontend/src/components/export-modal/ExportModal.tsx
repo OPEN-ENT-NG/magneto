@@ -22,13 +22,14 @@ import {
   alertListStyle,
   alertTitleStyle,
   buttonStyle,
+  contentStyle,
   exportContentStyle,
   exportTitleStyle,
   tabsStyle,
   tabStyle,
 } from "./style";
 import { ExportModalProps } from "./types";
-import { titleStyle } from "../message-modal/style";
+import { actionStyle, dialogStyle, titleStyle } from "../message-modal/style";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useExportBoardQuery } from "~/services/api/export.service.ts";
 
@@ -93,12 +94,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
 
   return (
     <Dialog
-      sx={{
-        "& .MuiDialog-paper": {
-          width: "40%",
-          maxWidth: "40%",
-        },
-      }}
+      sx={dialogStyle}
       open={isOpen}
       onClose={onClose}
       aria-labelledby="modal-title"
@@ -107,7 +103,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
       <DialogTitle fontWeight="bold" component="h2" sx={titleStyle}>
         {t("magneto.board.export")}
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={contentStyle}>
         <Tabs
           sx={tabsStyle}
           value={tabValue}
@@ -165,7 +161,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           )}
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={actionStyle}>
         <Button
           variant="text"
           color="primary"

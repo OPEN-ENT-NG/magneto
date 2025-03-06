@@ -69,7 +69,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
               // Afficher les toasts avec la liste formatée
               if (formattedErrors)
                 toast.warning(
-                  `ça c'est les cartes pas bien : ${formattedErrors}`,
+                  `${t("magneto.export.toast.warning")} ${formattedErrors}`,
                 );
             } catch (e) {
               console.error("Erreur de parsing:", e);
@@ -94,6 +94,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           window.URL.revokeObjectURL(url);
         } catch (downloadError) {
           console.error("Erreur lors du téléchargement:", downloadError);
+          toast.error(t("magneto.export.toast.error"));
         } finally {
           setShouldFetch(false);
           onClose();

@@ -25,7 +25,7 @@ public class SlideFile extends Slide {
 
     @Override
     public Object createApacheSlide(XSLFSlide newSlide) {
-        SlideHelper.createTitle(newSlide, title, Slideshow.TITLE_HEIGHT, Slideshow.DESCRIPTION_TITLE_FONT_SIZE,
+        SlideHelper.createTitle(newSlide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE,
                 TextParagraph.TextAlign.LEFT);
 
         XSLFTextBox textBox = SlideHelper.createContent(newSlide);
@@ -35,9 +35,8 @@ public class SlideFile extends Slide {
         XSLFTextRun textRun = paragraph.addNewTextRun();
         textRun.setText(filenameString);
         textRun.setFontSize(Slideshow.CONTENT_FONT_SIZE);
-        textRun.setFontFamily(Slideshow.DEFAULT_FONT);
 
-        SlideHelper.createImageWidthHeight(newSlide, fileSvg, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
+        SlideHelper.createImageWidthHeight(newSlide, fileSvg, fileContentType, Slideshow.SVG_CONTENT_MARGIN_TOP,
                 Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);
         SlideHelper.createLegend(newSlide, caption);
 

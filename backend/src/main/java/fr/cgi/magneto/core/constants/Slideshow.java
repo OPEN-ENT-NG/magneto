@@ -7,7 +7,6 @@ public class Slideshow {
     public static final int MARGIN_LEFT = 80;
     public static final int MARGIN_TOP_TITLE = 40;
     public static final int WIDTH = 1120;
-    public static final String DEFAULT_FONT = "Roboto";
     public static final int SLIDE_HEIGHT = 720;
     public static final int SLIDE_WIDTH = 1280;
 
@@ -17,18 +16,18 @@ public class Slideshow {
     public static final int DESCRIPTION_TITLE_HEIGHT = 75;
     public static final Double DESCRIPTION_TITLE_FONT_SIZE = 55.0;
     public static final int MAIN_TITLE_HEIGHT = 100;
-    public static final Double MAIN_TITLE_FONT_SIZE = 100.0;
+    public static final Double MAIN_TITLE_FONT_SIZE = 80.0;
 
     // Constantes pour les légendes
     public static final int LEGEND_HEIGHT = 70;
     public static final int LEGEND_MARGIN_BOTTOM = 20;
     public static final Double LEGEND_FONT_SIZE = 16.0;
-    public static final String LEGEND_FONT_FAMILY = "Roboto";
 
     // Constantes pour le contenu
     public static final int CONTENT_HEIGHT = 520;
     public static final int CONTENT_MARGIN_TOP = 140;
     public static final int MAIN_CONTENT_MARGIN_TOP = 300;
+    public static final int SVG_CONTENT_MARGIN_TOP = 340;
     public static final Double CONTENT_FONT_SIZE = 36.0;
     public static final int SLIDE_BOARD_CONTENT_MARGIN_TOP = 450;
     public static final Double DESCRIPTION_FONT_SIZE = 24.0;

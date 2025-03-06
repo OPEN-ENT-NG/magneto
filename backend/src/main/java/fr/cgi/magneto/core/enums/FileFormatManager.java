@@ -55,6 +55,8 @@ public class FileFormatManager {
                 resourcePath = "img/extension/pdf.svg";
                 break;
             case TEXT:
+                resourcePath = "img/extension/text.svg";
+                break;
             default:
                 resourcePath = "img/extension/default.svg";
                 break;

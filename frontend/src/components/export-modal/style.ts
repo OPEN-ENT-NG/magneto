@@ -6,6 +6,11 @@ export const tabsStyle = {
   overflow: "hidden",
 };
 
+export const contentStyle = {
+  paddingLeft: "3rem",
+  paddingRight: "3rem",
+};
+
 // New style constants
 export const tabStyle = {
   display: "flex",

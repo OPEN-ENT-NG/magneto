@@ -5,6 +5,8 @@ import fr.cgi.magneto.helper.SlideHelper;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 
+import java.util.Objects;
+
 public class SlideLink extends Slide {
     private final String link;
     private final String caption;
@@ -26,8 +28,13 @@ public class SlideLink extends Slide {
         SlideHelper.createTitle(newSlide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE,
                 TextParagraph.TextAlign.LEFT);
         SlideHelper.createLink(newSlide, link);
-        SlideHelper.createImageWidthHeight(newSlide, resourceData, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
-                Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);
+        if (Objects.equals(fileContentType, "image/png"))
+            SlideHelper.createImage(newSlide, resourceData, fileContentType, Slideshow.SVG_CONTENT_MARGIN_TOP,
+                    Slideshow.SVG_CONTENT_HEIGHT, false);
+        else
+            SlideHelper.createImageWidthHeight(newSlide, resourceData, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
+                    Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);
+
         SlideHelper.createLegend(newSlide, caption);
 
         SlideHelper.addNotes(newSlide, description);

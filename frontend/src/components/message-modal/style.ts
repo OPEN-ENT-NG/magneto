@@ -43,7 +43,7 @@ export const dialogStyle = {
     width: "90%",
     maxWidth: "95rem",
   },
-  "& .MuiSvgIcon-root.css-4uxqju-MuiSvgIcon-root": {
+  "& [data-testid='CloseRoundedIcon']": {
     fontSize: "2.4rem",
   },
 };

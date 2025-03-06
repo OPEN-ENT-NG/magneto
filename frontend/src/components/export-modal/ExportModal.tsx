@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@cgi-learning-hub/ui";
+import { useToast } from "@edifice.io/react";
 import DownloadIcon from "@mui/icons-material/Download";
 import { Trans, useTranslation } from "react-i18next";
 
@@ -38,6 +39,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation("magneto");
+  const toast = useToast();
   const [tabValue] = useState(0);
   const { selectedBoardsIds, selectedBoards } = useBoardsNavigation();
 
@@ -54,10 +56,28 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
     const triggerDownload = async () => {
       if (data) {
         try {
-          // Créer un Blob à partir des données
-          const blob = new Blob([data], { type: "application/zip" });
+          // Récupérer l'en-tête X-Cards-With-Errors
+          const cardsWithErrorsHeader = data.headers["x-cards-with-errors"];
+          if (cardsWithErrorsHeader) {
+            try {
+              const errorCardsList = JSON.parse(cardsWithErrorsHeader);
+              const formattedErrors = errorCardsList
+                .map((card: string) => `"${card}"`)
+                .join(", ");
 
-          // Créer un objet URL pour le blob
+              console.log(formattedErrors);
+              // Afficher les toasts avec la liste formatée
+              if (formattedErrors)
+                toast.warning(
+                  `ça c'est les cartes pas bien : ${formattedErrors}`,
+                );
+            } catch (e) {
+              console.error("Erreur de parsing:", e);
+            }
+          }
+          toast.warning("ça c'est les cartes pas bien : ");
+
+          const blob = data.data;
           const url = window.URL.createObjectURL(blob);
 
           // Créer un élément <a> pour le téléchargement

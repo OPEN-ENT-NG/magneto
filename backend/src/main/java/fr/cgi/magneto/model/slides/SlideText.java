@@ -12,10 +12,22 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.safety.Cleaner;
+import org.jsoup.safety.Safelist;
 
 import java.awt.*;
 
 public class SlideText extends Slide {
+
+    // Safelist basée sur basic() avec des ajouts pour les titres et styles
+    private static final Safelist TEXT_TAGS_SAFELIST = Safelist.basic()
+            // Ajouter les balises de titre
+            .addTags(Slideshow.TAG_H1, Slideshow.TAG_H2, Slideshow.TAG_H3, Slideshow.TAG_H4, Slideshow.TAG_H5,
+                    Slideshow.TAG_H6)
+            // Préserver les styles pour toutes les balises
+            .addAttributes(Slideshow.HTML_ALL_TAGS, Slideshow.CSS_STYLE)
+            // Préserver les liens relatifs
+            .preserveRelativeLinks(true);
 
     public SlideText(String title, String description) {
         this.title = title;
@@ -24,13 +36,21 @@ public class SlideText extends Slide {
 
     @Override
     public Object createApacheSlide(XSLFSlide newSlide) {
-
         SlideHelper.createTitle(newSlide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE,
                 TextParagraph.TextAlign.LEFT);
         XSLFTextBox contentBox = SlideHelper.createContent(newSlide);
 
+        // Parse le HTML
         Document doc = Jsoup.parse(description);
-        processHtmlContent(contentBox, doc.body());
+
+        // Nettoie le document en ne gardant que les balises de texte autorisées
+        Cleaner cleaner = new Cleaner(TEXT_TAGS_SAFELIST);
+        Document cleanDoc = cleaner.clean(doc);
+
+        // Assure que les sauts de ligne sont préservés dans les éléments de texte
+        cleanDoc.outputSettings().prettyPrint(false);
+
+        processHtmlContent(contentBox, cleanDoc.body());
 
         return newSlide;
     }

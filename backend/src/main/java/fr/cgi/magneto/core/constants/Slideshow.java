@@ -133,6 +133,9 @@ public class Slideshow {
     public static final String TAG_H1 = "h1";
     public static final String TAG_H2 = "h2";
     public static final String TAG_H3 = "h3";
+    public static final String TAG_H4 = "h4";
+    public static final String TAG_H5 = "h5";
+    public static final String TAG_H6 = "h6";
     public static final String TAG_BOLD = "b";
     public static final String TAG_STRONG = "strong";
     public static final String TAG_ITALIC = "i";
@@ -142,6 +145,7 @@ public class Slideshow {
     public static final String TAG_UNORDERED_LIST = "ul";
     public static final String TAG_ORDERED_LIST = "ol";
     public static final String TAG_LIST_ITEM = "li";
+    public static final String HTML_ALL_TAGS = ":all";
 
     // Constantes pour les extensions de fichiers
     public static final String EXT_MP3 = "mp3";

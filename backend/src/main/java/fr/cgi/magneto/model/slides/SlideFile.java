@@ -35,7 +35,6 @@ public class SlideFile extends Slide {
         XSLFTextRun textRun = paragraph.addNewTextRun();
         textRun.setText(filenameString);
         textRun.setFontSize(Slideshow.CONTENT_FONT_SIZE);
-        textRun.setFontFamily(Slideshow.DEFAULT_FONT);
 
         SlideHelper.createImageWidthHeight(newSlide, fileSvg, fileContentType, Slideshow.SVG_CONTENT_MARGIN_TOP,
                 Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);

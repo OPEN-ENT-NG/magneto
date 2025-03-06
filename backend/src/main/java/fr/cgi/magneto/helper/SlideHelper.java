@@ -84,7 +84,6 @@ public class SlideHelper {
 
         XSLFTextRun run = para.getTextRuns().get(0);
         run.setFontSize(Slideshow.LEGEND_FONT_SIZE);
-        run.setFontFamily(Slideshow.LEGEND_FONT_FAMILY);
 
         return legendShape;
     }

@@ -28,7 +28,6 @@ public class SlideDescription extends Slide {
         XSLFTextRun textRun = paragraph.addNewTextRun();
         textRun.setText(description);
         textRun.setFontSize(Slideshow.DESCRIPTION_FONT_SIZE);
-        textRun.setFontFamily(Slideshow.DEFAULT_FONT);
 
         return newSlide;
     }

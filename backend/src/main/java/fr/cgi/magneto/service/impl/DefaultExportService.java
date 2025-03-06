@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static fr.cgi.magneto.core.constants.Slideshow.FALLBACK_PNG;
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
 import static fr.cgi.magneto.helper.SlideHelper.generateUniqueFileName;
 import static fr.cgi.magneto.model.slides.SlideText.isDescriptionEmptyOrContainsEmptyParagraph;
@@ -91,8 +92,11 @@ public class DefaultExportService implements ExportService {
                                     ByteArrayOutputStream archiveOutputStream = new ByteArrayOutputStream();
                                     ZipOutputStream zipOutputStream = new ZipOutputStream(archiveOutputStream);
 
-                                    // Ajouter le PPTX à la racine de l'archive
-                                    ZipEntry pptxEntry = new ZipEntry(board.getTitle() + ".pptx");
+                                    // Nettoyer le titre du board pour le nom de fichier
+                                    String sanitizedTitle = board.getTitle().replaceAll("[\\\\/:*?\"<>|]", "_");
+
+                                    // Ajouter le PPTX à la racine de l'archive avec un nom sécurisé
+                                    ZipEntry pptxEntry = new ZipEntry(sanitizedTitle + ".pptx");
                                     zipOutputStream.putNextEntry(pptxEntry);
                                     ByteArrayOutputStream pptxOutputStream = new ByteArrayOutputStream();
                                     pptx.write(pptxOutputStream);
@@ -292,11 +296,30 @@ public class DefaultExportService implements ExportService {
 
         return this.serviceFactory.sectionService().createSectionWithCards(board, user)
                 .compose(sections -> {
+                    List<Section> displayedSections = sections.stream()
+                            .filter(Section::getDisplayed)
+                            .collect(Collectors.toList());
+
+                    // Create a new ordered list based on board.sectionIds
+                    List<Section> orderedSections = new ArrayList<>();
+                    // Reorder sections according to board.sectionIds if available
+                    if (board.sectionIds() != null && !board.sectionIds().isEmpty()) {
+                        // Create a map for faster lookups
+                        final Map<String, Section> sectionMap = displayedSections.stream()
+                                .collect(Collectors.toMap(Section::getId, s -> s));
+
+                        for (String sectionId : board.sectionIds()) {
+                            if (sectionMap.containsKey(sectionId) && sectionMap.get(sectionId).getDisplayed()) {
+                                orderedSections.add(sectionMap.get(sectionId));
+                            }
+                        }
+                    }
+
                     // Créer un Future initial qui réussit immédiatement
                     Future<XMLSlideShow> processingFuture = Future.succeededFuture(ppt);
 
                     // Traiter chaque section non cachée et ses cartes séquentiellement
-                    for (Section section : sections.stream()
+                    for (Section section : orderedSections.stream()
                             .filter(Section::getDisplayed)
                             .collect(Collectors.toList())) {
                         processingFuture = processingFuture.compose(currentPpt -> {
@@ -379,7 +402,7 @@ public class DefaultExportService implements ExportService {
             case LINK:
             case HYPERLINK:
             case EMBEDDER:
-                buildLink(card, propertiesBuilder);
+                buildLink(card, propertiesBuilder, false);
                 break;
             case IMAGE:
             case VIDEO:
@@ -388,7 +411,7 @@ public class DefaultExportService implements ExportService {
                 if (card.getResourceId() == null || card.getResourceId().isEmpty()){
                     card.setResourceType(SlideResourceType.EMBEDDER.getValue());
                     resourceType = SlideResourceType.fromString(card.getResourceType());
-                    buildLink(card, propertiesBuilder);
+                    buildLink(card, propertiesBuilder, true);
                 }
                 else {
                     //MEDIA
@@ -459,19 +482,20 @@ public class DefaultExportService implements ExportService {
         return slideFactory.createSlide(resourceType, propertiesBuilder.build());
     }
 
-    private void buildLink(Card card, SlideProperties.Builder propertiesBuilder) {
+    private void buildLink(Card card, SlideProperties.Builder propertiesBuilder, boolean isFallback) {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
             InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
 
             if (inputStream != null) {
-                byte[] svgData = IOUtils.toByteArray(inputStream);
+
+                byte[] svgData = isFallback ? FALLBACK_PNG : IOUtils.toByteArray(inputStream);
 
                 propertiesBuilder
-                        .resourceUrl(card.getResourceUrl())
+                        .resourceUrl(card.getResourceUrl().startsWith("/") ? serviceFactory.magnetoConfig().host() + card.getResourceUrl() : card.getResourceUrl())
                         .caption(card.getCaption())
                         .resourceData(svgData)
-                        .contentType("image/svg+xml");
+                        .contentType(isFallback ? "image/png" : "image/svg+xml");
             } else {
                 log.warn("SVG file not found in resources");
                 // Traitement alternatif si le fichier n'est pas trouvé

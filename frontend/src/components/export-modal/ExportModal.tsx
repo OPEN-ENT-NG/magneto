@@ -65,7 +65,6 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
                 .map((card: string) => `"${card}"`)
                 .join(", ");
 
-              console.log(formattedErrors);
               // Afficher les toasts avec la liste formatée
               if (formattedErrors)
                 toast.warning(
@@ -75,7 +74,6 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
               console.error("Erreur de parsing:", e);
             }
           }
-          toast.warning("ça c'est les cartes pas bien : ");
 
           const blob = data.data;
           const url = window.URL.createObjectURL(blob);
@@ -92,6 +90,9 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           // Nettoyer
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
+
+          //Success
+          toast.success(t("magneto.export.toast.success"));
         } catch (downloadError) {
           console.error("Erreur lors du téléchargement:", downloadError);
           toast.error(t("magneto.export.toast.error"));

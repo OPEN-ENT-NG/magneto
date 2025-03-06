@@ -120,7 +120,7 @@ public class DefaultExportService implements ExportService {
                                         // Déterminer l'extension de fichier basée sur le contentType
                                         String originalFileName = (String) doc.get(Field.FILENAME);
                                         String uniqueFileName = generateUniqueFileName(usedFileNames, originalFileName);
-                                        String fullPath = "Fichiers Liés/" + uniqueFileName;
+                                        String fullPath = "Fichiers liés/" + uniqueFileName;
 
                                         ZipEntry docEntry = new ZipEntry(fullPath);
                                         zipOutputStream.putNextEntry(docEntry);
@@ -418,9 +418,8 @@ public class DefaultExportService implements ExportService {
                     card.setResourceType(SlideResourceType.EMBEDDER.getValue());
                     resourceType = SlideResourceType.fromString(card.getResourceType());
                     buildLink(card, propertiesBuilder, true);
-                }
-                else {
-                    //MEDIA
+                } else {
+                    // MEDIA
                     Map<String, Map<String, Object>> documentMap = new HashMap<>();
                     if (documents != null) {
                         for (Map<String, Object> doc : documents) {
@@ -483,7 +482,7 @@ public class DefaultExportService implements ExportService {
 
                     propertiesBuilder
                             .title(referencedBoardData.getString(Field.TITLE))
-                            .description(referencedBoardData.getString(Field.DESCRIPTION))
+                            .description(card.getDescription())
                             .caption(card.getCaption())
                             .ownerName(referencedBoardData.getString(Field.OWNERNAME))
                             .modificationDate(referencedBoardData.getString(Field.MODIFICATIONDATE))
@@ -505,16 +504,18 @@ public class DefaultExportService implements ExportService {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
             InputStream inputStream = classLoader.getResourceAsStream("img/extension/link.svg");
-
+            InputStream fallBackStream = classLoader.getResourceAsStream("img/extension/video.svg");
             if (inputStream != null) {
 
-                byte[] svgData = isFallback ? getDefaultThumbnail() : IOUtils.toByteArray(inputStream);
+                byte[] svgData = isFallback ? IOUtils.toByteArray(fallBackStream) : IOUtils.toByteArray(inputStream);
 
                 propertiesBuilder
-                        .resourceUrl(card.getResourceUrl().startsWith("/") ? serviceFactory.magnetoConfig().host() + card.getResourceUrl() : card.getResourceUrl())
+                        .resourceUrl(card.getResourceUrl().startsWith("/")
+                                ? serviceFactory.magnetoConfig().host() + card.getResourceUrl()
+                                : card.getResourceUrl())
                         .caption(card.getCaption())
                         .resourceData(svgData)
-                        .contentType(isFallback ? "image/png" : "image/svg+xml");
+                        .contentType("image/svg+xml");
             } else {
                 log.warn("SVG file not found in resources");
                 // Traitement alternatif si le fichier n'est pas trouvé

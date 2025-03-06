@@ -19,12 +19,13 @@ public class SlideMedia extends Slide {
     private final MediaType mediaType;
 
     public SlideMedia(String title, String caption, byte[] resourceData,
-            String fileContentType) {
+            String fileContentType, String description) {
         this.title = title;
         this.caption = caption;
         this.resourceData = resourceData;
         this.fileContentType = fileContentType;
         this.mediaType = determineMediaType(fileContentType);
+        this.description = description;
     }
 
     private MediaType determineMediaType(String contentType) {

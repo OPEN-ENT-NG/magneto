@@ -1,7 +1,7 @@
 {
   "magneto": "Magnéto",
 
-  "magneto.notifying_board": "notifier tous les utilisateurs du tableau",
+  "magneto.notifying_board": "Notifier tous les utilisateurs du tableau",
   "push.notif.magneto.notifying.board": "Magneto : Notification aux utilisateurs du tableau",
   "timeline.magneto.notifying": "Des modifications ont été apportées au tableau ",
   "timeline.magneto.notifying.consult": "Consultez-le !",

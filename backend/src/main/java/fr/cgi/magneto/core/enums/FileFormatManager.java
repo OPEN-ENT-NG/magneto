@@ -24,18 +24,22 @@ public class FileFormatManager {
     /**
      * Charge une ressource appropriée en fonction de l'extension fournie
      *
-     * @param extension l'extension de fichier pour déterminer la ressource à charger
+     * @param extension l'extension de fichier pour déterminer la ressource à
+     *                  charger
      * @return le contenu de la ressource sous forme de byte[]
      * @throws IOException si une erreur se produit lors du chargement
      */
     public static String loadResourceForExtension(String extension) throws IOException {
         if (extension == null || extension.isEmpty()) {
-            throw new IllegalArgumentException("L'extension ne peut pas être null ou vide");
+            return "img/extension/default.svg";
         }
 
         // Déterminer le format à partir de l'extension
         FileFormat format = FileFormat.fromExtension(extension);
-
+        if (format == null) {
+            return "img/extension/default.svg";
+        }
+        
         // Déterminer le chemin de la ressource en fonction du format
         String resourcePath;
         switch (format) {
@@ -101,7 +105,7 @@ public class FileFormatManager {
             return Stream.of(FileFormat.values())
                     .filter(format -> format.hasExtension(lowerExt))
                     .findFirst()
-                    .orElse(FileFormat.TEXT);
+                    .orElse(null);
         }
 
         public List<String> getExtensions() {
@@ -118,6 +122,5 @@ public class FileFormatManager {
             return extensions.contains(extension.toLowerCase());
         }
     }
-
 
 }

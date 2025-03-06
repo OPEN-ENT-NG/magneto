@@ -91,9 +91,9 @@ public class SlideText extends Slide {
                     processStyle(elem, para, run);
 
                     String text = elem.text().trim();
-                    if (!text.isEmpty()) {
-                        run.setText(text);
-                    }
+
+                    run.setText(!text.isEmpty() ? text : " ");
+
                 }
             }
         }

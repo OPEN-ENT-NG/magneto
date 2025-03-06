@@ -17,7 +17,7 @@ public class Slideshow {
     public static final int DESCRIPTION_TITLE_HEIGHT = 75;
     public static final Double DESCRIPTION_TITLE_FONT_SIZE = 55.0;
     public static final int MAIN_TITLE_HEIGHT = 100;
-    public static final Double MAIN_TITLE_FONT_SIZE = 100.0;
+    public static final Double MAIN_TITLE_FONT_SIZE = 80.0;
 
     // Constantes pour les légendes
     public static final int LEGEND_HEIGHT = 70;
@@ -29,6 +29,7 @@ public class Slideshow {
     public static final int CONTENT_HEIGHT = 520;
     public static final int CONTENT_MARGIN_TOP = 140;
     public static final int MAIN_CONTENT_MARGIN_TOP = 300;
+    public static final int SVG_CONTENT_MARGIN_TOP = 340;
     public static final Double CONTENT_FONT_SIZE = 36.0;
     public static final int SLIDE_BOARD_CONTENT_MARGIN_TOP = 450;
     public static final Double DESCRIPTION_FONT_SIZE = 24.0;

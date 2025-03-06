@@ -295,8 +295,10 @@ public class DefaultExportService implements ExportService {
                     // Créer un Future initial qui réussit immédiatement
                     Future<XMLSlideShow> processingFuture = Future.succeededFuture(ppt);
 
-                    // Traiter chaque section et ses cartes séquentiellement
-                    for (Section section : sections) {
+                    // Traiter chaque section non cachée et ses cartes séquentiellement
+                    for (Section section : sections.stream()
+                            .filter(Section::getDisplayed)
+                            .collect(Collectors.toList())) {
                         processingFuture = processingFuture.compose(currentPpt -> {
                             // TITRE SECTION
                             XSLFSlide sectionApacheSlide = currentPpt.createSlide();

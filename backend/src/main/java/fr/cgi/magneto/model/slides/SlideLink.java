@@ -29,8 +29,8 @@ public class SlideLink extends Slide {
                 TextParagraph.TextAlign.LEFT);
         SlideHelper.createLink(newSlide, link);
         if (Objects.equals(fileContentType, "image/png"))
-            SlideHelper.createImage(newSlide, resourceData, fileContentType, Slideshow.CONTENT_MARGIN_TOP,
-                    Slideshow.IMAGE_CONTENT_HEIGHT, false);
+            SlideHelper.createImage(newSlide, resourceData, fileContentType, Slideshow.SVG_CONTENT_MARGIN_TOP,
+                    Slideshow.SVG_CONTENT_HEIGHT, false);
         else
             SlideHelper.createImageWidthHeight(newSlide, resourceData, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
                     Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);

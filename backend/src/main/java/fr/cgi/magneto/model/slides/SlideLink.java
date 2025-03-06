@@ -13,7 +13,8 @@ public class SlideLink extends Slide {
     private final byte[] resourceData;
     private final String fileContentType;
 
-    public SlideLink(String title, String description, String link, String caption, byte[] resourceData, String fileContentType) {
+    public SlideLink(String title, String description, String link, String caption, byte[] resourceData,
+            String fileContentType) {
         this.title = title;
         this.description = description;
         this.link = link;
@@ -28,12 +29,8 @@ public class SlideLink extends Slide {
         SlideHelper.createTitle(newSlide, title, Slideshow.TITLE_HEIGHT, Slideshow.TITLE_FONT_SIZE,
                 TextParagraph.TextAlign.LEFT);
         SlideHelper.createLink(newSlide, link);
-        if (Objects.equals(fileContentType, "image/png"))
-            SlideHelper.createImage(newSlide, resourceData, fileContentType, Slideshow.SVG_CONTENT_MARGIN_TOP,
-                    Slideshow.SVG_CONTENT_HEIGHT, false);
-        else
-            SlideHelper.createImageWidthHeight(newSlide, resourceData, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
-                    Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);
+        SlideHelper.createImageWidthHeight(newSlide, resourceData, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
+                Slideshow.SVG_CONTENT_HEIGHT, Slideshow.SVG_CONTENT_WIDTH, true);
 
         SlideHelper.createLegend(newSlide, caption);
 

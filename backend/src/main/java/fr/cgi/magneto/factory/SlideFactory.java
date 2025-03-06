@@ -30,7 +30,7 @@ public class SlideFactory {
             case VIDEO:
             case AUDIO:
                 return new SlideMedia(properties.getTitle(), properties.getCaption(),
-                        properties.getResourceData(), properties.getContentType());
+                        properties.getResourceData(), properties.getContentType(),properties.getDescription());
             case BOARD:
                 return new SlideBoard(
                         properties.getTitle(), properties.getDescription(),

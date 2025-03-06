@@ -54,7 +54,7 @@ public class SlideHelper {
 
     public static void addNotes(XSLFSlide newSlide, String description) {
         Document doc = Jsoup.parse(description);
-        doc.select("style").remove();
+        doc.select(Slideshow.CSS_STYLE).remove();
         String text = doc.text();
 
         XSLFNotes note = newSlide.getSlideShow().getNotesSlide(newSlide);

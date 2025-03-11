@@ -147,6 +147,31 @@ public class BoardController extends ControllerHelper {
 
     }
 
+    @Post("/boards/public")
+    @ApiDoc("Get public boards by ids")
+    @SuppressWarnings("unchecked")
+    public void getBoardsByIdsPublic(HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "boardList", boards -> {
+            List<String> boardIds = boards.getJsonArray(Field.BOARDIDS).getList();
+            boardService.getBoards(boardIds)
+                    .onSuccess(result -> {
+                        JsonArray boardsResult = new JsonArray(result
+                                .stream()
+                                .map(Board::toJson)
+                                .collect(Collectors.toList()));
+                        renderJson(request, new JsonObject()
+                                .put(Field.ALL, boardsResult));
+                    })
+                    .onFailure(fail -> {
+                        String message = String.format("[Magneto@%s::getBoardsByIds] Failed to get all boards by ids : %s",
+                                this.getClass().getSimpleName(), fail.getMessage());
+                        log.error(message);
+                        renderError(request);
+                    });
+        });
+
+    }
+
     @Post("/board")
     @ApiDoc("Create a board")
     @ResourceFilter(CreateBoardRight.class)

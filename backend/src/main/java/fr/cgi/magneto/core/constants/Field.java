@@ -240,4 +240,5 @@ public class Field {
     public static final String BOARD_IMAGE_ID = "boardImageId";
     public static final String BUFFER = "buffer";
     public static final String FILE = "file";
+    public static final String ISEXTERNAL = "isExternal";
 }

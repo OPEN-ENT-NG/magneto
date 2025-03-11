@@ -6,7 +6,6 @@ import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
-import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.FutureHelper;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.ModelHelper;
@@ -31,8 +30,8 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.bson.conversions.Bson;
 import org.entcore.common.mongodb.MongoDbResult;
-import org.entcore.common.user.UserInfos;
 import org.entcore.common.share.ShareNormalizer;
+import org.entcore.common.user.UserInfos;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -337,6 +336,42 @@ public class DefaultBoardService implements BoardService {
                 })
                 .onFailure(promise::fail);
         return promise.future();
+    }
+
+    @Override
+    public Future<JsonObject> isBoardExternal(String boardId){
+        Promise<JsonObject> promise = Promise.promise();
+        JsonObject query = this.isBoardExternalQuery(boardId);
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
+            if (either.isLeft()) {
+                log.error("[Magneto@%s::isBoardExternal] Failed to get board", this.getClass().getSimpleName(),
+                        either.left().getValue());
+                promise.fail(either.left().getValue());
+            } else {
+                JsonArray result = either.right().getValue()
+                        .getJsonObject(Field.CURSOR, new JsonObject())
+                        .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+
+                if (result.isEmpty()) {
+                    promise.complete(new JsonObject().put("isExternal", false));
+                } else {
+                    JsonObject board = result.getJsonObject(0);
+                    boolean isExternal = board.getBoolean(Field.ISEXTERNAL, false);
+                    promise.complete(new JsonObject().put("isExternal", isExternal));
+                }
+            }
+        }));
+        return promise.future();
+    }
+
+    private JsonObject isBoardExternalQuery(String boardId) {
+        MongoQuery query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, boardId))
+                .project(new JsonObject()
+                        .put(Field._ID, 0)
+                        .put(Field.ISEXTERNAL, 1));
+        return query.getAggregate();
     }
 
     @Override

@@ -91,6 +91,20 @@ public class BoardController extends ControllerHelper {
         });
     }
 
+    @Get("/board/:boardId/external")
+    @ApiDoc("Get if board is external")
+    public void getIfBoardExternal(HttpServerRequest request) {
+        String boardId = request.getParam(Field.BOARDID);
+        boardService.isBoardExternal(boardId)
+                .onSuccess(result -> renderJson(request, result))
+                .onFailure(fail -> {
+                    String message = String.format("[Magneto@%s::getIfBoardExternal] Failed to check if board is external : %s",
+                            this.getClass().getSimpleName(), fail.getMessage());
+                    log.error(message);
+                    renderError(request);
+                });
+    }
+
     @Get("/boards/editable")
     @ApiDoc("Get all boards editable")
     @ResourceFilter(ViewRight.class)

@@ -117,6 +117,8 @@ public interface BoardService {
 
     Future<JsonObject> restoreBoards(String userId, List<String> boardIds);
 
+    Future<JsonObject> isBoardExternal(String boardId);
+
     /**
      * Pre delete boards
      *

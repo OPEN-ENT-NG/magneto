@@ -1,6 +1,13 @@
 import { ReactNode, useState } from "react";
 
 import {
+  Alert,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from "@cgi-learning-hub/ui";
+import {
   ID,
   PutShareResponse,
   RightStringified,
@@ -31,11 +38,13 @@ import useShare from "./hooks/useShare";
 import { useShareBookmark } from "./hooks/useShareBookmark";
 import { ShareBookmark } from "./ShareBookmark";
 import { ShareBookmarkLine } from "./ShareBookmarkLine";
+import { typographyStyle } from "./style";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import "./ShareModal.scss";
+
 
 export type ShareOptions = {
   resourceId: ID;
@@ -145,6 +154,7 @@ export default function ShareResourceModal({
   const { selectedFolders, folderData } = useFoldersNavigation();
 
   const { t } = useTranslation("magneto");
+  const rootElement = document.getElementById("root");
 
   const searchPlaceholder = showSearchAdmlHint()
     ? t("magneto.explorer.search.adml.hint")
@@ -170,6 +180,7 @@ export default function ShareResourceModal({
 
     return isMyBoards && isNotMainPage && parentFolderIsShared;
   };
+  console.log(rootElement?.getAttribute("data-min-hours"));
 
   return createPortal(
     <Modal id="share_modal" size="lg" isOpen={isOpen} onModalClose={onCancel}>
@@ -321,6 +332,32 @@ export default function ShareResourceModal({
             </div>
           )}
         </div>
+        {appCode === "magneto/board" && (
+          <>
+            <hr />
+            <Heading headingStyle="h4" level="h3" className="mb-16">
+              {t("magneto.explorer.modal.share.usersWithAccess")}
+            </Heading>
+            <Alert severity="info">
+              <Typography sx={typographyStyle}>
+                {"magneto.share.public.info"}
+              </Typography>
+            </Alert>
+            <Stack
+              direction="row"
+              alignItems={"center"}
+              spacing={1}
+              useFlexGap
+              className="mt-16"
+            >
+              <Switch />
+              <Typography sx={typographyStyle}>
+                {"magneto.share.public.switch"}
+              </Typography>
+            </Stack>
+            <TextField label="Uncontrolled" defaultValue="foo" />
+          </>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button

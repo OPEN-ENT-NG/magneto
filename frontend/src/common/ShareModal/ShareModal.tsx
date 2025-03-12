@@ -1,12 +1,6 @@
 import { ReactNode, useState } from "react";
 
-import {
-  Alert,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-} from "@cgi-learning-hub/ui";
+import { Alert, Stack, Switch, Typography } from "@cgi-learning-hub/ui";
 import {
   ID,
   PutShareResponse,
@@ -39,12 +33,13 @@ import { useShareBookmark } from "./hooks/useShareBookmark";
 import { ShareBookmark } from "./ShareBookmark";
 import { ShareBookmarkLine } from "./ShareBookmarkLine";
 import { typographyStyle } from "./style";
+import { createExternalLink } from "./utils/utils";
+import { TextFieldWithCopyButton } from "~/components/textfield-with-copy-button/TextfieldWithCopyButton";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import "./ShareModal.scss";
-
 
 export type ShareOptions = {
   resourceId: ID;
@@ -103,7 +98,7 @@ export default function ShareResourceModal({
   const { resourceId, resourceCreatorId, resourceRights } = shareOptions;
 
   const [isLoading, setIsLoading] = useState(true);
-
+  const [isExternalInput, setIsExternalInput] = useState(false);
   const {
     state: { isSharing, shareRights, shareRightActions },
     dispatch: shareDispatch,
@@ -180,7 +175,18 @@ export default function ShareResourceModal({
 
     return isMyBoards && isNotMainPage && parentFolderIsShared;
   };
-  console.log(rootElement?.getAttribute("data-min-hours"));
+
+  const externalLink = createExternalLink(
+    rootElement?.getAttribute("data-host"),
+    selectedBoards[0].id,
+  );
+
+  const handleExternalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsExternalInput(event.target.checked);
+  };
+  const handleSubmitExternal = () => {
+    //TODO
+  };
 
   return createPortal(
     <Modal id="share_modal" size="lg" isOpen={isOpen} onModalClose={onCancel}>
@@ -336,11 +342,11 @@ export default function ShareResourceModal({
           <>
             <hr />
             <Heading headingStyle="h4" level="h3" className="mb-16">
-              {t("magneto.explorer.modal.share.usersWithAccess")}
+              {t("magneto.share.public.label")}
             </Heading>
             <Alert severity="info">
               <Typography sx={typographyStyle}>
-                {"magneto.share.public.info"}
+                {t("magneto.share.public.info")}
               </Typography>
             </Alert>
             <Stack
@@ -349,13 +355,23 @@ export default function ShareResourceModal({
               spacing={1}
               useFlexGap
               className="mt-16"
+              mb={2}
             >
-              <Switch />
+              <Switch
+                checked={isExternalInput}
+                onChange={handleExternalChange}
+              />
               <Typography sx={typographyStyle}>
-                {"magneto.share.public.switch"}
+                {t("magneto.share.public.switch")}
               </Typography>
             </Stack>
-            <TextField label="Uncontrolled" defaultValue="foo" />
+            {isExternalInput && (
+              <TextFieldWithCopyButton
+                value={externalLink || t("magneto.share.public.input.default")}
+                label={t("magneto.share.public.input.label")}
+                disabled={true}
+              />
+            )}
           </>
         )}
       </Modal.Body>
@@ -374,7 +390,10 @@ export default function ShareResourceModal({
           color="primary"
           variant="filled"
           isLoading={isSharing}
-          onClick={handleShare}
+          onClick={() => {
+            handleShare();
+            handleSubmitExternal();
+          }}
           disabled={isSharing}
         >
           {t("magneto.share")}

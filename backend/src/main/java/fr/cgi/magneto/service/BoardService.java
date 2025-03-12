@@ -65,6 +65,8 @@ public interface BoardService {
      */
     Future<List<Board>> getBoards(List<String> boardIds);
 
+    Future<JsonObject> changeBoardVisibility(String boardId, UserInfos user);
+
     /**
      * Get board title ans shared array by id
      *

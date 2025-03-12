@@ -452,6 +452,19 @@ public class BoardController extends ControllerHelper {
     }
 
 
+    @Put("/pub/:id")
+    @ApiDoc("Change board visibility")
+    @ResourceFilter(ManageBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void updatePublicBoard(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            boardService.changeBoardVisibility(boardId, user)
+                    .onFailure(err -> renderError(request))
+                    .onSuccess(result -> renderJson(request, result));
+        });
+    }
+
     private Future<List<String>> getGroupUsers(UserInfos user, String id) {
         Promise<List<String>> promise = Promise.promise();
         UserUtils.findUsersInProfilsGroups(id, eb, user.getUserId(), false, event ->

@@ -6,10 +6,8 @@ import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
-import fr.cgi.magneto.helper.FutureHelper;
-import fr.cgi.magneto.helper.I18nHelper;
-import fr.cgi.magneto.helper.ModelHelper;
-import fr.cgi.magneto.helper.ShareHelper;
+import fr.cgi.magneto.core.enums.EventBusActions;
+import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
@@ -47,6 +45,7 @@ public class DefaultBoardService implements BoardService {
     private final ShareNormalizer shareNormalizer;
 
     private final ShareService shareService;
+    private final ServiceFactory serviceFactory;
 
     protected static final Logger log = LoggerFactory.getLogger(DefaultBoardService.class);
 
@@ -59,6 +58,7 @@ public class DefaultBoardService implements BoardService {
         this.sectionService = serviceFactory.sectionService();
         this.shareService = serviceFactory.shareService();
         this.shareNormalizer = serviceFactory.shareNormalizer();
+        this.serviceFactory = serviceFactory;
     }
 
     public Optional<UserInfos> getCreatorForModel(final JsonObject json) {
@@ -455,6 +455,46 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
+    public Future<JsonObject> changeBoardVisibility(String boardId, UserInfos user){
+        Promise<JsonObject> promise = Promise.promise();
+
+        final Board[] boardRef = new Board[1];
+
+        serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
+                .compose(boards -> {
+                            if (boards.isEmpty()) {
+                                String message = String.format("[Magneto@%s::exportBoardToArchive] No board found with id %s",
+                                        this.getClass().getSimpleName(), boardId);
+                                log.error(message, new Throwable(message));
+                                return Future.failedFuture(message);
+                            }
+                            boardRef[0] = boards.get(0);
+                            return serviceFactory.boardService().getAllDocumentIds(boardId, user);
+                })
+                .compose(documentIds -> {
+                    String imageUrl = boardRef[0].getImageUrl();
+                    String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                    documentIds.add(imageId);
+                    JsonObject action = new JsonObject()
+                            .put(Field.ACTION, EventBusActions.CHANGEVISIBILITY.action())
+                            .put(Field.VISIBILITY, boardRef[0].getIsExternal() ? Field.PROTECTED : Field.PUBLIC) //si le board était public, on le met en privé, sinon il était en privé donc on le met en public
+                            .put(Field.DOCUMENTIDS, documentIds);
+                    return EventBusHelper.requestJsonObject(EventBusActions.EventBusAddresses.WORKSPACE_BUS_ADDRESS.address(), serviceFactory.eventBus(), action);
+                })
+                .compose(truc -> {
+                    BoardPayload payload = new BoardPayload(boardRef[0].toJson());
+                    payload.setIsExternal(!payload.getIsExternal());
+                    return serviceFactory.boardService().update(payload);
+                })
+                .onFailure(fail -> {
+                    String message = String.format("[Magneto@%s::changeBoardVisibility] Failed to change visibility", this.getClass().getSimpleName());
+                    promise.fail(message);
+                })
+                .onSuccess(promise::complete);
+        return promise.future();
+    }
+
+    @Override
     public Future<JsonObject> getBoardSharedUsers(String boardId){
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = this.getBoardById(boardId);
@@ -820,7 +860,8 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
-                        .put(Field.ISLOCKED, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISLOCKED).add(false))));
+                        .put(Field.ISLOCKED, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISLOCKED).add(false)))
+                        .put(Field.ISEXTERNAL, 1));
         return query.getAggregate();
     }
 

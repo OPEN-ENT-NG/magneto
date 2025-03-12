@@ -241,4 +241,7 @@ public class Field {
     public static final String BUFFER = "buffer";
     public static final String FILE = "file";
     public static final String ISEXTERNAL = "isExternal";
+    public static final String DOCUMENTIDS = "documentIds";
+    public static final String VISIBILITY = "visibility";
+    public static final Object PROTECTED = "protected";
 }

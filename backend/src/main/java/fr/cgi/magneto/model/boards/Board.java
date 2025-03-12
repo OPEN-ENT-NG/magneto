@@ -76,7 +76,7 @@ public class Board implements Model<Board> {
         if (board.containsKey(Field.NBCARDSSECTIONS))
             this.nbCardsSections = board.getInteger(Field.NBCARDSSECTIONS);
         this.rights = board.getJsonArray(Field.RIGHTS, new JsonArray());
-        this.isExternal = board.getBoolean(Field.ISEXTERNAL);
+        this.isExternal = board.getBoolean(Field.ISEXTERNAL, false);
 
     }
 

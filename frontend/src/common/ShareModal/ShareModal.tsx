@@ -369,7 +369,7 @@ export default function ShareResourceModal({
               <TextFieldWithCopyButton
                 value={externalLink || t("magneto.share.public.input.default")}
                 label={t("magneto.share.public.input.label")}
-                disabled={true}
+                readOnly={true}
               />
             )}
           </>

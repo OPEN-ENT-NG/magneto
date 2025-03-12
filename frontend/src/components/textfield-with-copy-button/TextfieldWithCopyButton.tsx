@@ -1,17 +1,22 @@
 import { FC, useState } from "react";
 
+import {
+  TextField,
+  IconButton,
+  Tooltip,
+} from "@cgi-learning-hub/ui";
 import CheckIcon from "@mui/icons-material/Check";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { TextField, InputAdornment, IconButton, Tooltip } from "@mui/material";
+import { InputAdornment } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { TextFieldWithCopyButtonProps } from "./types";
-import { typographyStyle } from "~/common/ShareModal/style";
+
 
 export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
   value,
   label = "Lien",
-  disabled = true,
+  readOnly = true,
   hasCopyButton = true,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -31,11 +36,19 @@ export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
   return (
     <TextField
       fullWidth
-      disabled={disabled}
       label={label}
       value={value}
+      sx={{
+        "& .MuiInputBase-input": {
+          fontSize: "1.6rem", // Larger font size for the input value
+        },
+        "& .MuiInputLabel-root": {
+          fontSize: "1.6rem",
+          backgroundColor: "white"
+        },
+      }}
       InputProps={{
-        style: typographyStyle,
+        readOnly: readOnly,
         endAdornment:
           !hasCopyButton ||
           value === t("magneto.share.public.input.default") ? null : (
@@ -48,7 +61,11 @@ export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
                 }
               >
                 <IconButton edge="end" onClick={handleCopy} disabled={!value}>
-                  {copied ? <CheckIcon color="success" /> : <ContentCopyIcon />}
+                  {copied ? (
+                    <CheckIcon color="success" />
+                  ) : (
+                    <ContentCopyIcon color="primary" />
+                  )}
                 </IconButton>
               </Tooltip>
             </InputAdornment>

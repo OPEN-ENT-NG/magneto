@@ -1,11 +1,12 @@
 package fr.cgi.magneto.model;
 
-import fr.cgi.magneto.model.boards.*;
-import io.vertx.core.json.*;
-import io.vertx.ext.unit.*;
-import io.vertx.ext.unit.junit.*;
-import org.junit.*;
-import org.junit.runner.*;
+import fr.cgi.magneto.model.boards.Board;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
 public class BoardTest {
@@ -33,7 +34,8 @@ public class BoardTest {
             .put("rights", new JsonArray())
             .put("displayNbFavorites", false)
             .put("nbCards", 0)
-            .put("nbCardsSections", 0);
+            .put("nbCardsSections", 0)
+            .put("isExternal", false);
 
     @Test
     public void testBoardHasBeenInstantiated(TestContext ctx) {

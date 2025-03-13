@@ -7,7 +7,10 @@ import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
-import fr.cgi.magneto.security.*;
+import fr.cgi.magneto.security.ContribBoardRight;
+import fr.cgi.magneto.security.DuplicateCardRight;
+import fr.cgi.magneto.security.ViewRight;
+import fr.cgi.magneto.security.WriteBoardRight;
 import fr.cgi.magneto.service.BoardService;
 import fr.cgi.magneto.service.CardService;
 import fr.cgi.magneto.service.SectionService;
@@ -80,6 +83,36 @@ public class SectionController extends ControllerHelper {
                     renderJson(request, new JsonObject()
                             .put(Field.ALL, sectionsResult));
                 })));
+    }
+
+    @Get("/sections/:id/public")
+    @ApiDoc("Get sections by board id")
+    public void getSectionsByBoardIdPublic(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        boardService.getBoards(Collections.singletonList(boardId))
+                .compose(boards -> {
+                    if (boards.isEmpty()) {
+                        String message = String.format("[Magneto@%s::getSectionsByBoardId] Failed to get boards with board id : %s",
+                                this.getClass().getSimpleName(), boardId);
+                        return Future.failedFuture(message);
+                    } else {
+                        return sectionService.getSectionsByBoard(boards.get(0), true);
+                    }
+                })
+                .onFailure(err -> {
+                    String message = String.format("[Magneto@%s::getSectionsByBoardId] Failed to get all sections by board id : %s",
+                            this.getClass().getSimpleName(), err.getMessage());
+                    log.error(message);
+                    renderError(request);
+                })
+                .onSuccess(result -> {
+                    JsonArray sectionsResult = new JsonArray(result
+                            .stream()
+                            .map(Section::toJson)
+                            .collect(Collectors.toList()));
+                    renderJson(request, new JsonObject()
+                            .put(Field.ALL, sectionsResult));
+                });
     }
 
     @Post("/section")

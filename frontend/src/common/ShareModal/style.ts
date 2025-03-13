@@ -1,3 +1,3 @@
 export const typographyStyle = {
-    fontSize: "1.6rem",
-  };
+  fontSize: "1.6rem",
+};

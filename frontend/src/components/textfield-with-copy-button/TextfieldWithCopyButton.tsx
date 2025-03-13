@@ -1,17 +1,12 @@
 import { FC, useState } from "react";
 
-import {
-  TextField,
-  IconButton,
-  Tooltip,
-} from "@cgi-learning-hub/ui";
+import { TextField, IconButton, Tooltip } from "@cgi-learning-hub/ui";
 import CheckIcon from "@mui/icons-material/Check";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { InputAdornment } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { TextFieldWithCopyButtonProps } from "./types";
-
 
 export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
   value,
@@ -44,7 +39,7 @@ export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
         },
         "& .MuiInputLabel-root": {
           fontSize: "1.6rem",
-          backgroundColor: "white"
+          backgroundColor: "white",
         },
       }}
       InputProps={{

@@ -65,6 +65,8 @@ public interface BoardService {
      */
     Future<List<Board>> getBoards(List<String> boardIds);
 
+    Future<JsonObject> changeBoardVisibility(String boardId, UserInfos user);
+
     /**
      * Get board title ans shared array by id
      *
@@ -116,6 +118,8 @@ public interface BoardService {
     Future<List<String>> getAllDocumentIds(String boardId, UserInfos user);
 
     Future<JsonObject> restoreBoards(String userId, List<String> boardIds);
+
+    Future<JsonObject> isBoardExternal(String boardId);
 
     /**
      * Pre delete boards

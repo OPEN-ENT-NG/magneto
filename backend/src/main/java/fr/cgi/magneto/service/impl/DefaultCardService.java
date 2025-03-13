@@ -1382,8 +1382,7 @@ public class DefaultCardService implements CardService {
                 }
             }
 
-            String userId = user.getUserId();
-            query.project(new JsonObject()
+            JsonObject q = new JsonObject()
                     .put(Field._ID, 1)
                     .put(Field.TITLE, 1)
                     .put(Field.CAPTION, 1)
@@ -1416,15 +1415,17 @@ public class DefaultCardService implements CardService {
                                             .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
                                     .put(Mongo.THEN, new JsonObject()
                                             .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
-                                    .put(Mongo.ELSE, 0)))
-                    .put(Field.ISLIKED, new JsonObject()
+                                    .put(Mongo.ELSE, 0)));
+                    if (user != null)
+                        q.put(Field.ISLIKED, new JsonObject()
                             .put(Mongo.$COND, new JsonObject()
                                     .put(Mongo.IF, new JsonObject()
                                             .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
                                     .put(Mongo.THEN, new JsonObject()
-                                            .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
-                                    .put(Mongo.ELSE, false)))
-            );
+                                            .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(user.getUserId())).add(String.format("$%s", Field.FAVORITELIST))))
+                                    .put(Mongo.ELSE, false)));
+
+            query.project(q);
         }
 
         return query.getAggregate();
@@ -1451,8 +1452,7 @@ public class DefaultCardService implements CardService {
         } else {
             if (page != null)
                 query.page(page);
-            String userId = user.getUserId();
-            query.project(new JsonObject()
+            JsonObject q = new JsonObject()
                     .put(Field._ID, 1)
                     .put(Field.TITLE, 1)
                     .put(Field.CAPTION, 1)
@@ -1485,15 +1485,17 @@ public class DefaultCardService implements CardService {
                                             .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
                                     .put(Mongo.THEN, new JsonObject()
                                             .put(Mongo.SIZE, String.format("$%s", Field.FAVORITELIST)))
-                                    .put(Mongo.ELSE, 0)))
-                    .put(Field.ISLIKED, new JsonObject()
-                            .put(Mongo.$COND, new JsonObject()
-                                    .put(Mongo.IF, new JsonObject()
-                                            .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
-                                    .put(Mongo.THEN, new JsonObject()
-                                            .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(userId)).add(String.format("$%s", Field.FAVORITELIST))))
-                                    .put(Mongo.ELSE, false)))
-            );
+                                    .put(Mongo.ELSE, 0)));
+                    if (user != null){
+                        q.put(Field.ISLIKED, new JsonObject()
+                                .put(Mongo.$COND, new JsonObject()
+                                        .put(Mongo.IF, new JsonObject()
+                                                .put(Mongo.ISARRAY, String.format("$%s", Field.FAVORITELIST)))
+                                        .put(Mongo.THEN, new JsonObject()
+                                                .put(Mongo.$SET_ISSUBSET, new JsonArray().add(new JsonArray().add(user.getUserId())).add(String.format("$%s", Field.FAVORITELIST))))
+                                        .put(Mongo.ELSE, false)));
+                    }
+            query.project(q);
         }
 
         return query.getAggregate();

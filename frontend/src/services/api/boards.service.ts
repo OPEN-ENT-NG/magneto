@@ -155,6 +155,12 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       }),
       providesTags: ["Boards"],
     }),
+    updatePublicBoard: builder.mutation({
+      query: (boardId: string) => ({
+        url: `pub/${boardId}`,
+        method: "PUT",
+      }),
+    }),
   }),
 });
 
@@ -173,4 +179,5 @@ export const {
   useGetAllBoardsEditableQuery,
   useGetAllBoardImagesQuery,
   useNotifyBoardUsersMutation,
+  useUpdatePublicBoardMutation,
 } = boardsApi;

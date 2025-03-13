@@ -29,6 +29,7 @@ export interface IBoardItemResponse {
   canComment: boolean;
   displayNbFavorites: boolean;
   isLocked: boolean;
+  isExternal: boolean;
   rights: any[];
   cards: Card[];
 }
@@ -66,6 +67,7 @@ export interface IBoardPayload {
   canComment?: boolean;
   displayNbFavorites?: boolean;
   isLocked?: boolean;
+  isExternal?: boolean;
 }
 
 export interface SectionPayload {
@@ -103,6 +105,7 @@ export class BoardForm {
   private _canComment: boolean;
   private _displayNbFavorites: boolean;
   private _isLocked: boolean;
+  private _isExternal: boolean;
 
   constructor() {
     this._id = "";
@@ -120,6 +123,7 @@ export class BoardForm {
     this._canComment = false;
     this._displayNbFavorites = false;
     this._isLocked = false;
+    this._isExternal = false;
   }
 
   build(board: Board): BoardForm {
@@ -138,6 +142,7 @@ export class BoardForm {
     this.cardIds = board.cardIds;
     this._sectionIds = board.sectionsIds;
     this.isLocked = board.isLocked;
+    this.isExternal = board.isExternal;
     return this;
   }
 
@@ -264,6 +269,14 @@ export class BoardForm {
     this._isLocked = value;
   }
 
+  get isExternal(): boolean {
+    return this._isExternal;
+  }
+
+  set isExternal(value: boolean) {
+    this._isExternal = value;
+  }
+
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;
   }
@@ -335,6 +348,10 @@ export class BoardForm {
       payload.isLocked = this.isLocked;
     }
 
+    if (this.isExternal != null) {
+      payload.isExternal = this.isExternal;
+    }
+
     return payload;
   }
 }
@@ -361,6 +378,7 @@ export class Board /*implements Shareable*/ {
   private _displayNbFavorites: boolean;
   private _cards: Card[];
   private _isLocked: boolean;
+  private _isExternal: boolean;
 
   // Share resource properties
   public shared: any[];
@@ -393,6 +411,7 @@ export class Board /*implements Shareable*/ {
     this._displayNbFavorites = false;
     this._cards = [];
     this._isLocked = false;
+    this._isExternal = false;
     return this;
   }
 
@@ -441,6 +460,7 @@ export class Board /*implements Shareable*/ {
     this._canComment = data.canComment;
     this._displayNbFavorites = data.displayNbFavorites;
     this._isLocked = data.isLocked;
+    this._isExternal = data.isExternal;
     return this;
   }
   get isLocked(): boolean {
@@ -449,6 +469,13 @@ export class Board /*implements Shareable*/ {
 
   set isLocked(value: boolean) {
     this._isLocked = value;
+  }
+  get isExternal(): boolean {
+    return this._isExternal;
+  }
+
+  set isExternal(value: boolean) {
+    this._isExternal = value;
   }
   get id(): string {
     return this._id;

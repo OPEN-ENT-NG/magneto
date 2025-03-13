@@ -44,9 +44,10 @@ public class MagnetoController extends ControllerHelper {
     @ApiDoc("Render view")
     @SecuredAction(Rights.VIEW)
     public void view(HttpServerRequest request) {
-        String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode()) ?
-                String.format(":%s%s", this.magnetoConfig.websocketConfig().port(), this.magnetoConfig.websocketConfig().endpointProxy()) :
-                this.magnetoConfig.websocketConfig().endpointProxy();
+        String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
+                ? String.format(":%s%s", this.magnetoConfig.websocketConfig().port(),
+                        this.magnetoConfig.websocketConfig().endpointProxy())
+                : this.magnetoConfig.websocketConfig().endpointProxy();
 
         Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
         Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();
@@ -63,16 +64,20 @@ public class MagnetoController extends ControllerHelper {
     @ResourceFilter(ViewRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void viewReact(HttpServerRequest request) {
-        String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode()) ?
-                String.format(":%s%s", this.magnetoConfig.websocketConfig().port(), this.magnetoConfig.websocketConfig().endpointProxy()) :
-                this.magnetoConfig.websocketConfig().endpointProxy();
+        String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
+                ? String.format(":%s%s", this.magnetoConfig.websocketConfig().port(),
+                        this.magnetoConfig.websocketConfig().endpointProxy())
+                : this.magnetoConfig.websocketConfig().endpointProxy();
 
         Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
         Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();
+        String host = this.magnetoConfig.host();
+
         JsonObject param = new JsonObject()
                 .put(Field.WEBSOCKETENDPOINT, websocketEndpoint)
                 .put(Field.MAGNETO_UPDATE_FREQUENCY, updateFrequency)
-                .put(Field.MAGNETO_STANDALONE, isStandalone);
+                .put(Field.MAGNETO_STANDALONE, isStandalone)
+                .put(Field.HOST, host);
         renderView(request, param, "index.html", null);
         eventStore.createAndStoreEvent(ACCESS.name(), request);
     }

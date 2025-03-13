@@ -40,6 +40,8 @@ import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import "./ShareModal.scss";
+import { useUpdatePublicBoardMutation } from "~/services/api/boards.service";
+import { Board } from "~/models/board.model";
 
 export type ShareOptions = {
   resourceId: ID;
@@ -148,6 +150,8 @@ export default function ShareResourceModal({
 
   const { selectedFolders, folderData } = useFoldersNavigation();
 
+  const [updatePublicBoard] = useUpdatePublicBoardMutation();
+
   const { t } = useTranslation("magneto");
   const rootElement = document.getElementById("root");
 
@@ -184,8 +188,9 @@ export default function ShareResourceModal({
   const handleExternalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsExternalInput(event.target.checked);
   };
-  const handleSubmitExternal = () => {
-    //TODO
+  const handleSubmitExternal = async () => {
+    if (isExternalInput === selectedBoards[0].isExternal)
+      await updatePublicBoard(selectedBoards[0].id);
   };
 
   return createPortal(

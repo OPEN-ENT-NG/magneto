@@ -38,7 +38,7 @@ public class BoardPayloadTest {
             .put("description", "description")
             .put("modificationDate", "modificationDate")
             .put("public", false)
-            .put("isExternal", false);;
+            .put("isExternal", false);
 
     @Test
     public void testBoardPayloadHasBeenInstantiated(TestContext ctx) {

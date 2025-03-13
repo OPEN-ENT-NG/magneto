@@ -41,7 +41,6 @@ import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import "./ShareModal.scss";
 import { useUpdatePublicBoardMutation } from "~/services/api/boards.service";
-import { Board } from "~/models/board.model";
 
 export type ShareOptions = {
   resourceId: ID;

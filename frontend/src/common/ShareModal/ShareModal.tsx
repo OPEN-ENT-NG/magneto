@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 
+import { Alert, Stack, Switch, Typography } from "@cgi-learning-hub/ui";
 import {
   ID,
   PutShareResponse,
@@ -31,11 +32,15 @@ import useShare from "./hooks/useShare";
 import { useShareBookmark } from "./hooks/useShareBookmark";
 import { ShareBookmark } from "./ShareBookmark";
 import { ShareBookmarkLine } from "./ShareBookmarkLine";
+import { typographyStyle } from "./style";
+import { createExternalLink } from "./utils/utils";
+import { TextFieldWithCopyButton } from "~/components/textfield-with-copy-button/TextfieldWithCopyButton";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import "./ShareModal.scss";
+import { useUpdatePublicBoardMutation } from "~/services/api/boards.service";
 
 export type ShareOptions = {
   resourceId: ID;
@@ -94,7 +99,7 @@ export default function ShareResourceModal({
   const { resourceId, resourceCreatorId, resourceRights } = shareOptions;
 
   const [isLoading, setIsLoading] = useState(true);
-
+  const [isExternalInput, setIsExternalInput] = useState(false);
   const {
     state: { isSharing, shareRights, shareRightActions },
     dispatch: shareDispatch,
@@ -144,7 +149,10 @@ export default function ShareResourceModal({
 
   const { selectedFolders, folderData } = useFoldersNavigation();
 
+  const [updatePublicBoard] = useUpdatePublicBoardMutation();
+
   const { t } = useTranslation("magneto");
+  const rootElement = document.getElementById("root");
 
   const searchPlaceholder = showSearchAdmlHint()
     ? t("magneto.explorer.search.adml.hint")
@@ -169,6 +177,19 @@ export default function ShareResourceModal({
       !!parentFolder && !!parentFolder.rights && parentFolder.rights.length > 1;
 
     return isMyBoards && isNotMainPage && parentFolderIsShared;
+  };
+
+  const externalLink = createExternalLink(
+    rootElement?.getAttribute("data-host"),
+    selectedBoards[0].id,
+  );
+
+  const handleExternalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsExternalInput(event.target.checked);
+  };
+  const handleSubmitExternal = async () => {
+    if (isExternalInput === selectedBoards[0].isExternal)
+      await updatePublicBoard(selectedBoards[0].id);
   };
 
   return createPortal(
@@ -321,6 +342,42 @@ export default function ShareResourceModal({
             </div>
           )}
         </div>
+        {appCode === "magneto/board" && (
+          <>
+            <hr />
+            <Heading headingStyle="h4" level="h3" className="mb-16">
+              {t("magneto.share.public.label")}
+            </Heading>
+            <Alert severity="info">
+              <Typography sx={typographyStyle}>
+                {t("magneto.share.public.info")}
+              </Typography>
+            </Alert>
+            <Stack
+              direction="row"
+              alignItems={"center"}
+              spacing={1}
+              useFlexGap
+              className="mt-16"
+              mb={2}
+            >
+              <Switch
+                checked={isExternalInput}
+                onChange={handleExternalChange}
+              />
+              <Typography sx={typographyStyle}>
+                {t("magneto.share.public.switch")}
+              </Typography>
+            </Stack>
+            {isExternalInput && (
+              <TextFieldWithCopyButton
+                value={externalLink || t("magneto.share.public.input.default")}
+                label={t("magneto.share.public.input.label")}
+                readOnly={true}
+              />
+            )}
+          </>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button
@@ -337,7 +394,10 @@ export default function ShareResourceModal({
           color="primary"
           variant="filled"
           isLoading={isSharing}
-          onClick={handleShare}
+          onClick={() => {
+            handleShare();
+            handleSubmitExternal();
+          }}
           disabled={isSharing}
         >
           {t("magneto.share")}

@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 
-import { Alert, Stack, Switch, Typography } from "@cgi-learning-hub/ui";
+import { Alert, Stack, Typography } from "@cgi-learning-hub/ui";
 import {
   ID,
   PutShareResponse,
@@ -23,6 +23,7 @@ import {
   IconInfoCircle,
   IconRafterDown,
 } from "@edifice.io/react/icons";
+import Switch from "@mui/material/Switch";
 import { UseMutationResult } from "@tanstack/react-query";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";

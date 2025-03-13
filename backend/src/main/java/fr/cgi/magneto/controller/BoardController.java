@@ -161,7 +161,7 @@ public class BoardController extends ControllerHelper {
 
     }
 
-    @Post("/boards/public")
+    @Post("/public/boards")
     @ApiDoc("Get public boards by ids")
     @SuppressWarnings("unchecked")
     public void getBoardsByIdsPublic(HttpServerRequest request) {

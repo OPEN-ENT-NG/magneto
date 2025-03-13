@@ -32,7 +32,11 @@ const store = setupStore();
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown) => {
-      if (error === "0090") window.location.replace("/auth/login");
+      if (error === "0090") {
+        if (!window.location.pathname.includes("/public/")) {
+          window.location.replace("/auth/login");
+        }
+      }
     },
   }),
   defaultOptions: {

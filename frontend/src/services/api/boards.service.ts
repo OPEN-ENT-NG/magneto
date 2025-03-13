@@ -161,6 +161,12 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         method: "PUT",
       }),
     }),
+    getIsExternal: builder.query({
+      query: (boardId: string) => ({
+        url: `/board/${boardId}/external`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -180,4 +186,5 @@ export const {
   useGetAllBoardImagesQuery,
   useNotifyBoardUsersMutation,
   useUpdatePublicBoardMutation,
+  useGetIsExternalQuery,
 } = boardsApi;

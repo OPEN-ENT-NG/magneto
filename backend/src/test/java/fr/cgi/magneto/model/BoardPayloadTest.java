@@ -1,11 +1,12 @@
 package fr.cgi.magneto.model;
 
 import fr.cgi.magneto.model.boards.BoardPayload;
-import io.vertx.core.json.*;
-import io.vertx.ext.unit.*;
-import io.vertx.ext.unit.junit.*;
-import org.junit.*;
-import org.junit.runner.*;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
 public class BoardPayloadTest {
@@ -24,7 +25,8 @@ public class BoardPayloadTest {
             .put("public", false)
             .put("isLocked", false)
             .put("cardIds", new JsonArray())
-            .put("sectionIds", new JsonArray());
+            .put("sectionIds", new JsonArray())
+            .put("isExternal", false);
 
     JsonObject boardUpdateJsonObject_1 = new JsonObject()
             .put("_id", "id")
@@ -35,7 +37,8 @@ public class BoardPayloadTest {
             .put("isLocked", false)
             .put("description", "description")
             .put("modificationDate", "modificationDate")
-            .put("public", false);
+            .put("public", false)
+            .put("isExternal", false);;
 
     @Test
     public void testBoardPayloadHasBeenInstantiated(TestContext ctx) {

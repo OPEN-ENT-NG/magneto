@@ -33,7 +33,9 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown) => {
       if (error === "0090") {
-        if (!window.location.pathname.includes("/public/")) {
+        console.log(window.location.pathname);
+        if (!window.location.pathname.includes("/pub/")) {
+          console.log("here");
           window.location.replace("/auth/login");
         }
       }
@@ -58,7 +60,7 @@ root.render(
         <EdificeThemeProvider>
           <ThemeProvider themeId="crna">
             <MediaLibraryProvider>
-              <RouterProvider router={router} />
+              <RouterProvider router={router(queryClient)} />
             </MediaLibraryProvider>
           </ThemeProvider>
         </EdificeThemeProvider>

@@ -8,6 +8,7 @@ import theme from "~/themes/theme";
 
 export const App = () => {
   // Appel au hook RTK Query
+  console.log("cc!!");
   const { id = "" } = useParams();
 
   const { data: isExternalQueryAllowed } = useGetIsExternalQuery(id);

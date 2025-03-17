@@ -1,10 +1,9 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createHashRouter, RouteObject } from "react-router-dom";
+import { createHashRouter } from "react-router-dom";
 
 import Root from "~/app/root";
 import "~/styles/index.scss";
 
-const routes = (queryClient: QueryClient): RouteObject[] => [
+const routes = [
   {
     path: "/",
     element: <Root />,
@@ -65,15 +64,8 @@ const routes = (queryClient: QueryClient): RouteObject[] => [
     ],
   },
   {
-    id: "public-portal",
-    path: "/pub/:slug",
-    async lazy() {
-      const { Component, loader } = await import("./public-portal");
-      return {
-        loader: loader(queryClient),
-        Component,
-      };
-    },
+    path: "/public/:id",
+    element: <Root />,
     children: [
       {
         index: true,
@@ -93,5 +85,4 @@ const routes = (queryClient: QueryClient): RouteObject[] => [
   },
 ];
 
-export const router = (queryClient: QueryClient) =>
-  createHashRouter(routes(queryClient));
+export const router = createHashRouter(routes);

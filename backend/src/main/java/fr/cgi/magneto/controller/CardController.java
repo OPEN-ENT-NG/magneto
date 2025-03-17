@@ -104,7 +104,7 @@ public class CardController extends ControllerHelper {
         });
     }
 
-    @Get("/public/cards/:boardId")
+    @Get("/cards/:boardId/public")
     @ApiDoc("Get all cards by board id")
     public void getAllCardsByBoardIdPublic(HttpServerRequest request) {
         String boardId = request.getParam(Field.BOARDID);
@@ -141,7 +141,7 @@ public class CardController extends ControllerHelper {
         });
     }
 
-    @Get("/public/cards/section/:sectionId")
+    @Get("/cards/section/:sectionId/public")
     @ApiDoc("Get all cards by section id")
     public void getAllCardsBySectionIdPublic(HttpServerRequest request) {
         String sectionId = request.getParam(Field.SECTIONID);

@@ -163,7 +163,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
     }),
     getIsExternal: builder.query({
       query: (boardId: string) => ({
-        url: `/board/${boardId}/external`,
+        url: `board/${boardId}/external`,
         method: "GET",
       }),
     }),

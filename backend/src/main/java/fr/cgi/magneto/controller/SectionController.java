@@ -85,7 +85,7 @@ public class SectionController extends ControllerHelper {
                 })));
     }
 
-    @Get("/public/sections/:id")
+    @Get("/sections/:id/public")
     @ApiDoc("Get sections by board id")
     public void getSectionsByBoardIdPublic(HttpServerRequest request) {
         String boardId = request.getParam(Field.ID);

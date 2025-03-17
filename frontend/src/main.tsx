@@ -26,11 +26,8 @@ if (process.env.NODE_ENV !== "production") {
     axe.default(React, root, 1000);
   });
 }
-console.log("path", window.location.pathname);
-
 const store = setupStore();
 if (window.location.hash.includes("/pub/")) {
-  console.log("here ON EST LA");
   root.render(
     <Provider store={store}>
       <EdificeClientProvider

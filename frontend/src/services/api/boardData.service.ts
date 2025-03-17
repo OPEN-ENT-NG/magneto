@@ -31,7 +31,7 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
       ) {
         // Helper function to get the proper URL prefix
         const getUrl = (path: string) => {
-          return isExternal ? `/public/${path}` : path;
+          return isExternal ? `${path}/public` : path;
         };
 
         const boardResult = (await fetchWithBQ({

@@ -7,11 +7,9 @@ function Root() {
   const { init } = useEdificeClient();
   if (window.location.hash.includes("/pub/"))
     return (
-      <Layout>
-        <ErrorBoundary>
-          <Outlet />
-        </ErrorBoundary>
-      </Layout>
+      <ErrorBoundary>
+        <Outlet />
+      </ErrorBoundary>
     );
   if (!init) {
     return <LoadingScreen position={false} />;

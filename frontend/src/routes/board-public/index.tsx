@@ -8,14 +8,12 @@ import theme from "~/themes/theme";
 
 export const App = () => {
   // Appel au hook RTK Query
-  console.log("cc!!");
   const { id = "" } = useParams();
 
   const { data: isExternalQueryAllowed } = useGetIsExternalQuery(id);
 
   // Si le résultat est faux, affiche une page d'erreur
-  console.log(isExternalQueryAllowed);
-  if (!isExternalQueryAllowed) {
+  if (!isExternalQueryAllowed?.isExternal) {
     return (
       <ThemeProvider theme={theme}>
         <div className="error-page">
@@ -28,7 +26,7 @@ export const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <BoardProvider isExternal={isExternalQueryAllowed}>
+      <BoardProvider isExternal={isExternalQueryAllowed?.isExternal}>
         <BoardView />
       </BoardProvider>
     </ThemeProvider>

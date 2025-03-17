@@ -64,7 +64,7 @@ const routes = [
     ],
   },
   {
-    path: "/public/:id",
+    path: "/pub/:id",
     element: <Root />,
     children: [
       {

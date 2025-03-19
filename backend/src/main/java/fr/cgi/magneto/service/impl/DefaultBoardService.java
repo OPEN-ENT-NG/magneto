@@ -669,6 +669,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.CANCOMMENT, 1)
                             .put(Field.DISPLAY_NB_FAVORITES, 1)
                             .put(Field.ISLOCKED, 1)
+                            .put(Field.ISEXTERNAL, 1)
                     )
                     .unwind(Field.FOLDERID, true);
         }
@@ -702,7 +703,8 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.PUBLIC, 1)
                 .put(Field.CANCOMMENT, 1)
                 .put(Field.DISPLAY_NB_FAVORITES, 1)
-                .put(Field.ISLOCKED, 1));
+                .put(Field.ISLOCKED, 1)
+                .put(Field.ISEXTERNAL, 1));
         if (getCount) {
             query = query.count();
         } else {
@@ -861,7 +863,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
                         .put(Field.ISLOCKED, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISLOCKED).add(false)))
-                        .put(Field.ISEXTERNAL, 1));
+                        .put(Field.ISEXTERNAL, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISEXTERNAL).add(false))));
         return query.getAggregate();
     }
 
@@ -988,7 +990,8 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
-                        .put(Field.ISLOCKED, 1));
+                        .put(Field.ISLOCKED, 1)
+                        .put(Field.ISEXTERNAL, 1));
         return query.getAggregate();
     }
 

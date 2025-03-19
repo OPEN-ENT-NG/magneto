@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import { Alert, Stack, Typography } from "@cgi-learning-hub/ui";
 import {
@@ -100,7 +100,6 @@ export default function ShareResourceModal({
   const { resourceId, resourceCreatorId, resourceRights } = shareOptions;
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isExternalInput, setIsExternalInput] = useState(false);
   const {
     state: { isSharing, shareRights, shareRightActions },
     dispatch: shareDispatch,
@@ -146,7 +145,20 @@ export default function ShareResourceModal({
     toggleBookmarkInput,
   } = useShareBookmark({ shareRights, shareDispatch });
 
-  const { selectedBoards } = useBoardsNavigation();
+  const { selectedBoards, setSelectedBoards, setSelectedBoardsIds } =
+    useBoardsNavigation();
+
+  const [isExternalInput, setIsExternalInput] = useState(
+    selectedBoards && selectedBoards.length > 0
+      ? selectedBoards[0].isExternal
+      : false,
+  );
+
+  useEffect(() => {
+    if (selectedBoards && selectedBoards.length > 0) {
+      setIsExternalInput(selectedBoards[0].isExternal);
+    }
+  }, [selectedBoards]);
 
   const { selectedFolders, folderData } = useFoldersNavigation();
 
@@ -189,8 +201,12 @@ export default function ShareResourceModal({
     setIsExternalInput(event.target.checked);
   };
   const handleSubmitExternal = async () => {
-    if (isExternalInput === selectedBoards[0].isExternal)
+    if (isExternalInput !== selectedBoards[0].isExternal) {
       await updatePublicBoard(selectedBoards[0].id);
+      //Reset selected boards
+      setSelectedBoards([]);
+      setSelectedBoardsIds([]);
+    }
   };
 
   return createPortal(

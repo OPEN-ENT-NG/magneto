@@ -13,6 +13,7 @@ export interface BoardProviderProps {
 
 export type BoardContextType = {
   board: Board;
+  isExternalView: boolean;
   documents: WorkspaceElement[];
   zoomLevel: number;
   setZoomLevel: Dispatch<SetStateAction<number>>;

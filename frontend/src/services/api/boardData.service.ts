@@ -19,10 +19,23 @@ interface SectionsResponse {
 
 export const boardDataApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
-    getBoardData: builder.query<unknown, string>({
-      async queryFn(boardId, _queryApi, _extraOptions, fetchWithBQ) {
+    getBoardData: builder.query<
+      unknown,
+      { boardId: string; isExternal?: boolean }
+    >({
+      async queryFn(
+        { boardId, isExternal = false },
+        _queryApi,
+        _extraOptions,
+        fetchWithBQ,
+      ) {
+        // Helper function to get the proper URL prefix
+        const getUrl = (path: string) => {
+          return isExternal ? `${path}/public` : path;
+        };
+
         const boardResult = (await fetchWithBQ({
-          url: "boards",
+          url: getUrl("boards"),
           method: "POST",
           body: { boardIds: [boardId] },
         })) as {
@@ -34,14 +47,16 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
         const boardData = boardResult.data.all[0];
 
         if (boardData.layoutType !== LAYOUT_TYPE.FREE) {
-          const sectionsResult = (await fetchWithBQ(`sections/${boardId}`)) as {
+          const sectionsResult = (await fetchWithBQ(
+            getUrl(`sections/${boardId}`),
+          )) as {
             data: SectionsResponse;
             error?: FetchBaseQueryError;
           };
           if (sectionsResult.error) return { error: sectionsResult.error };
 
           const cardPromises = sectionsResult.data.all.map((section) =>
-            fetchWithBQ(`cards/section/${section._id}?page=0`),
+            fetchWithBQ(getUrl(`cards/section/${section._id}?page=0`)),
           );
           const cardsResults = await Promise.all(cardPromises);
 
@@ -59,7 +74,7 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
             },
           };
         } else {
-          const allCardsResult = await fetchWithBQ(`cards/${boardId}`);
+          const allCardsResult = await fetchWithBQ(getUrl(`cards/${boardId}`));
           if (allCardsResult.error) return { error: allCardsResult.error };
           const cardMap = new Map(
             (allCardsResult.data as ICardsResponse).all.map((card) => [

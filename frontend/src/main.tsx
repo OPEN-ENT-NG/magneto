@@ -26,13 +26,36 @@ if (process.env.NODE_ENV !== "production") {
     axe.default(React, root, 1000);
   });
 }
-
 const store = setupStore();
+if (window.location.hash.includes("/pub/")) {
+  root.render(
+    <Provider store={store}>
+      <EdificeClientProvider
+        params={{
+          app: "magneto",
+        }}
+      >
+        <EdificeThemeProvider>
+          <ThemeProvider themeId="crna">
+            <MediaLibraryProvider>
+              <RouterProvider router={router} />
+            </MediaLibraryProvider>
+          </ThemeProvider>
+        </EdificeThemeProvider>
+      </EdificeClientProvider>
+    </Provider>,
+  );
+}
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown) => {
-      if (error === "0090") window.location.replace("/auth/login");
+      if (error === "0090" || undefined) {
+        console.log(window.location.pathname);
+        if (!window.location.pathname.includes("/pub/")) {
+          window.location.replace("/auth/login");
+        }
+      }
     },
   }),
   defaultOptions: {

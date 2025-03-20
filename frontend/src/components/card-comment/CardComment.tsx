@@ -23,6 +23,7 @@ import { CardCommentProps } from "./types";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
+import { useBoard } from "~/providers/BoardProvider";
 import { useAddCommentMutation } from "~/services/api/comment.service";
 
 export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
@@ -32,6 +33,7 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
   const { avatar } = useUser();
   const { cardComment, nbOfComment, cardId } = commentData;
   const { getAvatarURL } = useDirectory();
+  const { isExternalView } = useBoard();
 
   const time = useElapsedTime(cardComment?.modificationDate);
 
@@ -87,18 +89,20 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
           </Box>
         </>
       )}
-      <Box sx={inputContainerStyle}>
-        <Avatar sx={avatarStyle} src={avatar} />
-        <InputBase
-          data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
-          placeholder={t("magneto.add.comment")}
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleSubmit}
-          fullWidth
-          sx={inputBaseStyle}
-        />
-      </Box>
+      {!isExternalView && (
+        <Box sx={inputContainerStyle}>
+          <Avatar sx={avatarStyle} src={avatar} />
+          <InputBase
+            data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
+            placeholder={t("magneto.add.comment")}
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleSubmit}
+            fullWidth
+            sx={inputBaseStyle}
+          />
+        </Box>
+      )}
     </Box>
   );
 });

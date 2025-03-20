@@ -27,6 +27,7 @@ export const CardActions = memo(
     nbOfFavorites,
     displayNbFavorites,
     handleFavoriteClick,
+    isExternalView,
   }: CardActionsProps) => (
     <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
       <Box sx={styledTypographyContainer}>
@@ -50,6 +51,7 @@ export const CardActions = memo(
           size="small"
           onClick={handleFavoriteClick}
           data-type={POINTER_TYPES.NON_SELECTABLE}
+          disabled={isExternalView}
         >
           {cardIsLiked ? <StarIcon /> : <StarBorderIcon />}
         </IconButton>

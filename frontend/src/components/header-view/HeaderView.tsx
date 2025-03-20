@@ -26,15 +26,34 @@ import {
 import { BoardDescription } from "../board-description/BoardDescription";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { IWebApp } from "@edifice.io/client";
 
 export const HeaderView: FC = () => {
-  const { board } = useBoard();
+  const { board, isExternalView } = useBoard();
   const navigate = useNavigate();
-  const { currentApp } = useEdificeClient();
+  // Create a properly typed placeholder
+  const emptyWebApp: IWebApp = {
+    address: "/magneto",
+    displayName: "magneto",
+    icon: `${window.location.host}/magneto/public/img/uni-magneto.png`,
+    display: true,
+    isExternal: true,
+    name: "Magneto",
+    prefix: "/magneto",
+    scope: [""],
+  };
+
+  // Use it in your ternary expression
+  const { currentApp } = isExternalView
+    ? { currentApp: emptyWebApp }
+    : useEdificeClient();
   const { t } = useTranslation("magneto");
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
-  const onClick = () => navigate(`/board/${board.id}/read`);
+  const onClick = () =>
+    navigate(
+      isExternalView ? `/pub/${board.id}/read` : `/board/${board.id}/read`,
+    );
 
   const boardHasCards = (): boolean => {
     return (

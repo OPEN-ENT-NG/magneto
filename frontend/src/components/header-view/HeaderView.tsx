@@ -2,6 +2,7 @@ import { FC } from "react";
 
 import "./HeaderView.scss";
 
+import { IWebApp } from "@edifice.io/client";
 import {
   AppHeader,
   Breadcrumb,
@@ -26,13 +27,12 @@ import {
 import { BoardDescription } from "../board-description/BoardDescription";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
-import { IWebApp } from "@edifice.io/client";
 
 export const HeaderView: FC = () => {
   const { board, isExternalView } = useBoard();
   const navigate = useNavigate();
-  // Create a properly typed placeholder
-  const emptyWebApp: IWebApp = {
+
+  const magnetoWebApp: IWebApp = {
     address: "/magneto",
     displayName: "magneto",
     icon: `${window.location.host}/magneto/public/img/uni-magneto.png`,
@@ -43,10 +43,10 @@ export const HeaderView: FC = () => {
     scope: [""],
   };
 
-  // Use it in your ternary expression
+  const edificeClient = useEdificeClient();
   const { currentApp } = isExternalView
-    ? { currentApp: emptyWebApp }
-    : useEdificeClient();
+    ? { currentApp: magnetoWebApp }
+    : edificeClient;
   const { t } = useTranslation("magneto");
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];

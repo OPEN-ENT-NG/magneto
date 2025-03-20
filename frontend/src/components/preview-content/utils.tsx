@@ -9,16 +9,14 @@ import { ExternalVideoPlayer } from "../external-video-player/ExternalVideoPlaye
 import { VIDEO_SOURCE } from "../external-video-player/types";
 import { getVideoSource } from "../external-video-player/utils";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
+import { RootsConst } from "~/core/constants/roots.const";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
-import { useBoard } from "~/providers/BoardProvider";
-import { RootsConst } from "~/core/constants/roots.const";
 
 export const displayPreviewContentByType = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
-  const { isExternalView } = useBoard();
 
-  const finalResourceUrl = isExternalView
+  const finalResourceUrl = window.location.hash.includes("/pub/")
     ? `${RootsConst.workspacePublic}${card.resourceId}`
     : card.resourceUrl;
 

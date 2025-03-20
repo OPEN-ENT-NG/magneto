@@ -1,11 +1,10 @@
-import { RootsConst } from "~/core/constants/roots.const";
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
 import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
 import { CardContentText } from "../card-content-text/cardContentText";
+import { RootsConst } from "~/core/constants/roots.const";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
-import { useBoard } from "~/providers/BoardProvider";
 
 export const redirect = (url: string) => {
   window.open(url, "_blank", "noopener,noreferrer");
@@ -31,13 +30,12 @@ export const onClick = (card: Card) => {
 
 export const displayContentByType = (card: Card, src?: string) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
-  const { isExternalView } = useBoard();
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO:
       return (
         <CardContentImageDisplay
           url={
-            isExternalView
+            window.location.hash.includes("/pub/")
               ? `${RootsConst.workspacePublic}${card.resourceId}`
               : card.resourceUrl
           }
@@ -51,7 +49,7 @@ export const displayContentByType = (card: Card, src?: string) => {
       return (
         <CardContentImageDisplay
           defaultImageSrc={
-            isExternalView
+            window.location.hash.includes("/pub/")
               ? `${RootsConst.workspacePublic}${card.resourceId}`
               : card.resourceUrl
           }

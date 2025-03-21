@@ -2,6 +2,7 @@ import { FC } from "react";
 
 import "./HeaderView.scss";
 
+import { IWebApp } from "@edifice.io/client";
 import {
   AppHeader,
   Breadcrumb,
@@ -28,13 +29,31 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 
 export const HeaderView: FC = () => {
-  const { board } = useBoard();
+  const { board, isExternalView } = useBoard();
   const navigate = useNavigate();
-  const { currentApp } = useEdificeClient();
+
+  const magnetoWebApp: IWebApp = {
+    address: "/magneto",
+    displayName: "magneto",
+    icon: `${window.location.host}/magneto/public/img/uni-magneto.png`,
+    display: true,
+    isExternal: true,
+    name: "Magneto",
+    prefix: "/magneto",
+    scope: [""],
+  };
+
+  const edificeClient = useEdificeClient();
+  const { currentApp } = isExternalView
+    ? { currentApp: magnetoWebApp }
+    : edificeClient;
   const { t } = useTranslation("magneto");
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
-  const onClick = () => navigate(`/board/${board.id}/read`);
+  const onClick = () =>
+    navigate(
+      isExternalView ? `/pub/${board.id}/read` : `/board/${board.id}/read`,
+    );
 
   const boardHasCards = (): boolean => {
     return (

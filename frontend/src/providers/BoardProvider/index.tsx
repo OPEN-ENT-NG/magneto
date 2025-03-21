@@ -154,6 +154,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({
     );
   };
 
+  const isExternalView =
+    board.isExternal && window.location.hash.includes("/pub/");
+
   const toggleBoardModals = (modalType: BOARD_MODAL_TYPE) =>
     setDisplayModals((prevState) => ({
       ...prevState,
@@ -200,6 +203,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
       closeActiveCardAction,
       behaviours,
       boardImages,
+      isExternalView,
     }),
     [
       board,

@@ -7,6 +7,7 @@ import CSVParser from "../csv-viewer/CSVViewer";
 import { FileInfos } from "../file-infos/FileInfos";
 import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
 import { PreviewContentImage } from "../preview-content-image/PreviewContentImage";
+import { RootsConst } from "~/core/constants/roots.const";
 import { FILE_EXTENSION } from "~/core/enums/file-extension.enum";
 import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
 import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
@@ -21,6 +22,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     hasContribRights,
     hasManageRights,
     behaviours,
+    isExternalView,
   } = useBoard();
 
   const cardDocument = documents.find((doc) => doc._id === card.resourceId);
@@ -68,7 +70,11 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
   };
 
   const download = () => {
-    window.open(`/workspace/document/${card.resourceId}`);
+    window.open(
+      `${isExternalView ? RootsConst.workspacePublic : RootsConst.workspace}${
+        card.resourceId
+      }`,
+    );
   };
 
   const canDownload = card.locked ? hasManageRights() : hasContribRights();
@@ -121,12 +127,26 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
         }
       />
       {card.metadata.extension === FILE_EXTENSION.PDF && (
-        <PDFUploadViewer url={`/workspace/document/${card.resourceId}`} />
+        <PDFUploadViewer
+          url={`${
+            isExternalView ? RootsConst.workspacePublic : RootsConst.workspace
+          }${card.resourceId}`}
+        />
       )}
-      {isImage() && <PreviewContentImage ressourceUrl={card.resourceUrl} />}
+      {isImage() && (
+        <PreviewContentImage
+          ressourceUrl={
+            isExternalView
+              ? `${RootsConst.workspacePublic}${card.resourceId}`
+              : card.resourceUrl
+          }
+        />
+      )}
       {isOfficePdf() && (
         <PDFUploadViewer
-          url={`/workspace/document/preview/${card.resourceId}`}
+          url={`${
+            isExternalView ? RootsConst.workspacePublic : RootsConst.workspace
+          }preview/${card.resourceId}`}
         />
       )}
       {isOfficeExcelOrCsv() && (

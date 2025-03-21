@@ -7,8 +7,8 @@ import { CardContentImageDisplayProps } from "./types";
 import { getVideoThumbnailUrl } from "./utils";
 import { StyledBoxSvg } from "../card-content-svg-display/style";
 import { DefaultVideoThumbnail } from "../SVG/DefaultVideoThumbnail";
-import { useBoard } from "~/providers/BoardProvider";
 import { RootsConst } from "~/core/constants/roots.const";
+import { useBoard } from "~/providers/BoardProvider";
 
 export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
   url = "",

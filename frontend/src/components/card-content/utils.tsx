@@ -2,7 +2,6 @@ import { CardContentAudio } from "../card-content-audio/CardContentAudio";
 import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
 import { CardContentText } from "../card-content-text/cardContentText";
-import { RootsConst } from "~/core/constants/roots.const";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 

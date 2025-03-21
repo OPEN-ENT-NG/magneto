@@ -167,7 +167,9 @@ const BoardCard: FC<BoardCardProps> = ({
         />
       )}
 
-      {canComment && zoomLevel > 1 && <CardComment commentData={commentData} />}
+      {canComment && zoomLevel > 1 && !isExternalView && (
+        <CardComment commentData={commentData} />
+      )}
     </StyledCard>
   );
 };

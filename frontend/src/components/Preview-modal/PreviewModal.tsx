@@ -34,6 +34,7 @@ export const PreviewModal: FC = () => {
     board: { canComment },
     toggleBoardModals,
     setActiveCard,
+    isExternalView,
   } = useBoard();
   const [isRefReady, setIsRefReady] = useState(false);
   const [localCardIndex, setLocalCardIndex] = useState<number>(0);
@@ -136,7 +137,7 @@ export const PreviewModal: FC = () => {
               {activeCard && <PreviewContent card={activeCard} />}
             </StyledContentBox>
             <CommentContainer isVisible={COMMENT_PANEL} />
-            {canComment && !COMMENT_PANEL && (
+            {canComment && !COMMENT_PANEL && !isExternalView && (
               <IconButton
                 onClick={() =>
                   toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)

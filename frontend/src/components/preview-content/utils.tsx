@@ -16,9 +16,14 @@ import { Card } from "~/models/card.model";
 export const displayPreviewContentByType = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
 
-  const finalResourceUrl = window.location.hash.includes("/pub/")
-    ? `${RootsConst.workspacePublic}${card.resourceId}`
-    : card.resourceUrl;
+  const finalResourceUrl =
+    window.location.hash.includes("/pub/") &&
+    card.resourceUrl.startsWith("/workspace/")
+      ? card.resourceUrl.replace(
+          RootsConst.workspace,
+          RootsConst.workspacePublic,
+        )
+      : card.resourceUrl;
 
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO: {

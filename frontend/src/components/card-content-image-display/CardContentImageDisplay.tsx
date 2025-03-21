@@ -7,12 +7,15 @@ import { CardContentImageDisplayProps } from "./types";
 import { getVideoThumbnailUrl } from "./utils";
 import { StyledBoxSvg } from "../card-content-svg-display/style";
 import { DefaultVideoThumbnail } from "../SVG/DefaultVideoThumbnail";
+import { useBoard } from "~/providers/BoardProvider";
+import { RootsConst } from "~/core/constants/roots.const";
 
 export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
   url = "",
   defaultImageSrc = "",
 }) => {
   const [imageUrl, setImageUrl] = useState("");
+  const { isExternalView } = useBoard();
 
   const fetchThumbnailUrl = async () => {
     const formattedUrl = await getVideoThumbnailUrl(url);
@@ -28,7 +31,17 @@ export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
     if (!url) return null;
 
     if (url.startsWith("/workspace/")) {
-      return <video controls src={url} style={videoStyle}></video>;
+      return (
+        <video
+          controls
+          src={
+            isExternalView
+              ? url.replace(RootsConst.workspace, RootsConst.workspacePublic)
+              : url
+          }
+          style={videoStyle}
+        ></video>
+      );
     }
 
     if (imageUrl) {

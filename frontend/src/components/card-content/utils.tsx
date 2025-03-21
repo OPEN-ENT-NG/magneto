@@ -32,29 +32,13 @@ export const displayContentByType = (card: Card, src?: string) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
   switch (cardType) {
     case RESOURCE_TYPE.VIDEO:
-      return (
-        <CardContentImageDisplay
-          url={
-            window.location.hash.includes("/pub/")
-              ? `${RootsConst.workspacePublic}${card.resourceId}`
-              : card.resourceUrl
-          }
-        />
-      );
+      return <CardContentImageDisplay url={card.resourceUrl} />;
     case RESOURCE_TYPE.LINK:
       return <CardContentSvgDisplay url={card.resourceUrl} extension="link" />;
     case RESOURCE_TYPE.TEXT:
       return <CardContentText text={card.description} />;
     case RESOURCE_TYPE.IMAGE:
-      return (
-        <CardContentImageDisplay
-          defaultImageSrc={
-            window.location.hash.includes("/pub/")
-              ? `${RootsConst.workspacePublic}${card.resourceId}`
-              : card.resourceUrl
-          }
-        />
-      );
+      return <CardContentImageDisplay defaultImageSrc={card.resourceUrl} />;
     case RESOURCE_TYPE.AUDIO:
       return (
         <CardContentAudio

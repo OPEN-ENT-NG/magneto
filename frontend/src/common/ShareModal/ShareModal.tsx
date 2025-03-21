@@ -149,13 +149,11 @@ export default function ShareResourceModal({
     useBoardsNavigation();
 
   const [isExternalInput, setIsExternalInput] = useState(
-    selectedBoards && selectedBoards.length > 0
-      ? selectedBoards[0].isExternal
-      : false,
+    selectedBoards.length ? selectedBoards[0].isExternal : false,
   );
 
   useEffect(() => {
-    if (selectedBoards && selectedBoards.length > 0) {
+    if (selectedBoards.length) {
       setIsExternalInput(selectedBoards[0].isExternal);
     }
   }, [selectedBoards]);

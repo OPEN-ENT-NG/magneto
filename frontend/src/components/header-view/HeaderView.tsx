@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   externalToastStyle,
+  externalToastTextStyle,
   isLockedToastStyle,
   leftWrapperStyle,
   mainWrapperStyle,
@@ -82,7 +83,7 @@ export const HeaderView: FC = () => {
             {board.isExternal && (
               <Box sx={externalToastStyle}>
                 <Icon path={mdiEarth} size={1.5} />
-                <span style={{ color: "#545F66" }}>
+                <span style={externalToastTextStyle}>
                   {t("magneto.board.external")}
                 </span>
               </Box>

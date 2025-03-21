@@ -20,6 +20,9 @@ export const externalToastStyle = {
   color: "#2a9cc8",
   textWrap: "nowrap",
 };
+
+export const externalToastTextStyle = { color: "#545F66" };
+
 export const isLockedToastStyle = {
   display: "flex",
   alignItems: "center",

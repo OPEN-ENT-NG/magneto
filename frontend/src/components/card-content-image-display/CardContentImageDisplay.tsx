@@ -68,7 +68,14 @@ export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
       {!!defaultImageSrc && (
         <CardMedia
           component="img"
-          image={imageUrl}
+          image={
+            isExternalView
+              ? imageUrl.replace(
+                  RootsConst.workspace,
+                  RootsConst.workspacePublic,
+                )
+              : imageUrl
+          }
           alt="Image Display"
           sx={imgStyle}
         />

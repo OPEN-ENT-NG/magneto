@@ -51,7 +51,7 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown) => {
       if (error === "0090" || undefined) {
-        if (!window.location.pathname.includes("/pub/")) {
+        if (!window.location.hash.includes("/pub/")) {
           window.location.replace("/auth/login");
         }
       }

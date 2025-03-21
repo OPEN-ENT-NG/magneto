@@ -193,7 +193,7 @@ export const BoardView: FC = () => {
           appCode={appCode}
           ref={mediaLibraryRef}
           multiple={false}
-          visibility="protected"
+          visibility="public"
           {...mediaLibraryHandlers}
         />
       </Box>

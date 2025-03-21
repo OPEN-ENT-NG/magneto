@@ -54,6 +54,7 @@ export const ReadView: FC = () => {
     board,
     displayModals: { COMMENT_PANEL },
     toggleBoardModals,
+    isExternalView,
   } = useBoard();
   const navigate = useNavigate();
   const { t } = useTranslation("magneto");
@@ -80,7 +81,7 @@ export const ReadView: FC = () => {
   }, [COMMENT_PANEL]);
 
   const navigateToView = () => {
-    navigate(`/board/${board.id}/view`);
+    navigate(isExternalView ? `/pub/${board.id}` : `/board/${board.id}/view`);
   };
 
   const initialCards = useMemo(() => {

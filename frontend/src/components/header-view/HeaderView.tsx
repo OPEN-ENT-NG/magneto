@@ -12,11 +12,12 @@ import {
 import { mdiCheckCircle, mdiEarth } from "@mdi/js";
 import Icon from "@mdi/react";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import {
+  breadcrumbTitle,
   externalToastStyle,
   externalToastTextStyle,
   isLockedToastStyle,
@@ -71,7 +72,11 @@ export const HeaderView: FC = () => {
       <Box sx={mainWrapperStyle}>
         <Box sx={wrapperBoxStyle}>
           <Box sx={leftWrapperStyle}>
-            {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
+            {isExternalView ? (
+              <Typography sx={breadcrumbTitle}>{board.title}</Typography>
+            ) : (
+              currentApp && <Breadcrumb app={currentApp} name={board?.title} />
+            )}
           </Box>
           <Box sx={rightWrapperStyle}>
             {!board.isExternal && board.isLocked && (

@@ -66,3 +66,11 @@ export const rightWrapperStyle = {
   gap: "3rem",
   flexShrink: 0,
 };
+
+export const breadcrumbTitle = {
+  fontFamily: "Comfortaa",
+  fontSize: "1.75em",
+  color: "#ecbe30",
+  lineHeight: "1.2",
+  fontWeight: "bold",
+};

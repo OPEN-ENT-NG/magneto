@@ -13,7 +13,6 @@ export const titleEmptyState = {
 };
 
 export const contentEmptyState = {
-  textAlign: "justify",
   font: "Roboto",
   fontSize: "1.6rem",
   lineHeight: "150%",

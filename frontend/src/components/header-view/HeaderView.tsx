@@ -74,7 +74,7 @@ export const HeaderView: FC = () => {
             {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
           </Box>
           <Box sx={rightWrapperStyle}>
-            {board.isLocked && (
+            {!board.isExternal && board.isLocked && (
               <Box sx={isLockedToastStyle}>
                 <WarningAmberIcon color="warning" />
                 <span>{t("magneto.board.locked")}</span>

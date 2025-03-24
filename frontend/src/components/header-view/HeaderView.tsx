@@ -9,7 +9,7 @@ import {
   Button,
   useEdificeClient,
 } from "@edifice.io/react";
-import { mdiCheckCircle } from "@mdi/js";
+import { mdiCheckCircle, mdiEarth } from "@mdi/js";
 import Icon from "@mdi/react";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { Box } from "@mui/material";
@@ -17,6 +17,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import {
+  externalToastStyle,
+  externalToastTextStyle,
   isLockedToastStyle,
   leftWrapperStyle,
   mainWrapperStyle,
@@ -76,6 +78,14 @@ export const HeaderView: FC = () => {
               <Box sx={isLockedToastStyle}>
                 <WarningAmberIcon color="warning" />
                 <span>{t("magneto.board.locked")}</span>
+              </Box>
+            )}
+            {board.isExternal && (
+              <Box sx={externalToastStyle}>
+                <Icon path={mdiEarth} size={1.5} />
+                <span style={externalToastTextStyle}>
+                  {t("magneto.board.external")}
+                </span>
               </Box>
             )}
             <Box sx={toastStyle}>

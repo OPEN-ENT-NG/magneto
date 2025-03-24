@@ -52,7 +52,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   transformOrigin = { vertical: "bottom", horizontal: "right" },
 }) => {
   const { t } = useTranslation("magneto");
-  const { displayModals, toggleBoardModals } = useBoard();
+  const { displayModals, toggleBoardModals, isExternalView } = useBoard();
   const { avatar } = useUser();
   const [addComment] = useAddCommentMutation();
   const { data: commentsData } = useGetAllCommentsQuery({ cardId });
@@ -198,27 +198,29 @@ export const CommentPanel: FC<CommentPanelProps> = ({
             ),
           )}
         </Box>
-        <CommentPanelFooter isInCardPreview={isInCardPreview}>
-          <Box sx={leftFooterContent}>
-            <Avatar sx={avatarStyle} src={avatar}></Avatar>
-            <StyledTextarea
-              minRows={1}
-              maxRows={4}
-              placeholder={`${t("magneto.add.comment")}...`}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </Box>
-          <SubmitIconButton
-            onClick={handleSubmit}
-            aria-label="submit"
-            isEnabled={!!inputValue}
-            disabled={!inputValue}
-          >
-            <Icon path={mdiArrowUpCircle} size={2} />
-          </SubmitIconButton>
-        </CommentPanelFooter>
+        {!isExternalView && (
+          <CommentPanelFooter isInCardPreview={isInCardPreview}>
+            <Box sx={leftFooterContent}>
+              <Avatar sx={avatarStyle} src={avatar}></Avatar>
+              <StyledTextarea
+                minRows={1}
+                maxRows={4}
+                placeholder={`${t("magneto.add.comment")}...`}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+            </Box>
+            <SubmitIconButton
+              onClick={handleSubmit}
+              aria-label="submit"
+              isEnabled={!!inputValue}
+              disabled={!inputValue}
+            >
+              <Icon path={mdiArrowUpCircle} size={2} />
+            </SubmitIconButton>
+          </CommentPanelFooter>
+        )}
       </CommentPanelWrapper>
     </Modal>
   );

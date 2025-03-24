@@ -175,6 +175,7 @@
   "magneto.public.empty.state.title": "Aucun tableau trouvé",
   "magneto.public.empty.state.content": "Le tableau Magnéto que vous cherchez semble introuvable. Il se peut que l'URL soit mal orthographiée, ou que le tableau n'existe plus ou ne soit plus partagé.",
   "magneto.board.saved.at": "Tableau enregistré le {{0}} à {{1}}",
+  "magneto.board.external": "Tableau public",
   "magneto.read": "Lecture",
   "magneto.contrib": "Réutilisation",
   "magneto.manager": "Gestion",

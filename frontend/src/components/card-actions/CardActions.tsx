@@ -27,6 +27,7 @@ export const CardActions = memo(
     nbOfFavorites,
     displayNbFavorites,
     handleFavoriteClick,
+    isExternalView,
   }: CardActionsProps) => (
     <StyledCardActions zoomLevel={zoomLevel} disableSpacing>
       <Box sx={styledTypographyContainer}>
@@ -40,20 +41,23 @@ export const CardActions = memo(
           </Tooltip>
         )}
       </Box>
-      <Box sx={styledBox}>
-        {displayNbFavorites && (
-          <Typography sx={simple14Typography}>{nbOfFavorites}</Typography>
-        )}
-        <IconButton
-          sx={bottomIconButton}
-          aria-label="add to favorites"
-          size="small"
-          onClick={handleFavoriteClick}
-          data-type={POINTER_TYPES.NON_SELECTABLE}
-        >
-          {cardIsLiked ? <StarIcon /> : <StarBorderIcon />}
-        </IconButton>
-      </Box>
+      {!(isExternalView && !displayNbFavorites) && (
+        <Box sx={styledBox}>
+          {displayNbFavorites && (
+            <Typography sx={simple14Typography}>{nbOfFavorites}</Typography>
+          )}
+          <IconButton
+            sx={bottomIconButton}
+            aria-label="add to favorites"
+            size="small"
+            onClick={handleFavoriteClick}
+            data-type={POINTER_TYPES.NON_SELECTABLE}
+            disabled={isExternalView}
+          >
+            {cardIsLiked ? <StarIcon /> : <StarBorderIcon />}
+          </IconButton>
+        </Box>
+      )}
     </StyledCardActions>
   ),
 );

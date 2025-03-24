@@ -3,5 +3,5 @@ export const createExternalLink = (
   boardId: string,
 ) => {
   if (!host || host === "{{host}}") return null;
-  return `${host}/magneto#/pub/${boardId}`;
+  return `${host}/magneto/public#/pub/${boardId}`;
 };

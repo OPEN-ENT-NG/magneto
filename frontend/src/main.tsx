@@ -27,25 +27,6 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 const store = setupStore();
-if (window.location.hash.includes("/pub/")) {
-  root.render(
-    <Provider store={store}>
-      <EdificeClientProvider
-        params={{
-          app: "magneto",
-        }}
-      >
-        <EdificeThemeProvider>
-          <ThemeProvider themeId="crna">
-            <MediaLibraryProvider>
-              <RouterProvider router={router} />
-            </MediaLibraryProvider>
-          </ThemeProvider>
-        </EdificeThemeProvider>
-      </EdificeClientProvider>
-    </Provider>,
-  );
-}
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -61,6 +42,7 @@ const queryClient = new QueryClient({
     queries: {
       retry: false,
       refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
     },
   },
 });

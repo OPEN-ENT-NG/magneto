@@ -252,7 +252,7 @@ export const ReadView: FC = () => {
             {card && <PreviewContent card={card} />}
             <Box sx={commentButtonWrapperStyle}>
               <CommentContainer isVisible={COMMENT_PANEL} />
-              {board.canComment && !COMMENT_PANEL && (
+              {board.canComment && !COMMENT_PANEL && !isExternalView && (
                 <IconButton
                   onClick={() =>
                     toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)

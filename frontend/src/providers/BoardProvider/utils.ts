@@ -64,6 +64,17 @@ export const fetchZoomPreference = async () => {
   try {
     const zoomPreferences = await getPreference("magneto");
     const zoomLevel = convertPreferenceToZoomLevel(zoomPreferences);
+
+    if (
+      typeof zoomLevel !== "number" ||
+      isNaN(zoomLevel) ||
+      zoomLevel < 0 ||
+      zoomLevel > 5 ||
+      !Number.isInteger(zoomLevel)
+    ) {
+      return 3;
+    }
+
     return zoomLevel;
   } catch (error) {
     console.error("zoom request Error", error);

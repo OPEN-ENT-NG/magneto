@@ -133,29 +133,29 @@ export const BoardProvider: FC<BoardProviderProps> = ({
     }
   }, [boardData]);
 
+  const isExternalView =
+    board.isExternal && window.location.hash.includes("/pub/");
+
   const hasContribRights = (): boolean => {
     return (
       (board.owner.userId === user?.userId || !!boardRights?.contrib) &&
-      !board.isExternal
+      !isExternalView
     );
   };
 
   const hasEditRights = (): boolean => {
     return (
       (board.owner.userId === user?.userId || !!boardRights?.publish) &&
-      !board.isExternal
+      !isExternalView
     );
   };
 
   const hasManageRights = (): boolean => {
     return (
       (board.owner.userId === user?.userId || !!boardRights?.manager) &&
-      !board.isExternal
+      !isExternalView
     );
   };
-
-  const isExternalView =
-    board.isExternal && window.location.hash.includes("/pub/");
 
   const toggleBoardModals = (modalType: BOARD_MODAL_TYPE) =>
     setDisplayModals((prevState) => ({

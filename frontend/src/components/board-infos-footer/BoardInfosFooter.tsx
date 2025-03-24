@@ -20,18 +20,22 @@ import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { useBoard } from "~/providers/BoardProvider";
-import { useGetBoardsByIdsQuery } from "~/services/api/boards.service";
+import {
+  useGetBoardsByIdsQuery,
+  useGetBoardsByIdsPublicQuery,
+} from "~/services/api/boards.service";
 
 export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
   const typographyStyle = {
     fontSize: "1.6rem",
   };
   const { t } = useTranslation("magneto");
+
+  const { closeActiveCardAction, isExternalView } = useBoard();
   const { user } = useEdificeClient();
-  const { currentData: myBoardsResult } = useGetBoardsByIdsQuery([
-    card.resourceUrl,
-  ]);
-  const { closeActiveCardAction } = useBoard();
+  const { currentData: myBoardsResult } = isExternalView
+    ? useGetBoardsByIdsPublicQuery([card.resourceUrl])
+    : useGetBoardsByIdsQuery([card.resourceUrl]);
 
   const board = useMemo(() => {
     return myBoardsResult && myBoardsResult.all[0]

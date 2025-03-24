@@ -84,6 +84,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     board.imageUrl = thumbnail?.url ?? "";
     board.backgroundUrl = background?.url ?? "";
     board.public = boardToUpdate?.isPublished ?? false;
+    board.isExternal = boardToUpdate?.isExternal ?? false;
 
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")

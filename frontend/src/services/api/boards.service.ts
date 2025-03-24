@@ -45,6 +45,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       }),
       providesTags: ["Boards"],
     }),
+    getBoardsByIdsPublic: builder.query({
+      query: (ids: string[]) => ({
+        url: "boards/public",
+        method: "POST",
+        body: { boardIds: ids },
+      }),
+      providesTags: ["Boards"],
+    }),
     notifyBoardUsers: builder.mutation({
       query: (idBoard: string) => ({
         url: `board/${idBoard}/notify`,
@@ -174,6 +182,7 @@ export const {
   useGetBoardsQuery,
   useGetAllBoardsQuery,
   useGetBoardsByIdsQuery,
+  useGetBoardsByIdsPublicQuery,
   useCreateBoardMutation,
   useUpdateBoardMutation,
   useDuplicateBoardMutation,

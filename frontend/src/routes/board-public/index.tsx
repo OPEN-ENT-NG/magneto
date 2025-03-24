@@ -19,6 +19,7 @@ export const App = () => {
   // Appel au hook RTK Query
   const { id = "" } = useParams();
   const { t } = useTranslation("magneto");
+  console.log("coucouuu");
 
   const { data: isExternalQueryAllowed, isLoading } = useGetIsExternalQuery(id);
 

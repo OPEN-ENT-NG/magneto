@@ -40,7 +40,7 @@ export const App = () => {
     return (
       <ThemeProvider theme={theme}>
         <Box sx={emptyStateStyle}>
-          <Box sx={{ width: "30%" }}>
+          <Box sx={{ width: "50%" }}>
             <EmptyStatePublic
               title={t("magneto.public.empty.state.title")}
               description={t("magneto.public.empty.state.content")}

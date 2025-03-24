@@ -19,7 +19,7 @@ export const displayPreviewContentByType = (card: Card) => {
 
   const finalResourceUrl =
     window.location.hash.includes("/pub/") &&
-    card.resourceUrl.startsWith("/workspace/")
+    card.resourceUrl?.startsWith("/workspace/")
       ? card.resourceUrl.replace(
           RootsConst.workspace,
           RootsConst.workspacePublic,

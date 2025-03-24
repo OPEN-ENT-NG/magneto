@@ -2,20 +2,23 @@ package fr.cgi.magneto.controller;
 
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.I18nHelper;
+import fr.cgi.magneto.security.ContribBoardRight;
 import fr.cgi.magneto.service.ExportService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.impl.DefaultExportService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
+import fr.wseduc.security.ActionType;
+import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.I18n;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.Json;
+import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.user.UserUtils;
 
 import java.util.List;
-
-import org.entcore.common.controller.ControllerHelper;
-import org.entcore.common.user.UserUtils;
 
 public class ExportController extends ControllerHelper {
     private final ExportService exportService;
@@ -24,10 +27,12 @@ public class ExportController extends ControllerHelper {
         this.exportService = serviceFactory.exportService();
     }
 
-    @Get("/export/slide/:boardId")
+    @Get("/export/slide/:id")
     @ApiDoc("Export board to PPTX")
+    @ResourceFilter(ContribBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void exportBoardToPPTX(HttpServerRequest request) {
-        String boardId = request.getParam(Field.BOARDID);
+        String boardId = request.getParam(Field.ID);
         UserUtils.getUserInfos(eb, request, user -> {
             I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
             exportService.exportBoardToArchive(boardId, user, i18nHelper)

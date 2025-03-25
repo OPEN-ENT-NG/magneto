@@ -42,7 +42,6 @@ import java.util.zip.ZipOutputStream;
 
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
 import static fr.cgi.magneto.helper.SlideHelper.generateUniqueFileName;
-import static fr.cgi.magneto.helper.SlideHelper.getDefaultThumbnail;
 import static fr.cgi.magneto.model.slides.SlideText.isDescriptionEmptyOrContainsEmptyParagraph;
 
 public class DefaultExportService implements ExportService {
@@ -84,10 +83,15 @@ public class DefaultExportService implements ExportService {
                             })
                             .compose(docs -> {
                                 documents.addAll(docs);
-                                return board.isLayoutFree()
-                                        ? createFreeLayoutSlideObjects(board, user, slideShow, documents, i18nHelper)
-                                        : createSectionLayoutSlideObjects(board, user, slideShow, documents,
-                                                i18nHelper);
+                                try {
+                                    return board.isLayoutFree()
+                                            ? createFreeLayoutSlideObjects(board, user, slideShow, documents, i18nHelper)
+                                            : createSectionLayoutSlideObjects(board, user, slideShow, documents,
+                                                    i18nHelper);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    return null;
+                                }
                             })
                             .compose(pptx -> {
                                 try {
@@ -226,7 +230,7 @@ public class DefaultExportService implements ExportService {
     }
 
     private Future<XMLSlideShow> createFreeLayoutSlideObjects(Board board, UserInfos user,
-            JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
+            JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) throws IOException {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
@@ -280,7 +284,7 @@ public class DefaultExportService implements ExportService {
     }
 
     private Future<XMLSlideShow> createSectionLayoutSlideObjects(Board board, UserInfos user,
-            JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) {
+            JsonObject slideShowData, List<Map<String, Object>> documents, I18nHelper i18nHelper) throws IOException {
         XMLSlideShow ppt = new XMLSlideShow();
         ppt.setPageSize(new java.awt.Dimension(1280, 720));
 
@@ -292,7 +296,7 @@ public class DefaultExportService implements ExportService {
         titleSlide.createApacheSlide(newTitleSlide);
 
         // DESCRIPTION SI NON VIDE
-        if (!isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())) {
+        if (board.getDescription() != null && !isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())) {
             Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
             XSLFSlide newDescriptionSlide = ppt.createSlide();
             descriptionSlide.createApacheSlide(newDescriptionSlide);
@@ -639,18 +643,34 @@ public class DefaultExportService implements ExportService {
     }
 
     private Slide createTitleSlide(Board board, SlideFactory slideFactory, List<Map<String, Object>> documents,
-            I18nHelper i18nHelper) {
+            I18nHelper i18nHelper) throws IOException {
         SlideProperties.Builder propertiesBuilder = new SlideProperties.Builder()
                 .title(board.getTitle())
                 .description(board.getDescription());
 
         String imageUrl = board.getImageUrl();
         String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+        byte[] document;
         Map<String, Object> documentData = documents.stream()
                 .filter(doc -> imageId.equals(doc.get(Field.DOCUMENTID)))
                 .findFirst()
                 .orElse(null);
-        Buffer documentBuffer = (Buffer) documentData.get(Field.BUFFER);
+        if (documentData == null) {
+            ClassLoader classLoader = getClass().getClassLoader();
+            InputStream inputStream = classLoader.getResourceAsStream("img/magneto.svg");
+
+            if (inputStream != null) {
+                document = IOUtils.toByteArray(inputStream);
+            }
+            else {
+                log.error("Failed to load SVG file");
+                document = new byte[0];
+            }
+        }
+        else {
+            Buffer buffer = (Buffer) documentData.get(Field.BUFFER);
+            document = buffer.getBytes();
+        }
         String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
 
         // Format the modification date to dd/MM/yyyy
@@ -670,7 +690,7 @@ public class DefaultExportService implements ExportService {
         propertiesBuilder
                 .ownerName(i18nHelper.translate("magneto.slideshow.created.by") + board.getOwnerName() + ",")
                 .modificationDate(i18nHelper.translate("magneto.slideshow.updated.the") + formattedModificationDate)
-                .resourceData(documentBuffer != null ? documentBuffer.getBytes() : null)
+                .resourceData(document)
                 .contentType(contentType);
 
         return slideFactory.createSlide(SlideResourceType.TITLE, propertiesBuilder.build());

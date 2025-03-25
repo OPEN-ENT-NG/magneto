@@ -28,7 +28,7 @@ public class SlideProperties {
     }
 
     private boolean isValidForTitle() {
-        return title != null && description != null && ownerName != null && modificationDate != null
+        return title != null && ownerName != null && modificationDate != null
                 && resourceData != null && contentType != null;
     }
 

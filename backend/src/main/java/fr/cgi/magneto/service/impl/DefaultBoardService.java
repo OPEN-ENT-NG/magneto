@@ -14,6 +14,7 @@ import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import fr.cgi.magneto.service.*;
@@ -28,8 +29,10 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.bson.conversions.Bson;
 import org.entcore.common.mongodb.MongoDbResult;
+import org.entcore.common.service.VisibilityFilter;
 import org.entcore.common.share.ShareNormalizer;
 import org.entcore.common.user.UserInfos;
+import org.entcore.common.utils.ResourceUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -491,6 +494,7 @@ public class DefaultBoardService implements BoardService {
                     payload.setIsExternal(!payload.getIsExternal());
                     return serviceFactory.boardService().update(payload);
                 })
+                .compose(result -> getAndUpdateDescriptionDocuments(boardRef[0].getId(), user, boardRef[0].getIsExternal()))
                 .onFailure(fail -> {
                     String message = String.format("[Magneto@%s::changeBoardVisibility] Failed to change visibility", this.getClass().getSimpleName());
                     promise.fail(message);
@@ -912,6 +916,70 @@ public class DefaultBoardService implements BoardService {
                             .collect(Collectors.toList());
                     promise.complete(cardIds);
                 });
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<JsonObject> getAndUpdateDescriptionDocuments(String boardId, UserInfos user, Boolean isExternal) {
+        Promise<JsonObject> promise = Promise.promise();
+        final VisibilityFilter oldVisibilityFilter = isExternal ? VisibilityFilter.PUBLIC : VisibilityFilter.OWNER;
+        final VisibilityFilter newVisibilityFilter = isExternal ? VisibilityFilter.OWNER : VisibilityFilter.PUBLIC;
+
+
+        List<String> documentIds = new ArrayList<>();
+        List<Card> cardsList = new ArrayList<>();
+        Map<String, List<String>> idsByCard = new HashMap<>();
+
+        this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
+                .onFailure(promise::fail)
+                .compose(cards -> {
+                    for(Card card : cards){
+                        final List<String> currentIds = ResourceUtils.extractIds(card.getDescription(), oldVisibilityFilter);
+                        if(!currentIds.isEmpty()){
+                            cardsList.add(card);
+                            idsByCard.put(card.getId(), currentIds);
+                        }
+                        documentIds.addAll(currentIds);
+                    };
+                    JsonObject action = new JsonObject()
+                            .put(Field.ACTION, EventBusActions.CHANGEVISIBILITY.action())
+                            .put(Field.VISIBILITY, isExternal ? Field.PROTECTED : Field.PUBLIC)
+                            .put(Field.DOCUMENTIDS, documentIds);
+                    return EventBusHelper.requestJsonObject(EventBusActions.EventBusAddresses.WORKSPACE_BUS_ADDRESS.address(), serviceFactory.eventBus(), action);
+                })
+                .compose(result -> {
+                    List<Future> updateCardsFutures = new ArrayList<>();
+
+                    for(Card card : cardsList){
+                        Future<Card> cardUpdateFuture = Future.future(prom -> {
+                            String content = card.getDescription();
+                            List<String> ids = idsByCard.get(card.getId());
+
+                            CardPayload updateCard = new CardPayload(card.toJson())
+                                    .setId(card.getId())
+                                    .setDescription(ResourceUtils.transformUrlTo(content, ids, newVisibilityFilter));
+
+                            cardService.update(updateCard)
+                                    .onSuccess(promise::complete)
+                                    .onFailure(promise::fail);
+                        });
+
+                        updateCardsFutures.add(cardUpdateFuture);
+                    }
+
+                    // Utilisez Future.all pour attendre toutes les mises à jour
+                    return CompositeFuture.all(updateCardsFutures);
+                })
+                .onSuccess(v -> {
+                    promise.complete(new JsonObject()
+                            .put("status", "success")
+                            .put("message", "Documents updated successfully")
+                            .put("boardId", boardId)
+                            .put("documentCount", documentIds.size())
+                    );
+                })
+                .onFailure(promise::fail);
 
         return promise.future();
     }

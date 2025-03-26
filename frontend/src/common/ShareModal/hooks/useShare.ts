@@ -212,6 +212,7 @@ export default function useShare({
 
   const notifySuccess = (value: PutShareResponse) => {
     if (Object.keys(value)[0] === "error") {
+      console.log("kikoo");
       toast.error(t("explorer.shared.status.error"));
       console.error("Failed to save share", value);
     } else {
@@ -267,8 +268,10 @@ export default function useShare({
       }
       onSuccess();
     } catch (error) {
-      if (typeof error === "string")
+      if (typeof error === "string") {
+        console.log("kakoo");
         toast.error(t("explorer.shared.status.error"));
+      }
       console.error("Failed to save share", error);
     } finally {
       dispatch({

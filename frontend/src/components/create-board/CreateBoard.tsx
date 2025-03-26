@@ -418,7 +418,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
               appCode={appCode}
               ref={mediaLibraryRef}
               multiple={false}
-              visibility="protected"
+              visibility={boardToUpdate?.isExternal ? "public" : "protected"}
               {...mediaLibraryHandlers}
             />
           </Box>

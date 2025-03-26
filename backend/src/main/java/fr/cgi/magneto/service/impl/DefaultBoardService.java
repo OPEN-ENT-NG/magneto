@@ -475,6 +475,11 @@ public class DefaultBoardService implements BoardService {
                     String imageUrl = boardRef[0].getImageUrl();
                     String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
                     documentIds.add(imageId);
+                    String backgroundUrl = boardRef[0].getBackgroundUrl();
+                    if (backgroundUrl != null) {
+                        String backgroundId = backgroundUrl.substring(backgroundUrl.lastIndexOf('/') + 1);
+                        documentIds.add(backgroundId);
+                    }
                     JsonObject action = new JsonObject()
                             .put(Field.ACTION, EventBusActions.CHANGEVISIBILITY.action())
                             .put(Field.VISIBILITY, boardRef[0].getIsExternal() ? Field.PROTECTED : Field.PUBLIC) //si le board était public, on le met en privé, sinon il était en privé donc on le met en public

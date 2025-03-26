@@ -29,6 +29,7 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { RootsConst } from "~/core/constants/roots.const";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -46,6 +47,7 @@ export const BoardView: FC = () => {
     setIsFileDragging,
     isFileDragging,
     activeCard,
+    isExternalView,
   } = useBoard();
   const headerHeight = useHeaderHeight();
   const [, setDragCounter] = useState<number>(0);
@@ -146,7 +148,14 @@ export const BoardView: FC = () => {
           )}
           {board.backgroundUrl ? (
             <img
-              src={board.backgroundUrl}
+              src={
+                isExternalView
+                  ? board.backgroundUrl.replace(
+                      RootsConst.workspace,
+                      RootsConst.workspacePublic,
+                    )
+                  : board.backgroundUrl
+              }
               alt="backgroundImage"
               className="background-image"
             ></img>

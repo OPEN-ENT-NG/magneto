@@ -172,10 +172,10 @@ export default function ShareResourceModal({
   const parentFolder: Folder =
     appCode === "magneto/board"
       ? folderData.find(
-          (folder: Folder) => folder.id === selectedBoards[0].folderId,
+          (folder: Folder) => folder.id === selectedBoards[0]?.folderId,
         ) ?? new Folder()
       : folderData.find(
-          (folder: Folder) => folder.id === selectedFolders[0].parentId,
+          (folder: Folder) => folder.id === selectedFolders[0]?.parentId,
         ) ?? new Folder();
 
   const parentFolderIsShared = () => {
@@ -192,7 +192,7 @@ export default function ShareResourceModal({
 
   const externalLink = createExternalLink(
     rootElement?.getAttribute("data-host"),
-    selectedBoards[0].id,
+    selectedBoards[0]?.id,
   );
 
   const handleExternalChange = (event: React.ChangeEvent<HTMLInputElement>) => {

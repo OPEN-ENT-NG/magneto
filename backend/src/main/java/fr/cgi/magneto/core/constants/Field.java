@@ -11,6 +11,8 @@ public class Field {
     public static final String WEBSOCKETENDPOINT = "websocketEndpoint";
     public static final String ENDPOINT_PROXY_HYPHENS = "endpoint-proxy";
     public static final String PORT = "port";
+    public static final String KEBAB_THEME_PLATFORM = "theme-platform";
+    public static final String CAMEL_THEME_PLATFORM = "themePlatform";
 
     public static final String CREATE = "CREATE";
     public static final String UPDATE = "UPDATE";

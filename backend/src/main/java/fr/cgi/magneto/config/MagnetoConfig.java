@@ -10,6 +10,7 @@ public class MagnetoConfig {
     private final WebsocketConfig websocketConfig;
     private final Integer magnetoUpdateFrequency;
     private final Boolean magnetoStandalone;
+    private final String themePlatform;
 
     private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; //refresh every 10 seconds by default
 
@@ -20,6 +21,11 @@ public class MagnetoConfig {
         final int tempFrequency = config.getInteger(Field.MAGNETO_UPDATE_FREQUENCY, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
         this.magnetoUpdateFrequency = Math.max(tempFrequency, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
         this.magnetoStandalone = config.getBoolean(Field.MAGNETO_STANDALONE_CONFIG, false);
+        this.themePlatform = config.getString(Field.KEBAB_THEME_PLATFORM, "default");
+    }
+
+    public String getThemePlatform() {
+        return this.themePlatform;
     }
 
     public String host() {

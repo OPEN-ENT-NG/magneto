@@ -1,7 +1,7 @@
 import React from "react";
 
 import "@edifice.io/bootstrap/dist/index.css";
-import { ThemeProvider } from "@cgi-learning-hub/theme";
+import { ThemeProvider, ThemeProviderProps } from "@cgi-learning-hub/theme";
 import { EdificeClientProvider, EdificeThemeProvider } from "@edifice.io/react";
 import {
   QueryCache,
@@ -13,6 +13,7 @@ import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 
+import { DEFAULT_THEME } from "./core/constants/preferences.const";
 import { MediaLibraryProvider } from "./providers/MediaLibraryProvider";
 import { router } from "./routes";
 import { setupStore } from "./store";
@@ -20,6 +21,9 @@ import "~/i18n";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement!);
+
+const themePlatform = (rootElement?.getAttribute("data-theme") ??
+  DEFAULT_THEME) as ThemeProviderProps["themeId"];
 
 if (process.env.NODE_ENV !== "production") {
   import("@axe-core/react").then((axe) => {
@@ -52,7 +56,7 @@ root.render(
         }}
       >
         <EdificeThemeProvider>
-          <ThemeProvider themeId="crna">
+          <ThemeProvider themeId={themePlatform ?? "default"}>
             <MediaLibraryProvider>
               <RouterProvider router={router} />
             </MediaLibraryProvider>

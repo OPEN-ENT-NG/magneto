@@ -14,6 +14,7 @@ import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
+import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import {
   useUpdateCardMutation,
   useFavoriteCardMutation,
@@ -34,6 +35,7 @@ export const useBoardCard = (card: Card) => {
     openActiveCardAction,
     hasContribRights: hasContribRightsFn,
   } = useBoard();
+  const { setIsCreateMagnetOpen } = useMediaLibrary();
   const { user } = useUser();
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
     useDropdown();
@@ -68,7 +70,10 @@ export const useBoardCard = (card: Card) => {
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW);
+      if (hasEditRights || hasManageRights) {
+        setIsCreateMagnetOpen(true);
+        openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
+      } else openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW);
     },
     [card, openActiveCardAction],
   );

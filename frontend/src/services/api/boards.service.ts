@@ -93,6 +93,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["Boards", "BoardData"],
     }),
+    updateBoardCards: builder.mutation({
+      query: (params: IBoardPayload) => ({
+        url: `board/${params.id}/cards`,
+        method: "PUT",
+        body: params,
+      }),
+      invalidatesTags: ["Boards", "BoardData"],
+    }),
     duplicateBoard: builder.mutation({
       query: (boardId: string) => ({
         url: `board/duplicate/${boardId}`,
@@ -173,4 +181,5 @@ export const {
   useGetAllBoardsEditableQuery,
   useGetAllBoardImagesQuery,
   useNotifyBoardUsersMutation,
+  useUpdateBoardCardsMutation,
 } = boardsApi;

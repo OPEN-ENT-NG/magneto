@@ -56,7 +56,7 @@ public class SlideMedia extends Slide {
                 break;
             default:
                 SlideHelper.createImage(newSlide, resourceData, fileContentType, Slideshow.CONTENT_MARGIN_TOP,
-                        Slideshow.IMAGE_CONTENT_HEIGHT, false);
+                        Slideshow.IMAGE_CONTENT_HEIGHT, false, Slideshow.WIDTH);
         }
         SlideHelper.createLegend(newSlide, caption);
 

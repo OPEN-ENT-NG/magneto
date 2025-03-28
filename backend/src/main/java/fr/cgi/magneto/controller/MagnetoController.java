@@ -2,7 +2,9 @@ package fr.cgi.magneto.controller;
 
 import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.config.MagnetoConfig;
-import fr.cgi.magneto.core.constants.*;
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.Rights;
+import fr.cgi.magneto.security.ViewRight;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
@@ -10,16 +12,11 @@ import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
-import fr.cgi.magneto.security.ViewRight;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.SuperAdminFilter;
-import org.entcore.common.user.UserInfos;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 import static fr.cgi.magneto.core.enums.Events.ACCESS;
 
@@ -69,10 +66,12 @@ public class MagnetoController extends ControllerHelper {
 
         Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
         Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();
+        String themePlatform = this.magnetoConfig.getThemePlatform();
         JsonObject param = new JsonObject()
                 .put(Field.WEBSOCKETENDPOINT, websocketEndpoint)
                 .put(Field.MAGNETO_UPDATE_FREQUENCY, updateFrequency)
-                .put(Field.MAGNETO_STANDALONE, isStandalone);
+                .put(Field.MAGNETO_STANDALONE, isStandalone)
+                .put(Field.CAMEL_THEME_PLATFORM, themePlatform);
         renderView(request, param, "index.html", null);
         eventStore.createAndStoreEvent(ACCESS.name(), request);
     }

@@ -230,6 +230,41 @@ public class BoardController extends ControllerHelper {
         });
     }
 
+    @Put("/board/:id/cards")
+    @ApiDoc("Update board cards")
+    @ResourceFilter(WriteBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(Actions.BOARD_UPDATE)
+    @SuppressWarnings("unchecked")
+    public void updateBoardCards(HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "boardUpdate", board -> {
+            String boardId = request.getParam(Field.ID);
+            UserUtils.getUserInfos(eb, request, user -> {
+                boardService.getBoards(Collections.singletonList(boardId))
+                        .compose(boards -> {
+                            if (!boards.isEmpty()) {
+                                BoardPayload updateBoard = new BoardPayload()
+                                        .setId(boardId)
+                                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+                                if (!board.getJsonArray(Field.SECTIONIDS).isEmpty())
+                                    updateBoard.setSectionIds(board.getJsonArray(Field.SECTIONIDS).getList());
+                                if (!board.getJsonArray(Field.CARDIDS).isEmpty())
+                                    updateBoard.setSectionIds(board.getJsonArray(Field.CARDIDS).getList());
+                                Board currentBoard = boards.get(0);
+                                I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+                                return boardService.updateLayoutCards(updateBoard, currentBoard, i18nHelper, user)
+                                        .compose(boardUpdated -> boardService.update(new BoardPayload(boardUpdated)));
+                            } else {
+                                return Future.failedFuture(String.format("[Magneto%s::update] " +
+                                        "No board found with id %s", this.getClass().getSimpleName(), boardId));
+                            }
+                        })
+                        .onFailure(err -> renderError(request))
+                        .onSuccess(result -> renderJson(request, new JsonObject()));
+            });
+        });
+    }
+
     @Put("/boards/predelete")
     @ApiDoc("Pre delete boards")
     @ResourceFilter(DeleteBoardRight.class)

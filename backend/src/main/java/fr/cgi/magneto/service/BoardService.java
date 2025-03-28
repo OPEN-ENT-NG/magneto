@@ -140,6 +140,8 @@ public interface BoardService {
      */
     Future<JsonObject> delete(String userId, List<String> boardIds);
 
+    Future<JsonObject> getAndUpdateDescriptionDocuments(String boardId, UserInfos user, Boolean isExternal);
+
     /**
      * share Boards
      *

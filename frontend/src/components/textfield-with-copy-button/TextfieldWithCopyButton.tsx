@@ -49,13 +49,22 @@ export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
           value === t("magneto.share.public.input.default") ? null : (
             <InputAdornment position="end">
               <Tooltip
+                placement="top"
+                arrow={true}
                 title={
                   copied
                     ? t("magneto.share.public.input.tooltip.copied")
                     : t("magneto.share.public.input.tooltip.copy")
                 }
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "1.2rem", // Increased tooltip font size
+                    },
+                  },
+                }}
               >
-                <IconButton edge="end" onClick={handleCopy} disabled={!value}>
+                <IconButton edge="end" onClick={handleCopy} disabled={false}>
                   {copied ? (
                     <CheckIcon color="success" />
                   ) : (

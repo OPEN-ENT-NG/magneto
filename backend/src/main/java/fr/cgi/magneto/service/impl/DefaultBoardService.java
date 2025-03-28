@@ -910,7 +910,11 @@ public class DefaultBoardService implements BoardService {
         Promise<List<String>> promise = Promise.promise();
 
         this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
-                .onFailure(promise::fail)
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAllDocumentIds] Failed to get documents ids", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
+                })
                 .onSuccess(cards -> {
                     List<String> cardIds = cards.stream().map(Card::getResourceId)
                             .collect(Collectors.toList());
@@ -932,7 +936,11 @@ public class DefaultBoardService implements BoardService {
         Map<String, List<String>> idsByCard = new HashMap<>();
 
         this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
-                .onFailure(promise::fail)
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAndUpdateDescriptionDocuments] Failed to get all board cards", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
+                })
                 .compose(cards -> {
                     for(Card card : cards){
                         final List<String> currentIds = ResourceUtils.extractIds(card.getDescription(), oldVisibilityFilter);
@@ -962,7 +970,11 @@ public class DefaultBoardService implements BoardService {
 
                             cardService.update(updateCard)
                                     .onSuccess(promise::complete)
-                                    .onFailure(promise::fail);
+                                    .onFailure(fail -> {
+                                        log.error("[Magneto@%s::getAndUpdateDescriptionDocuments] Failed to update card", this.getClass().getSimpleName(),
+                                                fail.getMessage());
+                                        promise.fail(fail.getMessage());
+                                    });
                         });
 
                         updateCardsFutures.add(cardUpdateFuture);
@@ -979,7 +991,11 @@ public class DefaultBoardService implements BoardService {
                             .put("documentCount", documentIds.size())
                     );
                 })
-                .onFailure(promise::fail);
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAndUpdateDescriptionDocuments] Failed to update all the board cards", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
+                });
 
         return promise.future();
     }

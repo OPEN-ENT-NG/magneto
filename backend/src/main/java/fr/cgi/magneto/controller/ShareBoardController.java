@@ -3,7 +3,9 @@ package fr.cgi.magneto.controller;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
-import fr.cgi.magneto.helper.*;
+import fr.cgi.magneto.helper.FutureHelper;
+import fr.cgi.magneto.helper.I18nHelper;
+import fr.cgi.magneto.helper.ShareHelper;
 import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.security.GetSharesRight;
 import fr.cgi.magneto.security.SetShareRights;
@@ -14,16 +16,17 @@ import fr.wseduc.rs.Put;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.I18n;
-import fr.wseduc.webutils.request.*;
+import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.*;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.share.ShareRoles;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import org.entcore.common.share.ShareRoles;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,27 +152,64 @@ public class ShareBoardController extends ControllerHelper {
                                         badRequest(request, fail.getMessage());
                                     })
                                     .onSuccess(res -> {
-                                        JsonObject params = new JsonObject();
-                                        params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
-                                        params.put(Field.USERNAME, user.getUsername());
-                                        params.put(Field.BOARDURL, "/magneto#/board/view/" + id);
+                                        // Fetch the board to get its name
+                                        List<String> boardIds = Collections.singletonList(id);
+                                        this.boardService.getBoards(boardIds)
+                                                .onSuccess(boards -> {
+                                                    String boardName = boards != null && !boards.isEmpty() ?
+                                                            boards.get(0).getTitle() : id;
 
-                                        JsonObject pushNotif = new JsonObject()
-                                                .put(Field.TITLE, "push.notif.magneto.share")
-                                                .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
-                                        //params.put(Field.PUSHNOTIF, pushNotif);
+                                                    JsonObject params = new JsonObject();
+                                                    params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                                                    params.put(Field.USERNAME, user.getUsername());
+                                                    params.put(Field.BOARDURL, "/magneto#/board/" + id + "/view");
+                                                    params.put(Field.BOARDNAME, boardName);
 
-                                        List<String> ids = new ArrayList<>();
-                                        ids.add(id);
+                                                    JsonObject pushNotif = new JsonObject()
+                                                            .put(Field.TITLE, "push.notif.magneto.share")
+                                                            .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
+                                                    params.put(Field.PUSHNOTIF, pushNotif);
+                                                    params.put(Field.RESOURCE_URI, "/magneto");
 
-                                        newSharedElem.addAll(bookmarkShared);
-                                        this.boardService.shareBoard(ids, share, false)
-                                                .compose(success -> getUsersIdsToNotify(user, newSharedElem)
-                                                        .onSuccess(usersIdToShare -> {
-                                                            notification.notifyTimeline(request, "magneto.share_board", user, usersIdToShare, id, Field.TITLE,
-                                                                    params, true);
-                                                            request.response().setStatusMessage(id).setStatusCode(200).end();
-                                                        }).onFailure(error -> badRequest(request, error.getMessage())));
+                                                    List<String> ids = new ArrayList<>();
+                                                    ids.add(id);
+
+                                                    newSharedElem.addAll(bookmarkShared);
+                                                    this.boardService.shareBoard(ids, share, false)
+                                                            .compose(success -> getUsersIdsToNotify(user, newSharedElem)
+                                                                    .onSuccess(usersIdToShare -> {
+                                                                        notification.notifyTimeline(request, "magneto.share_board", user, usersIdToShare, id, Field.TITLE,
+                                                                                params, true);
+                                                                        request.response().setStatusMessage(id).setStatusCode(200).end();
+                                                                    }).onFailure(error -> badRequest(request, error.getMessage())));
+                                                })
+                                                .onFailure(error -> {
+                                                    log.error(String.format("[Magneto@%s::handleShareBoard] Failed to get board %s",
+                                                            user.getUserId(), id), error);
+                                                    // Continue with default value (id) as board name
+                                                    JsonObject params = new JsonObject();
+                                                    params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                                                    params.put(Field.USERNAME, user.getUsername());
+                                                    params.put(Field.BOARDURL, "/magneto#/board/" + id + "/view");
+                                                    params.put(Field.BOARDNAME, id); // Fallback to using ID as name
+
+                                                    JsonObject pushNotif = new JsonObject()
+                                                            .put(Field.TITLE, "push.notif.magneto.share")
+                                                            .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
+                                                    params.put(Field.PUSHNOTIF, pushNotif);
+
+                                                    List<String> ids = new ArrayList<>();
+                                                    ids.add(id);
+
+                                                    newSharedElem.addAll(bookmarkShared);
+                                                    this.boardService.shareBoard(ids, share, false)
+                                                            .compose(success -> getUsersIdsToNotify(user, newSharedElem)
+                                                                    .onSuccess(usersIdToShare -> {
+                                                                        notification.notifyTimeline(request, "magneto.share_board", user, usersIdToShare, id, Field.TITLE,
+                                                                                params, true);
+                                                                        request.response().setStatusMessage(id).setStatusCode(200).end();
+                                                                    }).onFailure(err -> badRequest(request, err.getMessage())));
+                                                });
                                     }));
 
                 } else {
@@ -177,7 +217,6 @@ public class ShareBoardController extends ControllerHelper {
                 }
             });
         }).onFailure(error -> badRequest(request, error.getMessage()));
-
     }
 
     private Future<List<String>> getUsersIdsToNotify(UserInfos user, List<SharedElem> newSharedElem) {
@@ -296,37 +335,39 @@ public class ShareBoardController extends ControllerHelper {
                     renderError(request);
                 })
                 .onSuccess(checkRight -> {
-                            if (Boolean.TRUE.equals(checkRight)) {
-                                deletedRightFuture
-                                        .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem, deleteRights))
-                                        .compose(r -> getFolderDataFuture)
-                                        .compose(success -> this.folderService.getChildrenBoardsIds(id))
-                                        .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem, deletedRightFuture.result(), true))
-                                        .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
-                                        .onSuccess(success -> {
+                    if (Boolean.TRUE.equals(checkRight)) {
+                        deletedRightFuture
+                                .compose(deleteRights -> this.folderService.shareFolder(id, newSharedElem, deleteRights))
+                                .compose(r -> getFolderDataFuture)
+                                .compose(success -> this.folderService.getChildrenBoardsIds(id))
+                                .compose(boardsIds -> this.boardService.shareBoard(boardsIds, newSharedElem, deletedRightFuture.result(), true))
+                                .compose(boardsIds -> this.workspaceService.setShareRights(boardsIds, share))
+                                .onSuccess(success -> {
 
-                                            JsonObject params = new JsonObject();
-                                            params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
-                                            params.put(Field.USERNAME, user.getUsername());
-                                            params.put(Field.FOLDERURL, "/magneto#/");
-                                            if (!getFolderDataFuture.result().isEmpty())
-                                                params.put(Field.FOLDERTITLE, getFolderDataFuture.result().getJsonObject(0).getValue(Field.TITLE, ""));
+                                    JsonObject params = new JsonObject();
+                                    params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                                    params.put(Field.USERNAME, user.getUsername());
+                                    params.put(Field.FOLDERURL, "/magneto#/");
+                                    if (!getFolderDataFuture.result().isEmpty())
+                                        params.put(Field.FOLDERTITLE, getFolderDataFuture.result().getJsonObject(0).getValue(Field.TITLE, ""));
 
-                                            JsonObject pushNotif = new JsonObject()
-                                                    .put(Field.TITLE, "push.notif.magneto.share")
-                                                    .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
-                                            params.put(Field.PUSHNOTIF, pushNotif);
-                                            getUsersIdsToNotify(user, newSharedElem)
-                                                    .onSuccess(usersIdToShare -> {
-                                                        notification.notifyTimeline(request, "magneto.share_folder", user, usersIdToShare, id, Field.TITLE,
-                                                                params, true);
-                                                        request.response().setStatusMessage(id).setStatusCode(200).end();
-                                                    }).onFailure(error -> badRequest(request, error.getMessage()));
-                                        })
-                                        .onFailure(error -> badRequest(request, error.getMessage()));
-                            } else {
-                                forbidden(request, "Can't apply this rights");
-                            }
+                                    JsonObject pushNotif = new JsonObject()
+                                            .put(Field.TITLE, "push.notif.magneto.share")
+                                            .put(Field.BODY, user.getUsername() + " " + i18nHelper.translate("magneto.shared.push.notif.body"));
+                                    params.put(Field.PUSHNOTIF, pushNotif);
+                                    params.put(Field.RESOURCE_URI, "/magneto");
+
+                                    getUsersIdsToNotify(user, newSharedElem)
+                                            .onSuccess(usersIdToShare -> {
+                                                notification.notifyTimeline(request, "magneto.share_folder", user, usersIdToShare, id, Field.TITLE,
+                                                        params, true);
+                                                request.response().setStatusMessage(id).setStatusCode(200).end();
+                                            }).onFailure(error -> badRequest(request, error.getMessage()));
+                                })
+                                .onFailure(error -> badRequest(request, error.getMessage()));
+                    } else {
+                        forbidden(request, "Can't apply this rights");
+                    }
                 });
 
 

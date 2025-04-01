@@ -42,7 +42,7 @@ public class SlideBoard extends Slide {
                 TextParagraph.TextAlign.LEFT);
         SlideHelper.createLink(newSlide, link);
         SlideHelper.createImage(newSlide, resourceData, fileContentType, Slideshow.MAIN_CONTENT_MARGIN_TOP,
-                Slideshow.BOARD_IMAGE_CONTENT_HEIGHT, true);
+                Slideshow.BOARD_IMAGE_CONTENT_HEIGHT, true, 560);
         SlideHelper.createBoardInfoList(newSlide, ownerName, modificationDate, resourceNumber, isShare, isPublic,
                 i18ns);
         SlideHelper.createLegend(newSlide, caption);

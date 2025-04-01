@@ -19,6 +19,7 @@
             "endpoint-proxy": "/magneto/eventbus"
         },
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},
-        "magnetoIsStandalone" : ${magnetoIsStandalone}
+        "magnetoIsStandalone" : ${magnetoIsStandalone},
+        "theme-platform": "${themePlatform}"
       }
     }

@@ -46,7 +46,8 @@ const BoardCard: FC<BoardCardProps> = ({
   } = useBoardCard(card);
 
   const { t } = useTranslation("magneto");
-  const { board, displayModals, closeActiveCardAction } = useBoard();
+  const { board, displayModals, closeActiveCardAction, isExternalView } =
+    useBoard();
 
   const dropDownItemList = useCardDropDownItems(
     readOnly,
@@ -104,6 +105,7 @@ const BoardCard: FC<BoardCardProps> = ({
     nbOfFavorites: card.nbOfFavorites,
     displayNbFavorites,
     handleFavoriteClick,
+    isExternalView,
   };
 
   const modalProps = {
@@ -165,7 +167,9 @@ const BoardCard: FC<BoardCardProps> = ({
         />
       )}
 
-      {canComment && zoomLevel > 1 && <CardComment commentData={commentData} />}
+      {canComment && zoomLevel > 1 && !isExternalView && (
+        <CardComment commentData={commentData} />
+      )}
     </StyledCard>
   );
 };

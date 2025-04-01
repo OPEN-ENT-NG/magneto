@@ -64,7 +64,7 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
     : "";
 
   return (
-    <Box sx={containerStyle}>
+    <Box sx={containerStyle} onClick={(e) => e.stopPropagation()}>
       {cardComment && nbOfComment > 0 && (
         <>
           <Box sx={commentCountContainerStyle}>

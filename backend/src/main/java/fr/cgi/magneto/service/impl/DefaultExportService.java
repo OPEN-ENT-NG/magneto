@@ -242,7 +242,7 @@ public class DefaultExportService implements ExportService {
         titleSlide.createApacheSlide(newTitleSlide);
 
         // DESCRIPTION SI NON VIDE
-        if (!isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())) {
+        if (board.getDescription() != null && !isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())) {
             Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
             XSLFSlide newDescriptionSlide = ppt.createSlide();
             descriptionSlide.createApacheSlide(newDescriptionSlide);

@@ -11,6 +11,8 @@ public class Field {
     public static final String WEBSOCKETENDPOINT = "websocketEndpoint";
     public static final String ENDPOINT_PROXY_HYPHENS = "endpoint-proxy";
     public static final String PORT = "port";
+    public static final String KEBAB_THEME_PLATFORM = "theme-platform";
+    public static final String CAMEL_THEME_PLATFORM = "themePlatform";
 
     public static final String CREATE = "CREATE";
     public static final String UPDATE = "UPDATE";
@@ -240,4 +242,8 @@ public class Field {
     public static final String BOARD_IMAGE_ID = "boardImageId";
     public static final String BUFFER = "buffer";
     public static final String FILE = "file";
+    public static final String ISEXTERNAL = "isExternal";
+    public static final String DOCUMENTIDS = "documentIds";
+    public static final String VISIBILITY = "visibility";
+    public static final Object PROTECTED = "protected";
 }

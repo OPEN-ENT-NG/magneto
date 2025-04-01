@@ -1,7 +1,8 @@
 package fr.cgi.magneto.core.enums;
 public enum EventBusActions {
 
-    GETDOCUMENT("getDocument");
+    GETDOCUMENT("getDocument"),
+    CHANGEVISIBILITY("changeVisibility");
 
     private final String action;
 

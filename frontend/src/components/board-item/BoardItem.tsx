@@ -8,6 +8,7 @@ import {
   mdiEarth,
   mdiMagnet,
   mdiShareVariant,
+  mdiAccountGroup,
 } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { Box } from "@mui/material";
@@ -33,6 +34,7 @@ interface BoardItemProps {
     owner: any;
     modificationDate: string;
     isPublished: boolean;
+    isExternal: boolean;
   };
   onDragAndDropBoard: (board: any) => void;
   isBoardDragged: boolean;
@@ -163,6 +165,22 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
               </Card.Text>
             </div>
             <div className="board-about-right-content">
+              {board.isExternal && (
+                <Tooltip
+                  message={t("magneto.board.external")}
+                  placement="bottom"
+                >
+                  <Icon path={mdiEarth} size={1} />
+                </Tooltip>
+              )}
+              {board.isPublished && (
+                <Tooltip
+                  message={t("magneto.board.tooltip.public.board")}
+                  placement="bottom"
+                >
+                  <Icon path={mdiAccountGroup} size={1} />
+                </Tooltip>
+              )}
               {!isSameAsUser(board.owner.userId) && (
                 <Tooltip
                   message={`${t("magneto.board.owner")} : ${
@@ -187,14 +205,6 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                   placement="bottom"
                 >
                   <Icon path={mdiShareVariant} size={1} />
-                </Tooltip>
-              )}
-              {board.isPublished && (
-                <Tooltip
-                  message={t("magneto.board.tooltip.public.board")}
-                  placement="bottom"
-                >
-                  <Icon path={mdiEarth} size={1} />
                 </Tooltip>
               )}
             </div>

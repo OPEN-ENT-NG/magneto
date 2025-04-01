@@ -96,14 +96,12 @@ public class SlideHelper {
     }
 
     public static XSLFPictureShape createImage(XSLFSlide slide, byte[] pictureData, String fileContentType,
-                                               int contentMarginTop, int imageContentHeight, Boolean alignLeft) {
+                                               int contentMarginTop, int imageContentHeight, Boolean alignLeft, int availableWidth) {
         XMLSlideShow ppt = slide.getSlideShow();
 
         XSLFPictureData pic = ppt.addPicture(pictureData, getPictureTypeFromContentType(fileContentType));
 
         java.awt.Dimension imgSize = pic.getImageDimension();
-
-        int availableWidth = Slideshow.WIDTH;
 
         // Calculer les dimensions tout en préservant le ratio
         double scaleFactor = Math.min(

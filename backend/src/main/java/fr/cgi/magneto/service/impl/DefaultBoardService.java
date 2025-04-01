@@ -6,17 +6,15 @@ import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
-import fr.cgi.magneto.helper.DateHelper;
-import fr.cgi.magneto.helper.FutureHelper;
-import fr.cgi.magneto.helper.I18nHelper;
-import fr.cgi.magneto.helper.ModelHelper;
-import fr.cgi.magneto.helper.ShareHelper;
+import fr.cgi.magneto.core.enums.EventBusActions;
+import fr.cgi.magneto.helper.*;
 import fr.cgi.magneto.model.MongoQuery;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.model.share.SharedElem;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
 import fr.cgi.magneto.service.*;
@@ -31,8 +29,10 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.bson.conversions.Bson;
 import org.entcore.common.mongodb.MongoDbResult;
-import org.entcore.common.user.UserInfos;
+import org.entcore.common.service.VisibilityFilter;
 import org.entcore.common.share.ShareNormalizer;
+import org.entcore.common.user.UserInfos;
+import org.entcore.common.utils.ResourceUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -48,6 +48,7 @@ public class DefaultBoardService implements BoardService {
     private final ShareNormalizer shareNormalizer;
 
     private final ShareService shareService;
+    private final ServiceFactory serviceFactory;
 
     protected static final Logger log = LoggerFactory.getLogger(DefaultBoardService.class);
 
@@ -60,6 +61,7 @@ public class DefaultBoardService implements BoardService {
         this.sectionService = serviceFactory.sectionService();
         this.shareService = serviceFactory.shareService();
         this.shareNormalizer = serviceFactory.shareNormalizer();
+        this.serviceFactory = serviceFactory;
     }
 
     public Optional<UserInfos> getCreatorForModel(final JsonObject json) {
@@ -340,6 +342,42 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
+    public Future<JsonObject> isBoardExternal(String boardId){
+        Promise<JsonObject> promise = Promise.promise();
+        JsonObject query = this.isBoardExternalQuery(boardId);
+        mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
+            if (either.isLeft()) {
+                log.error("[Magneto@%s::isBoardExternal] Failed to get board", this.getClass().getSimpleName(),
+                        either.left().getValue());
+                promise.fail(either.left().getValue());
+            } else {
+                JsonArray result = either.right().getValue()
+                        .getJsonObject(Field.CURSOR, new JsonObject())
+                        .getJsonArray(Field.FIRSTBATCH, new JsonArray());
+
+                if (result.isEmpty()) {
+                    promise.complete(new JsonObject().put("isExternal", false));
+                } else {
+                    JsonObject board = result.getJsonObject(0);
+                    boolean isExternal = board.getBoolean(Field.ISEXTERNAL, false);
+                    promise.complete(new JsonObject().put("isExternal", isExternal));
+                }
+            }
+        }));
+        return promise.future();
+    }
+
+    private JsonObject isBoardExternalQuery(String boardId) {
+        MongoQuery query = new MongoQuery(this.collection)
+                .match(new JsonObject()
+                        .put(Field._ID, boardId))
+                .project(new JsonObject()
+                        .put(Field._ID, 0)
+                        .put(Field.ISEXTERNAL, 1));
+        return query.getAggregate();
+    }
+
+    @Override
     public Future<JsonObject> preDeleteBoards(String userId, List<String> boardIds, boolean restore) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
@@ -416,6 +454,52 @@ public class DefaultBoardService implements BoardService {
             }
         }));
 
+        return promise.future();
+    }
+
+    @Override
+    public Future<JsonObject> changeBoardVisibility(String boardId, UserInfos user){
+        Promise<JsonObject> promise = Promise.promise();
+
+        final Board[] boardRef = new Board[1];
+
+        serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
+                .compose(boards -> {
+                            if (boards.isEmpty()) {
+                                String message = String.format("[Magneto@%s::exportBoardToArchive] No board found with id %s",
+                                        this.getClass().getSimpleName(), boardId);
+                                log.error(message, new Throwable(message));
+                                return Future.failedFuture(message);
+                            }
+                            boardRef[0] = boards.get(0);
+                            return serviceFactory.boardService().getAllDocumentIds(boardId, user);
+                })
+                .compose(documentIds -> {
+                    String imageUrl = boardRef[0].getImageUrl();
+                    String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                    documentIds.add(imageId);
+                    String backgroundUrl = boardRef[0].getBackgroundUrl();
+                    if (backgroundUrl != null) {
+                        String backgroundId = backgroundUrl.substring(backgroundUrl.lastIndexOf('/') + 1);
+                        documentIds.add(backgroundId);
+                    }
+                    JsonObject action = new JsonObject()
+                            .put(Field.ACTION, EventBusActions.CHANGEVISIBILITY.action())
+                            .put(Field.VISIBILITY, boardRef[0].getIsExternal() ? Field.PROTECTED : Field.PUBLIC) //si le board était public, on le met en privé, sinon il était en privé donc on le met en public
+                            .put(Field.DOCUMENTIDS, documentIds);
+                    return EventBusHelper.requestJsonObject(EventBusActions.EventBusAddresses.WORKSPACE_BUS_ADDRESS.address(), serviceFactory.eventBus(), action);
+                })
+                .compose(truc -> {
+                    BoardPayload payload = new BoardPayload(boardRef[0].toJson());
+                    payload.setIsExternal(!payload.getIsExternal());
+                    return serviceFactory.boardService().update(payload);
+                })
+                .compose(result -> getAndUpdateDescriptionDocuments(boardRef[0].getId(), user, boardRef[0].getIsExternal()))
+                .onFailure(fail -> {
+                    String message = String.format("[Magneto@%s::changeBoardVisibility] Failed to change visibility", this.getClass().getSimpleName());
+                    promise.fail(message);
+                })
+                .onSuccess(promise::complete);
         return promise.future();
     }
 
@@ -594,6 +678,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.CANCOMMENT, 1)
                             .put(Field.DISPLAY_NB_FAVORITES, 1)
                             .put(Field.ISLOCKED, 1)
+                            .put(Field.ISEXTERNAL, 1)
                     )
                     .unwind(Field.FOLDERID, true);
         }
@@ -627,7 +712,8 @@ public class DefaultBoardService implements BoardService {
                 .put(Field.PUBLIC, 1)
                 .put(Field.CANCOMMENT, 1)
                 .put(Field.DISPLAY_NB_FAVORITES, 1)
-                .put(Field.ISLOCKED, 1));
+                .put(Field.ISLOCKED, 1)
+                .put(Field.ISEXTERNAL, 1));
         if (getCount) {
             query = query.count();
         } else {
@@ -785,7 +871,8 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
-                        .put(Field.ISLOCKED, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISLOCKED).add(false))));
+                        .put(Field.ISLOCKED, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISLOCKED).add(false)))
+                        .put(Field.ISEXTERNAL, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISEXTERNAL).add(false))));
         return query.getAggregate();
     }
 
@@ -823,11 +910,91 @@ public class DefaultBoardService implements BoardService {
         Promise<List<String>> promise = Promise.promise();
 
         this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
-                .onFailure(promise::fail)
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAllDocumentIds] Failed to get documents ids", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
+                })
                 .onSuccess(cards -> {
                     List<String> cardIds = cards.stream().map(Card::getResourceId)
                             .collect(Collectors.toList());
                     promise.complete(cardIds);
+                });
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<JsonObject> getAndUpdateDescriptionDocuments(String boardId, UserInfos user, Boolean isExternal) {
+        Promise<JsonObject> promise = Promise.promise();
+        final VisibilityFilter oldVisibilityFilter = isExternal ? VisibilityFilter.PUBLIC : VisibilityFilter.OWNER;
+        final VisibilityFilter newVisibilityFilter = isExternal ? VisibilityFilter.OWNER : VisibilityFilter.PUBLIC;
+
+
+        List<String> documentIds = new ArrayList<>();
+        List<Card> cardsList = new ArrayList<>();
+        Map<String, List<String>> idsByCard = new HashMap<>();
+
+        this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAndUpdateDescriptionDocuments] Failed to get all board cards", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
+                })
+                .compose(cards -> {
+                    for(Card card : cards){
+                        final List<String> currentIds = ResourceUtils.extractIds(card.getDescription(), oldVisibilityFilter);
+                        if(!currentIds.isEmpty()){
+                            cardsList.add(card);
+                            idsByCard.put(card.getId(), currentIds);
+                        }
+                        documentIds.addAll(currentIds);
+                    };
+                    JsonObject action = new JsonObject()
+                            .put(Field.ACTION, EventBusActions.CHANGEVISIBILITY.action())
+                            .put(Field.VISIBILITY, isExternal ? Field.PROTECTED : Field.PUBLIC)
+                            .put(Field.DOCUMENTIDS, documentIds);
+                    return EventBusHelper.requestJsonObject(EventBusActions.EventBusAddresses.WORKSPACE_BUS_ADDRESS.address(), serviceFactory.eventBus(), action);
+                })
+                .compose(result -> {
+                    List<Future> updateCardsFutures = new ArrayList<>();
+
+                    for(Card card : cardsList){
+                        Future<Card> cardUpdateFuture = Future.future(prom -> {
+                            String content = card.getDescription();
+                            List<String> ids = idsByCard.get(card.getId());
+
+                            CardPayload updateCard = new CardPayload(card.toJson())
+                                    .setId(card.getId())
+                                    .setDescription(ResourceUtils.transformUrlTo(content, ids, newVisibilityFilter));
+
+                            cardService.update(updateCard)
+                                    .onSuccess(promise::complete)
+                                    .onFailure(fail -> {
+                                        log.error("[Magneto@%s::getAndUpdateDescriptionDocuments] Failed to update card", this.getClass().getSimpleName(),
+                                                fail.getMessage());
+                                        promise.fail(fail.getMessage());
+                                    });
+                        });
+
+                        updateCardsFutures.add(cardUpdateFuture);
+                    }
+
+                    // Utilisez Future.all pour attendre toutes les mises à jour
+                    return CompositeFuture.all(updateCardsFutures);
+                })
+                .onSuccess(v -> {
+                    promise.complete(new JsonObject()
+                            .put("status", "success")
+                            .put("message", "Documents updated successfully")
+                            .put("boardId", boardId)
+                            .put("documentCount", documentIds.size())
+                    );
+                })
+                .onFailure(fail -> {
+                    log.error("[Magneto@%s::getAndUpdateDescriptionDocuments] Failed to update all the board cards", this.getClass().getSimpleName(),
+                            fail.getMessage());
+                    promise.fail(fail.getMessage());
                 });
 
         return promise.future();
@@ -912,7 +1079,8 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
-                        .put(Field.ISLOCKED, 1));
+                        .put(Field.ISLOCKED, 1)
+                        .put(Field.ISEXTERNAL, 1));
         return query.getAggregate();
     }
 

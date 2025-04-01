@@ -58,6 +58,9 @@
           }
         ]
       }
+    },
+    "isExternal": {
+      "type": "boolean"
     }
   },
   "required": ["title"]

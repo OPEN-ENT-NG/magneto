@@ -104,6 +104,23 @@ public class CardController extends ControllerHelper {
         });
     }
 
+    @Get("/cards/:boardId/public")
+    @ApiDoc("Get all cards by board id")
+    public void getAllCardsByBoardIdPublic(HttpServerRequest request) {
+        String boardId = request.getParam(Field.BOARDID);
+        Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
+        boolean fromStartPage = request.getParam(Field.FROMSTARTPAGE) != null ? Boolean.parseBoolean(request.getParam(Field.FROMSTARTPAGE)) : false;
+        boardService.getBoards(Collections.singletonList(boardId))
+                .compose(board -> cardService.getAllCardsByBoard(board.get(0), page, null, fromStartPage))
+                .onSuccess(result -> renderJson(request, result))
+                .onFailure(fail -> {
+                    String message = String.format("[Magneto@%s::getAllCardsByBoardId] Failed to get all cards : %s",
+                            this.getClass().getSimpleName(), fail.getMessage());
+                    log.error(message);
+                    renderError(request);
+                });
+    }
+
     @Get("/cards/section/:sectionId")
     @ApiDoc("Get all cards by section id")
     @ResourceFilter(ViewRight.class)
@@ -122,6 +139,22 @@ public class CardController extends ControllerHelper {
                         renderError(request);
                     });
         });
+    }
+
+    @Get("/cards/section/:sectionId/public")
+    @ApiDoc("Get all cards by section id")
+    public void getAllCardsBySectionIdPublic(HttpServerRequest request) {
+        String sectionId = request.getParam(Field.SECTIONID);
+        Integer page = request.getParam(Field.PAGE) != null ? Integer.parseInt(request.getParam(Field.PAGE)) : null;
+        sectionService.get(Collections.singletonList(sectionId))
+                .compose(sections -> cardService.getAllCardsBySection(sections.get(0), page, null))
+                .onSuccess(result -> renderJson(request, result))
+                .onFailure(fail -> {
+                    String message = String.format("[Magneto@%s::getAllCardsBySectionId] Failed to get all cards : %s",
+                            this.getClass().getSimpleName(), fail.getMessage());
+                    log.error(message);
+                    renderError(request);
+                });
     }
 
     @Get("/card/:id")

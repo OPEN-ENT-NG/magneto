@@ -63,6 +63,26 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/pub/:id",
+    element: <Root />,
+    children: [
+      {
+        index: true,
+        async lazy() {
+          const { App } = await import("./board-public");
+          return { Component: App };
+        },
+      },
+      {
+        path: "read",
+        async lazy() {
+          const { App } = await import("./read-public");
+          return { Component: App };
+        },
+      },
+    ],
+  },
 ];
 
 export const router = createHashRouter(routes);

@@ -91,6 +91,20 @@ public class BoardController extends ControllerHelper {
         });
     }
 
+    @Get("/board/:boardId/external")
+    @ApiDoc("Get if board is external")
+    public void getIfBoardExternal(HttpServerRequest request) {
+        String boardId = request.getParam(Field.BOARDID);
+        boardService.isBoardExternal(boardId)
+                .onSuccess(result -> renderJson(request, result))
+                .onFailure(fail -> {
+                    String message = String.format("[Magneto@%s::getIfBoardExternal] Failed to check if board is external : %s",
+                            this.getClass().getSimpleName(), fail.getMessage());
+                    log.error(message);
+                    renderError(request);
+                });
+    }
+
     @Get("/boards/editable")
     @ApiDoc("Get all boards editable")
     @ResourceFilter(ViewRight.class)
@@ -143,6 +157,31 @@ public class BoardController extends ControllerHelper {
                             renderError(request);
                         });
             });
+        });
+
+    }
+
+    @Post("/boards/public")
+    @ApiDoc("Get public boards by ids")
+    @SuppressWarnings("unchecked")
+    public void getBoardsByIdsPublic(HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "boardList", boards -> {
+            List<String> boardIds = boards.getJsonArray(Field.BOARDIDS).getList();
+            boardService.getBoards(boardIds)
+                    .onSuccess(result -> {
+                        JsonArray boardsResult = new JsonArray(result
+                                .stream()
+                                .map(Board::toJson)
+                                .collect(Collectors.toList()));
+                        renderJson(request, new JsonObject()
+                                .put(Field.ALL, boardsResult));
+                    })
+                    .onFailure(fail -> {
+                        String message = String.format("[Magneto@%s::getBoardsByIds] Failed to get all boards by ids : %s",
+                                this.getClass().getSimpleName(), fail.getMessage());
+                        log.error(message);
+                        renderError(request);
+                    });
         });
 
     }
@@ -447,6 +486,19 @@ public class BoardController extends ControllerHelper {
                 }));
     }
 
+
+    @Put("/pub/:id")
+    @ApiDoc("Change board visibility")
+    @ResourceFilter(ManageBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void updatePublicBoard(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            boardService.changeBoardVisibility(boardId, user)
+                    .onFailure(err -> renderError(request))
+                    .onSuccess(result -> renderJson(request, result));
+        });
+    }
 
     private Future<List<String>> getGroupUsers(UserInfos user, String id) {
         Promise<List<String>> promise = Promise.promise();

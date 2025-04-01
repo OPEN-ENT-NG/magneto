@@ -9,9 +9,10 @@
   "magneto.share_board": "Partage d'un tableau",
   "push.notif.magneto.share": "Magneto : Partage de tableau",
   "timeline.magneto.shared.link.board": "lien du tableau",
-  "timeline.magneto.shared": "vous a donné accès à un nouveau tableau",
+  "timeline.magneto.shared": "vous a donné accès au tableau ",
 
   "magneto.share_folder": "Partage d'un dossier",
   "push.notif.magneto.share.folder": "Magneto : Partage de dossier",
+  "timeline.magneto.shared.folder": "vous a partagé le dossier",
   "timeline.magneto.shared.link.folder": "lien du dossier"
 }

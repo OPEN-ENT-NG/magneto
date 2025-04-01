@@ -40,6 +40,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static fr.cgi.magneto.core.constants.Slideshow.CONTENT_TYPE_IMAGE_SVG_XML;
+import static fr.cgi.magneto.core.constants.Slideshow.MAGNETO_SVG;
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
 import static fr.cgi.magneto.helper.SlideHelper.generateUniqueFileName;
 import static fr.cgi.magneto.model.slides.SlideText.isDescriptionEmptyOrContainsEmptyParagraph;
@@ -655,23 +657,26 @@ public class DefaultExportService implements ExportService {
                 .filter(doc -> imageId.equals(doc.get(Field.DOCUMENTID)))
                 .findFirst()
                 .orElse(null);
+        String contentType;
         if (documentData == null) {
             ClassLoader classLoader = getClass().getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream("img/magneto.svg");
+            InputStream inputStream = classLoader.getResourceAsStream(MAGNETO_SVG);
 
             if (inputStream != null) {
                 document = IOUtils.toByteArray(inputStream);
+                contentType = CONTENT_TYPE_IMAGE_SVG_XML;
             }
             else {
                 log.error("Failed to load SVG file");
                 document = new byte[0];
+                contentType = "";
             }
         }
         else {
             Buffer buffer = (Buffer) documentData.get(Field.BUFFER);
             document = buffer.getBytes();
+            contentType = (String) documentData.get(Field.CONTENTTYPE);
         }
-        String contentType = documentData != null ? (String) documentData.get(Field.CONTENTTYPE) : "";
 
         // Format the modification date to dd/MM/yyyy
         String formattedModificationDate = "";

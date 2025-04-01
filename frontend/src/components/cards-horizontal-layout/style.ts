@@ -33,6 +33,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
     height: "100%",
     overflow: "hidden",
     alignSelf: "center",
+    cursor: "move",
     ...marginBottomProperties,
   };
 });

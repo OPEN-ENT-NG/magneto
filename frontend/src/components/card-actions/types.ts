@@ -7,4 +7,5 @@ export interface CardActionsProps {
   nbOfFavorites: number;
   displayNbFavorites: boolean;
   handleFavoriteClick: () => void;
+  isExternalView: boolean;
 }

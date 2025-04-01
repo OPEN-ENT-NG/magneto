@@ -2,20 +2,24 @@ import { FC } from "react";
 
 import "./HeaderView.scss";
 
+import { IWebApp } from "@edifice.io/client";
 import {
   AppHeader,
   Breadcrumb,
   Button,
   useEdificeClient,
 } from "@edifice.io/react";
-import { mdiCheckCircle } from "@mdi/js";
+import { mdiCheckCircle, mdiEarth } from "@mdi/js";
 import Icon from "@mdi/react";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import {
+  breadcrumbTitle,
+  externalToastStyle,
+  externalToastTextStyle,
   isLockedToastStyle,
   leftWrapperStyle,
   mainWrapperStyle,
@@ -28,13 +32,31 @@ import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 
 export const HeaderView: FC = () => {
-  const { board } = useBoard();
+  const { board, isExternalView } = useBoard();
   const navigate = useNavigate();
-  const { currentApp } = useEdificeClient();
+
+  const magnetoWebApp: IWebApp = {
+    address: "/magneto",
+    displayName: "magneto",
+    icon: `${window.location.host}/magneto/public/img/uni-magneto.png`,
+    display: true,
+    isExternal: true,
+    name: "Magneto",
+    prefix: "/magneto",
+    scope: [""],
+  };
+
+  const edificeClient = useEdificeClient();
+  const { currentApp } = isExternalView
+    ? { currentApp: magnetoWebApp }
+    : edificeClient;
   const { t } = useTranslation("magneto");
   const modificationDate = board.modificationDate.split(" ")[0];
   const modificationHour = board.modificationDate.split(" ")[1];
-  const onClick = () => navigate(`/board/${board.id}/read`);
+  const onClick = () =>
+    navigate(
+      isExternalView ? `/pub/${board.id}/read` : `/board/${board.id}/read`,
+    );
 
   const boardHasCards = (): boolean => {
     return (
@@ -50,13 +72,25 @@ export const HeaderView: FC = () => {
       <Box sx={mainWrapperStyle}>
         <Box sx={wrapperBoxStyle}>
           <Box sx={leftWrapperStyle}>
-            {currentApp && <Breadcrumb app={currentApp} name={board?.title} />}
+            {isExternalView ? (
+              <Typography sx={breadcrumbTitle}>{board.title}</Typography>
+            ) : (
+              currentApp && <Breadcrumb app={currentApp} name={board?.title} />
+            )}
           </Box>
           <Box sx={rightWrapperStyle}>
-            {board.isLocked && (
+            {!board.isExternal && board.isLocked && (
               <Box sx={isLockedToastStyle}>
                 <WarningAmberIcon color="warning" />
                 <span>{t("magneto.board.locked")}</span>
+              </Box>
+            )}
+            {board.isExternal && (
+              <Box sx={externalToastStyle}>
+                <Icon path={mdiEarth} size={1.5} />
+                <span style={externalToastTextStyle}>
+                  {t("magneto.board.external")}
+                </span>
               </Box>
             )}
             <Box sx={toastStyle}>

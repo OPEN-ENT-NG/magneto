@@ -30,19 +30,23 @@ if (process.env.NODE_ENV !== "production") {
     axe.default(React, root, 1000);
   });
 }
-
 const store = setupStore();
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: unknown) => {
-      if (error === "0090") window.location.replace("/auth/login");
+      if (error === "0090" || undefined) {
+        if (!window.location.hash.includes("/pub/")) {
+          window.location.replace("/auth/login");
+        }
+      }
     },
   }),
   defaultOptions: {
     queries: {
       retry: false,
       refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
     },
   },
 });
@@ -55,7 +59,7 @@ root.render(
           app: "magneto",
         }}
       >
-        <EdificeThemeProvider>
+        <EdificeThemeProvider defaultTheme="neo">
           <ThemeProvider themeId={themePlatform ?? "default"}>
             <MediaLibraryProvider>
               <RouterProvider router={router} />

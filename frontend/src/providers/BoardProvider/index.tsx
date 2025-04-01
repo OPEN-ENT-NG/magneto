@@ -39,7 +39,10 @@ export const useBoard = () => {
   return context;
 };
 
-export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
+export const BoardProvider: FC<BoardProviderProps> = ({
+  children,
+  isExternal,
+}) => {
   const [isFileDragging, setIsFileDragging] = useState<boolean>(false);
   const [isModalDuplicate, setIsModalDuplicate] = useState<boolean>(false);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
@@ -47,7 +50,11 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
   const { id = "" } = useParams();
-  const { data: boardData, isLoading, isFetching } = useGetBoardDataQuery(id);
+  const {
+    data: boardData,
+    isLoading,
+    isFetching,
+  } = useGetBoardDataQuery({ boardId: id, isExternal });
   const { data: documentsData } = useGetDocumentsQuery("stub");
   const { behaviours, isLoading: isLoadingBehaviours } = useEntcoreBehaviours();
 
@@ -126,16 +133,28 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
     }
   }, [boardData]);
 
+  const isExternalView =
+    board.isExternal && window.location.hash.includes("/pub/");
+
   const hasContribRights = (): boolean => {
-    return board.owner.userId === user?.userId || !!boardRights?.contrib;
+    return (
+      (board.owner.userId === user?.userId || !!boardRights?.contrib) &&
+      !isExternalView
+    );
   };
 
   const hasEditRights = (): boolean => {
-    return board.owner.userId === user?.userId || !!boardRights?.publish;
+    return (
+      (board.owner.userId === user?.userId || !!boardRights?.publish) &&
+      !isExternalView
+    );
   };
 
   const hasManageRights = (): boolean => {
-    return board.owner.userId === user?.userId || !!boardRights?.manager;
+    return (
+      (board.owner.userId === user?.userId || !!boardRights?.manager) &&
+      !isExternalView
+    );
   };
 
   const toggleBoardModals = (modalType: BOARD_MODAL_TYPE) =>
@@ -184,6 +203,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({ children }) => {
       closeActiveCardAction,
       behaviours,
       boardImages,
+      isExternalView,
     }),
     [
       board,

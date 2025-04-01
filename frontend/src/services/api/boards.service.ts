@@ -45,6 +45,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       }),
       providesTags: ["Boards"],
     }),
+    getBoardsByIdsPublic: builder.query({
+      query: (ids: string[]) => ({
+        url: "boards/public",
+        method: "POST",
+        body: { boardIds: ids },
+      }),
+      providesTags: ["Boards"],
+    }),
     notifyBoardUsers: builder.mutation({
       query: (idBoard: string) => ({
         url: `board/${idBoard}/notify`,
@@ -88,6 +96,14 @@ export const boardsApi = emptySplitApi.injectEndpoints({
     updateBoard: builder.mutation({
       query: (params: IBoardPayload) => ({
         url: `board/${params.id}`,
+        method: "PUT",
+        body: params,
+      }),
+      invalidatesTags: ["Boards", "BoardData"],
+    }),
+    updateBoardCards: builder.mutation({
+      query: (params: IBoardPayload) => ({
+        url: `board/${params.id}/cards`,
         method: "PUT",
         body: params,
       }),
@@ -155,6 +171,18 @@ export const boardsApi = emptySplitApi.injectEndpoints({
       }),
       providesTags: ["Boards"],
     }),
+    updatePublicBoard: builder.mutation({
+      query: (boardId: string) => ({
+        url: `pub/${boardId}`,
+        method: "PUT",
+      }),
+    }),
+    getIsExternal: builder.query({
+      query: (boardId: string) => ({
+        url: `board/${boardId}/external`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -162,6 +190,7 @@ export const {
   useGetBoardsQuery,
   useGetAllBoardsQuery,
   useGetBoardsByIdsQuery,
+  useGetBoardsByIdsPublicQuery,
   useCreateBoardMutation,
   useUpdateBoardMutation,
   useDuplicateBoardMutation,
@@ -173,4 +202,7 @@ export const {
   useGetAllBoardsEditableQuery,
   useGetAllBoardImagesQuery,
   useNotifyBoardUsersMutation,
+  useUpdateBoardCardsMutation,
+  useUpdatePublicBoardMutation,
+  useGetIsExternalQuery,
 } = boardsApi;

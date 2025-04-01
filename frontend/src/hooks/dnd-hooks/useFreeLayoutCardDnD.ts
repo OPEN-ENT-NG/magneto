@@ -11,7 +11,7 @@ import { CustomPointerSensor } from "./customPointer";
 import { reorderWithLockedItems } from "./reorderUtils";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
-import { useUpdateBoardMutation } from "~/services/api/boards.service";
+import { useUpdateBoardCardsMutation } from "~/services/api/boards.service";
 
 export const useFreeLayoutCardDnD = (board: Board) => {
   const validCardIds = useMemo(() => {
@@ -21,7 +21,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
 
   const [updatedIds, setUpdatedIds] = useState<string[]>(validCardIds);
   const [activeItem, setActiveItem] = useState<Card | null>(null);
-  const [updateBoard] = useUpdateBoardMutation();
+  const [updateBoardCards] = useUpdateBoardCardsMutation();
 
   const cardMap = useMemo(() => {
     const map: Record<string, Card> = {};
@@ -93,12 +93,9 @@ export const useFreeLayoutCardDnD = (board: Board) => {
           const payload = {
             id: board._id,
             cardIds: newUpdatedIds,
-            layoutType: board.layoutType,
-            canComment: board.canComment,
-            displayNbFavorites: board.displayNbFavorites,
           };
 
-          await updateBoard(payload).unwrap();
+          await updateBoardCards(payload).unwrap();
         }
       } catch {
         setUpdatedIds(validCardIds);
@@ -106,7 +103,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
         setActiveItem(null);
       }
     },
-    [board, updatedIds, updateBoard, cardMap, validCardIds, lockedCards],
+    [board, updatedIds, updateBoardCards, cardMap, validCardIds, lockedCards],
   );
 
   const handleDragCancel = useCallback(() => {

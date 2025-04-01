@@ -84,6 +84,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     board.imageUrl = thumbnail?.url ?? "";
     board.backgroundUrl = background?.url ?? "";
     board.public = boardToUpdate?.isPublished ?? false;
+    board.isExternal = boardToUpdate?.isExternal ?? false;
 
     if (disposition == "vertical") board.layoutType = LAYOUT_TYPE.VERTICAL;
     else if (disposition == "horizontal")
@@ -417,7 +418,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
               appCode={appCode}
               ref={mediaLibraryRef}
               multiple={false}
-              visibility="protected"
+              visibility={boardToUpdate?.isExternal ? "public" : "protected"}
               {...mediaLibraryHandlers}
             />
           </Box>

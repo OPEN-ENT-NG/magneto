@@ -54,6 +54,7 @@ export const ReadView: FC = () => {
     board,
     displayModals: { COMMENT_PANEL },
     toggleBoardModals,
+    isExternalView,
   } = useBoard();
   const navigate = useNavigate();
   const { t } = useTranslation("magneto");
@@ -80,7 +81,7 @@ export const ReadView: FC = () => {
   }, [COMMENT_PANEL]);
 
   const navigateToView = () => {
-    navigate(`/board/${board.id}/view`);
+    navigate(isExternalView ? `/pub/${board.id}` : `/board/${board.id}/view`);
   };
 
   const initialCards = useMemo(() => {
@@ -251,7 +252,7 @@ export const ReadView: FC = () => {
             {card && <PreviewContent card={card} />}
             <Box sx={commentButtonWrapperStyle}>
               <CommentContainer isVisible={COMMENT_PANEL} />
-              {board.canComment && !COMMENT_PANEL && (
+              {board.canComment && !COMMENT_PANEL && !isExternalView && (
                 <IconButton
                   onClick={() =>
                     toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL)

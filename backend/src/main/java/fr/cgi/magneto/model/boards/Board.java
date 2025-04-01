@@ -38,6 +38,7 @@ public class Board implements Model<Board> {
     private int nbCards;
     private int nbCardsSections;
     private JsonArray rights;
+    private boolean isExternal;
 
     @SuppressWarnings("unchecked")
     public Board(JsonObject board) {
@@ -75,6 +76,7 @@ public class Board implements Model<Board> {
         if (board.containsKey(Field.NBCARDSSECTIONS))
             this.nbCardsSections = board.getInteger(Field.NBCARDSSECTIONS);
         this.rights = board.getJsonArray(Field.RIGHTS, new JsonArray());
+        this.isExternal = board.getBoolean(Field.ISEXTERNAL, false);
 
     }
 
@@ -315,6 +317,10 @@ public class Board implements Model<Board> {
         return this.rights;
     }
 
+    public boolean getIsExternal() { return isExternal; }
+
+    public void setIsExternal(boolean isExternal) { this.isExternal = isExternal; }
+
     public Board reset() {
         this.setId(null);
         this.setPublic(false);
@@ -349,7 +355,8 @@ public class Board implements Model<Board> {
                 .put(Field.TAGS, this.tags())
                 .put(Field.RIGHTS, this.getRights())
                 .put(Field.NBCARDS, this.getNbCards())
-                .put(Field.NBCARDSSECTIONS, this.getNbCardsSections());
+                .put(Field.NBCARDSSECTIONS, this.getNbCardsSections())
+                .put(Field.ISEXTERNAL, this.getIsExternal());
     }
 
     @Override

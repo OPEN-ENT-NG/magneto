@@ -34,6 +34,8 @@ public class BoardPayload implements Model<BoardPayload> {
 
     private JsonArray shared;
 
+    private Boolean isExternal;
+
     public BoardPayload() {
 
     }
@@ -69,6 +71,10 @@ public class BoardPayload implements Model<BoardPayload> {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
         }
         this.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+        if (board.getBoolean(Field.ISEXTERNAL) != null) {
+            this.isExternal = board.getBoolean(Field.ISEXTERNAL, false);
+        }
+
     }
 
     public String getId() {
@@ -176,6 +182,15 @@ public class BoardPayload implements Model<BoardPayload> {
     
     public BoardPayload setLocked(Boolean locked) {
         this.isLocked = locked;
+        return this;
+    }
+
+    public Boolean getIsExternal() {
+        return isExternal;
+    }
+
+    public BoardPayload setIsExternal(Boolean isExternal) {
+        this.isExternal = isExternal;
         return this;
     }
 
@@ -357,6 +372,10 @@ public class BoardPayload implements Model<BoardPayload> {
                     .put(Field.OWNERNAME, this.getOwnerName())
                     .put(Field.CARDIDS, new JsonArray())
                     .put(Field.SECTIONIDS, this.getSectionIds() != null ? this.getSectionIds() : new JsonArray());
+        }
+
+        if (this.getIsExternal() != null) {
+            json.put(Field.ISEXTERNAL, this.getIsExternal());
         }
 
         return json;

@@ -9,6 +9,20 @@ export const toastStyle = {
   color: "#2a9cc8",
   textWrap: "nowrap",
 };
+export const externalToastStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: ".5rem",
+  background: "#FAFDFF",
+  padding: " .8rem .5rem",
+  fontSize: "1.20rem",
+  borderRadius: ".5rem",
+  color: "#2a9cc8",
+  textWrap: "nowrap",
+};
+
+export const externalToastTextStyle = { color: "#545F66" };
+
 export const isLockedToastStyle = {
   display: "flex",
   alignItems: "center",
@@ -51,4 +65,12 @@ export const rightWrapperStyle = {
   boxSizing: "border-box",
   gap: "3rem",
   flexShrink: 0,
+};
+
+export const breadcrumbTitle = {
+  fontFamily: "Comfortaa",
+  fontSize: "1.75em",
+  color: "#ecbe30",
+  lineHeight: "1.2",
+  fontWeight: "bold",
 };

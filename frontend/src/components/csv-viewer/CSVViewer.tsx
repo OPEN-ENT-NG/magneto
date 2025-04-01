@@ -12,6 +12,8 @@ import {
   pageSizeOptions,
   parseCSV,
 } from "./utils";
+import { RootsConst } from "~/core/constants/roots.const";
+import { useBoard } from "~/providers/BoardProvider";
 import { useGetRessourceQuery } from "~/services/api/workspace.service";
 
 const CSVParser: FC<CSVParserProps> = ({ resourceId, isCSV }) => {
@@ -20,6 +22,7 @@ const CSVParser: FC<CSVParserProps> = ({ resourceId, isCSV }) => {
     { skip: !resourceId || !isCSV },
   );
   const { t } = useTranslation("magneto");
+  const { isExternalView } = useBoard();
   const [gridData, setGridData] = useState<GridDataType>({
     rows: [],
     columns: [],
@@ -29,7 +32,11 @@ const CSVParser: FC<CSVParserProps> = ({ resourceId, isCSV }) => {
       setGridData(parseCSV(data));
     } else if (!isCSV && resourceId) {
       try {
-        const response = await fetch(`/workspace/document/${resourceId}`);
+        const response = await fetch(
+          `${
+            isExternalView ? RootsConst.workspacePublic : RootsConst.workspace
+          }${resourceId}`,
+        );
         const excelData = await response.arrayBuffer();
         const csvData = convertExcelToCSV(excelData);
         setGridData(parseCSV(csvData));

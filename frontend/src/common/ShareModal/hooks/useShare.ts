@@ -267,8 +267,9 @@ export default function useShare({
       }
       onSuccess();
     } catch (error) {
-      if (typeof error === "string")
+      if (typeof error === "string") {
         toast.error(t("explorer.shared.status.error"));
+      }
       console.error("Failed to save share", error);
     } finally {
       dispatch({

@@ -28,7 +28,7 @@ import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
-import { useUpdateBoardMutation } from "~/services/api/boards.service";
+import { useUpdateBoardCardsMutation } from "~/services/api/boards.service";
 import {
   useUpdateSectionMutation,
   useCreateSectionMutation,
@@ -45,7 +45,7 @@ export const useSectionsDnD = (board: Board) => {
   const [newMagnetOver, setNewMagnetOver] = useState<Card[]>([]);
   const [updateSection] = useUpdateSectionMutation();
   const [createSection] = useCreateSectionMutation();
-  const [updateBoard] = useUpdateBoardMutation();
+  const [updateBoardCards] = useUpdateBoardCardsMutation();
   const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
   const toast = useToast();
@@ -254,15 +254,14 @@ export const useSectionsDnD = (board: Board) => {
   const handleSectionDragEnd = useCallback(async () => {
     const newOrder = updatedSections.map((section) => section._id);
     try {
-      await updateBoard({
+      await updateBoardCards({
         id: board._id,
         sectionIds: newOrder,
-        layoutType: board.layoutType,
       }).unwrap();
     } catch (error) {
       console.error("Failed to update board sections:", error);
     }
-  }, [updatedSections, updateBoard, board._id, board.layoutType]);
+  }, [updatedSections, updateBoardCards, board._id, board.layoutType]);
   const handleNewSectionCreation = useCallback(
     async (
       activeCardId: string,

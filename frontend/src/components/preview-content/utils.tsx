@@ -12,7 +12,6 @@ import { PreviewContentImage } from "../preview-content-image/PreviewContentImag
 import { RootsConst } from "~/core/constants/roots.const";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
-import MagnetoIcon from "../SVG/MagnetoIcon";
 
 export const displayPreviewContentByType = (card: Card) => {
   const cardType = card.resourceType as RESOURCE_TYPE;

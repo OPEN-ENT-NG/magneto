@@ -23,13 +23,13 @@ import { HeaderView } from "../header-view/HeaderView";
 import { PreviewModal } from "../Preview-modal/PreviewModal";
 import { SideMenu } from "../side-menu/SideMenu";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
+import { RootsConst } from "~/core/constants/roots.const";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { RootsConst } from "~/core/constants/roots.const";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");

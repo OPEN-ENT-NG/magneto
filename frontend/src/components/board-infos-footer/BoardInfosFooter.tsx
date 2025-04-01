@@ -33,9 +33,20 @@ export const BoardInfosFooter: FC<BoardInfosFooterProps> = ({ card }) => {
 
   const { closeActiveCardAction, isExternalView } = useBoard();
   const { user } = useEdificeClient();
-  const { currentData: myBoardsResult } = isExternalView
-    ? useGetBoardsByIdsPublicQuery([card.resourceUrl])
-    : useGetBoardsByIdsQuery([card.resourceUrl]);
+
+  const { currentData: privateBoardsResult } = useGetBoardsByIdsQuery(
+    isExternalView ? [] : [card.resourceUrl],
+    { skip: isExternalView },
+  );
+
+  const { currentData: publicBoardsResult } = useGetBoardsByIdsPublicQuery(
+    isExternalView ? [card.resourceUrl] : [],
+    { skip: !isExternalView },
+  );
+
+  const myBoardsResult = isExternalView
+    ? publicBoardsResult
+    : privateBoardsResult;
 
   const board = useMemo(() => {
     return myBoardsResult && myBoardsResult.all[0]

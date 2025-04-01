@@ -1,14 +1,19 @@
 package fr.cgi.magneto.security;
 
-import fr.cgi.magneto.core.constants.*;
-import fr.cgi.magneto.helper.*;
-import fr.wseduc.webutils.http.*;
-import fr.wseduc.webutils.request.*;
-import io.vertx.core.*;
-import io.vertx.core.http.*;
-import io.vertx.core.json.*;
-import org.entcore.common.http.filter.*;
-import org.entcore.common.user.*;
+import fr.cgi.magneto.core.constants.CollectionsConstant;
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.core.constants.Rights;
+import fr.cgi.magneto.helper.WorkflowHelper;
+import fr.wseduc.webutils.http.Binding;
+import fr.wseduc.webutils.request.RequestUtils;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import org.entcore.common.http.filter.MongoAppFilter;
+import org.entcore.common.http.filter.ResourcesProvider;
+import org.entcore.common.user.UserInfos;
 
 public class WriteBoardRight implements ResourcesProvider {
     @Override
@@ -17,6 +22,9 @@ public class WriteBoardRight implements ResourcesProvider {
 
         RequestUtils.bodyToJson(request, body -> {
             String boardId = body.getString(Field.BOARDID, request.getParam(Field.BOARDID));
+            if (boardId == null){
+                boardId = body.getString(Field.ID, null);
+            }
             JsonObject sharedUserCondition = new JsonObject()
                     .put(Field.USERID, user.getUserId())
                     .put(Rights.SHAREBOARDCONTROLLER_INITPUBLISHRIGHT, true);

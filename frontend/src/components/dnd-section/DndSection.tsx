@@ -37,7 +37,7 @@ export const DndSection: FC<DndSectionProps> = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    cursor: listeners && id !== "new-section" ? "move" : "default",
+    cursor: listeners && id !== "new-section" && !readOnly ? "move" : "default",
   };
 
   return (

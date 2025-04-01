@@ -49,7 +49,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
 
     transform: isDragging ? "scale(1.05)" : "scale(1)",
     opacity: isDragging ? "0.5" : "1",
-    cursor: isDragging ? "grabbing" : "grab",
+    cursor: "move",
   };
 });
 

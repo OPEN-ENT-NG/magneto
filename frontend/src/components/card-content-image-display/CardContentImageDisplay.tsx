@@ -30,8 +30,6 @@ export const CardContentImageDisplay: FC<CardContentImageDisplayProps> = ({
   const renderVideoContent = () => {
     if (!url) return null;
 
-    console.log(url);
-
     if (url.startsWith("/workspace/")) {
       return (
         <video

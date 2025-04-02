@@ -77,7 +77,8 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     );
   };
 
-  const canDownload = card.locked ? hasManageRights() : hasContribRights();
+  const canDownload =
+    isExternalView || (card.locked ? hasManageRights() : hasContribRights());
 
   const edit = (): void => {
     behaviours?.applicationsBehaviours["lool"]?.openOnLool(cardDocument);

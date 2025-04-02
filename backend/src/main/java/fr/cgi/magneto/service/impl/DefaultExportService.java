@@ -44,7 +44,6 @@ import static fr.cgi.magneto.core.constants.Slideshow.CONTENT_TYPE_IMAGE_SVG_XML
 import static fr.cgi.magneto.core.constants.Slideshow.MAGNETO_SVG;
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
 import static fr.cgi.magneto.helper.SlideHelper.generateUniqueFileName;
-import static fr.cgi.magneto.model.slides.SlideText.isDescriptionEmptyOrContainsEmptyParagraph;
 
 public class DefaultExportService implements ExportService {
 
@@ -244,7 +243,7 @@ public class DefaultExportService implements ExportService {
         titleSlide.createApacheSlide(newTitleSlide);
 
         // DESCRIPTION SI NON VIDE
-        if (board.getDescription() != null && !isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())) {
+        if (board.getDescription() != null && board.getDescription().isEmpty()) {
             Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
             XSLFSlide newDescriptionSlide = ppt.createSlide();
             descriptionSlide.createApacheSlide(newDescriptionSlide);
@@ -298,7 +297,7 @@ public class DefaultExportService implements ExportService {
         titleSlide.createApacheSlide(newTitleSlide);
 
         // DESCRIPTION SI NON VIDE
-        if (board.getDescription() != null && !isDescriptionEmptyOrContainsEmptyParagraph(board.getDescription())) {
+        if (board.getDescription() != null && board.getDescription().isEmpty()) {
             Slide descriptionSlide = createDescriptionSlide(board, slideFactory, i18nHelper);
             XSLFSlide newDescriptionSlide = ppt.createSlide();
             descriptionSlide.createApacheSlide(newDescriptionSlide);

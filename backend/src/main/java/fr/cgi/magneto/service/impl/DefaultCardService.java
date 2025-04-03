@@ -1086,7 +1086,8 @@ public class DefaultCardService implements CardService {
             workspaceService.getDocument(card.getResourceId())
                     .onSuccess(document -> {
                         if (document.containsKey(Field._ID) && !document.containsKey(Field.RESULT)) {
-                            card.setMetadata(new Metadata(document.getJsonObject(Field.METADATA)));
+                            card.setMetadata(new Metadata(document.getJsonObject(Field.METADATA)
+                                    .put(Field.FILEOWNER, document.getString("ownerName"))));
                         }
                         promise.complete();
                     })

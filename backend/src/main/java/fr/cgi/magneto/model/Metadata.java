@@ -11,6 +11,7 @@ public class Metadata implements Model {
     private final String charset;
     private final Integer size;
     private final String extension;
+    private final String fileOwner;
 
     public Metadata(JsonObject metadata) {
         this.name = metadata.getString(Field.NAME, null);
@@ -20,6 +21,7 @@ public class Metadata implements Model {
         this.charset = metadata.getString(Field.CHARSET, null);
         this.size = metadata.getInteger(Field.SIZE, null);
         this.extension = filename.substring(filename.lastIndexOf('.') + 1);
+        this.fileOwner = metadata.getString(Field.FILEOWNER, null);
     }
 
     public String getName() {
@@ -50,6 +52,10 @@ public class Metadata implements Model {
         return extension;
     }
 
+    public String getFileOwner() {
+        return fileOwner;
+    }
+
 
     @Override
     public JsonObject toJson() {
@@ -60,7 +66,8 @@ public class Metadata implements Model {
                 .put(Field.CONTENT_TRANSFER_ENCODING, this.getContentTransferEncoding())
                 .put(Field.CHARSET, this.getCharset())
                 .put(Field.SIZE, this.getSize())
-                .put(Field.EXTENSION, this.getExtension());
+                .put(Field.EXTENSION, this.getExtension())
+                .put(Field.FILEOWNER, this.getFileOwner());
     }
 
     @Override

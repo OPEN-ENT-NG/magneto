@@ -18,7 +18,7 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
           style={
             {
               height: "100%",
-              background: "var(--theme-palette-primary-main)",
+              background: "var(--theme-palette-primary-dark)",
             } as React.CSSProperties
           }
         />

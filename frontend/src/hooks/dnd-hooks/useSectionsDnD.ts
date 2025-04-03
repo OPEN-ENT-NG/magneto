@@ -560,7 +560,6 @@ export const useSectionsDnD = (board: Board) => {
       }
 
       if (over.id === "new-section" || over.id === newMagnetOver[0]?.id) {
-        console.log("hey");
         setNewMagnetOver([]);
         return await handleNewSectionCreation(
           activeCardId,
@@ -573,7 +572,6 @@ export const useSectionsDnD = (board: Board) => {
         return;
       }
       if (originalActiveSection._id !== currentOverSection._id) {
-        console.log("hoy");
         return await handleCardMoveBetweenSections(
           activeCardId,
           originalActiveSection,

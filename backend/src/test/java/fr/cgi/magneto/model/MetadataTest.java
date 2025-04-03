@@ -16,7 +16,8 @@ public class MetadataTest {
             .put("content-transfer-encoding", "contentTransferEncoding")
             .put("charset", "charset")
             .put("size", 1)
-            .put("extension", "test");
+            .put("extension", "test")
+            .put("fileOwner", "John Doe");
 
 
     @Test

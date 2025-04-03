@@ -1,62 +1,31 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:export-ydpi="3778.561"
-   inkscape:export-xdpi="3778.561"
-   inkscape:export-filename="C:\Users\sarah.lachise\Documents\ENT-Magneto\magneto.png"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   height="2.3818588"
-   width="3.8109746"
-   sodipodi:docname="magneto.svg"
-   id="svg4"
-   version="1.1"
-   viewBox="0 0 3.8109746 2.3818588">
-  <metadata
-     id="metadata10">
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:cc="http://creativecommons.org/ns#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     version="1.1"
+     viewBox="0 0 38.109746 33.345988"
+     height="333.45988"
+     width="381.09746">
+  <metadata id="metadata10">
     <rdf:RDF>
-      <cc:Work
-         rdf:about="">
+      <cc:Work rdf:about="">
         <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
         <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <defs
-     id="defs8" />
-  <sodipodi:namedview
-     inkscape:current-layer="svg4"
-     inkscape:window-maximized="1"
-     inkscape:window-y="-9"
-     inkscape:window-x="-9"
-     inkscape:cy="6.2267569"
-     inkscape:cx="11.644898"
-     inkscape:zoom="30.625"
-     showgrid="false"
-     id="namedview6"
-     inkscape:window-height="1001"
-     inkscape:window-width="1920"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0"
-     guidetolerance="10"
-     gridtolerance="10"
-     objecttolerance="10"
-     borderopacity="1"
-     bordercolor="#666666"
-     pagecolor="#ffffff" />
-  <path
-     style="fill:#ecbe30;fill-opacity:1;stroke-width:0.119093"
-     id="path2"
-     d="M 2.1436732,1.786394 V 1.0718363 A 1.0718367,1.0718367 0 0 0 1.0718363,0 1.0718367,1.0718367 0 0 0 0,1.0718363 V 1.786394 H 0.47637206 V 1.0718363 A 0.59546481,0.59546481 0 0 1 1.0718363,0.47637137 0.59546481,0.59546481 0 0 1 1.6673012,1.0718363 V 1.786394 M 0.47637206,2.0245797 H 0 V 2.3818589 H 0.47637206 M 2.1436732,2.0245797 h -0.476372 v 0.3572792 h 0.476372" />
-  <path
-     d="M 3.8109746,1.786394 V 1.0718363 A 1.0718367,1.0718367 0 0 0 2.7391374,0 1.0718367,1.0718367 0 0 0 1.6673012,1.0718363 V 1.786394 h 0.476372 V 1.0718363 A 0.59546481,0.59546481 0 0 1 2.7391374,0.47637137 0.59546481,0.59546481 0 0 1 3.3346023,1.0718363 V 1.786394 M 2.1436732,2.0245797 h -0.476372 v 0.3572792 h 0.476372 M 3.8109746,2.0245797 H 3.3346023 v 0.3572792 h 0.4763723"
-     id="path2-6"
-     style="fill:#ecbe30;fill-opacity:1;stroke-width:0.119093" />
+  <defs id="defs8" />
+  <!-- The original content positioned with 20% space above (4.76372 units) -->
+  <g transform="translate(0,4.76372)">
+    <path
+            style="fill:#ecbe30;fill-opacity:1;stroke-width:1.19093"
+            id="path2"
+            d="M 21.436732,17.86394 V 10.718363 A 10.718367,10.718367 0 0 0 10.718363,0 10.718367,10.718367 0 0 0 0,10.718363 V 17.86394 H 4.7637206 V 10.718363 A 5.9546481,5.9546481 0 0 1 10.718363,4.7637137 5.9546481,5.9546481 0 0 1 16.673012,10.718363 V 17.86394 M 4.7637206,20.245797 H 0 V 23.818589 H 4.7637206 M 21.436732,20.245797 h -4.76372 v 3.572792 h 4.76372" />
+    <path
+            d="M 38.109746,17.86394 V 10.718363 A 10.718367,10.718367 0 0 0 27.391374,0 10.718367,10.718367 0 0 0 16.673012,10.718363 V 17.86394 h 4.76372 V 10.718363 A 5.9546481,5.9546481 0 0 1 27.391374,4.7637137 5.9546481,5.9546481 0 0 1 33.346023,10.718363 V 17.86394 M 21.436732,20.245797 h -4.76372 v 3.572792 h 4.76372 M 38.109746,20.245797 H 33.346023 v 3.572792 h 4.763723"
+            id="path2-6"
+            style="fill:#ecbe30;fill-opacity:1;stroke-width:1.19093" />
+  </g>
+  <!-- The viewBox is now extended to have 20% space above and 20% space below -->
 </svg>

@@ -285,14 +285,11 @@ public class BoardController extends ControllerHelper {
                                 BoardPayload updateBoard = new BoardPayload()
                                         .setId(boardId)
                                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
-                                if (!board.getJsonArray(Field.SECTIONIDS).isEmpty())
+                                if (board.getJsonArray(Field.SECTIONIDS) != null && !board.getJsonArray(Field.SECTIONIDS).isEmpty())
                                     updateBoard.setSectionIds(board.getJsonArray(Field.SECTIONIDS).getList());
-                                if (!board.getJsonArray(Field.CARDIDS).isEmpty())
-                                    updateBoard.setSectionIds(board.getJsonArray(Field.CARDIDS).getList());
-                                Board currentBoard = boards.get(0);
-                                I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
-                                return boardService.updateLayoutCards(updateBoard, currentBoard, i18nHelper, user)
-                                        .compose(boardUpdated -> boardService.update(new BoardPayload(boardUpdated)));
+                                if (board.getJsonArray(Field.CARDIDS) != null && !board.getJsonArray(Field.CARDIDS).isEmpty())
+                                    updateBoard.setCardIds(board.getJsonArray(Field.CARDIDS).getList());
+                                return boardService.update(updateBoard);
                             } else {
                                 return Future.failedFuture(String.format("[Magneto%s::update] " +
                                         "No board found with id %s", this.getClass().getSimpleName(), boardId));

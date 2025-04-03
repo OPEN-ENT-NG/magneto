@@ -15,8 +15,13 @@ export const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
       >
         <nav
           className="navbar navbar-expand-md"
-          style={{ height: "100%" }}
-        ></nav>
+          style={
+            {
+              height: "100%",
+              background: "var(--theme-palette-primary-dark)",
+            } as React.CSSProperties
+          }
+        />
       </header>
       <main className={"d-flex flex-column bg-white container-fluid"}>
         {children}

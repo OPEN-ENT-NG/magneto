@@ -5,9 +5,7 @@ import { ErrorBoundary } from "~/components/error-boundary";
 import PublicLayout from "~/components/public-layout/PublicLayout";
 
 function Root() {
-  console.log("in root");
   const { init } = useEdificeClient();
-  console.log("in root");
   if (window.location.hash.includes("/pub/"))
     return (
       <PublicLayout>

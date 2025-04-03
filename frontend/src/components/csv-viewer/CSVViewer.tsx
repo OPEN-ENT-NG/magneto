@@ -17,12 +17,12 @@ import { useBoard } from "~/providers/BoardProvider";
 import { useGetRessourceQuery } from "~/services/api/workspace.service";
 
 const CSVParser: FC<CSVParserProps> = ({ resourceId, isCSV }) => {
-  const { data } = useGetRessourceQuery(
-    { visibility: false, id: resourceId },
-    { skip: !resourceId || !isCSV },
-  );
   const { t } = useTranslation("magneto");
   const { isExternalView } = useBoard();
+  const { data } = useGetRessourceQuery(
+    { visibility: isExternalView, id: resourceId },
+    { skip: !resourceId || !isCSV },
+  );
   const [gridData, setGridData] = useState<GridDataType>({
     rows: [],
     columns: [],

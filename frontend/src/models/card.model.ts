@@ -63,6 +63,7 @@ export interface IMetadata {
   charset: string;
   size: number;
   extension: string;
+  fileOwner: string;
 }
 
 export interface ICardPayload {
@@ -298,6 +299,7 @@ export class Card {
       charset: "",
       size: -1,
       extension: "",
+      fileOwner: "",
     };
     this._nbOfComments = -1;
     this._lastComment = new CardComment();

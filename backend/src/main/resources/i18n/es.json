@@ -219,7 +219,7 @@
   "magneto.share.warning": "Attention : vous ne pouvez pas restreindre les droits aux utilisateurs à qui tout le dossier \"{{0}}\" est partagé",
   "magneto.share.public.label": "Rendre ce tableau public",
   "magneto.share.public.info": "Créez un lien public afin que des personnes hors de l'ENT puissent accéder au tableau.\nEn cochant l'option, vous acceptez que tout le contenu du tableau, y compris les fichiers inclus dans les aimants, soit accessible librement.",
-  "magneto.share.public.switch": "Partager ce tableau en public",
+  "magneto.share.public.switch": "Accessible publiquement via une URL",
   "magneto.share.public.input.label": "URL publique",
   "magneto.share.public.input.default": "Lien non disponible",
   "magneto.share.public.input.tooltip.copy": "Copier le lien",

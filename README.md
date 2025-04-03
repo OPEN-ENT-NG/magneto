@@ -32,7 +32,8 @@ Dans le fichier 'ent-core.json.template' du projet OPEN ENT :
         "websocket-config": {
             "wsPort": 4404,
             "endpoint-proxy": "/magneto/eventbus"
-        }
+        },
+        "theme-platform": "${themePlatform}"
       }
     }
 </pre>

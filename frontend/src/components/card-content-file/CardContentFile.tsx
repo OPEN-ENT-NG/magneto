@@ -143,7 +143,7 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
           }
         />
       )}
-      {isOfficePdf() && (
+      {isOfficePdf() && !isExternalView && (
         <PDFUploadViewer
           url={`${
             isExternalView ? RootsConst.workspacePublic : RootsConst.workspace

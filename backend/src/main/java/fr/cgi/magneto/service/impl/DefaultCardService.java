@@ -1087,7 +1087,7 @@ public class DefaultCardService implements CardService {
                     .onSuccess(document -> {
                         if (document.containsKey(Field._ID) && !document.containsKey(Field.RESULT)) {
                             card.setMetadata(new Metadata(document.getJsonObject(Field.METADATA)
-                                    .put(Field.FILEOWNER, document.getString("ownerName"))));
+                                    .put(Field.FILEOWNER, document.getString(Field.OWNERNAME))));
                         }
                         promise.complete();
                     })

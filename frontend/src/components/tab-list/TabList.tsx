@@ -23,6 +23,9 @@ export const TabList: FC<TabListProps> = ({
       value={currentTab}
       onChange={handleChange}
       aria-label="basic tabs example"
+      variant="scrollable"
+      scrollButtons="auto"
+      allowScrollButtonsMobile={true} // Ensure scroll buttons appear on mobile too
     >
       {tabs.map((item) => (
         <StyledTab

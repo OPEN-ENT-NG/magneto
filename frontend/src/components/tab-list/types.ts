@@ -1,11 +1,15 @@
+import { SvgIconComponent } from "@mui/icons-material";
+
 export interface Tab {
   tabValue: CURRENTTAB_STATE;
   label: string;
+  icon?: SvgIconComponent;
 }
 
 export interface TabConfig {
   tabValue: CURRENTTAB_STATE;
   translationKey: string;
+  icon?: SvgIconComponent;
 }
 
 export interface TabListProps {
@@ -19,4 +23,6 @@ export enum CURRENTTAB_STATE {
   SHARED = "SHARED",
   PUBLIC = "PUBLIC",
   FAVORTIE = "FAVORITE",
+  EXPORT_PPTX = "EXPORT_PPTX",
+  EXPORT_IFRAME = "EXPORT_IFRAME",
 }

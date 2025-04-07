@@ -1,4 +1,4 @@
-import { FC, SyntheticEvent } from "react";
+import { createElement, FC, SyntheticEvent } from "react";
 
 import Tabs from "@mui/material/Tabs";
 
@@ -29,9 +29,15 @@ export const TabList: FC<TabListProps> = ({
     >
       {tabs.map((item) => (
         <StyledTab
+          iconPosition="start"
           key={item.tabValue}
           label={item.label.toUpperCase()}
           value={item.tabValue}
+          icon={
+            item.icon
+              ? createElement(item.icon, { fontSize: "large" })
+              : undefined
+          }
         />
       ))}
     </Tabs>

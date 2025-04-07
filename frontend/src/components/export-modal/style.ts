@@ -59,6 +59,7 @@ export const alertListStyle = {
   fontSize: "1.4rem",
   color: "text.primary",
   fontWeight: 400,
+  lineHeight: "143%",
 };
 
 export const alertListItemStyle = {

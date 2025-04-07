@@ -1,13 +1,16 @@
+import DownloadIcon from "@mui/icons-material/Download";
 import { useTranslation } from "react-i18next";
 
 import { CURRENTTAB_STATE, TabConfig } from "./types";
+import { CodeRounded } from "@mui/icons-material";
 
 export function useTabs(tabsConfig: TabConfig[]) {
   const { t } = useTranslation("magneto");
 
-  return tabsConfig.map(({ tabValue, translationKey }) => ({
+  return tabsConfig.map(({ tabValue, translationKey, icon }) => ({
     tabValue,
     label: t(translationKey),
+    icon,
   }));
 }
 
@@ -42,5 +45,18 @@ export const BOARD_TABS_CONFIG: TabConfig[] = [
   {
     tabValue: CURRENTTAB_STATE.PUBLIC,
     translationKey: "magneto.lycee.connecte.boards",
+  },
+];
+
+export const EXPORT_TABS_CONFIG: TabConfig[] = [
+  {
+    tabValue: CURRENTTAB_STATE.EXPORT_PPTX,
+    translationKey: "magneto.export",
+    icon: DownloadIcon,
+  },
+  {
+    tabValue: CURRENTTAB_STATE.EXPORT_IFRAME,
+    translationKey: "magneto.embed",
+    icon: CodeRounded,
   },
 ];

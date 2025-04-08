@@ -37,6 +37,7 @@ import { ShareBookmarkLine } from "./ShareBookmarkLine";
 import { typographyStyle } from "./style";
 import { createExternalLink } from "./utils/utils";
 import { TextFieldWithCopyButton } from "~/components/textfield-with-copy-button/TextfieldWithCopyButton";
+import { workflowName } from "~/config";
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
@@ -101,9 +102,7 @@ export default function ShareResourceModal({
 }: ShareResourceModalProps) {
   const { resourceId, resourceCreatorId, resourceRights } = shareOptions;
   const { data: actions } = useActions();
-  const canMakeBoardPublic = isActionAvailable("public", actions);
-  console.log(actions);
-  console.log(canMakeBoardPublic);
+  const canMakeBoardPublic = isActionAvailable(workflowName.public, actions);
 
   const [isLoading, setIsLoading] = useState(true);
   const {

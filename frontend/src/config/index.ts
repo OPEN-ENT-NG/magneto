@@ -7,6 +7,15 @@ export const workflows = {
   publicBoard: "fr.cgi.magneto.controller.FakeRight|boardPublic",
 };
 
+export const workflowName = {
+  view: "view",
+  manage: "manage",
+  publish: "publish",
+  comment: "comment",
+  favorites: "favorites",
+  public: "public",
+};
+
 export const rights = {
   read: {
     right: "fr-cgi-magneto-controller-ShareBoardController|initReadRight",

@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Alert, Stack, Typography } from "@cgi-learning-hub/ui";
 import {
   ID,
+  isActionAvailable,
   PutShareResponse,
   RightStringified,
   ShareRight,
@@ -42,6 +43,7 @@ import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
 import "./ShareModal.scss";
 import { useUpdatePublicBoardMutation } from "~/services/api/boards.service";
+import { useActions } from "~/services/queries";
 
 export type ShareOptions = {
   resourceId: ID;
@@ -98,6 +100,10 @@ export default function ShareResourceModal({
   onCancel,
 }: ShareResourceModalProps) {
   const { resourceId, resourceCreatorId, resourceRights } = shareOptions;
+  const { data: actions } = useActions();
+  const canMakeBoardPublic = isActionAvailable("public", actions);
+  console.log(actions);
+  console.log(canMakeBoardPublic);
 
   const [isLoading, setIsLoading] = useState(true);
   const {
@@ -357,7 +363,7 @@ export default function ShareResourceModal({
             </div>
           )}
         </div>
-        {appCode === "magneto/board" && (
+        {appCode === "magneto/board" && canMakeBoardPublic && (
           <>
             <hr />
             <Heading headingStyle="h4" level="h3" className="mb-16">

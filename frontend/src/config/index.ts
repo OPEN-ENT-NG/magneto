@@ -4,6 +4,7 @@ export const workflows = {
   publish: "fr.cgi.magneto.controller.FakeRight|boardPublish",
   comment: "fr.cgi.magneto.controller.FakeRight|boardComment",
   favorites: "fr.cgi.magneto.controller.FakeRight|boardFavorites",
+  publicBoard: "fr.cgi.magneto.controller.FakeRight|boardPublic",
 };
 
 export const rights = {

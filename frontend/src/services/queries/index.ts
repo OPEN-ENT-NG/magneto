@@ -11,7 +11,7 @@ import { workflows } from "~/config";
  */
 // const { actions } = getAppParams();
 export const useActions = () => {
-  const { view, manage, publish, comment, favorites } = workflows;
+  const { view, manage, publish, comment, favorites, publicBoard } = workflows;
 
   return useQuery<Record<string, boolean>, Error, IAction[]>({
     queryKey: ["actions"],
@@ -22,6 +22,7 @@ export const useActions = () => {
         publish,
         comment,
         favorites,
+        publicBoard,
       ]);
       return availableRights;
     },
@@ -46,6 +47,10 @@ export const useActions = () => {
         {
           id: "favorites",
           workflow: favorites,
+        },
+        {
+          id: "public",
+          workflow: publicBoard,
         },
       ];
       return actions.map((action) => ({

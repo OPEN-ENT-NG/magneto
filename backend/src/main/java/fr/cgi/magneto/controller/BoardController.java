@@ -486,7 +486,7 @@ public class BoardController extends ControllerHelper {
 
     @Put("/pub/:id")
     @ApiDoc("Change board visibility")
-    @ResourceFilter(ManageBoardRight.class)
+    @ResourceFilter(PublicBoardRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void updatePublicBoard(HttpServerRequest request) {
         String boardId = request.getParam(Field.ID);

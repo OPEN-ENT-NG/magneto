@@ -25,6 +25,7 @@ pipeline {
       steps {
         dir('backend') {
           sh 'cp -R ../frontend/dist/* ./src/main/resources/'
+          sh 'rm -rf ./src/main/resources/view'
           sh 'mkdir -p ./src/main/resources/view'
           sh 'mkdir -p ./src/main/resources/public/template'
           sh 'mkdir -p ./src/main/resources/public/img'

@@ -146,6 +146,7 @@ export const BoardCreateMagnetMagnetModal: FC<
           <StyledFormControlLabel
             control={
               <Switch
+                disabled={currentTab === CURRENTTAB_STATE.FAVORTIE}
                 checked={isByFavorite}
                 onChange={() => handleSwitchChange("isByFavorite")}
               />

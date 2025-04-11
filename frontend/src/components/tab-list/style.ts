@@ -1,6 +1,4 @@
-import { Tab, styled } from "@mui/material";
-
-export const StyledTab = styled(Tab)(() => ({
+export const tabStyle = {
   textTransform: "none",
   maxWidth: "500px",
   fontSize: "clamp(1.3rem, 1.7vw, 1.7rem)",
@@ -14,7 +12,27 @@ export const StyledTab = styled(Tab)(() => ({
   overflow: "hidden",
   textOverflow: "ellipsis",
   margin: "0 0.3rem",
-}));
+};
+
+export const alternativeTabStyle = {
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  maxHeight: "50px",
+  paddingBottom: 0,
+  fontSize: "1.6rem",
+  lineHeight: 2.4,
+  "& .MuiTab-iconWrapper": {
+    display: "flex",
+    alignItems: "center",
+    marginRight: "8px",
+    marginBottom: 0,
+  },
+  "& .MuiTab-label": {
+    display: "flex",
+    alignItems: "center",
+  },
+};
 
 export const tabsStyle = {
   width: "100%",
@@ -34,5 +52,15 @@ export const tabsStyle = {
   },
   "& .MuiTabs-flexContainer": {
     gap: "0.2rem",
+  },
+};
+
+export const alternativeTabsStyle = {
+  borderBottom: 1,
+  borderColor: "divider",
+  width: "100%",
+  height: "65px",
+  "& .MuiTabs-scroller": {
+    overflow: "hidden",
   },
 };

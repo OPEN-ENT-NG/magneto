@@ -153,6 +153,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           currentTab={currentTab}
           onChange={setCurrentTab}
           tabsConfig={EXPORT_TABS_CONFIG}
+          variant
         />
         <Box>
           {currentTab === CURRENTTAB_STATE.EXPORT_PPTX && (

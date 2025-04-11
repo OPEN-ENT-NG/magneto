@@ -16,6 +16,7 @@ export interface TabListProps {
   currentTab: CURRENTTAB_STATE;
   onChange: (newValue: CURRENTTAB_STATE) => void;
   tabsConfig?: TabConfig[];
+  variant?: boolean;
 }
 
 export enum CURRENTTAB_STATE {

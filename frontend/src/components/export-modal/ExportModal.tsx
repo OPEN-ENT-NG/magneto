@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Stack,
 } from "@cgi-learning-hub/ui";
 import { useToast } from "@edifice.io/react";
@@ -32,6 +31,8 @@ import { actionStyle, dialogStyle, titleStyle } from "../message-modal/style";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { EXPORT_TABS_CONFIG } from "../tab-list/utils";
+import { TextFieldWithCopyButton } from "../textfield-with-copy-button/TextfieldWithCopyButton";
+import { getIframeCode } from "~/core/constants/export-iFrame.const";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useExportBoardQuery } from "~/services/api/export.service.ts";
 
@@ -49,12 +50,20 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
 
   const [shouldFetch, setShouldFetch] = useState(false);
   const [isExternalInput, setIsExternalInput] = useState(false);
+  const [value, setValue] = useState("");
 
   const { data, error, isLoading } = useExportBoardQuery(selectedBoardsIds[0], {
     skip: !shouldFetch,
   });
-  const handleExport = () => {
-    setShouldFetch(true);
+
+  const handleConfirm = () => {
+    if (currentTab === CURRENTTAB_STATE.EXPORT_PPTX) {
+      setShouldFetch(true);
+    } else {
+      navigator.clipboard.writeText(value).then(() => {
+        toast.success(t("magneto.share.public.input.tooltip.copied"));
+      });
+    }
   };
   const handleExternalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsExternalInput(event.target.checked);
@@ -114,8 +123,6 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
     triggerDownload();
   }, [data, selectedBoards, onClose]);
 
-  console.log(window.location);
-
   // Gestion des erreurs
   useEffect(() => {
     if (error) {
@@ -123,6 +130,12 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
       setShouldFetch(false);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (selectedBoards.length > 0) {
+      setValue(getIframeCode(isExternalInput, selectedBoards[0].id));
+    }
+  }, [selectedBoards, isExternalInput]);
 
   return (
     <Dialog
@@ -213,29 +226,13 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
                   </Typography>
                 </Stack>
               )}
-              <TextField
-                label="Code"
-                value={`<div style="width:100%; overflow:hidden;">\n<iframe src="${
-                  window.location.origin
-                }${
-                  !isExternalInput
-                    ? `/magneto#/board/${selectedBoards[0].id}/view`
-                    : `/magneto/public#/pub/${selectedBoards[0].id}`
-                }" style="width:125%; height:125%; transform: scale(0.8); transform-origin: 0 0;" scrolling="no"></iframe>\n</div>`}
-                sx={{
-                  width: "100%",
-                  "& .MuiInputBase-input": {
-                    fontSize: "1.6rem",
-                    lineHeight: "2.4rem",
-                  },
-                  "& .MuiInputLabel-root": {
-                    fontSize: "1.6rem", // Increased label size
-                    background: "white", // Add background to prevent line showing through
-                  },
-                }}
-                multiline
-                size="medium"
-              ></TextField>
+              <TextFieldWithCopyButton
+                value={value} // Use the value state here
+                label={"Code"}
+                readOnly={true}
+                largerCopy
+                isMultiline
+              />
             </Box>
           )}
         </Box>
@@ -255,7 +252,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           color="primary"
           size="medium"
           sx={buttonStyle}
-          onClick={handleExport}
+          onClick={handleConfirm}
           loading={isLoading}
         >
           {currentTab === CURRENTTAB_STATE.EXPORT_PPTX

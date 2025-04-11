@@ -223,14 +223,10 @@ public class DefaultSectionService implements SectionService {
                 .compose(result -> {
                     // Check if board and section are not empty
                     if (result.succeeded() && !getBoardFuture.result().isEmpty() && !getSectionsFuture.result().isEmpty()) {
-                        Board currentBoard = getBoardFuture.result().get(0)
-                                .setSections(getSectionsFuture.result());
+                        Board currentBoard = getBoardFuture.result().get(0);
                         BoardPayload boardToUpdate = new BoardPayload()
                                 .setId(currentBoard.getId())
-                                .setSectionIds(currentBoard.sections()
-                                        .stream()
-                                        .map(Section::getId)
-                                        .collect(Collectors.toList())).removeSectionIds(sectionIds)
+                                .setSectionIds(new ArrayList<>(currentBoard.getSectionIds())).removeSectionIds(sectionIds)
                                 .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
 
                         // If deleteCards is true, we remove all cards from the section.

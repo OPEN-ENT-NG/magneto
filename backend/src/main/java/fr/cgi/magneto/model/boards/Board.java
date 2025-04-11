@@ -39,6 +39,7 @@ public class Board implements Model<Board> {
     private int nbCardsSections;
     private JsonArray rights;
     private boolean isExternal;
+    private List<String> sectionsIds;
 
     @SuppressWarnings("unchecked")
     public Board(JsonObject board) {
@@ -77,6 +78,8 @@ public class Board implements Model<Board> {
             this.nbCardsSections = board.getInteger(Field.NBCARDSSECTIONS);
         this.rights = board.getJsonArray(Field.RIGHTS, new JsonArray());
         this.isExternal = board.getBoolean(Field.ISEXTERNAL, false);
+        if (board.containsKey(Field.SECTIONIDS))
+            this.sectionsIds = board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList();
 
     }
 
@@ -320,6 +323,10 @@ public class Board implements Model<Board> {
     public boolean getIsExternal() { return isExternal; }
 
     public void setIsExternal(boolean isExternal) { this.isExternal = isExternal; }
+
+    public List<String> getSectionIds() { return sectionsIds; }
+
+    public void setSectionIds(List<String> sectionIds) { this.sectionsIds = sectionIds; }
 
     public Board reset() {
         this.setId(null);

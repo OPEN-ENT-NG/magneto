@@ -1,8 +1,8 @@
+import { CodeRounded } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useTranslation } from "react-i18next";
 
 import { CURRENTTAB_STATE, TabConfig } from "./types";
-import { CodeRounded } from "@mui/icons-material";
 
 export function useTabs(tabsConfig: TabConfig[]) {
   const { t } = useTranslation("magneto");

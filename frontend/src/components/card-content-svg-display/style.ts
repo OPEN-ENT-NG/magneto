@@ -1,7 +1,7 @@
-import { AppIcon } from "@edifice.io/react";
 import { Box, styled } from "@mui/material";
 
 import { IsPreviewProps } from "./types";
+import AppIcon from "../app-icon/AppIcon";
 
 export const StyledAppIcon = styled(AppIcon, {
   shouldForwardProp: (prop) => prop !== "isPreview",

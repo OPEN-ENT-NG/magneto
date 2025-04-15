@@ -26,6 +26,7 @@
       "@cgi-learning-hub/icons": ["node_modules/@cgi-learning-hub/icons"],
       "@cgi-learning-hub/theme": ["node_modules/@cgi-learning-hub/theme"],
       "@cgi-learning-hub/ui": ["node_modules/@cgi-learning-hub/ui"],
+      "@cgi-learning-hub/ui/dist": ["node_modules/@cgi-learning-hub/ui/dist"],
       "@images/*": ["node_modules/@edifice.io/bootstrap/dist/images/*"]
     },
 

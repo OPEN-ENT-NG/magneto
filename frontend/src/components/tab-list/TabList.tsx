@@ -1,7 +1,6 @@
 import { createElement, FC, SyntheticEvent } from "react";
 
-import { Tab } from "@mui/material";
-import Tabs from "@mui/material/Tabs";
+import { Tab, Tabs } from "@cgi-learning-hub/ui/dist";
 
 import {
   alternativeTabsStyle,

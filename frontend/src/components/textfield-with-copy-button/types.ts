@@ -3,4 +3,6 @@ export interface TextFieldWithCopyButtonProps {
   label?: string;
   readOnly?: boolean;
   hasCopyButton?: boolean;
+  largerCopy?: boolean;
+  isMultiline?: boolean;
 }

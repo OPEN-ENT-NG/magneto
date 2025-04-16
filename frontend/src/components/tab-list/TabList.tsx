@@ -1,8 +1,13 @@
-import { FC, SyntheticEvent } from "react";
+import { createElement, FC, SyntheticEvent } from "react";
 
-import Tabs from "@mui/material/Tabs";
+import { Tab, Tabs } from "@cgi-learning-hub/ui";
 
-import { StyledTab, tabsStyle } from "./style";
+import {
+  alternativeTabsStyle,
+  alternativeTabStyle,
+  tabsStyle,
+  tabStyle,
+} from "./style";
 import { CURRENTTAB_STATE, TabListProps } from "./types";
 import { DEFAULT_TABS_CONFIG, useTabs } from "./utils";
 
@@ -10,6 +15,7 @@ export const TabList: FC<TabListProps> = ({
   currentTab,
   onChange,
   tabsConfig = DEFAULT_TABS_CONFIG,
+  variant = false,
 }) => {
   const handleChange = (event: SyntheticEvent, newValue: CURRENTTAB_STATE) => {
     onChange(newValue);
@@ -19,19 +25,26 @@ export const TabList: FC<TabListProps> = ({
 
   return (
     <Tabs
-      sx={tabsStyle}
+      sx={variant ? alternativeTabsStyle : tabsStyle}
       value={currentTab}
       onChange={handleChange}
       aria-label="basic tabs example"
-      variant="scrollable"
+      variant={variant ? "standard" : "scrollable"}
       scrollButtons="auto"
-      allowScrollButtonsMobile={true} // Ensure scroll buttons appear on mobile too
+      allowScrollButtonsMobile={!variant} // Ensure scroll buttons appear on mobile too
     >
       {tabs.map((item) => (
-        <StyledTab
+        <Tab
+          iconPosition="start"
           key={item.tabValue}
-          label={item.label.toUpperCase()}
+          label={variant ? item.label : item.label.toUpperCase()}
           value={item.tabValue}
+          sx={variant ? alternativeTabStyle : tabStyle}
+          icon={
+            item.icon
+              ? createElement(item.icon, { fontSize: "large" })
+              : undefined
+          }
         />
       ))}
     </Tabs>

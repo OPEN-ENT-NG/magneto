@@ -4,16 +4,15 @@ import {
   Alert,
   Button,
   Box,
-  Tab,
-  Tabs,
   Typography,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Stack,
+  Switch,
 } from "@cgi-learning-hub/ui";
 import { useToast } from "@edifice.io/react";
-import DownloadIcon from "@mui/icons-material/Download";
 import { Trans, useTranslation } from "react-i18next";
 
 import {
@@ -26,11 +25,14 @@ import {
   contentStyle,
   exportContentStyle,
   exportTitleStyle,
-  tabsStyle,
-  tabStyle,
 } from "./style";
 import { ExportModalProps } from "./types";
 import { actionStyle, dialogStyle, titleStyle } from "../message-modal/style";
+import { TabList } from "../tab-list/TabList";
+import { CURRENTTAB_STATE } from "../tab-list/types";
+import { EXPORT_TABS_CONFIG } from "../tab-list/utils";
+import { TextFieldWithCopyButton } from "../textfield-with-copy-button/TextfieldWithCopyButton";
+import { getIframeCode } from "~/core/constants/export-iFrame.const";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useExportBoardQuery } from "~/services/api/export.service.ts";
 
@@ -40,16 +42,31 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
 }) => {
   const { t } = useTranslation("magneto");
   const toast = useToast();
-  const [tabValue] = useState(0);
   const { selectedBoardsIds, selectedBoards } = useBoardsNavigation();
 
+  const [currentTab, setCurrentTab] = useState<CURRENTTAB_STATE>(
+    CURRENTTAB_STATE.EXPORT_PPTX,
+  );
+
   const [shouldFetch, setShouldFetch] = useState(false);
+  const [isExternalInput, setIsExternalInput] = useState(false);
+  const [value, setValue] = useState("");
 
   const { data, error, isLoading } = useExportBoardQuery(selectedBoardsIds[0], {
     skip: !shouldFetch,
   });
-  const handleExport = () => {
-    setShouldFetch(true);
+
+  const handleConfirm = () => {
+    if (currentTab === CURRENTTAB_STATE.EXPORT_PPTX) {
+      setShouldFetch(true);
+    } else {
+      navigator.clipboard.writeText(value).then(() => {
+        toast.success(t("magneto.share.public.input.tooltip.copied"));
+      });
+    }
+  };
+  const handleExternalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsExternalInput(event.target.checked);
   };
 
   useEffect(() => {
@@ -114,6 +131,12 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
     }
   }, [error]);
 
+  useEffect(() => {
+    if (selectedBoards.length > 0) {
+      setValue(getIframeCode(isExternalInput, selectedBoards[0].id));
+    }
+  }, [selectedBoards, isExternalInput]);
+
   return (
     <Dialog
       sx={dialogStyle}
@@ -126,21 +149,14 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
         {t("magneto.board.export")}
       </DialogTitle>
       <DialogContent sx={contentStyle}>
-        <Tabs
-          sx={tabsStyle}
-          value={tabValue}
-          onChange={() => console.log("to be")}
-          variant="scrollable"
-          scrollButtons="false"
-        >
-          <Tab
-            label={t("magneto.board.download")}
-            icon={<DownloadIcon fontSize="large" />}
-            sx={tabStyle}
-          />
-        </Tabs>
+        <TabList
+          currentTab={currentTab}
+          onChange={setCurrentTab}
+          tabsConfig={EXPORT_TABS_CONFIG}
+          variant
+        />
         <Box>
-          {tabValue === 0 && (
+          {currentTab === CURRENTTAB_STATE.EXPORT_PPTX && (
             <Box>
               <Typography variant="h3" sx={exportTitleStyle}>
                 {t("magneto.export.modal.format")}
@@ -181,6 +197,45 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
               </Alert>
             </Box>
           )}
+          {currentTab === CURRENTTAB_STATE.EXPORT_IFRAME && (
+            <Box sx={{ height: "100%" }}>
+              <Typography variant="h3" sx={exportTitleStyle}>
+                {t("magneto.embed.modal.format")}
+              </Typography>
+              <Alert severity="warning" sx={{ marginY: "1.6rem" }}>
+                <Box sx={alertListStyle}>
+                  {t("magneto.embed.modal.warning")}
+                </Box>
+              </Alert>
+              {selectedBoards[0].isExternal && (
+                <Stack
+                  direction="row"
+                  alignItems={"center"}
+                  spacing={1}
+                  useFlexGap
+                  className="mt-16"
+                  mb={2}
+                >
+                  <Switch
+                    checked={isExternalInput}
+                    onChange={handleExternalChange}
+                  />
+                  <Typography
+                    sx={{ fontSize: "1.6rem", whiteSpace: "pre-line" }}
+                  >
+                    {t("magneto.embed.modal.switch")}
+                  </Typography>
+                </Stack>
+              )}
+              <TextFieldWithCopyButton
+                value={value} // Use the value state here
+                label={"Code"}
+                readOnly={true}
+                largerCopy
+                isMultiline
+              />
+            </Box>
+          )}
         </Box>
       </DialogContent>
       <DialogActions sx={actionStyle}>
@@ -198,10 +253,12 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           color="primary"
           size="medium"
           sx={buttonStyle}
-          onClick={handleExport}
+          onClick={handleConfirm}
           loading={isLoading}
         >
-          {t("magneto.board.download")}
+          {currentTab === CURRENTTAB_STATE.EXPORT_PPTX
+            ? t("magneto.board.download")
+            : t("magneto.embed.modal.copy")}
         </Button>
       </DialogActions>
     </Dialog>

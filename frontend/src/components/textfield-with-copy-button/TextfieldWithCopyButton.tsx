@@ -6,6 +6,11 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { InputAdornment } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
+import {
+  textFieldInputStyles,
+  largerIconStyles,
+  tooltipComponentsProps,
+} from "./style";
 import { TextFieldWithCopyButtonProps } from "./types";
 
 export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
@@ -13,6 +18,8 @@ export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
   label = "Lien",
   readOnly = true,
   hasCopyButton = true,
+  largerCopy = false,
+  isMultiline = false,
 }) => {
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation("magneto");
@@ -31,23 +38,19 @@ export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
   return (
     <TextField
       fullWidth
+      multiline={isMultiline}
       label={label}
       value={value}
-      sx={{
-        "& .MuiInputBase-input": {
-          fontSize: "1.6rem", // Larger font size for the input value
-        },
-        "& .MuiInputLabel-root": {
-          fontSize: "1.6rem",
-          backgroundColor: "white",
-        },
-      }}
+      sx={textFieldInputStyles}
       InputProps={{
         readOnly: readOnly,
         endAdornment:
           !hasCopyButton ||
           value === t("magneto.share.public.input.default") ? null : (
-            <InputAdornment position="end">
+            <InputAdornment
+              position="end"
+              sx={largerCopy ? largerIconStyles : undefined}
+            >
               <Tooltip
                 placement="top"
                 arrow={true}
@@ -56,13 +59,7 @@ export const TextFieldWithCopyButton: FC<TextFieldWithCopyButtonProps> = ({
                     ? t("magneto.share.public.input.tooltip.copied")
                     : t("magneto.share.public.input.tooltip.copy")
                 }
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      fontSize: "1.2rem", // Increased tooltip font size
-                    },
-                  },
-                }}
+                componentsProps={tooltipComponentsProps}
               >
                 <IconButton edge="end" onClick={handleCopy} disabled={false}>
                   {copied ? (

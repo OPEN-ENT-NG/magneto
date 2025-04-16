@@ -42,20 +42,22 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
       return (
         <>
           {icon ? (
-            <StyledAppIcon
-              isPreview={isPreview}
-              app={{
-                address: `/${appName}`,
-                icon: appName,
-                name: `${capFirstLetter(appName)}`,
-                scope: [],
-                display: false,
-                displayName: "",
-                isExternal: false,
-              }}
-            />
-          ) : icon === "magneto" ? (
-            <StyledAppIcon isPreview={isPreview} app={currentApp} />
+            icon === "magneto" ? (
+              <StyledAppIcon isPreview={isPreview} app={currentApp} />
+            ) : (
+              <StyledAppIcon
+                isPreview={isPreview}
+                app={{
+                  address: `/${appName}`,
+                  icon: appName,
+                  name: `${capFirstLetter(appName)}`,
+                  scope: [],
+                  display: false,
+                  displayName: "",
+                  isExternal: false,
+                }}
+              />
+            )
           ) : (
             <DefaultLinkIcon />
           )}

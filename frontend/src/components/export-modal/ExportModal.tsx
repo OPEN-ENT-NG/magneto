@@ -10,9 +10,9 @@ import {
   DialogContent,
   DialogActions,
   Stack,
+  Switch,
 } from "@cgi-learning-hub/ui";
 import { useToast } from "@edifice.io/react";
-import { Switch } from "@mui/material";
 import { Trans, useTranslation } from "react-i18next";
 
 import {

@@ -29,7 +29,6 @@ export const getMuiIconPath = (IconComponent: MuiIconComponent): string => {
       throw new Error("No path data found");
     }
 
-    console.log(pathData);
     return pathData;
   } catch (error) {
     console.error("Error extracting path from MUI icon:", error);

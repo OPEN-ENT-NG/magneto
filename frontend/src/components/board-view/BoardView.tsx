@@ -30,6 +30,7 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { Cursor } from "~/features/websocket/components/Cursor";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -118,6 +119,43 @@ export const BoardView: FC = () => {
     setIsFileDragging(false);
   };
 
+
+  // TEST IMPLE CURSOR FOR WEBSOCKET
+  const [position, setPosition] = useState<[number, number]>([0, 0]);
+
+  useEffect(() => {
+    // sendJsonMessage({
+    //   x: 0, y: 0
+    // })
+    const handleMouseMove = (e: MouseEvent) => {
+      setPosition([e.clientX, e.clientY]);
+    };
+
+    // sendJsonMessageThrottled.current({
+    //   x: e.clientX,
+    //   y: e.clientY
+    // })
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  // TODO with websocket
+  // const renderCursors = users => {
+  //   return Object
+  //     .keys(users)
+  //     .map(uuid => {
+  //       const user = users[uuid]
+  //       return <Cursor 
+  //         key={uuid} 
+  //         userId={uuid} 
+  //         point={[ user.state.x, user.state.y ]} />
+  //     })
+  // }
+  
+
+
   return isLoading ? (
     <LoadingScreen position={false} />
   ) : (
@@ -132,6 +170,11 @@ export const BoardView: FC = () => {
           },
         }}
       />
+      {/* Only for me  */}
+      <Cursor 
+          key={50} 
+          userId={"JDOU"} 
+          point={[ position[0], position[1] ]} />
       <BoardViewWrapper layout={board.layoutType}>
         <HeaderView />
         {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}

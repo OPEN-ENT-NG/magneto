@@ -141,18 +141,18 @@ export const BoardView: FC = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // TODO with websocket
-  const renderCursors = users => {
-    return Object
-      .keys(users)
-      .map(uuid => {
-        const user = users[uuid]
-        return <Cursor 
-          key={uuid} 
-          userId={uuid} 
-          point={[ user.state.x, user.state.y ]} />
-      })
-  }
+  // TODO
+  // const renderCursors = users => {
+  //   return Object
+  //     .keys(users)
+  //     .map(uuid => {
+  //       const user = users[uuid]
+  //       return <Cursor 
+  //         key={uuid} 
+  //         userId={uuid} 
+  //         point={[ user.state.x, user.state.y ]} />
+  //     })
+  // }
   
 
 

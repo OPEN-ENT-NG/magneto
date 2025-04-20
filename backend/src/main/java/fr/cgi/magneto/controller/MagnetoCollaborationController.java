@@ -5,11 +5,15 @@ import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MagnetoCollaborationController implements Handler<ServerWebSocket> {
 
     private final Vertx vertx;
     private static final Logger log = LoggerFactory.getLogger(MagnetoCollaborationController.class);
 
+    private final List<ServerWebSocket> clients = new ArrayList<>();
 
     public MagnetoCollaborationController(final Vertx vertx) {
         this.vertx = vertx;
@@ -17,18 +21,30 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
 
     @Override
     public void handle(ServerWebSocket ws) {
+        clients.add(ws);
+
+        // Log la connexion
+        log.info("Client connected: " + ws.remoteAddress());
+
+        // Gestion de la fermeture propre
+        ws.closeHandler(v -> {
+            clients.remove(ws);
+            log.info("Client disconnected: " + ws.remoteAddress());
+        });
+
         ws.frameHandler(frame -> {
-            try {
-                if (frame.isText()){
-                    log.info("Receiving: " + frame.textData());
-                    final String message = frame.textData();
-                    // push events to everyone
-                    ws.writeTextMessage(message);
-                } else {
-                    log.error("Not receiving anything");
-                }
-            } catch (Exception e) {
-                log.error("An error occured while parsing message:", e);
+            if (frame.isText()) {
+                String message = frame.textData();
+                log.info("Receiving: " + message);
+
+                // Broadcast à tous les autres clients
+                clients.forEach(client -> {
+                    if (client != ws && !client.isClosed()) {
+                        client.writeTextMessage(message);
+                    }
+                });
+            } else {
+                log.warn("Non-text frame received");
             }
         });
     }

@@ -1,20 +1,26 @@
 package fr.cgi.magneto.service.impl;
 
 
-import fr.cgi.magneto.core.constants.*;
+import fr.cgi.magneto.core.constants.CollectionsConstant;
+import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.EventBusActions;
 import fr.cgi.magneto.helper.EventBusHelper;
 import fr.cgi.magneto.helper.WorkspaceHelper;
-import fr.cgi.magneto.service.*;
-import fr.wseduc.mongodb.*;
-import io.vertx.core.*;
-import io.vertx.core.eventbus.*;
-import io.vertx.core.json.*;
-import io.vertx.core.logging.*;
-import org.entcore.common.mongodb.*;
+import fr.cgi.magneto.service.WorkspaceService;
+import fr.wseduc.mongodb.MongoDb;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.mongodb.MongoDbResult;
 
-import java.util.*;
+import java.util.List;
 
 public class DefaultWorkspaceService implements WorkspaceService {
 
@@ -90,7 +96,7 @@ public class DefaultWorkspaceService implements WorkspaceService {
                     .put(Mongo.SET, new JsonObject()
                             .put(Field.SHARED, shareArray)
                             .put(Field.INHERITEDSHARES, shareArray)
-                            .put(Field.ISSHARED, true));
+                            .put(Field.ISSHARED, false));
 
             mongoDb.update(CollectionsConstant.WORKSPACE_DOCUMENTS, query, update, false, true,
                     MongoDbResult.validActionResultHandler(results -> {

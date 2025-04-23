@@ -21,8 +21,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.mongodb.MongoDbResult;
-import org.entcore.common.user.UserInfos;
 import org.entcore.common.share.ShareNormalizer;
+import org.entcore.common.user.UserInfos;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -132,11 +132,10 @@ public class DefaultFolderService implements FolderService {
     }
 
     @Override
-    public Future<JsonObject> updateFolder(UserInfos user, FolderPayload folder) {
+    public Future<JsonObject> updateFolder(FolderPayload folder) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject query = new JsonObject()
-                .put(Field._ID, folder.getId())
-                .put(Field.OWNERID, user.getUserId());
+                .put(Field._ID, folder.getId());
         JsonObject update = new JsonObject().put(Mongo.SET, folder.toJson());
         mongoDb.update(this.collection, query, update, MongoDbResult.validResultHandler(results -> {
             if (results.isLeft()) {

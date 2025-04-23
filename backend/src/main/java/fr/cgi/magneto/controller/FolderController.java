@@ -1,18 +1,23 @@
 package fr.cgi.magneto.controller;
 
-import fr.cgi.magneto.core.constants.*;
-import fr.cgi.magneto.model.*;
-import fr.cgi.magneto.security.*;
-import fr.cgi.magneto.service.*;
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.model.FolderPayload;
+import fr.cgi.magneto.security.CreateFolderRight;
+import fr.cgi.magneto.security.DeleteFolderRight;
+import fr.cgi.magneto.security.ManageFolderRight;
+import fr.cgi.magneto.security.ViewRight;
+import fr.cgi.magneto.service.FolderService;
+import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.rs.*;
-import fr.wseduc.security.*;
-import fr.wseduc.webutils.request.*;
-import io.vertx.core.http.*;
-import org.entcore.common.controller.*;
-import org.entcore.common.http.filter.*;
-import org.entcore.common.user.*;
+import fr.wseduc.security.ActionType;
+import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.request.RequestUtils;
+import io.vertx.core.http.HttpServerRequest;
+import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.user.UserUtils;
 
-import java.util.*;
+import java.util.List;
 
 public class FolderController extends ControllerHelper {
 
@@ -60,14 +65,13 @@ public class FolderController extends ControllerHelper {
     @ResourceFilter(ManageFolderRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void updateFolder(HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "folder", folder ->
-                UserUtils.getUserInfos(eb, request, user -> {
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", folder -> {
                     String folderId = request.getParam(Field.FOLDERID);
                     FolderPayload folderPayload = new FolderPayload(folder).setId(folderId);
-                    folderService.updateFolder(user, folderPayload)
+                    folderService.updateFolder(folderPayload)
                                 .onFailure(err -> renderError(request))
                                 .onSuccess(result -> renderJson(request, result));
-                }));
+                });
     }
 
 

@@ -1,12 +1,13 @@
 package fr.cgi.magneto.service;
 
-import fr.cgi.magneto.model.*;
+import fr.cgi.magneto.model.FolderPayload;
 import fr.cgi.magneto.model.share.SharedElem;
-import io.vertx.core.*;
-import io.vertx.core.json.*;
-import org.entcore.common.user.*;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import org.entcore.common.user.UserInfos;
 
-import java.util.*;
+import java.util.List;
 
 public interface FolderService {
 
@@ -27,11 +28,10 @@ public interface FolderService {
 
         /**
          * Update a folder
-         * @param user       User Object containing user id and displayed name
          * @param folder     Folder to update
          * @return           Future {@link Future <JsonObject>} containing updated folder
          */
-        Future<JsonObject> updateFolder(UserInfos user, FolderPayload folder);
+        Future<JsonObject> updateFolder(FolderPayload folder);
 
 
         /**

@@ -26,6 +26,7 @@ import "./index.scss";
 import { Folder } from "~/models/folder.model";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useFoldersNavigation } from "~/providers/FoldersNavigationProvider";
+import { ONBOARDING_UPDATE_IMAGES } from "~/core/constants/onboarding.const";
 
 export const AppView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -128,7 +129,7 @@ export const AppView: FC = () => {
           modalProps={modalProps}
           onSetModalProps={setModalProps}
         />
-        <ModalExplorer />
+        <ModalExplorer onboarding={ONBOARDING_UPDATE_IMAGES} />
         <Grid className="main-grid">
           <Grid.Col
             lg={width < 1280 ? "2" : "3"}

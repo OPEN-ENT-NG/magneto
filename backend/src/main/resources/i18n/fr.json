@@ -355,6 +355,18 @@
   "magneto.modal.explorer.screen2.text": "Les performances de l’application ont augmenté ! Le déplacement des aimants dans les tableaux est plus fluide, rendant votre expérience plus agréable.",
   "magneto.modal.explorer.screen3.alt": "Image écran 3",
   "magneto.modal.explorer.screen3.text": "Le fonctionnement de la vignette Tableau évolue. Un seul clic suffit pour accéder au contenu. Le menu d’action s’affiche en cliquant sur les 3 petits points.",
+  "magneto.modal.update.screen1.alt": "Image écran 1",
+  "magneto.modal.update.screen1.text": "Grâce au nouveau type d’aimant “Tableau”, un tableau Magnéto peut en contenir d'autres, facilitant la navigation entre eux et améliorant la hiérarchisation de vos ressources.",
+  "magneto.modal.update.screen1.title": "Redécouvrez Magnéto !",
+  "magneto.modal.update.screen2.alt": "Image écran 2",
+  "magneto.modal.update.screen2.text": "Désormais, verrouiller un aimant fige également sa position. Vous pouvez aussi figer tous les aimants depuis les propriétés de votre tableau.",
+  "magneto.modal.update.screen2.title": "Figez la position de vos aimants",
+  "magneto.modal.update.screen3.alt": "Image écran 3",
+  "magneto.modal.update.screen3.text": "Les tableaux Magnéto sont désormais exportables au format PowerPoint ! Cliquez sur le bouton \"Exporter\" puis \"Télécharger\". Le contenu de tous vos aimants sera inséré dans un diaporama, et vous n'aurez plus qu'à appliquer la mise en page que vous souhaitez !",
+  "magneto.modal.update.screen3.title": "Exportez le tableau en diaporama",
+  "magneto.modal.update.screen4.alt": "Image écran 4",
+  "magneto.modal.update.screen4.text": "Depuis la fenêtre de partage, sélectionnez l’option pour rendre votre tableau public. Un lien sera créé le rendant accessible à tout utilisateur, y compris sans connexion à l’ENT !",
+  "magneto.modal.update.screen4.title": "Rendez votre tableau accessible publiquement",
 
   "magnetoexplorer.shared.status.error": "Une erreur est survenue. Veuillez réessayer ultérieurement."
 }

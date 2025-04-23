@@ -1,21 +1,31 @@
 import { FC, useEffect, useState } from "react";
 
-import { Button, Image, Modal } from "@edifice.io/react";
+import {
+  Dialog,
+  Button,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+} from "@cgi-learning-hub/ui";
+import { Image } from "@edifice.io/react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import { ONBOARDING_EXPLORER_IMAGES } from "~/core/constants/onboarding.const";
+import { ModalExplorerProps } from "./types";
+import { buttonStyle, contentStyle } from "../export-modal/style";
+import { actionStyle, dialogStyle, titleStyle } from "../message-modal/style";
 import { PREF_EXPLORER_MODAL } from "~/core/constants/preferences.const";
 import { useOnboardingModal } from "~/hooks/useOnboardingModal";
 
 import "./ModalExplorer.scss";
 
-export const ModalExplorer: FC = () => {
+export const ModalExplorer: FC<ModalExplorerProps> = ({ onboarding }) => {
   const { t } = useTranslation("magneto");
   const [swiperInstance, setSwiperInstance] = useState<any>();
   const [swiperProgress, setSwiperprogress] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const { isOpen, isOnboarding, setIsOpen, handleSavePreference } =
     useOnboardingModal(PREF_EXPLORER_MODAL);
 
@@ -32,19 +42,20 @@ export const ModalExplorer: FC = () => {
     };
   }, []);
 
-  return isOnboarding
+  return true
     ? createPortal(
-        <Modal
+        <Dialog
+          sx={dialogStyle}
           id="onboarding-modal-magneto"
-          size="md"
-          isOpen={isOpen}
-          focusId="nextButtonId"
-          onModalClose={() => setIsOpen(false)}
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
         >
-          <Modal.Header onModalClose={() => setIsOpen(false)}>
-            {t("magneto.modal.explorer.title")}
-          </Modal.Header>
-          <Modal.Body>
+          <DialogTitle component="h2" sx={titleStyle}>
+            {t(
+              onboarding[activeIndex]?.title || "magneto.modal.explorer.title",
+            )}
+          </DialogTitle>
+          <DialogContent sx={contentStyle}>
             <Swiper
               modules={[Pagination]}
               onSwiper={(swiper) => {
@@ -52,34 +63,38 @@ export const ModalExplorer: FC = () => {
               }}
               onSlideChange={(swiper) => {
                 setSwiperprogress(swiper.progress);
+                setActiveIndex(swiper.activeIndex);
               }}
               pagination={{
                 clickable: true,
               }}
             >
-              {ONBOARDING_EXPLORER_IMAGES.map((item, index) => {
+              {onboarding.map((item, index) => {
                 return (
                   <SwiperSlide
                     key={index}
                     className="mag-modal-explorer-swiper"
                   >
-                    <Image
-                      className="mx-auto my-12 mag-modal-explorer-image"
-                      loading="lazy"
-                      src={`${item.src}`}
-                      alt={t(item.alt)}
-                    />
+                    {item.custom ?? (
+                      <Image
+                        className="mx-auto my-12 mag-modal-explorer-image"
+                        loading="lazy"
+                        src={`${item.src}`}
+                        alt={t(item.alt)}
+                      />
+                    )}
                     <p>{t(item.text)}</p>
                   </SwiperSlide>
                 );
               })}
             </Swiper>
-          </Modal.Body>
-          <Modal.Footer>
+          </DialogContent>
+          <DialogActions sx={actionStyle}>
             <Button
-              type="button"
-              color="tertiary"
-              variant="ghost"
+              variant="text"
+              color="primary"
+              size="medium"
+              sx={buttonStyle}
               onClick={() => setIsOpen(false)}
             >
               {t("magneto.modal.explorer.trash.later")}
@@ -87,9 +102,10 @@ export const ModalExplorer: FC = () => {
 
             {swiperProgress > 0 && (
               <Button
-                type="button"
+                variant="outlined"
                 color="primary"
-                variant="outline"
+                size="medium"
+                sx={buttonStyle}
                 onClick={() => swiperInstance.slidePrev()}
               >
                 {t("magneto.modal.explorer.prev")}
@@ -98,9 +114,10 @@ export const ModalExplorer: FC = () => {
             {swiperProgress < 1 && (
               <Button
                 id="nextButtonId"
-                type="button"
+                variant="contained"
                 color="primary"
-                variant="filled"
+                size="medium"
+                sx={buttonStyle}
                 onClick={() => swiperInstance.slideNext()}
               >
                 {t("magneto.modal.explorer.next")}
@@ -108,16 +125,17 @@ export const ModalExplorer: FC = () => {
             )}
             {swiperProgress === 1 && (
               <Button
-                type="button"
+                variant="contained"
                 color="primary"
-                variant="filled"
+                size="medium"
+                sx={buttonStyle}
                 onClick={handleSavePreference}
               >
                 {t("magneto.modal.explorer.close")}
               </Button>
             )}
-          </Modal.Footer>
-        </Modal>,
+          </DialogActions>
+        </Dialog>,
         document.getElementById("portal") as HTMLElement,
       )
     : null;

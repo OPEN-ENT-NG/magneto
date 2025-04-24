@@ -42,7 +42,7 @@ export const ModalExplorer: FC<ModalExplorerProps> = ({ onboarding }) => {
     };
   }, []);
 
-  return true
+  return isOnboarding
     ? createPortal(
         <Dialog
           sx={dialogStyle}

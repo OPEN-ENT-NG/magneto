@@ -1,5 +1,4 @@
 import { createElement, ReactNode } from "react";
-import { text } from "stream/consumers";
 
 import AlertIcon from "~/components/alert-icon/AlertIcon";
 

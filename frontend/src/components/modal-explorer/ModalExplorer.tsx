@@ -16,7 +16,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { ModalExplorerProps } from "./types";
 import { buttonStyle, contentStyle } from "../export-modal/style";
 import { actionStyle, dialogStyle, titleStyle } from "../message-modal/style";
-import { PREF_EXPLORER_MODAL } from "~/core/constants/preferences.const";
+import { PREF_UPDATE_MODAL } from "~/core/constants/preferences.const";
 import { useOnboardingModal } from "~/hooks/useOnboardingModal";
 
 import "./ModalExplorer.scss";
@@ -27,7 +27,7 @@ export const ModalExplorer: FC<ModalExplorerProps> = ({ onboarding }) => {
   const [swiperProgress, setSwiperprogress] = useState<number>(0);
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const { isOpen, isOnboarding, setIsOpen, handleSavePreference } =
-    useOnboardingModal(PREF_EXPLORER_MODAL);
+    useOnboardingModal(PREF_UPDATE_MODAL);
 
   useEffect(() => {
     const link = document.createElement("link");

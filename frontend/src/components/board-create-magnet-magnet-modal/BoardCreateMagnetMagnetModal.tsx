@@ -143,16 +143,17 @@ export const BoardCreateMagnetMagnetModal: FC<
             }
             label={t("magneto.cards.collection.board.view")}
           />
-          <StyledFormControlLabel
-            control={
-              <Switch
-                disabled={currentTab === CURRENTTAB_STATE.FAVORTIE}
-                checked={isByFavorite}
-                onChange={() => handleSwitchChange("isByFavorite")}
-              />
-            }
-            label={t("magneto.cards.collection.favorite.view")}
-          />
+          {currentTab !== CURRENTTAB_STATE.FAVORTIE && (
+            <StyledFormControlLabel
+              control={
+                <Switch
+                  checked={isByFavorite}
+                  onChange={() => handleSwitchChange("isByFavorite")}
+                />
+              }
+              label={t("magneto.cards.collection.favorite.view")}
+            />
+          )}
         </FormGroup>
         <Box sx={contentContainerStyle}>
           {useRenderContent(inputValue, setInputValue)}

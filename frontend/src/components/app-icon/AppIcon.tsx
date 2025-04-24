@@ -139,7 +139,7 @@ const AppIcon = forwardRef(
           width={size}
           height={size}
           className={classes}
-          style={{ minWidth: size + "px" }}
+          style={{ minWidth: size + "px", width: "70% !important" }}
         />
       );
     }

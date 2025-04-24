@@ -36,6 +36,7 @@ export const ONBOARDING_UPDATE_IMAGES: ExplorerImage[] = [
     title: "magneto.modal.update.screen1.title",
     custom: createElement(AlertIcon, {
       iconColor: "var(--theme-palette-primary-main)",
+      backgroundColor: "var(--theme-palette-primary-lighter)",
     }),
   },
   {

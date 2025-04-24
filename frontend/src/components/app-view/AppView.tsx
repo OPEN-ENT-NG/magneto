@@ -19,6 +19,7 @@ import { MessageModal } from "~/components/message-modal/MessageModal";
 import { ModalExplorer } from "~/components/modal-explorer/ModalExplorer";
 import { SideBar } from "~/components/side-bar/SideBar";
 import ToasterContainer from "~/components/toaster-container/ToasterContainer";
+import { ONBOARDING_UPDATE_IMAGES } from "~/core/constants/onboarding.const";
 import adaptColumns from "~/hooks/useAdaptColumns";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { Board } from "~/models/board.model";
@@ -128,7 +129,7 @@ export const AppView: FC = () => {
           modalProps={modalProps}
           onSetModalProps={setModalProps}
         />
-        <ModalExplorer />
+        <ModalExplorer onboarding={ONBOARDING_UPDATE_IMAGES} />
         <Grid className="main-grid">
           <Grid.Col
             lg={width < 1280 ? "2" : "3"}

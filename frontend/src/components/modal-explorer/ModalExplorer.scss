@@ -1,5 +1,5 @@
 .mag-modal-explorer-swiper {
-  height: 350px !important;
+  height: 270px !important;
   display: flex !important;
   justify-content: center !important;
   flex-direction: column !important;
@@ -9,11 +9,12 @@
   max-height: 250px;
   padding-bottom: 2rem;
 }
-#onboarding-modal-magneto .modal-body {
-  margin-block: 0 !important;
-
+#onboarding-modal-magneto {
+  .modal-body {
+    margin-block: 0 !important;
+  }
   .swiper.swiper-horizontal {
-    padding-bottom: 1.5rem !important;
+    padding-bottom: 2.5rem !important;
   }
 }
 

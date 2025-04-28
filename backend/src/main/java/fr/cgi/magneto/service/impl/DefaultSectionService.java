@@ -223,7 +223,8 @@ public class DefaultSectionService implements SectionService {
                 .compose(result -> {
                     // Check if board and section are not empty
                     if (result.succeeded() && !getBoardFuture.result().isEmpty() && !getSectionsFuture.result().isEmpty()) {
-                        Board currentBoard = getBoardFuture.result().get(0);
+                        Board currentBoard = getBoardFuture.result().get(0)
+                                .setSections(getSectionsFuture.result());
                         BoardPayload boardToUpdate = new BoardPayload()
                                 .setId(currentBoard.getId())
                                 .setSectionIds(new ArrayList<>(currentBoard.getSectionIds())).removeSectionIds(sectionIds)

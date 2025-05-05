@@ -2,18 +2,20 @@ package fr.cgi.magneto;
 
 import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.controller.*;
-import fr.cgi.magneto.core.constants.*;
+import fr.cgi.magneto.core.constants.CollectionsConstant;
+import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.impl.MagnetoRepositoryEvents;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.Promise;
-import io.vertx.core.eventbus.*;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.http.HttpServerOptions;
 import org.entcore.common.http.BaseServer;
-import org.entcore.common.http.filter.*;
-import org.entcore.common.mongodb.*;
+import org.entcore.common.http.filter.ShareAndOwner;
+import org.entcore.common.mongodb.MongoDbConf;
 import org.entcore.common.neo4j.Neo4j;
-import org.entcore.common.service.impl.*;
-import org.entcore.common.share.impl.*;
+import org.entcore.common.service.impl.MongoDbCrudService;
+import org.entcore.common.share.impl.MongoDbShareService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.storage.StorageFactory;
@@ -62,7 +64,15 @@ public class Magneto extends BaseServer {
         startPromise.tryComplete();
         startPromise.tryFail("[Magneto@Magneto::start] Failed to start module Magneto.");
 
-        // TODO Websocket
-        // new RealTimeCollaboration(vertx, magnetoConfig).initRealTime();
+        final HttpServerOptions options = new HttpServerOptions().setMaxWebSocketFrameSize(1024 * 1024);
+        vertx.createHttpServer(options)
+                .webSocketHandler(new MagnetoCollaborationController(vertx))
+                .listen(9091, asyncResult -> {
+                    if(asyncResult.succeeded()) {
+                        log.info("Websocket server started and listening on port " + 9091);
+                    } else {
+                        log.error("Cannot start websocket controller", asyncResult.cause());
+                    }
+                });
     }
 }

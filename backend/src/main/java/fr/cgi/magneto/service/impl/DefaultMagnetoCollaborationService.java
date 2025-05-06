@@ -4,20 +4,17 @@ import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
-import fr.wseduc.webutils.Utils;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.RedisAPI;
-import io.vertx.redis.client.RedisConnection;
-import io.vertx.redis.client.RedisOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static io.vertx.core.http.impl.HttpClientConnection.log;
 
@@ -26,16 +23,14 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     private final Vertx vertx;
     private final JsonObject config;
     private final String serverId;
-    private final long reConnectionDelay;
     private final long publishPeriodInMs;
     private final long maxConnectedUser;
     private final List<Handler<RealTimeStatus>> statusSubscribers;
     private final List<Handler<MagnetoMessageWrapper>> messagesSubscribers;
-    private final RedisConnectionWrapper subscriberConnection = new RedisConnectionWrapper();
     private final ServiceFactory serviceFactory;
-    private long restartAttempt = 0;
-    private RedisAPI redisPublisher;
     private RealTimeStatus realTimeStatus;
+    private String eventBusAddress;
+    private MessageConsumer<JsonObject> eventBusConsumer;
 
     public DefaultMagnetoCollaborationService(Vertx vertx, final JsonObject config, ServiceFactory serviceFactory) {
         this.vertx = vertx;
@@ -43,32 +38,111 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.serviceFactory = serviceFactory;
         this.realTimeStatus = RealTimeStatus.STOPPED;
         this.serverId = UUID.randomUUID().toString();
-        this.messageFactory = new CollaborativeMessageFactory(serverId); //Do we make a factory?
         this.statusSubscribers = new ArrayList<>();
         this.messagesSubscribers = new ArrayList<>();
-        this.reConnectionDelay = config.getLong("reconnection-delay-in-ms", 1000L);
         this.publishPeriodInMs = config.getLong("publish-context-period-in-ms", 60000L);
         this.maxConnectedUser = config.getLong("max-connected-user", 50L);
+        this.eventBusAddress = config.getString("eventbus-address", "magneto.collaboration");
     }
 
     @Override
     public Future<Void> start() {
-        Future<Void> future;
+        Promise<Void> promise = Promise.promise();
         if (RealTimeStatus.STARTED.equals(this.realTimeStatus) || RealTimeStatus.LIMIT.equals(this.realTimeStatus)) {
-            future = Future.failedFuture(this.realTimeStatus + ".cannot.be.started");
-        } else {
-            changeRealTimeStatus(RealTimeStatus.STARTING);
-            try {
-                final RedisOptions redisOptions = getRedisOptions(vertx, config);
-                final Redis publisherClient = Redis.createClient(vertx, redisOptions);
-                redisPublisher = RedisAPI.api(publisherClient);
-                future = listenToRedis();
-                future.onSuccess(e -> publishContextLoop());
-            } catch (Exception e) {
-                future = Future.failedFuture(e);
-            }
+            return Future.failedFuture(this.realTimeStatus + ".cannot.be.started");
         }
-        return future;
+
+        try {
+            changeRealTimeStatus(RealTimeStatus.STARTING);
+
+            // Création du consumer sur l'EventBus
+            eventBusConsumer = vertx.eventBus().consumer(eventBusAddress);
+            eventBusConsumer.handler(ebMessage -> {
+                try {
+                    JsonObject messageBody = ebMessage.body();
+                    this.onNewMessage(messageBody.encode());
+                } catch (Exception e) {
+                    String message = String.format("[Magneto@%s::start] Cannot treat EventBus message",
+                            this.getClass().getSimpleName());
+                    log.error(message, e);
+                }
+            });
+
+            eventBusConsumer.exceptionHandler(t -> {
+                String message = String.format("[Magneto@%s::start] EventBus consumer error",
+                        this.getClass().getSimpleName());
+                log.error(message, t);
+                changeRealTimeStatus(RealTimeStatus.ERROR);
+                // Tentative de reconnexion
+                vertx.setTimer(1000, id -> start());
+            });
+
+            eventBusConsumer.completionHandler(ar -> {
+                if (ar.succeeded()) {
+                    log.info("EventBus consumer registered successfully");
+                    changeRealTimeStatus(RealTimeStatus.STARTED).onComplete(promise);
+                    publishContextLoop();
+                } else {
+                    String message = String.format("[Magneto@%s::start] EventBus consumer registration failed",
+                            this.getClass().getSimpleName());
+                    log.error(message, ar.cause());
+                    changeRealTimeStatus(RealTimeStatus.ERROR).onComplete(promise);
+                }
+            });
+
+        } catch (Exception e) {
+            String message = String.format("[Magneto@%s::start] Error starting VertxEventBusMagnetoCollaborationService",
+                    this.getClass().getSimpleName());
+            log.error(message, e);
+            changeRealTimeStatus(RealTimeStatus.ERROR).onComplete(promise);
+        }
+
+        return promise.future();
+    }
+
+    @Override
+    public void onNewMessage(String receivedMessage) {
+        try {
+            JsonObject jsonMessage = new JsonObject(receivedMessage);
+
+            // Ignorer les messages provenant de cette instance
+            if (jsonMessage.containsKey("serverId") && serverId.equals(jsonMessage.getString("serverId"))) {
+                return;
+            }
+
+            // Traiter le message en fonction de son type
+            String messageType = jsonMessage.getString("type", "");
+
+            switch (messageType) {
+                case "context":
+                    // Traitement des messages de contexte (si nécessaire)
+                    break;
+
+                case "collaboration":
+                    // Convertir en MagnetoMessageWrapper et notifier les abonnés
+                    MagnetoMessageWrapper magnetoMessage = new MagnetoMessageWrapper(jsonMessage);
+
+                    for (Handler<MagnetoMessageWrapper> messagesSubscriber : messagesSubscribers) {
+                        try {
+                            messagesSubscriber.handle(magnetoMessage);
+                        } catch (Exception e) {
+                            String message = String.format("[Magneto@%s::onNewMessage] Error occurred while calling message subscriber",
+                                    this.getClass().getSimpleName());
+                            log.error(message, e);
+                        }
+                    }
+                    break;
+
+                default:
+                    log.warn("Unknown message type: " + messageType);
+                    break;
+            }
+
+        } catch (Exception e) {
+            String message = String.format("[Magneto@%s::onNewMessage] Error processing received message: %s",
+                    this.getClass().getSimpleName(), receivedMessage);
+            log.error(message, e);
+        }
     }
 
     @Override
@@ -86,71 +160,26 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.messagesSubscribers.add(messagesHandler);
     }
 
-    private Future<Void> listenToRedis() {
-        final Promise<Void> promise = Promise.promise();
-        if(subscriberConnection.alreadyConnected()) {
-            promise.complete();
-        } else {
-            log.info("Connecting to Redis....");
-            Redis.createClient(vertx, getRedisOptions(vertx, config))
-                    .connect(onConnect -> {
-                        if (onConnect.succeeded()) {
-                            log.info(".... connection to redis established");
-                            changeRealTimeStatus(RealTimeStatus.STARTED);
-                            this.restartAttempt = 0;
-                            promise.complete();
-                            RedisConnection client = onConnect.result();
-                            subscriberConnection.connection = client;
-                            client.handler(message -> {
-                                try {
-                                    if ("message".equals(message.get(0).toString())) {
-                                        String receivedMessage = message.get(2).toString();
-                                        this.onNewRedisMessage(receivedMessage);
-                                    }
-                                } catch (Exception e) {
-                                    log.error("Cannot treat Redis message " + message, e);
-                                }
-                            }).exceptionHandler(t -> {
-                                log.error("Lost connection to redis", t);
-                                this.listenToRedis();
-                            }).send(Request.cmd(Command.SUBSCRIBE).arg(channelName), subscribeResult -> {
-                                if (subscribeResult.succeeded()) {
-                                    log.equals("Subscribed to channel " + channelName + " successfully!");
-                                } else {
-                                    log.error("Failed to subscribe: " + subscribeResult.cause());
-                                }
-                            });
-                        } else {
-                            this.onRedisConnectionStopped(onConnect.cause()).onComplete(promise);
-                        }
-                    });
-        }
-        return promise.future();
+    // Méthode pour publier un message
+    public Future<Void> publishMessage(JsonObject message) {
+        return Future.fromCompletionStage(
+                CompletableFuture.runAsync(() -> {
+                    vertx.eventBus().publish(eventBusAddress, message);
+                })
+        );
     }
 
-    private RedisOptions getRedisOptions(Vertx vertx, JsonObject conf) {
-        JsonObject redisConfig = conf.getJsonObject("redisConfig");
+    private void publishContextLoop() {
+        // Logique similaire à celle avec Redis
+        vertx.setPeriodic(publishPeriodInMs, timerId -> {
+            // Publier les informations de contexte
+            JsonObject contextInfo = new JsonObject()
+                    .put("type", "context")
+                    .put("serverId", serverId)
+                    .put("timestamp", System.currentTimeMillis());
 
-        if (redisConfig == null) {
-            final String redisConf = (String) vertx.sharedData().getLocalMap("server").get("redisConfig");
-            if (redisConf == null) {
-                throw new IllegalStateException("missing.redis.config");
-            } else {
-                redisConfig = new JsonObject(redisConf);
-            }
-        }
-        String redisConnectionString = redisConfig.getString("connection-string");
-        if (Utils.isEmpty(redisConnectionString)) {
-            redisConnectionString =
-                    "redis://" + (redisConfig.containsKey("auth") ? ":" + redisConfig.getString("auth") + "@" : "") +
-                            redisConfig.getString("host") + ":" + redisConfig.getInteger("port") + "/" +
-                            redisConfig.getInteger("select", 0);
-        }
-        return new RedisOptions()
-                .setConnectionString(redisConnectionString)
-                .setMaxPoolSize(redisConfig.getInteger("pool-size", 32))
-                .setMaxWaitingHandlers(redisConfig.getInteger("maxWaitingHandlers", 100))
-                .setMaxPoolWaiting(redisConfig.getInteger("maxPoolWaiting", 100));
+            publishMessage(contextInfo);
+        });
     }
 
     private Future<Void> changeRealTimeStatus(RealTimeStatus realTimeStatus) {
@@ -162,7 +191,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             this.realTimeStatus = realTimeStatus;
             final Future<Void> cleanPromise;
             if (realTimeStatus == RealTimeStatus.ERROR) {
-                cleanPromise = closeAndClean();
+                cleanPromise = cleanUp();
             } else {
                 cleanPromise = Future.succeededFuture();
             }
@@ -180,18 +209,26 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         return promise.future();
     }
 
-    private Future<Void> closeAndClean() {
+    private Future<Void> cleanUp() {
+        Promise<Void> promise = Promise.promise();
         try {
-            subscriberConnection.close();
+            if (eventBusConsumer != null) {
+                eventBusConsumer.unregister(ar -> {
+                    if (ar.succeeded()) {
+                        promise.complete();
+                    } else {
+                        promise.fail(ar.cause());
+                    }
+                });
+            } else {
+                promise.complete();
+            }
         } catch (Exception e) {
-            log.error("Cannot close redis subscriber", e);
+            String message = String.format("[Magneto@%s::cleanUp] Error during cleanup",
+                    this.getClass().getSimpleName());
+            log.error(message, e);
+            promise.fail(e);
         }
-        try {
-            redisPublisher.close();
-        } catch (Exception e) {
-            log.error("Cannot close redis publisher", e);
-        }
-        return Future.succeededFuture();
+        return promise.future();
     }
-
 }

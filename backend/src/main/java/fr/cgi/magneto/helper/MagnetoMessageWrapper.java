@@ -1,7 +1,10 @@
 package fr.cgi.magneto.helper;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MagnetoMessageWrapper {
@@ -19,6 +22,27 @@ public class MagnetoMessageWrapper {
         this.allowInternal = allowInternal;
         this.allowExternal = allowExternal;
         this.exceptWSId = exceptWSId;
+    }
+
+    public MagnetoMessageWrapper(JsonObject jsonObject) {
+        this.messages = new ArrayList<>();
+
+        // Extraction des messages du JsonObject
+        if (jsonObject.containsKey("messages") && jsonObject.getValue("messages") instanceof JsonArray) { //TODO : fix all magic strings
+            JsonArray messagesArray = jsonObject.getJsonArray("messages");
+            for (int i = 0; i < messagesArray.size(); i++) {
+                JsonObject messageJson = messagesArray.getJsonObject(i);
+                if (messageJson != null) {
+                    MagnetoMessage message = new MagnetoMessage(messageJson);
+                    this.messages.add(message);
+                }
+            }
+        }
+
+        // Extraction des propriétés de diffusion
+        this.allowInternal = jsonObject.getBoolean("allowInternal", true);
+        this.allowExternal = jsonObject.getBoolean("allowExternal", true);
+        this.exceptWSId = jsonObject.getString("exceptWSId", null);
     }
 
     public String getExceptWSId() {

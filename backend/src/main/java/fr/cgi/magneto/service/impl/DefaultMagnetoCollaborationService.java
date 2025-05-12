@@ -32,9 +32,9 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     private String eventBusAddress;
     private MessageConsumer<JsonObject> eventBusConsumer;
 
-    public DefaultMagnetoCollaborationService(Vertx vertx, final JsonObject config, ServiceFactory serviceFactory) {
-        this.vertx = vertx;
-        this.config = config;
+    public DefaultMagnetoCollaborationService(ServiceFactory serviceFactory) {
+        this.vertx = serviceFactory.vertx();
+        this.config = serviceFactory.config();
         this.serviceFactory = serviceFactory;
         this.realTimeStatus = RealTimeStatus.STOPPED;
         this.serverId = UUID.randomUUID().toString();
@@ -170,9 +170,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     }
 
     private void publishContextLoop() {
-        // Logique similaire à celle avec Redis
         vertx.setPeriodic(publishPeriodInMs, timerId -> {
-            // Publier les informations de contexte
             JsonObject contextInfo = new JsonObject()
                     .put("type", "context")
                     .put("serverId", serverId)
@@ -187,7 +185,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         if (realTimeStatus == this.realTimeStatus) {
             promise.complete();
         } else {
-            //log.debug("Changing real time status : " + this.realTimeStatus + " -> " + realTimeStatus);
+            log.debug("Changing real time status : " + this.realTimeStatus + " -> " + realTimeStatus);
             this.realTimeStatus = realTimeStatus;
             final Future<Void> cleanPromise;
             if (realTimeStatus == RealTimeStatus.ERROR) {
@@ -200,7 +198,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     try {
                         statusSubscriber.handle(this.realTimeStatus);
                     } catch (Exception exc) {
-                        //log.error("Error occurred while calling status change handler", exc);
+                        log.error("Error occurred while calling status change handler", exc);
                     }
                 }
                 promise.complete();

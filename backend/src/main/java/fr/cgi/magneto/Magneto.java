@@ -30,7 +30,7 @@ public class Magneto extends BaseServer {
 
         Storage storage = new StorageFactory(vertx, config).getStorage();
         MagnetoConfig magnetoConfig = new MagnetoConfig(config);
-        ServiceFactory serviceFactory = new ServiceFactory(vertx, storage, magnetoConfig, Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance(), securedActions);
+        ServiceFactory serviceFactory = new ServiceFactory(vertx, storage, magnetoConfig, Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance(), securedActions, config);
 
         final MongoDbConf conf = MongoDbConf.getInstance();
         conf.setCollection(CollectionsConstant.BOARD_COLLECTION);
@@ -66,7 +66,7 @@ public class Magneto extends BaseServer {
 
         final HttpServerOptions options = new HttpServerOptions().setMaxWebSocketFrameSize(1024 * 1024);
         vertx.createHttpServer(options)
-                .webSocketHandler(new MagnetoCollaborationController(vertx))
+                .webSocketHandler(new MagnetoCollaborationController(serviceFactory, 100, config))
                 .listen(9091, asyncResult -> {
                     if(asyncResult.succeeded()) {
                         log.info("Websocket server started and listening on port " + 9091);

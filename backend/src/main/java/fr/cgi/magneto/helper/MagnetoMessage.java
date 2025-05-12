@@ -1,20 +1,18 @@
 package fr.cgi.magneto.helper;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MagnetoMessage {
     private final String boardId;
     private final long emittedAt;
@@ -35,44 +33,98 @@ public class MagnetoMessage {
     //private final String actionId;
     private final Long maxConnectedUsers;
 
-    @JsonCreator
-    public MagnetoMessage(@JsonProperty("boardId") final String boardId,
-                                    @JsonProperty("emittedAt") final long emittedAt,
-                                    @JsonProperty("emittedBy") final String emittedBy,
-                                    @JsonProperty("websocketId") final String websocketId,
-                                    @JsonProperty("type") final MagnetoMessageType type,
-                                    @JsonProperty("userId") final String userId,
-                                    @JsonProperty("board") final Board board,
-                                    @JsonProperty("cardId") final String cardId,
-                                    @JsonProperty("card") final Card card,
-                                    @JsonProperty("oldCard") final Card oldCard,
-                                    @JsonProperty("cards") List<Card> cards,
-                                    @JsonProperty("connectedUsers") final Set<UserInfos> connectedUsers,
-                                    @JsonProperty("section") final Section section,
-                                    @JsonProperty("sections") final List<Section> sections,
-                                    //@JsonProperty("actionType") final CollaborativeWallUserAction.ActionType actionType,
-                                    //@JsonProperty("actionId") final String actionId,
-                                    @JsonProperty("maxConnectedUsers") final Long maxConnectedUsers) {
-        this.boardId = boardId;
-        this.emittedAt = emittedAt;
-        this.emittedBy = emittedBy;
-        this.websocketId = websocketId;
-        this.type = type;
-        this.userId = userId;
-        this.board = board;
-        this.cardId = cardId;
-        this.card = card;
-        this.oldCard = oldCard;
-        this.cards = cards;
-        this.connectedUsers = connectedUsers;
-        this.section = section;
-        this.sections = sections;
-        //this.actionType = actionType;
-        //this.actionId = actionId;
-        this.maxConnectedUsers = maxConnectedUsers;
+    public MagnetoMessage(JsonObject jsonObject) {
+        this.boardId = jsonObject.getString("boardId", null);
+        this.emittedAt = jsonObject.getLong("emittedAt", System.currentTimeMillis());
+        this.emittedBy = jsonObject.getString("emittedBy", null);
+        this.websocketId = jsonObject.getString("websocketId", null);
+
+        // Conversion du type en enum
+        String typeStr = jsonObject.getString("type", null);
+        this.type = typeStr != null ? MagnetoMessageType.valueOf(typeStr) : null;
+
+        this.userId = jsonObject.getString("userId", null);
+        this.cardId = jsonObject.getString("cardId", null);
+
+        // Conversion des objets complexes
+        if (jsonObject.containsKey("board") && jsonObject.getValue("board") instanceof JsonObject) {
+            this.board = new Board(jsonObject.getJsonObject("board"));
+        } else {
+            this.board = null;
+        }
+
+        if (jsonObject.containsKey("card") && jsonObject.getValue("card") instanceof JsonObject) {
+            this.card = new Card(jsonObject.getJsonObject("card"));
+        } else {
+            this.card = null;
+        }
+
+        if (jsonObject.containsKey("oldCard") && jsonObject.getValue("oldCard") instanceof JsonObject) {
+            this.oldCard = new Card(jsonObject.getJsonObject("oldCard"));
+        } else {
+            this.oldCard = null;
+        }
+
+        // Conversion des collections
+        this.cards = new ArrayList<>();
+        if (jsonObject.containsKey("cards") && jsonObject.getValue("cards") instanceof JsonArray) {
+            JsonArray cardsArray = jsonObject.getJsonArray("cards");
+            for (int i = 0; i < cardsArray.size(); i++) {
+                JsonObject cardJson = cardsArray.getJsonObject(i);
+                if (cardJson != null) {
+                    this.cards.add(new Card(cardJson));
+                }
+            }
+        }
+
+        // Section
+        if (jsonObject.containsKey("section") && jsonObject.getValue("section") instanceof JsonObject) {
+            this.section = new Section(jsonObject.getJsonObject("section"));
+        } else {
+            this.section = null;
+        }
+
+        // Sections list
+        this.sections = new ArrayList<>();
+        if (jsonObject.containsKey("sections") && jsonObject.getValue("sections") instanceof JsonArray) {
+            JsonArray sectionsArray = jsonObject.getJsonArray("sections");
+            for (int i = 0; i < sectionsArray.size(); i++) {
+                JsonObject sectionJson = sectionsArray.getJsonObject(i);
+                if (sectionJson != null) {
+                    this.sections.add(new Section(sectionJson));
+                }
+            }
+        }
+
+        // Connected users
+        this.connectedUsers = new HashSet<>();
+        if (jsonObject.containsKey("connectedUsers") && jsonObject.getValue("connectedUsers") instanceof JsonArray) {
+            JsonArray usersArray = jsonObject.getJsonArray("connectedUsers");
+            for (int i = 0; i < usersArray.size(); i++) {
+                JsonObject userJson = usersArray.getJsonObject(i);
+                if (userJson != null) {
+                    // Suppose qu'il existe un constructeur pour UserInfos prenant un JsonObject
+                    UserInfos userInfo = new UserInfos();
+                    try {
+                        // Remplir UserInfos avec les données de userJson
+                        if (userJson.containsKey("id")) userInfo.setUserId(userJson.getString("id"));
+                        if (userJson.containsKey("username")) userInfo.setUsername(userJson.getString("username"));
+                        if (userJson.containsKey("login")) userInfo.setLogin(userJson.getString("login"));
+                        //if (userJson.containsKey("displayName")) userInfo.setDisplayName(userJson.getString("displayName")); TODO why setDisplayName doesnt want to work??
+
+                        this.connectedUsers.add(userInfo);
+                    } catch (Exception e) {
+                        String message = String.format("[Magneto@%s::MagnetoMessage] Error parsing UserInfos from JsonObject",
+                                this.getClass().getSimpleName());
+                        System.err.println(message + ": " + e.getMessage());
+                    }
+                }
+            }
+        }
+
+        // Maximum connected users
+        this.maxConnectedUsers =  jsonObject.getLong("maxConnectedUsers", null);
     }
-
-
 
     public String getBoardId() {
         return boardId;

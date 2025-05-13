@@ -1,10 +1,14 @@
 package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import org.entcore.common.user.UserInfos;
+
+import java.util.List;
 
 /**
  * Service managing real-time collaboration features for Magneto
@@ -71,4 +75,6 @@ public interface MagnetoCollaborationService {
      * @param message String representation of the received message
      */
     void onNewMessage(String message);
+
+    Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId);
 }

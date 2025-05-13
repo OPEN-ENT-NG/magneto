@@ -33,6 +33,24 @@ public class MagnetoMessage {
     //private final String actionId;
     private final Long maxConnectedUsers;
 
+    public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, Set<UserInfos> connectedUsers, Long maxConnectedUsers) {
+        this.boardId = boardId;
+        this.emittedAt = emittedAt;
+        this.emittedBy = emittedBy;
+        this.websocketId = websocketId;
+        this.type = type;
+        this.userId = userId;
+        this.cardId = cardId;
+        this.board = board;
+        this.card = card;
+        this.oldCard = oldCard;
+        this.cards = cards;
+        this.section = section;
+        this.sections = sections;
+        this.connectedUsers = connectedUsers;
+        this.maxConnectedUsers = maxConnectedUsers;
+    }
+
     public MagnetoMessage(JsonObject jsonObject) {
         this.boardId = jsonObject.getString("boardId", null);
         this.emittedAt = jsonObject.getLong("emittedAt", System.currentTimeMillis());

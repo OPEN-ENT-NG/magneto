@@ -1,6 +1,8 @@
 package fr.cgi.magneto.service.impl;
 
+import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
@@ -10,6 +12,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
+import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -178,6 +181,36 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
             publishMessage(contextInfo);
         });
+    }
+
+    @Override
+    public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId) {
+        final MagnetoMessage newUserMessage = new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.connection, user.getUserId(), null, null, null, null, null, null, null, null,
+                null);
+        /*return CompositeFuture.all(
+                        this.collaborativeWallService.getWall(wallId),
+                        this.collaborativeWallService.getNotesOfWall(wallId)
+                ).flatMap(wall -> {
+                    final CollaborativeWallUsersMetadata context = metadataByWallId.computeIfAbsent(wallId, k -> new CollaborativeWallUsersMetadata());
+                    context.addConnectedUser(user);
+                    publishMetadata();
+                    return this.getUsersContext(wallId).map(userContext -> Pair.of(wall, userContext));
+                })
+                .map(context -> {
+                    final JsonObject wall = context.getKey().resultAt(0);
+                    final List<JsonObject> notes = context.getKey().resultAt(1);
+                    final CollaborativeWallUsersMetadata userContext = context.getRight();
+                    return this.messageFactory.metadata(wallId, wsId, user.getUserId(),
+                            new CollaborativeWallMetadata(wall, notes, userContext.getEditing(), userContext.getConnectedUsers()), this.maxConnectedUser);
+                })
+                .map(contextMessage -> newArrayList(newUserMessage, contextMessage))
+                .compose(messages -> publishMessagesOnRedis(messages).map(messages));*/
+        final Promise<List<MagnetoMessage>> promise = Promise.promise();
+        List<MagnetoMessage> messages = new ArrayList<>();
+        messages.add(newUserMessage);
+        promise.complete(messages);
+        return promise.future();
     }
 
     private Future<Void> changeRealTimeStatus(RealTimeStatus realTimeStatus) {

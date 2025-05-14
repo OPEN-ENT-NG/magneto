@@ -203,4 +203,65 @@ public class MagnetoMessage {
     public Long getMaxConnectedUsers() {
         return maxConnectedUsers;
     }
+
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+
+        // Propriétés simples
+        if (boardId != null) json.put("boardId", boardId);
+        json.put("emittedAt", emittedAt);
+        if (emittedBy != null) json.put("emittedBy", emittedBy);
+        if (websocketId != null) json.put("websocketId", websocketId);
+        if (type != null) json.put("type", type.name());
+        if (userId != null) json.put("userId", userId);
+        if (cardId != null) json.put("cardId", cardId);
+        if (maxConnectedUsers != null) json.put("maxConnectedUsers", maxConnectedUsers);
+
+        // Objets complexes
+        if (board != null) json.put("board", board.toJson());
+        if (card != null) json.put("card", card.toJson());
+        if (oldCard != null) json.put("oldCard", oldCard.toJson());
+
+        // Collections
+        if (cards != null && !cards.isEmpty()) {
+            JsonArray cardsArray = new JsonArray();
+            for (Card card : cards) {
+                if (card != null) {
+                    cardsArray.add(card.toJson());
+                }
+            }
+            json.put("cards", cardsArray);
+        }
+
+        if (section != null) json.put("section", section.toJson());
+
+        if (sections != null && !sections.isEmpty()) {
+            JsonArray sectionsArray = new JsonArray();
+            for (Section section : sections) {
+                if (section != null) {
+                    sectionsArray.add(section.toJson());
+                }
+            }
+            json.put("sections", sectionsArray);
+        }
+
+        // Connected users
+        if (connectedUsers != null && !connectedUsers.isEmpty()) {
+            JsonArray usersArray = new JsonArray();
+            for (UserInfos userInfo : connectedUsers) {
+                if (userInfo != null) {
+                    JsonObject userJson = new JsonObject();
+                    if (userInfo.getUserId() != null) userJson.put("id", userInfo.getUserId());
+                    if (userInfo.getUsername() != null) userJson.put("username", userInfo.getUsername());
+                    if (userInfo.getLogin() != null) userJson.put("login", userInfo.getLogin());
+                    // Ajout d'autres propriétés de UserInfos si nécessaire
+
+                    usersArray.add(userJson);
+                }
+            }
+            json.put("connectedUsers", usersArray);
+        }
+
+        return json;
+    }
 }

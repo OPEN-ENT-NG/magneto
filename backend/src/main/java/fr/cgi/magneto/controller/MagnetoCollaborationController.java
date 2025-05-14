@@ -78,7 +78,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                             } else if(frame.isText()){
                                 final String message = frame.textData();
                                 final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
-                               // this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false).onFailure(th -> this.sendError(th, ws));
+                                this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false);//.onFailure(th -> this.sendError(th, ws));
                             } else if(frame.isClose()) {
                                 log.debug("Received a close frame from the user");
                                 onCloseWSConnection(boardId, wsId);

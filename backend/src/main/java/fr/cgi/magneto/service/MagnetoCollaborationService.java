@@ -1,6 +1,7 @@
 package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import io.vertx.core.Future;
@@ -75,6 +76,12 @@ public interface MagnetoCollaborationService {
      * @param message String representation of the received message
      */
     void onNewMessage(String message);
+
+    Future<List<MagnetoMessage>> onNewUserAction(MagnetoUserAction action, String boardId, String wsId, UserInfos user, boolean checkConcurency);
+
+    Future<List<MagnetoMessage>> pushEventToAllUsers(String wallId, UserInfos session, MagnetoUserAction action, boolean checkConcurency);
+
+    Future<List<MagnetoMessage>> pushEvent(String wallId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);
 
     Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId);
 }

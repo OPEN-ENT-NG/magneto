@@ -2,6 +2,7 @@ package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
@@ -103,6 +104,19 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         return promise.future();
     }
 
+    private void broadcastMessagesToUsers(final List<MagnetoMessage> messages,
+                                          final boolean allowInternalMessages,
+                                          final boolean allowExternalMessages,
+                                          final String exceptWsId) {
+        for (final Handler<MagnetoMessageWrapper> messagesSubscriber : this.messagesSubscribers) {
+            try {
+                messagesSubscriber.handle(new MagnetoMessageWrapper(messages, allowInternalMessages, allowExternalMessages, exceptWsId));
+            } catch (Exception e) {
+                log.error("An error occurred while sending a message to users", e);
+            }
+        }
+    }
+
     @Override
     public void onNewMessage(String receivedMessage) {
         try {
@@ -181,6 +195,54 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
             publishMessage(contextInfo);
         });
+    }
+
+    @Override
+    public Future<List<MagnetoMessage>> onNewUserAction(final MagnetoUserAction action, String boardId, String wsId, final UserInfos user, final boolean checkConcurency) {
+
+        if (action == null) {
+            log.warn("Message does not contain a type");
+            return Future.failedFuture("wall.action.missing");
+        } else {
+            try {
+                if (action.isValid()) {
+                    //return executeAction(action, wallId, wsId, user, checkConcurency) TODO
+                    final MagnetoMessage newActionMessage = new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                            MagnetoMessageType.ping, user.getUserId(), null, null, null, null, null, null, null, null,
+                            null);
+                    final Promise<List<MagnetoMessage>> promise = Promise.promise();
+                    List<MagnetoMessage> messages = new ArrayList<>();
+                    messages.add(newActionMessage);
+                    promise.complete(messages);
+                    return promise.future();
+                } else {
+                    return Future.failedFuture("magneto.action.invalid");
+                }
+            } catch (Exception e) {
+                return Future.failedFuture(e);
+            }
+        }
+    }
+
+    @Override
+    public Future<List<MagnetoMessage>> pushEventToAllUsers(final String wallId, final UserInfos session, final MagnetoUserAction action, final boolean checkConcurency) {
+        return pushEvent(wallId, session, action, "", checkConcurency);
+    }
+
+    @Override
+    public Future<List<MagnetoMessage>> pushEvent(final String wallId, final UserInfos session, final MagnetoUserAction action, final String wsId, final boolean checkConcurency) {
+        return this.onNewUserAction(action, wallId, wsId, session, checkConcurency)
+                .onSuccess(messages -> {
+                    switch (action.getType()) {
+                        case ping:
+                        case cardMoved:
+                            this.broadcastMessagesToUsers(messages, true, false, wsId);
+                            return;
+                        default:
+                            this.broadcastMessagesToUsers(messages, true, false, null);
+                            return;
+                    }
+                });
     }
 
     @Override

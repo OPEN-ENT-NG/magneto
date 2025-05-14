@@ -264,4 +264,25 @@ public class MagnetoMessage {
 
         return json;
     }
+
+    @Override
+    public String toString() {
+        return "MagnetoMessage{" +
+                "boardId='" + boardId + '\'' +
+                ", emittedAt=" + emittedAt +
+                ", emittedBy='" + emittedBy + '\'' +
+                ", websocketId='" + websocketId + '\'' +
+                ", type=" + type +
+                ", userId='" + userId + '\'' +
+                ", cardId='" + cardId + '\'' +
+                ", board=" + board +
+                ", card=" + card +
+                ", oldCard=" + oldCard +
+                ", cards=" + cards +
+                ", section=" + section +
+                ", sections=" + sections +
+                ", connectedUsers=" + connectedUsers +
+                ", maxConnectedUsers=" + maxConnectedUsers +
+                '}';
+    }
 }

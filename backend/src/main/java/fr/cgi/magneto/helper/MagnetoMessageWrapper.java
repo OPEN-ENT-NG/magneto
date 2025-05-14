@@ -64,4 +64,14 @@ public class MagnetoMessageWrapper {
     public boolean isNotEmpty(){
         return CollectionUtils.isNotEmpty(this.getMessages());
     }
+
+    @Override
+    public String toString() {
+        return "MagnetoMessageWrapper{" +
+                "messages=" + messages +
+                ", allowInternal=" + allowInternal +
+                ", allowExternal=" + allowExternal +
+                ", exceptWSId='" + exceptWSId + '\'' +
+                '}';
+    }
 }

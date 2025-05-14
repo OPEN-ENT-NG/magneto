@@ -101,6 +101,19 @@ public class MagnetoUserAction {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "MagnetoUserAction{" +
+                "type=" + type +
+                ", cards=" + cards +
+                ", cardId='" + cardId + '\'' +
+                ", card=" + card +
+                ", board=" + board +
+                ", actionType=" + actionType +
+                ", actionId='" + actionId + '\'' +
+                '}';
+    }
+
     public enum ActionType{
         Do, Undo, Redo
     }

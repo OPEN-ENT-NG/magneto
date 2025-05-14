@@ -1,6 +1,7 @@
 package fr.cgi.magneto.controller;
 
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
@@ -76,8 +77,8 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                                 log.warn("Binary is not handled");
                             } else if(frame.isText()){
                                 final String message = frame.textData();
-                                //final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
-                                //this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false).onFailure(th -> this.sendError(th, ws));
+                                final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
+                               // this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false).onFailure(th -> this.sendError(th, ws));
                             } else if(frame.isClose()) {
                                 log.debug("Received a close frame from the user");
                                 onCloseWSConnection(boardId, wsId);

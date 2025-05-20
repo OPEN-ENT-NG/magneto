@@ -1,10 +1,11 @@
 package fr.cgi.magneto.service.impl;
 
-import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
+import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
 import io.vertx.core.Future;
@@ -16,10 +17,12 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static io.vertx.core.http.impl.HttpClientConnection.log;
 
 public class DefaultMagnetoCollaborationService implements MagnetoCollaborationService {
@@ -35,6 +38,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     private RealTimeStatus realTimeStatus;
     private String eventBusAddress;
     private MessageConsumer<JsonObject> eventBusConsumer;
+    private final MagnetoMessageFactory messageFactory;
 
     public DefaultMagnetoCollaborationService(ServiceFactory serviceFactory) {
         this.vertx = serviceFactory.vertx();
@@ -42,6 +46,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.serviceFactory = serviceFactory;
         this.realTimeStatus = RealTimeStatus.STOPPED;
         this.serverId = UUID.randomUUID().toString();
+        this.messageFactory = new MagnetoMessageFactory(serverId);
         this.statusSubscribers = new ArrayList<>();
         this.messagesSubscribers = new ArrayList<>();
         this.publishPeriodInMs = config.getLong("publish-context-period-in-ms", 60000L);
@@ -206,15 +211,15 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         } else {
             try {
                 if (action.isValid()) {
-                    //return executeAction(action, wallId, wsId, user, checkConcurency) TODO
-                    final MagnetoMessage newActionMessage = new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                    return executeAction(action, boardId, wsId, user, checkConcurency);
+                    /*final MagnetoMessage newActionMessage = new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                             MagnetoMessageType.ping, user.getUserId(), null, null, null, null, null, null, null, null,
                             null);
                     final Promise<List<MagnetoMessage>> promise = Promise.promise();
                     List<MagnetoMessage> messages = new ArrayList<>();
                     messages.add(newActionMessage);
                     promise.complete(messages);
-                    return promise.future();
+                    return promise.future();*/
                 } else {
                     return Future.failedFuture("magneto.action.invalid");
                 }
@@ -225,16 +230,90 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     }
 
     @Override
-    public Future<List<MagnetoMessage>> pushEventToAllUsers(final String wallId, final UserInfos session, final MagnetoUserAction action, final boolean checkConcurency) {
-        return pushEvent(wallId, session, action, "", checkConcurency);
+    public Future<List<MagnetoMessage>> executeAction(final MagnetoUserAction action, String boardId, String wsId, final UserInfos user, final boolean checkConcurency) {
+        switch (action.getType()) {
+            // a new client has been dis/connected => message already broadcasted in onNewConnection() / onUserDisconnection()
+            case connection:
+            case disconnection: {
+                return Future.succeededFuture(Collections.emptyList());
+            }
+            case ping: {
+                // client is sending a ping => broadcast to other users
+                return Future.succeededFuture(newArrayList(this.messageFactory.ping(boardId, wsId, user.getUserId())));
+            }
+            case cardAdded: {
+                // client has added a note => upsert then broadcast to other users
+                Card newCard = action.getCard();
+                CardPayload cardPayload = new CardPayload(action.getCard().toJson())
+                        .setOwnerId(user.getUserId())
+                        .setOwnerName(user.getUsername());
+                return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
+                        .map(saved -> newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), newCard, action.getActionType(), action.getActionId())));
+            }
+            /*case cardDeleted: {
+                // client has added a note => delete then broadcast to other users
+                return this.collaborativeWallService.deleteNote(boardId, action.getNoteId(), user, checkConcurency)
+                        .map(deleted -> newArrayList(this.messageFactory.noteDeleted(boardId, wsId, user.getUserId(), action.getNoteId(), deleted, action.getActionType(), action.getActionId())));
+            }
+            case cardEditionStarted: {
+                // add to editing
+                context.getEditing().add(new MagnetoEditingInformation(user.getUserId(), action.getNoteId(), System.currentTimeMillis()));
+                // client has start editing => broadcast to other users
+                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteEditionStarted(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
+            }
+            case cardEditionEnded: {
+                // remove from editing
+                context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
+                // publish meta
+                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteEditionEnded(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
+            }
+            case cardUpdated: {
+                // client has updated the image's note => upsert then broadcast to other users
+                return this.collaborativeWallService.upsertNote(boardId, action.getNote(), user, checkConcurency)
+                        .map(saved -> newArrayList(this.messageFactory.noteUpdated(boardId, wsId, user.getUserId(), saved.oldNote, saved.newNote, action.getActionType(), action.getActionId())));
+            }
+            case cardMoved: {
+                // client has moved the note => DONT patch now => broadcast to other users
+                return Future.succeededFuture(newArrayList(this.messageFactory.noteMoved(boardId, wsId, user.getUserId(), action.getNote(), action.getActionType(), action.getActionId())));
+            }
+            case cardSelected: {
+                // add to editing
+                context.getEditing().add(new MagnetoEditingInformation(user.getUserId(), action.getNoteId(), System.currentTimeMillis()));
+                // client has selected note => broadcast to other users
+                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteSelected(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
+            }
+            case noteUnselected: {
+                // remove from editing
+                context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
+                // client has unselected note => broadcast to other users
+                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteUnselected(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
+            }
+            case wallUpdate: {
+                // client has updated the wall => upsert then broadcast to other users
+                return this.collaborativeWallService.updateWall(boardId, action.getWall(), user)
+                        .map(saved -> newArrayList(this.messageFactory.wallUpdate(boardId, wsId, user.getUserId(), saved, action.getActionType(), action.getActionId())));
+            }
+            case wallDeleted: {
+                // client has deleted the wall => delete then broadcast to other users
+                return this.collaborativeWallService.deleteWall(boardId, user)
+                        .map(saved -> newArrayList(this.messageFactory.wallDeleted(boardId, wsId, user.getUserId(), action.getActionType(), action.getActionId())));
+            }*/
+        }
+        return Future.succeededFuture(Collections.emptyList());
     }
 
     @Override
-    public Future<List<MagnetoMessage>> pushEvent(final String wallId, final UserInfos session, final MagnetoUserAction action, final String wsId, final boolean checkConcurency) {
-        return this.onNewUserAction(action, wallId, wsId, session, checkConcurency)
+    public Future<List<MagnetoMessage>> pushEventToAllUsers(final String boardId, final UserInfos session, final MagnetoUserAction action, final boolean checkConcurency) {
+        return pushEvent(boardId, session, action, "", checkConcurency);
+    }
+
+    @Override
+    public Future<List<MagnetoMessage>> pushEvent(final String boardId, final UserInfos session, final MagnetoUserAction action, final String wsId, final boolean checkConcurency) {
+        return this.onNewUserAction(action, boardId, wsId, session, checkConcurency)
                 .onSuccess(messages -> {
                     switch (action.getType()) {
                         case ping:
+                        case cardAdded:
                         case cardMoved:
                             this.broadcastMessagesToUsers(messages, true, false, wsId);
                             return;
@@ -247,24 +326,22 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     @Override
     public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId) {
-        final MagnetoMessage newUserMessage = new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                MagnetoMessageType.connection, user.getUserId(), null, null, null, null, null, null, null, null,
-                null);
+        final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
         /*return CompositeFuture.all(
-                        this.collaborativeWallService.getWall(wallId),
-                        this.collaborativeWallService.getNotesOfWall(wallId)
+                        this.collaborativeWallService.getWall(boardId),
+                        this.collaborativeWallService.getNotesOfWall(boardId)
                 ).flatMap(wall -> {
-                    final CollaborativeWallUsersMetadata context = metadataByWallId.computeIfAbsent(wallId, k -> new CollaborativeWallUsersMetadata());
+                    final MagnetoUsersMetadata context = metadataByWallId.computeIfAbsent(boardId, k -> new MagnetoUsersMetadata());
                     context.addConnectedUser(user);
                     publishMetadata();
-                    return this.getUsersContext(wallId).map(userContext -> Pair.of(wall, userContext));
+                    return this.getUsersContext(boardId).map(userContext -> Pair.of(wall, userContext));
                 })
                 .map(context -> {
                     final JsonObject wall = context.getKey().resultAt(0);
                     final List<JsonObject> notes = context.getKey().resultAt(1);
-                    final CollaborativeWallUsersMetadata userContext = context.getRight();
-                    return this.messageFactory.metadata(wallId, wsId, user.getUserId(),
-                            new CollaborativeWallMetadata(wall, notes, userContext.getEditing(), userContext.getConnectedUsers()), this.maxConnectedUser);
+                    final MagnetoUsersMetadata userContext = context.getRight();
+                    return this.messageFactory.metadata(boardId, wsId, user.getUserId(),
+                            new MagnetoMetadata(wall, notes, userContext.getEditing(), userContext.getConnectedUsers()), this.maxConnectedUser);
                 })
                 .map(contextMessage -> newArrayList(newUserMessage, contextMessage))
                 .compose(messages -> publishMessagesOnRedis(messages).map(messages));*/

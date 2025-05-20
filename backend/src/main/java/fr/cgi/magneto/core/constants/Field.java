@@ -248,4 +248,5 @@ public class Field {
     public static final String VISIBILITY = "visibility";
     public static final Object PROTECTED = "protected";
     public static final String FILEOWNER = "fileOwner";
+    public static final String DEFAULTTITLE = "Section 1";
 }

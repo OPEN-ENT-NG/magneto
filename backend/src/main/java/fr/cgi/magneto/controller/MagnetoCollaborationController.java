@@ -49,6 +49,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
 
         ws.pause();
         log.info("Handle websocket");
+
         final String sessionId = CookieHelper.getInstance().getSigned(UserAuthFilter.SESSION_ID, ws);
         final Optional<String> maybeBoardId = getBoardId(ws.path());
         if (!maybeBoardId.isPresent()) {

@@ -66,8 +66,10 @@ import {
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
 import { workspaceApi } from "~/services/api/workspace.service";
+import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
+  const { send, isConnected } = useWebSocketManager();
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
   const dispatchRTK = useDispatch();
@@ -149,7 +151,14 @@ export const CreateMagnet: FC = () => {
     if (isEditMagnet) {
       await updateCard(payload);
     } else {
-      await createCard(payload);
+      if (isConnected) {
+        send({
+          type: "cardAdded",
+          card: payload,
+        });
+      } else {
+        await createCard(payload);
+      }
     }
     if (
       payload.resourceType === RESOURCE_TYPE.FILE &&

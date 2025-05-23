@@ -324,7 +324,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         case ping:
                         case cardAdded:
                         case cardMoved:
-                            this.broadcastMessagesToUsers(messages, true, false, wsId);
+                            this.broadcastMessagesToUsers(messages, true, false, null);
                             return;
                         default:
                             this.broadcastMessagesToUsers(messages, true, false, null);

@@ -4,6 +4,7 @@ import {
 } from "@reduxjs/toolkit/query";
 
 import { emptySplitApi } from "./emptySplitApi.service";
+import { createRTKWebSocketIntegration } from "../websocket/useWebSocketManager";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { IBoardItemResponse } from "~/models/board.model";
 import { ICardsResponse } from "~/models/card.model";
@@ -16,6 +17,8 @@ interface BoardsResponse {
 interface SectionsResponse {
   all: Section[];
 }
+
+const rtqWebSocket = createRTKWebSocketIntegration();
 
 export const boardDataApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -93,6 +96,7 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
           };
         }
       },
+      onCacheEntryAdded: rtqWebSocket.createOnCacheEntryAdded("boards"),
       providesTags: ["BoardData"],
     }),
   }),

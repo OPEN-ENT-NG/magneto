@@ -1,5 +1,6 @@
 package fr.cgi.magneto.service.impl;
 
+import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
@@ -241,6 +242,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 // client is sending a ping => broadcast to other users
                 return Future.succeededFuture(newArrayList(this.messageFactory.ping(boardId, wsId, user.getUserId())));
             }
+
             case cardAdded: {
                 // client has added a note => upsert then broadcast to other users
                 Card newCard = action.getCard();
@@ -248,7 +250,14 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
                 return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
-                        .map(saved -> newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), newCard, action.getActionType(), action.getActionId())));
+                        .flatMap(saved -> {
+                            String cardId = saved.getString(Field.ID);
+                            return this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
+                                    .map(cards -> {
+                                        Card updatedCard = cards.isEmpty() ? newCard.setId(cardId) : cards.get(0);
+                                        return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                                    });
+                        });
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users

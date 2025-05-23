@@ -30,8 +30,10 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 
 export const BoardView: FC = () => {
+  useWebSocketConnection();
   const { t } = useTranslation("magneto");
   const sideMenuData = useSideMenuData();
   const {

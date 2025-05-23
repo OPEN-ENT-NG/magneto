@@ -56,6 +56,7 @@ public class ServiceFactory {
         this.boardService = new DefaultBoardService(CollectionsConstant.BOARD_COLLECTION, mongoDb, this);
         this.exportService = new DefaultExportService(this);
         this.magnetoCollaborationService = new DefaultMagnetoCollaborationService(this);
+
     }
 
     public MagnetoService magnetoServiceExample() {

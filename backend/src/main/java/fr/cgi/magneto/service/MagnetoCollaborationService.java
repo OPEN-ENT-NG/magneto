@@ -79,6 +79,8 @@ public interface MagnetoCollaborationService {
 
     Future<List<MagnetoMessage>> onNewUserAction(MagnetoUserAction action, String boardId, String wsId, UserInfos user, boolean checkConcurency);
 
+    Future<List<MagnetoMessage>> executeAction(MagnetoUserAction action, String boardId, String wsId, UserInfos user, boolean checkConcurency);
+
     Future<List<MagnetoMessage>> pushEventToAllUsers(String wallId, UserInfos session, MagnetoUserAction action, boolean checkConcurency);
 
     Future<List<MagnetoMessage>> pushEvent(String wallId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);

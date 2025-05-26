@@ -49,6 +49,13 @@ public class MagnetoMessageFactory {
                 null, null, null, actionType, actionId, null);
     }
 
+    public MagnetoMessage cardUpdated(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.cardUpdated,
+                userId, null, null, card, null, null,
+                null, null, null, actionType, actionId, null);
+    }
+
     /*public MagnetoMessage cardEditionStarted(final String boardId, final String wsId, final String userId, final JsonObject note, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return noteAdded(boardId, wsId, userId, CollaborativeWallNote.fromJson(note), actionType, actionId);
     }
@@ -62,13 +69,6 @@ public class MagnetoMessageFactory {
 
     public MagnetoMessage cardMoved(final String boardId, final String wsId, final String userId, final JsonObject note, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return noteMoved(boardId, wsId, userId, CollaborativeWallNote.fromJson(note), actionType, actionId);
-    }
-
-    public MagnetoMessage cardUpdated(final String boardId, final String wsId, final String userId, final CollaborativeWallNote previousNote, final CollaborativeWallNote newNote, final MagnetoUserAction.ActionType actionType, final String actionId) {
-        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                MagnetoMessageType.cardUpdated,
-                userId, null, null, newNote, null, null,
-                null, null, previousNote, actionType, actionId, null);
     }
 
     public MagnetoMessage cardDeleted(final String boardId, final String wsId, final String userId, final JsonObject previousnote, final JsonObject note, final MagnetoUserAction.ActionType actionType, final String actionId) {

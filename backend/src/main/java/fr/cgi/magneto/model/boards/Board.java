@@ -41,6 +41,10 @@ public class Board implements Model<Board> {
     private boolean isExternal;
     private List<String> sectionsIds;
 
+    public Board(){
+        
+    }
+
     @SuppressWarnings("unchecked")
     public Board(JsonObject board) {
         this._id = board.getString(Field._ID, null);

@@ -1,6 +1,7 @@
 package fr.cgi.magneto.helper;
 
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
+import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
@@ -29,11 +30,11 @@ public class MagnetoMessage {
     private final Section section;
     private final List<Section> sections;
     private final Set<UserInfos> connectedUsers;
-    //private final MagnetoUserAction.ActionType actionType;
-    //private final String actionId;
+    private final MagnetoUserAction.ActionType actionType;
+    private final String actionId;
     private final Long maxConnectedUsers;
 
-    public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, Set<UserInfos> connectedUsers, Long maxConnectedUsers) {
+    public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, Set<UserInfos> connectedUsers, MagnetoUserAction.ActionType actionType, String actionId, Long maxConnectedUsers) {
         this.boardId = boardId;
         this.emittedAt = emittedAt;
         this.emittedBy = emittedBy;
@@ -47,6 +48,8 @@ public class MagnetoMessage {
         this.cards = cards;
         this.section = section;
         this.sections = sections;
+        this.actionType = actionType;
+        this.actionId = actionId;
         this.connectedUsers = connectedUsers;
         this.maxConnectedUsers = maxConnectedUsers;
     }
@@ -139,6 +142,9 @@ public class MagnetoMessage {
                 }
             }
         }
+
+        this.actionType = null;
+        this.actionId = jsonObject.getString("actionId", null);
 
         // Maximum connected users
         this.maxConnectedUsers =  jsonObject.getLong("maxConnectedUsers", null);

@@ -66,7 +66,7 @@ const attemptReconnect = (url: string) => {
 };
 
 const connectWebSocket = (
-  url: string = "ws://localhost:9091/9340ed52-ede0-4a62-a783-a448e0d5729e",
+  url: string = "ws://localhost:9091/",
 ): Promise<void> => {
   if (globalWebSocketState.connectionPromise) {
     return globalWebSocketState.connectionPromise;

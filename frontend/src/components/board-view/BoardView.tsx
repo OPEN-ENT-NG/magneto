@@ -33,7 +33,6 @@ import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 
 export const BoardView: FC = () => {
-  useWebSocketConnection();
   const { t } = useTranslation("magneto");
   const sideMenuData = useSideMenuData();
   const {
@@ -61,6 +60,7 @@ export const BoardView: FC = () => {
     mediaLibraryHandlers,
   } = useMediaLibrary();
   const { appCode } = useEdificeClient();
+  useWebSocketConnection("ws://localhost:9091/" + board.id);
 
   useEffect(() => {
     document.documentElement.style.setProperty(

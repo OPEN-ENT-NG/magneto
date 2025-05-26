@@ -27,11 +27,9 @@ const globalWebSocketState: WebSocketState = {
 const MAX_RECONNECT_ATTEMPTS = 5;
 
 const handleMessage = (message: any) => {
-  const { type, boardId } = message;
-
   // Pour les actions liées à un board, on route vers boards:boardId
-  if (boardId) {
-    const subscriptionKey = `boards:${boardId}`;
+  if (message.boardId) {
+    const subscriptionKey = `boards:${message.boardId}`;
     const subscribers = globalWebSocketState.subscriptions.get(subscriptionKey);
 
     if (subscribers) {
@@ -366,7 +364,7 @@ const applyUserUpdate = (draft: any, update: any) => {
   }
 };
 
-const handleCardMove = (draft: any, moveData: any) => {
+/*const handleCardMove = (draft: any, moveData: any) => {
   // Implémentation du déplacement de cartes entre sections
   const { cardId, fromSectionId, toSectionId, newPosition } = moveData;
 
@@ -386,4 +384,4 @@ const handleCardMove = (draft: any, moveData: any) => {
       }
     }
   }
-};
+};*/

@@ -523,7 +523,7 @@ public class DefaultCardService implements CardService {
                                 }
                             } else {
                                 SectionPayload createSection = new SectionPayload(boardPayload.getId())
-                                        .setTitle(i18n.translate("magneto.section.default.title"));
+                                        .setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
                                 createSection.addCardIds(Collections.singletonList(newId));
                                 String newSectionId = UUID.randomUUID().toString();
                                 boardPayload.addSection(newSectionId);

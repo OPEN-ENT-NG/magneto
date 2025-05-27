@@ -5,7 +5,7 @@ public enum MagnetoMessageType {
     metadata,
     disconnection,
     ping,
-    boardUpdate,
+    boardUpdated,
     cardAdded,
     cardEditionStarted,
     cardUpdated,

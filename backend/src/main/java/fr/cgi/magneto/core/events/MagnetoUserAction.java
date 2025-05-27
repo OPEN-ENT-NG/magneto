@@ -55,6 +55,8 @@ public class MagnetoUserAction {
         return card;
     }
 
+    public Board getBoard() { return board; }
+
     public ActionType getActionType() {
         return actionType;
     }
@@ -91,7 +93,7 @@ public class MagnetoUserAction {
                 }
                 break;
             }
-            case boardUpdate:{
+            case boardUpdated:{
                 if(this.board == null){
                     throw new ValidationException("wall.action.wall.missing");
                 }

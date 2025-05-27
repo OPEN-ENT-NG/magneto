@@ -1,11 +1,13 @@
 package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
+import fr.cgi.magneto.helper.WorkflowHelper;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -230,18 +232,15 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     @Override
     public Future<List<MagnetoMessage>> executeAction(final MagnetoUserAction action, String boardId, String wsId, final UserInfos user, final boolean checkConcurency) {
         switch (action.getType()) {
-            // a new client has been dis/connected => message already broadcasted in onNewConnection() / onUserDisconnection()
             case connection:
             case disconnection: {
                 return Future.succeededFuture(Collections.emptyList());
             }
             case ping: {
-                // client is sending a ping => broadcast to other users
                 return Future.succeededFuture(newArrayList(this.messageFactory.ping(boardId, wsId, user.getUserId())));
             }
 
             case cardAdded: {
-                // client has added a note => upsert then broadcast to other users
                 Card newCard = action.getCard();
                 CardPayload cardPayload = new CardPayload(action.getCard().toJson())
                         .setOwnerId(user.getUserId())
@@ -257,7 +256,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         });
             }
             case cardUpdated: {
-                // client has updated the image's note => upsert then broadcast to other users
                 CardPayload updateCard = new CardPayload(action.getCard().toJson())
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
@@ -273,6 +271,27 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             return this.serviceFactory.boardService().update(boardToUpdate);
                         })
                         .map(saved -> newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), new Card(updateCard.toJson()), action.getActionType(), action.getActionId())));
+            }
+            case boardUpdated: {
+                return this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
+                        .compose(boards -> {
+                            boolean hasCommRight = WorkflowHelper.hasRight(user, Rights.COMMENT_BOARD);
+                            JsonObject board = action.getBoard().toJson();
+                            if (!hasCommRight) {
+                                board.remove(Field.CANCOMMENT);
+                            }
+                            boolean hasDisplayNbFavoritesRight = WorkflowHelper.hasRight(user, Rights.DISPLAY_NB_FAVORITES);
+                            if (!hasDisplayNbFavoritesRight) {
+                                board.remove(Field.DISPLAY_NB_FAVORITES);
+                            }
+                            BoardPayload updateBoard = new BoardPayload(board)
+                                    .setId(boardId)
+                                    .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+                            Board currentBoard = boards.get(0);
+                            return this.serviceFactory.boardService().updateLayoutCards(updateBoard, currentBoard, null, user)
+                                    .compose(boardUpdated -> this.serviceFactory.boardService().update(new BoardPayload(boardUpdated))
+                                            .map(result -> newArrayList(this.messageFactory.boardUpdated(boardId, wsId, user.getUserId(), new Board(boardUpdated), action.getActionType(), action.getActionId()))));
+                        });
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users
@@ -306,11 +325,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
                 // client has unselected note => broadcast to other users
                 return publishMetadata().map(published -> newArrayList(this.messageFactory.noteUnselected(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
-            }
-            case wallUpdate: {
-                // client has updated the wall => upsert then broadcast to other users
-                return this.collaborativeWallService.updateWall(boardId, action.getWall(), user)
-                        .map(saved -> newArrayList(this.messageFactory.wallUpdate(boardId, wsId, user.getUserId(), saved, action.getActionType(), action.getActionId())));
             }
             case wallDeleted: {
                 // client has deleted the wall => delete then broadcast to other users

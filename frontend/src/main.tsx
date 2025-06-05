@@ -59,7 +59,7 @@ root.render(
           app: "magneto",
         }}
       >
-        <EdificeThemeProvider defaultTheme="neo">
+        <EdificeThemeProvider>
           <ThemeProvider themeId={themePlatform ?? "default"}>
             <MediaLibraryProvider>
               <RouterProvider router={router} />

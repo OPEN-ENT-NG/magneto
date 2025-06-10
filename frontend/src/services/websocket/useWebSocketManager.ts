@@ -9,7 +9,7 @@ export interface WebSocketSubscription {
 
 interface WebSocketState {
   socket: WebSocket | null;
-  subscriptions: Record<string, WebSocketSubscription[]>; // Changé de Map vers Record
+  subscriptions: Map<string, WebSocketSubscription[]>;
   isConnected: boolean;
   reconnectAttempts: number;
   connectionPromise: Promise<void> | null;
@@ -18,7 +18,7 @@ interface WebSocketState {
 // Store global partagé (sans classe)
 const globalWebSocketState: WebSocketState = {
   socket: null,
-  subscriptions: {}, // Changé de new Map() vers {}
+  subscriptions: new Map(),
   isConnected: false,
   reconnectAttempts: 0,
   connectionPromise: null,
@@ -27,38 +27,13 @@ const globalWebSocketState: WebSocketState = {
 const MAX_RECONNECT_ATTEMPTS = 5;
 
 const handleMessage = (message: any) => {
-  console.log("Handling message:", message);
-
   // Pour les actions liées à un board, on route vers boards:boardId
   if (message.boardId) {
     const subscriptionKey = `boards:${message.boardId}`;
-    console.log(`Looking for subscribers for key: ${subscriptionKey}`);
-
-    // Debug de l'état des subscriptions
-    console.log(
-      "Available subscription keys:",
-      Array.from(globalWebSocketState.subscriptions.keys()),
-    );
-    console.log(
-      "Total subscriptions count:",
-      globalWebSocketState.subscriptions.size,
-    );
-
     const subscribers = globalWebSocketState.subscriptions.get(subscriptionKey);
-    console.log(
-      `Found ${
-        subscribers ? subscribers.length : 0
-      } subscribers for ${subscriptionKey}`,
-    );
 
     if (subscribers) {
-      console.log(`Notifying ${subscribers.length} subscribers`);
-      subscribers.forEach((sub, index) => {
-        console.log(`Calling handler ${index} for subscription ${sub.id}`);
-        sub.handler(message);
-      });
-    } else {
-      console.warn(`No subscribers found for ${subscriptionKey}`);
+      subscribers.forEach((sub) => sub.handler(message));
     }
 
     // Également notifier les subscribers génériques pour boards
@@ -66,11 +41,8 @@ const handleMessage = (message: any) => {
     const genericSubscribers =
       globalWebSocketState.subscriptions.get(genericKey);
     if (genericSubscribers) {
-      console.log(`Notifying ${genericSubscribers.length} generic subscribers`);
       genericSubscribers.forEach((sub) => sub.handler(message));
     }
-  } else {
-    console.log("Message has no boardId, skipping routing");
   }
 };
 
@@ -106,7 +78,6 @@ const connectWebSocket = (
         console.log("WebSocket connected");
         globalWebSocketState.isConnected = true;
         globalWebSocketState.reconnectAttempts = 0;
-        // NE PAS réinitialiser les subscriptions ici !
         resolve();
       };
 
@@ -119,7 +90,6 @@ const connectWebSocket = (
         console.log("WebSocket disconnected");
         globalWebSocketState.isConnected = false;
         globalWebSocketState.connectionPromise = null;
-        // NE PAS réinitialiser les subscriptions lors de la déconnexion !
         attemptReconnect(url);
       };
 
@@ -133,61 +103,6 @@ const connectWebSocket = (
   });
 
   return globalWebSocketState.connectionPromise;
-};
-
-// Version modifiée pour supporter le boardId
-export const createRTKWebSocketIntegration = (boardId?: string) => {
-  const ensureConnection = async () => {
-    // Construire l'URL avec le boardId si fourni
-    const url = boardId
-      ? `ws://localhost:9091/?boardId=${boardId}`
-      : "ws://localhost:9091/";
-    await connectWebSocket(url);
-  };
-
-  const createOnCacheEntryAdded =
-    (resource: string, resourceId?: string) =>
-    async (
-      arg: any,
-      { updateCachedData, cacheDataLoaded, cacheEntryRemoved }: any,
-    ) => {
-      // Attendre que le cache soit chargé et que la connexion soit établie
-      await Promise.all([cacheDataLoaded, ensureConnection()]);
-
-      const targetResourceId =
-        resourceId || arg.boardId || arg.cardId || arg.userId || "all";
-
-      console.log(`Subscribing to ${resource}:${targetResourceId}`);
-
-      // Utiliser directement la fonction subscribe globale
-      const unsubscribe = subscribeToWebSocket(
-        resource,
-        targetResourceId,
-        (update) => {
-          console.log(
-            `Received update for ${resource}:${targetResourceId}`,
-            update,
-          );
-          updateCachedData((draft: any) => {
-            applyUpdateToDraft(draft, update, resource);
-          });
-        },
-      );
-
-      // Debug: vérifier les subscriptions
-      console.log("Current subscriptions:", globalWebSocketState.subscriptions);
-
-      // Attendre que le cache soit supprimé AVANT d'unsubscribe
-      try {
-        await cacheEntryRemoved;
-      } finally {
-        // Cleanup: unsubscribe quand le cache est supprimé
-        console.log(`Unsubscribing from ${resource}:${targetResourceId}`);
-        unsubscribe();
-      }
-    };
-
-  return { createOnCacheEntryAdded };
 };
 
 export const useWebSocketManager = () => {
@@ -205,20 +120,22 @@ export const useWebSocketManager = () => {
         handler,
       };
 
-      if (!globalWebSocketState.subscriptions[subscriptionKey]) {
-        globalWebSocketState.subscriptions[subscriptionKey] = [];
+      if (!globalWebSocketState.subscriptions.has(subscriptionKey)) {
+        globalWebSocketState.subscriptions.set(subscriptionKey, []);
       }
 
-      globalWebSocketState.subscriptions[subscriptionKey].push(subscription);
+      globalWebSocketState.subscriptions
+        .get(subscriptionKey)!
+        .push(subscription);
 
       return () => {
-        const subs = globalWebSocketState.subscriptions[subscriptionKey];
+        const subs = globalWebSocketState.subscriptions.get(subscriptionKey);
         if (subs) {
           const index = subs.findIndex((s) => s.id === subscriptionId);
           if (index !== -1) {
             subs.splice(index, 1);
             if (subs.length === 0) {
-              delete globalWebSocketState.subscriptions[subscriptionKey];
+              globalWebSocketState.subscriptions.delete(subscriptionKey);
             }
           }
         }
@@ -236,8 +153,7 @@ export const useWebSocketManager = () => {
     globalWebSocketState.socket = null;
     globalWebSocketState.isConnected = false;
     globalWebSocketState.connectionPromise = null;
-    // Ne vider les subscriptions que lors d'une déconnexion volontaire
-    globalWebSocketState.subscriptions = {};
+    globalWebSocketState.subscriptions.clear();
   }, []);
 
   const send = useCallback((message: any) => {
@@ -268,6 +184,40 @@ export const useWebSocketConnection = (url?: string) => {
   }, [connect, disconnect, url]);
 };
 
+export const createRTKWebSocketIntegration = () => {
+  const ensureConnection = async () => {
+    await connectWebSocket();
+  };
+
+  const createOnCacheEntryAdded =
+    (resource: string, resourceId?: string) =>
+    async (
+      arg: any,
+      { updateCachedData, cacheDataLoaded, cacheEntryRemoved }: any,
+    ) => {
+      await Promise.all([cacheDataLoaded, ensureConnection()]);
+
+      const targetResourceId =
+        resourceId || arg.boardId || arg.cardId || arg.userId || "all";
+
+      // Utiliser directement la fonction subscribe globale
+      const unsubscribe = subscribeToWebSocket(
+        resource,
+        targetResourceId,
+        (update) => {
+          updateCachedData((draft: any) => {
+            applyUpdateToDraft(draft, update, resource);
+          });
+        },
+      );
+
+      await cacheEntryRemoved;
+      unsubscribe();
+    };
+
+  return { createOnCacheEntryAdded };
+};
+
 // Fonction globale pour subscribe (sans hook)
 const subscribeToWebSocket = (
   resource: string,
@@ -282,48 +232,22 @@ const subscribeToWebSocket = (
     handler,
   };
 
-  console.log(
-    `Creating subscription: ${subscriptionKey} with ID: ${subscriptionId}`,
-  );
-
   if (!globalWebSocketState.subscriptions.has(subscriptionKey)) {
     globalWebSocketState.subscriptions.set(subscriptionKey, []);
-    console.log(`Created new subscription array for: ${subscriptionKey}`);
   }
 
-  const subscriptions =
-    globalWebSocketState.subscriptions.get(subscriptionKey)!;
-  subscriptions.push(subscription);
-
-  console.log(
-    `Added subscription. Total for ${subscriptionKey}: ${subscriptions.length}`,
-  );
-  console.log(
-    "Current subscription keys:",
-    Array.from(globalWebSocketState.subscriptions.keys()),
-  );
+  globalWebSocketState.subscriptions.get(subscriptionKey)!.push(subscription);
 
   return () => {
-    console.log(`Unsubscribing: ${subscriptionId}`);
     const subs = globalWebSocketState.subscriptions.get(subscriptionKey);
     if (subs) {
       const index = subs.findIndex((s) => s.id === subscriptionId);
       if (index !== -1) {
         subs.splice(index, 1);
-        console.log(
-          `Removed subscription ${subscriptionId}. Remaining: ${subs.length}`,
-        );
         if (subs.length === 0) {
           globalWebSocketState.subscriptions.delete(subscriptionKey);
-          console.log(`Deleted empty subscription key: ${subscriptionKey}`);
         }
-      } else {
-        console.warn(
-          `Subscription ${subscriptionId} not found for unsubscribe`,
-        );
       }
-    } else {
-      console.warn(`No subscriptions found for key: ${subscriptionKey}`);
     }
   };
 };
@@ -422,16 +346,6 @@ const applyBoardUpdate = (draft: any, update: any) => {
       break;
     }
 
-    case "boardUpdated": {
-      if (draft.board && update.board) {
-        draft.board = {
-          ...draft.board,
-          ...update.board,
-        };
-      }
-      break;
-    }
-
     // ... autres cases existants
   }
 };
@@ -449,3 +363,25 @@ const applyUserUpdate = (draft: any, update: any) => {
     Object.assign(draft, update.data);
   }
 };
+
+/*const handleCardMove = (draft: any, moveData: any) => {
+  // Implémentation du déplacement de cartes entre sections
+  const { cardId, fromSectionId, toSectionId, newPosition } = moveData;
+
+  if (draft.sections) {
+    const fromSection = draft.sections.find(
+      (s: any) => s._id === fromSectionId,
+    );
+    const toSection = draft.sections.find((s: any) => s._id === toSectionId);
+
+    if (fromSection && toSection) {
+      const cardIndex = fromSection.cards.findIndex(
+        (c: any) => c.id === cardId,
+      );
+      if (cardIndex !== -1) {
+        const [card] = fromSection.cards.splice(cardIndex, 1);
+        toSection.cards.splice(newPosition, 0, card);
+      }
+    }
+  }
+};*/

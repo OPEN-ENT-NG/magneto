@@ -28,6 +28,7 @@ import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
+import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -50,6 +51,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
   const { id = "" } = useParams();
+  useWebSocketConnection("ws://localhost:9091/" + id);
   const {
     data: boardData,
     isLoading,

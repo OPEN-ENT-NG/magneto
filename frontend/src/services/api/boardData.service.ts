@@ -18,6 +18,8 @@ interface SectionsResponse {
   all: Section[];
 }
 
+const rtqWebSocket = createRTKWebSocketIntegration();
+
 export const boardDataApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
     getBoardData: builder.query<
@@ -94,28 +96,7 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
           };
         }
       },
-      // Créer l'intégration WebSocket dynamiquement avec le boardId de l'argument
-      onCacheEntryAdded: async (
-        arg: { boardId: string; isExternal?: boolean },
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
-      ) => {
-        console.log("Coucou, ", arg);
-        // Créer l'intégration WebSocket avec le boardId spécifique
-        const rtqWebSocket = createRTKWebSocketIntegration(arg.boardId);
-
-        // Utiliser la fonction créée avec le boardId
-        const onCacheEntryAdded = rtqWebSocket.createOnCacheEntryAdded(
-          "boards",
-          arg.boardId,
-        );
-
-        // Appeler la fonction avec les bons paramètres
-        return onCacheEntryAdded(arg, {
-          updateCachedData,
-          cacheDataLoaded,
-          cacheEntryRemoved,
-        });
-      },
+      onCacheEntryAdded: rtqWebSocket.createOnCacheEntryAdded("boards"),
       providesTags: ["BoardData"],
     }),
   }),

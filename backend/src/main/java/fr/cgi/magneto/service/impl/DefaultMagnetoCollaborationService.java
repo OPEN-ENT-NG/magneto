@@ -3,24 +3,21 @@ package fr.cgi.magneto.service.impl;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
+import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
+import fr.cgi.magneto.model.boards.Board;
+import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -259,6 +256,24 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     });
                         });
             }
+            case cardUpdated: {
+                // client has updated the image's note => upsert then broadcast to other users
+                CardPayload updateCard = new CardPayload(action.getCard().toJson())
+                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
+                        .setLastModifierId(user.getUserId())
+                        .setLastModifierName(user.getUsername());
+                Future<JsonObject> updateCardFuture = this.serviceFactory.cardService().update(updateCard);
+                Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(updateCard.getBoardId()));
+                CompositeFuture.all(updateCardFuture, getBoardFuture)
+                        .compose(result -> {
+                            Board currentBoard = getBoardFuture.result().get(0);
+                            BoardPayload boardToUpdate = new BoardPayload()
+                                    .setId(currentBoard.getId())
+                                    .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+                            return this.serviceFactory.boardService().update(boardToUpdate);
+                        })
+                        .map(saved -> newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), new Card(updateCard.toJson()), action.getActionType(), action.getActionId())));
+            }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users
                 return this.collaborativeWallService.deleteNote(boardId, action.getNoteId(), user, checkConcurency)
@@ -275,11 +290,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
                 // publish meta
                 return publishMetadata().map(published -> newArrayList(this.messageFactory.noteEditionEnded(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
-            }
-            case cardUpdated: {
-                // client has updated the image's note => upsert then broadcast to other users
-                return this.collaborativeWallService.upsertNote(boardId, action.getNote(), user, checkConcurency)
-                        .map(saved -> newArrayList(this.messageFactory.noteUpdated(boardId, wsId, user.getUserId(), saved.oldNote, saved.newNote, action.getActionType(), action.getActionId())));
             }
             case cardMoved: {
                 // client has moved the note => DONT patch now => broadcast to other users

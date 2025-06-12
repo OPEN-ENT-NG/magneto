@@ -299,10 +299,10 @@ const applyBoardUpdate = (draft: any, update: any) => {
           (c: any) => c.id === update.card.id,
         );
         if (cardIndex !== -1) {
-          draft.cards[cardIndex] = {
-            ...draft.cards[cardIndex],
-            ...update.card,
-          };
+          const filteredUpdate = Object.fromEntries(
+            Object.entries(update.card).filter(([, value]) => value !== null),
+          );
+          Object.assign(draft.cards[cardIndex], filteredUpdate);
         }
       }
       // Aussi checker dans les sections
@@ -313,10 +313,12 @@ const applyBoardUpdate = (draft: any, update: any) => {
               (c: any) => c.id === update.card.id,
             );
             if (cardIndex !== -1) {
-              section.cards[cardIndex] = {
-                ...section.cards[cardIndex],
-                ...update.card,
-              };
+              const filteredUpdate = Object.fromEntries(
+                Object.entries(update.card).filter(
+                  ([, value]) => value !== null,
+                ),
+              );
+              Object.assign(section.cards[cardIndex], filteredUpdate);
             }
           }
         });

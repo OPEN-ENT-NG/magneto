@@ -30,7 +30,6 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -60,7 +59,6 @@ export const BoardView: FC = () => {
     mediaLibraryHandlers,
   } = useMediaLibrary();
   const { appCode } = useEdificeClient();
-  useWebSocketConnection("ws://localhost:9091/" + board.id);
 
   useEffect(() => {
     document.documentElement.style.setProperty(

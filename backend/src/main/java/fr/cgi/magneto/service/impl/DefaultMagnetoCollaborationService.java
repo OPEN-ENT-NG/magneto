@@ -257,12 +257,13 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             }
             case cardUpdated: {
                 CardPayload updateCard = new CardPayload(action.getCard().toJson())
+                        .setId(action.getCard().getId())
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());
                 Future<JsonObject> updateCardFuture = this.serviceFactory.cardService().update(updateCard);
                 Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(updateCard.getBoardId()));
-                CompositeFuture.all(updateCardFuture, getBoardFuture)
+                return CompositeFuture.all(updateCardFuture, getBoardFuture)
                         .compose(result -> {
                             Board currentBoard = getBoardFuture.result().get(0);
                             BoardPayload boardToUpdate = new BoardPayload()
@@ -270,7 +271,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
                             return this.serviceFactory.boardService().update(boardToUpdate);
                         })
-                        .map(saved -> newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), new Card(updateCard.toJson()), action.getActionType(), action.getActionId())));
+                        .map(saved -> newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), new Card(updateCard.toJson()).setId(updateCard.getId()), action.getActionType(), action.getActionId())));
             }
             case boardUpdated: {
                 return this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
@@ -348,6 +349,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         case ping:
                         case cardAdded:
                         case cardMoved:
+                        case cardUpdated:
                             this.broadcastMessagesToUsers(messages, true, false, null);
                             return;
                         default:

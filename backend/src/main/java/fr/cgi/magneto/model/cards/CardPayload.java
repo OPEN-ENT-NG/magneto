@@ -245,6 +245,7 @@ public class CardPayload implements Model<CardPayload> {
     public JsonObject toJson() {
 
         JsonObject json = new JsonObject()
+                .put(Field.ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.RESOURCETYPE, this.getResourceType())
                 .put(Field.RESOURCEID, this.getResourceId())

@@ -149,7 +149,14 @@ export const CreateMagnet: FC = () => {
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
     };
     if (isEditMagnet) {
-      await updateCard(payload);
+      if (isConnected) {
+        send({
+          type: "cardUpdated",
+          card: payload,
+        });
+      } else {
+        await updateCard(payload);
+      }
     } else {
       if (isConnected) {
         send({

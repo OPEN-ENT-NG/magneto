@@ -348,6 +348,24 @@ const applyBoardUpdate = (draft: any, update: any) => {
       break;
     }
 
+    case "sectionUpdated": {
+      // Gérer la mise à jour d'une carte existante
+      if (draft.section) {
+        const sectionIndex = draft.sections.findIndex(
+          (c: any) => c.id === update.card.id,
+        );
+        if (sectionIndex !== -1) {
+          const filteredUpdate = Object.fromEntries(
+            Object.entries(update.section).filter(
+              ([, value]) => value !== null,
+            ),
+          );
+          Object.assign(draft.sections[sectionIndex], filteredUpdate);
+        }
+      }
+      break;
+    }
+
     // ... autres cases existants
   }
 };

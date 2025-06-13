@@ -20,11 +20,13 @@ import {
   useFavoriteCardMutation,
   useDeleteCardsMutation,
 } from "~/services/api/cards.service";
+import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const useBoardCard = (card: Card) => {
   const [updateCard] = useUpdateCardMutation();
   const [favoriteCard] = useFavoriteCardMutation();
   const [deleteCards] = useDeleteCardsMutation();
+  const { send, isConnected } = useWebSocketManager();
 
   const {
     board,
@@ -130,7 +132,14 @@ export const useBoardCard = (card: Card) => {
   }, [card.id, board.id, deleteCards, closeActiveCardAction]);
 
   const handleFavoriteClick = useCallback(() => {
-    favoriteCard({ cardId: card.id, isFavorite: card.liked });
+    if (isConnected) {
+      send({
+        type: "cardFavorite",
+        card: { id: card.id, isLiked: card.liked },
+      });
+    } else {
+      favoriteCard({ cardId: card.id, isFavorite: card.liked });
+    }
   }, [card.id, card.liked, favoriteCard]);
 
   const hasEditRights = useMemo(() => hasEditRightsFn(), [hasEditRightsFn]);

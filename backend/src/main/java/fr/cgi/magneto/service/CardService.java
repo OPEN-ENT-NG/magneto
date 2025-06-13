@@ -79,6 +79,9 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing list of deleted cards
      */
     Future<JsonObject> deleteCards(String userId, List<String> cardIds);
+
+    Future<JsonObject> updateAndReturnPayload(CardPayload card);
+
     Future<JsonObject> deleteCards(List<String> cardIds);
 
     /**
@@ -181,9 +184,10 @@ public interface CardService {
      * @param cardId   The id of the card we want to update
      * @param favorite The new favorite status
      * @param user     {@link UserInfos} User info
+     *  @param returnPayload Return or not the card payload
      * @return Future {@link Future <JsonObject>} containing the id of the updated card
      */
-    Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user);
+    Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user, boolean returnPayload);
 
     /**
      * Duplicate a section (mainly its cards)

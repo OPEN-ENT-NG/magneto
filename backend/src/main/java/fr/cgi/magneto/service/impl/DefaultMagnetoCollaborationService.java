@@ -8,6 +8,7 @@ import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.helper.WorkflowHelper;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -293,6 +294,17 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     .compose(boardUpdated -> this.serviceFactory.boardService().update(new BoardPayload(boardUpdated))
                                             .map(result -> newArrayList(this.messageFactory.boardUpdated(boardId, wsId, user.getUserId(), new Board(boardUpdated), action.getActionType(), action.getActionId()))));
                         });
+            }
+            case sectionUpdated: {
+                SectionPayload updateSection = new SectionPayload(action.getSection().toJson())
+                        .setId(action.getSection().getId());
+                return serviceFactory.sectionService().update(updateSection)
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::updateSection] Failed to update section : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                        })
+                        .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), action.getSection(), action.getActionType(), action.getActionId())));
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users

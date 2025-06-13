@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import org.entcore.common.validation.ValidationException;
@@ -19,6 +20,7 @@ public class MagnetoUserAction {
     private final String cardId;
     private final Card card;
     private final Board board;
+    private final Section section;
     private final ActionType actionType;
     private final String actionId;
 
@@ -28,6 +30,7 @@ public class MagnetoUserAction {
                                        @JsonProperty("cardId") final String cardId,
                                        @JsonProperty("card") final Card card,
                                        @JsonProperty("board") final Board board,
+                                       @JsonProperty("section") final Section section,
                                        @JsonProperty("actionType") final ActionType actionType,
                                        @JsonProperty("actionId") final String actionId) {
         this.type = type;
@@ -35,6 +38,7 @@ public class MagnetoUserAction {
         this.cardId = cardId;
         this.card = card;
         this.board = board;
+        this.section = section;
         this.actionType = actionType;
         this.actionId = actionId;
     }
@@ -56,6 +60,8 @@ public class MagnetoUserAction {
     }
 
     public Board getBoard() { return board; }
+
+    public Section getSection() { return section; }
 
     public ActionType getActionType() {
         return actionType;
@@ -89,13 +95,19 @@ public class MagnetoUserAction {
             case cardEditionStarted:
             case cardEditionEnded:{
                 if(this.cardId == null){
-                    throw new ValidationException("magneto.action.noteId.missing");
+                    throw new ValidationException("magneto.action.cardId.missing");
                 }
                 break;
             }
             case boardUpdated:{
                 if(this.board == null){
-                    throw new ValidationException("wall.action.wall.missing");
+                    throw new ValidationException("magneto.action.board.missing");
+                }
+                break;
+            }
+            case sectionUpdated:{
+                if (this.section == null){
+                    throw new ValidationException("magneto.action.section.missing");
                 }
                 break;
             }

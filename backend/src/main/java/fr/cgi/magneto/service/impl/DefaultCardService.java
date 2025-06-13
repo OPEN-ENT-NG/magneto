@@ -585,6 +585,24 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
+    public Future<JsonObject> updateAndReturnPayload(CardPayload card) {
+        Promise<JsonObject> promise = Promise.promise();
+        JsonObject query = new JsonObject()
+                .put(Field._ID, card.getId());
+        JsonObject update = new JsonObject().put(Mongo.SET, card.toJson());
+        mongoDb.update(this.collection, query, update, MongoDbResult.validActionResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::update] Failed to update card", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+            promise.complete(card.toJson());
+        }));
+        return promise.future();
+    }
+
+    @Override
     public Future<JsonObject> deleteCards(List<String> cardIds) {
         return this.deleteCards(null, cardIds);
     }
@@ -885,7 +903,7 @@ public class DefaultCardService implements CardService {
         return this.serviceFactory.boardService().update(board);
     }
 
-    public Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user) {
+    public Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user, boolean returnPayload) {
         Promise<JsonObject> promise = Promise.promise();
         String userId = user.getUserId();
         if (cardId == null || userId == null) {
@@ -915,7 +933,7 @@ public class DefaultCardService implements CardService {
                         // Update card in database
                         CardPayload cardPayload = new CardPayload(card.toJson());
                         cardPayload.setId(cardId);
-                        return update(cardPayload);
+                        return returnPayload ? updateAndReturnPayload(cardPayload) : update(cardPayload);
                     } else {
                         return Future.failedFuture("No card found with id " + cardId);
                     }

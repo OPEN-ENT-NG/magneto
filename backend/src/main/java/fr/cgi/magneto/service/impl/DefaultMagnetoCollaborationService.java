@@ -4,6 +4,7 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
+import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
@@ -305,6 +306,27 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             log.error(message);
                         })
                         .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), action.getSection(), action.getActionType(), action.getActionId())));
+            }
+            case cardFavorite: {
+                String cardId = action.getCard().getId();
+                boolean favorite = action.getCard().isLiked();
+                if(user == null){
+                    BadRequestException noUser = new BadRequestException("User not found");
+                    String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
+                            this.getClass().getSimpleName(), noUser.getMessage());
+                    log.error(message);
+                }
+                return serviceFactory.cardService().updateFavorite(cardId, favorite, user, true)
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                        })
+                        .flatMap(saved -> this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
+                                .map(cards -> {
+                                    Card updatedCard = cards.isEmpty() ? action.getCard() : cards.get(0);
+                                    return newArrayList(this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                                }));
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users

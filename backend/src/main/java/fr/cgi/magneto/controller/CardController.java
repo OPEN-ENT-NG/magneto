@@ -243,7 +243,7 @@ public class CardController extends ControllerHelper {
                     log.error(message);
                     HttpRequestHelper.sendError(request, new BadRequestException("User not found"));
                 }
-                cardService.updateFavorite(cardId, favorite, user)
+                cardService.updateFavorite(cardId, favorite, user, false)
                         .onSuccess(res -> renderJson(request, res))
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",

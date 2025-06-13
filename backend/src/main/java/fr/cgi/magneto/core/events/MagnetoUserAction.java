@@ -85,6 +85,7 @@ public class MagnetoUserAction {
             }
             case cardAdded:
             case cardMoved:
+            case cardFavorite:
             case cardUpdated: {
                 if(this.card == null){
                     throw new ValidationException("magneto.action.note.missing");

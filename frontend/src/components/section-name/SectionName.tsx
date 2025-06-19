@@ -27,8 +27,10 @@ import {
   useCreateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
+import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
+  const { send, isConnected } = useWebSocketManager();
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const toast = useToast();
@@ -76,12 +78,25 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     }
     if (section?._id !== "new-section") {
       if (section.title === inputValue) return;
-      return updateSectionAndToast({
-        boardId,
-        id: section?._id,
-        title: inputValue,
-        cardIds: section.cardIds,
-      });
+      if (isConnected) {
+        send({
+          type: "sectionUpdated",
+          section: {
+            boardId,
+            id: section?._id,
+            title: inputValue,
+            cardIds: section.cardIds,
+          },
+        });
+        return;
+      } else {
+        return updateSectionAndToast({
+          boardId,
+          id: section?._id,
+          title: inputValue,
+          cardIds: section.cardIds,
+        });
+      }
     }
     try {
       await createSectionAndToast({

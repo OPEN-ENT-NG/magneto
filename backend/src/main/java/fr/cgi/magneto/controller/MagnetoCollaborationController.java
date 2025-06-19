@@ -137,13 +137,6 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
             final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
             final List<Future<Void>> writeMessagesPromise = wsIdToWs.entrySet().stream()
                     .filter(e -> !e.getKey().equals(exceptWsId))
-                    .filter(e -> {
-                        if (message.hasSpecificTargets()) {
-                            String userId = getUserIdFromWsId(e.getKey());
-                            return message.getTargetUserIds().contains(userId);
-                        }
-                        return true; // Si pas de cible spécifique, envoyer à tous
-                    })
                     .map(Map.Entry::getValue)
                     .filter(ws -> !ws.isClosed())
                     .map(ws -> {

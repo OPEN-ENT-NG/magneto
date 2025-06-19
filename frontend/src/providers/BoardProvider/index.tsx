@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { RightRole } from "@edifice.io/client";
+import { isActionAvailable, RightRole } from "@edifice.io/client";
 import { checkUserRight, useEdificeClient } from "@edifice.io/react";
 import { useParams } from "react-router-dom";
 
@@ -29,6 +29,8 @@ import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
 import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
+import { useActions } from "~/services/queries";
+import { workflowName } from "~/config";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -51,7 +53,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
   const { id = "" } = useParams();
-  useWebSocketConnection("ws://localhost:9091/" + id);
+  const { data: actions } = useActions();
+  const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
+  useWebSocketConnection("ws://localhost:9091/" + id, canSynchronous);
   const {
     data: boardData,
     isLoading,

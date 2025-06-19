@@ -14,7 +14,7 @@ public class CardPayloadTest {
     String n = null;
 
     JsonObject cardCreateJsonObject_1 = new JsonObject()
-            .put("id", "null")
+            .put("id", null)
             .put("title", "title")
             .put("resourceId", "resourceId")
             .put("resourceType", "resourceType")
@@ -33,7 +33,7 @@ public class CardPayloadTest {
             .put("favoriteList", new JsonArray());
 
     JsonObject cardUpdateJsonObject_1 = new JsonObject()
-            .put("id", "null")
+            .put("id", null)
             .put("title", "title")
             .put("resourceId", "resourceId")
             .put("resourceType", "resourceType")

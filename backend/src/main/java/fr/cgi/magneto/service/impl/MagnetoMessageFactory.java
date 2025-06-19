@@ -3,6 +3,7 @@ package fr.cgi.magneto.service.impl;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 
@@ -55,6 +56,13 @@ public class MagnetoMessageFactory {
                 MagnetoMessageType.cardUpdated,
                 userId, null, null, card, null, null,
                 null, null, null, actionType, actionId, null);
+    }
+
+    public MagnetoMessage sectionUpdated(final String boardId, final String wsId, final String userId, final Section section, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.cardUpdated,
+                userId, null, null, null, null, null,
+                section, null, null, actionType, actionId, null);
     }
 
     /*public MagnetoMessage cardEditionStarted(final String boardId, final String wsId, final String userId, final JsonObject note, final MagnetoUserAction.ActionType actionType, final String actionId) {

@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { RightRole } from "@edifice.io/client";
+import { isActionAvailable, RightRole } from "@edifice.io/client";
 import { checkUserRight, useEdificeClient } from "@edifice.io/react";
 import { useParams } from "react-router-dom";
 
@@ -21,6 +21,7 @@ import {
   initialDisplayModals,
   updateZoomPreference,
 } from "./utils";
+import { workflowName } from "~/config";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { Board, IBoardItemResponse } from "~/models/board.model";
@@ -28,6 +29,7 @@ import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
+import { useActions } from "~/services/queries";
 import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 
 const BoardContext = createContext<BoardContextType | null>(null);
@@ -51,7 +53,9 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
   const { id = "" } = useParams();
-  useWebSocketConnection("ws://localhost:9091/" + id);
+  const { data: actions } = useActions();
+  const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
+  useWebSocketConnection("ws://localhost:9091/" + id, canSynchronous);
   const {
     data: boardData,
     isLoading,

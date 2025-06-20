@@ -44,4 +44,10 @@ public class FakeRight extends ControllerHelper {
     public void boardPublic(HttpServerRequest request) {
         notImplemented(request);
     }
+
+    @Get("/rights/board/synchronous")
+    @SecuredAction(Rights.SYNCHRONOUS_MODE)
+    public void boardSynchronous(HttpServerRequest request) {
+        notImplemented(request);
+    }
 }

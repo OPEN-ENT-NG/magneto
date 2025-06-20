@@ -34,6 +34,12 @@ public class Rights {
      */
     public static final String MAKE_BOARD_PUBLIC = "magneto.board.public";
 
+    /**
+     * Right :
+     * - add/remove synchron mode
+     */
+    public static final String SYNCHRONOUS_MODE = "magneto.board.synchronous";
+
     /** === SHARING RIGHTS === */
 
     public static final String MANAGER = "magneto.manager";

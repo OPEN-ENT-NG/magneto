@@ -21,6 +21,7 @@ import {
   initialDisplayModals,
   updateZoomPreference,
 } from "./utils";
+import { workflowName } from "~/config";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { Board, IBoardItemResponse } from "~/models/board.model";
@@ -28,9 +29,8 @@ import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
-import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 import { useActions } from "~/services/queries";
-import { workflowName } from "~/config";
+import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 

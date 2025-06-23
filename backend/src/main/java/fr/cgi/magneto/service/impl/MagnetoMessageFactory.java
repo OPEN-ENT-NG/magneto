@@ -65,6 +65,13 @@ public class MagnetoMessageFactory {
                 section, null, null, actionType, actionId, null);
     }
 
+    public MagnetoMessage cardFavorite(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.cardFavorite,
+                userId, null, null, card, null, null,
+                null, null, null, actionType, actionId, null);
+    }
+
     /*public MagnetoMessage cardEditionStarted(final String boardId, final String wsId, final String userId, final JsonObject note, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return noteAdded(boardId, wsId, userId, CollaborativeWallNote.fromJson(note), actionType, actionId);
     }

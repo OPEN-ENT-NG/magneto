@@ -1,5 +1,6 @@
 package fr.cgi.magneto.helper;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.model.Section;
@@ -33,6 +34,9 @@ public class MagnetoMessage {
     private final MagnetoUserAction.ActionType actionType;
     private final String actionId;
     private final Long maxConnectedUsers;
+
+    @JsonIgnore
+    private Set<String> targetUserIds;
 
     public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, Set<UserInfos> connectedUsers, MagnetoUserAction.ActionType actionType, String actionId, Long maxConnectedUsers) {
         this.boardId = boardId;
@@ -208,6 +212,18 @@ public class MagnetoMessage {
 
     public Long getMaxConnectedUsers() {
         return maxConnectedUsers;
+    }
+
+    public Set<String> getTargetUserIds() {
+        return targetUserIds;
+    }
+
+    public void setTargetUserIds(Set<String> targetUserIds) {
+        this.targetUserIds = targetUserIds;
+    }
+
+    public boolean hasSpecificTargets() {
+        return targetUserIds != null && !targetUserIds.isEmpty();
     }
 
     public JsonObject toJson() {

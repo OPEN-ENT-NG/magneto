@@ -292,6 +292,7 @@ const applyBoardUpdate = (draft: any, update: any) => {
       break;
     }
 
+    case "cardFavorite":
     case "cardUpdated": {
       // Gérer la mise à jour d'une carte existante
       if (draft.cards) {

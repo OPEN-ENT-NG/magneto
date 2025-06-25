@@ -13,6 +13,7 @@ interface WebSocketState {
   isConnected: boolean;
   reconnectAttempts: number;
   connectionPromise: Promise<void> | null;
+  canSynchronous: boolean;
 }
 
 // Store global partagé (sans classe)
@@ -22,6 +23,7 @@ const globalWebSocketState: WebSocketState = {
   isConnected: false,
   reconnectAttempts: 0,
   connectionPromise: null,
+  canSynchronous: true,
 };
 
 const MAX_RECONNECT_ATTEMPTS = 5;
@@ -47,6 +49,10 @@ const handleMessage = (message: any) => {
 };
 
 const attemptReconnect = (url: string) => {
+  if (!globalWebSocketState.canSynchronous) {
+    return;
+  }
+
   if (globalWebSocketState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
     console.error("Max reconnection attempts reached");
     return;
@@ -66,6 +72,11 @@ const attemptReconnect = (url: string) => {
 const connectWebSocket = (
   url: string = "ws://localhost:9091/",
 ): Promise<void> => {
+  // Ne pas se connecter si canSynchronous est false
+  if (!globalWebSocketState.canSynchronous) {
+    return Promise.resolve();
+  }
+
   if (globalWebSocketState.connectionPromise) {
     return globalWebSocketState.connectionPromise;
   }
@@ -112,6 +123,11 @@ export const useWebSocketManager = () => {
       resourceId: string = "*",
       handler: UpdateHandler,
     ): (() => void) => {
+      // Ne pas s'abonner si canSynchronous est false
+      if (!globalWebSocketState.canSynchronous) {
+        return () => {}; // Retourner une fonction vide
+      }
+
       const subscriptionKey = `${resource}:${resourceId}`;
       const subscriptionId = `${subscriptionKey}:${Date.now()}:${Math.random()}`;
 
@@ -145,6 +161,9 @@ export const useWebSocketManager = () => {
   );
 
   const connect = useCallback(async (url?: string) => {
+    if (!globalWebSocketState.canSynchronous) {
+      return Promise.resolve();
+    }
     return connectWebSocket(url);
   }, []);
 
@@ -157,8 +176,25 @@ export const useWebSocketManager = () => {
   }, []);
 
   const send = useCallback((message: any) => {
-    if (globalWebSocketState.socket && globalWebSocketState.isConnected) {
+    if (
+      globalWebSocketState.socket &&
+      globalWebSocketState.isConnected &&
+      globalWebSocketState.canSynchronous
+    ) {
       globalWebSocketState.socket.send(JSON.stringify(message));
+    }
+  }, []);
+
+  // Fonction pour mettre à jour canSynchronous
+  const setCanSynchronous = useCallback((value: boolean) => {
+    globalWebSocketState.canSynchronous = value;
+
+    // Si on désactive la synchronisation, déconnecter
+    if (!value && globalWebSocketState.socket) {
+      globalWebSocketState.socket.close();
+      globalWebSocketState.socket = null;
+      globalWebSocketState.isConnected = false;
+      globalWebSocketState.connectionPromise = null;
     }
   }, []);
 
@@ -167,25 +203,39 @@ export const useWebSocketManager = () => {
     connect,
     disconnect,
     send,
-    isConnected: globalWebSocketState.isConnected,
+    isConnected:
+      globalWebSocketState.isConnected && globalWebSocketState.canSynchronous,
+    setCanSynchronous,
   };
 };
 
 // Hook pour la connexion automatique
-export const useWebSocketConnection = (url?: string) => {
-  const { connect, disconnect } = useWebSocketManager();
+export const useWebSocketConnection = (
+  url?: string,
+  canSynchronous?: boolean,
+) => {
+  const { connect, disconnect, setCanSynchronous } = useWebSocketManager();
 
   useEffect(() => {
-    connect(url).catch(console.error);
+    if (canSynchronous !== undefined) {
+      setCanSynchronous(canSynchronous);
+    }
+
+    if (globalWebSocketState.canSynchronous) {
+      connect(url).catch(console.error);
+    }
 
     return () => {
       disconnect();
     };
-  }, [connect, disconnect, url]);
+  }, [connect, disconnect, url, setCanSynchronous, canSynchronous]);
 };
 
 export const createRTKWebSocketIntegration = () => {
   const ensureConnection = async () => {
+    if (!globalWebSocketState.canSynchronous) {
+      return;
+    }
     await connectWebSocket();
   };
 
@@ -195,6 +245,11 @@ export const createRTKWebSocketIntegration = () => {
       arg: any,
       { updateCachedData, cacheDataLoaded, cacheEntryRemoved }: any,
     ) => {
+      if (!globalWebSocketState.canSynchronous) {
+        await cacheEntryRemoved;
+        return;
+      }
+
       await Promise.all([cacheDataLoaded, ensureConnection()]);
 
       const targetResourceId =
@@ -224,6 +279,10 @@ const subscribeToWebSocket = (
   resourceId: string = "*",
   handler: UpdateHandler,
 ): (() => void) => {
+  if (!globalWebSocketState.canSynchronous) {
+    return () => {};
+  }
+
   const subscriptionKey = `${resource}:${resourceId}`;
   const subscriptionId = `${subscriptionKey}:${Date.now()}:${Math.random()}`;
 
@@ -384,25 +443,3 @@ const applyUserUpdate = (draft: any, update: any) => {
     Object.assign(draft, update.data);
   }
 };
-
-/*const handleCardMove = (draft: any, moveData: any) => {
-  // Implémentation du déplacement de cartes entre sections
-  const { cardId, fromSectionId, toSectionId, newPosition } = moveData;
-
-  if (draft.sections) {
-    const fromSection = draft.sections.find(
-      (s: any) => s._id === fromSectionId,
-    );
-    const toSection = draft.sections.find((s: any) => s._id === toSectionId);
-
-    if (fromSection && toSection) {
-      const cardIndex = fromSection.cards.findIndex(
-        (c: any) => c.id === cardId,
-      );
-      if (cardIndex !== -1) {
-        const [card] = fromSection.cards.splice(cardIndex, 1);
-        toSection.cards.splice(newPosition, 0, card);
-      }
-    }
-  }
-};*/

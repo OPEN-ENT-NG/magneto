@@ -8,6 +8,7 @@ import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +36,18 @@ public class Card implements Model<Card> {
     private boolean isLiked;
 
     private List<String> favoriteList;
+
+    public Card() {
+        this._id = null;
+        this.nbOfComments = 0;
+        this.nbOfFavorites = 0;
+        this.isLiked = false;
+        this.isLocked = false;
+        this.lastComment = new JsonObject();
+        this.favoriteList = new ArrayList<>();
+        this.owner = new User(new JsonObject());
+        this.editor = new User(new JsonObject());
+    }
 
     public Card(JsonObject card) {
         this._id = card.getString(Field._ID, null);
@@ -272,8 +285,7 @@ public class Card implements Model<Card> {
 
     @Override
     public JsonObject toJson() {
-
-        return new JsonObject()
+        JsonObject json = new JsonObject()
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.RESOURCETYPE, this.getResourceType())
@@ -283,19 +295,28 @@ public class Card implements Model<Card> {
                 .put(Field.CAPTION, this.getCaption())
                 .put(Field.ISLOCKED, this.isLocked())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
-                .put(Field.LASTMODIFIERID, this.getLastModifierId())
-                .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
+                .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.LASTCOMMENT, this.getLastComment())
                 .put(Field.NBOFCOMMENTS, this.getNbOfComments())
-                .put(Field.CREATIONDATE, this.getCreationDate())
-                .put(Field.OWNERID, this.getOwnerId())
                 .put(Field.METADATA, this.getMetadata() != null ? this.getMetadata().toJson() : null)
-                .put(Field.OWNERNAME, this.getOwnerName())
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
                 .put(Field.FAVORITE_LIST, this.getFavoriteList());
+
+        // Gestion des propriétés owner et editor qui peuvent être nulles
+        if (this.owner != null) {
+            json.put(Field.OWNERID, this.getOwnerId())
+                    .put(Field.OWNERNAME, this.getOwnerName());
+        }
+
+        if (this.editor != null) {
+            json.put(Field.LASTMODIFIERID, this.getLastModifierId())
+                    .put(Field.LASTMODIFIERNAME, this.getLastModifierName());
+        }
+
+        return json;
     }
 
     @Override

@@ -5,6 +5,7 @@ export const workflows = {
   comment: "fr.cgi.magneto.controller.FakeRight|boardComment",
   favorites: "fr.cgi.magneto.controller.FakeRight|boardFavorites",
   publicBoard: "fr.cgi.magneto.controller.FakeRight|boardPublic",
+  synchronous: "fr.cgi.magneto.controller.FakeRight|boardSynchronous",
 };
 
 export const workflowName = {
@@ -14,6 +15,7 @@ export const workflowName = {
   comment: "comment",
   favorites: "favorites",
   public: "public",
+  synchronous: "synchronous",
 };
 
 export const rights = {

@@ -19,6 +19,7 @@ import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
 import io.vertx.core.*;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
@@ -146,6 +147,20 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     break;
 
                 case "collaboration":
+                    if (jsonMessage.containsKey("connectedUsers") || jsonMessage.containsKey("editing")) {
+                        String boardId = jsonMessage.getString("boardId");
+                        if (boardId != null) {
+                            try {
+                                // Optionnel : mettre à jour les métadonnées locales
+                                // (utile si vous avez plusieurs instances)
+                                log.debug("Received collaboration message with metadata for board: " + boardId);
+                            } catch (Exception e) {
+                                String message = String.format("[Magneto@%s::onNewMessage] Error processing collaboration metadata",
+                                        this.getClass().getSimpleName());
+                                log.error(message, e);
+                            }
+                        }
+                    }
                     // Convertir en MagnetoMessageWrapper et notifier les abonnés
                     MagnetoMessageWrapper magnetoMessage = new MagnetoMessageWrapper(jsonMessage);
 
@@ -396,54 +411,83 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 });
     }
 
-    private Future<Void> publishMetadata() {
-        final Promise<Void> promise = Promise.promise();
-        log.debug("Publishing contexts to Redis...");
-        final String payload = Json.encode(metadataByWallId);
-        redisPublisher.set(newArrayList(
-                metadataCollectionPrefix + serverId,
-                payload,
-                "PX",
-                String.valueOf(2 * publishPeriodInMs)
-        ), onPublishDone -> {
-            if (onPublishDone.succeeded()) {
-                promise.complete();
-            } else {
-                log.error("Cannot publish context to Redis");
-                changeRealTimeStatus(RealTimeStatus.ERROR);
-                promise.fail(onPublishDone.cause());
-            }
-        });
-        return promise.future();
+    private Future<Void> publishMetadata(String boardId, CollaborationUsersMetadata context) {
+        try {
+            JsonObject metadataMessage = new JsonObject()
+                    .put("type", "metadata")
+                    .put("serverId", serverId)
+                    .put("boardId", boardId)
+                    .put("timestamp", System.currentTimeMillis())
+                    .put("connectedUsers", Json.encode(context.getConnectedUsers()))
+                    .put("editing", Json.encode(context.getEditing()));
+
+            return publishMessage(metadataMessage);
+        } catch (Exception e) {
+            String message = String.format("[Magneto@%s::publishMetadataViaEventBus] Error publishing metadata",
+                    this.getClass().getSimpleName());
+            log.error(message, e);
+            return Future.failedFuture(e);
+        }
     }
 
     @Override
     public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId) {
         final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
-        return CompositeFuture.all(
-                        this.collaborativeWallService.getWall(boardId),
-                        this.collaborativeWallService.getNotesOfWall(boardId)
-                ).flatMap(wall -> {
-                    final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
-                    context.addConnectedUser(user);
-                    publishMetadata();
-                    return this.getUsersContext(boardId).map(userContext -> Pair.of(wall, userContext));
-                })
-                .map(context -> {
-                    final JsonObject wall = context.getKey().resultAt(0);
-                    final List<JsonObject> notes = context.getKey().resultAt(1);
-                    final CollaborationUsersMetadata userContext = context.getRight();
-                    return this.messageFactory.metadata(boardId, wsId, user.getUserId(),
-                            new MagnetoMetadata(wall, notes, userContext.getEditing(), userContext.getConnectedUsers()), this.maxConnectedUser);
-                })
-                .map(contextMessage -> newArrayList(newUserMessage, contextMessage))
-                .compose(messages -> publishMessagesOnRedis(messages).map(messages));
-        final Promise<List<MagnetoMessage>> promise = Promise.promise();
-        List<MagnetoMessage> messages = new ArrayList<>();
-        messages.add(newUserMessage);
-        promise.complete(messages);
-        return promise.future();
+
+        // Récupérer ou créer le contexte pour ce board
+        final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
+
+        // Ajouter l'utilisateur connecté au contexte
+        context.addConnectedUser(user);
+
+        // Créer le message avec les métadonnées (utilisateurs connectés, etc.)
+        final MagnetoMessage metadataMessage = this.messageFactory.metadata(
+                boardId,
+                wsId,
+                user.getUserId(),
+                new CollaborationUsersMetadata(
+                        context.getEditing(),
+                        context.getConnectedUsers()
+                ),
+                this.maxConnectedUser
+        );
+
+        // Publier les métadonnées mises à jour via EventBus
+        return publishMetadata(boardId, context)
+                .map(v -> Arrays.asList(newUserMessage, metadataMessage))
+                .compose(messages -> {
+                    // Publier le message de connexion aux autres utilisateurs
+                    JsonObject collaborationMessage = new JsonObject()
+                            .put("type", "collaboration")
+                            .put("serverId", serverId)
+                            .put("messages", Json.encode(Collections.singletonList(newUserMessage)));
+
+                    return publishMessage(collaborationMessage)
+                            .map(v -> messages);
+                });
     }
+
+    @Override
+    public Future<List<MagnetoMessage>> onNewDisconnection(String boardId, UserInfos user, final String wsId) {
+        final MagnetoMessage disconnectionMessage = this.messageFactory.disconnection(boardId, wsId, user.getUserId());
+
+        // Récupérer le contexte pour ce board
+        final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
+        if (context != null) {
+            // Retirer l'utilisateur du contexte
+            context.removeConnectedUser(user.getUserId());
+
+            // Si plus personne n'est connecté, on peut supprimer le contexte
+            if (context.getConnectedUsers().isEmpty()) {
+                metadataByBoardId.remove(boardId);
+            }
+        }
+        List<MagnetoMessage> messages = Collections.singletonList(disconnectionMessage);
+
+        return publishMetadata(boardId, context)
+                .map(v -> messages);
+    }
+
 
     private Future<Void> changeRealTimeStatus(RealTimeStatus realTimeStatus) {
         final Promise<Void> promise = Promise.promise();

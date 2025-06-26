@@ -15,9 +15,8 @@ import java.util.Set;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CollaborationUsersMetadata {
-    /** Users currently editing notes.*/
+
     private final List<CardEditingInformation> editing;
-    /** Connected users*/
     private final Set<User> connectedUsers;
 
     public CollaborationUsersMetadata() {
@@ -58,5 +57,7 @@ public class CollaborationUsersMetadata {
         this.connectedUsers.removeIf(user -> user.getUserId().equals(userId));
         this.getEditing().removeIf(info -> info.getUserId().equals(userId));
     }
+
+
 
 }

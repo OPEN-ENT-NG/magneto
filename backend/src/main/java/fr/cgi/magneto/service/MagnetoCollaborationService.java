@@ -86,4 +86,6 @@ public interface MagnetoCollaborationService {
     Future<List<MagnetoMessage>> pushEvent(String wallId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);
 
     Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId);
+
+    Future<List<MagnetoMessage>> onNewDisconnection(String boardId, UserInfos user, String wsId);
 }

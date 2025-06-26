@@ -3,6 +3,7 @@ package fr.cgi.magneto.service.impl;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
@@ -41,6 +42,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     private String eventBusAddress;
     private MessageConsumer<JsonObject> eventBusConsumer;
     private final MagnetoMessageFactory messageFactory;
+    private final Map<String, CollaborationUsersMetadata> metadataByBoardId;
 
     public DefaultMagnetoCollaborationService(ServiceFactory serviceFactory) {
         this.vertx = serviceFactory.vertx();
@@ -54,6 +56,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.publishPeriodInMs = config.getLong("publish-context-period-in-ms", 60000L);
         this.maxConnectedUser = config.getLong("max-connected-user", 50L);
         this.eventBusAddress = config.getString("eventbus-address", "magneto.collaboration");
+        this.metadataByBoardId = new HashMap<>();
     }
 
     @Override
@@ -393,14 +396,35 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 });
     }
 
+    private Future<Void> publishMetadata() {
+        final Promise<Void> promise = Promise.promise();
+        log.debug("Publishing contexts to Redis...");
+        final String payload = Json.encode(metadataByWallId);
+        redisPublisher.set(newArrayList(
+                metadataCollectionPrefix + serverId,
+                payload,
+                "PX",
+                String.valueOf(2 * publishPeriodInMs)
+        ), onPublishDone -> {
+            if (onPublishDone.succeeded()) {
+                promise.complete();
+            } else {
+                log.error("Cannot publish context to Redis");
+                changeRealTimeStatus(RealTimeStatus.ERROR);
+                promise.fail(onPublishDone.cause());
+            }
+        });
+        return promise.future();
+    }
+
     @Override
     public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId) {
         final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
-        /*return CompositeFuture.all(
+        return CompositeFuture.all(
                         this.collaborativeWallService.getWall(boardId),
                         this.collaborativeWallService.getNotesOfWall(boardId)
                 ).flatMap(wall -> {
-                    final MagnetoUsersMetadata context = metadataByWallId.computeIfAbsent(boardId, k -> new MagnetoUsersMetadata());
+                    final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
                     context.addConnectedUser(user);
                     publishMetadata();
                     return this.getUsersContext(boardId).map(userContext -> Pair.of(wall, userContext));
@@ -408,12 +432,12 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 .map(context -> {
                     final JsonObject wall = context.getKey().resultAt(0);
                     final List<JsonObject> notes = context.getKey().resultAt(1);
-                    final MagnetoUsersMetadata userContext = context.getRight();
+                    final CollaborationUsersMetadata userContext = context.getRight();
                     return this.messageFactory.metadata(boardId, wsId, user.getUserId(),
                             new MagnetoMetadata(wall, notes, userContext.getEditing(), userContext.getConnectedUsers()), this.maxConnectedUser);
                 })
                 .map(contextMessage -> newArrayList(newUserMessage, contextMessage))
-                .compose(messages -> publishMessagesOnRedis(messages).map(messages));*/
+                .compose(messages -> publishMessagesOnRedis(messages).map(messages));
         final Promise<List<MagnetoMessage>> promise = Promise.promise();
         List<MagnetoMessage> messages = new ArrayList<>();
         messages.add(newUserMessage);

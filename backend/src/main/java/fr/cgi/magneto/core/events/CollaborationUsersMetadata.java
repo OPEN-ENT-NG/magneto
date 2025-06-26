@@ -2,7 +2,6 @@ package fr.cgi.magneto.core.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.model.user.User;
 import org.entcore.common.user.UserInfos;
 
@@ -17,7 +16,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CollaborationUsersMetadata {
     /** Users currently editing notes.*/
-    private final List<CollaborativeWallEditingInformation> editing;
+    private final List<CardEditingInformation> editing;
     /** Connected users*/
     private final Set<User> connectedUsers;
 
@@ -27,24 +26,23 @@ public class CollaborationUsersMetadata {
     }
 
     @JsonCreator
-    public CollaborativeWallUsersMetadata(@JsonProperty("editing") final List<CollaborativeWallEditingInformation> editing,
-                                          @JsonProperty("connectedUsers") final Set<User> connectedUsers) {
+    public CollaborationUsersMetadata(List<CardEditingInformation> editing, Set<User> connectedUsers) {
         this.editing = editing;
         this.connectedUsers = connectedUsers;
     }
 
-    public static CollaborativeWallUsersMetadata merge(final CollaborativeWallUsersMetadata context1,
-                                                       final CollaborativeWallUsersMetadata context2) {
+    /*public static CollaborationUsersMetadata merge(final CollaborationUsersMetadata context1,
+                                                       final CollaborationUsersMetadata context2) {
         final List<CollaborativeWallEditingInformation> concatEditing = new ArrayList<>();
         concatEditing.addAll(context1.getEditing());
         concatEditing.addAll(context2.getEditing());
         final Set<User> concatUsers = new HashSet<>();
         concatUsers.addAll(context1.getConnectedUsers());
         concatUsers.addAll(context2.getConnectedUsers());
-        return new CollaborativeWallUsersMetadata(concatEditing, concatUsers);
-    }
+        return new CollaborationUsersMetadata(concatEditing, concatUsers);
+    }*/
 
-    public List<CollaborativeWallEditingInformation> getEditing() {
+    public List<CardEditingInformation> getEditing() {
         return editing;
     }
 
@@ -53,11 +51,11 @@ public class CollaborationUsersMetadata {
     }
 
     public void addConnectedUser(final UserInfos user){
-        this.connectedUsers.add(new User(user.getUserId(), user.getUsername(), user.getGroupsIds()));
+        this.connectedUsers.add(new User(user.getUserId(), user.getUsername()));
     }
 
     public void removeConnectedUser(final String userId){
-        this.connectedUsers.removeIf(user -> user.getId().equals(userId));
+        this.connectedUsers.removeIf(user -> user.getUserId().equals(userId));
         this.getEditing().removeIf(info -> info.getUserId().equals(userId));
     }
 

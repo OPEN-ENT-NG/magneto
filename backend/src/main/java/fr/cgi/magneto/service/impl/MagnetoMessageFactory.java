@@ -1,6 +1,7 @@
 package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
+import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.model.Section;
@@ -27,6 +28,14 @@ public class MagnetoMessageFactory {
     public MagnetoMessage disconnection(final String boardId, final String wsId, final String userId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.disconnection,
+                userId, null, null, null, null, null, null, null, null,
+                MagnetoUserAction.ActionType.Do, null, null);
+    }
+
+    public MagnetoMessage metadata(final String boardId, final String wsId, final String userId,
+                                   final CollaborationUsersMetadata magnetoContext, final Long maxUser) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.metadata,
                 userId, null, null, null, null, null, null, null, null,
                 MagnetoUserAction.ActionType.Do, null, null);
     }

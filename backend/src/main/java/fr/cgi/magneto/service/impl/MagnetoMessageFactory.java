@@ -36,8 +36,8 @@ public class MagnetoMessageFactory {
                                    final CollaborationUsersMetadata magnetoContext, final Long maxUser) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.metadata,
-                userId, null, null, null, null, null, null, null, null,
-                MagnetoUserAction.ActionType.Do, null, null);
+                userId, null, null, null, null, null, null, null, magnetoContext.getConnectedUsers(),
+                MagnetoUserAction.ActionType.Do, null, maxUser);
     }
 
     public MagnetoMessage ping(final String boardId, final String wsId, final String userId) {

@@ -12,7 +12,7 @@ import {
 import { mdiCheckCircle, mdiEarth } from "@mdi/js";
 import Icon from "@mdi/react";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import { Box, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Tooltip, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -28,11 +28,17 @@ import {
   wrapperBoxStyle,
 } from "./style";
 import { BoardDescription } from "../board-description/BoardDescription";
+import useDirectory from "~/hooks/useDirectory";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import {
+  useConnectedUsers,
+  useWebSocketManager,
+} from "~/services/websocket/useWebSocketManager";
 
 export const HeaderView: FC = () => {
   const { board, isExternalView } = useBoard();
+  const { getAvatarURL } = useDirectory();
   const navigate = useNavigate();
 
   const magnetoWebApp: IWebApp = {
@@ -47,6 +53,8 @@ export const HeaderView: FC = () => {
   };
 
   const edificeClient = useEdificeClient();
+  const { isConnected } = useWebSocketManager();
+  const connectedUsers = useConnectedUsers();
   const { currentApp } = isExternalView
     ? { currentApp: magnetoWebApp }
     : edificeClient;
@@ -93,15 +101,43 @@ export const HeaderView: FC = () => {
                 </span>
               </Box>
             )}
-            <Box sx={toastStyle}>
-              <Icon path={mdiCheckCircle} size={1} />
-              <span>
-                {t("magneto.board.saved.at", {
-                  0: modificationDate,
-                  1: modificationHour,
-                })}
-              </span>
-            </Box>
+            {isConnected && (
+              <AvatarGroup max={3}>
+                {connectedUsers.map((user) => (
+                  <Tooltip
+                    key={user.id || user._id}
+                    title={user.username || user.name || "Utilisateur"}
+                    placement="bottom"
+                    arrow
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          fontSize: "12px",
+                          padding: "6px 10px",
+                        },
+                      },
+                    }}
+                    slotProps={{
+                      popper: {
+                        modifiers: [
+                          {
+                            name: "offset",
+                            options: {
+                              offset: [0, -5],
+                            },
+                          },
+                        ],
+                      },
+                    }}
+                  >
+                    <Avatar
+                      alt={user.username}
+                      src={getAvatarURL(user.userId, "user")}
+                    ></Avatar>
+                  </Tooltip>
+                ))}
+              </AvatarGroup>
+            )}
             {boardHasCards() && (
               <Button
                 color="primary"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type UpdateHandler = (update: any) => void;
 
@@ -13,6 +13,9 @@ interface WebSocketState {
   isConnected: boolean;
   reconnectAttempts: number;
   connectionPromise: Promise<void> | null;
+  metadata: {
+    connectedUsers: any[];
+  };
   canSynchronous: boolean;
 }
 
@@ -23,12 +26,32 @@ const globalWebSocketState: WebSocketState = {
   isConnected: false,
   reconnectAttempts: 0,
   connectionPromise: null,
+  metadata: {
+    connectedUsers: [],
+  },
   canSynchronous: true,
 };
 
 const MAX_RECONNECT_ATTEMPTS = 5;
 
 const handleMessage = (message: any) => {
+  // Gestion des métadonnées
+  if (message.type === "metadata") {
+    if (message.connectedUsers) {
+      globalWebSocketState.metadata.connectedUsers = message.connectedUsers;
+
+      // Notifier tous les subscribers de métadonnées
+      const metadataSubscribers =
+        globalWebSocketState.subscriptions.get("metadata");
+      if (metadataSubscribers) {
+        metadataSubscribers.forEach((sub) =>
+          sub.handler(globalWebSocketState.metadata),
+        );
+      }
+    }
+    return;
+  }
+
   // Pour les actions liées à un board, on route vers boards:boardId
   if (message.boardId) {
     const subscriptionKey = `boards:${message.boardId}`;
@@ -198,6 +221,14 @@ export const useWebSocketManager = () => {
     }
   }, []);
 
+  const getMetadata = useCallback(() => {
+    return globalWebSocketState.metadata;
+  }, []);
+
+  const getConnectedUsers = useCallback(() => {
+    return globalWebSocketState.metadata.connectedUsers;
+  }, []);
+
   return {
     subscribe,
     connect,
@@ -206,6 +237,8 @@ export const useWebSocketManager = () => {
     isConnected:
       globalWebSocketState.isConnected && globalWebSocketState.canSynchronous,
     setCanSynchronous,
+    getMetadata,
+    getConnectedUsers,
   };
 };
 
@@ -229,6 +262,40 @@ export const useWebSocketConnection = (
       disconnect();
     };
   }, [connect, disconnect, url, setCanSynchronous, canSynchronous]);
+};
+
+// Hook spécialisé pour les métadonnées
+export const useWebSocketMetadata = () => {
+  const [metadata, setMetadata] = useState(globalWebSocketState.metadata);
+  const { subscribe } = useWebSocketManager();
+
+  useEffect(() => {
+    const unsubscribe = subscribe("metadata", "*", (newMetadata: any) => {
+      setMetadata(newMetadata);
+    });
+
+    return unsubscribe;
+  }, [subscribe]);
+
+  return metadata;
+};
+
+// Hook spécialisé pour les utilisateurs connectés
+export const useConnectedUsers = () => {
+  const [connectedUsers, setConnectedUsers] = useState(
+    globalWebSocketState.metadata.connectedUsers,
+  );
+  const { subscribe } = useWebSocketManager();
+
+  useEffect(() => {
+    const unsubscribe = subscribe("metadata", "*", (metadata: any) => {
+      setConnectedUsers(metadata.connectedUsers || []);
+    });
+
+    return unsubscribe;
+  }, [subscribe]);
+
+  return connectedUsers;
 };
 
 export const createRTKWebSocketIntegration = () => {

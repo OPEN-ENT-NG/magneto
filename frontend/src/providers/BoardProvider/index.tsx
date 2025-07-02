@@ -1,6 +1,7 @@
 import {
   FC,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -55,10 +56,14 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const { id = "" } = useParams();
   const { data: actions } = useActions();
   const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
-  useWebSocketConnection(
-    `ws://${window.location.hostname}:9091/` + id,
-    canSynchronous,
-  );
+  const isLocalhost = window.location.hostname === "localhost";
+  const getSocketURL = useCallback(() => {
+    return isLocalhost
+      ? `ws://${window.location.hostname}:9091/magneto/${id}`
+      : `wss://${window.location.host}/magneto/${id}`;
+  }, [isLocalhost]);
+
+  useWebSocketConnection(getSocketURL(), canSynchronous);
   const {
     data: boardData,
     isLoading,

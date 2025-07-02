@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   breadcrumbTitle,
+  connectedUsersContainerStyle,
   externalToastStyle,
   externalToastTextStyle,
   isLockedToastStyle,
@@ -25,6 +26,7 @@ import {
   mainWrapperStyle,
   rightWrapperStyle,
   toastStyle,
+  userTooltipStyle,
   wrapperBoxStyle,
 } from "./style";
 import { BoardDescription } from "../board-description/BoardDescription";
@@ -75,6 +77,10 @@ export const HeaderView: FC = () => {
     );
   };
 
+  const otherConnectedUsers = connectedUsers.filter(
+    (user) => user.userId !== edificeClient?.user?.userId,
+  );
+
   return (
     <AppHeader className="header-view">
       <Box sx={mainWrapperStyle}>
@@ -102,41 +108,72 @@ export const HeaderView: FC = () => {
               </Box>
             )}
             {isConnected && (
-              <AvatarGroup max={3}>
-                {connectedUsers.map((user) => (
-                  <Tooltip
-                    key={user.id || user._id}
-                    title={user.username || user.name || "Utilisateur"}
-                    placement="bottom"
-                    arrow
-                    componentsProps={{
-                      tooltip: {
-                        sx: {
-                          fontSize: "12px",
-                          padding: "6px 10px",
-                        },
-                      },
-                    }}
-                    slotProps={{
-                      popper: {
-                        modifiers: [
-                          {
-                            name: "offset",
-                            options: {
-                              offset: [0, -5],
-                            },
+              <Box sx={connectedUsersContainerStyle}>
+                {otherConnectedUsers.length > 0 && (
+                  <AvatarGroup max={4}>
+                    {otherConnectedUsers.map((user) => (
+                      <Tooltip
+                        key={user.userId}
+                        title={user.username || user.name || "Utilisateur"}
+                        placement="bottom"
+                        arrow
+                        componentsProps={{
+                          tooltip: {
+                            sx: userTooltipStyle,
                           },
-                        ],
-                      },
-                    }}
-                  >
-                    <Avatar
-                      alt={user.username}
-                      src={getAvatarURL(user.userId, "user")}
-                    ></Avatar>
-                  </Tooltip>
-                ))}
-              </AvatarGroup>
+                        }}
+                        slotProps={{
+                          popper: {
+                            modifiers: [
+                              {
+                                name: "offset",
+                                options: {
+                                  offset: [0, -5],
+                                },
+                              },
+                            ],
+                          },
+                        }}
+                      >
+                        <Avatar
+                          alt={user.username}
+                          src={getAvatarURL(user.userId, "user")}
+                        ></Avatar>
+                      </Tooltip>
+                    ))}
+                  </AvatarGroup>
+                )}
+                <Tooltip
+                  title={edificeClient?.user?.username || "Vous"}
+                  placement="bottom"
+                  arrow
+                  componentsProps={{
+                    tooltip: {
+                      sx: userTooltipStyle,
+                    },
+                  }}
+                  slotProps={{
+                    popper: {
+                      modifiers: [
+                        {
+                          name: "offset",
+                          options: {
+                            offset: [0, -5],
+                          },
+                        },
+                      ],
+                    },
+                  }}
+                >
+                  <Avatar
+                    alt={edificeClient?.user?.username}
+                    src={getAvatarURL(
+                      edificeClient?.user?.userId || "",
+                      "user",
+                    )}
+                  ></Avatar>
+                </Tooltip>
+              </Box>
             )}
             {boardHasCards() && (
               <Button

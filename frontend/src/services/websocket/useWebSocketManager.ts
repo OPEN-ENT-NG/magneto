@@ -42,7 +42,7 @@ const handleMessage = (message: any) => {
 
       // Notifier tous les subscribers de métadonnées
       const metadataSubscribers =
-        globalWebSocketState.subscriptions.get("metadata");
+        globalWebSocketState.subscriptions.get("metadata:*");
       if (metadataSubscribers) {
         metadataSubscribers.forEach((sub) =>
           sub.handler(globalWebSocketState.metadata),

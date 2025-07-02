@@ -55,7 +55,10 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const { id = "" } = useParams();
   const { data: actions } = useActions();
   const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
-  useWebSocketConnection("ws://localhost:9091/" + id, canSynchronous);
+  useWebSocketConnection(
+    `ws://${window.location.hostname}:9091/` + id,
+    canSynchronous,
+  );
   const {
     data: boardData,
     isLoading,

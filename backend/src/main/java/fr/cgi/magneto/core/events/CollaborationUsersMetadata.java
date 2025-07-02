@@ -30,17 +30,6 @@ public class CollaborationUsersMetadata {
         this.connectedUsers = connectedUsers;
     }
 
-    /*public static CollaborationUsersMetadata merge(final CollaborationUsersMetadata context1,
-                                                       final CollaborationUsersMetadata context2) {
-        final List<CollaborativeWallEditingInformation> concatEditing = new ArrayList<>();
-        concatEditing.addAll(context1.getEditing());
-        concatEditing.addAll(context2.getEditing());
-        final Set<User> concatUsers = new HashSet<>();
-        concatUsers.addAll(context1.getConnectedUsers());
-        concatUsers.addAll(context2.getConnectedUsers());
-        return new CollaborationUsersMetadata(concatEditing, concatUsers);
-    }*/
-
     public List<CardEditingInformation> getEditing() {
         return editing;
     }

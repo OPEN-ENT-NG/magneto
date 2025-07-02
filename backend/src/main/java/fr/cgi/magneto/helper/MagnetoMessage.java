@@ -6,6 +6,7 @@ import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
@@ -30,7 +31,7 @@ public class MagnetoMessage {
     private final List<Card> cards;
     private final Section section;
     private final List<Section> sections;
-    private final Set<UserInfos> connectedUsers;
+    private final Set<User> connectedUsers;
     private final MagnetoUserAction.ActionType actionType;
     private final String actionId;
     private final Long maxConnectedUsers;
@@ -38,7 +39,7 @@ public class MagnetoMessage {
     @JsonIgnore
     private Set<String> targetUserIds;
 
-    public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, Set<UserInfos> connectedUsers, MagnetoUserAction.ActionType actionType, String actionId, Long maxConnectedUsers) {
+    public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, Set<User> connectedUsers, MagnetoUserAction.ActionType actionType, String actionId, Long maxConnectedUsers) {
         this.boardId = boardId;
         this.emittedAt = emittedAt;
         this.emittedBy = emittedBy;
@@ -128,8 +129,7 @@ public class MagnetoMessage {
             for (int i = 0; i < usersArray.size(); i++) {
                 JsonObject userJson = usersArray.getJsonObject(i);
                 if (userJson != null) {
-                    // Suppose qu'il existe un constructeur pour UserInfos prenant un JsonObject
-                    UserInfos userInfo = new UserInfos();
+                    User userInfo = new User(userJson.getString("id"), userJson.getString("username"));
                     try {
                         // Remplir UserInfos avec les données de userJson
                         if (userJson.containsKey("id")) userInfo.setUserId(userJson.getString("id"));
@@ -206,7 +206,7 @@ public class MagnetoMessage {
         return sections;
     }
 
-    public Set<UserInfos> getConnectedUsers() {
+    public Set<User> getConnectedUsers() {
         return connectedUsers;
     }
 

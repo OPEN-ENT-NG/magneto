@@ -15,6 +15,7 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
+import fr.cgi.magneto.model.comments.CommentPayload;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
 import io.vertx.core.*;
@@ -322,7 +323,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             String message = String.format("[Magneto@%s::updateSection] Failed to update section : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
-                        })
+                        }) //TODO : pk on redonne action.getSection() dans le message?? ça s'update bien??
                         .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), action.getSection(), action.getActionType(), action.getActionId())));
             }
             case cardFavorite: {
@@ -345,6 +346,42 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     Card updatedCard = cards.isEmpty() ? action.getCard() : cards.get(0);
                                     return newArrayList(this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                                 }));
+            }
+            case commentAdded: {
+                CommentPayload commentPayload = new CommentPayload(action.getComment().toJson())
+                        .setOwnerId(user.getUserId())
+                        .setOwnerName(user.getUsername());
+
+                this.serviceFactory.commentService().createComment(commentPayload, action.getCardId())
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                                    this.getClass().getSimpleName());
+                            log.error(message);
+                        })
+                        .compose(r -> this.serviceFactory.commentService().getAllComments(action.getCardId(), null))
+                        .map(comments -> newArrayList(this.messageFactory.commentAdded(boardId, wsId, user.getUserId(), action.getCardId(), comments, action.getActionType(), action.getActionId())));
+            }
+            case commentDeleted: {
+                this.serviceFactory.commentService().deleteComment(user.getUserId(), action.getCardId(), action.getCommentId())
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                                    this.getClass().getSimpleName());
+                            log.error(message);
+                        })
+                        .compose(r -> this.serviceFactory.commentService().getAllComments(action.getCardId(), null))
+                        .map(comments -> newArrayList(this.messageFactory.commentDeleted(boardId, wsId, user.getUserId(), action.getCardId(), comments, action.getActionType(), action.getActionId())));
+            }
+            case commentEdited: {
+                CommentPayload commentPayload = new CommentPayload(user, action.getComment().getId(), action.getComment().getContent());
+
+                this.serviceFactory.commentService().updateComment(commentPayload, action.getCardId())
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                                    this.getClass().getSimpleName());
+                            log.error(message);
+                        })
+                        .compose(r -> this.serviceFactory.commentService().getAllComments(action.getCard().getId(), null))
+                        .map(comments -> newArrayList(this.messageFactory.commentEdited(boardId, wsId, user.getUserId(), action.getCardId(), comments, action.getActionType(), action.getActionId())));
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users

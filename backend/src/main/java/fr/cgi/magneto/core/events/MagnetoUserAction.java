@@ -8,6 +8,7 @@ import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.comments.Comment;
 import org.entcore.common.validation.ValidationException;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public class MagnetoUserAction {
     private final Card card;
     private final Board board;
     private final Section section;
+    private final Comment comment;
+    private final String commentId;
     private final ActionType actionType;
     private final String actionId;
 
@@ -31,6 +34,8 @@ public class MagnetoUserAction {
                                        @JsonProperty("card") final Card card,
                                        @JsonProperty("board") final Board board,
                                        @JsonProperty("section") final Section section,
+                                       @JsonProperty("comment") final Comment comment,
+                                       @JsonProperty("commentId") final String commentId,
                                        @JsonProperty("actionType") final ActionType actionType,
                                        @JsonProperty("actionId") final String actionId) {
         this.type = type;
@@ -39,6 +44,8 @@ public class MagnetoUserAction {
         this.card = card;
         this.board = board;
         this.section = section;
+        this.comment = comment;
+        this.commentId = commentId;
         this.actionType = actionType;
         this.actionId = actionId;
     }
@@ -62,6 +69,10 @@ public class MagnetoUserAction {
     public Board getBoard() { return board; }
 
     public Section getSection() { return section; }
+
+    public Comment getComment() { return comment; }
+
+    public String getCommentId() { return commentId; }
 
     public ActionType getActionType() {
         return actionType;
@@ -124,6 +135,8 @@ public class MagnetoUserAction {
                 ", cardId='" + cardId + '\'' +
                 ", card=" + card +
                 ", board=" + board +
+                ", section=" + section +
+                ", comment=" + comment +
                 ", actionType=" + actionType +
                 ", actionId='" + actionId + '\'' +
                 '}';

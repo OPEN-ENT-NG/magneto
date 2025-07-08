@@ -419,6 +419,9 @@ const applyBoardUpdate = (draft: any, update: any) => {
     }
 
     case "cardFavorite":
+    case "commentAdded":
+    case "commentEdited":
+    case "commentDeleted":
     case "cardUpdated": {
       // Gérer la mise à jour d'une carte existante
       if (draft.cards) {

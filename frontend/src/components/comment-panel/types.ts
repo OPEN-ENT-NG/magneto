@@ -12,6 +12,7 @@ export interface CommentPanelProps {
     vertical: "top" | "center" | "bottom";
     horizontal: "left" | "center" | "right";
   };
+  comments?: Comment[];
 }
 
 export interface CommentPanelWrapperProps {

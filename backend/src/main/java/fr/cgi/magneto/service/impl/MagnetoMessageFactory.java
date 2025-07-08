@@ -7,9 +7,6 @@ import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
-import fr.cgi.magneto.model.comments.Comment;
-
-import java.util.List;
 
 public class MagnetoMessageFactory {
     private final String serverId;
@@ -31,7 +28,7 @@ public class MagnetoMessageFactory {
     public MagnetoMessage disconnection(final String boardId, final String wsId, final String userId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.disconnection,
-                userId, null, null, null, null, null,null, null, null, null,
+                userId, null, null, null, null, null,null, null, null,
                 MagnetoUserAction.ActionType.Do, null, null);
     }
 
@@ -39,70 +36,70 @@ public class MagnetoMessageFactory {
                                    final CollaborationUsersMetadata magnetoContext, final Long maxUser) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.metadata,
-                userId, null, null, null, null, null, null,null, null, magnetoContext.getConnectedUsers(),
+                userId, null, null, null, null, null, null,null, magnetoContext.getConnectedUsers(),
                 MagnetoUserAction.ActionType.Do, null, maxUser);
     }
 
     public MagnetoMessage ping(final String boardId, final String wsId, final String userId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.ping,
-                userId, null, null, null, null, null, null,
+                userId, null, null, null, null, null,
                 null, null, null, MagnetoUserAction.ActionType.Do, null, null);
     }
 
     public MagnetoMessage boardUpdated(final String boardId, final String wsId, final String userId, final Board board, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.boardUpdated,
-                userId, null, null, null, null, null, null,
+                userId, null, null, null, null, null,
                 null, null, null, actionType, actionId, null);
     }
 
     public MagnetoMessage cardAdded(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                MagnetoMessageType.cardAdded, userId, null, null, card, null, null, null,
+                MagnetoMessageType.cardAdded, userId, null, null, card, null, null,
                 null, null, null, actionType, actionId, null);
     }
 
     public MagnetoMessage cardUpdated(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.cardUpdated,
-                userId, null, null, card, null, null, null,
+                userId, null, null, card, null, null,
                 null, null, null, actionType, actionId, null);
     }
 
     public MagnetoMessage sectionUpdated(final String boardId, final String wsId, final String userId, final Section section, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.cardUpdated,
-                userId, null, null, null, null, null, null,
+                userId, null, null, null, null, null,
                 section, null, null, actionType, actionId, null);
     }
 
     public MagnetoMessage cardFavorite(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.cardFavorite,
-                userId, null, null, card, null, null, null,
+                userId, null, null, card, null, null,
                 null, null, null, actionType, actionId, null);
     }
 
-    public MagnetoMessage commentAdded(final String boardId, final String wsId, final String userId, final String cardId, final List<Comment> comments, final MagnetoUserAction.ActionType actionType, final String actionId) {
+    public MagnetoMessage commentAdded(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.commentAdded,
-                userId, cardId, null, null, null, null, null,
-                null, comments, null, actionType, actionId, null);
+                userId, null, null, card, null, null,
+                null, null, null, actionType, actionId, null);
     }
 
-    public MagnetoMessage commentDeleted(final String boardId, final String wsId, final String userId, final String cardId, final List<Comment> comments, final MagnetoUserAction.ActionType actionType, final String actionId) {
+    public MagnetoMessage commentDeleted(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.commentDeleted,
-                userId, cardId, null, null, null, null, null,
-                null, comments, null, actionType, actionId, null);
+                userId, null, null, null, null, null,
+                null, null, null, actionType, actionId, null);
     }
 
-    public MagnetoMessage commentEdited(final String boardId, final String wsId, final String userId, final String cardId, final List<Comment> comments, final MagnetoUserAction.ActionType actionType, final String actionId) {
+    public MagnetoMessage commentEdited(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.commentEdited,
-                userId, cardId, null, null, null, null, null,
-                null, comments, null, actionType, actionId, null);
+                userId, null, null, null, null, null,
+                null, null, null, actionType, actionId, null);
     }
 
     /*public MagnetoMessage cardEditionStarted(final String boardId, final String wsId, final String userId, final JsonObject note, final MagnetoUserAction.ActionType actionType, final String actionId) {

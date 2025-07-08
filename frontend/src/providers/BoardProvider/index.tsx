@@ -59,8 +59,8 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const isLocalhost = window.location.hostname === "localhost";
   const getSocketURL = useCallback(() => {
     return isLocalhost
-      ? `ws://${window.location.hostname}:9091/magneto/${id}`
-      : `wss://${window.location.hostname}:9091/magneto/${id}`;
+      ? `ws://localhost:9091/${id}`
+      : `wss://${window.location.hostname}/magneto/ws/${id}`;
   }, [isLocalhost]);
 
   useWebSocketConnection(getSocketURL(), canSynchronous);

@@ -6,3 +6,16 @@ body {
 .MuiBox-root:focus-visible {
   outline: none;
 }
+
+$prefix: 'edifice-';
+
+[data-product="neo"][data-theme="theme-demo-cgi"] {
+  --#{$prefix}primary: #5236AB;
+  --#{$prefix}secondary: #B42D7E;
+
+  .header {
+    .navbar {
+      background: #200a58;
+    }
+  }
+}

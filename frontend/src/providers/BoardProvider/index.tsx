@@ -60,7 +60,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const getSocketURL = useCallback(() => {
     return isLocalhost
       ? `ws://localhost:9091/${id}`
-      : `wss://${window.location.hostname}/magneto/ws/${id}`;
+      : `wss://ng2.support-ent.fr/magneto/ws/${id}`;
   }, [isLocalhost]);
 
   useWebSocketConnection(getSocketURL(), canSynchronous);

@@ -31,7 +31,6 @@ import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
 import { useActions } from "~/services/queries";
-import { useWebSocketConnection } from "~/services/websocket/useWebSocketManager";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -56,14 +55,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const { id = "" } = useParams();
   const { data: actions } = useActions();
   const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
-  const isLocalhost = window.location.hostname === "localhost";
-  const getSocketURL = useCallback(() => {
-    return isLocalhost
-      ? `ws://localhost:9091/${id}`
-      : `wss://ng2.support-ent.fr/magneto/ws/${id}`;
-  }, [isLocalhost]);
 
-  useWebSocketConnection(getSocketURL(), canSynchronous);
   const {
     data: boardData,
     isLoading,

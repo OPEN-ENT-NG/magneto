@@ -1,515 +1,184 @@
-import { useCallback, useEffect, useState } from "react";
+/*import React, { createContext, useContext, useEffect, ReactNode, FC, useCallback, useMemo, useState } from 'react';
+import useWebSocket from 'react-use-websocket';
 
-export type UpdateHandler = (update: any) => void;
-
-export interface WebSocketSubscription {
-  id: string;
-  handler: UpdateHandler;
+// Définir les interfaces
+interface WebSocketUpdate {
+  type: string;
+  card?: any;
+  cardId?: string;
+  section?: any;
+  sectionId?: string;
+  [key: string]: any;
 }
 
-interface WebSocketState {
-  socket: WebSocket | null;
-  subscriptions: Map<string, WebSocketSubscription[]>;
-  isConnected: boolean;
-  reconnectAttempts: number;
-  connectionPromise: Promise<void> | null;
-  metadata: {
-    connectedUsers: any[];
-  };
-  canSynchronous: boolean;
+interface WebSocketContextValue {
+  sendMessage: (message: string) => void;
+  lastMessage: MessageEvent<any> | null;
+  readyState: number;
+  applyBoardUpdate: (draft: any, update: WebSocketUpdate) => void;
+  registerCacheUpdateCallback: (callback: (update: WebSocketUpdate) => void) => () => void;
+  useWebSocketCacheUpdater: () => (cacheLifecycleApi: any) => void;
 }
 
-// Store global partagé (sans classe)
-const globalWebSocketState: WebSocketState = {
-  socket: null,
-  subscriptions: new Map(),
-  isConnected: false,
-  reconnectAttempts: 0,
-  connectionPromise: null,
-  metadata: {
-    connectedUsers: [],
-  },
-  canSynchronous: true,
-};
+// Créer le contexte
+const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 
-const MAX_RECONNECT_ATTEMPTS = 5;
+interface WebSocketProviderProps {
+  children: ReactNode;
+  socketUrl: string;
+  onMessage?: (update: WebSocketUpdate) => void;
+}
 
-const handleMessage = (message: any) => {
-  // Gestion des métadonnées
-  if (message.type === "metadata") {
-    if (message.connectedUsers) {
-      globalWebSocketState.metadata.connectedUsers = message.connectedUsers;
-
-      // Notifier tous les subscribers de métadonnées
-      const metadataSubscribers =
-        globalWebSocketState.subscriptions.get("metadata:*");
-      if (metadataSubscribers) {
-        metadataSubscribers.forEach((sub) =>
-          sub.handler(globalWebSocketState.metadata),
-        );
-      }
-    }
-    return;
-  }
-
-  // Pour les actions liées à un board, on route vers boards:boardId
-  if (message.boardId) {
-    const subscriptionKey = `boards:${message.boardId}`;
-    const subscribers = globalWebSocketState.subscriptions.get(subscriptionKey);
-
-    if (subscribers) {
-      subscribers.forEach((sub) => sub.handler(message));
-    }
-
-    // Également notifier les subscribers génériques pour boards
-    const genericKey = `boards:*`;
-    const genericSubscribers =
-      globalWebSocketState.subscriptions.get(genericKey);
-    if (genericSubscribers) {
-      genericSubscribers.forEach((sub) => sub.handler(message));
-    }
-  }
-};
-
-const attemptReconnect = (url: string) => {
-  if (!globalWebSocketState.canSynchronous) {
-    return;
-  }
-
-  if (globalWebSocketState.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-    console.error("Max reconnection attempts reached");
-    return;
-  }
-
-  const delay = Math.pow(2, globalWebSocketState.reconnectAttempts) * 1000;
-  globalWebSocketState.reconnectAttempts++;
-
-  setTimeout(() => {
-    console.log(
-      `Reconnecting... Attempt ${globalWebSocketState.reconnectAttempts}`,
-    );
-    connectWebSocket(url);
-  }, delay);
-};
-
-const connectWebSocket = (
-  url: string = "ws://localhost:9091/",
-): Promise<void> => {
-  // Ne pas se connecter si canSynchronous est false
-  if (!globalWebSocketState.canSynchronous) {
-    return Promise.resolve();
-  }
-
-  if (globalWebSocketState.connectionPromise) {
-    return globalWebSocketState.connectionPromise;
-  }
-
-  globalWebSocketState.connectionPromise = new Promise((resolve, reject) => {
-    try {
-      globalWebSocketState.socket = new WebSocket(url);
-
-      globalWebSocketState.socket.onopen = () => {
-        console.log("WebSocket connected");
-        globalWebSocketState.isConnected = true;
-        globalWebSocketState.reconnectAttempts = 0;
-        resolve();
-      };
-
-      globalWebSocketState.socket.onmessage = (event) => {
-        console.log("Message reçu, ", JSON.parse(event.data));
-        handleMessage(JSON.parse(event.data));
-      };
-
-      globalWebSocketState.socket.onclose = () => {
-        console.log("WebSocket disconnected");
-        globalWebSocketState.isConnected = false;
-        globalWebSocketState.connectionPromise = null;
-        attemptReconnect(url);
-      };
-
-      globalWebSocketState.socket.onerror = (error) => {
-        console.error("WebSocket error:", error);
-        reject(error);
-      };
-    } catch (error) {
-      reject(error);
-    }
+export const WebSocketProvider: FC<WebSocketProviderProps> = ({ children, socketUrl, onMessage }) => {
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+    onOpen: () => console.log('WebSocket connected'),
+    onClose: () => console.log('WebSocket disconnected'),
+    onError: (error: any) => console.error('WebSocket error:', error),
+    shouldReconnect: () => true,
+    reconnectInterval: 3000,
+    reconnectAttempts: 10,
   });
 
-  return globalWebSocketState.connectionPromise;
-};
+  // Registry pour les callbacks RTK Query
+  const cacheUpdateCallbacks = useMemo(() => new Set<(update: WebSocketUpdate) => void>(), []);
 
-export const useWebSocketManager = () => {
-  const subscribe = useCallback(
-    (
-      resource: string,
-      resourceId: string = "*",
-      handler: UpdateHandler,
-    ): (() => void) => {
-      // Ne pas s'abonner si canSynchronous est false
-      if (!globalWebSocketState.canSynchronous) {
-        return () => {}; // Retourner une fonction vide
-      }
-
-      const subscriptionKey = `${resource}:${resourceId}`;
-      const subscriptionId = `${subscriptionKey}:${Date.now()}:${Math.random()}`;
-
-      const subscription: WebSocketSubscription = {
-        id: subscriptionId,
-        handler,
-      };
-
-      if (!globalWebSocketState.subscriptions.has(subscriptionKey)) {
-        globalWebSocketState.subscriptions.set(subscriptionKey, []);
-      }
-
-      globalWebSocketState.subscriptions
-        .get(subscriptionKey)!
-        .push(subscription);
-
-      return () => {
-        const subs = globalWebSocketState.subscriptions.get(subscriptionKey);
-        if (subs) {
-          const index = subs.findIndex((s) => s.id === subscriptionId);
-          if (index !== -1) {
-            subs.splice(index, 1);
-            if (subs.length === 0) {
-              globalWebSocketState.subscriptions.delete(subscriptionKey);
-            }
+  const applyBoardUpdate = useCallback((draft: any, update: WebSocketUpdate) => {
+    switch (update.type) {
+      case 'cardAdded': {
+        const newCard = update.card;
+        if (draft.sections && newCard.sectionId) {
+          const section = draft.sections.find((s: any) => s._id === newCard.sectionId);
+          if (section && section.cards) {
+            section.cards.unshift(newCard);
+          }
+        } else if (draft.cards) {
+          draft.cards.unshift(newCard);
+          if (draft.cardIds) {
+            draft.cardIds.unshift(newCard.id);
           }
         }
-      };
-    },
-    [],
-  );
-
-  const connect = useCallback(async (url?: string) => {
-    if (!globalWebSocketState.canSynchronous) {
-      return Promise.resolve();
-    }
-    return connectWebSocket(url);
-  }, []);
-
-  const disconnect = useCallback(() => {
-    globalWebSocketState.socket?.close();
-    globalWebSocketState.socket = null;
-    globalWebSocketState.isConnected = false;
-    globalWebSocketState.connectionPromise = null;
-    globalWebSocketState.subscriptions.clear();
-  }, []);
-
-  const send = useCallback((message: any) => {
-    if (
-      globalWebSocketState.socket &&
-      globalWebSocketState.isConnected &&
-      globalWebSocketState.canSynchronous
-    ) {
-      globalWebSocketState.socket.send(JSON.stringify(message));
-    }
-  }, []);
-
-  // Fonction pour mettre à jour canSynchronous
-  const setCanSynchronous = useCallback((value: boolean) => {
-    globalWebSocketState.canSynchronous = value;
-
-    // Si on désactive la synchronisation, déconnecter
-    if (!value && globalWebSocketState.socket) {
-      globalWebSocketState.socket.close();
-      globalWebSocketState.socket = null;
-      globalWebSocketState.isConnected = false;
-      globalWebSocketState.connectionPromise = null;
-    }
-  }, []);
-
-  const getMetadata = useCallback(() => {
-    return globalWebSocketState.metadata;
-  }, []);
-
-  const getConnectedUsers = useCallback(() => {
-    return globalWebSocketState.metadata.connectedUsers;
-  }, []);
-
-  return {
-    subscribe,
-    connect,
-    disconnect,
-    send,
-    isConnected:
-      globalWebSocketState.isConnected && globalWebSocketState.canSynchronous,
-    setCanSynchronous,
-    getMetadata,
-    getConnectedUsers,
-  };
-};
-
-// Hook pour la connexion automatique
-export const useWebSocketConnection = (
-  url?: string,
-  canSynchronous?: boolean,
-) => {
-  const { connect, disconnect, setCanSynchronous } = useWebSocketManager();
-
-  useEffect(() => {
-    if (canSynchronous !== undefined) {
-      setCanSynchronous(canSynchronous);
-    }
-
-    if (globalWebSocketState.canSynchronous) {
-      connect(url).catch(console.error);
-    }
-
-    return () => {
-      disconnect();
-    };
-  }, [connect, disconnect, url, setCanSynchronous, canSynchronous]);
-};
-
-// Hook spécialisé pour les métadonnées
-export const useWebSocketMetadata = () => {
-  const [metadata, setMetadata] = useState(globalWebSocketState.metadata);
-  const { subscribe } = useWebSocketManager();
-
-  useEffect(() => {
-    const unsubscribe = subscribe("metadata", "*", (newMetadata: any) => {
-      setMetadata(newMetadata);
-    });
-
-    return unsubscribe;
-  }, [subscribe]);
-
-  return metadata;
-};
-
-// Hook spécialisé pour les utilisateurs connectés
-export const useConnectedUsers = () => {
-  const [connectedUsers, setConnectedUsers] = useState(
-    globalWebSocketState.metadata.connectedUsers,
-  );
-  const { subscribe } = useWebSocketManager();
-
-  useEffect(() => {
-    const unsubscribe = subscribe("metadata", "*", (metadata: any) => {
-      setConnectedUsers(metadata.connectedUsers || []);
-    });
-
-    return unsubscribe;
-  }, [subscribe]);
-
-  return connectedUsers;
-};
-
-export const createRTKWebSocketIntegration = () => {
-  const ensureConnection = async () => {
-    if (!globalWebSocketState.canSynchronous) {
-      return;
-    }
-    await connectWebSocket();
-  };
-
-  const createOnCacheEntryAdded =
-    (resource: string, resourceId?: string) =>
-    async (
-      arg: any,
-      { updateCachedData, cacheDataLoaded, cacheEntryRemoved }: any,
-    ) => {
-      if (!globalWebSocketState.canSynchronous) {
-        await cacheEntryRemoved;
-        return;
+        break;
       }
 
-      await Promise.all([cacheDataLoaded, ensureConnection()]);
-
-      const targetResourceId =
-        resourceId || arg.boardId || arg.cardId || arg.userId || "all";
-
-      // Utiliser directement la fonction subscribe globale
-      const unsubscribe = subscribeToWebSocket(
-        resource,
-        targetResourceId,
-        (update) => {
-          updateCachedData((draft: any) => {
-            applyUpdateToDraft(draft, update, resource);
+      case 'cardFavorite':
+      case 'commentAdded':
+      case 'commentEdited':
+      case 'commentDeleted':
+      case 'cardUpdated': {
+        if (draft.cards) {
+          const cardIndex = draft.cards.findIndex((c: any) => c.id === update.card.id);
+          if (cardIndex !== -1) {
+            const filteredUpdate = Object.fromEntries(Object.entries(update.card).filter(([, value]) => value !== null));
+            Object.assign(draft.cards[cardIndex], filteredUpdate);
+          }
+        }
+        if (draft.sections) {
+          draft.sections.forEach((section: any) => {
+            if (section.cards) {
+              const cardIndex = section.cards.findIndex((c: any) => c.id === update.card.id);
+              if (cardIndex !== -1) {
+                const filteredUpdate = Object.fromEntries(Object.entries(update.card).filter(([, value]) => value !== null));
+                Object.assign(section.cards[cardIndex], filteredUpdate);
+              }
+            }
           });
-        },
-      );
-
-      await cacheEntryRemoved;
-      unsubscribe();
-    };
-
-  return { createOnCacheEntryAdded };
-};
-
-// Fonction globale pour subscribe (sans hook)
-const subscribeToWebSocket = (
-  resource: string,
-  resourceId: string = "*",
-  handler: UpdateHandler,
-): (() => void) => {
-  if (!globalWebSocketState.canSynchronous) {
-    return () => {};
-  }
-
-  const subscriptionKey = `${resource}:${resourceId}`;
-  const subscriptionId = `${subscriptionKey}:${Date.now()}:${Math.random()}`;
-
-  const subscription: WebSocketSubscription = {
-    id: subscriptionId,
-    handler,
-  };
-
-  if (!globalWebSocketState.subscriptions.has(subscriptionKey)) {
-    globalWebSocketState.subscriptions.set(subscriptionKey, []);
-  }
-
-  globalWebSocketState.subscriptions.get(subscriptionKey)!.push(subscription);
-
-  return () => {
-    const subs = globalWebSocketState.subscriptions.get(subscriptionKey);
-    if (subs) {
-      const index = subs.findIndex((s) => s.id === subscriptionId);
-      if (index !== -1) {
-        subs.splice(index, 1);
-        if (subs.length === 0) {
-          globalWebSocketState.subscriptions.delete(subscriptionKey);
         }
+        break;
       }
-    }
-  };
-};
 
-// Fonction helper pour appliquer les mises à jour selon le type de resource
-const applyUpdateToDraft = (draft: any, update: any, resource: string) => {
-  switch (resource) {
-    case "boards":
-      applyBoardUpdate(draft, update);
-      break;
-    case "cards":
-      applyCardUpdate(draft, update);
-      break;
-    case "users":
-      applyUserUpdate(draft, update);
-      break;
-    default:
-      console.warn(`Unknown resource type: ${resource}`);
-  }
-};
-
-const applyBoardUpdate = (draft: any, update: any) => {
-  switch (update.type) {
-    case "cardAdded": {
-      const newCard = update.card;
-      if (draft.sections && newCard.sectionId) {
-        // Board avec sections - ajouter la carte à la bonne section
-        const section = draft.sections.find(
-          (s: any) => s._id === newCard.sectionId,
-        );
-        if (section && section.cards) {
-          section.cards.unshift(newCard);
+      case 'cardDeleted': {
+        const cardIdToDelete = update.cardId || update.card?.id;
+        if (draft.cards) {
+          draft.cards = draft.cards.filter((c: any) => c.id !== cardIdToDelete);
+          if (draft.cardIds) {
+            draft.cardIds = draft.cardIds.filter((id: any) => id !== cardIdToDelete);
+          }
         }
-      } else if (draft.cards) {
-        // Board libre - ajouter la carte au tableau principal
-        draft.cards.unshift(newCard);
-        // Mettre à jour cardIds si présent
-        if (draft.cardIds) {
-          draft.cardIds.unshift(newCard.id);
-        }
-      }
-      break;
-    }
-
-    case "cardFavorite":
-    case "commentAdded":
-    case "commentEdited":
-    case "commentDeleted":
-    case "cardUpdated": {
-      // Gérer la mise à jour d'une carte existante
-      if (draft.cards) {
-        const cardIndex = draft.cards.findIndex(
-          (c: any) => c.id === update.card.id,
-        );
-        if (cardIndex !== -1) {
-          const filteredUpdate = Object.fromEntries(
-            Object.entries(update.card).filter(([, value]) => value !== null),
-          );
-          Object.assign(draft.cards[cardIndex], filteredUpdate);
-        }
-      }
-      // Aussi checker dans les sections
-      if (draft.sections) {
-        draft.sections.forEach((section: any) => {
-          if (section.cards) {
-            const cardIndex = section.cards.findIndex(
-              (c: any) => c.id === update.card.id,
-            );
-            if (cardIndex !== -1) {
-              const filteredUpdate = Object.fromEntries(
-                Object.entries(update.card).filter(
-                  ([, value]) => value !== null,
-                ),
-              );
-              Object.assign(section.cards[cardIndex], filteredUpdate);
+        if (draft.sections) {
+          draft.sections.forEach((section: any) => {
+            if (section.cards) {
+              section.cards = section.cards.filter((c: any) => c.id !== cardIdToDelete);
             }
-          }
-        });
-      }
-      break;
-    }
-
-    case "cardDeleted": {
-      const cardIdToDelete = update.cardId || update.card?.id;
-      if (draft.cards) {
-        draft.cards = draft.cards.filter((c: any) => c.id !== cardIdToDelete);
-        if (draft.cardIds) {
-          draft.cardIds = draft.cardIds.filter(
-            (id: any) => id !== cardIdToDelete,
-          );
+          });
         }
+        break;
       }
-      if (draft.sections) {
-        draft.sections.forEach((section: any) => {
-          if (section.cards) {
-            section.cards = section.cards.filter(
-              (c: any) => c.id !== cardIdToDelete,
-            );
+
+      case 'sectionUpdated': {
+        if (draft.sections) {
+          const sectionIndex = draft.sections.findIndex((s: any) => s.id === update.section.id);
+          if (sectionIndex !== -1) {
+            const filteredUpdate = Object.fromEntries(Object.entries(update.section).filter(([, value]) => value !== null));
+            Object.assign(draft.sections[sectionIndex], filteredUpdate);
           }
-        });
-      }
-      break;
-    }
-
-    case "sectionUpdated": {
-      // Gérer la mise à jour d'une carte existante
-      if (draft.section) {
-        const sectionIndex = draft.sections.findIndex(
-          (c: any) => c.id === update.card.id,
-        );
-        if (sectionIndex !== -1) {
-          const filteredUpdate = Object.fromEntries(
-            Object.entries(update.section).filter(
-              ([, value]) => value !== null,
-            ),
-          );
-          Object.assign(draft.sections[sectionIndex], filteredUpdate);
         }
+        break;
       }
-      break;
     }
+  }, []);
 
-    // ... autres cases existants
-  }
+  const registerCacheUpdateCallback = useCallback((callback: (update: WebSocketUpdate) => void) => {
+    cacheUpdateCallbacks.add(callback);
+    return () => {
+      cacheUpdateCallbacks.delete(callback);
+    };
+  }, [cacheUpdateCallbacks]);
+
+  const useWebSocketCacheUpdater = useCallback(() => {
+    return (cacheLifecycleApi: any) => {
+      const { updateCachedData, cacheDataLoaded, cacheEntryRemoved } = cacheLifecycleApi;
+
+      cacheDataLoaded.then(() => {
+        const unsubscribe = registerCacheUpdateCallback((update: WebSocketUpdate) => {
+          updateCachedData((draft: any) => {
+            applyBoardUpdate(draft, update);
+          });
+        });
+
+        cacheEntryRemoved.then(unsubscribe);
+      });
+    };
+  }, [registerCacheUpdateCallback, applyBoardUpdate]);
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      try {
+        const update: WebSocketUpdate = JSON.parse(lastMessage.data);
+
+        if (onMessage) {
+          onMessage(update);
+        }
+
+        cacheUpdateCallbacks.forEach((callback) => {
+          callback(update);
+        });
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    }
+  }, [lastMessage, onMessage, cacheUpdateCallbacks]);
+
+  const contextValue: WebSocketContextValue = useMemo(() => ({
+    sendMessage,
+    lastMessage,
+    readyState,
+    applyBoardUpdate,
+    registerCacheUpdateCallback,
+    useWebSocketCacheUpdater,
+  }), [sendMessage, lastMessage, readyState, applyBoardUpdate, registerCacheUpdateCallback, useWebSocketCacheUpdater]);
+
+  return (
+    <WebSocketContext.Provider value={contextValue}>
+      {children}
+    </WebSocketContext.Provider>
+  );
 };
 
-const applyCardUpdate = (draft: any, update: any) => {
-  // Logique spécifique aux cartes
-  if (update.type === "CARD_UPDATE") {
-    Object.assign(draft, update.data);
+export const useWebSocketContext = () => {
+  const context = useContext(WebSocketContext);
+  if (!context) {
+    throw new Error('useWebSocketContext must be used within a WebSocketProvider');
   }
+  return context;
 };
-
-const applyUserUpdate = (draft: any, update: any) => {
-  // Logique spécifique aux utilisateurs
-  if (update.type === "USER_UPDATE") {
-    Object.assign(draft, update.data);
-  }
-};
+*/

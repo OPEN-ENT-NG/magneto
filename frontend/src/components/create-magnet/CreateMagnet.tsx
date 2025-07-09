@@ -66,10 +66,11 @@ import {
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
 import { workspaceApi } from "~/services/api/workspace.service";
-import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
+//import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
-  const { send, isConnected } = useWebSocketManager();
+  //const { send, isConnected } = useWebSocketManager();
+  const isConnected = false;
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
   const dispatchRTK = useDispatch();
@@ -150,19 +151,19 @@ export const CreateMagnet: FC = () => {
     };
     if (isEditMagnet) {
       if (isConnected) {
-        send({
+        /*send({
           type: "cardUpdated",
           card: payload,
-        });
+        });*/
       } else {
         await updateCard(payload);
       }
     } else {
       if (isConnected) {
-        send({
+        /*send({
           type: "cardAdded",
           card: payload,
-        });
+        });*/
       } else {
         await createCard(payload);
       }

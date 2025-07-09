@@ -46,10 +46,10 @@ import { BoardDescription } from "../board-description/BoardDescription";
 import useDirectory from "~/hooks/useDirectory";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
-import {
+/*import {
   useConnectedUsers,
   useWebSocketManager,
-} from "~/services/websocket/useWebSocketManager";
+} from "~/services/websocket/useWebSocketManager";*/
 
 export const HeaderView: FC = () => {
   const { board, isExternalView } = useBoard();
@@ -70,8 +70,9 @@ export const HeaderView: FC = () => {
   };
 
   const edificeClient = useEdificeClient();
-  const { isConnected } = useWebSocketManager();
-  const connectedUsers = useConnectedUsers();
+  //const { isConnected } = useWebSocketManager();
+  const isConnected = false;
+  const connectedUsers: any[] = []; //useConnectedUsers();
   const { currentApp } = isExternalView
     ? { currentApp: magnetoWebApp }
     : edificeClient;
@@ -98,7 +99,7 @@ export const HeaderView: FC = () => {
     );
   };
 
-  const otherConnectedUsers = connectedUsers.filter(
+  const otherConnectedUsers = connectedUsers?.filter(
     (user) => user.userId !== edificeClient?.user?.userId,
   );
 

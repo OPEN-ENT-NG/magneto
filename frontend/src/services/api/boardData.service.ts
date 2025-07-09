@@ -4,11 +4,11 @@ import {
 } from "@reduxjs/toolkit/query";
 
 import { emptySplitApi } from "./emptySplitApi.service";
-import { createRTKWebSocketIntegration } from "../websocket/useWebSocketManager";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { IBoardItemResponse } from "~/models/board.model";
 import { ICardsResponse } from "~/models/card.model";
 import { Section } from "~/providers/BoardProvider/types";
+import { useWebSocketContext } from "~/providers/WebsocketProvider";
 
 interface BoardsResponse {
   all: IBoardItemResponse[];
@@ -18,7 +18,7 @@ interface SectionsResponse {
   all: Section[];
 }
 
-const rtqWebSocket = createRTKWebSocketIntegration();
+const { applyBoardUpdate } = useWebSocketContext();
 
 export const boardDataApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -96,7 +96,35 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
           };
         }
       },
-      onCacheEntryAdded: rtqWebSocket.createOnCacheEntryAdded("boards"),
+      async onCacheEntryAdded(
+        arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, extra },
+      ) {
+        try {
+          // Wait for the data to be loaded
+          await cacheDataLoaded;
+
+          // Get the store from the extra argument
+          const store = extra as any; // Adjust the type according to your store type
+
+          // Subscribe to the store updates
+          const unsubscribe = store.subscribe(() => {
+            const action = store.getState().lastAction;
+            if (action?.type === "api/updateCache") {
+              updateCachedData((draft: any) => {
+                applyBoardUpdate(draft, action.payload);
+              });
+            }
+          });
+
+          // Clean up when the cache entry is removed
+          await cacheEntryRemoved;
+          unsubscribe();
+        } catch (error) {
+          console.error("Error in cache entry lifecycle:", error);
+        }
+      },
+
       providesTags: ["BoardData"],
     }),
   }),

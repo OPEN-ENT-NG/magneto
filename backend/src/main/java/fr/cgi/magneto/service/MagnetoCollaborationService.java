@@ -87,5 +87,5 @@ public interface MagnetoCollaborationService {
 
     Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId);
 
-    Future<List<MagnetoMessage>> onNewDisconnection(String boardId, UserInfos user, String wsId);
+    Future<List<MagnetoMessage>> onNewDisconnection(String boardId, String userId, String wsId);
 }

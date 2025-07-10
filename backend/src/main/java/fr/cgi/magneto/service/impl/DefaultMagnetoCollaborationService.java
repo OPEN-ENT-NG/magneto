@@ -233,14 +233,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             try {
                 if (action.isValid()) {
                     return executeAction(action, boardId, wsId, user, checkConcurency);
-                    /*final MagnetoMessage newActionMessage = new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                            MagnetoMessageType.ping, user.getUserId(), null, null, null, null, null, null, null, null,
-                            null);
-                    final Promise<List<MagnetoMessage>> promise = Promise.promise();
-                    List<MagnetoMessage> messages = new ArrayList<>();
-                    messages.add(newActionMessage);
-                    promise.complete(messages);
-                    return promise.future();*/
                 } else {
                     return Future.failedFuture("magneto.action.invalid");
                 }
@@ -514,24 +506,37 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     }
 
     @Override
-    public Future<List<MagnetoMessage>> onNewDisconnection(String boardId, UserInfos user, final String wsId) {
-        final MagnetoMessage disconnectionMessage = this.messageFactory.disconnection(boardId, wsId, user.getUserId());
+    public Future<List<MagnetoMessage>> onNewDisconnection(String boardId, String userId, final String wsId) {
+        Promise<List<MagnetoMessage>> promise = Promise.promise();
+        final MagnetoMessage disconnectionMessage = this.messageFactory.disconnection(boardId, wsId, userId);
 
         // Récupérer le contexte pour ce board
         final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
+        List<MagnetoMessage> messages = new ArrayList<>();
+        messages.add(disconnectionMessage);
+
         if (context != null) {
             // Retirer l'utilisateur du contexte
-            context.removeConnectedUser(user.getUserId());
+            context.removeConnectedUser(userId);
 
             // Si plus personne n'est connecté, on peut supprimer le contexte
             if (context.getConnectedUsers().isEmpty()) {
                 metadataByBoardId.remove(boardId);
             }
+            final MagnetoMessage metadataMessage = this.messageFactory.metadata(
+                    boardId,
+                    wsId,
+                    userId,
+                    new CollaborationUsersMetadata(
+                            context.getEditing(),
+                            context.getConnectedUsers()
+                    ),
+                    this.maxConnectedUser
+            );
+            messages.add(metadataMessage);
         }
-        List<MagnetoMessage> messages = Collections.singletonList(disconnectionMessage);
-
-        return publishMetadata(boardId, context)
-                .map(v -> messages);
+        promise.complete(messages);
+        return promise.future();
     }
 
 

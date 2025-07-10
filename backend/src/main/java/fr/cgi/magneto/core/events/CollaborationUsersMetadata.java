@@ -46,7 +46,4 @@ public class CollaborationUsersMetadata {
         this.connectedUsers.removeIf(user -> user.getUserId().equals(userId));
         this.getEditing().removeIf(info -> info.getUserId().equals(userId));
     }
-
-
-
 }

@@ -16,7 +16,8 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MagnetoUserAction {
+
+public class MagnetoUserActionPayload {
     private final MagnetoMessageType type;
     private final List<Card> cards;
     private final String cardId;
@@ -25,22 +26,20 @@ public class MagnetoUserAction {
     private final Section section;
     private final Comment comment;
     private final String commentId;
-    private final Boolean isLiked;
     private final ActionType actionType;
     private final String actionId;
 
     @JsonCreator
-    public MagnetoUserAction(@JsonProperty("type") final MagnetoMessageType type,
-                                       @JsonProperty("notes") final List<Card> cards,
-                                       @JsonProperty("cardId") final String cardId,
-                                       @JsonProperty("card") final CardPayload card,
-                                       @JsonProperty("board") final Board board,
-                                       @JsonProperty("section") final Section section,
-                                       @JsonProperty("comment") final Comment comment,
-                                       @JsonProperty("commentId") final String commentId,
-                                       @JsonProperty("isLiked") final Boolean isLiked,
-                                       @JsonProperty("actionType") final ActionType actionType,
-                                       @JsonProperty("actionId") final String actionId) {
+    public MagnetoUserActionPayload(@JsonProperty("type") final MagnetoMessageType type,
+                             @JsonProperty("notes") final List<Card> cards,
+                             @JsonProperty("cardId") final String cardId,
+                             @JsonProperty("card") final CardPayload card,
+                             @JsonProperty("board") final Board board,
+                             @JsonProperty("section") final Section section,
+                             @JsonProperty("comment") final Comment comment,
+                             @JsonProperty("commentId") final String commentId,
+                             @JsonProperty("actionType") final ActionType actionType,
+                             @JsonProperty("actionId") final String actionId) {
         this.type = type;
         this.cards = cards;
         this.cardId = cardId;
@@ -49,7 +48,6 @@ public class MagnetoUserAction {
         this.section = section;
         this.comment = comment;
         this.commentId = commentId;
-        this.isLiked = isLiked;
         this.actionType = actionType;
         this.actionId = actionId;
     }
@@ -77,8 +75,6 @@ public class MagnetoUserAction {
     public Comment getComment() { return comment; }
 
     public String getCommentId() { return commentId; }
-
-    public Boolean getIsLiked() { return isLiked; }
 
     public ActionType getActionType() {
         return actionType;

@@ -254,8 +254,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             }
 
             case cardAdded: {
-                Card newCard = action.getCard();
-                CardPayload cardPayload = new CardPayload(action.getCard().toJson())
+                CardPayload cardPayload = action.getCard()
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
                 return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
@@ -263,7 +262,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             String cardId = saved.getString(Field.ID);
                             return this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
                                     .map(cards -> {
-                                        Card updatedCard = cards.isEmpty() ? newCard.setId(cardId) : cards.get(0);
+                                        Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(cardId) : cards.get(0);
                                         return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                                     });
                         });
@@ -320,7 +319,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
-                boolean favorite = action.getCard().isLiked();
+                boolean favorite = action.getIsLiked();
                 if(user == null){
                     BadRequestException noUser = new BadRequestException("User not found");
                     String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
@@ -335,7 +334,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         })
                         .flatMap(saved -> this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
                                 .map(cards -> {
-                                    Card updatedCard = cards.isEmpty() ? action.getCard() : cards.get(0);
+                                    Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()) : cards.get(0);
                                     return newArrayList(this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                                 }));
             }

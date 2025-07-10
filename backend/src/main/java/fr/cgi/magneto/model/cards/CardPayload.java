@@ -31,6 +31,26 @@ public class CardPayload implements Model<CardPayload> {
     private String sectionId;
     private List<String> favoriteList;
 
+    public CardPayload() {
+        this.id = null;
+        this.title = "";
+        this.resourceId = "";
+        this.resourceType = "";
+        this.resourceUrl = "";
+        this.description = "";
+        this.ownerId = "";
+        this.ownerName = "";
+        this.lastModifierId = "";
+        this.lastModifierName = "";
+        this.creationDate = DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT);
+        this.modificationDate = DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT);
+        this.caption = "";
+        this.isLocked = false;
+        this.parentId = "";
+        this.boardId = "";
+        this.sectionId = "";
+        this.favoriteList = new ArrayList<>();
+    }
 
     public CardPayload(JsonObject card) {
         this.id = card.getString(Field.ID, null);

@@ -28,7 +28,6 @@ import {
   useCreateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
-//import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const { sendMessage, readyState } = useWebSocketContext();
@@ -59,6 +58,10 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
+
+  useEffect(() => {
+    setInputValue(section?.title);
+  }, [section?.title]);
 
   const updateSectionAndToast = usePredefinedToasts({
     func: updateSection,

@@ -117,7 +117,7 @@ const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
     case "sectionUpdated": {
       if (draft.sections) {
         const sectionIndex = draft.sections.findIndex(
-          (s: any) => s.id === update.section.id,
+          (s: any) => s._id === update.section.id,
         );
         if (sectionIndex !== -1) {
           const filteredUpdate = Object.fromEntries(

@@ -1,11 +1,14 @@
 import { useCallback } from "react";
 
+import { isActionAvailable } from "@edifice.io/client";
 import { ThemeProvider } from "@mui/material/styles";
 import { useParams } from "react-router-dom";
 
 import { BoardView } from "~/components/board-view/BoardView";
+import { workflowName } from "~/config";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { WebSocketProvider } from "~/providers/WebsocketProvider";
+import { useActions } from "~/services/queries";
 import theme from "~/themes/theme";
 
 export const App = () => {
@@ -16,6 +19,8 @@ export const App = () => {
       ? `ws://localhost:9091/${id}`
       : `wss://ng2.support-ent.fr/magneto/ws/${id}`;
   }, [isLocalhost]);
+  const { data: actions } = useActions();
+  const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
 
   return (
     <ThemeProvider theme={theme}>
@@ -24,6 +29,7 @@ export const App = () => {
         onMessage={(update) => {
           console.log("Received WebSocket update:", update);
         }}
+        shouldConnect={canSynchronous}
       >
         <BoardProvider>
           <BoardView />

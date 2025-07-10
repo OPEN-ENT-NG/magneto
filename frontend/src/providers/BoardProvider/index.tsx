@@ -1,14 +1,13 @@
 import {
   FC,
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
 
-import { isActionAvailable, RightRole } from "@edifice.io/client";
+import { RightRole } from "@edifice.io/client";
 import { checkUserRight, useEdificeClient } from "@edifice.io/react";
 import { useParams } from "react-router-dom";
 
@@ -22,7 +21,6 @@ import {
   initialDisplayModals,
   updateZoomPreference,
 } from "./utils";
-import { workflowName } from "~/config";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { Board, IBoardItemResponse } from "~/models/board.model";
@@ -30,7 +28,6 @@ import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
 import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
-import { useActions } from "~/services/queries";
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
@@ -53,8 +50,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
   const { id = "" } = useParams();
-  const { data: actions } = useActions();
-  const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
 
   const {
     data: boardData,

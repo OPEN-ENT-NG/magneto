@@ -1,5 +1,12 @@
-import React, { createContext, useContext, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  ReactNode,
+  useState,
+} from "react";
 
+import { IUserInfo } from "@edifice.io/client";
 import useWebSocket from "react-use-websocket";
 
 interface WebSocketUpdate {
@@ -8,6 +15,7 @@ interface WebSocketUpdate {
   cardId?: string;
   section?: any;
   sectionId?: string;
+  connectedUsers?: IUserInfo[];
   [key: string]: any;
 }
 
@@ -15,6 +23,7 @@ interface WebSocketContextValue {
   sendMessage: (message: string) => void;
   lastMessage: MessageEvent<any> | null;
   readyState: number;
+  connectedUsers: IUserInfo[];
 }
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
@@ -23,6 +32,7 @@ interface WebSocketProviderProps {
   children: ReactNode;
   socketUrl: string;
   onMessage?: (update: WebSocketUpdate) => void;
+  shouldConnect?: boolean;
 }
 
 // Registry pour les callbacks RTK Query
@@ -137,20 +147,30 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   children,
   socketUrl,
   onMessage,
+  shouldConnect = true,
 }) => {
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
-    onOpen: () => console.log("WebSocket connected"),
-    onClose: () => console.log("WebSocket disconnected"),
-    onError: (error: any) => console.error("WebSocket error:", error),
-    shouldReconnect: () => true, // Reconnexion automatique
-    reconnectInterval: 3000,
-    reconnectAttempts: 10,
-  });
+  const [connectedUsers, setConnectedUsers] = useState<IUserInfo[]>([]);
+
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    shouldConnect ? socketUrl : null,
+    {
+      onOpen: () => console.log("WebSocket connected"),
+      onClose: () => console.log("WebSocket disconnected"),
+      onError: (error: any) => console.error("WebSocket error:", error),
+      shouldReconnect: () => shouldConnect,
+      reconnectInterval: 3000,
+      reconnectAttempts: 10,
+    },
+  );
 
   useEffect(() => {
     if (lastMessage !== null) {
       try {
         const update: WebSocketUpdate = JSON.parse(lastMessage.data);
+
+        if (update.type === "metadata" && update.connectedUsers) {
+          setConnectedUsers(update.connectedUsers);
+        }
 
         // Appeler le callback personnalisé si fourni
         if (onMessage) {
@@ -171,6 +191,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     sendMessage,
     lastMessage,
     readyState,
+    connectedUsers,
   };
 
   return (

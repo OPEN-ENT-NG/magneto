@@ -71,8 +71,7 @@ export const HeaderView: FC = () => {
   };
 
   const edificeClient = useEdificeClient();
-  const { readyState } = useWebSocketContext();
-  const connectedUsers: any[] = []; //useConnectedUsers();
+  const { readyState, connectedUsers } = useWebSocketContext();
   const { currentApp } = isExternalView
     ? { currentApp: magnetoWebApp }
     : edificeClient;
@@ -163,9 +162,7 @@ export const HeaderView: FC = () => {
                           {otherConnectedUsers.map((user) => (
                             <Tooltip
                               key={user.userId}
-                              title={
-                                user.username || user.name || "Utilisateur"
-                              }
+                              title={user.username || "Utilisateur"}
                               placement="bottom"
                               arrow
                               componentsProps={{
@@ -294,7 +291,7 @@ export const HeaderView: FC = () => {
                           <ListItemAvatar>
                             <Avatar
                               src={getAvatarURL(user.userId, "user")}
-                              alt={user.username || user.name}
+                              alt={user.username}
                               sx={{ width: 40, height: 40 }}
                             />
                           </ListItemAvatar>
@@ -304,7 +301,7 @@ export const HeaderView: FC = () => {
                                 variant="body1"
                                 sx={{ fontWeight: 500 }}
                               >
-                                {user.username || user.name || "Utilisateur"}
+                                {user.username || "Utilisateur"}
                               </Typography>
                             }
                             secondary={
@@ -312,7 +309,7 @@ export const HeaderView: FC = () => {
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                {user.role || "Éditeur"}
+                                {"Éditeur"}
                               </Typography>
                             }
                           />

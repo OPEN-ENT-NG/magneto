@@ -23,6 +23,7 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoard } from "~/providers/BoardProvider";
+import { useWebSocketContext } from "~/providers/WebsocketProvider";
 import {
   useCreateSectionMutation,
   useUpdateSectionMutation,
@@ -30,8 +31,7 @@ import {
 //import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
-  //const { send, isConnected } = useWebSocketManager();
-  const isConnected = false;
+  const { sendMessage, readyState } = useWebSocketContext();
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const toast = useToast();
@@ -79,16 +79,18 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     }
     if (section?._id !== "new-section") {
       if (section.title === inputValue) return;
-      if (isConnected) {
-        /*send({
-          type: "sectionUpdated",
-          section: {
-            boardId,
-            id: section?._id,
-            title: inputValue,
-            cardIds: section.cardIds,
-          },
-        });*/
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "sectionUpdated",
+            section: {
+              boardId,
+              id: section?._id,
+              title: inputValue,
+              cardIds: section.cardIds,
+            },
+          }),
+        );
         return;
       } else {
         return updateSectionAndToast({

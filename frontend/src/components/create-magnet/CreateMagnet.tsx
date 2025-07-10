@@ -61,6 +61,7 @@ import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { useWebSocketContext } from "~/providers/WebsocketProvider";
 import {
   useCreateCardMutation,
   useUpdateCardMutation,
@@ -69,8 +70,7 @@ import { workspaceApi } from "~/services/api/workspace.service";
 //import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
-  //const { send, isConnected } = useWebSocketManager();
-  const isConnected = false;
+  const { sendMessage, readyState } = useWebSocketContext();
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
   const dispatchRTK = useDispatch();
@@ -150,20 +150,24 @@ export const CreateMagnet: FC = () => {
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
     };
     if (isEditMagnet) {
-      if (isConnected) {
-        /*send({
-          type: "cardUpdated",
-          card: payload,
-        });*/
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "cardUpdated",
+            card: payload,
+          }),
+        );
       } else {
         await updateCard(payload);
       }
     } else {
-      if (isConnected) {
-        /*send({
-          type: "cardAdded",
-          card: payload,
-        });*/
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "cardAdded",
+            card: payload,
+          }),
+        );
       } else {
         await createCard(payload);
       }

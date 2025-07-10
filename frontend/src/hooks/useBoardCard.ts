@@ -15,6 +15,7 @@ import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { useWebSocketContext } from "~/providers/WebsocketProvider";
 import {
   useUpdateCardMutation,
   useFavoriteCardMutation,
@@ -26,8 +27,7 @@ export const useBoardCard = (card: Card) => {
   const [updateCard] = useUpdateCardMutation();
   const [favoriteCard] = useFavoriteCardMutation();
   const [deleteCards] = useDeleteCardsMutation();
-  //const { send, isConnected } = useWebSocketManager();
-  const isConnected = false;
+  const { sendMessage, readyState } = useWebSocketContext();
 
   const {
     board,
@@ -133,11 +133,13 @@ export const useBoardCard = (card: Card) => {
   }, [card.id, board.id, deleteCards, closeActiveCardAction]);
 
   const handleFavoriteClick = useCallback(() => {
-    if (isConnected) {
-      /*send({
-        type: "cardFavorite",
-        card: { id: card.id, isLiked: card.liked },
-      });*/
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: "cardFavorite",
+          card: { id: card.id, isLiked: card.liked },
+        }),
+      );
     } else {
       favoriteCard({ cardId: card.id, isFavorite: card.liked });
     }

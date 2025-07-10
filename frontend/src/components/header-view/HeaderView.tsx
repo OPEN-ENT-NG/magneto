@@ -46,6 +46,7 @@ import { BoardDescription } from "../board-description/BoardDescription";
 import useDirectory from "~/hooks/useDirectory";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useWebSocketContext } from "~/providers/WebsocketProvider";
 /*import {
   useConnectedUsers,
   useWebSocketManager,
@@ -70,8 +71,7 @@ export const HeaderView: FC = () => {
   };
 
   const edificeClient = useEdificeClient();
-  //const { isConnected } = useWebSocketManager();
-  const isConnected = false;
+  const { readyState } = useWebSocketContext();
   const connectedUsers: any[] = []; //useConnectedUsers();
   const { currentApp } = isExternalView
     ? { currentApp: magnetoWebApp }
@@ -129,7 +129,7 @@ export const HeaderView: FC = () => {
                 </span>
               </Box>
             )}
-            {isConnected && (
+            {readyState === WebSocket.OPEN && (
               <>
                 <Chip
                   sx={{

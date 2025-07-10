@@ -69,7 +69,7 @@ public class MagnetoMessageFactory {
 
     public MagnetoMessage sectionUpdated(final String boardId, final String wsId, final String userId, final Section section, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                MagnetoMessageType.cardUpdated,
+                MagnetoMessageType.sectionUpdated,
                 userId, null, null, null, null, null,
                 section, null, null, actionType, actionId, null);
     }

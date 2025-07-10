@@ -8,7 +8,10 @@ import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { IBoardItemResponse } from "~/models/board.model";
 import { ICardsResponse } from "~/models/card.model";
 import { Section } from "~/providers/BoardProvider/types";
-import { useWebSocketContext } from "~/providers/WebsocketProvider";
+import {
+  applyBoardUpdate,
+  registerCacheUpdateCallback,
+} from "~/providers/WebsocketProvider";
 
 interface BoardsResponse {
   all: IBoardItemResponse[];
@@ -17,8 +20,6 @@ interface BoardsResponse {
 interface SectionsResponse {
   all: Section[];
 }
-
-const { applyBoardUpdate } = useWebSocketContext();
 
 export const boardDataApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -98,33 +99,26 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
       },
       async onCacheEntryAdded(
         arg,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, extra },
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
       ) {
         try {
-          // Wait for the data to be loaded
+          // Attendre que les données soient chargées
           await cacheDataLoaded;
 
-          // Get the store from the extra argument
-          const store = extra as any; // Adjust the type according to your store type
-
-          // Subscribe to the store updates
-          const unsubscribe = store.subscribe(() => {
-            const action = store.getState().lastAction;
-            if (action?.type === "api/updateCache") {
-              updateCachedData((draft: any) => {
-                applyBoardUpdate(draft, action.payload);
-              });
-            }
+          // S'enregistrer pour recevoir les mises à jour WebSocket
+          const unsubscribe = registerCacheUpdateCallback((update) => {
+            updateCachedData((draft) => {
+              applyBoardUpdate(draft, update);
+            });
           });
 
-          // Clean up when the cache entry is removed
+          // Nettoyer lors de la suppression du cache
           await cacheEntryRemoved;
           unsubscribe();
         } catch (error) {
           console.error("Error in cache entry lifecycle:", error);
         }
       },
-
       providesTags: ["BoardData"],
     }),
   }),

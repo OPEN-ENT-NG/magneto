@@ -41,7 +41,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   );
 
   useEffect(() => {
-    if (lastMessage !== null) {
+    if (lastMessage) {
       try {
         const update: WebSocketUpdate = JSON.parse(lastMessage.data);
 

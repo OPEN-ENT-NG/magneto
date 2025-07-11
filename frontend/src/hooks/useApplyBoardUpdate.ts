@@ -1,3 +1,4 @@
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { WebSocketUpdate } from "~/providers/WebsocketProvider/types";
 
 const cacheUpdateCallbacks = new Set<(update: WebSocketUpdate) => void>();
@@ -17,16 +18,14 @@ export const notifyCacheUpdateCallbacks = (update: WebSocketUpdate) => {
 
 export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
   switch (update.type) {
-    case "cardAdded": {
+    case WEBSOCKET_MESSAGE_TYPE.CARD_ADDED: {
       const newCard = update.card;
-      if (draft.sections && newCard.sectionId) {
-        const section = draft.sections.find(
-          (s: any) => s._id === newCard.sectionId,
-        );
-        if (section && section.cards) {
-          section.cards.unshift(newCard);
+      if (newCard && draft.sections && draft.sections.length > 0) {
+        const firstSection = draft.sections[0];
+        if (firstSection.cards) {
+          firstSection.cards.unshift(newCard);
         }
-      } else if (draft.cards) {
+      } else if (newCard && draft.cards) {
         draft.cards.unshift(newCard);
         if (draft.cardIds) {
           draft.cardIds.unshift(newCard.id);
@@ -35,31 +34,32 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     }
 
-    case "cardFavorite":
-    case "commentAdded":
-    case "commentEdited":
-    case "commentDeleted":
-    case "cardUpdated": {
-      if (draft.cards) {
+    case WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE:
+    case WEBSOCKET_MESSAGE_TYPE.COMMENT_ADDED:
+    case WEBSOCKET_MESSAGE_TYPE.COMMENT_EDITED:
+    case WEBSOCKET_MESSAGE_TYPE.COMMENT_DELETED:
+    case WEBSOCKET_MESSAGE_TYPE.CARD_UPDATED: {
+      const cardToUpdate = update.card;
+      if (cardToUpdate && draft.cards) {
         const cardIndex = draft.cards.findIndex(
-          (c: any) => c.id === update.card.id,
+          (c: any) => c.id === cardToUpdate.id,
         );
         if (cardIndex !== -1) {
           const filteredUpdate = Object.fromEntries(
-            Object.entries(update.card).filter(([, value]) => value !== null),
+            Object.entries(cardToUpdate).filter(([, value]) => value !== null),
           );
           Object.assign(draft.cards[cardIndex], filteredUpdate);
         }
       }
-      if (draft.sections) {
+      if (cardToUpdate && draft.sections) {
         draft.sections.forEach((section: any) => {
           if (section.cards) {
             const cardIndex = section.cards.findIndex(
-              (c: any) => c.id === update.card.id,
+              (c: any) => c.id === cardToUpdate.id,
             );
             if (cardIndex !== -1) {
               const filteredUpdate = Object.fromEntries(
-                Object.entries(update.card).filter(
+                Object.entries(cardToUpdate).filter(
                   ([, value]) => value !== null,
                 ),
               );
@@ -71,7 +71,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     }
 
-    case "cardDeleted": {
+    case WEBSOCKET_MESSAGE_TYPE.CARD_DELETED: {
       const cardIdToDelete = update.cardId || update.card?.id;
       if (draft.cards) {
         draft.cards = draft.cards.filter((c: any) => c.id !== cardIdToDelete);
@@ -93,7 +93,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     }
 
-    case "sectionUpdated": {
+    case WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED: {
       if (draft.sections) {
         const sectionIndex = draft.sections.findIndex(
           (s: any) => s._id === update.section.id,

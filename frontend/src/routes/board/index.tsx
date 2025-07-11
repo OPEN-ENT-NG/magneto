@@ -16,8 +16,8 @@ export const App = () => {
   const isLocalhost = window.location.hostname === "localhost";
   const getSocketURL = useCallback(() => {
     return isLocalhost
-      ? `ws://localhost:9091/${id}`
-      : `wss://ng2.support-ent.fr/magneto/ws/${id}`;
+      ? `ws://${window.location.hostname}:9091/${id}`
+      : `wss://${window.location.host}/magneto/ws/${id}`;
   }, [isLocalhost]);
   const { data: actions } = useActions();
   const canSynchronous = isActionAvailable(workflowName.synchronous, actions);

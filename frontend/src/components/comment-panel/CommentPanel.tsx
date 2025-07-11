@@ -58,7 +58,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   const [addComment] = useAddCommentMutation();
   const { data: commentsData } = useGetAllCommentsQuery(
     { cardId },
-    { skip: comments.length > 0 },
+    { skip: !!comments.length },
   );
   const [inputValue, setInputValue] = useState<string>("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);

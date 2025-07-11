@@ -74,15 +74,3 @@ export const breadcrumbTitle = {
   lineHeight: "1.2",
   fontWeight: "bold",
 };
-
-export const connectedUsersContainerStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-  marginRight: "20px",
-};
-
-export const userTooltipStyle = {
-  fontSize: "12px",
-  padding: "6px 10px",
-};

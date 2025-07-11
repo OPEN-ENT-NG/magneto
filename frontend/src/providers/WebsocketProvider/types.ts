@@ -3,9 +3,11 @@ import { ReactNode } from "react";
 import { IUserInfo } from "@edifice.io/client";
 import { ReadyState } from "react-use-websocket";
 
+import { ICardItemResponse } from "~/models/card.model";
+
 export interface WebSocketUpdate {
   type: string;
-  card?: any;
+  card?: ICardItemResponse;
   cardId?: string;
   section?: any;
   sectionId?: string;

@@ -1,146 +1,23 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  ReactNode,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { IUserInfo } from "@edifice.io/client";
 import useWebSocket from "react-use-websocket";
 
-interface WebSocketUpdate {
-  type: string;
-  card?: any;
-  cardId?: string;
-  section?: any;
-  sectionId?: string;
-  connectedUsers?: IUserInfo[];
-  [key: string]: any;
-}
-
-interface WebSocketContextValue {
-  sendMessage: (message: string) => void;
-  lastMessage: MessageEvent<any> | null;
-  readyState: number;
-  connectedUsers: IUserInfo[];
-}
+import {
+  WebSocketContextValue,
+  WebSocketProviderProps,
+  WebSocketUpdate,
+} from "./types";
+import { notifyCacheUpdateCallbacks } from "~/hooks/useApplyBoardUpdate";
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 
-interface WebSocketProviderProps {
-  children: ReactNode;
-  socketUrl: string;
-  onMessage?: (update: WebSocketUpdate) => void;
-  shouldConnect?: boolean;
-}
-
-// Registry pour les callbacks RTK Query
-const cacheUpdateCallbacks = new Set<(update: WebSocketUpdate) => void>();
-
-export const registerCacheUpdateCallback = (
-  callback: (update: WebSocketUpdate) => void,
-) => {
-  cacheUpdateCallbacks.add(callback);
-  return () => cacheUpdateCallbacks.delete(callback);
-};
-
-// Fonction de traitement des mises à jour (ton code existant)
-const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
-  switch (update.type) {
-    case "cardAdded": {
-      const newCard = update.card;
-      if (draft.sections && newCard.sectionId) {
-        const section = draft.sections.find(
-          (s: any) => s._id === newCard.sectionId,
-        );
-        if (section && section.cards) {
-          section.cards.unshift(newCard);
-        }
-      } else if (draft.cards) {
-        draft.cards.unshift(newCard);
-        if (draft.cardIds) {
-          draft.cardIds.unshift(newCard.id);
-        }
-      }
-      break;
-    }
-
-    case "cardFavorite":
-    case "commentAdded":
-    case "commentEdited":
-    case "commentDeleted":
-    case "cardUpdated": {
-      if (draft.cards) {
-        const cardIndex = draft.cards.findIndex(
-          (c: any) => c.id === update.card.id,
-        );
-        if (cardIndex !== -1) {
-          const filteredUpdate = Object.fromEntries(
-            Object.entries(update.card).filter(([, value]) => value !== null),
-          );
-          Object.assign(draft.cards[cardIndex], filteredUpdate);
-        }
-      }
-      if (draft.sections) {
-        draft.sections.forEach((section: any) => {
-          if (section.cards) {
-            const cardIndex = section.cards.findIndex(
-              (c: any) => c.id === update.card.id,
-            );
-            if (cardIndex !== -1) {
-              const filteredUpdate = Object.fromEntries(
-                Object.entries(update.card).filter(
-                  ([, value]) => value !== null,
-                ),
-              );
-              Object.assign(section.cards[cardIndex], filteredUpdate);
-            }
-          }
-        });
-      }
-      break;
-    }
-
-    case "cardDeleted": {
-      const cardIdToDelete = update.cardId || update.card?.id;
-      if (draft.cards) {
-        draft.cards = draft.cards.filter((c: any) => c.id !== cardIdToDelete);
-        if (draft.cardIds) {
-          draft.cardIds = draft.cardIds.filter(
-            (id: any) => id !== cardIdToDelete,
-          );
-        }
-      }
-      if (draft.sections) {
-        draft.sections.forEach((section: any) => {
-          if (section.cards) {
-            section.cards = section.cards.filter(
-              (c: any) => c.id !== cardIdToDelete,
-            );
-          }
-        });
-      }
-      break;
-    }
-
-    case "sectionUpdated": {
-      if (draft.sections) {
-        const sectionIndex = draft.sections.findIndex(
-          (s: any) => s._id === update.section.id,
-        );
-        if (sectionIndex !== -1) {
-          const filteredUpdate = Object.fromEntries(
-            Object.entries(update.section).filter(
-              ([, value]) => value !== null,
-            ),
-          );
-          Object.assign(draft.sections[sectionIndex], filteredUpdate);
-        }
-      }
-      break;
-    }
+export const useWebSocketMagneto = () => {
+  const context = useContext(WebSocketContext);
+  if (!context) {
+    throw new Error("useWebSocket must be used within a WebSocketProvider");
   }
+  return context;
 };
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
@@ -178,9 +55,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         }
 
         // Notifier tous les callbacks RTK Query enregistrés
-        cacheUpdateCallbacks.forEach((callback) => {
-          callback(update);
-        });
+        notifyCacheUpdateCallbacks(update);
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
       }
@@ -200,38 +75,3 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     </WebSocketContext.Provider>
   );
 };
-
-export const useWebSocketContext = () => {
-  const context = useContext(WebSocketContext);
-  if (!context) {
-    throw new Error(
-      "useWebSocketContext must be used within a WebSocketProvider",
-    );
-  }
-  return context;
-};
-
-// Hook pour utiliser avec RTK Query onCacheEntryAdded
-export const useWebSocketCacheUpdater = () => {
-  return (cacheLifecycleApi: any) => {
-    const { updateCachedData, cacheDataLoaded, cacheEntryRemoved } =
-      cacheLifecycleApi;
-
-    cacheDataLoaded.then(() => {
-      // S'enregistrer pour recevoir les mises à jour WebSocket
-      const unsubscribe = registerCacheUpdateCallback(
-        (update: WebSocketUpdate) => {
-          updateCachedData((draft: any) => {
-            applyBoardUpdate(draft, update);
-          });
-        },
-      );
-
-      // Nettoyer lors de la suppression du cache
-      cacheEntryRemoved.then(unsubscribe);
-    });
-  };
-};
-
-// Export de la fonction applyBoardUpdate pour utilisation externe
-export { applyBoardUpdate };

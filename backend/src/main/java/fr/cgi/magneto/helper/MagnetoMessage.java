@@ -1,6 +1,7 @@
 package fr.cgi.magneto.helper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.model.Section;
@@ -9,7 +10,6 @@ import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,14 +20,13 @@ public class MagnetoMessage {
     private final String boardId;
     private final long emittedAt;
     private final String emittedBy;
-    /** Id of the websocket that generated the message .*/
     private final String websocketId;
-    private final MagnetoMessageType type; // Replace MessageType with your class
+    private final MagnetoMessageType type;
     private final String userId;
     private final String cardId;
     private final Board board;
     private final Card card;
-    private final Card oldCard; //Will this be useful? We'll see.. TODO remove it if useless
+    private final Card oldCard;
     private final List<Card> cards;
     private final Section section;
     private final List<Section> sections;
@@ -60,41 +59,38 @@ public class MagnetoMessage {
     }
 
     public MagnetoMessage(JsonObject jsonObject) {
-        this.boardId = jsonObject.getString("boardId", null);
-        this.emittedAt = jsonObject.getLong("emittedAt", System.currentTimeMillis());
-        this.emittedBy = jsonObject.getString("emittedBy", null);
-        this.websocketId = jsonObject.getString("websocketId", null);
+        this.boardId = jsonObject.getString(Field.BOARDID, null);
+        this.emittedAt = jsonObject.getLong(Field.EMITTEDAT, System.currentTimeMillis());
+        this.emittedBy = jsonObject.getString(Field.EMITTEDBY, null);
+        this.websocketId = jsonObject.getString(Field.WEBSOCKETID, null);
 
-        // Conversion du type en enum
-        String typeStr = jsonObject.getString("type", null);
+        String typeStr = jsonObject.getString(Field.TYPE, null);
         this.type = typeStr != null ? MagnetoMessageType.valueOf(typeStr) : null;
 
-        this.userId = jsonObject.getString("userId", null);
-        this.cardId = jsonObject.getString("cardId", null);
+        this.userId = jsonObject.getString(Field.USERID, null);
+        this.cardId = jsonObject.getString(Field.CARDID, null);
 
-        // Conversion des objets complexes
-        if (jsonObject.containsKey("board") && jsonObject.getValue("board") instanceof JsonObject) {
-            this.board = new Board(jsonObject.getJsonObject("board"));
+        if (jsonObject.containsKey(Field.BOARD) && jsonObject.getValue(Field.BOARD) instanceof JsonObject) {
+            this.board = new Board(jsonObject.getJsonObject(Field.BOARD));
         } else {
             this.board = null;
         }
 
-        if (jsonObject.containsKey("card") && jsonObject.getValue("card") instanceof JsonObject) {
-            this.card = new Card(jsonObject.getJsonObject("card"));
+        if (jsonObject.containsKey(Field.CARD) && jsonObject.getValue(Field.CARD) instanceof JsonObject) {
+            this.card = new Card(jsonObject.getJsonObject(Field.CARD));
         } else {
             this.card = null;
         }
 
-        if (jsonObject.containsKey("oldCard") && jsonObject.getValue("oldCard") instanceof JsonObject) {
-            this.oldCard = new Card(jsonObject.getJsonObject("oldCard"));
+        if (jsonObject.containsKey(Field.OLDCARD) && jsonObject.getValue(Field.OLDCARD) instanceof JsonObject) {
+            this.oldCard = new Card(jsonObject.getJsonObject(Field.OLDCARD));
         } else {
             this.oldCard = null;
         }
 
-        // Conversion des collections
         this.cards = new ArrayList<>();
-        if (jsonObject.containsKey("cards") && jsonObject.getValue("cards") instanceof JsonArray) {
-            JsonArray cardsArray = jsonObject.getJsonArray("cards");
+        if (jsonObject.containsKey(Field.CARDS) && jsonObject.getValue(Field.CARDS) instanceof JsonArray) {
+            JsonArray cardsArray = jsonObject.getJsonArray(Field.CARDS);
             for (int i = 0; i < cardsArray.size(); i++) {
                 JsonObject cardJson = cardsArray.getJsonObject(i);
                 if (cardJson != null) {
@@ -103,17 +99,15 @@ public class MagnetoMessage {
             }
         }
 
-        // Section
-        if (jsonObject.containsKey("section") && jsonObject.getValue("section") instanceof JsonObject) {
-            this.section = new Section(jsonObject.getJsonObject("section"));
+        if (jsonObject.containsKey(Field.SECTION) && jsonObject.getValue(Field.SECTION) instanceof JsonObject) {
+            this.section = new Section(jsonObject.getJsonObject(Field.SECTION));
         } else {
             this.section = null;
         }
 
-        // Sections list
         this.sections = new ArrayList<>();
-        if (jsonObject.containsKey("sections") && jsonObject.getValue("sections") instanceof JsonArray) {
-            JsonArray sectionsArray = jsonObject.getJsonArray("sections");
+        if (jsonObject.containsKey(Field.SECTIONS) && jsonObject.getValue(Field.SECTIONS) instanceof JsonArray) {
+            JsonArray sectionsArray = jsonObject.getJsonArray(Field.SECTIONS);
             for (int i = 0; i < sectionsArray.size(); i++) {
                 JsonObject sectionJson = sectionsArray.getJsonObject(i);
                 if (sectionJson != null) {
@@ -122,20 +116,17 @@ public class MagnetoMessage {
             }
         }
 
-        // Connected users
         this.connectedUsers = new HashSet<>();
-        if (jsonObject.containsKey("connectedUsers") && jsonObject.getValue("connectedUsers") instanceof JsonArray) {
-            JsonArray usersArray = jsonObject.getJsonArray("connectedUsers");
+        if (jsonObject.containsKey(Field.CONNECTEDUSERS) && jsonObject.getValue(Field.CONNECTEDUSERS) instanceof JsonArray) {
+            JsonArray usersArray = jsonObject.getJsonArray(Field.CONNECTEDUSERS);
             for (int i = 0; i < usersArray.size(); i++) {
                 JsonObject userJson = usersArray.getJsonObject(i);
                 if (userJson != null) {
-                    User userInfo = new User(userJson.getString("id"), userJson.getString("username"));
+                    User userInfo = new User(userJson.getString(Field.ID), userJson.getString(Field.USERNAME));
                     try {
-                        // Remplir UserInfos avec les données de userJson
-                        if (userJson.containsKey("id")) userInfo.setUserId(userJson.getString("id"));
-                        if (userJson.containsKey("username")) userInfo.setUsername(userJson.getString("username"));
-                        if (userJson.containsKey("login")) userInfo.setLogin(userJson.getString("login"));
-                        //if (userJson.containsKey("displayName")) userInfo.setDisplayName(userJson.getString("displayName")); TODO why setDisplayName doesnt want to work??
+                        if (userJson.containsKey(Field.ID)) userInfo.setUserId(userJson.getString(Field.ID));
+                        if (userJson.containsKey(Field.USERNAME)) userInfo.setUsername(userJson.getString(Field.USERNAME));
+                        if (userJson.containsKey(Field.LOGIN)) userInfo.setLogin(userJson.getString(Field.LOGIN));
 
                         this.connectedUsers.add(userInfo);
                     } catch (Exception e) {
@@ -148,10 +139,9 @@ public class MagnetoMessage {
         }
 
         this.actionType = null;
-        this.actionId = jsonObject.getString("actionId", null);
+        this.actionId = jsonObject.getString(Field.ACTIONID, null);
 
-        // Maximum connected users
-        this.maxConnectedUsers =  jsonObject.getLong("maxConnectedUsers", null);
+        this.maxConnectedUsers = jsonObject.getLong(Field.MAXCONNECTEDUSERS, null);
     }
 
     public String getBoardId() {
@@ -229,22 +219,19 @@ public class MagnetoMessage {
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
 
-        // Propriétés simples
-        if (boardId != null) json.put("boardId", boardId);
-        json.put("emittedAt", emittedAt);
-        if (emittedBy != null) json.put("emittedBy", emittedBy);
-        if (websocketId != null) json.put("websocketId", websocketId);
-        if (type != null) json.put("type", type.name());
-        if (userId != null) json.put("userId", userId);
-        if (cardId != null) json.put("cardId", cardId);
-        if (maxConnectedUsers != null) json.put("maxConnectedUsers", maxConnectedUsers);
+        if (boardId != null) json.put(Field.BOARDID, boardId);
+        json.put(Field.EMITTEDAT, emittedAt);
+        if (emittedBy != null) json.put(Field.EMITTEDBY, emittedBy);
+        if (websocketId != null) json.put(Field.WEBSOCKETID, websocketId);
+        if (type != null) json.put(Field.TYPE, type.name());
+        if (userId != null) json.put(Field.USERID, userId);
+        if (cardId != null) json.put(Field.CARDID, cardId);
+        if (maxConnectedUsers != null) json.put(Field.MAXCONNECTEDUSERS, maxConnectedUsers);
 
-        // Objets complexes
-        if (board != null) json.put("board", board.toJson());
-        if (card != null) json.put("card", card.toJson());
-        if (oldCard != null) json.put("oldCard", oldCard.toJson());
+        if (board != null) json.put(Field.BOARD, board.toJson());
+        if (card != null) json.put(Field.CARD, card.toJson());
+        if (oldCard != null) json.put(Field.OLDCARD, oldCard.toJson());
 
-        // Collections
         if (cards != null && !cards.isEmpty()) {
             JsonArray cardsArray = new JsonArray();
             for (Card card : cards) {
@@ -252,10 +239,10 @@ public class MagnetoMessage {
                     cardsArray.add(card.toJson());
                 }
             }
-            json.put("cards", cardsArray);
+            json.put(Field.CARDS, cardsArray);
         }
 
-        if (section != null) json.put("section", section.toJson());
+        if (section != null) json.put(Field.SECTION, section.toJson());
 
         if (sections != null && !sections.isEmpty()) {
             JsonArray sectionsArray = new JsonArray();
@@ -264,24 +251,22 @@ public class MagnetoMessage {
                     sectionsArray.add(section.toJson());
                 }
             }
-            json.put("sections", sectionsArray);
+            json.put(Field.SECTIONS, sectionsArray);
         }
 
-        // Connected users
         if (connectedUsers != null && !connectedUsers.isEmpty()) {
             JsonArray usersArray = new JsonArray();
-            for (UserInfos userInfo : connectedUsers) {
+            for (User userInfo : connectedUsers) {
                 if (userInfo != null) {
                     JsonObject userJson = new JsonObject();
-                    if (userInfo.getUserId() != null) userJson.put("id", userInfo.getUserId());
-                    if (userInfo.getUsername() != null) userJson.put("username", userInfo.getUsername());
-                    if (userInfo.getLogin() != null) userJson.put("login", userInfo.getLogin());
-                    // Ajout d'autres propriétés de UserInfos si nécessaire
+                    if (userInfo.getUserId() != null) userJson.put(Field.ID, userInfo.getUserId());
+                    if (userInfo.getUsername() != null) userJson.put(Field.USERNAME, userInfo.getUsername());
+                    if (userInfo.getLogin() != null) userJson.put(Field.LOGIN, userInfo.getLogin());
 
                     usersArray.add(userJson);
                 }
             }
-            json.put("connectedUsers", usersArray);
+            json.put(Field.CONNECTEDUSERS, usersArray);
         }
 
         return json;

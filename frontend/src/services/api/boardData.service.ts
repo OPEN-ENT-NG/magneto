@@ -5,13 +5,13 @@ import {
 
 import { emptySplitApi } from "./emptySplitApi.service";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
-import { IBoardItemResponse } from "~/models/board.model";
-import { ICardsResponse } from "~/models/card.model";
-import { Section } from "~/providers/BoardProvider/types";
 import {
   applyBoardUpdate,
   registerCacheUpdateCallback,
-} from "~/providers/WebsocketProvider";
+} from "~/hooks/useApplyBoardUpdate";
+import { IBoardItemResponse } from "~/models/board.model";
+import { ICardsResponse } from "~/models/card.model";
+import { Section } from "~/providers/BoardProvider/types";
 
 interface BoardsResponse {
   all: IBoardItemResponse[];
@@ -106,7 +106,7 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
           await cacheDataLoaded;
 
           // S'enregistrer pour recevoir les mises à jour WebSocket
-          const unsubscribe = registerCacheUpdateCallback((update) => {
+          const unsubscribe = registerCacheUpdateCallback((update: any) => {
             updateCachedData((draft) => {
               applyBoardUpdate(draft, update);
             });

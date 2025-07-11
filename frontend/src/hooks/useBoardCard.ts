@@ -15,7 +15,7 @@ import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { useWebSocketContext } from "~/providers/WebsocketProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useUpdateCardMutation,
   useFavoriteCardMutation,
@@ -27,7 +27,7 @@ export const useBoardCard = (card: Card) => {
   const [updateCard] = useUpdateCardMutation();
   const [favoriteCard] = useFavoriteCardMutation();
   const [deleteCards] = useDeleteCardsMutation();
-  const { sendMessage, readyState } = useWebSocketContext();
+  const { sendMessage, readyState } = useWebSocketMagneto();
 
   const {
     board,

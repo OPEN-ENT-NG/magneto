@@ -61,7 +61,7 @@ import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
-import { useWebSocketContext } from "~/providers/WebsocketProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useCreateCardMutation,
   useUpdateCardMutation,
@@ -70,7 +70,7 @@ import { workspaceApi } from "~/services/api/workspace.service";
 //import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
-  const { sendMessage, readyState } = useWebSocketContext();
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
   const dispatchRTK = useDispatch();

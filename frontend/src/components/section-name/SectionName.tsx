@@ -23,14 +23,14 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoard } from "~/providers/BoardProvider";
-import { useWebSocketContext } from "~/providers/WebsocketProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useCreateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
-  const { sendMessage, readyState } = useWebSocketContext();
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const toast = useToast();

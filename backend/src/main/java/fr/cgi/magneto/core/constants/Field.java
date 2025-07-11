@@ -249,4 +249,14 @@ public class Field {
     public static final Object PROTECTED = "protected";
     public static final String FILEOWNER = "fileOwner";
     public static final String DEFAULTTITLE = "Section 1";
+
+    // WEBSOCKET
+    public static final String EMITTEDAT = "emittedAt";
+    public static final String WEBSOCKETID = "websocketId";
+    public static final String MAXCONNECTEDUSERS = "maxConnectedUsers";
+    public static final String EMITTEDBY = "emittedBy";
+    public static final String OLDCARD = "oldCard";
+    public static final String CONNECTEDUSERS = "connectedUsers";
+    public static final String LOGIN = "login";
+    public static final String ACTIONID = "actionId";
 }

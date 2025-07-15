@@ -100,6 +100,8 @@ public interface CardService {
 
     Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText, String sortBy);
 
+    Future<List<Card>> getCardsOrFirstSection(Board board, UserInfos user);
+
     /**
      * Get cards by ids
      *

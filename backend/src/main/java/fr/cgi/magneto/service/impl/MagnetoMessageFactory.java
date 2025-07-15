@@ -8,6 +8,8 @@ import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 
+import java.util.List;
+
 public class MagnetoMessageFactory {
     private final String serverId;
 
@@ -54,9 +56,9 @@ public class MagnetoMessageFactory {
                 null, null, null, actionType, actionId, null);
     }
 
-    public MagnetoMessage cardAdded(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
+    public MagnetoMessage cardAdded(final String boardId, final String wsId, final String userId, final List<Card> cards, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                MagnetoMessageType.cardAdded, userId, null, null, card, null, null,
+                MagnetoMessageType.cardAdded, userId, null, null, null, null, cards,
                 null, null, null, actionType, actionId, null);
     }
 
@@ -99,6 +101,13 @@ public class MagnetoMessageFactory {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.commentEdited,
                 userId, null, null, null, null, null,
+                null, null, null, actionType, actionId, null);
+    }
+
+    public MagnetoMessage cardDuplicated(final String boardId, final String wsId, final String userId, final List<Card> cards, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.cardDuplicated,
+                userId, null, null, null, null, cards,
                 null, null, null, actionType, actionId, null);
     }
 

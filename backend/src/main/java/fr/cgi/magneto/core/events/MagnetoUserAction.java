@@ -20,8 +20,10 @@ public class MagnetoUserAction {
     private final MagnetoMessageType type;
     private final List<Card> cards;
     private final String cardId;
+    private final List<String> cardIds;
     private final CardPayload card;
     private final Board board;
+    private final String boardId;
     private final Section section;
     private final Comment comment;
     private final String commentId;
@@ -33,8 +35,10 @@ public class MagnetoUserAction {
     public MagnetoUserAction(@JsonProperty("type") final MagnetoMessageType type,
                                        @JsonProperty("notes") final List<Card> cards,
                                        @JsonProperty("cardId") final String cardId,
+                                       @JsonProperty("cardIds") final List<String> cardIds,
                                        @JsonProperty("card") final CardPayload card,
                                        @JsonProperty("board") final Board board,
+                                       @JsonProperty("boardId") final String boardId,
                                        @JsonProperty("section") final Section section,
                                        @JsonProperty("comment") final Comment comment,
                                        @JsonProperty("commentId") final String commentId,
@@ -44,8 +48,10 @@ public class MagnetoUserAction {
         this.type = type;
         this.cards = cards;
         this.cardId = cardId;
+        this.cardIds = cardIds;
         this.card = card;
         this.board = board;
+        this.boardId = boardId;
         this.section = section;
         this.comment = comment;
         this.commentId = commentId;
@@ -72,6 +78,8 @@ public class MagnetoUserAction {
 
     public Board getBoard() { return board; }
 
+    public String getBoardId() { return boardId; }
+
     public Section getSection() { return section; }
 
     public Comment getComment() { return comment; }
@@ -87,6 +95,8 @@ public class MagnetoUserAction {
     public String getActionId() {
         return actionId;
     }
+
+    public List<String> getCardsIds() { return cardIds; }
 
     public boolean isValid(){
         if(this.type==null){
@@ -139,6 +149,7 @@ public class MagnetoUserAction {
                 "type=" + type +
                 ", cards=" + cards +
                 ", cardId='" + cardId + '\'' +
+                ", cardIds='" + cardIds + '\'' +
                 ", card=" + card +
                 ", board=" + board +
                 ", section=" + section +

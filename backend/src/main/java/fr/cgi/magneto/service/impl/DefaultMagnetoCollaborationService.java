@@ -258,14 +258,8 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
                 return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
-                        .flatMap(saved -> {
-                            String cardId = saved.getString(Field.ID);
-                            return this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
-                                    .map(cards -> {
-                                        Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(cardId) : cards.get(0);
-                                        return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                                    });
-                        });
+                        .flatMap(saved -> this.serviceFactory.cardService().getCardsOrFirstSection(action.getBoard(), user)
+                                .map(cards -> newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId()))));
             }
             case cardUpdated: {
                 CardPayload updateCard = new CardPayload(action.getCard().toJson())
@@ -352,7 +346,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                            return newArrayList(this.messageFactory.commentAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
             }
             case commentDeleted: {
@@ -365,7 +359,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                            return newArrayList(this.messageFactory.commentDeleted(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
             }
             case commentEdited: {
@@ -380,8 +374,20 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                            return newArrayList(this.messageFactory.commentEdited(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
+            }
+            case cardDuplicated: {
+                List<String> cardIds = action.getCardsIds();
+                String destinationBoardId = action.getBoardId();
+
+                return this.serviceFactory.cardService().getCards(cardIds, user)
+                        .compose(cardsToDuplicate -> this.serviceFactory.cardService().duplicateCards(destinationBoardId, cardsToDuplicate, null, user))
+                        .compose(res -> this.serviceFactory.boardService().getBoards(Collections.singletonList(destinationBoardId)))
+                        .compose(boards -> this.serviceFactory.cardService().getCardsOrFirstSection(boards.get(0), user))
+                        .map(cards -> destinationBoardId.equals(boardId) ?
+                                newArrayList(this.messageFactory.cardDuplicated(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId())) :
+                                new ArrayList<>());
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users

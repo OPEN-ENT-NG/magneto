@@ -674,6 +674,25 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
+    public Future<List<Card>> getCardsOrFirstSection(Board board, UserInfos user){
+        if (board.isLayoutFree()) {
+            return this.serviceFactory.cardService().getAllCardsByBoard(board, user);
+        } else {
+            return this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
+                    .compose(sections -> {
+                        if (sections.isEmpty()) {
+                            return Future.succeededFuture(new ArrayList<>());
+                        }
+                        Section section = sections.stream()
+                                .filter(s -> s.getId().equals(board.getSectionIds().get(0)))
+                                .findFirst()
+                                .orElse(null);
+                        return this.fetchAllCardsBySection(section, 0, user);
+                    });
+        }
+    }
+
+    @Override
     public Future<List<Card>> getCards(List<String> cardIds, UserInfos user) {
         Promise<List<Card>> promise = Promise.promise();
         getCardsRequest(cardIds, user)

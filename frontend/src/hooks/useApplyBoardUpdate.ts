@@ -109,5 +109,23 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       }
       break;
     }
+
+    case WEBSOCKET_MESSAGE_TYPE.CARD_DUPLICATED: {
+      if (update.cards) {
+        if (draft.sections) {
+          draft.sections.forEach((section: any) => {
+            if (section.cards) {
+              section.cards = update.cards;
+            }
+          });
+        } else if (draft.cards) {
+          draft.cards = update.cards;
+          if (draft.cardIds) {
+            draft.cardIds = update.cards.map((card: any) => card.id);
+          }
+        }
+      }
+      break;
+    }
   }
 };

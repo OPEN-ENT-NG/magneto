@@ -50,12 +50,16 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   anchorEl,
   anchorOrigin = { vertical: "bottom", horizontal: "right" },
   transformOrigin = { vertical: "bottom", horizontal: "right" },
+  comments = [],
 }) => {
   const { t } = useTranslation("magneto");
   const { displayModals, toggleBoardModals, isExternalView } = useBoard();
   const { avatar } = useUser();
   const [addComment] = useAddCommentMutation();
-  const { data: commentsData } = useGetAllCommentsQuery({ cardId });
+  const { data: commentsData } = useGetAllCommentsQuery(
+    { cardId },
+    { skip: !!comments.length },
+  );
   const [inputValue, setInputValue] = useState<string>("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
@@ -83,12 +87,15 @@ export const CommentPanel: FC<CommentPanelProps> = ({
       window.removeEventListener("wheel", handleWheel);
     };
   }, []);
+
   useEffect(() => {
-    if (commentsData?.all.length) {
-      return setComsAndDividers(processCommentsWithDividers(commentsData.all));
+    const commentsToUse = comments?.length ? comments : commentsData?.all;
+
+    if (commentsToUse?.length) {
+      return setComsAndDividers(processCommentsWithDividers(commentsToUse));
     }
     return setComsAndDividers([]);
-  }, [commentsData]);
+  }, [commentsData, comments]);
 
   useEffect(() => {
     if (comsAndDividers.length > prevLengthRef.current) {

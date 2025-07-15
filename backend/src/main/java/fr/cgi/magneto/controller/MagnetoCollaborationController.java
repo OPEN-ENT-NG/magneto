@@ -68,7 +68,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                 //TODO : check l'accès au tableau si necessaire
 
                 final String userId = session.getUserId();
-                ws.closeHandler(e -> onCloseWSConnection(boardId, wsId));
+                ws.closeHandler(e -> onCloseWSConnection(boardId, userId, wsId));
                 onConnect(session, boardId, wsId, ws).onSuccess(onSuccess -> {
                     ws.resume();
                     ws.frameHandler(frame -> {
@@ -82,7 +82,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                                 this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false);//.onFailure(th -> this.sendError(th, ws));
                             } else if(frame.isClose()) {
                                 log.debug("Received a close frame from the user");
-                                onCloseWSConnection(boardId, wsId);
+                                onCloseWSConnection(boardId, userId, wsId);
                             }
                         } catch (Exception e) {
                             log.error("An error occured while parsing message:", e);
@@ -108,15 +108,19 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         return Optional.empty();
     }
 
-    protected void onCloseWSConnection(final String wallId, final String wsId) {
-        final Map<String, ServerWebSocket> wss = boardIdToWSIdToWS.get(wallId);
-        if (wss != null) {
-            if (wss.remove(wsId) == null) {
-                log.debug("No ws removed");
-            } else {
-                log.debug("WS correctly removed");
-            }
-        }
+    protected void onCloseWSConnection(final String boardId, final String userId, final String wsId) {
+        this.magnetoCollaborationService.onNewDisconnection(boardId, userId, wsId)
+                .compose(messages -> this.broadcastMessagesToUsers(messages, wsId))
+                .onComplete(e -> {
+                    final Map<String, ServerWebSocket> wss = boardIdToWSIdToWS.get(boardId);
+                    if (wss != null) {
+                        if (wss.remove(wsId) == null) {
+                            log.debug("No ws removed");
+                        } else {
+                            log.debug("WS correctly removed");
+                        }
+                    }
+                });
     }
 
     private Future<Void> onConnect(final UserInfos user, final String boardId, final String wsId, final ServerWebSocket ws) {

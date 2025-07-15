@@ -1,6 +1,7 @@
 package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
+import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.model.Section;
@@ -20,15 +21,23 @@ public class MagnetoMessageFactory {
     public MagnetoMessage connection(final String boardId, final String wsId, final String userId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.connection,
-                userId, null, null, null, null, null, null, null, null,
+                userId, null, null, null, null, null,null, null, null,
                 MagnetoUserAction.ActionType.Do, null, null);
     }
 
     public MagnetoMessage disconnection(final String boardId, final String wsId, final String userId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.disconnection,
-                userId, null, null, null, null, null, null, null, null,
+                userId, null, null, null, null, null,null, null, null,
                 MagnetoUserAction.ActionType.Do, null, null);
+    }
+
+    public MagnetoMessage metadata(final String boardId, final String wsId, final String userId,
+                                   final CollaborationUsersMetadata magnetoContext, final Long maxUser) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.metadata,
+                userId, null, null, null, null, null, null,null, magnetoContext.getConnectedUsers(),
+                MagnetoUserAction.ActionType.Do, null, maxUser);
     }
 
     public MagnetoMessage ping(final String boardId, final String wsId, final String userId) {
@@ -60,7 +69,7 @@ public class MagnetoMessageFactory {
 
     public MagnetoMessage sectionUpdated(final String boardId, final String wsId, final String userId, final Section section, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                MagnetoMessageType.cardUpdated,
+                MagnetoMessageType.sectionUpdated,
                 userId, null, null, null, null, null,
                 section, null, null, actionType, actionId, null);
     }
@@ -69,6 +78,27 @@ public class MagnetoMessageFactory {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.cardFavorite,
                 userId, null, null, card, null, null,
+                null, null, null, actionType, actionId, null);
+    }
+
+    public MagnetoMessage commentAdded(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.commentAdded,
+                userId, null, null, card, null, null,
+                null, null, null, actionType, actionId, null);
+    }
+
+    public MagnetoMessage commentDeleted(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.commentDeleted,
+                userId, null, null, null, null, null,
+                null, null, null, actionType, actionId, null);
+    }
+
+    public MagnetoMessage commentEdited(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.commentEdited,
+                userId, null, null, null, null, null,
                 null, null, null, actionType, actionId, null);
     }
 

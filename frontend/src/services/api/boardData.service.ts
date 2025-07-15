@@ -4,8 +4,11 @@ import {
 } from "@reduxjs/toolkit/query";
 
 import { emptySplitApi } from "./emptySplitApi.service";
-import { createRTKWebSocketIntegration } from "../websocket/useWebSocketManager";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
+import {
+  applyBoardUpdate,
+  registerCacheUpdateCallback,
+} from "~/hooks/useApplyBoardUpdate";
 import { IBoardItemResponse } from "~/models/board.model";
 import { ICardsResponse } from "~/models/card.model";
 import { Section } from "~/providers/BoardProvider/types";
@@ -17,8 +20,6 @@ interface BoardsResponse {
 interface SectionsResponse {
   all: Section[];
 }
-
-const rtqWebSocket = createRTKWebSocketIntegration();
 
 export const boardDataApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -96,7 +97,28 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
           };
         }
       },
-      onCacheEntryAdded: rtqWebSocket.createOnCacheEntryAdded("boards"),
+      async onCacheEntryAdded(
+        arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        try {
+          // Attendre que les données soient chargées
+          await cacheDataLoaded;
+
+          // S'enregistrer pour recevoir les mises à jour WebSocket
+          const unsubscribe = registerCacheUpdateCallback((update: any) => {
+            updateCachedData((draft) => {
+              applyBoardUpdate(draft, update);
+            });
+          });
+
+          // Nettoyer lors de la suppression du cache
+          await cacheEntryRemoved;
+          unsubscribe();
+        } catch (error) {
+          console.error("Error in cache entry lifecycle:", error);
+        }
+      },
       providesTags: ["BoardData"],
     }),
   }),

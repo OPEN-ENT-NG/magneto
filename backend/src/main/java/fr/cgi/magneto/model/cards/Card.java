@@ -4,6 +4,7 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.Metadata;
 import fr.cgi.magneto.model.Model;
+import fr.cgi.magneto.model.comments.Comment;
 import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -11,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Card implements Model<Card> {
 
@@ -34,6 +36,7 @@ public class Card implements Model<Card> {
     private Integer nbOfComments;
     private Integer nbOfFavorites;
     private boolean isLiked;
+    private List<Comment> comments;
 
     private List<String> favoriteList;
 
@@ -72,6 +75,9 @@ public class Card implements Model<Card> {
         this.favoriteList = (favoriteListOrNull != null) ? favoriteListOrNull.getList() : new JsonArray().getList();
         this.nbOfFavorites = card.getInteger(Field.NBOFFAVORITES, 0);
         this.isLiked = card.getBoolean(Field.ISLIKED, false);
+        this.comments = card.getJsonArray(Field.COMMENTS, new JsonArray()).stream()
+                .map(obj -> new Comment((JsonObject) obj))
+                .collect(Collectors.toList());
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -283,6 +289,13 @@ public class Card implements Model<Card> {
     	return this;
     }
 
+    public List<Comment> getComments() { return comments; }
+
+    public Card setComments(List<Comment> comments) {
+        this.comments = comments;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject()
@@ -303,7 +316,8 @@ public class Card implements Model<Card> {
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
-                .put(Field.FAVORITE_LIST, this.getFavoriteList());
+                .put(Field.FAVORITE_LIST, this.getFavoriteList())
+                .put(Field.COMMENTS, this.getComments());
 
         // Gestion des propriétés owner et editor qui peuvent être nulles
         if (this.owner != null) {

@@ -3,6 +3,7 @@ package fr.cgi.magneto.service.impl;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
@@ -14,10 +15,12 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
+import fr.cgi.magneto.model.comments.CommentPayload;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
 import io.vertx.core.*;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
@@ -41,6 +44,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     private String eventBusAddress;
     private MessageConsumer<JsonObject> eventBusConsumer;
     private final MagnetoMessageFactory messageFactory;
+    private final Map<String, CollaborationUsersMetadata> metadataByBoardId;
 
     public DefaultMagnetoCollaborationService(ServiceFactory serviceFactory) {
         this.vertx = serviceFactory.vertx();
@@ -54,6 +58,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.publishPeriodInMs = config.getLong("publish-context-period-in-ms", 60000L);
         this.maxConnectedUser = config.getLong("max-connected-user", 50L);
         this.eventBusAddress = config.getString("eventbus-address", "magneto.collaboration");
+        this.metadataByBoardId = new HashMap<>();
     }
 
     @Override
@@ -143,6 +148,20 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     break;
 
                 case "collaboration":
+                    if (jsonMessage.containsKey("connectedUsers") || jsonMessage.containsKey("editing")) {
+                        String boardId = jsonMessage.getString("boardId");
+                        if (boardId != null) {
+                            try {
+                                // Optionnel : mettre à jour les métadonnées locales
+                                // (utile si vous avez plusieurs instances)
+                                log.debug("Received collaboration message with metadata for board: " + boardId);
+                            } catch (Exception e) {
+                                String message = String.format("[Magneto@%s::onNewMessage] Error processing collaboration metadata",
+                                        this.getClass().getSimpleName());
+                                log.error(message, e);
+                            }
+                        }
+                    }
                     // Convertir en MagnetoMessageWrapper et notifier les abonnés
                     MagnetoMessageWrapper magnetoMessage = new MagnetoMessageWrapper(jsonMessage);
 
@@ -214,14 +233,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             try {
                 if (action.isValid()) {
                     return executeAction(action, boardId, wsId, user, checkConcurency);
-                    /*final MagnetoMessage newActionMessage = new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                            MagnetoMessageType.ping, user.getUserId(), null, null, null, null, null, null, null, null,
-                            null);
-                    final Promise<List<MagnetoMessage>> promise = Promise.promise();
-                    List<MagnetoMessage> messages = new ArrayList<>();
-                    messages.add(newActionMessage);
-                    promise.complete(messages);
-                    return promise.future();*/
                 } else {
                     return Future.failedFuture("magneto.action.invalid");
                 }
@@ -243,8 +254,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             }
 
             case cardAdded: {
-                Card newCard = action.getCard();
-                CardPayload cardPayload = new CardPayload(action.getCard().toJson())
+                CardPayload cardPayload = action.getCard()
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
                 return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
@@ -252,7 +262,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             String cardId = saved.getString(Field.ID);
                             return this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
                                     .map(cards -> {
-                                        Card updatedCard = cards.isEmpty() ? newCard.setId(cardId) : cards.get(0);
+                                        Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(cardId) : cards.get(0);
                                         return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                                     });
                         });
@@ -304,12 +314,12 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             String message = String.format("[Magneto@%s::updateSection] Failed to update section : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
-                        })
+                        }) //TODO : pk on redonne action.getSection() dans le message?? ça s'update bien??
                         .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), action.getSection(), action.getActionType(), action.getActionId())));
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
-                boolean favorite = action.getCard().isLiked();
+                boolean favorite = action.getIsLiked();
                 if(user == null){
                     BadRequestException noUser = new BadRequestException("User not found");
                     String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
@@ -324,9 +334,54 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         })
                         .flatMap(saved -> this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
                                 .map(cards -> {
-                                    Card updatedCard = cards.isEmpty() ? action.getCard() : cards.get(0);
+                                    Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()) : cards.get(0);
                                     return newArrayList(this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                                 }));
+            }
+            case commentAdded: {
+                CommentPayload commentPayload = new CommentPayload(action.getComment().toJson())
+                        .setOwnerId(user.getUserId())
+                        .setOwnerName(user.getUsername());
+
+                this.serviceFactory.commentService().createComment(commentPayload, action.getCardId())
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                                    this.getClass().getSimpleName());
+                            log.error(message);
+                        })
+                        .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
+                        .map(cards -> {
+                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
+                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                        });
+            }
+            case commentDeleted: {
+                this.serviceFactory.commentService().deleteComment(user.getUserId(), action.getCardId(), action.getCommentId())
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                                    this.getClass().getSimpleName());
+                            log.error(message);
+                        })
+                        .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
+                        .map(cards -> {
+                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
+                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                        });
+            }
+            case commentEdited: {
+                CommentPayload commentPayload = new CommentPayload(user, action.getComment().getId(), action.getComment().getContent());
+
+                this.serviceFactory.commentService().updateComment(commentPayload, action.getCardId())
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                                    this.getClass().getSimpleName());
+                            log.error(message);
+                        })
+                        .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
+                        .map(cards -> {
+                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
+                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                        });
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users
@@ -393,33 +448,96 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 });
     }
 
+    private Future<Void> publishMetadata(String boardId, CollaborationUsersMetadata context) {
+        try {
+            JsonObject metadataMessage = new JsonObject()
+                    .put("type", "metadata")
+                    .put("serverId", serverId)
+                    .put("boardId", boardId)
+                    .put("timestamp", System.currentTimeMillis())
+                    .put("connectedUsers", Json.encode(context.getConnectedUsers()))
+                    .put("editing", Json.encode(context.getEditing()));
+
+            return publishMessage(metadataMessage);
+        } catch (Exception e) {
+            String message = String.format("[Magneto@%s::publishMetadataViaEventBus] Error publishing metadata",
+                    this.getClass().getSimpleName());
+            log.error(message, e);
+            return Future.failedFuture(e);
+        }
+    }
+
     @Override
     public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId) {
         final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
-        /*return CompositeFuture.all(
-                        this.collaborativeWallService.getWall(boardId),
-                        this.collaborativeWallService.getNotesOfWall(boardId)
-                ).flatMap(wall -> {
-                    final MagnetoUsersMetadata context = metadataByWallId.computeIfAbsent(boardId, k -> new MagnetoUsersMetadata());
-                    context.addConnectedUser(user);
-                    publishMetadata();
-                    return this.getUsersContext(boardId).map(userContext -> Pair.of(wall, userContext));
-                })
-                .map(context -> {
-                    final JsonObject wall = context.getKey().resultAt(0);
-                    final List<JsonObject> notes = context.getKey().resultAt(1);
-                    final MagnetoUsersMetadata userContext = context.getRight();
-                    return this.messageFactory.metadata(boardId, wsId, user.getUserId(),
-                            new MagnetoMetadata(wall, notes, userContext.getEditing(), userContext.getConnectedUsers()), this.maxConnectedUser);
-                })
-                .map(contextMessage -> newArrayList(newUserMessage, contextMessage))
-                .compose(messages -> publishMessagesOnRedis(messages).map(messages));*/
-        final Promise<List<MagnetoMessage>> promise = Promise.promise();
+
+        // Récupérer ou créer le contexte pour ce board
+        final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
+
+        // Ajouter l'utilisateur connecté au contexte
+        context.addConnectedUser(user);
+
+        // Créer le message avec les métadonnées (utilisateurs connectés, etc.)
+        final MagnetoMessage metadataMessage = this.messageFactory.metadata(
+                boardId,
+                wsId,
+                user.getUserId(),
+                new CollaborationUsersMetadata(
+                        context.getEditing(),
+                        context.getConnectedUsers()
+                ),
+                this.maxConnectedUser
+        );
+
+        // Publier les métadonnées mises à jour via EventBus
+        return publishMetadata(boardId, context)
+                .map(v -> Arrays.asList(newUserMessage, metadataMessage))
+                .compose(messages -> {
+                    // Publier le message de connexion aux autres utilisateurs
+                    JsonObject collaborationMessage = new JsonObject()
+                            .put("type", "collaboration")
+                            .put("serverId", serverId)
+                            .put("messages", Json.encode(Collections.singletonList(newUserMessage)));
+
+                    return publishMessage(collaborationMessage)
+                            .map(v -> messages);
+                });
+    }
+
+    @Override
+    public Future<List<MagnetoMessage>> onNewDisconnection(String boardId, String userId, final String wsId) {
+        Promise<List<MagnetoMessage>> promise = Promise.promise();
+        final MagnetoMessage disconnectionMessage = this.messageFactory.disconnection(boardId, wsId, userId);
+
+        // Récupérer le contexte pour ce board
+        final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
         List<MagnetoMessage> messages = new ArrayList<>();
-        messages.add(newUserMessage);
+        messages.add(disconnectionMessage);
+
+        if (context != null) {
+            // Retirer l'utilisateur du contexte
+            context.removeConnectedUser(userId);
+
+            // Si plus personne n'est connecté, on peut supprimer le contexte
+            if (context.getConnectedUsers().isEmpty()) {
+                metadataByBoardId.remove(boardId);
+            }
+            final MagnetoMessage metadataMessage = this.messageFactory.metadata(
+                    boardId,
+                    wsId,
+                    userId,
+                    new CollaborationUsersMetadata(
+                            context.getEditing(),
+                            context.getConnectedUsers()
+                    ),
+                    this.maxConnectedUser
+            );
+            messages.add(metadataMessage);
+        }
         promise.complete(messages);
         return promise.future();
     }
+
 
     private Future<Void> changeRealTimeStatus(RealTimeStatus realTimeStatus) {
         final Promise<Void> promise = Promise.promise();

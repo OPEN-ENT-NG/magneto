@@ -26,6 +26,7 @@ export interface ICardItemResponse {
   nbOfComments?: number;
   nbOfFavorites?: number;
   liked?: boolean;
+  comments?: any[];
 }
 
 export interface ICardsResponse {

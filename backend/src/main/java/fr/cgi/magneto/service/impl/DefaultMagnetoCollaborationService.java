@@ -258,7 +258,8 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
                 return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
-                        .flatMap(saved -> this.serviceFactory.cardService().getCardsOrFirstSection(action.getBoard(), user)
+                        .compose(saved -> this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId)))
+                        .compose(board -> this.serviceFactory.cardService().getCardsOrFirstSection(board.get(0), user)
                                 .map(cards -> newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId()))));
             }
             case cardUpdated: {
@@ -388,6 +389,13 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .map(cards -> destinationBoardId.equals(boardId) ?
                                 newArrayList(this.messageFactory.cardDuplicated(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId())) :
                                 new ArrayList<>());
+            }
+            case sectionDuplicated: {
+                List<String> sectionIds = action.getSectionIds();
+                String destinationBoardId = action.getBoardId();
+                return this.serviceFactory.sectionService().duplicateSectionsWithCards(destinationBoardId, sectionIds, user)
+                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
+                        .map(board -> newArrayList(this.messageFactory.sectionDuplicated(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users

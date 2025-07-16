@@ -12,6 +12,7 @@ import {
   useDuplicateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 
 export const useCreateSectionDropDownItems: (
   section: Section | null | undefined,
@@ -21,6 +22,7 @@ export const useCreateSectionDropDownItems: (
   const toast = useToast();
   const [duplicate] = useDuplicateSectionMutation();
   const [update] = useUpdateSectionMutation();
+  const { sendMessage, readyState } = useWebSocketMagneto();
 
   const { hasManageRights } = useBoard();
 
@@ -36,7 +38,16 @@ export const useCreateSectionDropDownItems: (
       sectionIds: [_id],
     };
     try {
-      await duplicate(payload);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "sectionDuplicated",
+            ...payload,
+          }),
+        );
+      } else {
+        await duplicate(payload);
+      }
       toast.success(t("magneto.duplicate.section.confirm"));
     } catch (err) {
       console.error(err);

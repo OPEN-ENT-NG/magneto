@@ -8,9 +8,11 @@ import { ICardItemResponse } from "~/models/card.model";
 export interface WebSocketUpdate {
   type: string;
   card?: ICardItemResponse;
+  cards?: ICardItemResponse[];
   cardId?: string;
   section?: any;
   sectionId?: string;
+  board?: any;
   connectedUsers?: IUserInfo[];
   [key: string]: any;
 }

@@ -46,6 +46,15 @@ public interface BoardService {
     Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n, UserInfos user);
 
     /**
+     * Get board with its content (cards or sections with cards)
+     *
+     * @param boardId Board identifier
+     * @param user    User Object containing user id and displayed name
+     * @return Future {@link Future<Board>} containing board with cards or sections populated
+     */
+    Future<Board> getBoardWithContent(String boardId, UserInfos user);
+
+    /**
      * Duplicate a board
      *
      * @param boardId Board identifier to duplicate

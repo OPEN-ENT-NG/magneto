@@ -17,5 +17,6 @@ public enum MagnetoMessageType {
     commentAdded,
     commentDeleted,
     commentEdited,
-    cardDuplicated
+    cardDuplicated,
+    sectionDuplicated,
 }

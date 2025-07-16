@@ -1,3 +1,4 @@
+import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { WebSocketUpdate } from "~/providers/WebsocketProvider/types";
 
@@ -19,21 +20,47 @@ export const notifyCacheUpdateCallbacks = (update: WebSocketUpdate) => {
 export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
   switch (update.type) {
     case WEBSOCKET_MESSAGE_TYPE.CARD_ADDED: {
-      const newCard = update.card;
-      if (newCard && draft.sections && draft.sections.length > 0) {
+      if (
+        update.cards &&
+        draft.layoutType !== LAYOUT_TYPE.FREE &&
+        draft.sections &&
+        draft.sections.length > 0
+      ) {
         const firstSection = draft.sections[0];
         if (firstSection.cards) {
-          firstSection.cards.unshift(newCard);
+          firstSection.cards = update.cards;
         }
-      } else if (newCard && draft.cards) {
-        draft.cards.unshift(newCard);
-        if (draft.cardIds) {
-          draft.cardIds.unshift(newCard.id);
-        }
+      } else if (
+        update.cards &&
+        draft.layoutType === LAYOUT_TYPE.FREE &&
+        draft.cards
+      ) {
+        draft.cards = update.cards;
       }
       break;
     }
-
+    case WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED: {
+      console.log(draft.sections);
+      console.log(update.board);
+      if (
+        draft.sections &&
+        update.board?.layoutType !== LAYOUT_TYPE.FREE &&
+        update.board?.sections &&
+        update.board?.sections.length
+      ) {
+        draft.sections = update.board.sections;
+        draft.sectionIds = update.board.sectionIds;
+      } else if (
+        draft.cards &&
+        update.board?.layoutType === LAYOUT_TYPE.FREE &&
+        update.board?.cards &&
+        update.board?.cards.length
+      ) {
+        draft.cards = update.board.cards;
+        draft.cardIds = update.board.cardIds;
+      }
+      break;
+    }
     case WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE:
     case WEBSOCKET_MESSAGE_TYPE.COMMENT_ADDED:
     case WEBSOCKET_MESSAGE_TYPE.COMMENT_EDITED:

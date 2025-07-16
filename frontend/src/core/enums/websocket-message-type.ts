@@ -8,4 +8,5 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   CARD_DELETED = "cardDeleted",
   SECTION_UPDATED = "sectionUpdated",
   CARD_DUPLICATED = "cardDuplicated",
+  SECTION_DUPLICATED = "sectionDuplicated",
 }

@@ -25,6 +25,7 @@ public class MagnetoUserAction {
     private final Board board;
     private final String boardId;
     private final Section section;
+    private final List<String> sectionIds;
     private final Comment comment;
     private final String commentId;
     private final Boolean isLiked;
@@ -40,6 +41,7 @@ public class MagnetoUserAction {
                                        @JsonProperty("board") final Board board,
                                        @JsonProperty("boardId") final String boardId,
                                        @JsonProperty("section") final Section section,
+                                       @JsonProperty("sectionIds") final List<String> sectionIds,
                                        @JsonProperty("comment") final Comment comment,
                                        @JsonProperty("commentId") final String commentId,
                                        @JsonProperty("isLiked") final Boolean isLiked,
@@ -53,6 +55,7 @@ public class MagnetoUserAction {
         this.board = board;
         this.boardId = boardId;
         this.section = section;
+        this.sectionIds = sectionIds;
         this.comment = comment;
         this.commentId = commentId;
         this.isLiked = isLiked;
@@ -97,6 +100,8 @@ public class MagnetoUserAction {
     }
 
     public List<String> getCardsIds() { return cardIds; }
+
+    public List<String> getSectionIds() { return sectionIds; }
 
     public boolean isValid(){
         if(this.type==null){

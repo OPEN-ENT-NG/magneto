@@ -274,6 +274,19 @@ public class DefaultSectionService implements SectionService {
         return this.serviceFactory.boardService().update(board);
     }
 
+    public Future<JsonObject> duplicateSectionsWithCards(String boardId, List<String> sectionIds, UserInfos user) {
+        Future<JsonObject> getCardsFuture = this.serviceFactory.cardService().getAllCardsByBoard(new Board(new JsonObject()).setId(boardId), null, user, false);
+        Future<List<Section>> getSectionsFuture = this.get(sectionIds);
+
+        return CompositeFuture.all(getCardsFuture, getSectionsFuture)
+                .compose(sections -> {
+                    List<Section> duplicateSections = getSectionsFuture.result();
+                    JsonArray duplicateCardsArray = getCardsFuture.result().getJsonArray(Field.ALL);
+                    List<Card> duplicateCards = duplicateCardsArray.getList();
+                    return this.duplicateSections(boardId, duplicateSections, duplicateCards, false, user);
+                });
+    }
+
     public Future<JsonObject> duplicateSections(String boardId, List<Section> sections, List<Card> cards,
                                                 boolean isDuplicateBoard, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();

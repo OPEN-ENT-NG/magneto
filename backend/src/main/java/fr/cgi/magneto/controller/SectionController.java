@@ -6,7 +6,6 @@ import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
-import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.security.ContribBoardRight;
 import fr.cgi.magneto.security.DuplicateCardRight;
 import fr.cgi.magneto.security.ViewRight;
@@ -206,15 +205,7 @@ public class SectionController extends ControllerHelper {
             UserUtils.getUserInfos(eb, request, user -> {
                 List<String> sectionIds = sectionDuplicate.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList();
                 String boardId = sectionDuplicate.getString(Field.BOARDID);
-                Future<JsonObject> getCardsFuture = cardService.getAllCardsByBoard(new Board(new JsonObject()).setId(boardId), null, user, false);
-                Future<List<Section>> getSectionsFuture = sectionService.get(sectionIds);
-                CompositeFuture.all(getCardsFuture, getSectionsFuture)
-                        .compose(sections -> {
-                            List<Section> duplicateSections = getSectionsFuture.result();
-                            JsonArray duplicateCardsArray = getCardsFuture.result().getJsonArray(Field.ALL);
-                            List<Card> duplicateCards = duplicateCardsArray.getList();
-                            return sectionService.duplicateSections(boardId, duplicateSections, duplicateCards, false, user);
-                        })
+                sectionService.duplicateSectionsWithCards(boardId, sectionIds, user)
                         .onSuccess(res -> {
                             eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()
                                     .put(Field.RESOURCE_DASH_TYPE, Field.RESOURCE_SECTION));

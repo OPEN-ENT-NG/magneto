@@ -407,14 +407,22 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 List<Card> cards = cardIds.stream()
                         .map(cardId -> new Card().setId(cardId))
                         .collect(Collectors.toList());
-                return this.serviceFactory.cardService().deleteCardsWithBoardValidation(cardIds, destinationBoardId, user)
+                return serviceFactory.cardService().deleteCardsWithBoardValidation(cardIds, destinationBoardId, user)
                         .map(result -> newArrayList(this.messageFactory.cardsDeleted(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId())));
             }
-            /*case sectionDeleted: {
-                String newId = UUID.randomUUID().toString();
-                return serviceFactory.sectionService().createSectionWithBoardUpdate(action.getSection(), newId)
-                        .map(result -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()).setId(newId), action.getActionType(), action.getActionId())));
-            }*/
+            case sectionsDeleted: {
+                List<String> sectionIds = action.getSectionIds();
+                String destinationBoardId = action.getBoardId();
+                Boolean deleteCards = action.getDeleteCards();
+                return serviceFactory.sectionService().deleteSections(sectionIds, destinationBoardId, deleteCards)
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::deleteSections] Failed to delete sections : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                        })
+                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
+                        .map(board -> newArrayList(this.messageFactory.sectionsDeleted(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+            }
             /*
             case cardEditionStarted: {
                 // add to editing

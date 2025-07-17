@@ -39,6 +39,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       }
       break;
     }
+    case WEBSOCKET_MESSAGE_TYPE.SECTIONS_DELETED:
     case WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED: {
       if (
         draft.sections &&
@@ -98,6 +99,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
 
     case WEBSOCKET_MESSAGE_TYPE.CARDS_DELETED: {
       const cardIdsToDelete = update.cards?.map((card: any) => card._id) || [];
+      console.log(cardIdsToDelete);
       if (draft.cards) {
         draft.cards = draft.cards.filter(
           (c: any) => !cardIdsToDelete.includes(c.id),
@@ -134,7 +136,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
     case WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED: {
       if (draft.sections) {
         const sectionIndex = draft.sections.findIndex(
-          (s: any) => s._id === update.section.id,
+          (s: any) => s._id === update.section._id,
         );
         if (sectionIndex !== -1) {
           const filteredUpdate = Object.fromEntries(

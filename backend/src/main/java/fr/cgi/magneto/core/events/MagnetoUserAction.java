@@ -29,6 +29,7 @@ public class MagnetoUserAction {
     private final Comment comment;
     private final String commentId;
     private final Boolean isLiked;
+    private final Boolean deleteCards;
     private final ActionType actionType;
     private final String actionId;
 
@@ -45,6 +46,7 @@ public class MagnetoUserAction {
                                        @JsonProperty("comment") final Comment comment,
                                        @JsonProperty("commentId") final String commentId,
                                        @JsonProperty("isLiked") final Boolean isLiked,
+                                       @JsonProperty("deleteCards") final Boolean deleteCards,
                                        @JsonProperty("actionType") final ActionType actionType,
                                        @JsonProperty("actionId") final String actionId) {
         this.type = type;
@@ -59,6 +61,7 @@ public class MagnetoUserAction {
         this.comment = comment;
         this.commentId = commentId;
         this.isLiked = isLiked;
+        this.deleteCards = deleteCards;
         this.actionType = actionType;
         this.actionId = actionId;
     }
@@ -90,6 +93,8 @@ public class MagnetoUserAction {
     public String getCommentId() { return commentId; }
 
     public Boolean getIsLiked() { return isLiked; }
+
+    public Boolean getDeleteCards() { return deleteCards; }
 
     public ActionType getActionType() {
         return actionType;

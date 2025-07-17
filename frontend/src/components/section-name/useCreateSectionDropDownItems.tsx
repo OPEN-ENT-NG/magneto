@@ -8,11 +8,11 @@ import { useTranslation } from "react-i18next";
 import { DropDownListItem } from "../drop-down-list/types";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useDuplicateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
-import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 
 export const useCreateSectionDropDownItems: (
   section: Section | null | undefined,
@@ -65,7 +65,16 @@ export const useCreateSectionDropDownItems: (
     };
 
     try {
-      await update(payload);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "sectionUpdated",
+            section: payload,
+          }),
+        );
+      } else {
+        await update(payload);
+      }
     } catch (err) {
       console.error(err);
     }

@@ -35,7 +35,9 @@ public class BoardTest {
             .put("displayNbFavorites", false)
             .put("nbCards", 0)
             .put("nbCardsSections", 0)
-            .put("isExternal", false);
+            .put("isExternal", false)
+            .put("cards", new JsonArray())
+            .put("sections", new JsonArray());;
 
     @Test
     public void testBoardHasBeenInstantiated(TestContext ctx) {

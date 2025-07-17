@@ -136,7 +136,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
     private Future<Void> broadcastMessagesToUsers(final List<MagnetoMessage> messages,
                                                   final String exceptWsId) {
         final List<Future<Object>> futures = messages.stream().map(message -> {
-            final String payload = Json.encode(message);
+            final String payload = message.toJson().encode();
             final String boardId = message.getBoardId();
             final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
             final List<Future<Void>> writeMessagesPromise = wsIdToWs.entrySet().stream()

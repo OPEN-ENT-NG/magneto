@@ -24,6 +24,7 @@ import {
 } from "./style";
 import { DeleteSectionModalProps } from "./types";
 import { StyledRadio } from "../styled-radio/StyledRadio";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDeleteSectionMutation } from "~/services/api/sections.service";
 
 export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
@@ -34,7 +35,9 @@ export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
   const [inputValue, setInputValue] = useState<boolean>(true);
   const { t } = useTranslation("magneto");
   const { boardId, _id: id } = section;
+
   const [deleteSection] = useDeleteSectionMutation();
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const toast = useToast();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +46,16 @@ export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
   const handleSubmit = async () => {
     const payload = { boardId, sectionIds: [id], deleteCards: inputValue };
     try {
-      await deleteSection(payload);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "sectionsDeleted",
+            ...payload,
+          }),
+        );
+      } else {
+        await deleteSection(payload);
+      }
       toast.success(t("magneto.delete.section.confirm"));
       onClose();
     } catch (err) {

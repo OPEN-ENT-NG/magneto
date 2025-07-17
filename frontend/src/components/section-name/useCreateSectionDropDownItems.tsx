@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { DropDownListItem } from "../drop-down-list/types";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useDuplicateSectionMutation,
   useUpdateSectionMutation,
@@ -21,6 +22,7 @@ export const useCreateSectionDropDownItems: (
   const toast = useToast();
   const [duplicate] = useDuplicateSectionMutation();
   const [update] = useUpdateSectionMutation();
+  const { sendMessage, readyState } = useWebSocketMagneto();
 
   const { hasManageRights } = useBoard();
 
@@ -36,7 +38,16 @@ export const useCreateSectionDropDownItems: (
       sectionIds: [_id],
     };
     try {
-      await duplicate(payload);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "sectionDuplicated",
+            ...payload,
+          }),
+        );
+      } else {
+        await duplicate(payload);
+      }
       toast.success(t("magneto.duplicate.section.confirm"));
     } catch (err) {
       console.error(err);
@@ -54,7 +65,16 @@ export const useCreateSectionDropDownItems: (
     };
 
     try {
-      await update(payload);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "sectionUpdated",
+            section: payload,
+          }),
+        );
+      } else {
+        await update(payload);
+      }
     } catch (err) {
       console.error(err);
     }

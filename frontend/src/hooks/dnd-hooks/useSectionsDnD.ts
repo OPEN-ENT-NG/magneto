@@ -51,6 +51,7 @@ export const useSectionsDnD = (board: Board) => {
   const toast = useToast();
 
   const lockedCardIds = useMemo(() => {
+    console.log("🚀 ~ lockedCardIds ~ updatedSections:", updatedSections);
     return updatedSections.flatMap((section) =>
       section.cards.filter((card) => card.locked).map((card) => card.id),
     );

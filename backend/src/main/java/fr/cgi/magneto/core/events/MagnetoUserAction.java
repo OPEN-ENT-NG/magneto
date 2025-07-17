@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
-import fr.cgi.magneto.model.Section;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
@@ -20,12 +20,16 @@ public class MagnetoUserAction {
     private final MagnetoMessageType type;
     private final List<Card> cards;
     private final String cardId;
+    private final List<String> cardIds;
     private final CardPayload card;
     private final Board board;
-    private final Section section;
+    private final String boardId;
+    private final SectionPayload section;
+    private final List<String> sectionIds;
     private final Comment comment;
     private final String commentId;
     private final Boolean isLiked;
+    private final Boolean deleteCards;
     private final ActionType actionType;
     private final String actionId;
 
@@ -33,23 +37,31 @@ public class MagnetoUserAction {
     public MagnetoUserAction(@JsonProperty("type") final MagnetoMessageType type,
                                        @JsonProperty("notes") final List<Card> cards,
                                        @JsonProperty("cardId") final String cardId,
+                                       @JsonProperty("cardIds") final List<String> cardIds,
                                        @JsonProperty("card") final CardPayload card,
                                        @JsonProperty("board") final Board board,
-                                       @JsonProperty("section") final Section section,
+                                       @JsonProperty("boardId") final String boardId,
+                                       @JsonProperty("section") final SectionPayload section,
+                                       @JsonProperty("sectionIds") final List<String> sectionIds,
                                        @JsonProperty("comment") final Comment comment,
                                        @JsonProperty("commentId") final String commentId,
                                        @JsonProperty("isLiked") final Boolean isLiked,
+                                       @JsonProperty("deleteCards") final Boolean deleteCards,
                                        @JsonProperty("actionType") final ActionType actionType,
                                        @JsonProperty("actionId") final String actionId) {
         this.type = type;
         this.cards = cards;
         this.cardId = cardId;
+        this.cardIds = cardIds;
         this.card = card;
         this.board = board;
+        this.boardId = boardId;
         this.section = section;
+        this.sectionIds = sectionIds;
         this.comment = comment;
         this.commentId = commentId;
         this.isLiked = isLiked;
+        this.deleteCards = deleteCards;
         this.actionType = actionType;
         this.actionId = actionId;
     }
@@ -72,13 +84,17 @@ public class MagnetoUserAction {
 
     public Board getBoard() { return board; }
 
-    public Section getSection() { return section; }
+    public String getBoardId() { return boardId; }
+
+    public SectionPayload getSection() { return section; }
 
     public Comment getComment() { return comment; }
 
     public String getCommentId() { return commentId; }
 
     public Boolean getIsLiked() { return isLiked; }
+
+    public Boolean getDeleteCards() { return deleteCards; }
 
     public ActionType getActionType() {
         return actionType;
@@ -87,6 +103,10 @@ public class MagnetoUserAction {
     public String getActionId() {
         return actionId;
     }
+
+    public List<String> getCardsIds() { return cardIds; }
+
+    public List<String> getSectionIds() { return sectionIds; }
 
     public boolean isValid(){
         if(this.type==null){
@@ -109,7 +129,12 @@ public class MagnetoUserAction {
                 }
                 break;
             }
-            case cardDeleted:
+            case cardsDeleted: {
+                if (this.cardIds == null && boardId == null) {
+                    throw new ValidationException("magneto.action.note.missing");
+                }
+                break;
+            }
             case cardEditionStarted:
             case cardEditionEnded:{
                 if(this.cardId == null){
@@ -139,6 +164,7 @@ public class MagnetoUserAction {
                 "type=" + type +
                 ", cards=" + cards +
                 ", cardId='" + cardId + '\'' +
+                ", cardIds='" + cardIds + '\'' +
                 ", card=" + card +
                 ", board=" + board +
                 ", section=" + section +

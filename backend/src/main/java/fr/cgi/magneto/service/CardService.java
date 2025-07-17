@@ -8,6 +8,7 @@ import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
@@ -82,6 +83,8 @@ public interface CardService {
 
     Future<JsonObject> updateAndReturnPayload(CardPayload card);
 
+    Future<CompositeFuture> deleteCardsWithBoardValidation(List<String> cardIds, String boardId, UserInfos user);
+
     Future<JsonObject> deleteCards(List<String> cardIds);
 
     /**
@@ -99,6 +102,8 @@ public interface CardService {
      */
 
     Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText, String sortBy);
+
+    Future<List<Card>> getCardsOrFirstSection(Board board, UserInfos user);
 
     /**
      * Get cards by ids

@@ -121,14 +121,36 @@ export const useBoardCard = (card: Card) => {
   }, [toggleDropdown]);
 
   const lockOrUnlockMagnet = useCallback(async () => {
-    await updateCard({
-      ...cardPayload,
-      locked: !card.locked,
-    });
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: "cardUpdated",
+          card: {
+            ...cardPayload,
+            locked: !card.locked,
+          },
+        }),
+      );
+    } else {
+      await updateCard({
+        ...cardPayload,
+        locked: !card.locked,
+      });
+    }
   }, [cardPayload, card.locked, updateCard]);
 
   const deleteMagnet = useCallback(async () => {
-    await deleteCards({ cardIds: [card.id], boardId: board.id });
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: "cardsDeleted",
+          cardIds: [card.id],
+          boardId: board.id,
+        }),
+      );
+    } else {
+      await deleteCards({ cardIds: [card.id], boardId: board.id });
+    }
     closeActiveCardAction(BOARD_MODAL_TYPE.DELETE);
   }, [card.id, board.id, deleteCards, closeActiveCardAction]);
 

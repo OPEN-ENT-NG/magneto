@@ -343,7 +343,7 @@ public class Board implements Model<Board> {
     public JsonObject toJson() {
         JsonArray cardsArray = new JsonArray(this.cardIds());
         JsonArray sectionArray = new JsonArray(this.sectionIds());
-        return new JsonObject()
+        JsonObject board = new JsonObject()
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.IMAGEURL, this.getImageUrl())
@@ -368,6 +368,18 @@ public class Board implements Model<Board> {
                 .put(Field.NBCARDS, this.getNbCards())
                 .put(Field.NBCARDSSECTIONS, this.getNbCardsSections())
                 .put(Field.ISEXTERNAL, this.getIsExternal());
+        if (this.cards != null) {
+            JsonArray cardsJsonArray = new JsonArray();
+            this.cards().forEach(card -> cardsJsonArray.add(card.toJson()));
+            board.put(Field.CARDS, cardsJsonArray);
+        }
+        // Convertir explicitement les sections en utilisant leur toJson()
+        if (this.sections != null) {
+            JsonArray sectionsJsonArray = new JsonArray();
+            this.sections().forEach(section -> sectionsJsonArray.add(section.toJson()));
+            board.put(Field.SECTIONS, sectionsJsonArray);
+        }
+        return board;
     }
 
     @Override

@@ -40,8 +40,6 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     }
     case WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED: {
-      console.log(draft.sections);
-      console.log(update.board);
       if (
         draft.sections &&
         update.board?.layoutType !== LAYOUT_TYPE.FREE &&
@@ -98,13 +96,15 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     }
 
-    case WEBSOCKET_MESSAGE_TYPE.CARD_DELETED: {
-      const cardIdToDelete = update.cardId || update.card?.id;
+    case WEBSOCKET_MESSAGE_TYPE.CARDS_DELETED: {
+      const cardIdsToDelete = update.cards?.map((card: any) => card._id) || [];
       if (draft.cards) {
-        draft.cards = draft.cards.filter((c: any) => c.id !== cardIdToDelete);
+        draft.cards = draft.cards.filter(
+          (c: any) => !cardIdsToDelete.includes(c.id),
+        );
         if (draft.cardIds) {
           draft.cardIds = draft.cardIds.filter(
-            (id: any) => id !== cardIdToDelete,
+            (id: any) => !cardIdsToDelete.includes(id),
           );
         }
       }
@@ -112,7 +112,12 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
         draft.sections.forEach((section: any) => {
           if (section.cards) {
             section.cards = section.cards.filter(
-              (c: any) => c.id !== cardIdToDelete,
+              (c: any) => !cardIdsToDelete.includes(c.id),
+            );
+          }
+          if (section.cardIds) {
+            section.cardIds = section.cardIds.filter(
+              (id: any) => !cardIdsToDelete.includes(id),
             );
           }
         });
@@ -120,7 +125,6 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     }
     case WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED: {
-      console.log(update.section);
       if (draft.sections && draft.sectionIds && update.section) {
         draft.sections.push(update.section);
         draft.sectionIds.push(update.section.id);

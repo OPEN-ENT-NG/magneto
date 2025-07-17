@@ -128,7 +128,17 @@ export const useBoardCard = (card: Card) => {
   }, [cardPayload, card.locked, updateCard]);
 
   const deleteMagnet = useCallback(async () => {
-    await deleteCards({ cardIds: [card.id], boardId: board.id });
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: "cardsDeleted",
+          cardIds: [card.id],
+          boardId: board.id,
+        }),
+      );
+    } else {
+      await deleteCards({ cardIds: [card.id], boardId: board.id });
+    }
     closeActiveCardAction(BOARD_MODAL_TYPE.DELETE);
   }, [card.id, board.id, deleteCards, closeActiveCardAction]);
 

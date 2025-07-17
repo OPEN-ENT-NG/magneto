@@ -26,6 +26,7 @@ import org.entcore.common.user.UserInfos;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.vertx.core.http.impl.HttpClientConnection.log;
@@ -400,11 +401,21 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 return serviceFactory.sectionService().createSectionWithBoardUpdate(action.getSection(), newId)
                         .map(result -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()).setId(newId), action.getActionType(), action.getActionId())));
             }
-            /*case cardDeleted: {
-                // client has added a note => delete then broadcast to other users
-                return this.collaborativeWallService.deleteNote(boardId, action.getNoteId(), user, checkConcurency)
-                        .map(deleted -> newArrayList(this.messageFactory.noteDeleted(boardId, wsId, user.getUserId(), action.getNoteId(), deleted, action.getActionType(), action.getActionId())));
+            case cardsDeleted: {
+                List<String> cardIds = action.getCardsIds();
+                String destinationBoardId = action.getBoardId();
+                List<Card> cards = cardIds.stream()
+                        .map(cardId -> new Card().setId(cardId))
+                        .collect(Collectors.toList());
+                return this.serviceFactory.cardService().deleteCardsWithBoardValidation(cardIds, destinationBoardId, user)
+                        .map(result -> newArrayList(this.messageFactory.cardsDeleted(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId())));
             }
+            /*case sectionDeleted: {
+                String newId = UUID.randomUUID().toString();
+                return serviceFactory.sectionService().createSectionWithBoardUpdate(action.getSection(), newId)
+                        .map(result -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()).setId(newId), action.getActionType(), action.getActionId())));
+            }*/
+            /*
             case cardEditionStarted: {
                 // add to editing
                 context.getEditing().add(new MagnetoEditingInformation(user.getUserId(), action.getNoteId(), System.currentTimeMillis()));

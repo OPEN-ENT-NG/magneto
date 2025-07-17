@@ -5,7 +5,7 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   COMMENT_EDITED = "commentEdited",
   COMMENT_DELETED = "commentDeleted",
   CARD_UPDATED = "cardUpdated",
-  CARD_DELETED = "cardDeleted",
+  CARDS_DELETED = "cardsDeleted",
   SECTION_UPDATED = "sectionUpdated",
   CARD_DUPLICATED = "cardDuplicated",
   SECTION_DUPLICATED = "sectionDuplicated",

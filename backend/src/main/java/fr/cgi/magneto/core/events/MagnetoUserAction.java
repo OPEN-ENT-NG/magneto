@@ -124,7 +124,12 @@ public class MagnetoUserAction {
                 }
                 break;
             }
-            case cardDeleted:
+            case cardsDeleted: {
+                if (this.cardIds == null && boardId == null) {
+                    throw new ValidationException("magneto.action.note.missing");
+                }
+                break;
+            }
             case cardEditionStarted:
             case cardEditionEnded:{
                 if(this.cardId == null){

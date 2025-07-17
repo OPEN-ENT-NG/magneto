@@ -603,6 +603,27 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
+    public Future<CompositeFuture> deleteCardsWithBoardValidation(List<String> cardIds, String boardId, UserInfos user) {
+        Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId));
+        Future<List<Section>> getSectionFuture = this.serviceFactory.sectionService().getSectionsByBoardId(boardId);
+
+        return CompositeFuture.all(getBoardFuture, getSectionFuture)
+                .compose(result -> {
+                    if (!getBoardFuture.result().isEmpty()) {
+                        Board currentBoard = getBoardFuture.result().get(0);
+                        List<Future> removeCardsFutures = new ArrayList<>();
+
+                        this.deleteCardsWithLocked(cardIds, getSectionFuture, currentBoard, removeCardsFutures, user);
+                        removeCardsFutures.add(this.deleteCards(cardIds));
+                        return CompositeFuture.all(removeCardsFutures);
+                    } else {
+                        return Future.failedFuture(String.format("[Magneto%s::deleteCards] " +
+                                "No board found with id %s", this.getClass().getSimpleName(), boardId));
+                    }
+                });
+    }
+
+    @Override
     public Future<JsonObject> deleteCards(List<String> cardIds) {
         return this.deleteCards(null, cardIds);
     }

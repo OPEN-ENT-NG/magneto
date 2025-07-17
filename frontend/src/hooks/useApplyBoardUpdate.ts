@@ -68,7 +68,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       const cardToUpdate = update.card;
       if (cardToUpdate && draft.cards) {
         const cardIndex = draft.cards.findIndex(
-          (c: any) => c.id === cardToUpdate.id,
+          (c: any) => c.id === cardToUpdate._id,
         );
         if (cardIndex !== -1) {
           const filteredUpdate = Object.fromEntries(
@@ -81,7 +81,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
         draft.sections.forEach((section: any) => {
           if (section.cards) {
             const cardIndex = section.cards.findIndex(
-              (c: any) => c.id === cardToUpdate.id,
+              (c: any) => c.id === cardToUpdate._id,
             );
             if (cardIndex !== -1) {
               const filteredUpdate = Object.fromEntries(
@@ -89,7 +89,15 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
                   ([, value]) => value !== null,
                 ),
               );
-              Object.assign(section.cards[cardIndex], filteredUpdate);
+              Object.assign(section.cards[cardIndex], {
+                ...filteredUpdate,
+                ...(filteredUpdate.isLocked !== undefined && {
+                  locked: filteredUpdate.isLocked,
+                }),
+                ...(filteredUpdate.isLiked !== undefined && {
+                  liked: filteredUpdate.isLiked,
+                }),
+              });
             }
           }
         });

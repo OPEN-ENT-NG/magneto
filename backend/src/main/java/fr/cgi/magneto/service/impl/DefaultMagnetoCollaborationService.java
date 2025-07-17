@@ -264,8 +264,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                 .map(cards -> newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId()))));
             }
             case cardUpdated: {
-                CardPayload updateCard = new CardPayload(action.getCard().toJson())
-                        .setId(action.getCard().getId())
+                CardPayload updateCard = action.getCard()
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());
@@ -279,7 +278,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
                             return this.serviceFactory.boardService().update(boardToUpdate);
                         })
-                        .map(saved -> newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), new Card(updateCard.toJson()).setId(updateCard.getId()), action.getActionType(), action.getActionId())));
+                        .compose(saved -> this.serviceFactory.cardService().getCards(newArrayList(action.getCard().getId()), user))
+                        .map(cards -> {
+                            Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(updateCard.getId()) : cards.get(0);
+                            return newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                        });
             }
             case boardUpdated: {
                 return this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))

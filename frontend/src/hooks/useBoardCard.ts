@@ -121,10 +121,22 @@ export const useBoardCard = (card: Card) => {
   }, [toggleDropdown]);
 
   const lockOrUnlockMagnet = useCallback(async () => {
-    await updateCard({
-      ...cardPayload,
-      locked: !card.locked,
-    });
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: "cardUpdated",
+          card: {
+            ...cardPayload,
+            locked: !card.locked,
+          },
+        }),
+      );
+    } else {
+      await updateCard({
+        ...cardPayload,
+        locked: !card.locked,
+      });
+    }
   }, [cardPayload, card.locked, updateCard]);
 
   const deleteMagnet = useCallback(async () => {

@@ -1,12 +1,15 @@
 package fr.cgi.magneto.model;
 
 import fr.cgi.magneto.model.boards.Board;
+import fr.cgi.magneto.model.cards.Card;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
 
 @RunWith(VertxUnitRunner.class)
 public class BoardTest {
@@ -36,8 +39,8 @@ public class BoardTest {
             .put("nbCards", 0)
             .put("nbCardsSections", 0)
             .put("isExternal", false)
-            .put("cards", new JsonArray())
-            .put("sections", new JsonArray());;
+            .put("cards", new ArrayList<Card>())
+            .put("sections", new ArrayList<Section>());
 
     @Test
     public void testBoardHasBeenInstantiated(TestContext ctx) {

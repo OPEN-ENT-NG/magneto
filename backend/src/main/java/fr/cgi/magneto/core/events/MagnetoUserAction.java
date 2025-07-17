@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
-import fr.cgi.magneto.model.Section;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
@@ -24,7 +24,7 @@ public class MagnetoUserAction {
     private final CardPayload card;
     private final Board board;
     private final String boardId;
-    private final Section section;
+    private final SectionPayload section;
     private final List<String> sectionIds;
     private final Comment comment;
     private final String commentId;
@@ -40,7 +40,7 @@ public class MagnetoUserAction {
                                        @JsonProperty("card") final CardPayload card,
                                        @JsonProperty("board") final Board board,
                                        @JsonProperty("boardId") final String boardId,
-                                       @JsonProperty("section") final Section section,
+                                       @JsonProperty("section") final SectionPayload section,
                                        @JsonProperty("sectionIds") final List<String> sectionIds,
                                        @JsonProperty("comment") final Comment comment,
                                        @JsonProperty("commentId") final String commentId,
@@ -83,7 +83,7 @@ public class MagnetoUserAction {
 
     public String getBoardId() { return boardId; }
 
-    public Section getSection() { return section; }
+    public SectionPayload getSection() { return section; }
 
     public Comment getComment() { return comment; }
 

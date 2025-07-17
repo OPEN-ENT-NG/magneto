@@ -62,6 +62,8 @@ public interface SectionService {
      */
     Future<JsonObject> delete(List<String> sectionIds);
 
+    Future<JsonObject> createSectionWithBoardUpdate(SectionPayload createSection, String newId);
+
     /**
      * Delete section
      *

@@ -214,6 +214,25 @@ public class DefaultSectionService implements SectionService {
     }
 
     @Override
+    public Future<JsonObject> createSectionWithBoardUpdate(SectionPayload createSection, String newId) {
+
+        Future<List<Board>> getBoardFuture = serviceFactory.boardService().getBoards(Collections.singletonList(createSection.getBoardId()));
+        Future<JsonObject> createSectionFuture = this.create(createSection, newId);
+
+        return CompositeFuture.all(getBoardFuture, createSectionFuture)
+                .compose(result -> {
+                    if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
+                        BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
+                        boardPayload.addSection(newId);
+                        return serviceFactory.boardService().update(boardPayload);
+                    } else {
+                        return Future.failedFuture(String.format("[Magneto%s::createSection] " +
+                                "No board found with id %s", this.getClass().getSimpleName(), createSection.getBoardId()));
+                    }
+                });
+    }
+
+    @Override
     public Future<JsonObject> deleteSections(List<String> sectionIds, String boardId, Boolean deleteCards) {
         Promise<JsonObject> promise = Promise.promise();
         List<Future> removeSectionsFuture = new ArrayList<>();

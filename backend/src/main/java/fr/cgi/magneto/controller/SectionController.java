@@ -4,8 +4,6 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
-import fr.cgi.magneto.model.boards.Board;
-import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.security.ContribBoardRight;
 import fr.cgi.magneto.security.DuplicateCardRight;
 import fr.cgi.magneto.security.ViewRight;
@@ -18,7 +16,6 @@ import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.request.RequestUtils;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
@@ -123,20 +120,7 @@ public class SectionController extends ControllerHelper {
             UserUtils.getUserInfos(eb, request, user -> {
                 SectionPayload createSection = new SectionPayload(section);
                 String newId = UUID.randomUUID().toString();
-
-                Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(createSection.getBoardId()));
-                Future<JsonObject> createSectionFuture = sectionService.create(createSection, newId);
-                CompositeFuture.all(getBoardFuture, createSectionFuture)
-                        .compose(result -> {
-                            if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
-                                BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
-                                boardPayload.addSection(newId);
-                                return boardService.update(boardPayload);
-                            } else {
-                                return Future.failedFuture(String.format("[Magneto%s::createSection] " +
-                                        "No board found with id %s", this.getClass().getSimpleName(), createSection.getBoardId()));
-                            }
-                        })
+                this.sectionService.createSectionWithBoardUpdate(createSection, newId)
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::createSection] Failed to create section : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
@@ -146,7 +130,7 @@ public class SectionController extends ControllerHelper {
                         .onSuccess(result -> {
                             eventStore.createAndStoreEvent(CREATE.name(), user, new JsonObject()
                                     .put(Field.RESOURCE_DASH_TYPE, Field.RESOURCE_SECTION));
-                            renderJson(request, createSectionFuture.result());
+                            renderJson(request, result);
                         });
             });
         });

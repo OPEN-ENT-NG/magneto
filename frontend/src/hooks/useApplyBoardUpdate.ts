@@ -119,7 +119,14 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       }
       break;
     }
-
+    case WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED: {
+      console.log(update.section);
+      if (draft.sections && draft.sectionIds && update.section) {
+        draft.sections.push(update.section);
+        draft.sectionIds.push(update.section.id);
+      }
+      break;
+    }
     case WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED: {
       if (draft.sections) {
         const sectionIndex = draft.sections.findIndex(

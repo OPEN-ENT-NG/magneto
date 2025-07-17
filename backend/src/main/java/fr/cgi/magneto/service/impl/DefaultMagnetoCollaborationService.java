@@ -10,7 +10,7 @@ import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.helper.WorkflowHelper;
-import fr.cgi.magneto.model.SectionPayload;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -302,15 +302,13 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         });
             }
             case sectionUpdated: {
-                SectionPayload updateSection = new SectionPayload(action.getSection().toJson())
-                        .setId(action.getSection().getId());
-                return serviceFactory.sectionService().update(updateSection)
+                return serviceFactory.sectionService().update(action.getSection())
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateSection] Failed to update section : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
-                        }) //TODO : pk on redonne action.getSection() dans le message?? ça s'update bien??
-                        .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), action.getSection(), action.getActionType(), action.getActionId())));
+                        })
+                        .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()), action.getActionType(), action.getActionId())));
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
@@ -396,6 +394,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 return this.serviceFactory.sectionService().duplicateSectionsWithCards(destinationBoardId, sectionIds, user)
                         .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
                         .map(board -> newArrayList(this.messageFactory.sectionDuplicated(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+            }
+            case sectionAdded: {
+                String newId = UUID.randomUUID().toString();
+                return serviceFactory.sectionService().createSectionWithBoardUpdate(action.getSection(), newId)
+                        .map(result -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()).setId(newId), action.getActionType(), action.getActionId())));
             }
             /*case cardDeleted: {
                 // client has added a note => delete then broadcast to other users

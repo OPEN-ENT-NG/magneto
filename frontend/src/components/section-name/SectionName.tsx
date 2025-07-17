@@ -105,10 +105,22 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       }
     }
     try {
-      await createSectionAndToast({
-        boardId,
-        title: inputValue,
-      });
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "sectionAdded",
+            section: {
+              boardId,
+              title: inputValue,
+            },
+          }),
+        );
+      } else {
+        await createSectionAndToast({
+          boardId,
+          title: inputValue,
+        });
+      }
       setInputValue("");
     } catch (error) {
       console.error(error);

@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { IUserInfo } from "@edifice.io/client";
 import { ReadyState } from "react-use-websocket";
 
+import { IBoardItemResponse } from "~/models/board.model";
 import { ICardItemResponse } from "~/models/card.model";
 
 export interface WebSocketUpdate {
@@ -12,7 +13,7 @@ export interface WebSocketUpdate {
   cardId?: string;
   section?: any;
   sectionId?: string;
-  board?: any;
+  board?: IBoardItemResponse;
   connectedUsers?: IUserInfo[];
   [key: string]: any;
 }

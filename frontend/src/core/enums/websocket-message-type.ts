@@ -11,4 +11,5 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   SECTION_DUPLICATED = "sectionDuplicated",
   SECTION_ADDED = "sectionAdded",
   SECTIONS_DELETED = "sectionsDeleted",
+  CARD_MOVED = "cardMoved",
 }

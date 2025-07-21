@@ -28,6 +28,7 @@ import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useUpdateBoardCardsMutation } from "~/services/api/boards.service";
 import {
   useUpdateSectionMutation,
@@ -46,6 +47,7 @@ export const useSectionsDnD = (board: Board) => {
   const [updateSection] = useUpdateSectionMutation();
   const [createSection] = useCreateSectionMutation();
   const [updateBoardCards] = useUpdateBoardCardsMutation();
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
   const toast = useToast();
@@ -255,10 +257,20 @@ export const useSectionsDnD = (board: Board) => {
   const handleSectionDragEnd = useCallback(async () => {
     const newOrder = updatedSections.map((section) => section._id);
     try {
-      await updateBoardCards({
-        id: board._id,
-        sectionIds: newOrder,
-      }).unwrap();
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "cardMoved",
+            boardId: board._id,
+            sectionIds: newOrder,
+          }),
+        );
+      } else {
+        await updateBoardCards({
+          id: board._id,
+          sectionIds: newOrder,
+        }).unwrap();
+      }
     } catch (error) {
       console.error("Failed to update board sections:", error);
     }
@@ -396,20 +408,42 @@ export const useSectionsDnD = (board: Board) => {
             return section;
           }),
         );
-
         try {
-          await Promise.all([
-            updateSection({
-              id: originalActiveSection._id,
-              boardId: board._id,
-              cardIds: originalActiveSection.cardIds,
-            }).unwrap(),
-            updateSection({
-              id: currentOverSectionWithoutNewCard._id,
-              boardId: board._id,
-              cardIds: currentOverSectionWithoutNewCard.cardIds,
-            }).unwrap(),
-          ]);
+          if (readyState === WebSocket.OPEN) {
+            sendMessage(
+              JSON.stringify({
+                type: "sectionUpdated",
+                section: {
+                  id: originalActiveSection._id,
+                  boardId: board._id,
+                  cardIds: originalActiveSection.cardIds,
+                },
+              }),
+            );
+            sendMessage(
+              JSON.stringify({
+                type: "sectionUpdated",
+                section: {
+                  id: currentOverSectionWithoutNewCard._id,
+                  boardId: board._id,
+                  cardIds: currentOverSectionWithoutNewCard.cardIds,
+                },
+              }),
+            );
+          } else {
+            await Promise.all([
+              updateSection({
+                id: originalActiveSection._id,
+                boardId: board._id,
+                cardIds: originalActiveSection.cardIds,
+              }).unwrap(),
+              updateSection({
+                id: currentOverSectionWithoutNewCard._id,
+                boardId: board._id,
+                cardIds: currentOverSectionWithoutNewCard.cardIds,
+              }).unwrap(),
+            ]);
+          }
         } catch (error) {
           console.error("Failed to update sections:", error);
         }
@@ -466,18 +500,41 @@ export const useSectionsDnD = (board: Board) => {
           }),
         );
         try {
-          await Promise.all([
-            updateSection({
-              id: originalActiveSection._id,
-              boardId: board._id,
-              cardIds: newOriginalSectionCardIds,
-            }).unwrap(),
-            updateSection({
-              id: currentOverSection._id,
-              boardId: board._id,
-              cardIds: newOverSectionCardIds,
-            }).unwrap(),
-          ]);
+          if (readyState === WebSocket.OPEN) {
+            sendMessage(
+              JSON.stringify({
+                type: "sectionUpdated",
+                section: {
+                  id: originalActiveSection._id,
+                  boardId: board._id,
+                  cardIds: newOriginalSectionCardIds,
+                },
+              }),
+            );
+            sendMessage(
+              JSON.stringify({
+                type: "sectionUpdated",
+                section: {
+                  id: currentOverSection._id,
+                  boardId: board._id,
+                  cardIds: newOverSectionCardIds,
+                },
+              }),
+            );
+          } else {
+            await Promise.all([
+              updateSection({
+                id: originalActiveSection._id,
+                boardId: board._id,
+                cardIds: newOriginalSectionCardIds,
+              }).unwrap(),
+              updateSection({
+                id: currentOverSection._id,
+                boardId: board._id,
+                cardIds: newOverSectionCardIds,
+              }).unwrap(),
+            ]);
+          }
         } catch (error) {
           console.error("Failed to update sections:", error);
         }
@@ -525,11 +582,24 @@ export const useSectionsDnD = (board: Board) => {
       );
 
       try {
-        await updateSection({
-          id: currentOverSection._id,
-          boardId: board._id,
-          cardIds: newCardIds,
-        }).unwrap();
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: "sectionUpdated",
+              section: {
+                id: currentOverSection._id,
+                boardId: board._id,
+                cardIds: newCardIds,
+              },
+            }),
+          );
+        } else {
+          await updateSection({
+            id: currentOverSection._id,
+            boardId: board._id,
+            cardIds: newCardIds,
+          }).unwrap();
+        }
       } catch (error) {
         console.error("Failed to update section:", error);
       }

@@ -306,13 +306,15 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         });
             }
             case sectionUpdated: {
+                Section updatedSection = new Section(action.getSection().toJson());
                 return serviceFactory.sectionService().update(action.getSection())
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateSection] Failed to update section : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
                         })
-                        .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()), action.getActionType(), action.getActionId())));
+                        .compose(res -> this.serviceFactory.cardService().getAllCardsBySectionSimple(updatedSection, null, user))
+                        .map(cards -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), updatedSection.setCards(cards), action.getActionType(), action.getActionId())));
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
@@ -425,6 +427,29 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         })
                         .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
                         .map(board -> newArrayList(this.messageFactory.sectionsDeleted(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+            }
+            case cardMoved: {
+                List<String> sectionIds = action.getSectionIds();
+                List<String> cardIds = action.getCardsIds();
+                String destinationBoardId = action.getBoardId();
+                return this.serviceFactory.boardService().getBoards(Collections.singletonList(destinationBoardId))
+                        .compose(boards -> {
+                            if (!boards.isEmpty()) {
+                                BoardPayload updateBoard = new BoardPayload()
+                                        .setId(destinationBoardId)
+                                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
+                                if (sectionIds != null && !sectionIds.isEmpty())
+                                    updateBoard.setSectionIds(sectionIds);
+                                if (cardIds != null && !cardIds.isEmpty())
+                                    updateBoard.setCardIds(cardIds);
+                                return this.serviceFactory.boardService().update(updateBoard);
+                            } else {
+                                return Future.failedFuture(String.format("[Magneto%s::update] " +
+                                        "No board found with id %s", this.getClass().getSimpleName(), boardId));
+                            }
+                        })
+                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
+                        .map(board -> newArrayList(this.messageFactory.cardMoved(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
             }
             /*
             case cardEditionStarted: {

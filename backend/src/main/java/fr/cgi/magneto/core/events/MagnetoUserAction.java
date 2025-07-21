@@ -121,7 +121,6 @@ public class MagnetoUserAction {
                 break;
             }
             case cardAdded:
-            case cardMoved:
             case cardFavorite:
             case cardUpdated: {
                 if(this.card == null){
@@ -150,6 +149,12 @@ public class MagnetoUserAction {
             }
             case sectionUpdated:{
                 if (this.section == null){
+                    throw new ValidationException("magneto.action.section.missing");
+                }
+                break;
+            }
+            case cardMoved: {
+                if (this.boardId == null || (this.sectionIds == null && this.cardIds == null)) {
                     throw new ValidationException("magneto.action.section.missing");
                 }
                 break;

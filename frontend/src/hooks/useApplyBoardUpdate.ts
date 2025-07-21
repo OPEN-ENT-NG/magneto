@@ -138,10 +138,18 @@ const handleSectionUpdated = (draft: any, update: WebSocketUpdate) => {
       (s: any) => s._id === update.section._id,
     );
     if (sectionIndex !== -1) {
-      const filteredUpdate = Object.fromEntries(
-        Object.entries(update.section).filter(([, value]) => value !== null),
-      );
-      Object.assign(draft.sections[sectionIndex], filteredUpdate);
+      Object.entries(update.section).forEach(([key, value]) => {
+        if (value !== null) {
+          if (key === "cardIds") {
+            console.log("Avant:", draft.sections[sectionIndex][key]);
+            console.log("Nouvelle valeur:", value);
+          }
+          draft.sections[sectionIndex][key] = value;
+          if (key === "cardIds") {
+            console.log("Après:", draft.sections[sectionIndex][key]);
+          }
+        }
+      });
     }
   }
 };
@@ -170,6 +178,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     case WEBSOCKET_MESSAGE_TYPE.SECTIONS_DELETED:
     case WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED:
+    case WEBSOCKET_MESSAGE_TYPE.CARD_MOVED:
       handleSectionsDeletedOrDuplicated(draft, update);
       break;
     case WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE:

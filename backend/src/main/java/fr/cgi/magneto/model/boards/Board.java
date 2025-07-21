@@ -40,9 +40,10 @@ public class Board implements Model<Board> {
     private JsonArray rights;
     private boolean isExternal;
     private List<String> sectionsIds;
+    private List<String> cardIds;
 
     public Board(){
-        
+
     }
 
     @SuppressWarnings("unchecked")
@@ -84,7 +85,8 @@ public class Board implements Model<Board> {
         this.isExternal = board.getBoolean(Field.ISEXTERNAL, false);
         if (board.containsKey(Field.SECTIONIDS))
             this.sectionsIds = board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList();
-
+        if (board.containsKey(Field.CARDIDS))
+            this.cardIds = board.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
     }
 
     public String getId() {
@@ -205,10 +207,6 @@ public class Board implements Model<Board> {
 
     public List<Card> cards() {
         return this.layoutType != null ? this.layoutType.equals(Field.FREE) ? this.cards : this.getCardsSection() : new ArrayList<>();
-    }
-
-    public List<String> cardIds() {
-        return this.cards().stream().map(Card::getId).collect(Collectors.toList());
     }
 
     public Board setCards(List<Card> cards) {
@@ -332,6 +330,10 @@ public class Board implements Model<Board> {
 
     public void setSectionIds(List<String> sectionIds) { this.sectionsIds = sectionIds; }
 
+    public List<String> getCardIds() { return cardIds; }
+
+    public void setCardIds(List<String> cardIds) { this.cardIds = cardIds; }
+
     public Board reset() {
         this.setId(null);
         this.setPublic(false);
@@ -341,7 +343,7 @@ public class Board implements Model<Board> {
 
     @Override
     public JsonObject toJson() {
-        JsonArray cardsArray = new JsonArray(this.cardIds());
+        JsonArray cardsArray = new JsonArray(this.getCardIds() != null ? this.getCardIds() : new ArrayList<>());
         JsonArray sectionArray = new JsonArray(this.sectionIds());
         JsonObject board = new JsonObject()
                 .put(Field._ID, this.getId())

@@ -10,7 +10,7 @@ import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.helper.WorkflowHelper;
-import fr.cgi.magneto.model.SectionPayload;
+import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -26,6 +26,7 @@ import org.entcore.common.user.UserInfos;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static io.vertx.core.http.impl.HttpClientConnection.log;
@@ -258,18 +259,12 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
                 return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
-                        .flatMap(saved -> {
-                            String cardId = saved.getString(Field.ID);
-                            return this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
-                                    .map(cards -> {
-                                        Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(cardId) : cards.get(0);
-                                        return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                                    });
-                        });
+                        .compose(saved -> this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId)))
+                        .compose(board -> this.serviceFactory.cardService().getCardsOrFirstSection(board.get(0), user)
+                                .map(cards -> newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId()))));
             }
             case cardUpdated: {
-                CardPayload updateCard = new CardPayload(action.getCard().toJson())
-                        .setId(action.getCard().getId())
+                CardPayload updateCard = action.getCard()
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());
@@ -283,7 +278,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
                             return this.serviceFactory.boardService().update(boardToUpdate);
                         })
-                        .map(saved -> newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), new Card(updateCard.toJson()).setId(updateCard.getId()), action.getActionType(), action.getActionId())));
+                        .compose(saved -> this.serviceFactory.cardService().getCards(newArrayList(action.getCard().getId()), user))
+                        .map(cards -> {
+                            Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(updateCard.getId()) : cards.get(0);
+                            return newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                        });
             }
             case boardUpdated: {
                 return this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
@@ -307,15 +306,13 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         });
             }
             case sectionUpdated: {
-                SectionPayload updateSection = new SectionPayload(action.getSection().toJson())
-                        .setId(action.getSection().getId());
-                return serviceFactory.sectionService().update(updateSection)
+                return serviceFactory.sectionService().update(action.getSection())
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateSection] Failed to update section : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
-                        }) //TODO : pk on redonne action.getSection() dans le message?? ça s'update bien??
-                        .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), action.getSection(), action.getActionType(), action.getActionId())));
+                        })
+                        .map(result -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()), action.getActionType(), action.getActionId())));
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
@@ -352,7 +349,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                            return newArrayList(this.messageFactory.commentAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
             }
             case commentDeleted: {
@@ -365,7 +362,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                            return newArrayList(this.messageFactory.commentDeleted(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
             }
             case commentEdited: {
@@ -380,14 +377,56 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                            return newArrayList(this.messageFactory.commentEdited(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
             }
-            /*case cardDeleted: {
-                // client has added a note => delete then broadcast to other users
-                return this.collaborativeWallService.deleteNote(boardId, action.getNoteId(), user, checkConcurency)
-                        .map(deleted -> newArrayList(this.messageFactory.noteDeleted(boardId, wsId, user.getUserId(), action.getNoteId(), deleted, action.getActionType(), action.getActionId())));
+            case cardDuplicated: {
+                List<String> cardIds = action.getCardsIds();
+                String destinationBoardId = action.getBoardId();
+
+                return this.serviceFactory.cardService().getCards(cardIds, user)
+                        .compose(cardsToDuplicate -> this.serviceFactory.cardService().duplicateCards(destinationBoardId, cardsToDuplicate, null, user))
+                        .compose(res -> this.serviceFactory.boardService().getBoards(Collections.singletonList(destinationBoardId)))
+                        .compose(boards -> this.serviceFactory.cardService().getCardsOrFirstSection(boards.get(0), user))
+                        .map(cards -> destinationBoardId.equals(boardId) ?
+                                newArrayList(this.messageFactory.cardDuplicated(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId())) :
+                                new ArrayList<>());
             }
+            case sectionDuplicated: {
+                List<String> sectionIds = action.getSectionIds();
+                String destinationBoardId = action.getBoardId();
+                return this.serviceFactory.sectionService().duplicateSectionsWithCards(destinationBoardId, sectionIds, user)
+                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
+                        .map(board -> newArrayList(this.messageFactory.sectionDuplicated(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+            }
+            case sectionAdded: {
+                String newId = UUID.randomUUID().toString();
+                return serviceFactory.sectionService().createSectionWithBoardUpdate(action.getSection(), newId)
+                        .map(result -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()).setId(newId), action.getActionType(), action.getActionId())));
+            }
+            case cardsDeleted: {
+                List<String> cardIds = action.getCardsIds();
+                String destinationBoardId = action.getBoardId();
+                List<Card> cards = cardIds.stream()
+                        .map(cardId -> new Card().setId(cardId))
+                        .collect(Collectors.toList());
+                return serviceFactory.cardService().deleteCardsWithBoardValidation(cardIds, destinationBoardId, user)
+                        .map(result -> newArrayList(this.messageFactory.cardsDeleted(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId())));
+            }
+            case sectionsDeleted: {
+                List<String> sectionIds = action.getSectionIds();
+                String destinationBoardId = action.getBoardId();
+                Boolean deleteCards = action.getDeleteCards();
+                return serviceFactory.sectionService().deleteSections(sectionIds, destinationBoardId, deleteCards)
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::deleteSections] Failed to delete sections : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                        })
+                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
+                        .map(board -> newArrayList(this.messageFactory.sectionsDeleted(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+            }
+            /*
             case cardEditionStarted: {
                 // add to editing
                 context.getEditing().add(new MagnetoEditingInformation(user.getUserId(), action.getNoteId(), System.currentTimeMillis()));

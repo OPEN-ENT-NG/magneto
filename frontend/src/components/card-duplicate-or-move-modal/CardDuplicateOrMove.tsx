@@ -55,7 +55,6 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
     try {
       if (isModalDuplicate) {
         if (readyState === WebSocket.OPEN) {
-          console.log(inputValue, [activeCard.id]);
           sendMessage(
             JSON.stringify({
               type: "cardDuplicated",

@@ -11,6 +11,7 @@ import { CustomPointerSensor } from "./customPointer";
 import { reorderWithLockedItems } from "./reorderUtils";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useUpdateBoardCardsMutation } from "~/services/api/boards.service";
 
 export const useFreeLayoutCardDnD = (board: Board) => {
@@ -22,6 +23,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
   const [updatedIds, setUpdatedIds] = useState<string[]>(validCardIds);
   const [activeItem, setActiveItem] = useState<Card | null>(null);
   const [updateBoardCards] = useUpdateBoardCardsMutation();
+  const { sendMessage, readyState } = useWebSocketMagneto();
 
   const cardMap = useMemo(() => {
     const map: Record<string, Card> = {};
@@ -95,7 +97,17 @@ export const useFreeLayoutCardDnD = (board: Board) => {
             cardIds: newUpdatedIds,
           };
 
-          await updateBoardCards(payload).unwrap();
+          if (readyState === WebSocket.OPEN) {
+            sendMessage(
+              JSON.stringify({
+                type: "cardMoved",
+                boardId: board._id,
+                cardIds: newUpdatedIds,
+              }),
+            );
+          } else {
+            await updateBoardCards(payload).unwrap();
+          }
         }
       } catch {
         setUpdatedIds(validCardIds);

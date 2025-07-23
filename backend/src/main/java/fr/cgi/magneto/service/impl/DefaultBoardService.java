@@ -319,7 +319,7 @@ public class DefaultBoardService implements BoardService {
 
         // Check if we are changing the layout from free to section
         if (currentBoard.isLayoutFree() && !updateBoard.isLayoutFree()) {
-            SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.cardIds());
+            SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.getCardIds());
 
             String sectionId = UUID.randomUUID().toString();
             sectionPayload.setTitle(i18n.translate("magneto.section.default.title"));

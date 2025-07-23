@@ -155,7 +155,7 @@ public class MagnetoUserAction {
             }
             case cardMoved: {
                 if (this.boardId == null || (this.sectionIds == null && this.cardIds == null)) {
-                    throw new ValidationException("magneto.action.section.missing");
+                    throw new ValidationException("magneto.action.moved.missing");
                 }
                 break;
             }

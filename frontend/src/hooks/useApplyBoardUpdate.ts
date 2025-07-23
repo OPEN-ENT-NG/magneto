@@ -98,7 +98,6 @@ const handleCardFavoriteOrComment = (draft: any, update: WebSocketUpdate) => {
 
 const handleCardsDeleted = (draft: any, update: WebSocketUpdate) => {
   const cardIdsToDelete = update.cards?.map((card: any) => card._id) || [];
-  console.log(cardIdsToDelete);
   if (draft.cards) {
     draft.cards = draft.cards.filter(
       (c: any) => !cardIdsToDelete.includes(c.id),
@@ -140,14 +139,7 @@ const handleSectionUpdated = (draft: any, update: WebSocketUpdate) => {
     if (sectionIndex !== -1) {
       Object.entries(update.section).forEach(([key, value]) => {
         if (value !== null) {
-          if (key === "cardIds") {
-            console.log("Avant:", draft.sections[sectionIndex][key]);
-            console.log("Nouvelle valeur:", value);
-          }
           draft.sections[sectionIndex][key] = value;
-          if (key === "cardIds") {
-            console.log("Après:", draft.sections[sectionIndex][key]);
-          }
         }
       });
     }

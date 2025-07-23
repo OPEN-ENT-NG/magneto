@@ -97,7 +97,6 @@ export const useFreeLayoutCardDnD = (board: Board) => {
             cardIds: newUpdatedIds,
           };
 
-          console.log("🚀 ~ payload:", payload);
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({

@@ -5,6 +5,10 @@ import {
 
 import { emptySplitApi } from "./emptySplitApi.service";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
+import {
+  applyBoardUpdate,
+  registerCacheUpdateCallback,
+} from "~/hooks/useApplyBoardUpdate";
 import { IBoardItemResponse } from "~/models/board.model";
 import { ICardsResponse } from "~/models/card.model";
 import { Section } from "~/providers/BoardProvider/types";
@@ -91,6 +95,28 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
               cards: sortedCards,
             },
           };
+        }
+      },
+      async onCacheEntryAdded(
+        arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        try {
+          // Attendre que les données soient chargées
+          await cacheDataLoaded;
+
+          // S'enregistrer pour recevoir les mises à jour WebSocket
+          const unsubscribe = registerCacheUpdateCallback((update: any) => {
+            updateCachedData((draft) => {
+              applyBoardUpdate(draft, update);
+            });
+          });
+
+          // Nettoyer lors de la suppression du cache
+          await cacheEntryRemoved;
+          unsubscribe();
+        } catch (error) {
+          console.error("Error in cache entry lifecycle:", error);
         }
       },
       providesTags: ["BoardData"],

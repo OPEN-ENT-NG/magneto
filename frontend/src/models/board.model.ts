@@ -14,6 +14,7 @@ export interface IBoardItemResponse {
   backgroundUrl: string;
   cardIds: Array<string>;
   sections: Section[];
+  sectionIds: Array<string>;
   tags: Array<string>;
   nbCards: number;
   nbCardsSections: number;

@@ -50,6 +50,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
   const { id = "" } = useParams();
+
   const {
     data: boardData,
     isLoading,

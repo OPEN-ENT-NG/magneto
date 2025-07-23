@@ -109,8 +109,11 @@ public class Section implements Model {
                 .put(Field.BOARDID, this.getBoardId());
         if (this.displayed != null)
             json.put(Field.DISPLAYED, this.getDisplayed());
-        if (this.cards != null)
-            json.put(Field.CARDS, this.getCards());
+        if (this.cards != null) {
+            JsonArray cardsJsonArray = new JsonArray();
+            this.cards.forEach(card -> cardsJsonArray.add(card.toJson()));
+            json.put(Field.CARDS, cardsJsonArray);
+        }
         return json;
     }
 

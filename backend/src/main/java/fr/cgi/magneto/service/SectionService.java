@@ -62,6 +62,8 @@ public interface SectionService {
      */
     Future<JsonObject> delete(List<String> sectionIds);
 
+    Future<JsonObject> createSectionWithBoardUpdate(SectionPayload createSection, String newId);
+
     /**
      * Delete section
      *
@@ -72,6 +74,16 @@ public interface SectionService {
      */
 
     Future<JsonObject> deleteSections(List<String> sectionIds, String boardId, Boolean deleteCards);
+
+    /**
+     * Duplicate sections and their cards
+     *
+     * @param boardId  Board identifier
+     * @param sectionIds List of section ids to duplicate
+     * @param user     {@link UserInfos} User info
+     * @return Future {@link Future <JsonObject>} containing status of duplicate
+     */
+    Future<JsonObject> duplicateSectionsWithCards(String boardId, List<String> sectionIds, UserInfos user);
 
     /**
      * Duplicate cards

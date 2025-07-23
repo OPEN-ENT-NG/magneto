@@ -243,7 +243,7 @@ public class CardController extends ControllerHelper {
                     log.error(message);
                     HttpRequestHelper.sendError(request, new BadRequestException("User not found"));
                 }
-                cardService.updateFavorite(cardId, favorite, user)
+                cardService.updateFavorite(cardId, favorite, user, false)
                         .onSuccess(res -> renderJson(request, res))
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
@@ -348,22 +348,7 @@ public class CardController extends ControllerHelper {
                 UserUtils.getUserInfos(eb, request, user -> {
                             List<String> cardIds = cards.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
                             String boardId = request.getParam(Field.BOARDID);
-                            Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(boardId));
-                            Future<List<Section>> getSectionFuture = sectionService.getSectionsByBoardId(boardId);
-                    CompositeFuture.all(getBoardFuture, getSectionFuture)
-                                    .compose(result -> {
-                                        if (!getBoardFuture.result().isEmpty()) {
-                                            Board currentBoard = getBoardFuture.result().get(0);
-                                            List<Future> removeCardsFutures = new ArrayList<>();
-
-                                            cardService.deleteCardsWithLocked(cardIds, getSectionFuture, currentBoard, removeCardsFutures, user);
-                                            removeCardsFutures.add(cardService.deleteCards(cardIds));
-                                            return CompositeFuture.all(removeCardsFutures);
-                                        } else {
-                                            return Future.failedFuture(String.format("[Magneto%s::deleteCards] " +
-                                                    "No board found with id %s", this.getClass().getSimpleName(), boardId));
-                                        }
-                                    })
+                            this.cardService.deleteCardsWithBoardValidation(cardIds, boardId, user)
                                     .onFailure(err -> renderError(request))
                                     .onSuccess(res -> renderJson(request, new JsonObject()));
                         }

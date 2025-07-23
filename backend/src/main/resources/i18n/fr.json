@@ -368,5 +368,8 @@
   "magneto.modal.update.screen4.text": "Depuis la fenêtre de partage, sélectionnez l’option pour rendre votre tableau public. Un lien sera créé le rendant accessible à tout utilisateur, y compris sans connexion à l’ENT !",
   "magneto.modal.update.screen4.title": "Rendez votre tableau accessible publiquement",
 
-  "magnetoexplorer.shared.status.error": "Une erreur est survenue. Veuillez réessayer ultérieurement."
+  "magnetoexplorer.shared.status.error": "Une erreur est survenue. Veuillez réessayer ultérieurement.",
+
+  "magneto.user": "utilisateur",
+  "magneto.you": "Vous"
 }

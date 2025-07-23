@@ -29,6 +29,7 @@ import { initialInputvalue } from "./utils";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { useBoard } from "~/providers/BoardProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDuplicateCardMutation } from "~/services/api/cards.service";
 
 export const BoardCreateMagnetMagnetModal: FC<
@@ -38,6 +39,7 @@ export const BoardCreateMagnetMagnetModal: FC<
   const [inputValue, setInputValue] =
     useState<InputValueState>(initialInputvalue);
   const { currentTab, isByBoards, isByFavorite } = inputValue;
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { t } = useTranslation("magneto");
   const [duplicateCard] = useDuplicateCardMutation();
   const toast = useToast();
@@ -77,7 +79,16 @@ export const BoardCreateMagnetMagnetModal: FC<
         cardIds: inputValue.cardIds,
       };
       try {
-        await duplicateCard(magnetMagnetParams);
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: "cardDuplicated",
+              ...magnetMagnetParams,
+            }),
+          );
+        } else {
+          await duplicateCard(magnetMagnetParams);
+        }
         toast.success(t("magneto.duplicate.cards.confirm"));
         onCloseModal();
       } catch {

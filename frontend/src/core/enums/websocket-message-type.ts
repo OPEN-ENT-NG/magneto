@@ -1,0 +1,15 @@
+export enum WEBSOCKET_MESSAGE_TYPE {
+  CARD_ADDED = "cardAdded",
+  CARD_FAVORITE = "cardFavorite",
+  COMMENT_ADDED = "commentAdded",
+  COMMENT_EDITED = "commentEdited",
+  COMMENT_DELETED = "commentDeleted",
+  CARD_UPDATED = "cardUpdated",
+  CARDS_DELETED = "cardsDeleted",
+  SECTION_UPDATED = "sectionUpdated",
+  CARD_DUPLICATED = "cardDuplicated",
+  SECTION_DUPLICATED = "sectionDuplicated",
+  SECTION_ADDED = "sectionAdded",
+  SECTIONS_DELETED = "sectionsDeleted",
+  CARD_MOVED = "cardMoved",
+}

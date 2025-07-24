@@ -30,6 +30,7 @@ import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { useImageHandler } from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { BoardForm } from "~/models/board.model";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
@@ -41,6 +42,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   boardToUpdate,
   reset,
   parentFolderId,
+  hasWebSocket = false,
 }) => {
   const { t } = useTranslation("magneto");
   const { appCode } = useEdificeClient();
@@ -57,6 +59,10 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [tags, setTags] = useState([""]);
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
+  const webSocketData = hasWebSocket
+    ? useWebSocketMagneto()
+    : { sendMessage: null, readyState: null };
+  const { sendMessage, readyState } = webSocketData;
   const { width } = useWindowDimensions();
   const {
     thumbnail,
@@ -119,7 +125,16 @@ export const CreateBoard: FC<CreateBoardProps> = ({
 
     if (boardToUpdate) {
       board.id = boardToUpdate.id;
-      updateBoard(board.toJSON());
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "boardUpdated",
+            board: board.toJSON(),
+          }),
+        );
+      } else {
+        updateBoard(board.toJSON());
+      }
       if (reset != null) reset();
       return resetFields();
     }

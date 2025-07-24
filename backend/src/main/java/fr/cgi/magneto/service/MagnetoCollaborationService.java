@@ -4,12 +4,14 @@ import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
+import fr.cgi.magneto.model.user.User;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service managing real-time collaboration features for Magneto
@@ -85,7 +87,9 @@ public interface MagnetoCollaborationService {
 
     Future<List<MagnetoMessage>> pushEvent(String wallId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);
 
-    Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId);
+    Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId, Map<String, User> wsIdToUser);
 
     Future<List<MagnetoMessage>> onNewDisconnection(String boardId, String userId, String wsId);
+
+    Future<Boolean> hasContribRight(String boardId, UserInfos user);
 }

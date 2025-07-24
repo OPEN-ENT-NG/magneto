@@ -52,13 +52,13 @@ public class MagnetoMessageFactory {
     public MagnetoMessage boardUpdated(final String boardId, final String wsId, final String userId, final Board board, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.boardUpdated,
-                userId, null, null, null, null, null,
+                userId, null, board, null, null, null,
                 null, null, null, actionType, actionId, null);
     }
 
-    public MagnetoMessage cardAdded(final String boardId, final String wsId, final String userId, final List<Card> cards, final MagnetoUserAction.ActionType actionType, final String actionId) {
+    public MagnetoMessage cardAdded(final String boardId, final String wsId, final String userId, final Board board, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
-                MagnetoMessageType.cardAdded, userId, null, null, null, null, cards,
+                MagnetoMessageType.cardAdded, userId, null, board, null, null, null,
                 null, null, null, actionType, actionId, null);
     }
 
@@ -142,6 +142,13 @@ public class MagnetoMessageFactory {
     public MagnetoMessage cardMoved(final String boardId, final String wsId, final String userId, final Board board, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.cardMoved,
+                userId, null, board, null, null, null,
+                null, null, null, actionType, actionId, null);
+    }
+
+    public MagnetoMessage boardMessage(final String boardId, final String wsId, final String userId, final Board board, final MagnetoUserAction.ActionType actionType, final String actionId) {
+        return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
+                MagnetoMessageType.boardMessage,
                 userId, null, board, null, null, null,
                 null, null, null, actionType, actionId, null);
     }

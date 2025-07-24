@@ -1,6 +1,8 @@
 package fr.cgi.magneto.service.impl;
 
+import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
@@ -16,11 +18,14 @@ import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.model.comments.CommentPayload;
+import fr.cgi.magneto.model.user.User;
 import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
+import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.*;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
@@ -259,9 +264,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
                 return this.serviceFactory.cardService().createCardLayout(cardPayload, null, user)
-                        .compose(saved -> this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId)))
-                        .compose(board -> this.serviceFactory.cardService().getCardsOrFirstSection(board.get(0), user)
-                                .map(cards -> newArrayList(this.messageFactory.cardAdded(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId()))));
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardUpdated: {
                 CardPayload updateCard = action.getCard()
@@ -288,21 +291,21 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 return this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
                         .compose(boards -> {
                             boolean hasCommRight = WorkflowHelper.hasRight(user, Rights.COMMENT_BOARD);
-                            JsonObject board = action.getBoard().toJson();
+                            JsonObject boardPayload = action.getBoard().toJson();
                             if (!hasCommRight) {
-                                board.remove(Field.CANCOMMENT);
+                                boardPayload.remove(Field.CANCOMMENT);
                             }
                             boolean hasDisplayNbFavoritesRight = WorkflowHelper.hasRight(user, Rights.DISPLAY_NB_FAVORITES);
                             if (!hasDisplayNbFavoritesRight) {
-                                board.remove(Field.DISPLAY_NB_FAVORITES);
+                                boardPayload.remove(Field.DISPLAY_NB_FAVORITES);
                             }
-                            BoardPayload updateBoard = new BoardPayload(board)
+                            BoardPayload updateBoard = new BoardPayload(boardPayload)
                                     .setId(boardId)
                                     .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
                             Board currentBoard = boards.get(0);
                             return this.serviceFactory.boardService().updateLayoutCards(updateBoard, currentBoard, null, user)
-                                    .compose(boardUpdated -> this.serviceFactory.boardService().update(new BoardPayload(boardUpdated))
-                                            .map(result -> newArrayList(this.messageFactory.boardUpdated(boardId, wsId, user.getUserId(), new Board(boardUpdated), action.getActionType(), action.getActionId()))));
+                                    .compose(boardUpdated -> this.serviceFactory.boardService().update(new BoardPayload(boardUpdated)))
+                                    .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
                         });
             }
             case sectionUpdated: {
@@ -398,8 +401,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 List<String> sectionIds = action.getSectionIds();
                 String destinationBoardId = action.getBoardId();
                 return this.serviceFactory.sectionService().duplicateSectionsWithCards(destinationBoardId, sectionIds, user)
-                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
-                        .map(board -> newArrayList(this.messageFactory.sectionDuplicated(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case sectionAdded: {
                 String newId = UUID.randomUUID().toString();
@@ -425,8 +427,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
                         })
-                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
-                        .map(board -> newArrayList(this.messageFactory.sectionsDeleted(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardMoved: {
                 List<String> sectionIds = action.getSectionIds();
@@ -448,8 +449,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                         "No board found with id %s", this.getClass().getSimpleName(), boardId));
                             }
                         })
-                        .compose(res -> this.serviceFactory.boardService().getBoardWithContent(boardId, user))
-                        .map(board -> newArrayList(this.messageFactory.cardMoved(boardId, wsId, user.getUserId(), board, action.getActionType(), action.getActionId())));
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             /*
             case cardEditionStarted: {
@@ -532,39 +532,45 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     }
 
     @Override
-    public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId) {
-        final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
+    public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId, Map<String, User> wsIdToUser) {
+        return hasContribRight(boardId, user)
+                .compose(hasContrib -> {
+                    boolean isReadOnly = !hasContrib;
 
-        // Récupérer ou créer le contexte pour ce board
-        final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
+                    final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
 
-        // Ajouter l'utilisateur connecté au contexte
-        context.addConnectedUser(user);
+                    // Récupérer ou créer le contexte pour ce board
+                    final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
 
-        // Créer le message avec les métadonnées (utilisateurs connectés, etc.)
-        final MagnetoMessage metadataMessage = this.messageFactory.metadata(
-                boardId,
-                wsId,
-                user.getUserId(),
-                new CollaborationUsersMetadata(
-                        context.getEditing(),
-                        context.getConnectedUsers()
-                ),
-                this.maxConnectedUser
-        );
+                    // Ajouter l'utilisateur connecté au contexte avec son statut readOnly
+                    context.addConnectedUser(user, isReadOnly);
 
-        // Publier les métadonnées mises à jour via EventBus
-        return publishMetadata(boardId, context)
-                .map(v -> Arrays.asList(newUserMessage, metadataMessage))
-                .compose(messages -> {
-                    // Publier le message de connexion aux autres utilisateurs
-                    JsonObject collaborationMessage = new JsonObject()
-                            .put("type", "collaboration")
-                            .put("serverId", serverId)
-                            .put("messages", Json.encode(Collections.singletonList(newUserMessage)));
+                    wsIdToUser.put(wsId, new User(user.getUserId(), user.getUsername(), isReadOnly));
 
-                    return publishMessage(collaborationMessage)
-                            .map(v -> messages);
+                    // Créer le message avec les métadonnées
+                    final MagnetoMessage metadataMessage = this.messageFactory.metadata(
+                            boardId,
+                            wsId,
+                            user.getUserId(),
+                            new CollaborationUsersMetadata(
+                                    context.getEditing(),
+                                    context.getConnectedUsers()
+                            ),
+                            this.maxConnectedUser
+                    );
+
+                    // Publier les métadonnées mises à jour via EventBus
+                    return publishMetadata(boardId, context)
+                            .map(v -> Arrays.asList(newUserMessage, metadataMessage))
+                            .compose(messages -> {
+                                JsonObject collaborationMessage = new JsonObject()
+                                        .put("type", "collaboration")
+                                        .put("serverId", serverId)
+                                        .put("messages", Json.encode(Collections.singletonList(newUserMessage)));
+
+                                return publishMessage(collaborationMessage)
+                                        .map(v -> messages);
+                            });
                 });
     }
 
@@ -651,5 +657,56 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             promise.fail(e);
         }
         return promise.future();
+    }
+
+    @Override
+    public Future<Boolean> hasContribRight(String boardId, UserInfos user) {
+        Promise<Boolean> promise = Promise.promise();
+
+        JsonObject sharedUserCondition = new JsonObject()
+                .put(Field.USERID, user.getUserId())
+                .put("fr-cgi-magneto-controller-ShareBoardController|initContribRight", true);
+
+        JsonObject sharedGroupCondition = new JsonObject()
+                .put(Field.GROUPID, new JsonObject().put(Mongo.IN, user.getGroupsIds()))
+                .put("fr-cgi-magneto-controller-ShareBoardController|initContribRight", true);
+
+        JsonObject query = new JsonObject()
+                .put(Field._ID, boardId)
+                .put(Field.DELETED, false)
+                .put(Mongo.OR, new JsonArray()
+                        .add(new JsonObject().put(Field.OWNERID, user.getUserId()))
+                        .add(new JsonObject().put(Field.SHARED, new JsonObject().put(Mongo.ELEMMATCH, sharedUserCondition)))
+                        .add(new JsonObject().put(Field.SHARED, new JsonObject().put(Mongo.ELEMMATCH, sharedGroupCondition))));
+
+        MongoDb.getInstance().count(CollectionsConstant.BOARD_COLLECTION, query, res -> {
+            if ("ok".equals(res.body().getString("status"))) {
+                boolean hasContrib = res.body().getInteger("count", 0) > 0 && WorkflowHelper.hasRight(user, Rights.MANAGE_BOARD);
+                promise.complete(hasContrib);
+            } else {
+                promise.complete(false);
+            }
+        });
+
+        return promise.future();
+    }
+
+    private Future<List<MagnetoMessage>> createBoardMessagesForUsers(String boardId, String wsId, UserInfos user, MagnetoUserAction.ActionType actionType) {
+        // Board avec sections : créer deux versions
+        List<Future> messageFutures = new ArrayList<>();
+
+        // Version readOnly
+        Future<MagnetoMessage> readOnlyMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, false)
+                .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, "readOnly"));
+
+        // Version complète
+        Future<MagnetoMessage> fullMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, false)
+                .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, "fullAccess"));
+
+        messageFutures.add(readOnlyMessageFuture);
+        messageFutures.add(fullMessageFuture);
+
+        return CompositeFuture.all(messageFutures)
+                .map(compositeFuture -> Arrays.asList(readOnlyMessageFuture.result(), fullMessageFuture.result()));
     }
 }

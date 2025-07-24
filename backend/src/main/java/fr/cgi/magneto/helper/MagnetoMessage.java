@@ -208,6 +208,10 @@ public class MagnetoMessage {
         return targetUserIds;
     }
 
+    public String getActionId() {
+        return actionId;
+    }
+
     public void setTargetUserIds(Set<String> targetUserIds) {
         this.targetUserIds = targetUserIds;
     }
@@ -292,4 +296,6 @@ public class MagnetoMessage {
                 ", maxConnectedUsers=" + maxConnectedUsers +
                 '}';
     }
+
+
 }

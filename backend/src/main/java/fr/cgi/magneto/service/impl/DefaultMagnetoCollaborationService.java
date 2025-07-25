@@ -699,11 +699,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
         // Version readOnly
         Future<MagnetoMessage> readOnlyMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, true)
-                .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, "readOnly"));
+                .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, Field.READONLY));
 
         // Version complète
         Future<MagnetoMessage> fullMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, false)
-                .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, "fullAccess"));
+                .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, Field.FULLACCESS));
 
         messageFutures.add(readOnlyMessageFuture);
         messageFutures.add(fullMessageFuture);

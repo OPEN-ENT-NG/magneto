@@ -1,5 +1,6 @@
 package fr.cgi.magneto.controller;
 
+import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.helper.MagnetoMessage;
@@ -45,7 +46,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                 // Vérifier si on a des messages avec différenciation readOnly/fullAccess
                 boolean hasReadOnlyAndFullAccess = messageList.size() > 1 &&
                         messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
-                                (msg.getActionId().equals("readOnly") || msg.getActionId().equals("fullAccess")));
+                                (msg.getActionId().equals(Field.READONLY) || msg.getActionId().equals(Field.FULLACCESS)));
 
                 if (hasReadOnlyAndFullAccess) {
                     // Logique spéciale pour les messages différenciés
@@ -155,9 +156,9 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         MagnetoMessage fullAccessMessage = null;
 
         for (MagnetoMessage message : messages) {
-            if (message.getActionId() != null && message.getActionId().equals("readOnly")) {
+            if (message.getActionId() != null && message.getActionId().equals(Field.READONLY)) {
                 readOnlyMessage = message;
-            } else if (message.getActionId() != null && message.getActionId().equals("fullAccess")) {
+            } else if (message.getActionId() != null && message.getActionId().equals(Field.FULLACCESS)) {
                 fullAccessMessage = message;
             }
         }

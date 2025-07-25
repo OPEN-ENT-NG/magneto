@@ -259,4 +259,6 @@ public class Field {
     public static final String CONNECTEDUSERS = "connectedUsers";
     public static final String LOGIN = "login";
     public static final String ACTIONID = "actionId";
+    public static final String READONLY = "readOnly";
+    public static final String FULLACCESS = "fullAccess";
 }

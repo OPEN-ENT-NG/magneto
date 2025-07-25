@@ -185,7 +185,6 @@ export const BoardView: FC = () => {
           isOpen={displayModals.PARAMETERS}
           toggle={() => toggleBoardModals(BOARD_MODAL_TYPE.PARAMETERS)}
           boardToUpdate={board}
-          hasWebSocket={true}
         />
         <div className="zoom-container">
           <ZoomComponent

@@ -42,7 +42,6 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   boardToUpdate,
   reset,
   parentFolderId,
-  hasWebSocket = false,
 }) => {
   const { t } = useTranslation("magneto");
   const { appCode } = useEdificeClient();
@@ -59,10 +58,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [tags, setTags] = useState([""]);
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
-  const webSocketData = hasWebSocket
-    ? useWebSocketMagneto()
-    : { sendMessage: null, readyState: null };
-  const { sendMessage, readyState } = webSocketData;
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { width } = useWindowDimensions();
   const {
     thumbnail,

@@ -696,7 +696,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         List<Future> messageFutures = new ArrayList<>();
 
         // Version readOnly
-        Future<MagnetoMessage> readOnlyMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, false)
+        Future<MagnetoMessage> readOnlyMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, true)
                 .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, "readOnly"));
 
         // Version complète

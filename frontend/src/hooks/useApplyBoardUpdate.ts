@@ -156,6 +156,7 @@ const handleBoardUpdated = (draft: any, update: WebSocketUpdate) => {
 
 export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
   switch (update.type) {
+    case WEBSOCKET_MESSAGE_TYPE.BOARD_MESSAGE:
     case WEBSOCKET_MESSAGE_TYPE.BOARD_UPDATED: {
       handleBoardUpdated(draft, update);
       break;

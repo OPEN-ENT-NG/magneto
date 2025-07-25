@@ -406,7 +406,9 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             case sectionAdded: {
                 String newId = UUID.randomUUID().toString();
                 return serviceFactory.sectionService().createSectionWithBoardUpdate(action.getSection(), newId)
-                        .map(result -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), new Section(action.getSection().toJson()).setId(newId), action.getActionType(), action.getActionId())));
+                        .compose(res -> serviceFactory.sectionService().get(Collections.singletonList(newId)))
+                        .flatMap(sections -> this.serviceFactory.cardService().getAllCardsBySectionSimple(sections.get(0), null, user)
+                                .map(cards -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), sections.get(0).setCards(cards), action.getActionType(), action.getActionId()))));
             }
             case cardsDeleted: {
                 List<String> cardIds = action.getCardsIds();

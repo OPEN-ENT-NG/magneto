@@ -322,7 +322,7 @@ public class DefaultBoardService implements BoardService {
             SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.getCardIds());
 
             String sectionId = UUID.randomUUID().toString();
-            sectionPayload.setTitle(i18n.translate("magneto.section.default.title"));
+            sectionPayload.setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
             updateBoard.addSection(sectionId);
             updateBoard.setCardIds(new ArrayList<>());
             updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));

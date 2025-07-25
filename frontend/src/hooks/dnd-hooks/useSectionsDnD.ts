@@ -53,7 +53,6 @@ export const useSectionsDnD = (board: Board) => {
   const toast = useToast();
 
   const lockedCardIds = useMemo(() => {
-    console.log("🚀 ~ lockedCardIds ~ updatedSections:", updatedSections);
     return updatedSections.flatMap((section) =>
       section.cards.filter((card) => card.locked).map((card) => card.id),
     );
@@ -328,18 +327,41 @@ export const useSectionsDnD = (board: Board) => {
       ]);
 
       try {
-        await Promise.all([
-          createSection({
-            boardId: board._id,
-            title: newSectionTitle,
-            cardIds: [activeCardId],
-          }).unwrap(),
-          updateSection({
-            id: originalActiveSection._id,
-            boardId: board._id,
-            cardIds: newOriginalSectionCardIds,
-          }).unwrap(),
-        ]);
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: "sectionAdded",
+              section: {
+                boardId: board._id,
+                title: newSectionTitle,
+                cardIds: [activeCardId],
+              },
+            }),
+          );
+          sendMessage(
+            JSON.stringify({
+              type: "sectionUpdated",
+              section: {
+                id: originalActiveSection._id,
+                boardId: board._id,
+                cardIds: newOriginalSectionCardIds,
+              },
+            }),
+          );
+        } else {
+          await Promise.all([
+            createSection({
+              boardId: board._id,
+              title: newSectionTitle,
+              cardIds: [activeCardId],
+            }).unwrap(),
+            updateSection({
+              id: originalActiveSection._id,
+              boardId: board._id,
+              cardIds: newOriginalSectionCardIds,
+            }).unwrap(),
+          ]);
+        }
       } catch (error) {
         console.error(
           "Failed to create new section or update original section:",

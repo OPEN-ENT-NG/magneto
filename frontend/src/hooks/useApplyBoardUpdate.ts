@@ -108,7 +108,7 @@ const handleCardsDeleted = (draft: any, update: WebSocketUpdate) => {
 const handleSectionAdded = (draft: any, update: WebSocketUpdate) => {
   if (draft.sections && draft.sectionIds && update.section) {
     draft.sections = [...draft.sections, update.section];
-    draft.sectionIds = [...draft.sectionIds, update.section.id];
+    draft.sectionIds = [...draft.sectionIds, update.section._id];
   }
 };
 

@@ -1,4 +1,5 @@
 export enum WEBSOCKET_MESSAGE_TYPE {
+  BOARD_UPDATED = "boardUpdated",
   CARD_ADDED = "cardAdded",
   CARD_FAVORITE = "cardFavorite",
   COMMENT_ADDED = "commentAdded",
@@ -12,4 +13,5 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   SECTION_ADDED = "sectionAdded",
   SECTIONS_DELETED = "sectionsDeleted",
   CARD_MOVED = "cardMoved",
+  BOARD_MESSAGE = "boardMessage",
 }

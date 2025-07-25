@@ -17,25 +17,6 @@ export const notifyCacheUpdateCallbacks = (update: WebSocketUpdate) => {
   });
 };
 
-const handleCardAdded = (draft: any, update: WebSocketUpdate) => {
-  if (
-    update.cards &&
-    draft.layoutType !== LAYOUT_TYPE.FREE &&
-    !!draft.sections.length
-  ) {
-    const firstSection = draft.sections[0];
-    if (firstSection.cards) {
-      firstSection.cards = update.cards;
-    }
-  } else if (
-    update.cards &&
-    draft.layoutType === LAYOUT_TYPE.FREE &&
-    draft.cards
-  ) {
-    draft.cards = update.cards;
-  }
-};
-
 const handleSectionsDeletedOrDuplicated = (
   draft: any,
   update: WebSocketUpdate,
@@ -127,7 +108,7 @@ const handleCardsDeleted = (draft: any, update: WebSocketUpdate) => {
 const handleSectionAdded = (draft: any, update: WebSocketUpdate) => {
   if (draft.sections && draft.sectionIds && update.section) {
     draft.sections = [...draft.sections, update.section];
-    draft.sectionIds = [...draft.sectionIds, update.section.id];
+    draft.sectionIds = [...draft.sectionIds, update.section._id];
   }
 };
 
@@ -163,14 +144,27 @@ const handleCardDuplicated = (draft: any, update: WebSocketUpdate) => {
   }
 };
 
+const handleBoardUpdated = (draft: any, update: WebSocketUpdate) => {
+  if (update.board) {
+    Object.entries(update.board)
+      .filter(([, value]) => value != null)
+      .forEach(([key, value]) => {
+        draft[key] = value;
+      });
+  }
+};
+
 export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
   switch (update.type) {
-    case WEBSOCKET_MESSAGE_TYPE.CARD_ADDED:
-      handleCardAdded(draft, update);
+    case WEBSOCKET_MESSAGE_TYPE.BOARD_MESSAGE:
+    case WEBSOCKET_MESSAGE_TYPE.BOARD_UPDATED: {
+      handleBoardUpdated(draft, update);
       break;
+    }
     case WEBSOCKET_MESSAGE_TYPE.SECTIONS_DELETED:
     case WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED:
     case WEBSOCKET_MESSAGE_TYPE.CARD_MOVED:
+    case WEBSOCKET_MESSAGE_TYPE.CARD_ADDED:
       handleSectionsDeletedOrDuplicated(draft, update);
       break;
     case WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE:

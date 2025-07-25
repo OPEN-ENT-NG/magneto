@@ -181,7 +181,7 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
-    public Future<Board> getBoardWithContent(String boardId, UserInfos user) {
+    public Future<Board> getBoardWithContent(String boardId, UserInfos user, Boolean isReadOnly) {
         return this.getBoards(Collections.singletonList(boardId))
                 .compose(boards -> {
                     if (boards.isEmpty()) {
@@ -199,7 +199,7 @@ public class DefaultBoardService implements BoardService {
                                 });
                     } else {
                         // Layout avec sections : récupérer les sections avec leurs cartes
-                        return serviceFactory.sectionService().getSectionsByBoard(board, false)
+                        return serviceFactory.sectionService().getSectionsByBoard(board, isReadOnly)
                                 .compose(sections -> {
                                     List<Future> cardFutures = sections.stream()
                                             .map(section -> serviceFactory.cardService().getAllCardsBySectionSimple(section, null, user))
@@ -322,7 +322,7 @@ public class DefaultBoardService implements BoardService {
             SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.getCardIds());
 
             String sectionId = UUID.randomUUID().toString();
-            sectionPayload.setTitle(i18n.translate("magneto.section.default.title"));
+            sectionPayload.setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
             updateBoard.addSection(sectionId);
             updateBoard.setCardIds(new ArrayList<>());
             updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));

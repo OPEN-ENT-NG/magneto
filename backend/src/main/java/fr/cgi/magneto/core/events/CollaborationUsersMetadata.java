@@ -38,12 +38,20 @@ public class CollaborationUsersMetadata {
         return connectedUsers;
     }
 
-    public void addConnectedUser(final UserInfos user){
-        this.connectedUsers.add(new User(user.getUserId(), user.getUsername()));
+    public void addConnectedUser(final UserInfos user, Boolean readOnly){
+        this.connectedUsers.add(new User(user.getUserId(), user.getUsername(), readOnly));
     }
 
     public void removeConnectedUser(final String userId){
         this.connectedUsers.removeIf(user -> user.getUserId().equals(userId));
         this.getEditing().removeIf(info -> info.getUserId().equals(userId));
+    }
+
+    public boolean isUserReadOnly(String userId) {
+        return connectedUsers.stream()
+                .filter(user -> user.getUserId().equals(userId))
+                .findFirst()
+                .map(User::isReadOnly)
+                .orElse(true);
     }
 }

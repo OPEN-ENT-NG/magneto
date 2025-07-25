@@ -20,5 +20,5 @@ public enum MagnetoMessageType {
     cardDuplicated,
     sectionDuplicated,
     sectionAdded,
-    sectionsDeleted,
+    sectionsDeleted, boardMessage,
 }

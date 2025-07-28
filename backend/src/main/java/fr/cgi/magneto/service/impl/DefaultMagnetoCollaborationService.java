@@ -341,11 +341,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                 }));
             }
             case commentAdded: {
-                CommentPayload commentPayload = new CommentPayload(action.getComment().toJson())
+                CommentPayload commentPayload = action.getComment()
                         .setOwnerId(user.getUserId())
                         .setOwnerName(user.getUsername());
 
-                this.serviceFactory.commentService().createComment(commentPayload, action.getCardId())
+                return this.serviceFactory.commentService().createComment(commentPayload, action.getCardId())
                         .onFailure(fail -> {
                             String message = String.format("[Magneto@%s::addComment] Failed to create comment",
                                     this.getClass().getSimpleName());
@@ -353,12 +353,12 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         })
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
                         .map(cards -> {
-                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
+                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0); //TODO : bien récupérer comments
                             return newArrayList(this.messageFactory.commentAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
             }
             case commentDeleted: {
-                this.serviceFactory.commentService().deleteComment(user.getUserId(), action.getCardId(), action.getCommentId())
+                return this.serviceFactory.commentService().deleteComment(user.getUserId(), action.getCardId(), action.getCommentId())
                         .onFailure(fail -> {
                             String message = String.format("[Magneto@%s::addComment] Failed to create comment",
                                     this.getClass().getSimpleName());
@@ -373,7 +373,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             case commentEdited: {
                 CommentPayload commentPayload = new CommentPayload(user, action.getComment().getId(), action.getComment().getContent());
 
-                this.serviceFactory.commentService().updateComment(commentPayload, action.getCardId())
+                return this.serviceFactory.commentService().updateComment(commentPayload, action.getCardId())
                         .onFailure(fail -> {
                             String message = String.format("[Magneto@%s::addComment] Failed to create comment",
                                     this.getClass().getSimpleName());

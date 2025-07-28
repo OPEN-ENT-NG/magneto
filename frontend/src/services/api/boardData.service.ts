@@ -101,22 +101,34 @@ export const boardDataApi = emptySplitApi.injectEndpoints({
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
       ) {
+        let unsubscribe: (() => void) | null = null;
+
         try {
-          // Attendre que les données soient chargées
-          await cacheDataLoaded;
+          // Attendre que les données soient chargées avec un timeout
+          await Promise.race([
+            cacheDataLoaded,
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Cache load timeout")), 10000),
+            ),
+          ]);
 
           // S'enregistrer pour recevoir les mises à jour WebSocket
-          const unsubscribe = registerCacheUpdateCallback((update: any) => {
+          unsubscribe = registerCacheUpdateCallback((update: any) => {
             updateCachedData((draft) => {
               applyBoardUpdate(draft, update);
             });
           });
-
-          // Nettoyer lors de la suppression du cache
-          await cacheEntryRemoved;
-          unsubscribe();
         } catch (error) {
-          console.error("Error in cache entry lifecycle:", error);
+          console.error("Error loading cache data:", error);
+        }
+
+        try {
+          await cacheEntryRemoved;
+        } finally {
+          // S'assurer que unsubscribe est appelé même si cacheDataLoaded a échoué
+          if (unsubscribe) {
+            unsubscribe();
+          }
         }
       },
       providesTags: ["BoardData"],

@@ -39,6 +39,7 @@ import {
 import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useBoard } from "~/providers/BoardProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useAddCommentMutation,
   useGetAllCommentsQuery,
@@ -56,10 +57,20 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   const { displayModals, toggleBoardModals, isExternalView } = useBoard();
   const { avatar } = useUser();
   const [addComment] = useAddCommentMutation();
+
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { data: commentsData } = useGetAllCommentsQuery(
     { cardId },
     { skip: !!comments.length },
   );
+
+  useEffect(() => {
+    console.log("comments", comments);
+  }, [comments]);
+
+  useEffect(() => {
+    console.log("commentsData", commentsData);
+  }, [commentsData]);
   const [inputValue, setInputValue] = useState<string>("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
@@ -107,10 +118,22 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   const handleSubmit = async () => {
     if (!inputValue) return;
     try {
-      await addComment({
-        cardId: cardId,
-        content: inputValue,
-      }).unwrap();
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: "commentAdded",
+            comment: {
+              content: inputValue,
+            },
+            cardId: cardId,
+          }),
+        );
+      } else {
+        await addComment({
+          cardId: cardId,
+          content: inputValue,
+        }).unwrap();
+      }
       setInputValue("");
     } catch (error) {
       console.error(error);
@@ -139,6 +162,20 @@ export const CommentPanel: FC<CommentPanelProps> = ({
     toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL);
     setEditingCommentId(null);
   };
+
+  useEffect(() => {
+    const commentsToUse = comments?.length ? comments : commentsData?.all;
+
+    if (commentsToUse?.length) {
+      setComsAndDividers(processCommentsWithDividers(commentsToUse));
+    } else {
+      setComsAndDividers([]);
+    }
+
+    // Réinitialiser les states d'édition/suppression lors des mises à jour WebSocket
+    setEditingCommentId(null);
+    setDeletingCommentId(null);
+  }, [commentsData, comments]);
 
   return (
     <Modal

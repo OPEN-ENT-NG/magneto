@@ -321,24 +321,20 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
-                boolean favorite = action.getIsLiked();
                 if(user == null){
                     BadRequestException noUser = new BadRequestException("User not found");
                     String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
                             this.getClass().getSimpleName(), noUser.getMessage());
                     log.error(message);
                 }
-                return serviceFactory.cardService().updateFavorite(cardId, favorite, user, true)
+                return serviceFactory.cardService().updateFavorite(cardId, action.getCard().isFavorite(), user, true)
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
                         })
-                        .flatMap(saved -> this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
-                                .map(cards -> {
-                                    Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()) : cards.get(0);
-                                    return newArrayList(this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                                }));
+                        .compose(saved -> this.serviceFactory.cardService().getCards(newArrayList(cardId), user))
+                        .compose(res -> this.createCardFavoriteMessagesForUsers(boardId, cardId, wsId, user, action.getActionType()));
             }
             case commentAdded: {
                 CommentPayload commentPayload = action.getComment()
@@ -713,5 +709,24 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
         return CompositeFuture.all(messageFutures)
                 .map(compositeFuture -> Arrays.asList(readOnlyMessageFuture.result(), fullMessageFuture.result()));
+    }
+
+    private Future<List<MagnetoMessage>> createCardFavoriteMessagesForUsers(String boardId, String cardId, String wsId, UserInfos user, MagnetoUserAction.ActionType actionType) {
+        // Board avec sections : créer deux versions
+        List<Future> messageFutures = new ArrayList<>();
+
+        // Version readOnly
+        Future<MagnetoMessage> actualUserFavoriteFuture = this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
+                .map(cards -> this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), cards.get(0), actionType, Field.ACTUALUSER));
+
+        // Version complète
+        Future<MagnetoMessage> otherUsersFavoriteFuture = this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
+                .map(cards -> this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), cards.get(0).setIsLiked(null), actionType, Field.OTHERUSERS));
+
+        messageFutures.add(actualUserFavoriteFuture);
+        messageFutures.add(otherUsersFavoriteFuture);
+
+        return CompositeFuture.all(messageFutures)
+                .map(compositeFuture -> Arrays.asList(actualUserFavoriteFuture.result(), otherUsersFavoriteFuture.result()));
     }
 }

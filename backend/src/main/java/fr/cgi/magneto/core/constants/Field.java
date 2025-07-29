@@ -261,4 +261,6 @@ public class Field {
     public static final String ACTIONID = "actionId";
     public static final String READONLY = "readOnly";
     public static final String FULLACCESS = "fullAccess";
+    public static final String ACTUALUSER = "actualUser";
+    public static final String OTHERUSERS = "otherUsers";
 }

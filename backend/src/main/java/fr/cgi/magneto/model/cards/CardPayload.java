@@ -30,6 +30,7 @@ public class CardPayload implements Model<CardPayload> {
     private String boardId;
     private String sectionId;
     private List<String> favoriteList;
+    private Boolean isFavorite;
 
     public CardPayload() {
         this.id = null;
@@ -49,6 +50,7 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = "";
         this.boardId = "";
         this.sectionId = "";
+        this.isFavorite = false;
         this.favoriteList = new ArrayList<>();
     }
 
@@ -69,6 +71,7 @@ public class CardPayload implements Model<CardPayload> {
         this.boardId = card.getString(Field.BOARDID);
         this.sectionId = card.getString(Field.SECTIONID);
         this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
+        this.isFavorite = card.getBoolean(Field.ISFAVORITE);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -94,6 +97,7 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = other.parentId;
         this.boardId = other.boardId;
         this.sectionId = other.sectionId;
+        this.isFavorite = other.isFavorite;
         // Create a new list to avoid sharing the reference
         this.favoriteList = other.favoriteList != null ?
                 new ArrayList<>(other.favoriteList) : new ArrayList<>();
@@ -248,6 +252,15 @@ public class CardPayload implements Model<CardPayload> {
     }
 
     public CardPayload setLocked(boolean locked) {
+        this.isLocked = locked;
+        return this;
+    }
+
+    public Boolean isFavorite() {
+        return isLocked;
+    }
+
+    public CardPayload setIsFavorite(Boolean locked) {
         this.isLocked = locked;
         return this;
     }

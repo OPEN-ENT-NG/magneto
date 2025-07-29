@@ -28,6 +28,7 @@ import {
   useCreateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const { sendMessage, readyState } = useWebSocketMagneto();
@@ -85,7 +86,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionUpdated",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
             section: {
               boardId,
               id: section?._id,
@@ -108,7 +109,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionAdded",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED,
             section: {
               boardId,
               title: inputValue,

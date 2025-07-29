@@ -35,6 +35,7 @@ import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const CreateBoard: FC<CreateBoardProps> = ({
   isOpen,
@@ -124,7 +125,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "boardUpdated",
+            type: WEBSOCKET_MESSAGE_TYPE.BOARD_UPDATED,
             board: board.toJSON(),
           }),
         );

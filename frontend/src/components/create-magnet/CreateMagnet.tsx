@@ -67,6 +67,7 @@ import {
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
 import { workspaceApi } from "~/services/api/workspace.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 //import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
@@ -153,7 +154,7 @@ export const CreateMagnet: FC = () => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "cardUpdated",
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_UPDATED,
             card: payload,
           }),
         );
@@ -164,7 +165,7 @@ export const CreateMagnet: FC = () => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "cardAdded",
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_ADDED,
             card: payload,
           }),
         );

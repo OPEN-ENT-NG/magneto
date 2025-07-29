@@ -40,6 +40,7 @@ import {
   useDeleteCommentMutation,
   useUpdateCommentMutation,
 } from "~/services/api/comment.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 const CommentPanelItemBase = memo(
   (props: CommentPanelItemProps) => {
@@ -102,7 +103,7 @@ const CommentPanelItemBase = memo(
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "commentEdited",
+              type: WEBSOCKET_MESSAGE_TYPE.COMMENT_EDITED,
               cardId: cardId,
               comment: {
                 id,
@@ -128,7 +129,7 @@ const CommentPanelItemBase = memo(
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "commentDeleted",
+              type: WEBSOCKET_MESSAGE_TYPE.COMMENT_DELETED,
               commentId: id,
               cardId: cardId,
             }),

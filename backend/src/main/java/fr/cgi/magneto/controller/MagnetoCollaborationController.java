@@ -44,11 +44,11 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                 List<MagnetoMessage> messageList = messages.getMessages();
 
                 // Vérifier si on a des messages avec différenciation readOnly/fullAccess
-                boolean hasReadOnlyAndFullAccess = messageList.size() > 1 &&
+                boolean hasReadOnlyOrFullAccess = messageList.size() > 1 &&
                         messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
                                 (msg.getActionId().equals(Field.READONLY) || msg.getActionId().equals(Field.FULLACCESS)));
 
-                if (hasReadOnlyAndFullAccess) {
+                if (hasReadOnlyOrFullAccess) {
                     // Logique spéciale pour les messages différenciés
                     this.broadcastDifferentiatedMessages(messageList, messages.getExceptWSId());
                 } else {

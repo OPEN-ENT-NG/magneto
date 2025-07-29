@@ -44,6 +44,7 @@ import {
   useAddCommentMutation,
   useGetAllCommentsQuery,
 } from "~/services/api/comment.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const CommentPanel: FC<CommentPanelProps> = ({
   isInCardPreview = false,
@@ -113,7 +114,7 @@ export const CommentPanel: FC<CommentPanelProps> = ({
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "commentAdded",
+            type: WEBSOCKET_MESSAGE_TYPE.COMMENT_ADDED,
             comment: {
               content: inputValue,
             },

@@ -13,6 +13,7 @@ import {
   useDuplicateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const useCreateSectionDropDownItems: (
   section: Section | null | undefined,
@@ -41,7 +42,7 @@ export const useCreateSectionDropDownItems: (
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionDuplicated",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED,
             ...payload,
           }),
         );
@@ -68,7 +69,7 @@ export const useCreateSectionDropDownItems: (
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionUpdated",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
             section: payload,
           }),
         );

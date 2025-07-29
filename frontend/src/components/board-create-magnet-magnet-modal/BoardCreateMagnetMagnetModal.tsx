@@ -31,6 +31,7 @@ import { CURRENTTAB_STATE } from "../tab-list/types";
 import { useBoard } from "~/providers/BoardProvider";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDuplicateCardMutation } from "~/services/api/cards.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const BoardCreateMagnetMagnetModal: FC<
   BoardCreateMagnetMagnetModalProps
@@ -82,7 +83,7 @@ export const BoardCreateMagnetMagnetModal: FC<
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "cardDuplicated",
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_DUPLICATED,
               ...magnetMagnetParams,
             }),
           );

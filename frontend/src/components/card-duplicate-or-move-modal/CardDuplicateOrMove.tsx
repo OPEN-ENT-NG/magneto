@@ -23,6 +23,7 @@ import {
   useDuplicateCardMutation,
   useMoveCardMutation,
 } from "~/services/api/cards.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
   isOpen,
@@ -57,7 +58,7 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "cardDuplicated",
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_DUPLICATED,
               boardId: inputValue,
               cardIds: [activeCard.id],
             }),

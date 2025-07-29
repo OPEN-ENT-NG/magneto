@@ -21,6 +21,7 @@ import {
   useFavoriteCardMutation,
   useDeleteCardsMutation,
 } from "~/services/api/cards.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 //import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const useBoardCard = (card: Card) => {
@@ -124,7 +125,7 @@ export const useBoardCard = (card: Card) => {
     if (readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: "cardUpdated",
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_UPDATED,
           card: {
             ...cardPayload,
             locked: !card.locked,
@@ -143,7 +144,7 @@ export const useBoardCard = (card: Card) => {
     if (readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: "cardsDeleted",
+          type: WEBSOCKET_MESSAGE_TYPE.CARDS_DELETED,
           cardIds: [card.id],
           boardId: board.id,
         }),
@@ -158,7 +159,7 @@ export const useBoardCard = (card: Card) => {
     if (readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: "cardFavorite",
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE,
           card: { id: card.id, isLiked: card.liked },
         }),
       );

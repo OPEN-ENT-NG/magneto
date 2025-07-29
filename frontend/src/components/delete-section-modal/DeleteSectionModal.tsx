@@ -26,6 +26,7 @@ import { DeleteSectionModalProps } from "./types";
 import { StyledRadio } from "../styled-radio/StyledRadio";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDeleteSectionMutation } from "~/services/api/sections.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
   open,
@@ -49,7 +50,7 @@ export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionsDeleted",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTIONS_DELETED,
             ...payload,
           }),
         );

@@ -34,6 +34,7 @@ import {
   useUpdateSectionMutation,
   useCreateSectionMutation,
 } from "~/services/api/sections.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const useSectionsDnD = (board: Board) => {
   const [activeItem, setActiveItem] = useState<ActiveItemState>(null);
@@ -259,7 +260,7 @@ export const useSectionsDnD = (board: Board) => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "cardMoved",
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_MOVED,
             boardId: board._id,
             sectionIds: newOrder,
           }),
@@ -330,7 +331,7 @@ export const useSectionsDnD = (board: Board) => {
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "sectionAdded",
+              type: WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED,
               section: {
                 boardId: board._id,
                 title: newSectionTitle,
@@ -340,7 +341,7 @@ export const useSectionsDnD = (board: Board) => {
           );
           sendMessage(
             JSON.stringify({
-              type: "sectionUpdated",
+              type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
               section: {
                 id: originalActiveSection._id,
                 boardId: board._id,
@@ -434,7 +435,7 @@ export const useSectionsDnD = (board: Board) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: "sectionUpdated",
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
                 section: {
                   id: originalActiveSection._id,
                   boardId: board._id,
@@ -444,7 +445,7 @@ export const useSectionsDnD = (board: Board) => {
             );
             sendMessage(
               JSON.stringify({
-                type: "sectionUpdated",
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
                 section: {
                   id: currentOverSectionWithoutNewCard._id,
                   boardId: board._id,
@@ -525,7 +526,7 @@ export const useSectionsDnD = (board: Board) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: "sectionUpdated",
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
                 section: {
                   id: originalActiveSection._id,
                   boardId: board._id,
@@ -535,7 +536,7 @@ export const useSectionsDnD = (board: Board) => {
             );
             sendMessage(
               JSON.stringify({
-                type: "sectionUpdated",
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
                 section: {
                   id: currentOverSection._id,
                   boardId: board._id,
@@ -607,7 +608,7 @@ export const useSectionsDnD = (board: Board) => {
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "sectionUpdated",
+              type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
               section: {
                 id: currentOverSection._id,
                 boardId: board._id,

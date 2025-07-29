@@ -13,6 +13,7 @@ import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useUpdateBoardCardsMutation } from "~/services/api/boards.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const useFreeLayoutCardDnD = (board: Board) => {
   const validCardIds = useMemo(() => {
@@ -100,7 +101,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: "cardMoved",
+                type: WEBSOCKET_MESSAGE_TYPE.CARD_MOVED,
                 boardId: board._id,
                 cardIds: newUpdatedIds,
               }),

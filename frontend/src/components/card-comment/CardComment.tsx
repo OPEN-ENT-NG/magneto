@@ -25,6 +25,7 @@ import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useAddCommentMutation } from "~/services/api/comment.service";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
   const [inputValue, setInputValue] = useState<string>("");
@@ -44,7 +45,7 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: "commentAdded",
+                type: WEBSOCKET_MESSAGE_TYPE.COMMENT_ADDED,
                 comment: {
                   content: inputValue,
                 },

@@ -740,7 +740,6 @@ public class DefaultCardService implements CardService {
 
         JsonObject query = new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, cardIds)))
-                .unwind(Field.COMMENTS, true)
                 .project(new JsonObject()
                         .put(Field._ID, 1)
                         .put(Field.TITLE, 1)
@@ -758,7 +757,6 @@ public class DefaultCardService implements CardService {
                         .put(Field.PARENTID, 1)
                         .put(Field.LASTMODIFIERID, 1)
                         .put(Field.LASTMODIFIERNAME, 1)
-                        .put(Field.COMMENTS, 1) //TODO : faire en sorte de récupérer "id" en tant que "_id" (ou faire ça en front, à voir)
                         .put(Field.LASTCOMMENT, new JsonObject()
                                 .put(Mongo.ARRAYELEMAT, new JsonArray().add("$" + Field.COMMENTS).add(-1)))
                         .put(Field.NBOFCOMMENTS, new JsonObject()

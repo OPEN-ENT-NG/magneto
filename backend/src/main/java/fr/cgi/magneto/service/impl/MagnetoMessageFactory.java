@@ -93,14 +93,14 @@ public class MagnetoMessageFactory {
     public MagnetoMessage commentDeleted(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.commentDeleted,
-                userId, null, null, null, null, null,
+                userId, null, null, card, null, null,
                 null, null, null, actionType, actionId, null);
     }
 
     public MagnetoMessage commentEdited(final String boardId, final String wsId, final String userId, final Card card, final MagnetoUserAction.ActionType actionType, final String actionId) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.commentEdited,
-                userId, null, null, null, null, null,
+                userId, null, null, card, null, null,
                 null, null, null, actionType, actionId, null);
     }
 

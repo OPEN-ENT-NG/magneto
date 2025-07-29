@@ -35,6 +35,7 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { iconButtonStyle, iconStyle } from "../section-name/style";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useDeleteCommentMutation,
   useUpdateCommentMutation,
@@ -55,6 +56,7 @@ const CommentPanelItemBase = memo(
 
     const { getAvatarURL } = useDirectory();
     const { user } = useEdificeClient();
+    const { sendMessage, readyState } = useWebSocketMagneto();
     const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
       useDropdown();
     const { t } = useTranslation("magneto");
@@ -97,11 +99,24 @@ const CommentPanelItemBase = memo(
         return;
       }
       try {
-        await updateComment({
-          commentId: id,
-          cardId: cardId,
-          content: inputValue,
-        }).unwrap();
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: "commentEdited",
+              cardId: cardId,
+              comment: {
+                id,
+                content: inputValue,
+              },
+            }),
+          );
+        } else {
+          await updateComment({
+            commentId: id,
+            cardId: cardId,
+            content: inputValue,
+          }).unwrap();
+        }
         onStopEditing();
       } catch (error) {
         console.error(error);
@@ -110,10 +125,20 @@ const CommentPanelItemBase = memo(
 
     const handleDelete = useCallback(async () => {
       try {
-        await deleteComment({
-          commentId: id,
-          cardId: cardId,
-        }).unwrap();
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: "commentDeleted",
+              commentId: id,
+              cardId: cardId,
+            }),
+          );
+        } else {
+          await deleteComment({
+            commentId: id,
+            cardId: cardId,
+          }).unwrap();
+        }
         toast.success(t("magneto.delete.comment.success"));
         onStopEditing();
       } catch (error) {

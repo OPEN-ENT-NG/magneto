@@ -63,14 +63,6 @@ export const CommentPanel: FC<CommentPanelProps> = ({
     { cardId },
     { skip: !!comments.length },
   );
-
-  useEffect(() => {
-    console.log("comments", comments);
-  }, [comments]);
-
-  useEffect(() => {
-    console.log("commentsData", commentsData);
-  }, [commentsData]);
   const [inputValue, setInputValue] = useState<string>("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
@@ -162,20 +154,6 @@ export const CommentPanel: FC<CommentPanelProps> = ({
     toggleBoardModals(BOARD_MODAL_TYPE.COMMENT_PANEL);
     setEditingCommentId(null);
   };
-
-  useEffect(() => {
-    const commentsToUse = comments?.length ? comments : commentsData?.all;
-
-    if (commentsToUse?.length) {
-      setComsAndDividers(processCommentsWithDividers(commentsToUse));
-    } else {
-      setComsAndDividers([]);
-    }
-
-    // Réinitialiser les states d'édition/suppression lors des mises à jour WebSocket
-    setEditingCommentId(null);
-    setDeletingCommentId(null);
-  }, [commentsData, comments]);
 
   return (
     <Modal

@@ -352,10 +352,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             log.error(message);
                         })
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
-                        .map(cards -> {
-                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0); //TODO : bien récupérer comments
-                            return newArrayList(this.messageFactory.commentAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                        });
+                        .flatMap(cards -> this.serviceFactory.commentService().getAllComments(action.getCardId(), 0)
+                                .map(comments -> {
+                                    Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0).setComments(comments);
+                                    return newArrayList(this.messageFactory.commentAdded(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                                }));
             }
             case commentDeleted: {
                 return this.serviceFactory.commentService().deleteComment(user.getUserId(), action.getCardId(), action.getCommentId())
@@ -365,10 +366,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             log.error(message);
                         })
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
-                        .map(cards -> {
-                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.commentDeleted(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                        });
+                        .flatMap(cards -> this.serviceFactory.commentService().getAllComments(action.getCardId(), 0)
+                                .map(comments -> {
+                                    Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0).setComments(comments);
+                                    return newArrayList(this.messageFactory.commentDeleted(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                                }));
             }
             case commentEdited: {
                 CommentPayload commentPayload = new CommentPayload(user, action.getComment().getId(), action.getComment().getContent());
@@ -380,10 +382,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             log.error(message);
                         })
                         .compose(r -> this.serviceFactory.cardService().getCards(newArrayList(action.getCardId()), user))
-                        .map(cards -> {
-                            Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0);
-                            return newArrayList(this.messageFactory.commentEdited(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                        });
+                        .flatMap(cards -> this.serviceFactory.commentService().getAllComments(action.getCardId(), 0)
+                                .map(comments -> {
+                                    Card updatedCard = cards.isEmpty() ? new Card() : cards.get(0).setComments(comments);
+                                    return newArrayList(this.messageFactory.commentEdited(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
+                                }));
             }
             case cardDuplicated: {
                 List<String> cardIds = action.getCardsIds();

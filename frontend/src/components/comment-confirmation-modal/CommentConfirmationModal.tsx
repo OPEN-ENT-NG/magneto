@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC } from "react";
 
 import { Button } from "@edifice.io/react";
 import { Modal, Paper, Typography, Box } from "@mui/material";
@@ -15,12 +15,9 @@ const DeleteConfirmationModal: FC<CommentConfirmationModalProps> = ({
   anchorEl,
 }) => {
   const { t } = useTranslation("magneto");
-  const modalPosition = useMemo(() => {
-    if (!anchorEl || !open) return null;
-    return anchorEl.getBoundingClientRect();
-  }, [anchorEl, open]);
+  if (!anchorEl) return null;
 
-  if (!anchorEl || !modalPosition) return null;
+  const rect = anchorEl.getBoundingClientRect();
 
   return (
     <Modal
@@ -32,7 +29,7 @@ const DeleteConfirmationModal: FC<CommentConfirmationModalProps> = ({
         },
       }}
     >
-      <Paper sx={modalPaperStyles({ rect: modalPosition })}>
+      <Paper sx={modalPaperStyles({ rect })}>
         <Typography variant="h6" sx={titleStyles}>
           {t("magneto.delete.comment")}
         </Typography>

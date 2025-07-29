@@ -18,7 +18,11 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { connectedUsersContainerStyle } from "./style";
+import {
+  connectedUsersContainerStyle,
+  listItemAvatarStyle,
+  roleTypographyStyle,
+} from "./style";
 import {
   userTooltipStyle,
   expandMoreIconStyle,
@@ -54,7 +58,7 @@ export const ConnectedUsersChip: FC = () => {
   };
 
   const otherConnectedUsers = connectedUsers.filter(
-    (user) => user.userId !== edificeClient.user?.userId,
+    (user) => user.id !== edificeClient.user?.userId,
   );
 
   if (readyState !== WebSocket.OPEN) {
@@ -71,7 +75,7 @@ export const ConnectedUsersChip: FC = () => {
               <AvatarGroup max={4}>
                 {otherConnectedUsers.map((user) => (
                   <Tooltip
-                    key={user.userId}
+                    key={user.id}
                     title={user.username || t("magneto.user")}
                     placement="bottom"
                     arrow
@@ -88,32 +92,36 @@ export const ConnectedUsersChip: FC = () => {
                   >
                     <Avatar
                       alt={user.username}
-                      src={getAvatarURL(user.userId, "user")}
+                      src={getAvatarURL(user.id, "user")}
                     ></Avatar>
                   </Tooltip>
                 ))}
               </AvatarGroup>
             )}
-            <Tooltip
-              title={edificeClient?.user?.username || t("magneto.you")}
-              placement="bottom"
-              arrow
-              componentsProps={{
-                tooltip: {
-                  sx: userTooltipStyle,
-                },
-              }}
-              slotProps={{
-                popper: {
-                  modifiers: tooltipPopperModifiers,
-                },
-              }}
-            >
-              <Avatar
-                alt={edificeClient?.user?.username}
-                src={getAvatarURL(edificeClient?.user?.userId || "", "user")}
-              ></Avatar>
-            </Tooltip>
+            <Box sx={{ marginLeft: "auto" }}>
+              {" "}
+              {/* Pousse cet avatar à droite */}
+              <Tooltip
+                title={edificeClient?.user?.username || t("magneto.you")}
+                placement="bottom"
+                arrow
+                componentsProps={{
+                  tooltip: {
+                    sx: userTooltipStyle,
+                  },
+                }}
+                slotProps={{
+                  popper: {
+                    modifiers: tooltipPopperModifiers,
+                  },
+                }}
+              >
+                <Avatar
+                  alt={edificeClient?.user?.username}
+                  src={getAvatarURL(edificeClient?.user?.userId || "", "user")}
+                ></Avatar>
+              </Tooltip>
+            </Box>
           </>
         }
         deleteIcon={<ExpandMoreIcon sx={expandMoreIconStyle} />}
@@ -137,7 +145,7 @@ export const ConnectedUsersChip: FC = () => {
         <Box sx={popoverContainerStyle}>
           {/* Utilisateur actuel en premier */}
           <ListItem sx={listItemStyle}>
-            <ListItemAvatar>
+            <ListItemAvatar sx={listItemAvatarStyle}>
               <Avatar
                 src={getAvatarURL(edificeClient?.user?.userId || "", "user")}
                 alt={edificeClient?.user?.username}
@@ -147,11 +155,16 @@ export const ConnectedUsersChip: FC = () => {
             <ListItemText
               primary={
                 <Typography variant="body1" sx={usernameTypographyStyle}>
-                  {edificeClient?.user?.username || t("magneto.you")}
+                  {edificeClient?.user?.username + " (vous)" ||
+                    t("magneto.you")}
                 </Typography>
               }
               secondary={
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={roleTypographyStyle}
+                >
                   Éditeur
                 </Typography>
               }
@@ -160,29 +173,39 @@ export const ConnectedUsersChip: FC = () => {
           <Divider sx={dividerStyle} />
 
           <Typography variant="h6" sx={onlineUsersTypographyStyle}>
-            Utilisateurs en ligne ({connectedUsers.length})
+            Utilisateurs en ligne ({otherConnectedUsers.length})
           </Typography>
           <List sx={userListStyle}>
             {/* Autres utilisateurs connectés */}
             {otherConnectedUsers.map((user) => (
-              <ListItem key={user.userId} sx={otherUserListItemStyle}>
-                <ListItemAvatar>
+              <ListItem key={user.id} sx={otherUserListItemStyle}>
+                <ListItemAvatar sx={listItemAvatarStyle}>
                   <Avatar
-                    src={getAvatarURL(user.userId, "user")}
+                    src={getAvatarURL(user.id, "user")}
                     alt={user.username}
                     sx={avatarListStyle}
                   />
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Typography variant="body1" sx={usernameTypographyStyle}>
-                      {user.username || t("magneto.user")}
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography variant="body2" color="text.secondary">
-                      {"Éditeur"}
-                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography variant="body1" sx={usernameTypographyStyle}>
+                        {user.username || t("magneto.user")}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ marginRight: 1, fontSize: "1.1rem" }}
+                      >
+                        Éditeur
+                      </Typography>
+                    </Box>
                   }
                 />
               </ListItem>

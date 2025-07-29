@@ -4,7 +4,9 @@ export const connectedUsersContainerStyle = {
   gap: "10px",
   marginRight: "20px",
   backgroundColor: "#F5F7F9",
-  height: "60px",
+  height: "50px",
+  minWidth: "200px",
+  maxWidth: "300px",
   borderRadius: "30px",
   cursor: "pointer",
   "&:hover": {
@@ -17,11 +19,13 @@ export const connectedUsersContainerStyle = {
     display: "flex",
     alignItems: "center",
     gap: 1,
-    padding: "8px 12px",
+    padding: "8px 0px 8px 12px",
+    justifyContent: "flex-start",
+    width: "100%",
   },
   "& .MuiChip-deleteIcon": {
     fontSize: "1.8rem",
-    marginLeft: "3px",
+    marginLeft: "auto",
     marginRight: "8px",
   },
 };
@@ -35,14 +39,15 @@ export const popoverStyle = {
     borderRadius: "12px",
     boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.15)",
     border: "1px solid #E5E5E5",
-    minWidth: "280px",
-    maxWidth: "320px",
+    minWidth: "320px",
+    maxWidth: "380px",
     mt: 1,
   },
 };
 
 export const popoverContainerStyle = {
   p: 2,
+  paddingTop: "0.6rem",
 };
 
 export const listItemStyle = {
@@ -60,8 +65,17 @@ export const avatarListStyle = {
   height: 40,
 };
 
+export const listItemAvatarStyle = {
+  minWidth: "4.9rem",
+};
+
+export const roleTypographyStyle = {
+  fontSize: "1.1rem",
+};
+
 export const usernameTypographyStyle = {
-  fontWeight: 500,
+  fontWeight: 400,
+  fontSize: "1.4rem",
 };
 
 export const dividerStyle = {
@@ -69,8 +83,9 @@ export const dividerStyle = {
 };
 
 export const onlineUsersTypographyStyle = {
-  mb: 1,
+  mt: "1.5rem",
   fontWeight: 600,
+  fontSize: "1.3rem",
 };
 
 export const userListStyle = {

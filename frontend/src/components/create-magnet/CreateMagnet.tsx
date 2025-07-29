@@ -58,6 +58,7 @@ import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -153,7 +154,7 @@ export const CreateMagnet: FC = () => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "cardUpdated",
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_UPDATED,
             card: payload,
           }),
         );
@@ -164,7 +165,7 @@ export const CreateMagnet: FC = () => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "cardAdded",
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_ADDED,
             card: payload,
           }),
         );

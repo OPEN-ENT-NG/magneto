@@ -12,6 +12,7 @@ import { useResourceTypeDisplay } from "~/components/board-card/useResourceTypeD
 import { useDropdown } from "~/components/drop-down-list/useDropDown";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -124,7 +125,7 @@ export const useBoardCard = (card: Card) => {
     if (readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: "cardUpdated",
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_UPDATED,
           card: {
             ...cardPayload,
             locked: !card.locked,
@@ -143,7 +144,7 @@ export const useBoardCard = (card: Card) => {
     if (readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: "cardsDeleted",
+          type: WEBSOCKET_MESSAGE_TYPE.CARDS_DELETED,
           cardIds: [card.id],
           boardId: board.id,
         }),
@@ -158,7 +159,7 @@ export const useBoardCard = (card: Card) => {
     if (readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: "cardFavorite",
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE,
           card: { id: card.id, isLiked: card.liked },
         }),
       );

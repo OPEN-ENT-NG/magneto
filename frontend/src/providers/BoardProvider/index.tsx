@@ -176,6 +176,19 @@ export const BoardProvider: FC<BoardProviderProps> = ({
     toggleBoardModals(actionType);
   };
 
+  useEffect(() => {
+    if (activeCard && board) {
+      const cards = board.isLayoutFree()
+        ? board.cards
+        : board.sections.flatMap((section) => section.cards || []);
+
+      const updatedCard = cards.find((card) => card.id === activeCard.id);
+      if (updatedCard && updatedCard !== activeCard) {
+        setActiveCard(updatedCard);
+      }
+    }
+  }, [board, activeCard]);
+
   const value = useMemo<BoardContextType>(
     () => ({
       board,

@@ -28,6 +28,7 @@ import { useRenderContent } from "./useRenderContent";
 import { initialInputvalue } from "./utils";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useBoard } from "~/providers/BoardProvider";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDuplicateCardMutation } from "~/services/api/cards.service";
@@ -82,7 +83,7 @@ export const BoardCreateMagnetMagnetModal: FC<
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "cardDuplicated",
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_DUPLICATED,
               ...magnetMagnetParams,
             }),
           );

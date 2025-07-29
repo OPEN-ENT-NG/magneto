@@ -1,6 +1,7 @@
 import { CardComment, ICardItemCommentResponse } from "./card-comment.model";
 import { FileViewModel } from "../components/file-viewer/FileViewerModel";
 import { RESOURCE_TYPE } from "../core/enums/resource-type.enum";
+import { Comment } from "~/models/comment.types";
 
 export interface ICardItemResponse {
   id?: string;
@@ -273,6 +274,7 @@ export class Card {
   private _nbOfFavorites?: number;
   private _liked?: boolean;
   private _resource?: FileViewModel;
+  private _comments?: Comment[];
 
   constructor() {
     this._id = "";
@@ -305,6 +307,7 @@ export class Card {
     this._nbOfComments = -1;
     this._lastComment = new CardComment();
     this._nbOfFavorites = -1;
+    this._comments = [];
     this._liked = false;
     if (this._resourceType === "file") this._resource = this.initResource();
     return this;
@@ -336,6 +339,7 @@ export class Card {
         : undefined;
     this._nbOfFavorites = data.nbOfFavorites;
     this._liked = data.liked;
+    this._comments = data.comments;
     if (this._resourceType === "file") this._resource = undefined; //this.initResource();
     return this;
   }
@@ -491,6 +495,14 @@ export class Card {
 
   set liked(value: boolean) {
     this._liked = value;
+  }
+
+  get comments(): Comment[] {
+    return this._comments ? this._comments : [];
+  }
+
+  set comments(value: Comment[]) {
+    this._comments = value;
   }
 
   isType = (resourceType: string): boolean => {

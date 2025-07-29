@@ -38,7 +38,9 @@ import {
 } from "./utils";
 import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useBoard } from "~/providers/BoardProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useAddCommentMutation,
   useGetAllCommentsQuery,
@@ -56,6 +58,8 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   const { displayModals, toggleBoardModals, isExternalView } = useBoard();
   const { avatar } = useUser();
   const [addComment] = useAddCommentMutation();
+
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { data: commentsData } = useGetAllCommentsQuery(
     { cardId },
     { skip: !!comments.length },
@@ -107,10 +111,22 @@ export const CommentPanel: FC<CommentPanelProps> = ({
   const handleSubmit = async () => {
     if (!inputValue) return;
     try {
-      await addComment({
-        cardId: cardId,
-        content: inputValue,
-      }).unwrap();
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.COMMENT_ADDED,
+            comment: {
+              content: inputValue,
+            },
+            cardId: cardId,
+          }),
+        );
+      } else {
+        await addComment({
+          cardId: cardId,
+          content: inputValue,
+        }).unwrap();
+      }
       setInputValue("");
     } catch (error) {
       console.error(error);

@@ -317,7 +317,9 @@ public class Card implements Model<Card> {
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
                 .put(Field.FAVORITE_LIST, this.getFavoriteList())
-                .put(Field.COMMENTS, this.getComments());
+                .put(Field.COMMENTS, this.getComments().stream()
+                        .map(Comment::toJson)
+                        .collect(Collectors.toList()));
 
         // Gestion des propriétés owner et editor qui peuvent être nulles
         if (this.owner != null) {

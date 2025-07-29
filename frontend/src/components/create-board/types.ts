@@ -6,6 +6,7 @@ export type CreateBoardProps = {
   boardToUpdate?: Board;
   reset?: () => void;
   parentFolderId?: string;
+  hasWebSocket?: boolean;
 };
 
 export interface FormInputs {

@@ -6,6 +6,7 @@ import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
 
 import { DropDownListItem } from "../drop-down-list/types";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -41,7 +42,7 @@ export const useCreateSectionDropDownItems: (
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionDuplicated",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED,
             ...payload,
           }),
         );
@@ -68,7 +69,7 @@ export const useCreateSectionDropDownItems: (
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionUpdated",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
             section: payload,
           }),
         );

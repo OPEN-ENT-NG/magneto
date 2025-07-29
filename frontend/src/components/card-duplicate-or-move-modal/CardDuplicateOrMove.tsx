@@ -15,6 +15,7 @@ import { CardDuplicateOrMoveModalProps } from "./types";
 import { prepareI18nByModalType, prepareSortedBoards } from "./utils";
 import { MessageModal } from "../message-modal/MessageModal";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { CardForm } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -57,7 +58,7 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: "cardDuplicated",
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_DUPLICATED,
               boardId: inputValue,
               cardIds: [activeCard.id],
             }),

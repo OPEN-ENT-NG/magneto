@@ -20,9 +20,11 @@ import {
   userNameStyle,
 } from "./style";
 import { CardCommentProps } from "./types";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useAddCommentMutation } from "~/services/api/comment.service";
 
 export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
@@ -32,6 +34,7 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
   const { avatar } = useUser();
   const { cardComment, nbOfComment, cardId } = commentData;
   const { getAvatarURL } = useDirectory();
+  const { sendMessage, readyState } = useWebSocketMagneto();
 
   const time = useElapsedTime(cardComment?.modificationDate);
 
@@ -39,10 +42,22 @@ export const CardComment: FC<CardCommentProps> = memo(({ commentData }) => {
     async (event: KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter" && inputValue && cardId) {
         try {
-          await addComment({
-            cardId: cardId,
-            content: inputValue,
-          }).unwrap();
+          if (readyState === WebSocket.OPEN) {
+            sendMessage(
+              JSON.stringify({
+                type: WEBSOCKET_MESSAGE_TYPE.COMMENT_ADDED,
+                comment: {
+                  content: inputValue,
+                },
+                cardId: cardId,
+              }),
+            );
+          } else {
+            await addComment({
+              cardId: cardId,
+              content: inputValue,
+            }).unwrap();
+          }
           setInputValue("");
         } catch (error) {
           console.error(error);

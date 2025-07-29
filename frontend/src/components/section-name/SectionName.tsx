@@ -20,6 +20,7 @@ import { useCreateSectionDropDownItems } from "./useCreateSectionDropDownItems";
 import { DeleteSectionModal } from "../delete-section-modal/DeleteSectionModal";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoard } from "~/providers/BoardProvider";
@@ -85,7 +86,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionUpdated",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
             section: {
               boardId,
               id: section?._id,
@@ -108,7 +109,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: "sectionAdded",
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED,
             section: {
               boardId,
               title: inputValue,

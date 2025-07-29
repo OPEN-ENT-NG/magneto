@@ -157,6 +157,7 @@ export const PreviewModal: FC = () => {
               cardId={activeCard.id}
               anchorEl={commentDivRef.current}
               isInCardPreview
+              comments={activeCard.comments}
             />
           )}
         </ModalWrapper>

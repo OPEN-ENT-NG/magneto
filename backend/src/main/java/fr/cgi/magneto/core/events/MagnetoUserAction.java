@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.enums.MagnetoMessageType;
 import fr.cgi.magneto.model.SectionPayload;
-import fr.cgi.magneto.model.boards.Board;
+import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
-import fr.cgi.magneto.model.comments.Comment;
+import fr.cgi.magneto.model.comments.CommentPayload;
 import org.entcore.common.validation.ValidationException;
 
 import java.util.List;
@@ -22,11 +22,11 @@ public class MagnetoUserAction {
     private final String cardId;
     private final List<String> cardIds;
     private final CardPayload card;
-    private final Board board;
+    private final BoardPayload board;
     private final String boardId;
     private final SectionPayload section;
     private final List<String> sectionIds;
-    private final Comment comment;
+    private final CommentPayload comment;
     private final String commentId;
     private final Boolean isLiked;
     private final Boolean deleteCards;
@@ -39,11 +39,11 @@ public class MagnetoUserAction {
                                        @JsonProperty("cardId") final String cardId,
                                        @JsonProperty("cardIds") final List<String> cardIds,
                                        @JsonProperty("card") final CardPayload card,
-                                       @JsonProperty("board") final Board board,
+                                       @JsonProperty("board") final BoardPayload board,
                                        @JsonProperty("boardId") final String boardId,
                                        @JsonProperty("section") final SectionPayload section,
                                        @JsonProperty("sectionIds") final List<String> sectionIds,
-                                       @JsonProperty("comment") final Comment comment,
+                                       @JsonProperty("comment") final CommentPayload comment,
                                        @JsonProperty("commentId") final String commentId,
                                        @JsonProperty("isLiked") final Boolean isLiked,
                                        @JsonProperty("deleteCards") final Boolean deleteCards,
@@ -82,13 +82,13 @@ public class MagnetoUserAction {
         return card;
     }
 
-    public Board getBoard() { return board; }
+    public BoardPayload getBoard() { return board; }
 
     public String getBoardId() { return boardId; }
 
     public SectionPayload getSection() { return section; }
 
-    public Comment getComment() { return comment; }
+    public CommentPayload getComment() { return comment; }
 
     public String getCommentId() { return commentId; }
 

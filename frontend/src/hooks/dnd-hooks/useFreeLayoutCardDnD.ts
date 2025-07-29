@@ -9,6 +9,7 @@ import {
 
 import { CustomPointerSensor } from "./customPointer";
 import { reorderWithLockedItems } from "./reorderUtils";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -100,7 +101,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: "cardMoved",
+                type: WEBSOCKET_MESSAGE_TYPE.CARD_MOVED,
                 boardId: board._id,
                 cardIds: newUpdatedIds,
               }),

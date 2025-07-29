@@ -27,6 +27,7 @@ import { MediaProps } from "../board-view/types";
 import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useImageHandler } from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
 import { BoardForm } from "~/models/board.model";
@@ -35,7 +36,6 @@ import {
   useCreateBoardMutation,
   useUpdateBoardMutation,
 } from "~/services/api/boards.service";
-import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const CreateBoard: FC<CreateBoardProps> = ({
   isOpen,

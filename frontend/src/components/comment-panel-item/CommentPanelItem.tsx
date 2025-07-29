@@ -33,6 +33,7 @@ import { avatarStyle } from "../comment-panel/style";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
 import { iconButtonStyle, iconStyle } from "../section-name/style";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import useDirectory from "~/hooks/useDirectory";
 import { useElapsedTime } from "~/hooks/useElapsedTime";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -40,7 +41,6 @@ import {
   useDeleteCommentMutation,
   useUpdateCommentMutation,
 } from "~/services/api/comment.service";
-import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 const CommentPanelItemBase = memo(
   (props: CommentPanelItemProps) => {

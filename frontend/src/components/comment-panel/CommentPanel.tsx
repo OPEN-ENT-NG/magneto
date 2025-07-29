@@ -38,13 +38,13 @@ import {
 } from "./utils";
 import { CommentPanelItem } from "../comment-panel-item/CommentPanelItem";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useBoard } from "~/providers/BoardProvider";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useAddCommentMutation,
   useGetAllCommentsQuery,
 } from "~/services/api/comment.service";
-import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const CommentPanel: FC<CommentPanelProps> = ({
   isInCardPreview = false,

@@ -12,6 +12,7 @@ import { useResourceTypeDisplay } from "~/components/board-card/useResourceTypeD
 import { useDropdown } from "~/components/drop-down-list/useDropDown";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -21,7 +22,6 @@ import {
   useFavoriteCardMutation,
   useDeleteCardsMutation,
 } from "~/services/api/cards.service";
-import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 //import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const useBoardCard = (card: Card) => {

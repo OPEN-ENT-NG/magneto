@@ -24,9 +24,9 @@ import {
 } from "./style";
 import { DeleteSectionModalProps } from "./types";
 import { StyledRadio } from "../styled-radio/StyledRadio";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDeleteSectionMutation } from "~/services/api/sections.service";
-import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
   open,

@@ -24,6 +24,7 @@ import {
 } from "./reorderUtils";
 import { ActiveItemState, DND_ITEM_TYPE } from "./types";
 import { createCardMap, createSectionMap } from "./utils";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
@@ -34,7 +35,6 @@ import {
   useUpdateSectionMutation,
   useCreateSectionMutation,
 } from "~/services/api/sections.service";
-import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const useSectionsDnD = (board: Board) => {
   const [activeItem, setActiveItem] = useState<ActiveItemState>(null);

@@ -28,10 +28,10 @@ import { useRenderContent } from "./useRenderContent";
 import { initialInputvalue } from "./utils";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useBoard } from "~/providers/BoardProvider";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDuplicateCardMutation } from "~/services/api/cards.service";
-import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 export const BoardCreateMagnetMagnetModal: FC<
   BoardCreateMagnetMagnetModalProps

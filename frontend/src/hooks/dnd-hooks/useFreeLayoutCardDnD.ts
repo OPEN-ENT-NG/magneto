@@ -101,7 +101,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: WEBSOCKET_MESSAGE_TYPE.CARD_MOVED,
+                type: WEBSOCKET_MESSAGE_TYPE.CARDS_BOARD_UPDATED,
                 boardId: board._id,
                 cardIds: newUpdatedIds,
               }),

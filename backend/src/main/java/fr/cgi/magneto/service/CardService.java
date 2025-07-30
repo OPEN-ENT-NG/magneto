@@ -37,7 +37,7 @@ public interface CardService {
      */
     void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard, UserInfos user);
 
-    void removeCardWithLocked(JsonObject moveCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user);
+    void removeCardWithLocked(CardPayload updateCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user);
 
     /**
      * Add a card to a section (with locked items logic)
@@ -203,4 +203,6 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing the id of the updated card
      */
     Future<JsonObject> duplicateSection(String boardId, List<Card> cardsFilter, SectionPayload setId, UserInfos user);
+
+    Future<Void> processMoveCard(CardPayload updateCard, String oldBoardId, String newBoardId, UserInfos user, I18nHelper i18nHelper);
 }

@@ -13,7 +13,6 @@ import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
 import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.helper.WorkflowHelper;
-import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -310,15 +309,13 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         });
             }
             case sectionUpdated: {
-                Section updatedSection = new Section(action.getSection().toJson());
                 return serviceFactory.sectionService().update(action.getSection())
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateSection] Failed to update section : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
                         })
-                        .compose(res -> this.serviceFactory.cardService().getAllCardsBySectionSimple(updatedSection, null, user))
-                        .map(cards -> newArrayList(this.messageFactory.sectionUpdated(boardId, wsId, user.getUserId(), updatedSection.setCards(cards), action.getActionType(), action.getActionId())));
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
@@ -432,6 +429,18 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardMoved: {
+                String oldBoardId = action.getCard().getBoardId();
+                String newBoardId = action.getBoardId();
+                CardPayload updateCard = action.getCard()
+                        .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
+                        .setLastModifierId(user.getUserId())
+                        .setLastModifierName(user.getUsername())
+                        .setBoardId(newBoardId);
+
+                this.serviceFactory.cardService().processMoveCard(updateCard, oldBoardId, newBoardId, user, null)
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
+            }
+            case cardsBoardUpdated: {
                 List<String> sectionIds = action.getSectionIds();
                 List<String> cardIds = action.getCardsIds();
                 String destinationBoardId = action.getBoardId();

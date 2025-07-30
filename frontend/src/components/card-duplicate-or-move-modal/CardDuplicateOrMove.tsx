@@ -70,10 +70,20 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
           });
         }
       } else {
-        await move({
-          boardId: inputValue,
-          card: new CardForm().build(activeCard).toJSON(),
-        });
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_MOVED,
+              boardId: inputValue,
+              card: new CardForm().build(activeCard).toJSON(),
+            }),
+          );
+        } else {
+          await move({
+            boardId: inputValue,
+            card: new CardForm().build(activeCard).toJSON(),
+          });
+        }
       }
       toast.success(t(sucess));
       closeActiveCardAction(BOARD_MODAL_TYPE.DUPLICATE_OR_MOVE);

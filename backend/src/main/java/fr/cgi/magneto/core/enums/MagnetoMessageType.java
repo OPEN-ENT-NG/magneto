@@ -11,6 +11,7 @@ public enum MagnetoMessageType {
     cardUpdated,
     cardEditionEnded,
     cardMoved,
+    cardsBoardUpdated,
     cardsDeleted,
     cardFavorite,
     sectionUpdated,

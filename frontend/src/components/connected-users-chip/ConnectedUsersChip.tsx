@@ -124,7 +124,9 @@ export const ConnectedUsersChip: FC = () => {
             )}
             <Box sx={currentUserBoxStyle}>
               <Tooltip
-                title={currentUser?.username || t("magneto.you")}
+                title={
+                  currentUser?.username + t("magneto.(you)") || t("magneto.you")
+                }
                 placement="bottom"
                 arrow
                 componentsProps={{

@@ -35,7 +35,7 @@ public class Card implements Model<Card> {
     private JsonObject lastComment;
     private Integer nbOfComments;
     private Integer nbOfFavorites;
-    private boolean isLiked;
+    private Boolean isLiked;
     private List<Comment> comments;
 
     private List<String> favoriteList;
@@ -270,15 +270,16 @@ public class Card implements Model<Card> {
         this.nbOfFavorites = nbOfFavorites;
     }
 
-    public void setIsLiked(boolean isLiked) {
+    public Card setIsLiked(Boolean  isLiked) {
         this.isLiked = isLiked;
+        return this;
     }
 
     public Integer getNbOfFavorites() {
         return nbOfFavorites;
     }
 
-    public boolean isLiked() {
+    public Boolean  isLiked() {
         return isLiked;
     }
 

@@ -5,6 +5,7 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.core.enums.UserColor;
 import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.excpetion.BadRequestException;
@@ -321,24 +322,20 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             }
             case cardFavorite: {
                 String cardId = action.getCard().getId();
-                boolean favorite = action.getIsLiked();
                 if(user == null){
                     BadRequestException noUser = new BadRequestException("User not found");
                     String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
                             this.getClass().getSimpleName(), noUser.getMessage());
                     log.error(message);
                 }
-                return serviceFactory.cardService().updateFavorite(cardId, favorite, user, true)
+                return serviceFactory.cardService().updateFavorite(cardId, action.getCard().isFavorite(), user, true)
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
                                     this.getClass().getSimpleName(), err.getMessage());
                             log.error(message);
                         })
-                        .flatMap(saved -> this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
-                                .map(cards -> {
-                                    Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()) : cards.get(0);
-                                    return newArrayList(this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                                }));
+                        .compose(saved -> this.serviceFactory.cardService().getCards(newArrayList(cardId), user))
+                        .compose(res -> this.createCardFavoriteMessagesForUsers(boardId, cardId, wsId, user, action.getActionType()));
             }
             case commentAdded: {
                 CommentPayload commentPayload = action.getComment()
@@ -519,12 +516,16 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     private Future<Void> publishMetadata(String boardId, CollaborationUsersMetadata context) {
         try {
+            JsonArray connectedUsersJson = new JsonArray();
+            for (User user : context.getConnectedUsers()) {
+                connectedUsersJson.add(user.toJson());
+            }
             JsonObject metadataMessage = new JsonObject()
                     .put("type", "metadata")
                     .put("serverId", serverId)
                     .put("boardId", boardId)
                     .put("timestamp", System.currentTimeMillis())
-                    .put("connectedUsers", Json.encode(context.getConnectedUsers()))
+                    .put("connectedUsers", connectedUsersJson)
                     .put("editing", Json.encode(context.getEditing()));
 
             return publishMessage(metadataMessage);
@@ -547,10 +548,14 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     // Récupérer ou créer le contexte pour ce board
                     final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
 
-                    // Ajouter l'utilisateur connecté au contexte avec son statut readOnly
-                    context.addConnectedUser(user, isReadOnly);
+                    // Assigner une couleur avant de créer l'utilisateur
+                    UserColor assignedColor = assignColorToUser(boardId);
 
-                    wsIdToUser.put(wsId, new User(user.getUserId(), user.getUsername(), isReadOnly));
+                    // Ajouter l'utilisateur connecté au contexte avec son statut readOnly
+                    User userWithColor = new User(user.getUserId(), user.getUsername(), isReadOnly, assignedColor);
+                    context.addConnectedUser(userWithColor);
+
+                    wsIdToUser.put(wsId, userWithColor);
 
                     // Créer le message avec les métadonnées
                     final MagnetoMessage metadataMessage = this.messageFactory.metadata(
@@ -713,5 +718,53 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
         return CompositeFuture.all(messageFutures)
                 .map(compositeFuture -> Arrays.asList(readOnlyMessageFuture.result(), fullMessageFuture.result()));
+    }
+
+    private Future<List<MagnetoMessage>> createCardFavoriteMessagesForUsers(String boardId, String cardId, String wsId, UserInfos user, MagnetoUserAction.ActionType actionType) {
+        // Board avec sections : créer deux versions
+        List<Future> messageFutures = new ArrayList<>();
+
+        // Version readOnly
+        Future<MagnetoMessage> actualUserFavoriteFuture = this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
+                .map(cards -> this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), cards.get(0), actionType, Field.ACTUALUSER));
+
+        // Version complète
+        Future<MagnetoMessage> otherUsersFavoriteFuture = this.serviceFactory.cardService().getCards(newArrayList(cardId), user)
+                .map(cards -> this.messageFactory.cardFavorite(boardId, wsId, user.getUserId(), cards.get(0).setIsLiked(null), actionType, Field.OTHERUSERS));
+
+        messageFutures.add(actualUserFavoriteFuture);
+        messageFutures.add(otherUsersFavoriteFuture);
+
+        return CompositeFuture.all(messageFutures)
+                .map(compositeFuture -> Arrays.asList(actualUserFavoriteFuture.result(), otherUsersFavoriteFuture.result()));
+    }
+
+    private UserColor assignColorToUser(String boardId) {
+        final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
+
+        if (context == null || context.getConnectedUsers().isEmpty()) {
+            UserColor[] colors = UserColor.values();
+            Random random = new Random();
+            return colors[random.nextInt(colors.length)];
+        }
+
+        // Récupérer les couleurs déjà utilisées depuis le Set
+        Set<UserColor> usedColors = context.getConnectedUsers().stream()
+                .map(User::getColor)
+                .collect(Collectors.toSet());
+
+        // Créer une liste des couleurs disponibles
+        List<UserColor> availableColors = Arrays.stream(UserColor.values())
+                .filter(color -> !usedColors.contains(color))
+                .collect(Collectors.toList());
+
+        Random random = new Random();
+
+        if (!availableColors.isEmpty()) {
+            return availableColors.get(random.nextInt(availableColors.size()));
+        } else {
+            UserColor[] colors = UserColor.values();
+            return colors[random.nextInt(colors.length)];
+        }
     }
 }

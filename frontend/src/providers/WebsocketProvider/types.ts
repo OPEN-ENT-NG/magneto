@@ -1,10 +1,14 @@
 import { ReactNode } from "react";
 
-import { IUserInfo } from "@edifice.io/client";
 import { ReadyState } from "react-use-websocket";
 
 import { IBoardItemResponse } from "~/models/board.model";
 import { ICardItemResponse } from "~/models/card.model";
+
+export interface User {
+  id: string;
+  username: string;
+}
 
 export interface WebSocketUpdate {
   type: string;
@@ -14,7 +18,7 @@ export interface WebSocketUpdate {
   section?: any;
   sectionId?: string;
   board?: IBoardItemResponse;
-  connectedUsers?: IUserInfo[];
+  connectedUsers?: UserCollaboration[];
   [key: string]: any;
 }
 
@@ -22,7 +26,7 @@ export interface WebSocketContextValue {
   sendMessage: (message: string) => void;
   lastMessage: MessageEvent | null;
   readyState: ReadyState;
-  connectedUsers: IUserInfo[];
+  connectedUsers: UserCollaboration[];
 }
 
 export interface WebSocketProviderProps {
@@ -30,4 +34,10 @@ export interface WebSocketProviderProps {
   socketUrl: string;
   onMessage?: (update: WebSocketUpdate) => void;
   shouldConnect?: boolean;
+}
+
+export interface UserCollaboration {
+  id: string;
+  username: string;
+  color: string;
 }

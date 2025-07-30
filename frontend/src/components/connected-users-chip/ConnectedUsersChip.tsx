@@ -3,7 +3,6 @@ import { FC, useState } from "react";
 import { useEdificeClient } from "@edifice.io/react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  Avatar,
   AvatarGroup,
   Box,
   Tooltip,
@@ -18,20 +17,25 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { connectedUsersContainerStyle } from "./style";
 import {
+  connectedUsersContainerStyle,
+  listItemAvatarStyle,
+  roleTypographyStyle,
   userTooltipStyle,
   expandMoreIconStyle,
   popoverStyle,
   popoverContainerStyle,
   listItemStyle,
   otherUserListItemStyle,
-  avatarListStyle,
   usernameTypographyStyle,
   dividerStyle,
   onlineUsersTypographyStyle,
   userListStyle,
   tooltipPopperModifiers,
+  BorderedAvatar,
+  currentUserBoxStyle,
+  userInfoBoxStyle,
+  otherUserRoleStyle,
 } from "./style";
 import useDirectory from "~/hooks/useDirectory";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -54,12 +58,32 @@ export const ConnectedUsersChip: FC = () => {
   };
 
   const otherConnectedUsers = connectedUsers.filter(
-    (user) => user.userId !== edificeClient.user?.userId,
+    (user) => user.id !== edificeClient.user?.userId,
+  );
+
+  const currentUser = connectedUsers.find(
+    (user) => user.id === edificeClient.user?.userId,
   );
 
   if (readyState !== WebSocket.OPEN) {
     return null;
   }
+
+  const getInitials = (username?: string): string => {
+    if (!username) return "??";
+
+    const words = username.trim().split(/\s+/);
+
+    if (words.length === 1) {
+      // 1 mot : prendre les 2 premières lettres
+      return words[0].slice(0, 2).toUpperCase();
+    } else {
+      // 2+ mots : première lettre du premier mot + première lettre du dernier mot
+      const firstLetter = words[0].charAt(0);
+      const lastLetter = words[words.length - 1].charAt(0);
+      return (firstLetter + lastLetter).toUpperCase();
+    }
+  };
 
   return (
     <>
@@ -71,7 +95,7 @@ export const ConnectedUsersChip: FC = () => {
               <AvatarGroup max={4}>
                 {otherConnectedUsers.map((user) => (
                   <Tooltip
-                    key={user.userId}
+                    key={user.id}
                     title={user.username || t("magneto.user")}
                     placement="bottom"
                     arrow
@@ -86,34 +110,44 @@ export const ConnectedUsersChip: FC = () => {
                       },
                     }}
                   >
-                    <Avatar
+                    <BorderedAvatar
                       alt={user.username}
-                      src={getAvatarURL(user.userId, "user")}
-                    ></Avatar>
+                      src={getAvatarURL(user.id, "user")}
+                      borderColor={user.color}
+                      size="small"
+                    >
+                      {getInitials(user.username)}
+                    </BorderedAvatar>
                   </Tooltip>
                 ))}
               </AvatarGroup>
             )}
-            <Tooltip
-              title={edificeClient?.user?.username || t("magneto.you")}
-              placement="bottom"
-              arrow
-              componentsProps={{
-                tooltip: {
-                  sx: userTooltipStyle,
-                },
-              }}
-              slotProps={{
-                popper: {
-                  modifiers: tooltipPopperModifiers,
-                },
-              }}
-            >
-              <Avatar
-                alt={edificeClient?.user?.username}
-                src={getAvatarURL(edificeClient?.user?.userId || "", "user")}
-              ></Avatar>
-            </Tooltip>
+            <Box sx={currentUserBoxStyle}>
+              <Tooltip
+                title={currentUser?.username || t("magneto.you")}
+                placement="bottom"
+                arrow
+                componentsProps={{
+                  tooltip: {
+                    sx: userTooltipStyle,
+                  },
+                }}
+                slotProps={{
+                  popper: {
+                    modifiers: tooltipPopperModifiers,
+                  },
+                }}
+              >
+                <BorderedAvatar
+                  alt={currentUser?.username}
+                  src={getAvatarURL(currentUser?.id || "", "user")}
+                  borderColor={currentUser?.color || "#cccccc"}
+                  size="medium"
+                >
+                  {getInitials(currentUser?.username)}
+                </BorderedAvatar>
+              </Tooltip>
+            </Box>
           </>
         }
         deleteIcon={<ExpandMoreIcon sx={expandMoreIconStyle} />}
@@ -137,21 +171,28 @@ export const ConnectedUsersChip: FC = () => {
         <Box sx={popoverContainerStyle}>
           {/* Utilisateur actuel en premier */}
           <ListItem sx={listItemStyle}>
-            <ListItemAvatar>
-              <Avatar
-                src={getAvatarURL(edificeClient?.user?.userId || "", "user")}
-                alt={edificeClient?.user?.username}
-                sx={avatarListStyle}
-              />
+            <ListItemAvatar sx={listItemAvatarStyle}>
+              <BorderedAvatar
+                src={getAvatarURL(currentUser?.id || "", "user")}
+                alt={currentUser?.username}
+                borderColor={currentUser?.color || "#cccccc"}
+                size="medium"
+              >
+                {getInitials(currentUser?.username)}
+              </BorderedAvatar>
             </ListItemAvatar>
             <ListItemText
               primary={
                 <Typography variant="body1" sx={usernameTypographyStyle}>
-                  {edificeClient?.user?.username || t("magneto.you")}
+                  {currentUser?.username + " (vous)" || t("magneto.you")}
                 </Typography>
               }
               secondary={
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={roleTypographyStyle}
+                >
                   Éditeur
                 </Typography>
               }
@@ -160,29 +201,36 @@ export const ConnectedUsersChip: FC = () => {
           <Divider sx={dividerStyle} />
 
           <Typography variant="h6" sx={onlineUsersTypographyStyle}>
-            Utilisateurs en ligne ({connectedUsers.length})
+            Utilisateurs en ligne ({otherConnectedUsers.length})
           </Typography>
           <List sx={userListStyle}>
             {/* Autres utilisateurs connectés */}
             {otherConnectedUsers.map((user) => (
-              <ListItem key={user.userId} sx={otherUserListItemStyle}>
-                <ListItemAvatar>
-                  <Avatar
-                    src={getAvatarURL(user.userId, "user")}
+              <ListItem key={user.id} sx={otherUserListItemStyle}>
+                <ListItemAvatar sx={listItemAvatarStyle}>
+                  <BorderedAvatar
+                    src={getAvatarURL(user.id, "user")}
                     alt={user.username}
-                    sx={avatarListStyle}
-                  />
+                    borderColor={user.color}
+                    size="medium"
+                  >
+                    {getInitials(user.username)}
+                  </BorderedAvatar>
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Typography variant="body1" sx={usernameTypographyStyle}>
-                      {user.username || t("magneto.user")}
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography variant="body2" color="text.secondary">
-                      {"Éditeur"}
-                    </Typography>
+                    <Box sx={userInfoBoxStyle}>
+                      <Typography variant="body1" sx={usernameTypographyStyle}>
+                        {user.username || t("magneto.user")}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={otherUserRoleStyle}
+                      >
+                        Éditeur
+                      </Typography>
+                    </Box>
                   }
                 />
               </ListItem>

@@ -1,10 +1,14 @@
+import { Avatar, styled } from "@mui/material";
+
 export const connectedUsersContainerStyle = {
   display: "flex",
   alignItems: "center",
-  gap: "10px",
-  marginRight: "20px",
+  gap: "1rem",
+  marginRight: "2rem",
   backgroundColor: "#F5F7F9",
-  height: "60px",
+  height: "5rem",
+  minWidth: "200px",
+  maxWidth: "300px",
   borderRadius: "30px",
   cursor: "pointer",
   "&:hover": {
@@ -17,12 +21,14 @@ export const connectedUsersContainerStyle = {
     display: "flex",
     alignItems: "center",
     gap: 1,
-    padding: "8px 12px",
+    padding: "0.8rem 0rem 0.8rem 1.2rem",
+    justifyContent: "flex-start",
+    width: "100%",
   },
   "& .MuiChip-deleteIcon": {
     fontSize: "1.8rem",
-    marginLeft: "3px",
-    marginRight: "8px",
+    marginLeft: "auto",
+    marginRight: "0.8rem",
   },
 };
 
@@ -35,14 +41,16 @@ export const popoverStyle = {
     borderRadius: "12px",
     boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.15)",
     border: "1px solid #E5E5E5",
-    minWidth: "280px",
-    maxWidth: "320px",
+    minWidth: "320px",
+    maxWidth: "380px",
     mt: 1,
+    pb: "0rem",
   },
 };
 
 export const popoverContainerStyle = {
-  p: 2,
+  px: "1.6rem",
+  py: "0.6rem",
 };
 
 export const listItemStyle = {
@@ -60,8 +68,17 @@ export const avatarListStyle = {
   height: 40,
 };
 
+export const listItemAvatarStyle = {
+  minWidth: "4.9rem",
+};
+
+export const roleTypographyStyle = {
+  fontSize: "1.1rem",
+};
+
 export const usernameTypographyStyle = {
-  fontWeight: 500,
+  fontWeight: 400,
+  fontSize: "1.4rem",
 };
 
 export const dividerStyle = {
@@ -69,8 +86,9 @@ export const dividerStyle = {
 };
 
 export const onlineUsersTypographyStyle = {
-  mb: 1,
+  mt: "1.5rem",
   fontWeight: 600,
+  fontSize: "1.3rem",
 };
 
 export const userListStyle = {
@@ -89,6 +107,30 @@ export const tooltipPopperModifiers = [
 ];
 
 export const userTooltipStyle = {
-  fontSize: "12px",
-  padding: "6px 10px",
+  fontSize: "1.2rem",
+  padding: "0.6rem 1rem",
+};
+
+export const BorderedAvatar = styled(Avatar)<{
+  borderColor: string;
+  size?: "small" | "medium";
+}>`
+  border: 2px solid ${({ borderColor }) => borderColor} !important;
+  width: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
+  height: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
+`;
+
+export const currentUserBoxStyle = {
+  marginLeft: "auto",
+};
+
+export const userInfoBoxStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+};
+
+export const otherUserRoleStyle = {
+  marginRight: 1,
+  fontSize: "1.1rem",
 };

@@ -160,13 +160,13 @@ export const useBoardCard = (card: Card) => {
       sendMessage(
         JSON.stringify({
           type: WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE,
-          card: { id: card.id, isLiked: card.liked },
+          card: { id: card.id, isFavorite: card.liked },
         }),
       );
     } else {
       favoriteCard({ cardId: card.id, isFavorite: card.liked });
     }
-  }, [card.id, card.liked, favoriteCard]);
+  }, [card.id, card.liked, favoriteCard, sendMessage]);
 
   const hasEditRights = useMemo(() => hasEditRightsFn(), [hasEditRightsFn]);
   const hasContribRights = useMemo(

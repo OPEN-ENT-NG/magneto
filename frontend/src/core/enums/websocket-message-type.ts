@@ -13,5 +13,6 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   SECTION_ADDED = "sectionAdded",
   SECTIONS_DELETED = "sectionsDeleted",
   CARD_MOVED = "cardMoved",
+  CARDS_BOARD_UPDATED = "cardsBoardUpdated",
   BOARD_MESSAGE = "boardMessage",
 }

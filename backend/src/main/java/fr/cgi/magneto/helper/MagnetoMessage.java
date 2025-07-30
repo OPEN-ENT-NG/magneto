@@ -262,12 +262,7 @@ public class MagnetoMessage {
             JsonArray usersArray = new JsonArray();
             for (User userInfo : connectedUsers) {
                 if (userInfo != null) {
-                    JsonObject userJson = new JsonObject();
-                    if (userInfo.getUserId() != null) userJson.put(Field.ID, userInfo.getUserId());
-                    if (userInfo.getUsername() != null) userJson.put(Field.USERNAME, userInfo.getUsername());
-                    if (userInfo.getLogin() != null) userJson.put(Field.LOGIN, userInfo.getLogin());
-
-                    usersArray.add(userJson);
+                    usersArray.add(userInfo.toJson());
                 }
             }
             json.put(Field.CONNECTEDUSERS, usersArray);

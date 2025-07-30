@@ -18,7 +18,7 @@ export interface WebSocketUpdate {
   section?: any;
   sectionId?: string;
   board?: IBoardItemResponse;
-  connectedUsers?: User[];
+  connectedUsers?: UserCollaboration[];
   [key: string]: any;
 }
 
@@ -26,7 +26,7 @@ export interface WebSocketContextValue {
   sendMessage: (message: string) => void;
   lastMessage: MessageEvent | null;
   readyState: ReadyState;
-  connectedUsers: User[];
+  connectedUsers: UserCollaboration[];
 }
 
 export interface WebSocketProviderProps {
@@ -34,4 +34,10 @@ export interface WebSocketProviderProps {
   socketUrl: string;
   onMessage?: (update: WebSocketUpdate) => void;
   shouldConnect?: boolean;
+}
+
+export interface UserCollaboration {
+  id: string;
+  username: string;
+  color: string;
 }

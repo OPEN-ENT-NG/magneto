@@ -1,3 +1,5 @@
+import { Avatar, styled } from "@mui/material";
+
 export const connectedUsersContainerStyle = {
   display: "flex",
   alignItems: "center",
@@ -42,12 +44,13 @@ export const popoverStyle = {
     minWidth: "320px",
     maxWidth: "380px",
     mt: 1,
+    pb: "0rem",
   },
 };
 
 export const popoverContainerStyle = {
-  p: 2,
-  paddingTop: "0.6rem",
+  px: "1.6rem",
+  py: "0.6rem",
 };
 
 export const listItemStyle = {
@@ -106,4 +109,28 @@ export const tooltipPopperModifiers = [
 export const userTooltipStyle = {
   fontSize: "12px",
   padding: "6px 10px",
+};
+
+export const BorderedAvatar = styled(Avatar)<{
+  borderColor: string;
+  size?: "small" | "medium";
+}>`
+  border: 2px solid ${({ borderColor }) => borderColor} !important;
+  width: ${({ size }) => (size === "small" ? "36px" : "40px")};
+  height: ${({ size }) => (size === "small" ? "36px" : "40px")};
+`;
+
+export const currentUserBoxStyle = {
+  marginLeft: "auto",
+};
+
+export const userInfoBoxStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+};
+
+export const otherUserRoleStyle = {
+  marginRight: 1,
+  fontSize: "1.1rem",
 };

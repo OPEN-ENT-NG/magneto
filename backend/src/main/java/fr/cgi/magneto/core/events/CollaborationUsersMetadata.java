@@ -3,7 +3,6 @@ package fr.cgi.magneto.core.events;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr.cgi.magneto.model.user.User;
-import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,8 +37,8 @@ public class CollaborationUsersMetadata {
         return connectedUsers;
     }
 
-    public void addConnectedUser(final UserInfos user, Boolean readOnly){
-        this.connectedUsers.add(new User(user.getUserId(), user.getUsername(), readOnly));
+    public void addConnectedUser(final User user){
+        this.connectedUsers.add(user);
     }
 
     public void removeConnectedUser(final String userId){

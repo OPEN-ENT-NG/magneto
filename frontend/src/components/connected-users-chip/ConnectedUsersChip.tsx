@@ -3,7 +3,6 @@ import { FC, useState } from "react";
 import { useEdificeClient } from "@edifice.io/react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  Avatar,
   AvatarGroup,
   Box,
   Tooltip,
@@ -22,20 +21,21 @@ import {
   connectedUsersContainerStyle,
   listItemAvatarStyle,
   roleTypographyStyle,
-} from "./style";
-import {
   userTooltipStyle,
   expandMoreIconStyle,
   popoverStyle,
   popoverContainerStyle,
   listItemStyle,
   otherUserListItemStyle,
-  avatarListStyle,
   usernameTypographyStyle,
   dividerStyle,
   onlineUsersTypographyStyle,
   userListStyle,
   tooltipPopperModifiers,
+  BorderedAvatar,
+  currentUserBoxStyle,
+  userInfoBoxStyle,
+  otherUserRoleStyle,
 } from "./style";
 import useDirectory from "~/hooks/useDirectory";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -61,9 +61,30 @@ export const ConnectedUsersChip: FC = () => {
     (user) => user.id !== edificeClient.user?.userId,
   );
 
+  const currentUser = connectedUsers.find(
+    (user) => user.id === edificeClient.user?.userId,
+  );
+  console.log("🚀 ~ ConnectedUsersChip ~ currentUser:", currentUser);
+
   if (readyState !== WebSocket.OPEN) {
     return null;
   }
+
+  const getInitials = (username?: string): string => {
+    if (!username) return "??";
+
+    const words = username.trim().split(/\s+/);
+
+    if (words.length === 1) {
+      // 1 mot : prendre les 2 premières lettres
+      return words[0].slice(0, 2).toUpperCase();
+    } else {
+      // 2+ mots : première lettre du premier mot + première lettre du dernier mot
+      const firstLetter = words[0].charAt(0);
+      const lastLetter = words[words.length - 1].charAt(0);
+      return (firstLetter + lastLetter).toUpperCase();
+    }
+  };
 
   return (
     <>
@@ -90,19 +111,21 @@ export const ConnectedUsersChip: FC = () => {
                       },
                     }}
                   >
-                    <Avatar
+                    <BorderedAvatar
                       alt={user.username}
                       src={getAvatarURL(user.id, "user")}
-                    ></Avatar>
+                      borderColor={user.color}
+                      size="small"
+                    >
+                      {getInitials(user.username)}
+                    </BorderedAvatar>
                   </Tooltip>
                 ))}
               </AvatarGroup>
             )}
-            <Box sx={{ marginLeft: "auto" }}>
-              {" "}
-              {/* Pousse cet avatar à droite */}
+            <Box sx={currentUserBoxStyle}>
               <Tooltip
-                title={edificeClient?.user?.username || t("magneto.you")}
+                title={currentUser?.username || t("magneto.you")}
                 placement="bottom"
                 arrow
                 componentsProps={{
@@ -116,10 +139,14 @@ export const ConnectedUsersChip: FC = () => {
                   },
                 }}
               >
-                <Avatar
-                  alt={edificeClient?.user?.username}
-                  src={getAvatarURL(edificeClient?.user?.userId || "", "user")}
-                ></Avatar>
+                <BorderedAvatar
+                  alt={currentUser?.username}
+                  src={getAvatarURL(currentUser?.id || "", "user")}
+                  borderColor={currentUser?.color || "#cccccc"}
+                  size="medium"
+                >
+                  {getInitials(currentUser?.username)}
+                </BorderedAvatar>
               </Tooltip>
             </Box>
           </>
@@ -146,17 +173,19 @@ export const ConnectedUsersChip: FC = () => {
           {/* Utilisateur actuel en premier */}
           <ListItem sx={listItemStyle}>
             <ListItemAvatar sx={listItemAvatarStyle}>
-              <Avatar
-                src={getAvatarURL(edificeClient?.user?.userId || "", "user")}
-                alt={edificeClient?.user?.username}
-                sx={avatarListStyle}
-              />
+              <BorderedAvatar
+                src={getAvatarURL(currentUser?.id || "", "user")}
+                alt={currentUser?.username}
+                borderColor={currentUser?.color || "#cccccc"}
+                size="medium"
+              >
+                {getInitials(currentUser?.username)}
+              </BorderedAvatar>
             </ListItemAvatar>
             <ListItemText
               primary={
                 <Typography variant="body1" sx={usernameTypographyStyle}>
-                  {edificeClient?.user?.username + " (vous)" ||
-                    t("magneto.you")}
+                  {currentUser?.username + " (vous)" || t("magneto.you")}
                 </Typography>
               }
               secondary={
@@ -180,28 +209,25 @@ export const ConnectedUsersChip: FC = () => {
             {otherConnectedUsers.map((user) => (
               <ListItem key={user.id} sx={otherUserListItemStyle}>
                 <ListItemAvatar sx={listItemAvatarStyle}>
-                  <Avatar
+                  <BorderedAvatar
                     src={getAvatarURL(user.id, "user")}
                     alt={user.username}
-                    sx={avatarListStyle}
-                  />
+                    borderColor={user.color}
+                    size="medium"
+                  >
+                    {getInitials(user.username)}
+                  </BorderedAvatar>
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
+                    <Box sx={userInfoBoxStyle}>
                       <Typography variant="body1" sx={usernameTypographyStyle}>
                         {user.username || t("magneto.user")}
                       </Typography>
                       <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ marginRight: 1, fontSize: "1.1rem" }}
+                        sx={otherUserRoleStyle}
                       >
                         Éditeur
                       </Typography>

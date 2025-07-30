@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { IUserInfo } from "@edifice.io/client";
 import useWebSocket from "react-use-websocket";
 
 import {
+  UserCollaboration,
   WebSocketContextValue,
   WebSocketProviderProps,
   WebSocketUpdate,
@@ -26,7 +26,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   onMessage,
   shouldConnect = true,
 }) => {
-  const [connectedUsers, setConnectedUsers] = useState<IUserInfo[]>([]);
+  const [connectedUsers, setConnectedUsers] = useState<UserCollaboration[]>([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     shouldConnect ? socketUrl : null,

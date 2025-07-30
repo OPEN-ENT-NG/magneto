@@ -3,10 +3,10 @@ import { Avatar, styled } from "@mui/material";
 export const connectedUsersContainerStyle = {
   display: "flex",
   alignItems: "center",
-  gap: "10px",
-  marginRight: "20px",
+  gap: "1rem",
+  marginRight: "2rem",
   backgroundColor: "#F5F7F9",
-  height: "50px",
+  height: "5rem",
   minWidth: "200px",
   maxWidth: "300px",
   borderRadius: "30px",
@@ -21,14 +21,14 @@ export const connectedUsersContainerStyle = {
     display: "flex",
     alignItems: "center",
     gap: 1,
-    padding: "8px 0px 8px 12px",
+    padding: "0.8rem 0rem 0.8rem 1.2rem",
     justifyContent: "flex-start",
     width: "100%",
   },
   "& .MuiChip-deleteIcon": {
     fontSize: "1.8rem",
     marginLeft: "auto",
-    marginRight: "8px",
+    marginRight: "0.8rem",
   },
 };
 
@@ -107,8 +107,8 @@ export const tooltipPopperModifiers = [
 ];
 
 export const userTooltipStyle = {
-  fontSize: "12px",
-  padding: "6px 10px",
+  fontSize: "1.2rem",
+  padding: "0.6rem 1rem",
 };
 
 export const BorderedAvatar = styled(Avatar)<{
@@ -116,8 +116,8 @@ export const BorderedAvatar = styled(Avatar)<{
   size?: "small" | "medium";
 }>`
   border: 2px solid ${({ borderColor }) => borderColor} !important;
-  width: ${({ size }) => (size === "small" ? "36px" : "40px")};
-  height: ${({ size }) => (size === "small" ? "36px" : "40px")};
+  width: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
+  height: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
 `;
 
 export const currentUserBoxStyle = {

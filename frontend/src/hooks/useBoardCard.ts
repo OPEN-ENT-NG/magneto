@@ -157,10 +157,6 @@ export const useBoardCard = (card: Card) => {
 
   const handleFavoriteClick = useCallback(() => {
     if (readyState === WebSocket.OPEN) {
-      console.log({
-        type: WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE,
-        card: { id: card.id, isFavorite: card.liked },
-      });
       sendMessage(
         JSON.stringify({
           type: WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE,

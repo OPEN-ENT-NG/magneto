@@ -64,7 +64,6 @@ export const ConnectedUsersChip: FC = () => {
   const currentUser = connectedUsers.find(
     (user) => user.id === edificeClient.user?.userId,
   );
-  console.log("🚀 ~ ConnectedUsersChip ~ currentUser:", currentUser);
 
   if (readyState !== WebSocket.OPEN) {
     return null;

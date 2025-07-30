@@ -31,12 +31,12 @@ public class User extends UserInfos implements Model<User> {
 
     public User(JsonObject user) {
         super();
-        this.setUserId(user.getString("userId", user.getString("id", "")));
-        this.setUsername(user.getString("username", ""));
-        this.isReadOnly = user.getBoolean("readOnly", false);
+        this.setUserId(user.getString(Field.USERID, user.getString(Field.ID, "")));
+        this.setUsername(user.getString(Field.USERNAME, ""));
+        this.isReadOnly = user.getBoolean(Field.READONLY, false);
 
         // Récupérer la couleur depuis le JSON
-        String colorName = user.getString("color");
+        String colorName = user.getString(Field.COLOR);
         if (colorName != null) {
             try {
                 this.color = UserColor.valueOf(colorName);

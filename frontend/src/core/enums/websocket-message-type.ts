@@ -15,4 +15,6 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   CARD_MOVED = "cardMoved",
   CARDS_BOARD_UPDATED = "cardsBoardUpdated",
   BOARD_MESSAGE = "boardMessage",
+  CARD_EDITION_STARTED = "cardEditionStarted",
+  CARD_EDITION_ENDED = "cardEditionEnded",
 }

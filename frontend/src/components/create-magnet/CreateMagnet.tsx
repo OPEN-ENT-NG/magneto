@@ -82,6 +82,7 @@ export const CreateMagnet: FC = () => {
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
   );
+  const [hasOpenMessageSent, setHasOpenMessageSent] = useState(false);
   const [description, setDescription] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
 
@@ -99,8 +100,45 @@ export const CreateMagnet: FC = () => {
     selectedBoardData,
     setSelectedBoardData,
   } = useMediaLibrary();
+
   const { activeCard, closeActiveCardAction } = useBoard();
   const isEditMagnet = !!activeCard;
+
+  useEffect(() => {
+    if (
+      isCreateMagnetOpen &&
+      isEditMagnet &&
+      readyState === WebSocket.OPEN &&
+      !hasOpenMessageSent
+    ) {
+      sendMessage(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_STARTED,
+          cardId: activeCard.id,
+          isMoving: false,
+        }),
+      );
+      setHasOpenMessageSent(true);
+    }
+  }, [
+    isCreateMagnetOpen,
+    isEditMagnet,
+    hasOpenMessageSent,
+    readyState,
+    sendMessage,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (isEditMagnet && hasOpenMessageSent && readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_ENDED,
+          }),
+        );
+      }
+    };
+  }, [isEditMagnet, hasOpenMessageSent, readyState]);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 

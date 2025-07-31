@@ -372,5 +372,6 @@
 
   "magneto.user": "utilisateur",
   "magneto.you": "Vous",
-  "magneto.(you)": " (vous)"
+  "magneto.(you)": " (vous)",
+  "magneto.card.editing.tooltip": "Ces actions sont impossibles pendant l'édition."
 }

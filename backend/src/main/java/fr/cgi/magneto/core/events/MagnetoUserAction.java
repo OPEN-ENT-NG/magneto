@@ -117,6 +117,7 @@ public class MagnetoUserAction {
             case connectedUsers:
             case cardEditing:
             case disconnection:
+            case cardEditionEnded:
             case ping:{
                 // no required fields
                 break;
@@ -135,8 +136,7 @@ public class MagnetoUserAction {
                 }
                 break;
             }
-            case cardEditionStarted:
-            case cardEditionEnded:{
+            case cardEditionStarted:{
                 if(this.cardId == null){
                     throw new ValidationException("magneto.action.cardId.missing");
                 }

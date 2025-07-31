@@ -282,6 +282,16 @@ public class MagnetoMessage {
             json.put(Field.CONNECTEDUSERS, usersArray);
         }
 
+        if (cardEditingInformations != null) {
+            JsonArray cardEditingArray = new JsonArray();
+            for (CardEditingInformation cardEditingInformation : cardEditingInformations) {
+                if (cardEditingInformation != null) {
+                    cardEditingArray.add(cardEditingInformation.toJson());
+                }
+            }
+            json.put(Field.CARDEDITINGINFORMATIONS, cardEditingArray);
+        }
+
         return json;
     }
 
@@ -302,6 +312,7 @@ public class MagnetoMessage {
                 ", section=" + section +
                 ", sections=" + sections +
                 ", connectedUsers=" + connectedUsers +
+                ", cardEditingInformations=" + cardEditingInformations +
                 ", maxConnectedUsers=" + maxConnectedUsers +
                 '}';
     }

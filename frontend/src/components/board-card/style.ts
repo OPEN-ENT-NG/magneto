@@ -1,5 +1,5 @@
 import { CSS } from "@dnd-kit/utilities";
-import { Card, styled } from "@mui/material";
+import { Card, Chip, styled } from "@mui/material";
 
 export const handleCardSize = (zoomLevel: number) => {
   let cardSize = { width: "269px", height: "fit-content", minHeight: "264px" };
@@ -29,19 +29,28 @@ export const handleCardSize = (zoomLevel: number) => {
 
 export const StyledCard = styled(Card, {
   shouldForwardProp: (prop) =>
-    !["zoomLevel", "isDragging", "isLockedBoard", "isLocked"].includes(
-      prop as string,
-    ),
+    ![
+      "zoomLevel",
+      "isDragging",
+      "isLockedBoard",
+      "isLocked",
+      "isBeingEdited",
+      "editingUserColor",
+    ].includes(prop as string),
 })<{
   zoomLevel: number;
   isDragging: boolean;
   isLockedBoard: boolean;
   isLocked: boolean;
+  isBeingEdited?: boolean;
+  editingUserColor?: string;
 }>(({
   zoomLevel = 3,
   isDragging = false,
   isLockedBoard = false,
   isLocked = false,
+  isBeingEdited = false,
+  editingUserColor,
 }) => {
   const LOCKED_CURSOR = "default !important";
   const DRAGGING_CURSOR = "grabbing";
@@ -61,7 +70,11 @@ export const StyledCard = styled(Card, {
     boxShadow: "0 1px 3px rgba(0,0,0,.1)",
     width: handleCardSize(zoomLevel).width,
     height: handleCardSize(zoomLevel).height,
-    opacity: isDragging ? "0.5" : "1",
+    opacity: isDragging ? "0.5" : isBeingEdited ? "0.6" : "1",
+    border:
+      isBeingEdited && editingUserColor
+        ? `3px solid ${editingUserColor}`
+        : "none",
     cursor,
   };
 });
@@ -80,3 +93,39 @@ export const getTransformStyle = (
   transition: transition || undefined,
   cursor: listeners ? "move" : "default",
 });
+
+export const EditingChip = styled(Chip, {
+  shouldForwardProp: (prop) => prop !== "userColor",
+})<{ userColor: string }>(({ userColor }) => ({
+  position: "absolute",
+  bottom: "-1px",
+  right: "-1px",
+  backgroundColor: `${userColor} !important`,
+  color: "#fff !important",
+  borderRadius: "8px 0 8px 0",
+  fontSize: "12px",
+  fontWeight: "500",
+  zIndex: 10,
+  opacity: "1 !important",
+  border: "none",
+  boxShadow: "none",
+  fontFamily: "Inter, Arial, sans-serif",
+  "& .MuiChip-label": {
+    padding: "4px 8px 4px 4px",
+    color: "#fff !important",
+    fontFamily: "inherit",
+  },
+  "& .MuiChip-icon": {
+    color: "#fff !important",
+    marginLeft: "4px",
+    marginRight: "0px",
+  },
+  "&:hover": {
+    backgroundColor: `${userColor} !important`,
+  },
+  "&:focus": {
+    backgroundColor: `${userColor} !important`,
+  },
+}));
+
+export const iconStyle = { color: "#fff !important", fontSize: "14px" };

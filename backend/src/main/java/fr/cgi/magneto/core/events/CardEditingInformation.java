@@ -1,12 +1,16 @@
 package fr.cgi.magneto.core.events;
 
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.model.Model;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+
+import java.util.List;
 
 /**
  * Information about a card being edited by a user.
  */
-public class CardEditingInformation {
+public class CardEditingInformation implements Model<CardEditingInformation> {
 
     private final String userId;
     private final String cardId;
@@ -31,7 +35,7 @@ public class CardEditingInformation {
         return userId;
     }
 
-    public String getNoteId() {
+    public String getCardId() {
         return cardId;
     }
 
@@ -41,5 +45,24 @@ public class CardEditingInformation {
 
     public Boolean getIsMoving() {
         return isMoving;
+    }
+
+    @Override
+    public JsonObject toJson() {
+        return new JsonObject()
+                .put(Field.USERID, this.getUserId())
+                .put(Field.CARDID, this.getCardId())
+                .put(Field.SINCE, this.getSince())
+                .put(Field.ISMOVING, this.getIsMoving());
+    }
+
+    @Override
+    public CardEditingInformation model(JsonObject cardEditingInformation) {
+        return new CardEditingInformation(cardEditingInformation);
+    }
+
+    @Override
+    public List<CardEditingInformation> toList(JsonArray results) {
+        return Model.super.toList(results);
     }
 }

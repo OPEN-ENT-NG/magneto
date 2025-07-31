@@ -59,9 +59,18 @@ export const useFreeLayoutCardDnD = (board: Board) => {
 
       if (card) {
         setActiveItem(card);
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_STARTED,
+              cardId: card.id,
+              isMoving: true,
+            }),
+          );
+        }
       }
     },
-    [cardMap],
+    [cardMap, readyState, sendMessage],
   );
 
   const handleDragEnd = useCallback(
@@ -114,6 +123,13 @@ export const useFreeLayoutCardDnD = (board: Board) => {
         setUpdatedIds(validCardIds);
       } finally {
         setActiveItem(null);
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_ENDED,
+            }),
+          );
+        }
       }
     },
     [board, updatedIds, updateBoardCards, cardMap, validCardIds, lockedCards],

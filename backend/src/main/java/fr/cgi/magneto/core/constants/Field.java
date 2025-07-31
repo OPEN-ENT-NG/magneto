@@ -264,4 +264,7 @@ public class Field {
     public static final String ACTUALUSER = "actualUser";
     public static final String OTHERUSERS = "otherUsers";
     public static final String COLOR = "color";
+    public static final String CARDEDITINGINFORMATIONS = "cardEditingInformations";
+    public static final String SINCE = "since";
+    public static final String ISMOVING = "isMoving";
 }

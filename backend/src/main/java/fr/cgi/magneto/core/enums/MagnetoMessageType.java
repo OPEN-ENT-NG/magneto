@@ -2,7 +2,7 @@ package fr.cgi.magneto.core.enums;
 
 public enum MagnetoMessageType {
     connection,
-    metadata,
+    connectedUsers,
     disconnection,
     ping,
     boardUpdated,
@@ -21,5 +21,7 @@ public enum MagnetoMessageType {
     cardDuplicated,
     sectionDuplicated,
     sectionAdded,
-    sectionsDeleted, boardMessage,
+    sectionsDeleted,
+    boardMessage,
+    cardEditing,
 }

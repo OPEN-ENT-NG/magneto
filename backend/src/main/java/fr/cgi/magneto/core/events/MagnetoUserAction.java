@@ -28,7 +28,7 @@ public class MagnetoUserAction {
     private final List<String> sectionIds;
     private final CommentPayload comment;
     private final String commentId;
-    private final Boolean isLiked;
+    private final Boolean isMoving;
     private final Boolean deleteCards;
     private final ActionType actionType;
     private final String actionId;
@@ -45,7 +45,7 @@ public class MagnetoUserAction {
                                        @JsonProperty("sectionIds") final List<String> sectionIds,
                                        @JsonProperty("comment") final CommentPayload comment,
                                        @JsonProperty("commentId") final String commentId,
-                                       @JsonProperty("isLiked") final Boolean isLiked,
+                                       @JsonProperty("isMoving") final Boolean isMoving,
                                        @JsonProperty("deleteCards") final Boolean deleteCards,
                                        @JsonProperty("actionType") final ActionType actionType,
                                        @JsonProperty("actionId") final String actionId) {
@@ -60,7 +60,7 @@ public class MagnetoUserAction {
         this.sectionIds = sectionIds;
         this.comment = comment;
         this.commentId = commentId;
-        this.isLiked = isLiked;
+        this.isMoving = isMoving;
         this.deleteCards = deleteCards;
         this.actionType = actionType;
         this.actionId = actionId;
@@ -92,7 +92,7 @@ public class MagnetoUserAction {
 
     public String getCommentId() { return commentId; }
 
-    public Boolean getIsLiked() { return isLiked; }
+    public Boolean getIsMoving() { return isMoving; }
 
     public Boolean getDeleteCards() { return deleteCards; }
 
@@ -114,7 +114,8 @@ public class MagnetoUserAction {
         }
         switch(this.type){
             case connection:
-            case metadata:
+            case connectedUsers:
+            case cardEditing:
             case disconnection:
             case ping:{
                 // no required fields

@@ -6,6 +6,7 @@ import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.enums.UserColor;
+import fr.cgi.magneto.core.events.CardEditingInformation;
 import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
 import fr.cgi.magneto.excpetion.BadRequestException;
@@ -462,40 +463,32 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         })
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
-            /*
             case cardEditionStarted: {
-                // add to editing
-                context.getEditing().add(new MagnetoEditingInformation(user.getUserId(), action.getNoteId(), System.currentTimeMillis()));
-                // client has start editing => broadcast to other users
-                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteEditionStarted(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
+                final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
+                context.getEditing().add(new CardEditingInformation(user.getUserId(), action.getCardId(), System.currentTimeMillis(), action.getIsMoving()));
+
+                return publishMetadata(boardId, context).map(published -> newArrayList(
+                        this.messageFactory.cardEditing(
+                                boardId,
+                                wsId,
+                                user.getUserId(),
+                                context.getEditing(),
+                                this.maxConnectedUser
+                        )));
             }
             case cardEditionEnded: {
-                // remove from editing
+                final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
                 context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
-                // publish meta
-                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteEditionEnded(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
+
+                return publishMetadata(boardId, context).map(published -> newArrayList(
+                        this.messageFactory.cardEditing(
+                                boardId,
+                                wsId,
+                                user.getUserId(),
+                                context.getEditing(),
+                                this.maxConnectedUser
+                        )));
             }
-            case cardMoved: {
-                // client has moved the note => DONT patch now => broadcast to other users
-                return Future.succeededFuture(newArrayList(this.messageFactory.noteMoved(boardId, wsId, user.getUserId(), action.getNote(), action.getActionType(), action.getActionId())));
-            }
-            case cardSelected: {
-                // add to editing
-                context.getEditing().add(new MagnetoEditingInformation(user.getUserId(), action.getNoteId(), System.currentTimeMillis()));
-                // client has selected note => broadcast to other users
-                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteSelected(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
-            }
-            case noteUnselected: {
-                // remove from editing
-                context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
-                // client has unselected note => broadcast to other users
-                return publishMetadata().map(published -> newArrayList(this.messageFactory.noteUnselected(boardId, wsId, user.getUserId(), action.getNoteId(), action.getActionType(), action.getActionId())));
-            }
-            case wallDeleted: {
-                // client has deleted the wall => delete then broadcast to other users
-                return this.collaborativeWallService.deleteWall(boardId, user)
-                        .map(saved -> newArrayList(this.messageFactory.wallDeleted(boardId, wsId, user.getUserId(), action.getActionType(), action.getActionId())));
-            }*/
         }
         return Future.succeededFuture(Collections.emptyList());
     }
@@ -567,20 +560,25 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     wsIdToUser.put(wsId, userWithColor);
 
                     // Créer le message avec les métadonnées
-                    final MagnetoMessage metadataMessage = this.messageFactory.metadata(
+                    final MagnetoMessage connectedUsersMessage = this.messageFactory.connectedUsers(
                             boardId,
                             wsId,
                             user.getUserId(),
-                            new CollaborationUsersMetadata(
-                                    context.getEditing(),
-                                    context.getConnectedUsers()
-                            ),
+                            context.getConnectedUsers(),
+                            this.maxConnectedUser
+                    );
+
+                    final MagnetoMessage cardEditingMessage = this.messageFactory.cardEditing(
+                            boardId,
+                            wsId,
+                            user.getUserId(),
+                            context.getEditing(),
                             this.maxConnectedUser
                     );
 
                     // Publier les métadonnées mises à jour via EventBus
                     return publishMetadata(boardId, context)
-                            .map(v -> Arrays.asList(newUserMessage, metadataMessage))
+                            .map(v -> Arrays.asList(newUserMessage, connectedUsersMessage, cardEditingMessage))
                             .compose(messages -> {
                                 JsonObject collaborationMessage = new JsonObject()
                                         .put("type", "collaboration")
@@ -607,21 +605,30 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             // Retirer l'utilisateur du contexte
             context.removeConnectedUser(userId);
 
+            // Retirer toutes les cartes en cours d'édition par cet utilisateur
+            context.getEditing().removeIf(info -> info.getUserId().equals(userId));
+
             // Si plus personne n'est connecté, on peut supprimer le contexte
             if (context.getConnectedUsers().isEmpty()) {
                 metadataByBoardId.remove(boardId);
             }
-            final MagnetoMessage metadataMessage = this.messageFactory.metadata(
+            final MagnetoMessage connectedUsersMessage = this.messageFactory.connectedUsers(
                     boardId,
                     wsId,
                     userId,
-                    new CollaborationUsersMetadata(
-                            context.getEditing(),
-                            context.getConnectedUsers()
-                    ),
+                    context.getConnectedUsers(),
                     this.maxConnectedUser
             );
-            messages.add(metadataMessage);
+
+            final MagnetoMessage cardEditingMessage = this.messageFactory.cardEditing(
+                    boardId,
+                    wsId,
+                    userId,
+                    context.getEditing(),
+                    this.maxConnectedUser
+            );
+            messages.add(connectedUsersMessage);
+            messages.add(cardEditingMessage);
         }
         promise.complete(messages);
         return promise.future();

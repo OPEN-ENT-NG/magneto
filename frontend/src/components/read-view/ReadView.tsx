@@ -92,6 +92,17 @@ export const ReadView: FC = () => {
 
   useEffect(() => {
     if (!card) return setCard(initialCards[0]);
+
+    if (card && board) {
+      const cards = board.isLayoutFree()
+        ? board.cards
+        : board.sections.flatMap((section) => section.cards || []);
+
+      const updatedCard = cards.find((cardFind) => cardFind.id === card.id);
+      if (updatedCard && updatedCard !== card) {
+        setCard(updatedCard);
+      }
+    }
   }, [board]);
 
   useEffect(() => {
@@ -269,7 +280,11 @@ export const ReadView: FC = () => {
             </Box>
           </Box>
           {card && COMMENT_PANEL && isRefReady && (
-            <CommentPanel cardId={card.id} anchorEl={commentDivRef.current} />
+            <CommentPanel
+              cardId={card.id}
+              anchorEl={commentDivRef.current}
+              comments={card.comments}
+            />
           )}
         </Box>
       </Box>

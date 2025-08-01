@@ -1,0 +1,27 @@
+package fr.cgi.magneto.core.enums;
+
+public enum MagnetoMessageType {
+    connection,
+    connectedUsers,
+    disconnection,
+    ping,
+    boardUpdated,
+    cardAdded,
+    cardEditionStarted,
+    cardUpdated,
+    cardEditionEnded,
+    cardMoved,
+    cardsBoardUpdated,
+    cardsDeleted,
+    cardFavorite,
+    sectionUpdated,
+    commentAdded,
+    commentDeleted,
+    commentEdited,
+    cardDuplicated,
+    sectionDuplicated,
+    sectionAdded,
+    sectionsDeleted,
+    boardMessage,
+    cardEditing,
+}

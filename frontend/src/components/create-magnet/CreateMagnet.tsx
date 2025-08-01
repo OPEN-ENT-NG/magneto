@@ -58,16 +58,20 @@ import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useCreateCardMutation,
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
 import { workspaceApi } from "~/services/api/workspace.service";
+//import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
   const dispatchRTK = useDispatch();
@@ -78,6 +82,7 @@ export const CreateMagnet: FC = () => {
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
   );
+  const [hasOpenMessageSent, setHasOpenMessageSent] = useState(false);
   const [description, setDescription] = useState<string>("");
   const editorRef = useRef<EditorRef>(null);
 
@@ -95,8 +100,45 @@ export const CreateMagnet: FC = () => {
     selectedBoardData,
     setSelectedBoardData,
   } = useMediaLibrary();
+
   const { activeCard, closeActiveCardAction } = useBoard();
   const isEditMagnet = !!activeCard;
+
+  useEffect(() => {
+    if (
+      isCreateMagnetOpen &&
+      isEditMagnet &&
+      readyState === WebSocket.OPEN &&
+      !hasOpenMessageSent
+    ) {
+      sendMessage(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_STARTED,
+          cardId: activeCard.id,
+          isMoving: false,
+        }),
+      );
+      setHasOpenMessageSent(true);
+    }
+  }, [
+    isCreateMagnetOpen,
+    isEditMagnet,
+    hasOpenMessageSent,
+    readyState,
+    sendMessage,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (isEditMagnet && hasOpenMessageSent && readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_ENDED,
+          }),
+        );
+      }
+    };
+  }, [isEditMagnet, hasOpenMessageSent, readyState]);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -147,9 +189,27 @@ export const CreateMagnet: FC = () => {
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
     };
     if (isEditMagnet) {
-      await updateCard(payload);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_UPDATED,
+            card: payload,
+          }),
+        );
+      } else {
+        await updateCard(payload);
+      }
     } else {
-      await createCard(payload);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_ADDED,
+            card: payload,
+          }),
+        );
+      } else {
+        await createCard(payload);
+      }
     }
     if (
       payload.resourceType === RESOURCE_TYPE.FILE &&

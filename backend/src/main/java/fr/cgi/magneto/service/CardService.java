@@ -8,6 +8,7 @@ import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.model.statistics.StatisticsPayload;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
@@ -36,7 +37,7 @@ public interface CardService {
      */
     void addCardWithLocked(CardPayload updateCard, List<Future> updateBoardsFutures, Board currentBoard, UserInfos user);
 
-    void removeCardWithLocked(JsonObject moveCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user);
+    void removeCardWithLocked(CardPayload updateCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user);
 
     /**
      * Add a card to a section (with locked items logic)
@@ -79,6 +80,11 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing list of deleted cards
      */
     Future<JsonObject> deleteCards(String userId, List<String> cardIds);
+
+    Future<JsonObject> updateAndReturnPayload(CardPayload card);
+
+    Future<CompositeFuture> deleteCardsWithBoardValidation(List<String> cardIds, String boardId, UserInfos user);
+
     Future<JsonObject> deleteCards(List<String> cardIds);
 
     /**
@@ -96,6 +102,8 @@ public interface CardService {
      */
 
     Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText, String sortBy);
+
+    Future<List<Card>> getCardsOrFirstSection(Board board, UserInfos user);
 
     /**
      * Get cards by ids
@@ -181,9 +189,10 @@ public interface CardService {
      * @param cardId   The id of the card we want to update
      * @param favorite The new favorite status
      * @param user     {@link UserInfos} User info
+     *  @param returnPayload Return or not the card payload
      * @return Future {@link Future <JsonObject>} containing the id of the updated card
      */
-    Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user);
+    Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user, boolean returnPayload);
 
     /**
      * Duplicate a section (mainly its cards)
@@ -194,4 +203,6 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing the id of the updated card
      */
     Future<JsonObject> duplicateSection(String boardId, List<Card> cardsFilter, SectionPayload setId, UserInfos user);
+
+    Future<Void> processMoveCard(CardPayload updateCard, String oldBoardId, String newBoardId, UserInfos user, I18nHelper i18nHelper);
 }

@@ -11,6 +11,7 @@ import {
 } from "~/components/card-content-board/style";
 import { EmptyStatePublic } from "~/components/empty-state-public/EmptyStatePublic";
 import { BoardProvider } from "~/providers/BoardProvider";
+import { WebSocketProvider } from "~/providers/WebsocketProvider";
 import { useGetIsExternalQuery } from "~/services/api/boards.service"; // Importation du hook RTK Query
 import theme from "~/themes/theme";
 import "./removeDisconnectLightbox.scss";
@@ -52,9 +53,17 @@ export const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <BoardProvider isExternal={isExternalQueryAllowed?.isExternal}>
-        <BoardView />
-      </BoardProvider>
+      <WebSocketProvider //Not connecting to the websocket
+        socketUrl={""}
+        onMessage={(update) => {
+          console.log("Received WebSocket update:", update);
+        }}
+        shouldConnect={false}
+      >
+        <BoardProvider isExternal={isExternalQueryAllowed?.isExternal}>
+          <BoardView />
+        </BoardProvider>
+      </WebSocketProvider>
     </ThemeProvider>
   );
 };

@@ -9,8 +9,10 @@ import {
 
 import { CustomPointerSensor } from "./customPointer";
 import { reorderWithLockedItems } from "./reorderUtils";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useUpdateBoardCardsMutation } from "~/services/api/boards.service";
 
 export const useFreeLayoutCardDnD = (board: Board) => {
@@ -22,6 +24,7 @@ export const useFreeLayoutCardDnD = (board: Board) => {
   const [updatedIds, setUpdatedIds] = useState<string[]>(validCardIds);
   const [activeItem, setActiveItem] = useState<Card | null>(null);
   const [updateBoardCards] = useUpdateBoardCardsMutation();
+  const { sendMessage, readyState } = useWebSocketMagneto();
 
   const cardMap = useMemo(() => {
     const map: Record<string, Card> = {};
@@ -56,9 +59,18 @@ export const useFreeLayoutCardDnD = (board: Board) => {
 
       if (card) {
         setActiveItem(card);
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_STARTED,
+              cardId: card.id,
+              isMoving: true,
+            }),
+          );
+        }
       }
     },
-    [cardMap],
+    [cardMap, readyState, sendMessage],
   );
 
   const handleDragEnd = useCallback(
@@ -95,12 +107,29 @@ export const useFreeLayoutCardDnD = (board: Board) => {
             cardIds: newUpdatedIds,
           };
 
-          await updateBoardCards(payload).unwrap();
+          if (readyState === WebSocket.OPEN) {
+            sendMessage(
+              JSON.stringify({
+                type: WEBSOCKET_MESSAGE_TYPE.CARDS_BOARD_UPDATED,
+                boardId: board._id,
+                cardIds: newUpdatedIds,
+              }),
+            );
+          } else {
+            await updateBoardCards(payload).unwrap();
+          }
         }
       } catch {
         setUpdatedIds(validCardIds);
       } finally {
         setActiveItem(null);
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_ENDED,
+            }),
+          );
+        }
       }
     },
     [board, updatedIds, updateBoardCards, cardMap, validCardIds, lockedCards],

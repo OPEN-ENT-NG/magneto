@@ -29,6 +29,7 @@ export const useCardDropDownItems = (
   hasContribRights: boolean,
   hasEditRights: boolean,
   board: Board,
+  isBeingEdited: boolean,
 ): DropDownListItem[] => {
   const { t } = useTranslation("magneto");
   const { openActiveCardAction, setIsModalDuplicate } = useBoard();
@@ -122,12 +123,13 @@ export const useCardDropDownItems = (
   );
 
   return useMemo(() => {
-    if (readOnly && !hasContribRights) {
-      return [menuItems.preview];
-    }
+    let items: DropDownListItem[];
 
-    if (isLocked) {
-      return !hasEditRights
+    // Logique existante pour déterminer les items disponibles
+    if (readOnly && !hasContribRights) {
+      items = [menuItems.preview];
+    } else if (isLocked) {
+      items = !hasEditRights
         ? [menuItems.preview]
         : isMagnetOwner || isManager
         ? [
@@ -139,10 +141,8 @@ export const useCardDropDownItems = (
             menuItems.delete,
           ]
         : [menuItems.preview];
-    }
-
-    if (isManager || (isMagnetOwner && hasEditRights)) {
-      return [
+    } else if (isManager || (isMagnetOwner && hasEditRights)) {
+      items = [
         menuItems.preview,
         menuItems.duplicate,
         menuItems.edit,
@@ -150,22 +150,32 @@ export const useCardDropDownItems = (
         menuItems.lock,
         menuItems.delete,
       ];
-    }
-
-    if (hasEditRights) {
-      return [
+    } else if (hasEditRights) {
+      items = [
         menuItems.preview,
         menuItems.duplicate,
         menuItems.edit,
         menuItems.move,
       ];
+    } else if (hasContribRights) {
+      items = [menuItems.preview, menuItems.duplicate];
+    } else {
+      items = [menuItems.preview];
     }
 
-    if (hasContribRights) {
-      return [menuItems.preview, menuItems.duplicate];
+    // Si la carte est en cours d'édition, désactiver toutes les actions sauf l'aperçu
+    if (isBeingEdited) {
+      return items.map((item) => ({
+        ...item,
+        disabled: item.secondary !== labels.preview ? true : item.disabled,
+        tooltip:
+          item.secondary !== labels.preview
+            ? "magneto.card.editing.tooltip"
+            : item.tooltip,
+      }));
     }
 
-    return [menuItems.preview];
+    return items;
   }, [
     isMagnetOwner,
     isManager,
@@ -174,5 +184,6 @@ export const useCardDropDownItems = (
     isLocked,
     hasContribRights,
     hasEditRights,
+    isBeingEdited,
   ]);
 };

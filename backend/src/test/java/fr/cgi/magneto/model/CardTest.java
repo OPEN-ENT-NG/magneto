@@ -1,11 +1,15 @@
 package fr.cgi.magneto.model;
 
-import fr.cgi.magneto.model.cards.*;
-import io.vertx.core.json.*;
-import io.vertx.ext.unit.*;
-import io.vertx.ext.unit.junit.*;
-import org.junit.*;
-import org.junit.runner.*;
+import fr.cgi.magneto.model.cards.Card;
+import fr.cgi.magneto.model.comments.Comment;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
 
 @RunWith(VertxUnitRunner.class)
 public class CardTest {
@@ -33,7 +37,8 @@ public class CardTest {
             .put("caption", "caption")
             .put("nbOfFavorites",0)
             .put("isLiked",false)
-            .put("favoriteList", new JsonArray().getList());
+            .put("favoriteList", new JsonArray().getList())
+            .put("comments", new ArrayList<Comment>());
 
     @Test
     public void testCardHasBeenInstantiated(TestContext ctx) {

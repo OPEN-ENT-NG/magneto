@@ -63,8 +63,9 @@ export const rightWrapperStyle = {
   justifyContent: "center",
   alignItems: "center",
   boxSizing: "border-box",
-  gap: "3rem",
+  gap: "1rem",
   flexShrink: 0,
+  minWidth: "auto",
 };
 
 export const breadcrumbTitle = {

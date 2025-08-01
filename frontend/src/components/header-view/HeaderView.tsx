@@ -28,8 +28,10 @@ import {
   wrapperBoxStyle,
 } from "./style";
 import { BoardDescription } from "../board-description/BoardDescription";
+import { ConnectedUsersChip } from "../connected-users-chip/ConnectedUsersChip";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 
 export const HeaderView: FC = () => {
   const { board, isExternalView } = useBoard();
@@ -47,6 +49,7 @@ export const HeaderView: FC = () => {
   };
 
   const edificeClient = useEdificeClient();
+  const { readyState } = useWebSocketMagneto();
   const { currentApp } = isExternalView
     ? { currentApp: magnetoWebApp }
     : edificeClient;
@@ -93,15 +96,19 @@ export const HeaderView: FC = () => {
                 </span>
               </Box>
             )}
-            <Box sx={toastStyle}>
-              <Icon path={mdiCheckCircle} size={1} />
-              <span>
-                {t("magneto.board.saved.at", {
-                  0: modificationDate,
-                  1: modificationHour,
-                })}
-              </span>
-            </Box>
+            {readyState === WebSocket.OPEN ? (
+              <ConnectedUsersChip />
+            ) : (
+              <Box sx={toastStyle}>
+                <Icon path={mdiCheckCircle} size={1} />
+                <span>
+                  {t("magneto.board.saved.at", {
+                    0: modificationDate,
+                    1: modificationHour,
+                  })}
+                </span>
+              </Box>
+            )}
             {boardHasCards() && (
               <Button
                 color="primary"

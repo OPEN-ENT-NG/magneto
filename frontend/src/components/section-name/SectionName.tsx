@@ -20,15 +20,18 @@ import { useCreateSectionDropDownItems } from "./useCreateSectionDropDownItems";
 import { DeleteSectionModal } from "../delete-section-modal/DeleteSectionModal";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
 import { useBoard } from "~/providers/BoardProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useCreateSectionMutation,
   useUpdateSectionMutation,
 } from "~/services/api/sections.service";
 
 export const SectionName: FC<SectionNameProps> = ({ section }) => {
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const toast = useToast();
@@ -57,6 +60,10 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     setInputValue(event.target.value);
   };
 
+  useEffect(() => {
+    setInputValue(section?.title);
+  }, [section?.title]);
+
   const updateSectionAndToast = usePredefinedToasts({
     func: updateSection,
     successMessage: t("magneto.update.section.confirm"),
@@ -76,18 +83,45 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     }
     if (section?._id !== "new-section") {
       if (section.title === inputValue) return;
-      return updateSectionAndToast({
-        boardId,
-        id: section?._id,
-        title: inputValue,
-        cardIds: section.cardIds,
-      });
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+            section: {
+              boardId,
+              id: section?._id,
+              title: inputValue,
+              cardIds: section.cardIds,
+            },
+          }),
+        );
+        return;
+      } else {
+        return updateSectionAndToast({
+          boardId,
+          id: section?._id,
+          title: inputValue,
+          cardIds: section.cardIds,
+        });
+      }
     }
     try {
-      await createSectionAndToast({
-        boardId,
-        title: inputValue,
-      });
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED,
+            section: {
+              boardId,
+              title: inputValue,
+            },
+          }),
+        );
+      } else {
+        await createSectionAndToast({
+          boardId,
+          title: inputValue,
+        });
+      }
       setInputValue("");
     } catch (error) {
       console.error(error);

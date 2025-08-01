@@ -4,12 +4,15 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.Metadata;
 import fr.cgi.magneto.model.Model;
+import fr.cgi.magneto.model.comments.Comment;
 import fr.cgi.magneto.model.user.User;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Card implements Model<Card> {
 
@@ -32,9 +35,22 @@ public class Card implements Model<Card> {
     private JsonObject lastComment;
     private Integer nbOfComments;
     private Integer nbOfFavorites;
-    private boolean isLiked;
+    private Boolean isLiked;
+    private List<Comment> comments;
 
     private List<String> favoriteList;
+
+    public Card() {
+        this._id = null;
+        this.nbOfComments = 0;
+        this.nbOfFavorites = 0;
+        this.isLiked = false;
+        this.isLocked = false;
+        this.lastComment = new JsonObject();
+        this.favoriteList = new ArrayList<>();
+        this.owner = new User(new JsonObject());
+        this.editor = new User(new JsonObject());
+    }
 
     public Card(JsonObject card) {
         this._id = card.getString(Field._ID, null);
@@ -59,6 +75,9 @@ public class Card implements Model<Card> {
         this.favoriteList = (favoriteListOrNull != null) ? favoriteListOrNull.getList() : new JsonArray().getList();
         this.nbOfFavorites = card.getInteger(Field.NBOFFAVORITES, 0);
         this.isLiked = card.getBoolean(Field.ISLIKED, false);
+        this.comments = card.getJsonArray(Field.COMMENTS, new JsonArray()).stream()
+                .map(obj -> new Comment((JsonObject) obj))
+                .collect(Collectors.toList());
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -251,15 +270,16 @@ public class Card implements Model<Card> {
         this.nbOfFavorites = nbOfFavorites;
     }
 
-    public void setIsLiked(boolean isLiked) {
+    public Card setIsLiked(Boolean  isLiked) {
         this.isLiked = isLiked;
+        return this;
     }
 
     public Integer getNbOfFavorites() {
         return nbOfFavorites;
     }
 
-    public boolean isLiked() {
+    public Boolean  isLiked() {
         return isLiked;
     }
 
@@ -270,11 +290,17 @@ public class Card implements Model<Card> {
     	return this;
     }
 
+    public List<Comment> getComments() { return comments; }
+
+    public Card setComments(List<Comment> comments) {
+        this.comments = comments;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
-
-        return new JsonObject()
-                .put(Field._ID, this.getId())
+        JsonObject json = new JsonObject()
+                .put(Field.ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.RESOURCETYPE, this.getResourceType())
                 .put(Field.RESOURCEID, this.getResourceId())
@@ -282,20 +308,37 @@ public class Card implements Model<Card> {
                 .put(Field.DESCRIPTION, this.getDescription())
                 .put(Field.CAPTION, this.getCaption())
                 .put(Field.ISLOCKED, this.isLocked())
+                .put(Field.LOCKED, this.isLocked())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
-                .put(Field.LASTMODIFIERID, this.getLastModifierId())
-                .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
+                .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.LASTCOMMENT, this.getLastComment())
                 .put(Field.NBOFCOMMENTS, this.getNbOfComments())
-                .put(Field.CREATIONDATE, this.getCreationDate())
-                .put(Field.OWNERID, this.getOwnerId())
                 .put(Field.METADATA, this.getMetadata() != null ? this.getMetadata().toJson() : null)
-                .put(Field.OWNERNAME, this.getOwnerName())
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
+                .put(Field.LIKED, this.isLiked())
                 .put(Field.FAVORITE_LIST, this.getFavoriteList());
+
+        if (this.comments != null){
+            json.put(Field.COMMENTS, this.getComments().stream()
+                    .map(Comment::toJson)
+                    .collect(Collectors.toList()));
+        }
+
+        // Gestion des propriétés owner et editor qui peuvent être nulles
+        if (this.owner != null) {
+            json.put(Field.OWNERID, this.getOwnerId())
+                    .put(Field.OWNERNAME, this.getOwnerName());
+        }
+
+        if (this.editor != null) {
+            json.put(Field.LASTMODIFIERID, this.getLastModifierId())
+                    .put(Field.LASTMODIFIERNAME, this.getLastModifierName());
+        }
+
+        return json;
     }
 
     @Override

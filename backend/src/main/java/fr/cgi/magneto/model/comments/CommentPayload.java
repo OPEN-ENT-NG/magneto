@@ -1,12 +1,12 @@
 package fr.cgi.magneto.model.comments;
 
-import fr.cgi.magneto.core.constants.*;
-import fr.cgi.magneto.helper.*;
-import fr.cgi.magneto.model.*;
-import io.vertx.core.json.*;
-import org.entcore.common.user.*;
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.model.Model;
+import io.vertx.core.json.JsonObject;
+import org.entcore.common.user.UserInfos;
 
-import java.util.*;
+import java.util.Date;
 
 public class CommentPayload implements Model<CommentPayload> {
 
@@ -20,6 +20,24 @@ public class CommentPayload implements Model<CommentPayload> {
     private String creationDate;
 
     private String content;
+
+    public CommentPayload() {
+        this.id = null;
+        this.ownerId = null;
+        this.ownerName = "";
+        this.modificationDate = DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT);
+        this.creationDate = DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT);
+        this.content = "";
+    }
+
+    public CommentPayload(String id, String ownerId, String ownerName, String modificationDate, String creationDate, String content) {
+        this.id = id;
+        this.ownerId = ownerId;
+        this.ownerName = ownerName;
+        this.modificationDate = modificationDate;
+        this.creationDate = creationDate;
+        this.content = content;
+    }
 
     public CommentPayload(JsonObject comment) {
         this.id = comment.getString(Field.ID, null);

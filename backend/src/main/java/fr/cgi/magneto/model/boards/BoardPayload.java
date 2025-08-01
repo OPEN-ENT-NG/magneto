@@ -299,12 +299,21 @@ public class BoardPayload implements Model<BoardPayload> {
         return this;
     }
 
+    public Boolean getIsLocked() {
+        return isLocked;
+    }
+
+    public void setIsLocked(Boolean isLocked) {
+        this.isLocked = isLocked;
+    }
+
     public JsonArray getShared() {
         return shared;
     }
 
-    public void setShared(JsonArray shared) {
+    public BoardPayload setShared(JsonArray shared) {
         this.shared = shared;
+        return this;
     }
 
     @Override

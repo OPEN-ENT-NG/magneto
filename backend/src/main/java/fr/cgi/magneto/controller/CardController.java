@@ -7,7 +7,6 @@ import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.HttpRequestHelper;
 import fr.cgi.magneto.helper.I18nHelper;
-import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.CardPayload;
@@ -36,7 +35,6 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.Trace;
 import org.entcore.common.user.UserUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -243,7 +241,7 @@ public class CardController extends ControllerHelper {
                     log.error(message);
                     HttpRequestHelper.sendError(request, new BadRequestException("User not found"));
                 }
-                cardService.updateFavorite(cardId, favorite, user)
+                cardService.updateFavorite(cardId, favorite, user, false)
                         .onSuccess(res -> renderJson(request, res))
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
@@ -294,43 +292,7 @@ public class CardController extends ControllerHelper {
                         .setLastModifierName(user.getUsername())
                         .setBoardId(moveCard.getString(Field.BOARDID));
 
-                Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(moveCard.getString(Field.BOARDID)));
-                Future<List<Board>> getOldBoardFuture = boardService.getBoards(Collections.singletonList(oldBoardId));
-                Future<List<Section>> getSectionFuture = sectionService.getSectionsByBoardId(moveCard.getString(Field.BOARDID));
-                Future<List<Section>> getOldSectionFuture = sectionService.getSectionsByBoardId(oldBoardId);
-                CompositeFuture.all(getBoardFuture, getOldBoardFuture, getSectionFuture, getOldSectionFuture)
-                        .compose(result -> {
-                            if (!getOldBoardFuture.result().isEmpty() && !getBoardFuture.result().isEmpty()) {
-                                List<Future> updateBoardsFutures = new ArrayList<>();
-                                Board currentBoard = getBoardFuture.result().get(0);
-                                Board oldBoard = getOldBoardFuture.result().get(0);
-
-                                // Add cards in current board
-                                if (currentBoard.isLayoutFree()) {
-                                    // Add cards ids to new board if free
-                                    cardService.addCardWithLocked(updateCard, updateBoardsFutures, currentBoard, user);
-                                } else {
-                                    // Add cards ids to new board for section
-                                    String defaultTitle = i18nHelper.translate("magneto.section.default.title");
-                                    cardService.addCardSectionWithLocked(updateCard, getSectionFuture, updateBoardsFutures, currentBoard, defaultTitle, user);
-                                }
-
-                                // Remove cards in old board
-                                if (oldBoard.isLayoutFree()) {
-                                    // Remove cards ids from old board
-                                    cardService.removeCardWithLocked(moveCard, getOldBoardFuture, updateBoardsFutures, user);
-                                } else {
-                                    // Remove cards ids from old board for section
-                                    cardService.removeCardSectionWithLocked(updateCard, oldBoardId, getOldSectionFuture, updateBoardsFutures, currentBoard, user);
-                                }
-
-                                updateBoardsFutures.add(cardService.update(updateCard));
-                                return CompositeFuture.all(updateBoardsFutures);
-                            } else {
-                                return Future.failedFuture(String.format("[Magneto%s::moveCard] " +
-                                        "No board found with id %s", this.getClass().getSimpleName(), oldBoardId));
-                            }
-                        })
+                cardService.processMoveCard(updateCard, oldBoardId, moveCard.getString(Field.BOARDID), user, i18nHelper)
                         .onFailure(err -> renderError(request))
                         .onSuccess(res -> renderJson(request, new JsonObject()));
             });
@@ -348,22 +310,7 @@ public class CardController extends ControllerHelper {
                 UserUtils.getUserInfos(eb, request, user -> {
                             List<String> cardIds = cards.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
                             String boardId = request.getParam(Field.BOARDID);
-                            Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(boardId));
-                            Future<List<Section>> getSectionFuture = sectionService.getSectionsByBoardId(boardId);
-                    CompositeFuture.all(getBoardFuture, getSectionFuture)
-                                    .compose(result -> {
-                                        if (!getBoardFuture.result().isEmpty()) {
-                                            Board currentBoard = getBoardFuture.result().get(0);
-                                            List<Future> removeCardsFutures = new ArrayList<>();
-
-                                            cardService.deleteCardsWithLocked(cardIds, getSectionFuture, currentBoard, removeCardsFutures, user);
-                                            removeCardsFutures.add(cardService.deleteCards(cardIds));
-                                            return CompositeFuture.all(removeCardsFutures);
-                                        } else {
-                                            return Future.failedFuture(String.format("[Magneto%s::deleteCards] " +
-                                                    "No board found with id %s", this.getClass().getSimpleName(), boardId));
-                                        }
-                                    })
+                            this.cardService.deleteCardsWithBoardValidation(cardIds, boardId, user)
                                     .onFailure(err -> renderError(request))
                                     .onSuccess(res -> renderJson(request, new JsonObject()));
                         }

@@ -94,6 +94,11 @@ public class SectionPayload implements Model {
         return displayed;
     }
 
+    public SectionPayload setDisplayed(Boolean displayed) {
+        this.displayed = displayed;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();

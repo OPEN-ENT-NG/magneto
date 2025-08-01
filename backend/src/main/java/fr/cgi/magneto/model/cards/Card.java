@@ -308,6 +308,7 @@ public class Card implements Model<Card> {
                 .put(Field.DESCRIPTION, this.getDescription())
                 .put(Field.CAPTION, this.getCaption())
                 .put(Field.ISLOCKED, this.isLocked())
+                .put(Field.LOCKED, this.isLocked())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.LASTCOMMENT, this.getLastComment())
@@ -317,6 +318,7 @@ public class Card implements Model<Card> {
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
+                .put(Field.LIKED, this.isLiked())
                 .put(Field.FAVORITE_LIST, this.getFavoriteList());
 
         if (this.comments != null){

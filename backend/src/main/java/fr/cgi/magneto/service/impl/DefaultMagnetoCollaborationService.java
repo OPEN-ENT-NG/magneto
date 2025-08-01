@@ -389,11 +389,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
                 return this.serviceFactory.cardService().getCards(cardIds, user)
                         .compose(cardsToDuplicate -> this.serviceFactory.cardService().duplicateCards(destinationBoardId, cardsToDuplicate, null, user))
-                        .compose(res -> this.serviceFactory.boardService().getBoards(Collections.singletonList(destinationBoardId)))
-                        .compose(boards -> this.serviceFactory.cardService().getCardsOrFirstSection(boards.get(0), user))
-                        .map(cards -> destinationBoardId.equals(boardId) ?
-                                newArrayList(this.messageFactory.cardDuplicated(boardId, wsId, user.getUserId(), cards, action.getActionType(), action.getActionId())) :
-                                new ArrayList<>());
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case sectionDuplicated: {
                 List<String> sectionIds = action.getSectionIds();

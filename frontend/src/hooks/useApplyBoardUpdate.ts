@@ -49,7 +49,15 @@ const handleCardFavoriteOrComment = (draft: any, update: WebSocketUpdate) => {
       const filteredUpdate = Object.fromEntries(
         Object.entries(cardToUpdate).filter(([, value]) => value !== null),
       );
-      Object.assign(draft.cards[cardIndex], filteredUpdate);
+      Object.assign(draft.cards[cardIndex], {
+        ...filteredUpdate,
+        ...(filteredUpdate.isLocked !== undefined && {
+          locked: filteredUpdate.isLocked,
+        }),
+        ...(filteredUpdate.isLiked !== undefined && {
+          liked: filteredUpdate.isLiked,
+        }),
+      });
     }
   }
   if (cardToUpdate && draft.layoutType !== LAYOUT_TYPE.FREE && draft.sections) {
@@ -114,11 +122,11 @@ const handleSectionAdded = (draft: any, update: WebSocketUpdate) => {
 
 const handleCardDuplicated = (draft: any, update: WebSocketUpdate) => {
   if (update.cards) {
-    if (draft.sections) {
+    if (draft.sections && draft.layoutType !== LAYOUT_TYPE.FREE) {
       if (draft.sections[0] && draft.sections[0].cards) {
         draft.sections[0].cards = update.cards;
       }
-    } else if (draft.cards) {
+    } else if (draft.cards && draft.layoutType === LAYOUT_TYPE.FREE) {
       draft.cards = update.cards;
       if (draft.cardIds) {
         draft.cardIds = update.cards.map((card: any) => card.id);

@@ -13,7 +13,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +31,7 @@ public class MagnetoMessage {
     private final List<Card> cards;
     private final Section section;
     private final List<Section> sections;
-    private final Set<User> connectedUsers;
+    private final LinkedHashSet<User> connectedUsers;
     private final List<CardEditingInformation> cardEditingInformations;
     private final MagnetoUserAction.ActionType actionType;
     private final String actionId;
@@ -40,7 +40,7 @@ public class MagnetoMessage {
     @JsonIgnore
     private Set<String> targetUserIds;
 
-    public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, Set<User> connectedUsers, List<CardEditingInformation> cardEditingInformations, MagnetoUserAction.ActionType actionType, String actionId, Long maxConnectedUsers) {
+    public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, LinkedHashSet<User> connectedUsers, List<CardEditingInformation> cardEditingInformations, MagnetoUserAction.ActionType actionType, String actionId, Long maxConnectedUsers) {
         this.boardId = boardId;
         this.emittedAt = emittedAt;
         this.emittedBy = emittedBy;
@@ -119,7 +119,7 @@ public class MagnetoMessage {
             }
         }
 
-        this.connectedUsers = new HashSet<>();
+        this.connectedUsers = new LinkedHashSet<>();
         if (jsonObject.containsKey(Field.CONNECTEDUSERS) && jsonObject.getValue(Field.CONNECTEDUSERS) instanceof JsonArray) {
             JsonArray usersArray = jsonObject.getJsonArray(Field.CONNECTEDUSERS);
             for (int i = 0; i < usersArray.size(); i++) {

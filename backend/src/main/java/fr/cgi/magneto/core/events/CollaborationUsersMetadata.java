@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr.cgi.magneto.model.user.User;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Metadata of a wall concerning the actions of the users connected to it.
@@ -16,15 +15,15 @@ import java.util.Set;
 public class CollaborationUsersMetadata {
 
     private final List<CardEditingInformation> editing;
-    private final Set<User> connectedUsers;
+    private LinkedHashSet<User> connectedUsers;
 
     public CollaborationUsersMetadata() {
         this.editing = new ArrayList<>();
-        this.connectedUsers = new HashSet<>();
+        this.connectedUsers = new LinkedHashSet<>();
     }
 
     @JsonCreator
-    public CollaborationUsersMetadata(List<CardEditingInformation> editing, Set<User> connectedUsers) {
+    public CollaborationUsersMetadata(List<CardEditingInformation> editing, LinkedHashSet<User> connectedUsers) {
         this.editing = editing;
         this.connectedUsers = connectedUsers;
     }
@@ -33,12 +32,17 @@ public class CollaborationUsersMetadata {
         return editing;
     }
 
-    public Set<User> getConnectedUsers() {
+    public LinkedHashSet<User> getConnectedUsers() {
         return connectedUsers;
     }
 
     public void addConnectedUser(final User user){
-        this.connectedUsers.add(user);
+        if (!this.connectedUsers.contains(user)) {
+            LinkedHashSet<User> newSet = new LinkedHashSet<>();
+            newSet.add(user);
+            newSet.addAll(this.connectedUsers);
+            this.connectedUsers = newSet;
+        }
     }
 
     public void removeConnectedUser(final String userId){

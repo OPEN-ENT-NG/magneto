@@ -9,8 +9,8 @@ import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.user.User;
 
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class MagnetoMessageFactory {
     private final String serverId;
@@ -37,7 +37,7 @@ public class MagnetoMessageFactory {
     }
 
     public MagnetoMessage connectedUsers(final String boardId, final String wsId, final String userId,
-                                         final Set<User> connectedUsers, final Long maxUser) {
+                                         final LinkedHashSet<User> connectedUsers, final Long maxUser) {
         return new MagnetoMessage(boardId, System.currentTimeMillis(), serverId, wsId,
                 MagnetoMessageType.connectedUsers,
                 userId, null, null, null, null, null, null,null, connectedUsers,

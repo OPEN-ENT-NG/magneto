@@ -68,10 +68,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     }
   }, [lastMessage, onMessage]);
 
-  useEffect(() => {
-    console.log(cardEditing);
-  }, [cardEditing]);
-
   const contextValue: WebSocketContextValue = {
     sendMessage,
     lastMessage,

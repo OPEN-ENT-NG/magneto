@@ -268,7 +268,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardUpdated: {
-                CardPayload updateCard = action.getCard()
+                CardPayload updateCard = new CardPayload(action.getCard().toJson())
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());

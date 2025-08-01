@@ -50,8 +50,6 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = "";
         this.boardId = "";
         this.sectionId = "";
-        this.isFavorite = false;
-        this.favoriteList = new ArrayList<>();
     }
 
     public CardPayload(JsonObject card) {

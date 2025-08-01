@@ -70,12 +70,28 @@ export const StyledCard = styled(Card, {
     boxShadow: "0 1px 3px rgba(0,0,0,.1)",
     width: handleCardSize(zoomLevel).width,
     height: handleCardSize(zoomLevel).height,
-    opacity: isDragging ? "0.5" : isBeingEdited ? "0.6" : "1",
+    opacity: isDragging ? "0.5" : "1",
     border:
       isBeingEdited && editingUserColor
         ? `3px solid ${editingUserColor}`
         : "none",
     cursor,
+    // Ajout du pseudo-élément pour l'overlay d'opacité
+    "&::before":
+      isBeingEdited && !isDragging
+        ? {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.4)",
+            borderRadius: "10px",
+            zIndex: 1,
+            pointerEvents: "none",
+          }
+        : {},
   };
 });
 
@@ -105,7 +121,7 @@ export const EditingChip = styled(Chip, {
   borderRadius: "8px 0 8px 0",
   fontSize: "12px",
   fontWeight: "500",
-  zIndex: 10,
+  zIndex: 11,
   opacity: "1 !important",
   border: "none",
   boxShadow: "none",

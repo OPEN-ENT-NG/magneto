@@ -20,7 +20,6 @@ import { useTranslation } from "react-i18next";
 import {
   connectedUsersContainerStyle,
   listItemAvatarStyle,
-  roleTypographyStyle,
   userTooltipStyle,
   expandMoreIconStyle,
   popoverStyle,
@@ -35,7 +34,6 @@ import {
   BorderedAvatar,
   currentUserBoxStyle,
   userInfoBoxStyle,
-  otherUserRoleStyle,
 } from "./style";
 import useDirectory from "~/hooks/useDirectory";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -92,7 +90,28 @@ export const ConnectedUsersChip: FC = () => {
         label={
           <>
             {!!otherConnectedUsers.length && (
-              <AvatarGroup max={4}>
+              <AvatarGroup
+                max={4}
+                componentsProps={{
+                  additionalAvatar: {
+                    sx: {
+                      width: "4rem !important",
+                      height: "4rem !important",
+                      fontSize: "1.7rem !important",
+                      border: "none !important",
+                      boxShadow: "0 0 0 2px white !important",
+                    },
+                  },
+                }}
+                renderSurplus={(surplus) => (
+                  <BorderedAvatar
+                    borderColor="var(--theme-palette-grey-dark)"
+                    size="medium"
+                  >
+                    +{surplus}
+                  </BorderedAvatar>
+                )}
+              >
                 {otherConnectedUsers.map((user) => (
                   <Tooltip
                     key={user.id}
@@ -124,7 +143,9 @@ export const ConnectedUsersChip: FC = () => {
             )}
             <Box sx={currentUserBoxStyle}>
               <Tooltip
-                title={currentUser?.username || t("magneto.you")}
+                title={
+                  currentUser?.username + t("magneto.(you)") || t("magneto.you")
+                }
                 placement="bottom"
                 arrow
                 componentsProps={{
@@ -187,21 +208,12 @@ export const ConnectedUsersChip: FC = () => {
                   {currentUser?.username + " (vous)" || t("magneto.you")}
                 </Typography>
               }
-              secondary={
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={roleTypographyStyle}
-                >
-                  Éditeur
-                </Typography>
-              }
             />
           </ListItem>
           <Divider sx={dividerStyle} />
 
           <Typography variant="h6" sx={onlineUsersTypographyStyle}>
-            Utilisateurs en ligne ({otherConnectedUsers.length})
+            {t("magneto.users.online")} ({otherConnectedUsers.length})
           </Typography>
           <List sx={userListStyle}>
             {/* Autres utilisateurs connectés */}
@@ -222,13 +234,6 @@ export const ConnectedUsersChip: FC = () => {
                     <Box sx={userInfoBoxStyle}>
                       <Typography variant="body1" sx={usernameTypographyStyle}>
                         {user.username || t("magneto.user")}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={otherUserRoleStyle}
-                      >
-                        Éditeur
                       </Typography>
                     </Box>
                   }

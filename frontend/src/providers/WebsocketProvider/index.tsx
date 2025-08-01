@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 
 import {
+  CardEditing,
   UserCollaboration,
   WebSocketContextValue,
   WebSocketProviderProps,
@@ -27,6 +28,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   shouldConnect = true,
 }) => {
   const [connectedUsers, setConnectedUsers] = useState<UserCollaboration[]>([]);
+  const [cardEditing, setCardEditing] = useState<CardEditing[]>([]);
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     shouldConnect ? socketUrl : null,
@@ -45,8 +47,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       try {
         const update: WebSocketUpdate = JSON.parse(lastMessage.data);
 
-        if (update.type === "metadata" && update.connectedUsers) {
+        if (update.type === "connectedUsers" && update.connectedUsers) {
           setConnectedUsers(update.connectedUsers);
+        }
+
+        if (update.type === "cardEditing" && update.cardEditingInformations) {
+          setCardEditing(update.cardEditingInformations);
         }
 
         // Appeler le callback personnalisé si fourni
@@ -67,6 +73,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     lastMessage,
     readyState,
     connectedUsers,
+    cardEditing,
   };
 
   return (

@@ -88,6 +88,15 @@ export const useSectionsDnD = (board: Board) => {
       if (activeType === DND_ITEM_TYPE.CARD) {
         const cardInfo = cardMap[active.id.toString()];
         setActiveItem(cardInfo?.card ?? null);
+        if (cardInfo?.card && readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_STARTED,
+              cardId: cardInfo.card.id,
+              isMoving: true,
+            }),
+          );
+        }
       } else if (activeType === DND_ITEM_TYPE.SECTION) {
         setActiveItem(sectionMap[active.id.toString()] || null);
       } else {
@@ -260,7 +269,7 @@ export const useSectionsDnD = (board: Board) => {
       if (readyState === WebSocket.OPEN) {
         sendMessage(
           JSON.stringify({
-            type: WEBSOCKET_MESSAGE_TYPE.CARD_MOVED,
+            type: WEBSOCKET_MESSAGE_TYPE.CARDS_BOARD_UPDATED,
             boardId: board._id,
             sectionIds: newOrder,
           }),
@@ -708,6 +717,13 @@ export const useSectionsDnD = (board: Board) => {
       setNewMagnetOver([]);
       setActiveItem(null);
       setOriginalSections(updatedSections);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_ENDED,
+          }),
+        );
+      }
     },
     [handleSectionDragEnd, handleCardDragEnd, updatedSections],
   );

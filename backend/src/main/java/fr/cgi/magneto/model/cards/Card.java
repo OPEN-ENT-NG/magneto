@@ -300,7 +300,7 @@ public class Card implements Model<Card> {
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject()
-                .put(Field._ID, this.getId())
+                .put(Field.ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.RESOURCETYPE, this.getResourceType())
                 .put(Field.RESOURCEID, this.getResourceId())
@@ -308,6 +308,7 @@ public class Card implements Model<Card> {
                 .put(Field.DESCRIPTION, this.getDescription())
                 .put(Field.CAPTION, this.getCaption())
                 .put(Field.ISLOCKED, this.isLocked())
+                .put(Field.LOCKED, this.isLocked())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.CREATIONDATE, this.getCreationDate())
                 .put(Field.LASTCOMMENT, this.getLastComment())
@@ -317,10 +318,14 @@ public class Card implements Model<Card> {
                 .put(Field.PARENTID, this.getParentId())
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
-                .put(Field.FAVORITE_LIST, this.getFavoriteList())
-                .put(Field.COMMENTS, this.getComments().stream()
-                        .map(Comment::toJson)
-                        .collect(Collectors.toList()));
+                .put(Field.LIKED, this.isLiked())
+                .put(Field.FAVORITE_LIST, this.getFavoriteList());
+
+        if (this.comments != null){
+            json.put(Field.COMMENTS, this.getComments().stream()
+                    .map(Comment::toJson)
+                    .collect(Collectors.toList()));
+        }
 
         // Gestion des propriétés owner et editor qui peuvent être nulles
         if (this.owner != null) {

@@ -50,8 +50,6 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = "";
         this.boardId = "";
         this.sectionId = "";
-        this.isFavorite = false;
-        this.favoriteList = new ArrayList<>();
     }
 
     public CardPayload(JsonObject card) {
@@ -70,8 +68,10 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = card.getString(Field.PARENTID);
         this.boardId = card.getString(Field.BOARDID);
         this.sectionId = card.getString(Field.SECTIONID);
-        this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
-        this.isFavorite = card.getBoolean(Field.ISFAVORITE);
+        if (card.getJsonArray(Field.FAVORITE_LIST) != null)
+            this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
+        if (card.getBoolean(Field.ISFAVORITE) != null)
+            this.isFavorite = card.getBoolean(Field.ISFAVORITE);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -257,7 +257,7 @@ public class CardPayload implements Model<CardPayload> {
     }
 
     public Boolean isFavorite() {
-        return isLocked;
+        return isFavorite;
     }
 
     public CardPayload setIsFavorite(Boolean locked) {
@@ -289,8 +289,10 @@ public class CardPayload implements Model<CardPayload> {
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.LASTMODIFIERID, this.getLastModifierId())
-                .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
-                .put(Field.FAVORITE_LIST, this.getFavoriteList());
+                .put(Field.LASTMODIFIERNAME, this.getLastModifierName());
+
+        if (this.getFavoriteList() != null)
+            json.put(Field.FAVORITE_LIST, this.getFavoriteList());
 
         // If create
         if (this.getId() == null) {

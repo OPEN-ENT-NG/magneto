@@ -1,9 +1,10 @@
 import { FC, useMemo, useEffect, memo } from "react";
 
 import { useSortable } from "@dnd-kit/sortable";
+import { Edit, OpenWith } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
-import { getTransformStyle, StyledCard } from "./style";
+import { EditingChip, getTransformStyle, iconStyle, StyledCard } from "./style";
 import { BoardCardProps } from "./types";
 import { useCardDropDownItems } from "./useCardDropDownItems";
 import { CardActions } from "../card-actions/CardActions";
@@ -15,6 +16,7 @@ import { DropDownList } from "../drop-down-list/DropDownList";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { useBoardCard } from "~/hooks/useBoardCard";
 import { useBoard } from "~/providers/BoardProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 
 const BoardCard: FC<BoardCardProps> = ({
   card,
@@ -43,11 +45,22 @@ const BoardCard: FC<BoardCardProps> = ({
     hasContribRights,
     hasEditRights,
     isLockedBoard,
+    isBeingEdited,
   } = useBoardCard(card);
 
   const { t } = useTranslation("magneto");
   const { board, displayModals, closeActiveCardAction, isExternalView } =
     useBoard();
+
+  const { connectedUsers, cardEditing } = useWebSocketMagneto();
+
+  // Vérifier si la carte est en cours d'édition
+  const cardEditingInfo = cardEditing?.find(
+    (editing) => editing.cardId === card.id,
+  );
+  const editingUser = cardEditingInfo
+    ? connectedUsers?.find((user) => user.id === cardEditingInfo.userId)
+    : null;
 
   const dropDownItemList = useCardDropDownItems(
     readOnly,
@@ -59,6 +72,7 @@ const BoardCard: FC<BoardCardProps> = ({
     hasContribRights,
     hasEditRights,
     board,
+    isBeingEdited,
   );
 
   const sortableProps = useSortable({
@@ -106,6 +120,7 @@ const BoardCard: FC<BoardCardProps> = ({
     displayNbFavorites,
     handleFavoriteClick,
     isExternalView,
+    isBeingEdited: !!cardEditingInfo,
   };
 
   const modalProps = {
@@ -134,12 +149,14 @@ const BoardCard: FC<BoardCardProps> = ({
     <StyledCard
       data-dropdown-open={isOpen ? "true" : "false"}
       data-type={
-        isLockedBoard || card.locked
+        isLockedBoard || card.locked || cardEditingInfo?.isMoving
           ? DND_ITEM_TYPE.NON_DRAGGABLE
           : DND_ITEM_TYPE.CARD
       }
       zoomLevel={zoomLevel}
       isDragging={isDragging}
+      isBeingEdited={!!cardEditingInfo}
+      editingUserColor={editingUser?.color}
       ref={setNodeRef}
       onClick={handleClick}
       style={style}
@@ -169,6 +186,21 @@ const BoardCard: FC<BoardCardProps> = ({
 
       {canComment && zoomLevel > 1 && !isExternalView && (
         <CardComment commentData={commentData} />
+      )}
+
+      {cardEditingInfo && editingUser && (
+        <EditingChip
+          label={editingUser.username}
+          icon={
+            cardEditingInfo.isMoving ? (
+              <OpenWith sx={iconStyle} />
+            ) : (
+              <Edit sx={iconStyle} />
+            )
+          }
+          size="small"
+          userColor={editingUser.color}
+        />
       )}
     </StyledCard>
   );

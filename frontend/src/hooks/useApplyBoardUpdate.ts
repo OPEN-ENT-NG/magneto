@@ -41,22 +41,30 @@ const handleSectionsDeletedOrDuplicated = (
 
 const handleCardFavoriteOrComment = (draft: any, update: WebSocketUpdate) => {
   const cardToUpdate = update.card;
-  if (cardToUpdate && draft.cards) {
+  if (cardToUpdate && draft.layoutType === LAYOUT_TYPE.FREE && draft.cards) {
     const cardIndex = draft.cards.findIndex(
-      (c: any) => c.id === cardToUpdate._id,
+      (c: any) => c.id === cardToUpdate.id,
     );
     if (cardIndex !== -1) {
       const filteredUpdate = Object.fromEntries(
         Object.entries(cardToUpdate).filter(([, value]) => value !== null),
       );
-      Object.assign(draft.cards[cardIndex], filteredUpdate);
+      Object.assign(draft.cards[cardIndex], {
+        ...filteredUpdate,
+        ...(filteredUpdate.isLocked !== undefined && {
+          locked: filteredUpdate.isLocked,
+        }),
+        ...(filteredUpdate.isLiked !== undefined && {
+          liked: filteredUpdate.isLiked,
+        }),
+      });
     }
   }
-  if (cardToUpdate && draft.sections) {
+  if (cardToUpdate && draft.layoutType !== LAYOUT_TYPE.FREE && draft.sections) {
     draft.sections.forEach((section: any) => {
       if (section.cards) {
         const cardIndex = section.cards.findIndex(
-          (c: any) => c.id === cardToUpdate._id,
+          (c: any) => c.id === cardToUpdate.id,
         );
         if (cardIndex !== -1) {
           const filteredUpdate = Object.fromEntries(
@@ -78,7 +86,7 @@ const handleCardFavoriteOrComment = (draft: any, update: WebSocketUpdate) => {
 };
 
 const handleCardsDeleted = (draft: any, update: WebSocketUpdate) => {
-  const cardIdsToDelete = update.cards?.map((card: any) => card._id) || [];
+  const cardIdsToDelete = update.cards?.map((card: any) => card.id) || [];
   if (draft.cards) {
     draft.cards = draft.cards.filter(
       (c: any) => !cardIdsToDelete.includes(c.id),
@@ -112,30 +120,13 @@ const handleSectionAdded = (draft: any, update: WebSocketUpdate) => {
   }
 };
 
-const handleSectionUpdated = (draft: any, update: WebSocketUpdate) => {
-  if (draft.sections) {
-    const sectionIndex = draft.sections.findIndex(
-      (s: any) => s._id === update.section._id,
-    );
-    if (sectionIndex !== -1) {
-      Object.entries(update.section).forEach(([key, value]) => {
-        if (value !== null) {
-          draft.sections[sectionIndex][key] = value;
-        }
-      });
-    }
-  }
-};
-
 const handleCardDuplicated = (draft: any, update: WebSocketUpdate) => {
   if (update.cards) {
-    if (draft.sections) {
-      draft.sections.forEach((section: any) => {
-        if (section.cards) {
-          section.cards = update.cards;
-        }
-      });
-    } else if (draft.cards) {
+    if (draft.sections && draft.layoutType !== LAYOUT_TYPE.FREE) {
+      if (draft.sections[0] && draft.sections[0].cards) {
+        draft.sections[0].cards = update.cards;
+      }
+    } else if (draft.cards && draft.layoutType === LAYOUT_TYPE.FREE) {
       draft.cards = update.cards;
       if (draft.cardIds) {
         draft.cardIds = update.cards.map((card: any) => card.id);
@@ -164,6 +155,7 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
     case WEBSOCKET_MESSAGE_TYPE.SECTIONS_DELETED:
     case WEBSOCKET_MESSAGE_TYPE.SECTION_DUPLICATED:
     case WEBSOCKET_MESSAGE_TYPE.CARD_MOVED:
+    case WEBSOCKET_MESSAGE_TYPE.CARDS_BOARD_UPDATED:
     case WEBSOCKET_MESSAGE_TYPE.CARD_ADDED:
       handleSectionsDeletedOrDuplicated(draft, update);
       break;
@@ -179,9 +171,6 @@ export const applyBoardUpdate = (draft: any, update: WebSocketUpdate) => {
       break;
     case WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED:
       handleSectionAdded(draft, update);
-      break;
-    case WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED:
-      handleSectionUpdated(draft, update);
       break;
     case WEBSOCKET_MESSAGE_TYPE.CARD_DUPLICATED:
       handleCardDuplicated(draft, update);

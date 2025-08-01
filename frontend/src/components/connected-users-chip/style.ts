@@ -7,8 +7,6 @@ export const connectedUsersContainerStyle = {
   marginRight: "2rem",
   backgroundColor: "#F5F7F9",
   height: "5rem",
-  minWidth: "200px",
-  maxWidth: "300px",
   borderRadius: "30px",
   cursor: "pointer",
   "&:hover": {
@@ -20,7 +18,7 @@ export const connectedUsersContainerStyle = {
   "& .MuiChip-label": {
     display: "flex",
     alignItems: "center",
-    gap: 1,
+    gap: 2,
     padding: "0.8rem 0rem 0.8rem 1.2rem",
     justifyContent: "flex-start",
     width: "100%",
@@ -29,6 +27,12 @@ export const connectedUsersContainerStyle = {
     fontSize: "1.8rem",
     marginLeft: "auto",
     marginRight: "0.8rem",
+  },
+  "& .MuiAvatarGroup-avatar": {
+    "&:nth-of-type(1)": { zIndex: 4 },
+    "&:nth-of-type(2)": { zIndex: 3 },
+    "&:nth-of-type(3)": { zIndex: 2 },
+    "&:nth-of-type(4)": { zIndex: 1 },
   },
 };
 
@@ -87,6 +91,7 @@ export const dividerStyle = {
 
 export const onlineUsersTypographyStyle = {
   mt: "1.5rem",
+  mb: "1rem",
   fontWeight: 600,
   fontSize: "1.3rem",
 };
@@ -116,8 +121,21 @@ export const BorderedAvatar = styled(Avatar)<{
   size?: "small" | "medium";
 }>`
   border: 2px solid ${({ borderColor }) => borderColor} !important;
+  box-shadow: 0 0 0 2px white;
+  background-color: ${({ borderColor }) => borderColor};
   width: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
   height: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
+  font-size: 1.7rem;
+`;
+
+export const BorderedAvatarPlus = styled(Avatar)<{
+  borderColor: string;
+  size?: "small" | "medium";
+}>`
+  background-color: ${({ borderColor }) => borderColor};
+  width: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")} !important;
+  height: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")} !important;
+  font-size: 1.7rem;
 `;
 
 export const currentUserBoxStyle = {

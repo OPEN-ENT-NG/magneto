@@ -19,6 +19,7 @@ export interface WebSocketUpdate {
   sectionId?: string;
   board?: IBoardItemResponse;
   connectedUsers?: UserCollaboration[];
+  cardEditingInformations?: CardEditing[];
   [key: string]: any;
 }
 
@@ -27,6 +28,7 @@ export interface WebSocketContextValue {
   lastMessage: MessageEvent | null;
   readyState: ReadyState;
   connectedUsers: UserCollaboration[];
+  cardEditing: CardEditing[];
 }
 
 export interface WebSocketProviderProps {
@@ -40,4 +42,11 @@ export interface UserCollaboration {
   id: string;
   username: string;
   color: string;
+}
+
+export interface CardEditing {
+  userId: string;
+  cardId: string;
+  since: number;
+  isMoving: boolean;
 }

@@ -28,7 +28,7 @@ export const useBoardCard = (card: Card) => {
   const [updateCard] = useUpdateCardMutation();
   const [favoriteCard] = useFavoriteCardMutation();
   const [deleteCards] = useDeleteCardsMutation();
-  const { sendMessage, readyState } = useWebSocketMagneto();
+  const { sendMessage, readyState, cardEditing } = useWebSocketMagneto();
 
   const {
     board,
@@ -47,6 +47,11 @@ export const useBoardCard = (card: Card) => {
   const { getAvatarURL } = useDirectory();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const cardEditingInfo = cardEditing?.find(
+    (editing) => editing.cardId === card.id,
+  );
+  const isBeingEdited = !!cardEditingInfo;
 
   const cardPayload = useMemo(
     () => ({
@@ -74,12 +79,14 @@ export const useBoardCard = (card: Card) => {
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      if (isBeingEdited) return;
+
       if (hasEditRights || hasManageRights) {
         setIsCreateMagnetOpen(true);
         openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
       } else openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW);
     },
-    [card, openActiveCardAction],
+    [card, openActiveCardAction, isBeingEdited],
   );
 
   const handleSimpleClick = useCallback(
@@ -202,6 +209,7 @@ export const useBoardCard = (card: Card) => {
       isActiveCardId,
       isMagnetOwner,
       isManager: hasManageRights,
+      isBeingEdited,
       dropdownRef,
       getAvatarURL,
       lockOrUnlockMagnet,
@@ -223,6 +231,7 @@ export const useBoardCard = (card: Card) => {
       isActiveCardId,
       isMagnetOwner,
       hasManageRights,
+      isBeingEdited,
       getAvatarURL,
       lockOrUnlockMagnet,
       deleteMagnet,

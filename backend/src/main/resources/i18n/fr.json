@@ -210,6 +210,7 @@
   "group.school.Guest": "Invités de l'{{0}}.",
   "magneto.return": "Retour",
   "magneto.card.saved.by": "Crée par {{0}}, modifié par {{1}}",
+  "magneto.card.editing.saved.by": "Crée par {{0}}, en cours de modification par",
   "magneto.boards.collection": "Collection de tableaux",
   "magneto.cards.collection": "Collection d'aimants",
   "magneto.cards.collection.mine": "Dans mes tableaux",
@@ -371,5 +372,8 @@
   "magnetoexplorer.shared.status.error": "Une erreur est survenue. Veuillez réessayer ultérieurement.",
 
   "magneto.user": "utilisateur",
-  "magneto.you": "Vous"
+  "magneto.you": "Vous",
+  "magneto.(you)": " (vous)",
+  "magneto.card.editing.tooltip": "Ces actions sont impossibles pendant l'édition.",
+  "magneto.users.online": "Utilisateurs en ligne"
 }

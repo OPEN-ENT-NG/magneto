@@ -1,4 +1,4 @@
-import { FC, useEffect, DragEvent, useState } from "react";
+import { FC, useEffect, DragEvent, useState, useRef } from "react";
 
 import "./BoardView.scss";
 
@@ -30,6 +30,24 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { Cursor } from "~/features/websocket/components/Cursor";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+
+// Implémentation maison du throttle
+function throttle<T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let lastCall = 0;
+  return (...args: Parameters<T>) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      func(...args);
+    }
+  };
+}
+
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -118,6 +136,73 @@ export const BoardView: FC = () => {
     setIsFileDragging(false);
   };
 
+
+  // TEST IMPLE CURSOR FOR WEBSOCKET
+  const userId = useRef(`user-${Math.floor(Math.random() * 1000)}`);
+  const [position, setPosition] = useState<[number, number]>([0, 0]);
+  const [users, setUsers] = useState<Record<string, { x: number; y: number }>>({});
+
+
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket("ws://localhost:9091", {
+    share: true,
+    shouldReconnect: () => true,
+  });
+  
+  // Throttle personnalisé pour envoyer la position
+  const throttledSendCursor = useRef(
+    throttle((x: number, y: number) => {
+      sendJsonMessage({
+        type: "CURSOR_MOVE",
+        userId: userId.current,
+        x,
+        y,
+      });
+    }, 50)
+  ).current;
+  
+  // Écoute des messages entrants
+  useEffect(() => {
+    if (lastJsonMessage) {
+      // const data = JSON.parse(lastJsonMessage.data);
+      const data: any = lastJsonMessage;
+      console.log("data?: ", data);
+      if (data.type === "CURSOR_MOVE" && data.userId !== userId.current) {
+        console.log("data?: ", data);
+        setUsers((prev) => ({
+          ...prev,
+          [data.userId]: {
+            x: data.x,
+            y: data.y,
+          },
+        }));
+      }
+    }
+  }, [lastJsonMessage]);
+
+  useEffect(() => {
+    console.log('WebSocket connected, userId:', userId.current);
+  }, [readyState]);
+  
+  useEffect(() => {
+    if (lastJsonMessage) {
+      console.log('Reçu via WebSocket:', lastJsonMessage);
+    }
+  }, [lastJsonMessage]);
+  
+  // Mouvement souris + envoi position via WebSocket
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const [x, y] = [e.clientX, e.clientY];
+      setPosition([x, y]);
+      throttledSendCursor(x, y);
+    };
+  
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+  
+
+
   return isLoading ? (
     <LoadingScreen position={false} />
   ) : (
@@ -132,6 +217,13 @@ export const BoardView: FC = () => {
           },
         }}
       />
+      {/* Cursors des autres utilisateurs */}
+      {Object.entries(users).map(([id, coords]) => (
+        <Cursor key={id} userId={id} point={[coords.x, coords.y]} />
+      ))}
+
+      {/* Mon curseur perso */}
+      <Cursor key={userId.current} userId={userId.current} point={position} />
       <BoardViewWrapper layout={board.layoutType}>
         <HeaderView />
         {hasEditRights() && <SideMenu sideMenuData={sideMenuData} />}

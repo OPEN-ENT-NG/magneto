@@ -8,6 +8,7 @@ import fr.cgi.magneto.service.impl.MagnetoRepositoryEvents;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.*;
+import io.vertx.core.http.HttpServerOptions;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.http.filter.*;
 import org.entcore.common.mongodb.*;
@@ -63,6 +64,15 @@ public class Magneto extends BaseServer {
         startPromise.tryFail("[Magneto@Magneto::start] Failed to start module Magneto.");
 
         // TODO Websocket
-        // new RealTimeCollaboration(vertx, magnetoConfig).initRealTime();
+        final HttpServerOptions options = new HttpServerOptions().setMaxWebSocketFrameSize(1024 * 1024);
+        vertx.createHttpServer(options)
+                .webSocketHandler(new MagnetoCollaborationController(vertx))
+                .listen(9091, asyncResult -> {
+                    if(asyncResult.succeeded()) {
+                        log.info("Websocket server started and listening on port " + 9091);
+                    } else {
+                        log.error("Cannot start websocket controller", asyncResult.cause());
+                    }
+                });
     }
 }

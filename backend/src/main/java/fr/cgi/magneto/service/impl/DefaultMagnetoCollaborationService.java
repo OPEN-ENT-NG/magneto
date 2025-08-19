@@ -270,7 +270,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardUpdated: {
-                CardPayload updateCard = new CardPayload(action.getCard().toJson())
+                CardPayload updateCard = action.getCard()
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());
@@ -287,6 +287,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(saved -> this.serviceFactory.cardService().getCards(newArrayList(action.getCard().getId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(updateCard.getId()) : cards.get(0);
+                            updatedCard.setIsLiked(null);
                             return newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
                         });
             }
@@ -321,14 +322,14 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardFavorite: {
-                String cardId = action.getCard().getId();
+                String cardId = action.getCardId();
                 if(user == null){
                     BadRequestException noUser = new BadRequestException("User not found");
                     String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
                             this.getClass().getSimpleName(), noUser.getMessage());
                     log.error(message);
                 }
-                return serviceFactory.cardService().updateFavorite(cardId, action.getCard().isFavorite(), user, true)
+                return serviceFactory.cardService().updateFavorite(cardId, action.getIsMoving(), user, true)
                         .onFailure(err -> {
                             String message = String.format("[Magneto@%s::updateFavorite] Failed to update favorite state : %s",
                                     this.getClass().getSimpleName(), err.getMessage());

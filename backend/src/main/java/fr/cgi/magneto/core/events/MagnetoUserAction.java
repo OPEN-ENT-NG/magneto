@@ -123,7 +123,6 @@ public class MagnetoUserAction {
                 break;
             }
             case cardAdded:
-            case cardFavorite:
             case cardUpdated: {
                 if(this.card == null){
                     throw new ValidationException("magneto.action.note.missing");
@@ -136,6 +135,7 @@ public class MagnetoUserAction {
                 }
                 break;
             }
+            case cardFavorite:
             case cardEditionStarted:{
                 if(this.cardId == null){
                     throw new ValidationException("magneto.action.cardId.missing");

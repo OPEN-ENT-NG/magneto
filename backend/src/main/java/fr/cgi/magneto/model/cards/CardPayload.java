@@ -72,6 +72,8 @@ public class CardPayload implements Model<CardPayload> {
             this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
         if (card.getBoolean(Field.ISFAVORITE) != null)
             this.isFavorite = card.getBoolean(Field.ISFAVORITE);
+        else if (card.getBoolean(Field.LIKED) != null)
+            this.isFavorite = card.getBoolean(Field.LIKED);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -293,6 +295,9 @@ public class CardPayload implements Model<CardPayload> {
 
         if (this.getFavoriteList() != null)
             json.put(Field.FAVORITE_LIST, this.getFavoriteList());
+
+        if (this.isFavorite() != null)
+            json.put(Field.ISFAVORITE, this.isFavorite);
 
         // If create
         if (this.getId() == null) {

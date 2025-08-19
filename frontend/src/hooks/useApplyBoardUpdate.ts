@@ -140,7 +140,47 @@ const handleBoardUpdated = (draft: any, update: WebSocketUpdate) => {
     Object.entries(update.board)
       .filter(([, value]) => value != null)
       .forEach(([key, value]) => {
-        draft[key] = value;
+        if (key === "cards" && draft.layoutType === LAYOUT_TYPE.FREE) {
+          // Préserver les champs liked et isLiked des cards existantes
+          draft[key] = value.map((updatedCard: any) => {
+            const existingCard = draft.cards?.find(
+              (card: any) => card.id === updatedCard.id,
+            );
+            return existingCard
+              ? {
+                  ...updatedCard,
+                  liked: existingCard.liked,
+                  isLiked: existingCard.isLiked,
+                }
+              : updatedCard;
+          });
+        } else if (
+          key === "sections" &&
+          draft.layoutType !== LAYOUT_TYPE.FREE
+        ) {
+          // Préserver les champs liked et isLiked des cards dans les sections
+          draft[key] = value.map((updatedSection: any) => {
+            const existingSection = draft.sections?.find(
+              (section: any) => section._id === updatedSection._id,
+            );
+            return {
+              ...updatedSection,
+              cards:
+                updatedSection.cards?.map((updatedCard: any) => {
+                  const existingCard = existingSection?.cards?.find(
+                    (card: any) => card.id === updatedCard.id,
+                  );
+                  return {
+                    ...updatedCard,
+                    liked: existingCard?.liked ?? updatedCard.liked,
+                    isLiked: existingCard?.isLiked ?? updatedCard.isLiked,
+                  };
+                }) || [],
+            };
+          });
+        } else {
+          draft[key] = value;
+        }
       });
   }
 };

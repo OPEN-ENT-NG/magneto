@@ -167,7 +167,8 @@ export const useBoardCard = (card: Card) => {
       sendMessage(
         JSON.stringify({
           type: WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE,
-          card: { id: card.id, isFavorite: card.liked },
+          cardId: card.id,
+          isMoving: card.liked,
         }),
       );
     } else {

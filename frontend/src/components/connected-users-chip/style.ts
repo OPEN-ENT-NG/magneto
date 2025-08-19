@@ -77,7 +77,7 @@ export const listItemAvatarStyle = {
 };
 
 export const roleTypographyStyle = {
-  fontSize: "1.1rem",
+  fontSize: "1.2rem",
 };
 
 export const usernameTypographyStyle = {
@@ -151,6 +151,6 @@ export const userInfoBoxStyle = {
 
 export const otherUserRoleStyle = {
   marginRight: 1,
-  fontSize: "1.1rem",
+  fontSize: "1.2rem",
   lineHeight: 1.2,
 };

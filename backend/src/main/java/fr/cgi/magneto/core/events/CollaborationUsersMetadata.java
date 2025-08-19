@@ -49,12 +49,4 @@ public class CollaborationUsersMetadata {
         this.connectedUsers.removeIf(user -> user.getUserId().equals(userId));
         this.getEditing().removeIf(info -> info.getUserId().equals(userId));
     }
-
-    public boolean isUserReadOnly(String userId) {
-        return connectedUsers.stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .map(User::isReadOnly)
-                .orElse(true);
-    }
 }

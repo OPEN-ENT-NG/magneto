@@ -186,7 +186,7 @@
   "magneto.manager": "Gestion",
   "magneto.publish": "Écriture",
   "magneto.user.read": "Lecteur",
-  "magneto.user.contrib": "Contributeur",
+  "magneto.user.contrib": "Réutilisateur",
   "magneto.user.publish": "Éditeur",
   "magneto.user.manager": "Gestionnaire",
   "magneto.user.owner": "Propriétaire",

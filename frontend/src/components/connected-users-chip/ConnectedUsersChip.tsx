@@ -34,6 +34,8 @@ import {
   BorderedAvatar,
   currentUserBoxStyle,
   userInfoBoxStyle,
+  otherUserRoleStyle,
+  roleTypographyStyle,
 } from "./style";
 import useDirectory from "~/hooks/useDirectory";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -208,6 +210,15 @@ export const ConnectedUsersChip: FC = () => {
                   {currentUser?.username + " (vous)" || t("magneto.you")}
                 </Typography>
               }
+              secondary={
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={roleTypographyStyle}
+                >
+                  {t(`magneto.user.${currentUser?.rights.maxRight}`)}
+                </Typography>
+              }
             />
           </ListItem>
           <Divider sx={dividerStyle} />
@@ -234,6 +245,13 @@ export const ConnectedUsersChip: FC = () => {
                     <Box sx={userInfoBoxStyle}>
                       <Typography variant="body1" sx={usernameTypographyStyle}>
                         {user.username || t("magneto.user")}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={otherUserRoleStyle}
+                      >
+                        {t(`magneto.user.${user.rights.maxRight}`)}
                       </Typography>
                     </Box>
                   }

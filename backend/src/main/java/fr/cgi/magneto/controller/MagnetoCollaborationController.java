@@ -196,7 +196,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
             }
 
             // Choisir le bon message selon le statut readOnly de l'utilisateur
-            MagnetoMessage messageToSend = user.isReadOnly() ? readOnlyMessage : fullAccessMessage;
+            MagnetoMessage messageToSend = user.getRights().hasRead() ? readOnlyMessage : fullAccessMessage;
             String payload = messageToSend.toJson().encode();
 
             final Promise<Void> writeMessagePromise = Promise.promise();

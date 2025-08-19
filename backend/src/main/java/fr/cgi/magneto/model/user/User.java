@@ -2,6 +2,7 @@ package fr.cgi.magneto.model.user;
 
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.UserColor;
+import fr.cgi.magneto.core.events.UserBoardRights;
 import fr.cgi.magneto.model.Model;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
@@ -10,14 +11,14 @@ import java.util.Objects;
 
 public class User extends UserInfos implements Model<User> {
 
-    private Boolean isReadOnly;
+    private UserBoardRights rights;
     private UserColor color;
 
-    public User(String id, String name, Boolean isReadOnly, UserColor color) {
+    public User(String id, String name, UserBoardRights rights, UserColor color) {
         super();
         this.setUserId(id);
         this.setUsername(name);
-        this.isReadOnly = isReadOnly;
+        this.rights = rights;
         this.color = color;
     }
 
@@ -25,7 +26,7 @@ public class User extends UserInfos implements Model<User> {
         super();
         this.setUserId(id);
         this.setUsername(name);
-        this.isReadOnly = false;
+        this.rights = new UserBoardRights();
         this.color = UserColor.DARK_GOLD;
     }
 
@@ -33,7 +34,7 @@ public class User extends UserInfos implements Model<User> {
         super();
         this.setUserId(user.getString(Field.USERID, user.getString(Field.ID, "")));
         this.setUsername(user.getString(Field.USERNAME, ""));
-        this.isReadOnly = user.getBoolean(Field.READONLY, false);
+        this.rights = new UserBoardRights();
 
         // Récupérer la couleur depuis le JSON
         String colorName = user.getString(Field.COLOR);
@@ -47,12 +48,16 @@ public class User extends UserInfos implements Model<User> {
         }
     }
 
-    public Boolean isReadOnly() {
-        return isReadOnly;
+    public UserBoardRights getRights() {
+        return rights;
     }
 
-    public User setReadOnly(Boolean readOnly) {
-        this.isReadOnly = readOnly;
+    public Boolean isReadOnly() {
+        return rights.isReadOnly();
+    }
+
+    public User setReadOnly(UserBoardRights rights) {
+        this.rights = rights;
         return this;
     }
 
@@ -74,7 +79,8 @@ public class User extends UserInfos implements Model<User> {
         return new JsonObject()
                 .put(Field.ID, this.getUserId())
                 .put(Field.USERNAME, this.getUsername())
-                .put(Field.COLOR, this.getColorHex());
+                .put(Field.COLOR, this.getColorHex())
+                .put(Field.RIGHTS, this.getRights().toJson());
     }
 
     @Override

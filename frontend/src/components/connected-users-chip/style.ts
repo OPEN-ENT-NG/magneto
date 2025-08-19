@@ -83,6 +83,7 @@ export const roleTypographyStyle = {
 export const usernameTypographyStyle = {
   fontWeight: 400,
   fontSize: "1.4rem",
+  lineHeight: 1.2,
 };
 
 export const dividerStyle = {
@@ -151,4 +152,5 @@ export const userInfoBoxStyle = {
 export const otherUserRoleStyle = {
   marginRight: 1,
   fontSize: "1.1rem",
+  lineHeight: 1.2,
 };

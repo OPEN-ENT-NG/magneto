@@ -5,10 +5,12 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
+import fr.cgi.magneto.core.enums.RightLevel;
 import fr.cgi.magneto.core.enums.UserColor;
 import fr.cgi.magneto.core.events.CardEditingInformation;
 import fr.cgi.magneto.core.events.CollaborationUsersMetadata;
 import fr.cgi.magneto.core.events.MagnetoUserAction;
+import fr.cgi.magneto.core.events.UserBoardRights;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.MagnetoMessage;
@@ -537,10 +539,8 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     @Override
     public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId, Map<String, User> wsIdToUser) {
-        return hasContribRight(boardId, user)
-                .compose(hasContrib -> {
-                    boolean isReadOnly = !hasContrib;
-
+        return getBoardRights(boardId, user)
+                .compose(rights -> {
                     final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
 
                     // Récupérer ou créer le contexte pour ce board
@@ -550,7 +550,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     UserColor assignedColor = assignColorToUser(boardId);
 
                     // Ajouter l'utilisateur connecté au contexte avec son statut readOnly
-                    User userWithColor = new User(user.getUserId(), user.getUsername(), isReadOnly, assignedColor);
+                    User userWithColor = new User(user.getUserId(), user.getUsername(), rights, assignedColor);
                     context.addConnectedUser(userWithColor);
 
                     wsIdToUser.put(wsId, userWithColor);
@@ -711,6 +711,78 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         });
 
         return promise.future();
+    }
+
+    public Future<UserBoardRights> getBoardRights(String boardId, UserInfos user) {
+        Promise<UserBoardRights> promise = Promise.promise();
+
+        JsonObject query = new JsonObject()
+                .put(Field._ID, boardId)
+                .put(Field.DELETED, false);
+
+        JsonObject projection = new JsonObject()
+                .put(Field.OWNERID, 1)
+                .put(Field.SHARED, 1);
+
+        MongoDb.getInstance().findOne(CollectionsConstant.BOARD_COLLECTION, query, projection, res -> {
+            if ("ok".equals(res.body().getString("status"))) {
+                JsonObject board = res.body().getJsonObject("result");
+                if (board != null) {
+                    UserBoardRights rights = calculateRights(board, user);
+                    promise.complete(rights);
+                } else {
+                    promise.complete(new UserBoardRights());
+                }
+            } else {
+                promise.complete(new UserBoardRights());
+            }
+        });
+
+        return promise.future();
+    }
+
+    private UserBoardRights calculateRights(JsonObject board, UserInfos user) {
+        // Vérifier si owner
+        boolean isOwner = user.getUserId().equals(board.getString(Field.OWNERID));
+        if (isOwner) {
+            return new UserBoardRights(RightLevel.OWNER);
+        }
+
+        RightLevel maxRight = RightLevel.NONE;
+
+        // Parcourir les partages pour trouver le droit le plus élevé
+        JsonArray shared = board.getJsonArray(Field.SHARED, new JsonArray());
+        for (Object item : shared) {
+            JsonObject share = (JsonObject) item;
+
+            boolean isUserShare = user.getUserId().equals(share.getString(Field.USERID));
+            boolean isGroupShare = user.getGroupsIds().contains(share.getString(Field.GROUPID));
+
+            if (isUserShare || isGroupShare) {
+                // Vérifier dans l'ordre décroissant pour optimiser
+                if (share.getBoolean("fr-cgi-magneto-controller-ShareBoardController|initManagerRight", false)) {
+                    maxRight = RightLevel.MANAGER;
+                    break; // Pas besoin de continuer, c'est le maximum
+                } else if (share.getBoolean("fr-cgi-magneto-controller-ShareBoardController|initPublishRight", false)) {
+                    maxRight = RightLevel.PUBLISH;
+                } else if (share.getBoolean("fr-cgi-magneto-controller-ShareBoardController|initContribRight", false)
+                        && maxRight.getLevel() < RightLevel.CONTRIB.getLevel()) {
+                    maxRight = RightLevel.CONTRIB;
+                } else if (share.getBoolean("fr-cgi-magneto-controller-ShareBoardController|initReadRight", false)
+                        && maxRight.getLevel() < RightLevel.READ.getLevel()) {
+                    maxRight = RightLevel.READ;
+                }
+            }
+        }
+
+        UserBoardRights rights = new UserBoardRights(maxRight);
+
+        // Appliquer les règles de workflow pour contrib et plus
+        if (rights.hasContrib() && !WorkflowHelper.hasRight(user, Rights.MANAGE_BOARD)) {
+            rights.setMaxRight(RightLevel.READ);
+        }
+
+        return rights;
     }
 
     private Future<List<MagnetoMessage>> createBoardMessagesForUsers(String boardId, String wsId, UserInfos user, MagnetoUserAction.ActionType actionType) {

@@ -42,6 +42,7 @@ export interface UserCollaboration {
   id: string;
   username: string;
   color: string;
+  rights: any;
 }
 
 export interface CardEditing {

@@ -12,19 +12,23 @@ import { useResourceTypeDisplay } from "~/components/board-card/useResourceTypeD
 import { useDropdown } from "~/components/drop-down-list/useDropDown";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
   useUpdateCardMutation,
   useFavoriteCardMutation,
   useDeleteCardsMutation,
 } from "~/services/api/cards.service";
+//import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const useBoardCard = (card: Card) => {
   const [updateCard] = useUpdateCardMutation();
   const [favoriteCard] = useFavoriteCardMutation();
   const [deleteCards] = useDeleteCardsMutation();
+  const { sendMessage, readyState, cardEditing } = useWebSocketMagneto();
 
   const {
     board,
@@ -43,6 +47,11 @@ export const useBoardCard = (card: Card) => {
   const { getAvatarURL } = useDirectory();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const cardEditingInfo = cardEditing?.find(
+    (editing) => editing.cardId === card.id,
+  );
+  const isBeingEdited = !!cardEditingInfo;
 
   const cardPayload = useMemo(
     () => ({
@@ -70,12 +79,14 @@ export const useBoardCard = (card: Card) => {
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      if (isBeingEdited) return;
+
       if (hasEditRights || hasManageRights) {
         setIsCreateMagnetOpen(true);
         openActiveCardAction(card, BOARD_MODAL_TYPE.CREATE_EDIT);
       } else openActiveCardAction(card, BOARD_MODAL_TYPE.CARD_PREVIEW);
     },
-    [card, openActiveCardAction],
+    [card, openActiveCardAction, isBeingEdited],
   );
 
   const handleSimpleClick = useCallback(
@@ -118,20 +129,52 @@ export const useBoardCard = (card: Card) => {
   }, [toggleDropdown]);
 
   const lockOrUnlockMagnet = useCallback(async () => {
-    await updateCard({
-      ...cardPayload,
-      locked: !card.locked,
-    });
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_UPDATED,
+          card: {
+            ...cardPayload,
+            locked: !card.locked,
+          },
+        }),
+      );
+    } else {
+      await updateCard({
+        ...cardPayload,
+        locked: !card.locked,
+      });
+    }
   }, [cardPayload, card.locked, updateCard]);
 
   const deleteMagnet = useCallback(async () => {
-    await deleteCards({ cardIds: [card.id], boardId: board.id });
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPE.CARDS_DELETED,
+          cardIds: [card.id],
+          boardId: board.id,
+        }),
+      );
+    } else {
+      await deleteCards({ cardIds: [card.id], boardId: board.id });
+    }
     closeActiveCardAction(BOARD_MODAL_TYPE.DELETE);
   }, [card.id, board.id, deleteCards, closeActiveCardAction]);
 
   const handleFavoriteClick = useCallback(() => {
-    favoriteCard({ cardId: card.id, isFavorite: card.liked });
-  }, [card.id, card.liked, favoriteCard]);
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPE.CARD_FAVORITE,
+          cardId: card.id,
+          isMoving: card.liked,
+        }),
+      );
+    } else {
+      favoriteCard({ cardId: card.id, isFavorite: card.liked });
+    }
+  }, [card.id, card.liked, favoriteCard, sendMessage]);
 
   const hasEditRights = useMemo(() => hasEditRightsFn(), [hasEditRightsFn]);
   const hasContribRights = useMemo(
@@ -167,6 +210,7 @@ export const useBoardCard = (card: Card) => {
       isActiveCardId,
       isMagnetOwner,
       isManager: hasManageRights,
+      isBeingEdited,
       dropdownRef,
       getAvatarURL,
       lockOrUnlockMagnet,
@@ -188,6 +232,7 @@ export const useBoardCard = (card: Card) => {
       isActiveCardId,
       isMagnetOwner,
       hasManageRights,
+      isBeingEdited,
       getAvatarURL,
       lockOrUnlockMagnet,
       deleteMagnet,

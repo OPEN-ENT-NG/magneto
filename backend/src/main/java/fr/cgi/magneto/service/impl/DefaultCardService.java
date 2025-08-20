@@ -274,7 +274,7 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public void removeCardWithLocked(JsonObject moveCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user) {
+    public void removeCardWithLocked(CardPayload updateCard, Future<List<Board>> getOldBoardFuture, List<Future> updateBoardsFutures, UserInfos user) {
         BoardPayload boardToUpdate = new BoardPayload(getOldBoardFuture.result().get(0).toJson());
         boardToUpdate.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
 
@@ -288,7 +288,7 @@ public class DefaultCardService implements CardService {
                         }
                     }
                     List<String> notLockedCards = cards.stream()
-                            .filter(c -> !c.isLocked() && !c.getId().equals(moveCard.getJsonObject(Field.CARD).getString(Field.ID)))
+                            .filter(c -> !c.isLocked() && !c.getId().equals(updateCard.getId()))
                             .map(Card::getId)
                             .collect(Collectors.toList());
 
@@ -523,7 +523,7 @@ public class DefaultCardService implements CardService {
                                 }
                             } else {
                                 SectionPayload createSection = new SectionPayload(boardPayload.getId())
-                                        .setTitle(i18n.translate("magneto.section.default.title"));
+                                        .setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
                                 createSection.addCardIds(Collections.singletonList(newId));
                                 String newSectionId = UUID.randomUUID().toString();
                                 boardPayload.addSection(newSectionId);
@@ -582,6 +582,45 @@ public class DefaultCardService implements CardService {
             promise.complete(new JsonObject().put(Field.ID, card.getId()));
         }));
         return promise.future();
+    }
+
+    @Override
+    public Future<JsonObject> updateAndReturnPayload(CardPayload card) {
+        Promise<JsonObject> promise = Promise.promise();
+        JsonObject query = new JsonObject()
+                .put(Field._ID, card.getId());
+        JsonObject update = new JsonObject().put(Mongo.SET, card.toJson());
+        mongoDb.update(this.collection, query, update, MongoDbResult.validActionResultHandler(results -> {
+            if (results.isLeft()) {
+                String message = String.format("[Magneto@%s::update] Failed to update card", this.getClass().getSimpleName());
+                log.error(String.format("%s : %s", message, results.left().getValue()));
+                promise.fail(message);
+                return;
+            }
+            promise.complete(card.toJson());
+        }));
+        return promise.future();
+    }
+
+    @Override
+    public Future<CompositeFuture> deleteCardsWithBoardValidation(List<String> cardIds, String boardId, UserInfos user) {
+        Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId));
+        Future<List<Section>> getSectionFuture = this.serviceFactory.sectionService().getSectionsByBoardId(boardId);
+
+        return CompositeFuture.all(getBoardFuture, getSectionFuture)
+                .compose(result -> {
+                    if (!getBoardFuture.result().isEmpty()) {
+                        Board currentBoard = getBoardFuture.result().get(0);
+                        List<Future> removeCardsFutures = new ArrayList<>();
+
+                        this.deleteCardsWithLocked(cardIds, getSectionFuture, currentBoard, removeCardsFutures, user);
+                        removeCardsFutures.add(this.deleteCards(cardIds));
+                        return CompositeFuture.all(removeCardsFutures);
+                    } else {
+                        return Future.failedFuture(String.format("[Magneto%s::deleteCards] " +
+                                "No board found with id %s", this.getClass().getSimpleName(), boardId));
+                    }
+                });
     }
 
     @Override
@@ -653,6 +692,25 @@ public class DefaultCardService implements CardService {
                                     0 : (long) Math.ceil(cardsCount / (double) Magneto.PAGE_SIZE)));
                 });
         return promise.future();
+    }
+
+    @Override
+    public Future<List<Card>> getCardsOrFirstSection(Board board, UserInfos user){
+        if (board.isLayoutFree()) {
+            return this.serviceFactory.cardService().getAllCardsByBoard(board, user);
+        } else {
+            return this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
+                    .compose(sections -> {
+                        if (sections.isEmpty()) {
+                            return Future.succeededFuture(new ArrayList<>());
+                        }
+                        Section section = sections.stream()
+                                .filter(s -> s.getId().equals(board.getSectionIds().get(0)))
+                                .findFirst()
+                                .orElse(null);
+                        return this.fetchAllCardsBySection(section, 0, user);
+                    });
+        }
     }
 
     @Override
@@ -885,7 +943,7 @@ public class DefaultCardService implements CardService {
         return this.serviceFactory.boardService().update(board);
     }
 
-    public Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user) {
+    public Future<JsonObject> updateFavorite(String cardId, boolean favorite, UserInfos user, boolean returnPayload) {
         Promise<JsonObject> promise = Promise.promise();
         String userId = user.getUserId();
         if (cardId == null || userId == null) {
@@ -915,7 +973,7 @@ public class DefaultCardService implements CardService {
                         // Update card in database
                         CardPayload cardPayload = new CardPayload(card.toJson());
                         cardPayload.setId(cardId);
-                        return update(cardPayload);
+                        return returnPayload ? updateAndReturnPayload(cardPayload) : update(cardPayload);
                     } else {
                         return Future.failedFuture("No card found with id " + cardId);
                     }
@@ -925,6 +983,43 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
+    @Override
+    public Future<Void> processMoveCard(CardPayload updateCard, String oldBoardId, String newBoardId, UserInfos user, I18nHelper i18nHelper) {
+        Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(newBoardId));
+        Future<List<Board>> getOldBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(oldBoardId));
+        Future<List<Section>> getSectionFuture = this.serviceFactory.sectionService().getSectionsByBoardId(newBoardId);
+        Future<List<Section>> getOldSectionFuture = this.serviceFactory.sectionService().getSectionsByBoardId(oldBoardId);
+
+        return CompositeFuture.all(getBoardFuture, getOldBoardFuture, getSectionFuture, getOldSectionFuture)
+                .compose(result -> {
+                    if (!getOldBoardFuture.result().isEmpty() && !getBoardFuture.result().isEmpty()) {
+                        List<Future> updateBoardsFutures = new ArrayList<>();
+                        Board currentBoard = getBoardFuture.result().get(0);
+                        Board oldBoard = getOldBoardFuture.result().get(0);
+
+                        // Add cards in current board
+                        if (currentBoard.isLayoutFree()) {
+                            this.addCardWithLocked(updateCard, updateBoardsFutures, currentBoard, user);
+                        } else {
+                            String defaultTitle = (i18nHelper != null ? i18nHelper.translate("magneto.section.default.title") : Field.DEFAULTTITLE);;
+                            this.addCardSectionWithLocked(updateCard, getSectionFuture, updateBoardsFutures, currentBoard, defaultTitle, user);
+                        }
+
+                        // Remove cards in old board
+                        if (oldBoard.isLayoutFree()) {
+                            this.removeCardWithLocked(updateCard, getOldBoardFuture, updateBoardsFutures, user);
+                        } else {
+                            this.removeCardSectionWithLocked(updateCard, oldBoardId, getOldSectionFuture, updateBoardsFutures, currentBoard, user);
+                        }
+
+                        updateBoardsFutures.add(this.update(updateCard));
+                        return CompositeFuture.all(updateBoardsFutures).mapEmpty();
+                    } else {
+                        return Future.failedFuture(String.format("[Magneto%s::moveCard] " +
+                                "No board found with id %s", this.getClass().getSimpleName(), oldBoardId));
+                    }
+                });
+    }
 
     private Future<JsonObject> duplicateCardsFuture(String boardId, List<Card> cards, SectionPayload section, Board boardResult, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();

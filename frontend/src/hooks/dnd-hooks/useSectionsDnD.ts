@@ -24,10 +24,12 @@ import {
 } from "./reorderUtils";
 import { ActiveItemState, DND_ITEM_TYPE } from "./types";
 import { createCardMap, createSectionMap } from "./utils";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { Board } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
+import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useUpdateBoardCardsMutation } from "~/services/api/boards.service";
 import {
   useUpdateSectionMutation,
@@ -46,6 +48,7 @@ export const useSectionsDnD = (board: Board) => {
   const [updateSection] = useUpdateSectionMutation();
   const [createSection] = useCreateSectionMutation();
   const [updateBoardCards] = useUpdateBoardCardsMutation();
+  const { sendMessage, readyState } = useWebSocketMagneto();
   const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
   const toast = useToast();
@@ -85,6 +88,15 @@ export const useSectionsDnD = (board: Board) => {
       if (activeType === DND_ITEM_TYPE.CARD) {
         const cardInfo = cardMap[active.id.toString()];
         setActiveItem(cardInfo?.card ?? null);
+        if (cardInfo?.card && readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_STARTED,
+              cardId: cardInfo.card.id,
+              isMoving: true,
+            }),
+          );
+        }
       } else if (activeType === DND_ITEM_TYPE.SECTION) {
         setActiveItem(sectionMap[active.id.toString()] || null);
       } else {
@@ -254,10 +266,20 @@ export const useSectionsDnD = (board: Board) => {
   const handleSectionDragEnd = useCallback(async () => {
     const newOrder = updatedSections.map((section) => section._id);
     try {
-      await updateBoardCards({
-        id: board._id,
-        sectionIds: newOrder,
-      }).unwrap();
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.CARDS_BOARD_UPDATED,
+            boardId: board._id,
+            sectionIds: newOrder,
+          }),
+        );
+      } else {
+        await updateBoardCards({
+          id: board._id,
+          sectionIds: newOrder,
+        }).unwrap();
+      }
     } catch (error) {
       console.error("Failed to update board sections:", error);
     }
@@ -315,18 +337,41 @@ export const useSectionsDnD = (board: Board) => {
       ]);
 
       try {
-        await Promise.all([
-          createSection({
-            boardId: board._id,
-            title: newSectionTitle,
-            cardIds: [activeCardId],
-          }).unwrap(),
-          updateSection({
-            id: originalActiveSection._id,
-            boardId: board._id,
-            cardIds: newOriginalSectionCardIds,
-          }).unwrap(),
-        ]);
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED,
+              section: {
+                boardId: board._id,
+                title: newSectionTitle,
+                cardIds: [activeCardId],
+              },
+            }),
+          );
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+              section: {
+                id: originalActiveSection._id,
+                boardId: board._id,
+                cardIds: newOriginalSectionCardIds,
+              },
+            }),
+          );
+        } else {
+          await Promise.all([
+            createSection({
+              boardId: board._id,
+              title: newSectionTitle,
+              cardIds: [activeCardId],
+            }).unwrap(),
+            updateSection({
+              id: originalActiveSection._id,
+              boardId: board._id,
+              cardIds: newOriginalSectionCardIds,
+            }).unwrap(),
+          ]);
+        }
       } catch (error) {
         console.error(
           "Failed to create new section or update original section:",
@@ -395,20 +440,42 @@ export const useSectionsDnD = (board: Board) => {
             return section;
           }),
         );
-
         try {
-          await Promise.all([
-            updateSection({
-              id: originalActiveSection._id,
-              boardId: board._id,
-              cardIds: originalActiveSection.cardIds,
-            }).unwrap(),
-            updateSection({
-              id: currentOverSectionWithoutNewCard._id,
-              boardId: board._id,
-              cardIds: currentOverSectionWithoutNewCard.cardIds,
-            }).unwrap(),
-          ]);
+          if (readyState === WebSocket.OPEN) {
+            sendMessage(
+              JSON.stringify({
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+                section: {
+                  id: originalActiveSection._id,
+                  boardId: board._id,
+                  cardIds: originalActiveSection.cardIds,
+                },
+              }),
+            );
+            sendMessage(
+              JSON.stringify({
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+                section: {
+                  id: currentOverSectionWithoutNewCard._id,
+                  boardId: board._id,
+                  cardIds: currentOverSectionWithoutNewCard.cardIds,
+                },
+              }),
+            );
+          } else {
+            await Promise.all([
+              updateSection({
+                id: originalActiveSection._id,
+                boardId: board._id,
+                cardIds: originalActiveSection.cardIds,
+              }).unwrap(),
+              updateSection({
+                id: currentOverSectionWithoutNewCard._id,
+                boardId: board._id,
+                cardIds: currentOverSectionWithoutNewCard.cardIds,
+              }).unwrap(),
+            ]);
+          }
         } catch (error) {
           console.error("Failed to update sections:", error);
         }
@@ -465,18 +532,41 @@ export const useSectionsDnD = (board: Board) => {
           }),
         );
         try {
-          await Promise.all([
-            updateSection({
-              id: originalActiveSection._id,
-              boardId: board._id,
-              cardIds: newOriginalSectionCardIds,
-            }).unwrap(),
-            updateSection({
-              id: currentOverSection._id,
-              boardId: board._id,
-              cardIds: newOverSectionCardIds,
-            }).unwrap(),
-          ]);
+          if (readyState === WebSocket.OPEN) {
+            sendMessage(
+              JSON.stringify({
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+                section: {
+                  id: originalActiveSection._id,
+                  boardId: board._id,
+                  cardIds: newOriginalSectionCardIds,
+                },
+              }),
+            );
+            sendMessage(
+              JSON.stringify({
+                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+                section: {
+                  id: currentOverSection._id,
+                  boardId: board._id,
+                  cardIds: newOverSectionCardIds,
+                },
+              }),
+            );
+          } else {
+            await Promise.all([
+              updateSection({
+                id: originalActiveSection._id,
+                boardId: board._id,
+                cardIds: newOriginalSectionCardIds,
+              }).unwrap(),
+              updateSection({
+                id: currentOverSection._id,
+                boardId: board._id,
+                cardIds: newOverSectionCardIds,
+              }).unwrap(),
+            ]);
+          }
         } catch (error) {
           console.error("Failed to update sections:", error);
         }
@@ -524,11 +614,24 @@ export const useSectionsDnD = (board: Board) => {
       );
 
       try {
-        await updateSection({
-          id: currentOverSection._id,
-          boardId: board._id,
-          cardIds: newCardIds,
-        }).unwrap();
+        if (readyState === WebSocket.OPEN) {
+          sendMessage(
+            JSON.stringify({
+              type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+              section: {
+                id: currentOverSection._id,
+                boardId: board._id,
+                cardIds: newCardIds,
+              },
+            }),
+          );
+        } else {
+          await updateSection({
+            id: currentOverSection._id,
+            boardId: board._id,
+            cardIds: newCardIds,
+          }).unwrap();
+        }
       } catch (error) {
         console.error("Failed to update section:", error);
       }
@@ -614,6 +717,13 @@ export const useSectionsDnD = (board: Board) => {
       setNewMagnetOver([]);
       setActiveItem(null);
       setOriginalSections(updatedSections);
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.CARD_EDITION_ENDED,
+          }),
+        );
+      }
     },
     [handleSectionDragEnd, handleCardDragEnd, updatedSections],
   );

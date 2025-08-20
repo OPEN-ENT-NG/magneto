@@ -1,15 +1,40 @@
+import { useCallback } from "react";
+
+import { isActionAvailable } from "@edifice.io/client";
 import { ThemeProvider } from "@mui/material/styles";
+import { useParams } from "react-router-dom";
 
 import { ReadView } from "~/components/read-view/ReadView";
+import { workflowName } from "~/config";
 import { BoardProvider } from "~/providers/BoardProvider";
+import { WebSocketProvider } from "~/providers/WebsocketProvider";
+import { useActions } from "~/services/queries";
 import theme from "~/themes/theme";
 
 export const App = () => {
+  const { id = "" } = useParams();
+  const isLocalhost = window.location.hostname === "localhost";
+  const getSocketURL = useCallback(() => {
+    return isLocalhost
+      ? `ws://${window.location.hostname}:9091/${id}`
+      : `wss://${window.location.host}/magneto/ws/${id}`;
+  }, [isLocalhost]);
+  const { data: actions } = useActions();
+  const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
+
   return (
     <ThemeProvider theme={theme}>
-      <BoardProvider>
-        <ReadView />
-      </BoardProvider>
+      <WebSocketProvider
+        socketUrl={getSocketURL()}
+        onMessage={(update) => {
+          console.log("Received WebSocket update:", update);
+        }}
+        shouldConnect={canSynchronous}
+      >
+        <BoardProvider>
+          <ReadView />
+        </BoardProvider>
+      </WebSocketProvider>
     </ThemeProvider>
   );
 };

@@ -7,13 +7,16 @@ import fr.wseduc.mongodb.MongoDb;
 import fr.wseduc.webutils.security.SecuredAction;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.net.*;
-import io.vertx.ext.web.client.*;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.ProxyOptions;
+import io.vertx.core.net.ProxyType;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.client.WebClientOptions;
 import org.entcore.common.neo4j.Neo4j;
+import org.entcore.common.share.ShareNormalizer;
 import org.entcore.common.share.impl.MongoDbShareService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.storage.Storage;
-import org.entcore.common.share.ShareNormalizer;
 
 import java.util.Map;
 
@@ -23,6 +26,7 @@ public class ServiceFactory {
     private final Neo4j neo4j;
     private final Sql sql;
     private final MongoDb mongoDb;
+    private final JsonObject config;
 
     private final WebClient webClient;
     private final MagnetoConfig magnetoConfig;
@@ -31,10 +35,12 @@ public class ServiceFactory {
     private final BoardService boardService;
     private final CardService cardService;
     private final ExportService exportService;
+    private final MagnetoCollaborationService magnetoCollaborationService;
     private final Map<String, SecuredAction> securedActions;
     private final ShareNormalizer shareNormalizer;
 
-    public ServiceFactory(Vertx vertx, Storage storage, MagnetoConfig magnetoConfig, Neo4j neo4j, Sql sql, MongoDb mongoDb, Map<String, SecuredAction> securedActions) {
+    public ServiceFactory(Vertx vertx, Storage storage, MagnetoConfig magnetoConfig, Neo4j neo4j, Sql sql, MongoDb mongoDb,
+                          Map<String, SecuredAction> securedActions, JsonObject config) {
         this.vertx = vertx;
         this.storage = storage;
         this.magnetoConfig = magnetoConfig;
@@ -42,12 +48,15 @@ public class ServiceFactory {
         this.sql = sql;
         this.mongoDb = mongoDb;
         this.securedActions = securedActions;
+        this.config = config;
         this.webClient = initWebClient();
         this.shareNormalizer = new ShareNormalizer(securedActions);
         this.folderService = new DefaultFolderService(CollectionsConstant.FOLDER_COLLECTION, mongoDb, this);
         this.cardService = new DefaultCardService(CollectionsConstant.CARD_COLLECTION, mongoDb, this);
         this.boardService = new DefaultBoardService(CollectionsConstant.BOARD_COLLECTION, mongoDb, this);
         this.exportService = new DefaultExportService(this);
+        this.magnetoCollaborationService = new DefaultMagnetoCollaborationService(this);
+
     }
 
     public MagnetoService magnetoServiceExample() {
@@ -93,6 +102,11 @@ public class ServiceFactory {
     public CommentService commentService() {
         return new DefaultCommentService(CollectionsConstant.CARD_COLLECTION, mongoDb);
     }
+
+    public MagnetoCollaborationService magnetoCollaborationService() {
+        return this.magnetoCollaborationService;
+    }
+
     public BoardAccessService boardViewService(){
         return new DefaultBoardAccessService(CollectionsConstant.BOARD_VIEW_COLLECTION,mongoDb);
     }
@@ -107,6 +121,10 @@ public class ServiceFactory {
 
     public Vertx vertx() {
         return this.vertx;
+    }
+
+    public JsonObject config() {
+        return this.config;
     }
 
     public Storage storage() {

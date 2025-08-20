@@ -14,6 +14,7 @@ export const PreviewContent: FC<PreviewContentProps> = ({ card }) => {
   return (
     <Box sx={previewWrapper}>
       <PreviewTitle
+        cardId={card.id}
         title={card.title}
         modificationDate={card.modificationDate}
         ownerName={card.ownerName}

@@ -180,6 +180,50 @@ public class DefaultBoardService implements BoardService {
         return promise.future();
     }
 
+    @Override
+    public Future<Board> getBoardWithContent(String boardId, UserInfos user, Boolean isReadOnly) {
+        return this.getBoards(Collections.singletonList(boardId))
+                .compose(boards -> {
+                    if (boards.isEmpty()) {
+                        return Future.failedFuture(String.format("No board found with id %s", boardId));
+                    }
+
+                    Board board = boards.get(0);
+
+                    if (board.isLayoutFree()) {
+                        // Layout libre : récupérer toutes les cartes du board
+                        return serviceFactory.cardService().getAllCardsByBoard(board, user)
+                                .map(cards -> {
+                                    board.setCards(cards);
+                                    return board;
+                                });
+                    } else {
+                        // Layout avec sections : récupérer les sections avec leurs cartes
+                        return serviceFactory.sectionService().getSectionsByBoard(board, isReadOnly)
+                                .compose(sections -> {
+                                    List<Future> cardFutures = sections.stream()
+                                            .map(section -> serviceFactory.cardService().getAllCardsBySectionSimple(section, null, user))
+                                            .collect(Collectors.toList());
+
+                                    return CompositeFuture.all(cardFutures)
+                                            .map(result -> {
+                                                List<Section> sectionsWithCards = sections.stream()
+                                                        .map(section -> {
+                                                            List<Card> sectionCards = result.list().stream()
+                                                                    .flatMap(list -> ((List<Card>) list).stream())
+                                                                    .filter(card -> section.getCardIds().contains(card.getId()))
+                                                                    .collect(Collectors.toList());
+                                                            return section.setCards(sectionCards);
+                                                        })
+                                                        .collect(Collectors.toList());
+                                                board.setSections(sectionsWithCards);
+                                                return board;
+                                            });
+                                });
+                    }
+                });
+    }
+
     @SuppressWarnings("unchecked")
     public Future<JsonObject> duplicate(String boardId, UserInfos user, I18nHelper i18n) {
         Promise<JsonObject> promise = Promise.promise();
@@ -275,10 +319,10 @@ public class DefaultBoardService implements BoardService {
 
         // Check if we are changing the layout from free to section
         if (currentBoard.isLayoutFree() && !updateBoard.isLayoutFree()) {
-            SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.cardIds());
+            SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.getCardIds());
 
             String sectionId = UUID.randomUUID().toString();
-            sectionPayload.setTitle(i18n.translate("magneto.section.default.title"));
+            sectionPayload.setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
             updateBoard.addSection(sectionId);
             updateBoard.setCardIds(new ArrayList<>());
             updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));

@@ -30,7 +30,27 @@ public class CardPayload implements Model<CardPayload> {
     private String boardId;
     private String sectionId;
     private List<String> favoriteList;
+    private Boolean isFavorite;
 
+    public CardPayload() {
+        this.id = null;
+        this.title = "";
+        this.resourceId = "";
+        this.resourceType = "";
+        this.resourceUrl = "";
+        this.description = "";
+        this.ownerId = "";
+        this.ownerName = "";
+        this.lastModifierId = "";
+        this.lastModifierName = "";
+        this.creationDate = DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT);
+        this.modificationDate = DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT);
+        this.caption = "";
+        this.isLocked = false;
+        this.parentId = "";
+        this.boardId = "";
+        this.sectionId = "";
+    }
 
     public CardPayload(JsonObject card) {
         this.id = card.getString(Field.ID, null);
@@ -48,7 +68,12 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = card.getString(Field.PARENTID);
         this.boardId = card.getString(Field.BOARDID);
         this.sectionId = card.getString(Field.SECTIONID);
-        this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
+        if (card.getJsonArray(Field.FAVORITE_LIST) != null)
+            this.favoriteList = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray()).getList();
+        if (card.getBoolean(Field.ISFAVORITE) != null)
+            this.isFavorite = card.getBoolean(Field.ISFAVORITE);
+        else if (card.getBoolean(Field.LIKED) != null)
+            this.isFavorite = card.getBoolean(Field.LIKED);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -74,6 +99,7 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = other.parentId;
         this.boardId = other.boardId;
         this.sectionId = other.sectionId;
+        this.isFavorite = other.isFavorite;
         // Create a new list to avoid sharing the reference
         this.favoriteList = other.favoriteList != null ?
                 new ArrayList<>(other.favoriteList) : new ArrayList<>();
@@ -232,6 +258,15 @@ public class CardPayload implements Model<CardPayload> {
         return this;
     }
 
+    public Boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public CardPayload setIsFavorite(Boolean locked) {
+        this.isLocked = locked;
+        return this;
+    }
+
     public CardPayload setFavoriteList(List<String> favoriteList) {
         this.favoriteList = favoriteList;
         return this;
@@ -245,6 +280,7 @@ public class CardPayload implements Model<CardPayload> {
     public JsonObject toJson() {
 
         JsonObject json = new JsonObject()
+                .put(Field.ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.RESOURCETYPE, this.getResourceType())
                 .put(Field.RESOURCEID, this.getResourceId())
@@ -255,8 +291,13 @@ public class CardPayload implements Model<CardPayload> {
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.LASTMODIFIERID, this.getLastModifierId())
-                .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
-                .put(Field.FAVORITE_LIST, this.getFavoriteList());
+                .put(Field.LASTMODIFIERNAME, this.getLastModifierName());
+
+        if (this.getFavoriteList() != null)
+            json.put(Field.FAVORITE_LIST, this.getFavoriteList());
+
+        if (this.isFavorite() != null)
+            json.put(Field.ISFAVORITE, this.isFavorite);
 
         // If create
         if (this.getId() == null) {

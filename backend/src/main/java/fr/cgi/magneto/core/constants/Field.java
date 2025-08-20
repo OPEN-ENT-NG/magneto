@@ -248,4 +248,24 @@ public class Field {
     public static final String VISIBILITY = "visibility";
     public static final Object PROTECTED = "protected";
     public static final String FILEOWNER = "fileOwner";
+    public static final String DEFAULTTITLE = "Section 1";
+
+    // WEBSOCKET
+    public static final String EMITTEDAT = "emittedAt";
+    public static final String WEBSOCKETID = "websocketId";
+    public static final String MAXCONNECTEDUSERS = "maxConnectedUsers";
+    public static final String EMITTEDBY = "emittedBy";
+    public static final String OLDCARD = "oldCard";
+    public static final String CONNECTEDUSERS = "connectedUsers";
+    public static final String LOGIN = "login";
+    public static final String ACTIONID = "actionId";
+    public static final String READONLY = "readOnly";
+    public static final String FULLACCESS = "fullAccess";
+    public static final String ACTUALUSER = "actualUser";
+    public static final String OTHERUSERS = "otherUsers";
+    public static final String COLOR = "color";
+    public static final String CARDEDITINGINFORMATIONS = "cardEditingInformations";
+    public static final String SINCE = "since";
+    public static final String ISMOVING = "isMoving";
+    public static final String LIKED = "liked";
 }

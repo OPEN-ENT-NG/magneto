@@ -185,6 +185,11 @@
   "magneto.contrib": "Réutilisation",
   "magneto.manager": "Gestion",
   "magneto.publish": "Écriture",
+  "magneto.user.read": "Lecteur",
+  "magneto.user.contrib": "Réutilisateur",
+  "magneto.user.publish": "Éditeur",
+  "magneto.user.manager": "Gestionnaire",
+  "magneto.user.owner": "Propriétaire",
   "group.HeadTeacher": "Professeurs principaux de {{0}}.",
   "group.Direction": "Directeurs de {{0}}.",
   "group.Func": "Personnels de fonction {{0}}.",
@@ -210,6 +215,7 @@
   "group.school.Guest": "Invités de l'{{0}}.",
   "magneto.return": "Retour",
   "magneto.card.saved.by": "Crée par {{0}}, modifié par {{1}}",
+  "magneto.card.editing.saved.by": "Crée par {{0}}, en cours de modification par",
   "magneto.boards.collection": "Collection de tableaux",
   "magneto.cards.collection": "Collection d'aimants",
   "magneto.cards.collection.mine": "Dans mes tableaux",
@@ -368,5 +374,11 @@
   "magneto.modal.update.screen4.text": "Depuis la fenêtre de partage, sélectionnez l’option pour rendre votre tableau public. Un lien sera créé le rendant accessible à tout utilisateur, y compris sans connexion à l’ENT !",
   "magneto.modal.update.screen4.title": "Rendez votre tableau accessible publiquement",
 
-  "magnetoexplorer.shared.status.error": "Une erreur est survenue. Veuillez réessayer ultérieurement."
+  "magnetoexplorer.shared.status.error": "Une erreur est survenue. Veuillez réessayer ultérieurement.",
+
+  "magneto.user": "utilisateur",
+  "magneto.you": "Vous",
+  "magneto.(you)": " (vous)",
+  "magneto.card.editing.tooltip": "Ces actions sont impossibles pendant l'édition.",
+  "magneto.users.online": "Utilisateurs en ligne"
 }

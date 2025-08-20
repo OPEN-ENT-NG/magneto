@@ -1,16 +1,17 @@
 package fr.cgi.magneto.service;
 
-import fr.cgi.magneto.service.impl.*;
-import fr.wseduc.mongodb.*;
-import io.vertx.core.*;
-import io.vertx.core.json.*;
-import io.vertx.ext.unit.*;
-import io.vertx.ext.unit.junit.*;
-import org.entcore.common.user.*;
-import org.junit.*;
-import org.junit.runner.*;
-import org.mockito.*;
-import org.powermock.reflect.*;
+import fr.cgi.magneto.service.impl.DefaultBoardService;
+import fr.wseduc.mongodb.MongoDb;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.entcore.common.user.UserInfos;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.reflect.Whitebox;
 
 @RunWith(VertxUnitRunner.class)
 public class BoardServiceTest {
@@ -24,7 +25,7 @@ public class BoardServiceTest {
     public void setUp() {
         vertx = Vertx.vertx();
         MongoDb.getInstance().init(vertx.eventBus(), "fr.cgi.magneto");
-        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, mongoDb, null);
+        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, mongoDb, null, new JsonObject());
         this.boardService = new DefaultBoardService("board", mongoDb, serviceFactory);
     }
 

@@ -401,10 +401,10 @@ public class BoardController extends ControllerHelper {
 
                         JsonObject params = new JsonObject();
 
-                        String scheme = request.isSSL() ? "https" : "http";
-                        String host = request.getHeader("Host");
+                        String scheme = request.isSSL() ? Field.HTTPS : Field.HTTP;
+                        String host = request.getHeader(Field.BHOST);
                         if (host == null) {
-                            host = request.getHeader("X-Forwarded-Host");
+                            host = request.getHeader(Field.XFORWARDEDHOST);
                         }
                         if (host == null) {
                             host = request.localAddress().host() + ":" + request.localAddress().port();

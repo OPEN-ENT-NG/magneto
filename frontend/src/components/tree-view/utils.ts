@@ -1,5 +1,7 @@
 import { FOLDER_TYPE } from "~/core/enums/folder-type.enum";
 import { FolderObjectState } from "~/providers/FoldersNavigationProvider/types";
+import { useInitialDeletedBoardsFolderObject } from "~/providers/FoldersNavigationProvider/useInitialDeletedBoardsFolderObject";
+import { useInitialMyBoardsFolderObject } from "~/providers/FoldersNavigationProvider/useInitialMyBoardsFolderObject";
 import { useInitialPublicFolderObject } from "~/providers/FoldersNavigationProvider/useInitialPublicFolderObject";
 
 export const useGetFolderTypeData = (
@@ -7,6 +9,9 @@ export const useGetFolderTypeData = (
   folderObject: FolderObjectState,
 ) => {
   const publicFolderObject = useInitialPublicFolderObject();
+  const myBoardsFolderObject = useInitialMyBoardsFolderObject();
+  const deletedBoardsFolderObject = useInitialDeletedBoardsFolderObject();
+
   if (folderObject.myFolderObject && folderObject.deletedFolderObject) {
     switch (folderType) {
       case FOLDER_TYPE.MY_BOARDS:
@@ -19,5 +24,15 @@ export const useGetFolderTypeData = (
         return folderObject.myFolderObject;
     }
   }
-  return publicFolderObject;
+
+  switch (folderType) {
+    case FOLDER_TYPE.MY_BOARDS:
+      return myBoardsFolderObject;
+    case FOLDER_TYPE.PUBLIC_BOARDS:
+      return publicFolderObject;
+    case FOLDER_TYPE.DELETED_BOARDS:
+      return deletedBoardsFolderObject;
+    default:
+      return publicFolderObject;
+  }
 };

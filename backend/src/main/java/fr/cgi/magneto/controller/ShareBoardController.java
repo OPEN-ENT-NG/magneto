@@ -159,10 +159,19 @@ public class ShareBoardController extends ControllerHelper {
                                                     String boardName = boards != null && !boards.isEmpty() ?
                                                             boards.get(0).getTitle() : id;
 
+                                                    String scheme = request.isSSL() ? "https" : "http";
+                                                    String host = request.getHeader("Host");
+                                                    if (host == null) {
+                                                        host = request.getHeader("X-Forwarded-Host");
+                                                    }
+                                                    if (host == null) {
+                                                        host = request.localAddress().host() + ":" + request.localAddress().port();
+                                                    }
+
                                                     JsonObject params = new JsonObject();
                                                     params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                                                     params.put(Field.USERNAME, user.getUsername());
-                                                    params.put(Field.BOARDURL, "/magneto#/board/" + id + "/view");
+                                                    params.put(Field.BOARDURL, scheme + "://" + host + "/magneto#/board/" + id + "/view");
                                                     params.put(Field.BOARDNAME, boardName);
 
                                                     JsonObject pushNotif = new JsonObject()
@@ -187,10 +196,18 @@ public class ShareBoardController extends ControllerHelper {
                                                     log.error(String.format("[Magneto@%s::handleShareBoard] Failed to get board %s",
                                                             user.getUserId(), id), error);
                                                     // Continue with default value (id) as board name
+                                                    String scheme = request.isSSL() ? "https" : "http";
+                                                    String host = request.getHeader("Host");
+                                                    if (host == null) {
+                                                        host = request.getHeader("X-Forwarded-Host");
+                                                    }
+                                                    if (host == null) {
+                                                        host = request.localAddress().host() + ":" + request.localAddress().port();
+                                                    }
                                                     JsonObject params = new JsonObject();
                                                     params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                                                     params.put(Field.USERNAME, user.getUsername());
-                                                    params.put(Field.BOARDURL, "/magneto#/board/" + id + "/view");
+                                                    params.put(Field.BOARDURL, scheme + "://" + host + "/magneto#/board/" + id + "/view");
                                                     params.put(Field.BOARDNAME, id); // Fallback to using ID as name
 
                                                     JsonObject pushNotif = new JsonObject()
@@ -345,9 +362,19 @@ public class ShareBoardController extends ControllerHelper {
                                 .onSuccess(success -> {
 
                                     JsonObject params = new JsonObject();
+                                    String scheme = request.isSSL() ? "https" : "http";
+                                    String host = request.getHeader("Host");
+                                    if (host == null) {
+                                        host = request.getHeader("X-Forwarded-Host");
+                                    }
+                                    if (host == null) {
+                                        host = request.localAddress().host() + ":" + request.localAddress().port();
+                                    }
+
                                     params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                                     params.put(Field.USERNAME, user.getUsername());
-                                    params.put(Field.FOLDERURL, "/magneto#/");
+
+                                    params.put(Field.FOLDERURL, scheme + "://" + host + "/magneto#/");
                                     if (!getFolderDataFuture.result().isEmpty())
                                         params.put(Field.FOLDERTITLE, getFolderDataFuture.result().getJsonObject(0).getValue(Field.TITLE, ""));
 

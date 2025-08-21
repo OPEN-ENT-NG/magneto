@@ -401,9 +401,18 @@ public class BoardController extends ControllerHelper {
 
                         JsonObject params = new JsonObject();
 
+                        String scheme = request.isSSL() ? Field.HTTPS : Field.HTTP;
+                        String host = request.getHeader(Field.BHOST);
+                        if (host == null) {
+                            host = request.getHeader(Field.XFORWARDEDHOST);
+                        }
+                        if (host == null) {
+                            host = request.localAddress().host() + ":" + request.localAddress().port();
+                        }
+
                         params.put(Field.PROFILURI, "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
                                 .put(Field.USERNAME, user.getUsername())
-                                .put(Field.BOARDURL, "/magneto#/board/" + boardId + "/view/")
+                                .put(Field.BOARDURL, scheme + "://" + host + "/magneto#/board/" + boardId + "/view/")
                                 .put(Field.BOARDNAME, board.getString(Field.TITLE));
                         
                         JsonObject pushNotif = new JsonObject()

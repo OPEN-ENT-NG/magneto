@@ -7,11 +7,11 @@ body {
   outline: none;
 }
 
-$prefix: 'edifice-';
+$prefix: "edifice-";
 
 [data-product="neo"][data-theme="theme-demo-cgi"] {
-  --#{$prefix}primary: #5236AB;
-  --#{$prefix}secondary: #B42D7E;
+  --#{$prefix}primary: #5236ab;
+  --#{$prefix}secondary: #b42d7e;
 
   .header {
     .navbar {

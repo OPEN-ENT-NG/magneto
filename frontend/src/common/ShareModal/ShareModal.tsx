@@ -168,7 +168,6 @@ export default function ShareResourceModal({
   const [updatePublicBoard] = useUpdatePublicBoardMutation();
 
   const { t } = useTranslation("magneto");
-  const rootElement = document.getElementById("root");
 
   const searchPlaceholder = showSearchAdmlHint()
     ? t("magneto.explorer.search.adml.hint")
@@ -196,7 +195,7 @@ export default function ShareResourceModal({
   };
 
   const externalLink = createExternalLink(
-    rootElement?.getAttribute("data-host"),
+    window.location.origin,
     selectedBoards[0]?.id,
   );
 

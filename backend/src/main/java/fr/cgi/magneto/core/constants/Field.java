@@ -268,4 +268,8 @@ public class Field {
     public static final String SINCE = "since";
     public static final String ISMOVING = "isMoving";
     public static final String LIKED = "liked";
+    public static final String XFORWARDEDHOST = "X-Forwarded-Host";
+    public static final String BHOST = "Host";
+    public static final String HTTP = "http";
+    public static final String HTTPS = "https";
 }

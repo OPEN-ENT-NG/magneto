@@ -25,9 +25,12 @@ import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.HttpResponse;
+import io.vertx.ext.web.client.WebClient;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
@@ -35,6 +38,7 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.Trace;
 import org.entcore.common.user.UserUtils;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -48,11 +52,14 @@ public class CardController extends ControllerHelper {
     private final BoardService boardService;
     private final SectionService sectionService;
 
+    private final WebClient webClient;
+
 
     public CardController(ServiceFactory serviceFactory) {
         this.cardService = serviceFactory.cardService();
         this.boardService = serviceFactory.boardService();
         this.sectionService = serviceFactory.sectionService();
+        this.webClient = serviceFactory.webClient();
         this.eventStore = EventStoreFactory.getFactory().getEventStore(Magneto.class.getSimpleName());
     }
 
@@ -295,6 +302,60 @@ public class CardController extends ControllerHelper {
                 cardService.processMoveCard(updateCard, oldBoardId, moveCard.getString(Field.BOARDID), user, i18nHelper)
                         .onFailure(err -> renderError(request))
                         .onSuccess(res -> renderJson(request, new JsonObject()));
+            });
+        });
+    }
+
+    // Dans CardController.java
+    @Post("/fetch-html")
+    @ApiDoc("Fetch raw HTML from URL")
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void fetchRawHtml(HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, body -> {
+            UserUtils.getUserInfos(eb, request, user -> {
+                String url = body.getString("url");
+
+                if (url == null || url.trim().isEmpty()) {
+                    renderJson(request, new JsonObject().put("error", "URL is required"), 400);
+                    return;
+                }
+
+                // Validation URL
+                try {
+                    new URI(url).toURL();
+                } catch (Exception e) {
+                    renderJson(request, new JsonObject().put("error", "Invalid URL"), 400);
+                    return;
+                }
+
+                webClient.getAbs(url)
+                        .putHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                        .putHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                        .timeout(30000)
+                        .send(ar -> {
+                            if (ar.succeeded()) {
+                                HttpResponse<Buffer> response = ar.result();
+
+                                if (response.statusCode() == 200) {
+                                    JsonObject result = new JsonObject()
+                                            .put("html", response.bodyAsString())
+                                            .put("url", url)
+                                            .put("contentType", response.getHeader("Content-Type"))
+                                            .put("timestamp", System.currentTimeMillis());
+                                    renderJson(request, result);
+                                } else {
+                                    renderJson(request, new JsonObject()
+                                            .put("error", "HTTP " + response.statusCode()), response.statusCode());
+                                }
+                            } else {
+                                String message = String.format("[Magneto@%s::fetchRawHtml] Failed to fetch URL : %s",
+                                        this.getClass().getSimpleName(), ar.cause().getMessage());
+                                log.error(message);
+                                renderJson(request, new JsonObject()
+                                        .put("error", "Failed to fetch content"), 500);
+                            }
+                        });
             });
         });
     }

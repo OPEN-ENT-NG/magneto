@@ -59,6 +59,8 @@ import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
+import { useHtmlScraper } from "~/hooks/useHtmlScrapper";
+import useHtmlGet from "~/hooks/useUrlToMarkdown";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -71,6 +73,17 @@ import { workspaceApi } from "~/services/api/workspace.service";
 //import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
+  const { html } = useHtmlGet(
+    "https://en.wikipedia.org/wiki/Georgia_women%27s_football_championship",
+  );
+  const url =
+    "https://www.aachenerdom.de/fr/un-lieu-dhistoire/charlemagne/#:~:text=Charlemagne%20fut%20le%20premier%20empereur,l'expansion%20de%20son%20empire.";
+  const { scrapedContent } = useHtmlScraper({
+    url,
+    autoScrape: true,
+  });
+
+  // data?.markdown contient le résultat
   const { sendMessage, readyState } = useWebSocketMagneto();
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
@@ -296,6 +309,19 @@ export const CreateMagnet: FC = () => {
       setSection(board.sections[0]);
     }
   }, [board.sections]);
+
+  useEffect(() => {
+    if (html) {
+      console.log(html);
+      setDescription(html);
+    }
+  }, [html]);
+
+  useEffect(() => {
+    if (scrapedContent) {
+      setDescription(scrapedContent.cleanHtml);
+    }
+  }, [scrapedContent]);
 
   return (
     <Modal

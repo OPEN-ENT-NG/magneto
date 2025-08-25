@@ -1,0 +1,395 @@
+import { useCallback, useMemo, useEffect } from "react";
+
+import { useFetchRawHtmlMutation } from "~/services/api/cards.service";
+
+// types/htmlScraping.ts
+export interface RawHtmlResponse {
+  html: string;
+  url: string;
+  contentType?: string;
+  timestamp: number;
+}
+
+export interface ScrapedContent {
+  originalUrl: string;
+  cleanHtml: string;
+  title: string;
+  timestamp: number;
+  contentType?: string;
+}
+
+export interface HtmlScrapingError {
+  error: string;
+  message?: string;
+  status?: number | string;
+}
+
+interface UseHtmlScrapperReturn {
+  scrapedContent: ScrapedContent | null;
+  scrape: () => Promise<ScrapedContent>;
+  isLoading: boolean;
+  error: HtmlScrapingError | null;
+  reset: () => void;
+  isValidUrl: boolean;
+}
+
+interface UseHtmlScrapperParams {
+  url?: string;
+  autoScrape?: boolean; // Lancer automatiquement le scraping quand l'URL change
+}
+
+// Pour RTK Query
+export interface FetchHtmlRequest {
+  url: string;
+}
+
+// ===== FONCTIONS UTILITAIRES =====
+
+const removeElements = (doc: Document, selectors: string[]): void => {
+  selectors.forEach((selector) => {
+    try {
+      doc.querySelectorAll(selector).forEach((el) => el.remove());
+    } catch (error) {
+      console.warn(`Invalid selector: ${selector}`, error);
+    }
+  });
+};
+
+const fixUrls = (doc: Document, baseUrl: string): void => {
+  try {
+    const base = new URL(baseUrl);
+
+    // Fixer les images
+    doc.querySelectorAll<HTMLImageElement>("img[src]").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (
+        src &&
+        !src.startsWith("http") &&
+        !src.startsWith("data:") &&
+        !src.startsWith("//")
+      ) {
+        try {
+          img.src = new URL(src, base).toString();
+        } catch (e) {
+          console.warn(`Invalid image URL: ${src}`, e);
+          img.remove();
+        }
+      }
+    });
+
+    // Fixer les liens CSS
+    doc
+      .querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')
+      .forEach((link) => {
+        const href = link.getAttribute("href");
+        if (href && !href.startsWith("http") && !href.startsWith("//")) {
+          try {
+            link.href = new URL(href, base).toString();
+          } catch (e) {
+            console.warn(`Invalid CSS URL: ${href}`, e);
+          }
+        }
+      });
+
+    // Fixer les autres liens
+    doc.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((link) => {
+      const href = link.getAttribute("href");
+      if (
+        href &&
+        !href.startsWith("http") &&
+        !href.startsWith("mailto:") &&
+        !href.startsWith("#") &&
+        !href.startsWith("//")
+      ) {
+        try {
+          link.href = new URL(href, base).toString();
+        } catch (e) {
+          console.warn(`Invalid link URL: ${href}`, e);
+        }
+      }
+    });
+  } catch (e) {
+    console.error("URL fixing error:", e);
+  }
+};
+
+const optimizeStyles = (doc: Document): void => {
+  // Nettoyer les styles inline potentiellement dangereux
+  doc.querySelectorAll<HTMLElement>("[style]").forEach((element) => {
+    const style = element.getAttribute("style");
+    if (style) {
+      // Supprimer les propriétés CSS dangereuses
+      const cleanStyle = style
+        .replace(/expression\s*\([^)]*\)/gi, "") // IE expressions
+        .replace(/javascript\s*:/gi, "") // JavaScript dans les CSS
+        .replace(/url\s*\(\s*javascript\s*:/gi, ""); // JavaScript dans les URLs CSS
+
+      element.setAttribute("style", cleanStyle);
+    }
+  });
+
+  // Optimiser les balises style internes
+  doc.querySelectorAll<HTMLStyleElement>("style").forEach((style) => {
+    if (style.textContent) {
+      // Supprimer les commentaires CSS et espaces inutiles
+      const cleanedContent = style.textContent
+        .replace(/\/\*[\s\S]*?\*\//g, "") // Commentaires CSS
+        .replace(/\s+/g, " ") // Espaces multiples
+        .trim();
+
+      style.textContent = cleanedContent;
+    }
+  });
+};
+
+const extractTitle = (htmlString: string): string => {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+    const titleElement = doc.querySelector("title");
+    return titleElement?.textContent?.trim() || "";
+  } catch (error) {
+    console.error("Title extraction error:", error);
+    return "";
+  }
+};
+
+const cleanHtml = (htmlString: string, baseUrl: string): string => {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+
+    // Vérifier si le parsing a réussi
+    const parserError = doc.querySelector("parsererror");
+    if (parserError) {
+      throw new Error("HTML parsing failed");
+    }
+
+    // Supprimer les éléments indésirables
+    const selectorsToRemove: string[] = [
+      "script",
+      "noscript",
+      'iframe[src*="analytics"]',
+      'iframe[src*="google-analytics"]',
+      'iframe[src*="facebook"]',
+      'iframe[src*="twitter"]',
+      "nav",
+      "header",
+      "footer",
+      ".navbar",
+      ".nav-bar",
+      ".navigation",
+      ".sidebar",
+      ".side-bar",
+      ".menu",
+      ".advertisement",
+      ".ads",
+      ".ad",
+      ".cookie-banner",
+      ".cookie-notice",
+      ".popup",
+      ".modal",
+      "meta[http-equiv]",
+      "base", // Supprimer les balises qui pourraient causer des problèmes
+      ".social-share",
+      ".share-buttons",
+      ".comments",
+      ".comment-section",
+      ".related-articles",
+      ".recommended",
+    ];
+
+    removeElements(doc, selectorsToRemove);
+
+    // Supprimer les attributs d'événements dangereux
+    const dangerousAttributes = [
+      "onclick",
+      "onload",
+      "onerror",
+      "onmouseover",
+      "onmouseout",
+      "onfocus",
+      "onblur",
+      "onsubmit",
+      "onchange",
+      "onkeydown",
+      "onkeyup",
+      "onmousedown",
+      "onmouseup",
+      "ondblclick",
+      "oncontextmenu",
+    ];
+
+    doc.querySelectorAll("*").forEach((element) => {
+      dangerousAttributes.forEach((attr) => element.removeAttribute(attr));
+
+      // Supprimer les attributs data potentiellement problématiques
+      Array.from(element.attributes).forEach((attr) => {
+        if (
+          attr.name.startsWith("data-track") ||
+          attr.name.startsWith("data-analytics") ||
+          attr.name.startsWith("data-ga")
+        ) {
+          element.removeAttribute(attr.name);
+        }
+      });
+    });
+
+    // Corriger les URLs relatives
+    fixUrls(doc, baseUrl);
+
+    // Optimiser les styles
+    optimizeStyles(doc);
+
+    // Nettoyer les éléments vides ou inutiles
+    doc.querySelectorAll("div, span, p").forEach((element) => {
+      if (
+        !element.textContent?.trim() &&
+        !element.querySelector("img, video, audio, canvas, svg")
+      ) {
+        element.remove();
+      }
+    });
+
+    //Saut de ligne avant et après chaque titre
+    doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading) => {
+      const brBefore = doc.createElement("br");
+      heading.parentNode?.insertBefore(brBefore, heading);
+
+      const pAfter = doc.createElement("p");
+      pAfter.innerHTML = "&nbsp;";
+      heading.parentNode?.insertBefore(pAfter, heading.nextSibling);
+    });
+
+    return doc.documentElement.outerHTML;
+  } catch (error) {
+    console.error("HTML cleaning error:", error);
+    // Fallback: retourner le HTML original en cas d'erreur
+    return htmlString;
+  }
+};
+
+// ===== TYPES =====
+
+// ===== HOOK PRINCIPAL =====
+
+export const useHtmlScraper = (
+  params?: UseHtmlScrapperParams,
+): UseHtmlScrapperReturn => {
+  const { url, autoScrape = false } = params || {};
+
+  const [
+    fetchRawHtml,
+    { data: rawData, isLoading, error: rtqError, reset: resetMutation },
+  ] = useFetchRawHtmlMutation();
+
+  // Validation de l'URL
+  const isValidUrl = useMemo((): boolean => {
+    if (!url) return false;
+
+    try {
+      new URL(url);
+      return url.startsWith("http://") || url.startsWith("https://");
+    } catch {
+      return false;
+    }
+  }, [url]);
+
+  // Transformation de l'erreur
+  const error = useMemo((): HtmlScrapingError | null => {
+    if (!rtqError) return null;
+
+    if ("status" in rtqError) {
+      return {
+        error: "Network error",
+        status: rtqError.status,
+      };
+    }
+
+    if ("message" in rtqError) {
+      return {
+        error: "Request failed",
+        message: rtqError.message,
+      };
+    }
+
+    return {
+      error: "Unknown error",
+      message: String(rtqError),
+    };
+  }, [rtqError]);
+
+  // Traitement et nettoyage du HTML récupéré
+  const scrapedContent = useMemo((): ScrapedContent | null => {
+    if (!rawData || !url) return null;
+
+    try {
+      const cleanedHtml = cleanHtml(rawData.html, rawData.url);
+      const title = extractTitle(rawData.html);
+
+      return {
+        originalUrl: rawData.url,
+        cleanHtml: cleanedHtml,
+        title,
+        timestamp: rawData.timestamp,
+        contentType: rawData.contentType,
+      };
+    } catch (error) {
+      console.error("HTML processing error:", error);
+      return null;
+    }
+  }, [rawData, url]);
+
+  // Fonction pour déclencher manuellement le scraping
+  const scrape = useCallback(async (): Promise<ScrapedContent> => {
+    if (!url || !isValidUrl) {
+      throw new Error("Invalid or missing URL");
+    }
+
+    try {
+      const rawResult = await fetchRawHtml(url).unwrap();
+
+      const cleanedHtml = cleanHtml(rawResult.html, rawResult.url);
+      const title = extractTitle(rawResult.html);
+
+      return {
+        originalUrl: rawResult.url,
+        cleanHtml: cleanedHtml,
+        title,
+        timestamp: rawResult.timestamp,
+        contentType: rawResult.contentType,
+      };
+    } catch (err) {
+      console.error("Scraping error:", err);
+
+      if (err && typeof err === "object" && "message" in err) {
+        throw new Error(`Scraping failed: ${err.message}`);
+      }
+
+      throw new Error("Failed to scrape and clean HTML content");
+    }
+  }, [url, isValidUrl, fetchRawHtml]);
+
+  // Auto-scraping quand l'URL change
+  useEffect(() => {
+    if (autoScrape && url && isValidUrl && !isLoading) {
+      scrape().catch((error) => {
+        console.error("Auto-scraping failed:", error);
+      });
+    }
+  }, [autoScrape, url, isValidUrl, isLoading, scrape]);
+
+  // Reset function qui nettoie tout
+  const reset = useCallback(() => {
+    resetMutation();
+  }, [resetMutation]);
+
+  return {
+    scrapedContent,
+    scrape,
+    isLoading,
+    error,
+    reset,
+    isValidUrl,
+  };
+};

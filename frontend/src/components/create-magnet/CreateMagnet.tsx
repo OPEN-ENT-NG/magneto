@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState, useCallback } from "react";
 
 import {
   IconButton as EdIconButton,
@@ -60,7 +60,6 @@ import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useHtmlScraper } from "~/hooks/useHtmlScrapper";
-import useHtmlGet from "~/hooks/useUrlToMarkdown";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
@@ -70,20 +69,10 @@ import {
   useUpdateCardMutation,
 } from "~/services/api/cards.service";
 import { workspaceApi } from "~/services/api/workspace.service";
-//import { useWebSocketManager } from "~/services/websocket/useWebSocketManager";
 
 export const CreateMagnet: FC = () => {
-  const { html } = useHtmlGet(
-    "https://en.wikipedia.org/wiki/Georgia_women%27s_football_championship",
-  );
-  const url =
-    "https://www.aachenerdom.de/fr/un-lieu-dhistoire/charlemagne/#:~:text=Charlemagne%20fut%20le%20premier%20empereur,l'expansion%20de%20son%20empire.";
-  const { scrapedContent } = useHtmlScraper({
-    url,
-    autoScrape: true,
-  });
+  const { scrape } = useHtmlScraper();
 
-  // data?.markdown contient le résultat
   const { sendMessage, readyState } = useWebSocketMagneto();
   const { t } = useTranslation("magneto");
   const { board, documents } = useBoard();
@@ -116,6 +105,32 @@ export const CreateMagnet: FC = () => {
 
   const { activeCard, closeActiveCardAction } = useBoard();
   const isEditMagnet = !!activeCard;
+
+  // Fonction pour scraper une URL donnée
+  const handleScrapeUrl = useCallback(
+    async (urlToScrape: string) => {
+      if (
+        !urlToScrape ||
+        !(
+          urlToScrape.startsWith("http://") ||
+          urlToScrape.startsWith("https://")
+        )
+      ) {
+        return;
+      }
+
+      try {
+        console.log(urlToScrape);
+        const content = await scrape(urlToScrape);
+        if (content?.cleanHtml) {
+          setDescription(content.cleanHtml);
+        }
+      } catch (error) {
+        console.error("Erreur lors du scraping:", error);
+      }
+    },
+    [scrape],
+  );
 
   useEffect(() => {
     if (
@@ -242,15 +257,21 @@ export const CreateMagnet: FC = () => {
   };
 
   useEffect(() => {
-    if (!isEditMagnet && media?.name) {
-      if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
-      if (magnetTypeHasLink) {
-        setLinkUrl(media.url); // init if type link only
-        setTitle(media.name.replace(/^(?:https?:\/\/(?:www\.)?|www\.)/, ""));
-      } else if (!magnetTypeHasVideo)
-        setTitle(media.name.split(".").slice(0, -1).join("."));
-    }
-  }, [media]);
+    const handleMediaChange = async () => {
+      if (!isEditMagnet && media?.name) {
+        if (magnetTypeHasAudio) return setTitle(media.name.split(".")[0]);
+        if (magnetTypeHasLink) {
+          setLinkUrl(media.url);
+          setTitle(media.name.replace(/^(?:https?:\/\/(?:www\.)?|www\.)/, ""));
+          // Scraper automatiquement l'URL du media
+          await handleScrapeUrl(media.url);
+        } else if (!magnetTypeHasVideo)
+          setTitle(media.name.split(".").slice(0, -1).join("."));
+      }
+    };
+
+    handleMediaChange();
+  }, [media, isEditMagnet, handleScrapeUrl]);
 
   useEffect(() => {
     if (!isEditMagnet && selectedBoardData) {
@@ -296,6 +317,19 @@ export const CreateMagnet: FC = () => {
     media && media.url && media.type === MEDIA_LIBRARY_TYPE.VIDEO;
   const magnetTypeHasCaption = magnetType !== "text";
 
+  // Dans la fonction où tu gères le changement de linkUrl
+  const handleLinkUrlChange = useCallback(
+    async (url: string) => {
+      setLinkUrl(url);
+
+      // Scraper seulement si c'est un type link
+      if (magnetTypeHasLink) {
+        await handleScrapeUrl(url);
+      }
+    },
+    [magnetTypeHasLink, handleScrapeUrl],
+  );
+
   useEffect(() => {
     if (isCreateMagnetOpen) {
       setTimeout(() => {
@@ -309,19 +343,6 @@ export const CreateMagnet: FC = () => {
       setSection(board.sections[0]);
     }
   }, [board.sections]);
-
-  useEffect(() => {
-    if (html) {
-      console.log(html);
-      setDescription(html);
-    }
-  }, [html]);
-
-  useEffect(() => {
-    if (scrapedContent) {
-      setDescription(scrapedContent.cleanHtml);
-    }
-  }, [scrapedContent]);
 
   return (
     <Modal
@@ -399,7 +420,8 @@ export const CreateMagnet: FC = () => {
                 value={linkUrl}
                 size="md"
                 type="text"
-                onChange={(e) => setLinkUrl(e.target.value)}
+                onChange={(e) => handleLinkUrlChange(e.target.value)}
+                disabled={magnetTypeHasLink}
               />
             </FormControl>
           )}

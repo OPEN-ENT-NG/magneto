@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useFetchRawHtmlMutation } from "~/services/api/cards.service";
 
@@ -26,7 +26,7 @@ export interface HtmlScrapingError {
 
 interface UseHtmlScrapperReturn {
   scrapedContent: ScrapedContent | null;
-  scrape: () => Promise<ScrapedContent>;
+  scrape: (urlToScrape?: string) => Promise<ScrapedContent>;
   isLoading: boolean;
   error: HtmlScrapingError | null;
   reset: () => void;
@@ -35,7 +35,6 @@ interface UseHtmlScrapperReturn {
 
 interface UseHtmlScrapperParams {
   url?: string;
-  autoScrape?: boolean; // Lancer automatiquement le scraping quand l'URL change
 }
 
 // Pour RTK Query
@@ -142,6 +141,140 @@ const optimizeStyles = (doc: Document): void => {
   });
 };
 
+/**
+ * Nettoie les délimiteurs LaTeX d'une formule mathématique
+ */
+const cleanLatexDelimiters = (latex: string): string => {
+  let result = latex;
+
+  // Mappings des délimiteurs LaTeX vers leurs équivalents simples
+  const delimiterMappings: Record<string, string> = {
+    // Barres absolues et normes
+    "\\left\\|": "‖",
+    "\\right\\|": "‖",
+    "\\left|": "|",
+    "\\right|": "|",
+
+    // Parenthèses
+    "\\left(": "(",
+    "\\right)": ")",
+
+    // Crochets
+    "\\left[": "[",
+    "\\right]": "]",
+
+    // Accolades
+    "\\left\\{": "{",
+    "\\right\\}": "}",
+
+    // Chevrons
+    "\\left\\langle": "⟨",
+    "\\right\\rangle": "⟩",
+
+    // Plafonds et planchers
+    "\\left\\lceil": "⌈",
+    "\\right\\rceil": "⌉",
+    "\\left\\lfloor": "⌊",
+    "\\right\\rfloor": "⌋",
+
+    // Autres délimiteurs courants
+    "\\left.": "", // délimiteur invisible
+    "\\right.": "", // délimiteur invisible
+
+    // Espaces LaTeX
+    "\\,": " ", // petit espace
+    "\\:": " ", // espace moyen
+    "\\;": " ", // grand espace
+    "\\quad": "  ", // espace quadruple
+    "\\qquad": "    ", // espace octuple
+    "\\ ": " ", // espace forcé
+  };
+
+  // Remplacer dans l'ordre des plus longs aux plus courts
+  const sortedKeys = Object.keys(delimiterMappings).sort(
+    (a, b) => b.length - a.length,
+  );
+
+  sortedKeys.forEach((latexDelimiter) => {
+    const replacement = delimiterMappings[latexDelimiter];
+    // Échapper les caractères spéciaux pour la regex
+    const escapedDelimiter = latexDelimiter.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    );
+    const regex = new RegExp(escapedDelimiter, "g");
+    result = result.replace(regex, replacement);
+  });
+
+  // Nettoyer les espaces multiples
+  result = result.replace(/\s+/g, " ").trim();
+
+  return result;
+};
+
+const extractKaTeXFormulas = (doc: Document): void => {
+  try {
+    const katexWrappers = doc.querySelectorAll(".katex-wrapper");
+    let formulasExtracted = 0;
+
+    katexWrappers.forEach((wrapper) => {
+      try {
+        const annotation = wrapper.querySelector(
+          'annotation[encoding="application/x-tex"]',
+        );
+
+        if (annotation && annotation.textContent) {
+          const latexFormula = annotation.textContent.trim();
+
+          // Nettoyer les délimiteurs LaTeX
+          const cleanedFormula = cleanLatexDelimiters(latexFormula);
+
+          const isDisplayMode =
+            wrapper.querySelector(".katex-display") !== null;
+
+          // Créer l'élément de remplacement
+          const mathElement = doc.createElement("span");
+          mathElement.className = isDisplayMode
+            ? "math-display"
+            : "math-inline";
+          mathElement.textContent = cleanedFormula; // Utiliser la formule nettoyée
+          mathElement.setAttribute("title", latexFormula); // Garder l'original en tooltip
+
+          // Gérer le cas spécial des paragraphes tex-par pour display
+          const texParent = wrapper.closest("p.tex-par");
+          if (texParent && isDisplayMode && texParent.children.length === 1) {
+            const mathDiv = doc.createElement("div");
+            mathDiv.className = "math-display";
+            mathDiv.textContent = cleanedFormula; // Utiliser la formule nettoyée
+            mathDiv.setAttribute("title", latexFormula); // Garder l'original en tooltip
+            texParent.parentNode?.replaceChild(mathDiv, texParent);
+          } else {
+            wrapper.parentNode?.replaceChild(mathElement, wrapper);
+          }
+
+          console.log(`Formule nettoyée: ${latexFormula} → ${cleanedFormula}`);
+          formulasExtracted++;
+        }
+      } catch (error) {
+        console.warn("Erreur extraction formule:", error);
+      }
+    });
+
+    if (formulasExtracted > 0) {
+      console.log(`${formulasExtracted} formules KaTeX extraites`);
+    }
+
+    // Nettoyer les résidus KaTeX
+    doc
+      .querySelectorAll(
+        ".katex, .katex-wrapper, .katex-display, .katex-html, .katex-mathml",
+      )
+      .forEach((el) => el.remove());
+  } catch (error) {
+    console.error("Erreur extraction KaTeX:", error);
+  }
+};
+
 const extractTitle = (htmlString: string): string => {
   try {
     const parser = new DOMParser();
@@ -164,6 +297,9 @@ const cleanHtml = (htmlString: string, baseUrl: string): string => {
     if (parserError) {
       throw new Error("HTML parsing failed");
     }
+
+    // Extraire les formules KaTeX en premier
+    extractKaTeXFormulas(doc);
 
     // Supprimer les éléments indésirables
     const selectorsToRemove: string[] = [
@@ -190,7 +326,7 @@ const cleanHtml = (htmlString: string, baseUrl: string): string => {
       ".popup",
       ".modal",
       "meta[http-equiv]",
-      "base", // Supprimer les balises qui pourraient causer des problèmes
+      "base",
       ".social-share",
       ".share-buttons",
       ".comments",
@@ -243,40 +379,69 @@ const cleanHtml = (htmlString: string, baseUrl: string): string => {
 
     // Nettoyer les éléments vides ou inutiles
     doc.querySelectorAll("div, span, p").forEach((element) => {
+      // Préserver les éléments mathématiques
+      if (
+        element.classList.contains("math-display") ||
+        element.classList.contains("math-inline")
+      ) {
+        return;
+      }
+
       if (
         !element.textContent?.trim() &&
-        !element.querySelector("img, video, audio, canvas, svg")
+        !element.querySelector("img, video, audio, canvas, svg") &&
+        !element.querySelector(".math-display, .math-inline")
       ) {
         element.remove();
       }
     });
 
-    //Saut de ligne avant et après chaque titre
-    doc.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading) => {
-      const brBefore = doc.createElement("br");
-      heading.parentNode?.insertBefore(brBefore, heading);
-
-      const pAfter = doc.createElement("p");
-      pAfter.innerHTML = "&nbsp;";
-      heading.parentNode?.insertBefore(pAfter, heading.nextSibling);
-    });
-
     return doc.documentElement.outerHTML;
   } catch (error) {
     console.error("HTML cleaning error:", error);
-    // Fallback: retourner le HTML original en cas d'erreur
     return htmlString;
   }
 };
 
-// ===== TYPES =====
+// Fonction utilitaire pour convertir en format TipTap
+export const convertHtmlForTipTap = (cleanHtml: string): string => {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(cleanHtml, "text/html");
+
+    // Convertir math-display
+    doc.querySelectorAll(".math-display").forEach((element) => {
+      const latexContent = element.textContent || "";
+      const mathDiv = doc.createElement("div");
+      mathDiv.setAttribute("data-type", "mathematics");
+      mathDiv.setAttribute("data-display", "block");
+      mathDiv.textContent = latexContent;
+      element.parentNode?.replaceChild(mathDiv, element);
+    });
+
+    // Convertir math-inline
+    doc.querySelectorAll(".math-inline").forEach((element) => {
+      const latexContent = element.textContent || "";
+      const mathSpan = doc.createElement("span");
+      mathSpan.setAttribute("data-type", "mathematics");
+      mathSpan.setAttribute("data-display", "inline");
+      mathSpan.textContent = latexContent;
+      element.parentNode?.replaceChild(mathSpan, element);
+    });
+
+    return doc.body.innerHTML;
+  } catch (error) {
+    console.error("Erreur conversion TipTap:", error);
+    return cleanHtml;
+  }
+};
 
 // ===== HOOK PRINCIPAL =====
 
 export const useHtmlScraper = (
   params?: UseHtmlScrapperParams,
 ): UseHtmlScrapperReturn => {
-  const { url, autoScrape = false } = params || {};
+  const { url } = params || {};
 
   const [
     fetchRawHtml,
@@ -341,43 +506,52 @@ export const useHtmlScraper = (
   }, [rawData, url]);
 
   // Fonction pour déclencher manuellement le scraping
-  const scrape = useCallback(async (): Promise<ScrapedContent> => {
-    if (!url || !isValidUrl) {
-      throw new Error("Invalid or missing URL");
-    }
+  const scrape = useCallback(
+    async (urlToScrape?: string): Promise<ScrapedContent> => {
+      const targetUrl = urlToScrape || url;
 
-    try {
-      const rawResult = await fetchRawHtml(url).unwrap();
-
-      const cleanedHtml = cleanHtml(rawResult.html, rawResult.url);
-      const title = extractTitle(rawResult.html);
-
-      return {
-        originalUrl: rawResult.url,
-        cleanHtml: cleanedHtml,
-        title,
-        timestamp: rawResult.timestamp,
-        contentType: rawResult.contentType,
-      };
-    } catch (err) {
-      console.error("Scraping error:", err);
-
-      if (err && typeof err === "object" && "message" in err) {
-        throw new Error(`Scraping failed: ${err.message}`);
+      if (!targetUrl) {
+        throw new Error("Invalid or missing URL");
       }
 
-      throw new Error("Failed to scrape and clean HTML content");
-    }
-  }, [url, isValidUrl, fetchRawHtml]);
+      // Validation de l'URL cible
+      try {
+        new URL(targetUrl);
+        if (
+          !targetUrl.startsWith("http://") &&
+          !targetUrl.startsWith("https://")
+        ) {
+          throw new Error("URL must start with http:// or https://");
+        }
+      } catch {
+        throw new Error("Invalid URL format");
+      }
 
-  // Auto-scraping quand l'URL change
-  useEffect(() => {
-    if (autoScrape && url && isValidUrl && !isLoading) {
-      scrape().catch((error) => {
-        console.error("Auto-scraping failed:", error);
-      });
-    }
-  }, [autoScrape, url, isValidUrl, isLoading, scrape]);
+      try {
+        const rawResult = await fetchRawHtml(targetUrl).unwrap();
+
+        const cleanedHtml = cleanHtml(rawResult.html, rawResult.url);
+        const title = extractTitle(rawResult.html);
+
+        return {
+          originalUrl: rawResult.url,
+          cleanHtml: cleanedHtml,
+          title,
+          timestamp: rawResult.timestamp,
+          contentType: rawResult.contentType,
+        };
+      } catch (err) {
+        console.error("Scraping error:", err);
+
+        if (err && typeof err === "object" && "message" in err) {
+          throw new Error(`Scraping failed: ${err.message}`);
+        }
+
+        throw new Error("Failed to scrape and clean HTML content");
+      }
+    },
+    [url, fetchRawHtml],
+  );
 
   // Reset function qui nettoie tout
   const reset = useCallback(() => {

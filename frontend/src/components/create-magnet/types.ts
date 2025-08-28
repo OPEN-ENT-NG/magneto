@@ -1,5 +1,5 @@
 export interface CreateMagnetProps {
-  open: boolean;
+  descriptionScraped?: string;
 }
 
 export interface CardPayload {

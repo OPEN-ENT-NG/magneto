@@ -77,7 +77,7 @@ export const cardsApi = emptySplitApi.injectEndpoints({
     }),
     fetchRawHtml: builder.mutation({
       query: (url) => ({
-        url: "/fetch-html",
+        url: "/card/fetchHtml",
         method: "POST",
         body: { url },
       }),

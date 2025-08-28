@@ -306,32 +306,30 @@ public class CardController extends ControllerHelper {
         });
     }
 
-    // Dans CardController.java
-    @Post("/fetch-html")
+    @Post("/card/fetchHtml")
     @ApiDoc("Fetch raw HTML from URL")
     @ResourceFilter(ViewRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void fetchRawHtml(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, body -> {
             UserUtils.getUserInfos(eb, request, user -> {
-                String url = body.getString("url");
+                String url = body.getString(Field.URL);
 
                 if (url == null || url.trim().isEmpty()) {
-                    renderJson(request, new JsonObject().put("error", "URL is required"), 400);
+                    renderError(request);
                     return;
                 }
 
-                // Validation URL
                 try {
                     new URI(url).toURL();
                 } catch (Exception e) {
-                    renderJson(request, new JsonObject().put("error", "Invalid URL"), 400);
+                    renderError(request);
                     return;
                 }
 
                 webClient.getAbs(url)
-                        .putHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                        .putHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                        .putHeader(Field.USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                        .putHeader(Field.ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
                         .timeout(30000)
                         .send(ar -> {
                             if (ar.succeeded()) {
@@ -339,21 +337,19 @@ public class CardController extends ControllerHelper {
 
                                 if (response.statusCode() == 200) {
                                     JsonObject result = new JsonObject()
-                                            .put("html", response.bodyAsString())
-                                            .put("url", url)
-                                            .put("contentType", response.getHeader("Content-Type"))
-                                            .put("timestamp", System.currentTimeMillis());
+                                            .put(Field.HTML, response.bodyAsString())
+                                            .put(Field.URL, url)
+                                            .put(Field.CONTENTTYPE, response.getHeader("Content-Type"))
+                                            .put(Field.TIMESTAMP, System.currentTimeMillis());
                                     renderJson(request, result);
                                 } else {
-                                    renderJson(request, new JsonObject()
-                                            .put("error", "HTTP " + response.statusCode()), response.statusCode());
+                                    renderError(request);
                                 }
                             } else {
                                 String message = String.format("[Magneto@%s::fetchRawHtml] Failed to fetch URL : %s",
                                         this.getClass().getSimpleName(), ar.cause().getMessage());
                                 log.error(message);
-                                renderJson(request, new JsonObject()
-                                        .put("error", "Failed to fetch content"), 500);
+                                renderError(request);
                             }
                         });
             });

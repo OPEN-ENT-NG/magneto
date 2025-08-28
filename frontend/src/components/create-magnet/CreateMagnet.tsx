@@ -120,7 +120,6 @@ export const CreateMagnet: FC = () => {
       }
 
       try {
-        console.log(urlToScrape);
         const content = await scrape(urlToScrape);
         if (content?.cleanHtml) {
           setDescription(content.cleanHtml);

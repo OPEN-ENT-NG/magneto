@@ -215,7 +215,6 @@ const cleanLatexDelimiters = (latex: string): string => {
 const extractKaTeXFormulas = (doc: Document): void => {
   try {
     const katexWrappers = doc.querySelectorAll(".katex-wrapper");
-    let formulasExtracted = 0;
 
     katexWrappers.forEach((wrapper) => {
       try {
@@ -251,18 +250,11 @@ const extractKaTeXFormulas = (doc: Document): void => {
           } else {
             wrapper.parentNode?.replaceChild(mathElement, wrapper);
           }
-
-          console.log(`Formule nettoyée: ${latexFormula} → ${cleanedFormula}`);
-          formulasExtracted++;
         }
       } catch (error) {
         console.warn("Erreur extraction formule:", error);
       }
     });
-
-    if (formulasExtracted > 0) {
-      console.log(`${formulasExtracted} formules KaTeX extraites`);
-    }
 
     // Nettoyer les résidus KaTeX
     doc

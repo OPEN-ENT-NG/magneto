@@ -272,4 +272,8 @@ public class Field {
     public static final String BHOST = "Host";
     public static final String HTTP = "http";
     public static final String HTTPS = "https";
+    public static final String URL = "url";
+    public static final String USERAGENT = "User-Agent";
+    public static final String HTML = "html";
+    public static final String TIMESTAMP = "timestamp";
 }

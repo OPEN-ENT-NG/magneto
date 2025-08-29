@@ -75,6 +75,13 @@ export const cardsApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ["BoardData"],
     }),
+    fetchRawHtml: builder.mutation({
+      query: (url) => ({
+        url: "/card/fetchHtml",
+        method: "POST",
+        body: { url },
+      }),
+    }),
   }),
 });
 
@@ -88,4 +95,5 @@ export const {
   useFavoriteCardMutation,
   useDeleteCardsMutation,
   useMoveCardMutation,
+  useFetchRawHtmlMutation,
 } = cardsApi;

@@ -157,3 +157,14 @@ export const audioWrapperStyle = {
   justifyContent: "center",
   alignItems: "center",
 };
+
+export const buttonStyle = {
+  fontSize: "1.4rem",
+  height: "4rem",
+  minHeight: "4rem",
+  borderRadius: "2rem",
+  paddingX: "1rem",
+  minWidth: "auto",
+  whiteSpace: "nowrap",
+  color: "#4a4a4a",
+};

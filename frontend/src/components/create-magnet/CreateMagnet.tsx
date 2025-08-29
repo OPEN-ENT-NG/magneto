@@ -1,8 +1,9 @@
 import { FC, useEffect, useRef, useState, useCallback } from "react";
 
+import { Button } from "@cgi-learning-hub/ui";
 import {
   IconButton as EdIconButton,
-  Button,
+  Button as EdificeButton,
   FormControl,
   Input,
   Label,
@@ -41,6 +42,7 @@ import {
   menuItemStyle,
   formControlEditorStyle,
   audioWrapperStyle,
+  buttonStyle,
 } from "./style";
 import { CardPayload } from "./types";
 import {
@@ -412,17 +414,37 @@ export const CreateMagnet: FC = () => {
           )}
           {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
           {magnetTypeHasLink && (
-            <FormControl id="url" style={formControlStyle}>
-              <Label>{t("magneto.site.address")}</Label>
-              <Input
-                ref={firstInputRef}
-                value={linkUrl}
-                size="md"
-                type="text"
-                onChange={(e) => handleLinkUrlChange(e.target.value)}
-                disabled={magnetTypeHasLink}
-              />
-            </FormControl>
+            <>
+              <ScaledIframe src={linkUrl} />
+              <div
+                style={{
+                  ...formControlStyle,
+                  display: "flex",
+                  alignItems: "flex-end",
+                  gap: "1rem",
+                }}
+              >
+                <FormControl id="url" style={{ flex: 1, marginBottom: 0 }}>
+                  <Label>{t("magneto.site.address")}</Label>
+                  <Input
+                    ref={firstInputRef}
+                    value={linkUrl}
+                    size="md"
+                    type="text"
+                    onChange={(e) => handleLinkUrlChange(e.target.value)}
+                    disabled={magnetTypeHasLink}
+                  />
+                </FormControl>
+                <Button
+                  size="medium"
+                  variant="text"
+                  sx={buttonStyle}
+                  onClick={() => handleClickMedia(MEDIA_LIBRARY_TYPE.HYPERLINK)}
+                >
+                  <IconEdit fontSize="large" />
+                </Button>
+              </div>
+            </>
           )}
           <FormControl id="title" style={formControlStyle}>
             <Label>{t("magneto.card.title")}</Label>
@@ -482,7 +504,7 @@ export const CreateMagnet: FC = () => {
             </FormControlMUI>
           )}
           <Box sx={modalFooterStyle}>
-            <Button
+            <EdificeButton
               style={footerButtonStyle}
               color="tertiary"
               type="button"
@@ -490,8 +512,8 @@ export const CreateMagnet: FC = () => {
               onClick={() => onCloseModalAndDeactivateCard()}
             >
               {t("magneto.cancel")}
-            </Button>
-            <Button
+            </EdificeButton>
+            <EdificeButton
               style={footerButtonStyle}
               color="primary"
               type="submit"
@@ -499,7 +521,7 @@ export const CreateMagnet: FC = () => {
               onClick={() => onUpload()}
             >
               {t("magneto.save")}
-            </Button>
+            </EdificeButton>
           </Box>
         </Box>
       </Box>

@@ -37,7 +37,7 @@ export default [
           jsx: true,
         },
         projectService: true,
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: {

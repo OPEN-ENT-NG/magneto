@@ -157,3 +157,49 @@ export const audioWrapperStyle = {
   justifyContent: "center",
   alignItems: "center",
 };
+
+export const buttonBoxStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexShrink: 0,
+  width: "6%",
+};
+
+export const inputAndButtonBoxStyle = {
+  display: "flex",
+  alignItems: "flex-end",
+};
+
+export const buttonStyle = {
+  fontSize: "1.4rem",
+  height: "4rem",
+  minHeight: "4rem",
+  borderRadius: "2rem",
+  paddingX: "1rem",
+  minWidth: "auto",
+  whiteSpace: "nowrap",
+  color: "#4a4a4a",
+};
+
+export const dualButtonsStyle = {
+  fontSize: "1.4rem",
+  height: "4rem",
+  minHeight: "4rem",
+  borderRadius: "2rem",
+  minWidth: "auto",
+  whiteSpace: "nowrap",
+  color: "#4a4a4a",
+};
+
+export const dualButtonsSize = {
+  fontSize: "2.3rem",
+};
+
+export const successColor = {
+  color: "#2E7D32",
+};
+
+export const cancelColor = {
+  color: "#EB002B",
+};

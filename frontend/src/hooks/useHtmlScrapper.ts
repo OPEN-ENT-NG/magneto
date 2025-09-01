@@ -177,6 +177,10 @@ const cleanLatexDelimiters = (latex: string): string => {
     "\\left\\lfloor": "⌊",
     "\\right\\rfloor": "⌋",
 
+    // Opérateurs mathématiques
+    "\\times": " × ",
+    "\\cdot": "·",
+
     // Autres délimiteurs courants
     "\\left.": "", // délimiteur invisible
     "\\right.": "", // délimiteur invisible
@@ -190,6 +194,40 @@ const cleanLatexDelimiters = (latex: string): string => {
     "\\ ": " ", // espace forcé
   };
 
+  // Traitement spécial pour les fractions AVANT les autres remplacements
+  result = result.replace(
+    /\\frac\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g,
+    (match, numerator, denominator) => {
+      // Fonction pour vérifier si c'est un nombre/variable simple (sans opérateurs)
+      const isSimple = (str: string): boolean => {
+        const trimmed = str.trim();
+        // Accepte : nombres, variables simples, ou combinaisons simples comme "2x", "3y"
+        return /^[a-zA-Z0-9]+$/.test(trimmed) || /^\d*[a-zA-Z]?$/.test(trimmed);
+      };
+
+      const cleanNumerator = numerator.trim();
+      const cleanDenominator = denominator.trim();
+
+      // Si les deux sont simples, pas de parenthèses
+      if (isSimple(cleanNumerator) && isSimple(cleanDenominator)) {
+        return `${cleanNumerator}/${cleanDenominator}`;
+      }
+
+      // Si seul le numérateur est simple
+      if (isSimple(cleanNumerator) && !isSimple(cleanDenominator)) {
+        return `${cleanNumerator}/(${cleanDenominator})`;
+      }
+
+      // Si seul le dénominateur est simple
+      if (!isSimple(cleanNumerator) && isSimple(cleanDenominator)) {
+        return `(${cleanNumerator})/${cleanDenominator}`;
+      }
+
+      // Si les deux sont complexes, garder les parenthèses
+      return `(${cleanNumerator})/(${cleanDenominator})`;
+    },
+  );
+
   // Remplacer dans l'ordre des plus longs aux plus courts
   const sortedKeys = Object.keys(delimiterMappings).sort(
     (a, b) => b.length - a.length,
@@ -197,7 +235,6 @@ const cleanLatexDelimiters = (latex: string): string => {
 
   sortedKeys.forEach((latexDelimiter) => {
     const replacement = delimiterMappings[latexDelimiter];
-    // Échapper les caractères spéciaux pour la regex
     const escapedDelimiter = latexDelimiter.replace(
       /[.*+?^${}()|[\]\\]/g,
       "\\$&",

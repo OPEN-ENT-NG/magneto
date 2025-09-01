@@ -1,8 +1,9 @@
 import { FC, useEffect, useRef, useState, useCallback } from "react";
 
+import { Button } from "@cgi-learning-hub/ui";
 import {
   IconButton as EdIconButton,
-  Button,
+  Button as EdificeButton,
   FormControl,
   Input,
   Label,
@@ -10,6 +11,7 @@ import {
 import { Editor, EditorRef } from "@edifice.io/react/editor";
 import { IconEdit } from "@edifice.io/react/icons";
 import { MediaLibraryType } from "@edifice.io/react/multimedia";
+import { CancelOutlined, CheckCircleOutline } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -41,6 +43,13 @@ import {
   menuItemStyle,
   formControlEditorStyle,
   audioWrapperStyle,
+  buttonStyle,
+  inputAndButtonBoxStyle,
+  buttonBoxStyle,
+  dualButtonsStyle,
+  dualButtonsSize,
+  successColor,
+  cancelColor,
 } from "./style";
 import { CardPayload } from "./types";
 import {
@@ -86,6 +95,7 @@ export const CreateMagnet: FC = () => {
   );
   const [hasOpenMessageSent, setHasOpenMessageSent] = useState(false);
   const [description, setDescription] = useState<string>("");
+  const [isLinkInputDisabled, setIsLinkInputDisabled] = useState(true);
   const editorRef = useRef<EditorRef>(null);
 
   const [createCard] = useCreateCardMutation();
@@ -316,18 +326,13 @@ export const CreateMagnet: FC = () => {
     media && media.url && media.type === MEDIA_LIBRARY_TYPE.VIDEO;
   const magnetTypeHasCaption = magnetType !== "text";
 
-  // Dans la fonction où tu gères le changement de linkUrl
-  const handleLinkUrlChange = useCallback(
-    async (url: string) => {
-      setLinkUrl(url);
-
-      // Scraper seulement si c'est un type link
-      if (magnetTypeHasLink) {
-        await handleScrapeUrl(url);
-      }
-    },
-    [magnetTypeHasLink, handleScrapeUrl],
-  );
+  const handleLinkUrlChange = useCallback(async () => {
+    // Scraper seulement si c'est un type link
+    if (magnetTypeHasLink) {
+      setIsLinkInputDisabled(true);
+      await handleScrapeUrl(linkUrl);
+    }
+  }, [magnetTypeHasLink, handleScrapeUrl, linkUrl]);
 
   useEffect(() => {
     if (isCreateMagnetOpen) {
@@ -342,6 +347,10 @@ export const CreateMagnet: FC = () => {
       setSection(board.sections[0]);
     }
   }, [board.sections]);
+
+  useEffect(() => {
+    console.log(linkUrl);
+  }, [linkUrl]);
 
   return (
     <Modal
@@ -412,17 +421,53 @@ export const CreateMagnet: FC = () => {
           )}
           {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
           {magnetTypeHasLink && (
-            <FormControl id="url" style={formControlStyle}>
-              <Label>{t("magneto.site.address")}</Label>
-              <Input
-                ref={firstInputRef}
-                value={linkUrl}
-                size="md"
-                type="text"
-                onChange={(e) => handleLinkUrlChange(e.target.value)}
-                disabled={magnetTypeHasLink}
-              />
-            </FormControl>
+            <>
+              <ScaledIframe src={linkUrl} />
+              <Box sx={inputAndButtonBoxStyle}>
+                <FormControl id="url" style={{ flex: 1, marginBottom: 0 }}>
+                  <Label>{t("magneto.site.address")}</Label>
+                  <Input
+                    ref={firstInputRef}
+                    value={linkUrl}
+                    size="md"
+                    type="text"
+                    onChange={(e) => setLinkUrl(e.target.value)}
+                    disabled={magnetTypeHasLink && isLinkInputDisabled}
+                  />
+                </FormControl>
+                <Box sx={buttonBoxStyle}>
+                  {isLinkInputDisabled ? (
+                    <Button
+                      size="medium"
+                      variant="text"
+                      sx={buttonStyle}
+                      onClick={() => setIsLinkInputDisabled(false)}
+                    >
+                      <IconEdit fontSize="large" />
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        size="medium"
+                        variant="text"
+                        sx={{ ...dualButtonsStyle, ...successColor }}
+                        onClick={handleLinkUrlChange}
+                      >
+                        <CheckCircleOutline sx={dualButtonsSize} />
+                      </Button>
+                      <Button
+                        size="medium"
+                        variant="text"
+                        sx={{ ...dualButtonsStyle, ...cancelColor }}
+                        onClick={() => setIsLinkInputDisabled(true)}
+                      >
+                        <CancelOutlined sx={dualButtonsSize} />
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              </Box>
+            </>
           )}
           <FormControl id="title" style={formControlStyle}>
             <Label>{t("magneto.card.title")}</Label>
@@ -482,7 +527,7 @@ export const CreateMagnet: FC = () => {
             </FormControlMUI>
           )}
           <Box sx={modalFooterStyle}>
-            <Button
+            <EdificeButton
               style={footerButtonStyle}
               color="tertiary"
               type="button"
@@ -490,8 +535,8 @@ export const CreateMagnet: FC = () => {
               onClick={() => onCloseModalAndDeactivateCard()}
             >
               {t("magneto.cancel")}
-            </Button>
-            <Button
+            </EdificeButton>
+            <EdificeButton
               style={footerButtonStyle}
               color="primary"
               type="submit"
@@ -499,7 +544,7 @@ export const CreateMagnet: FC = () => {
               onClick={() => onUpload()}
             >
               {t("magneto.save")}
-            </Button>
+            </EdificeButton>
           </Box>
         </Box>
       </Box>

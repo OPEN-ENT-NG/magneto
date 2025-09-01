@@ -7,12 +7,12 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: opendigitaleducation/node:18-alpine-pnpm
+      image: opendigitaleducation/node:20-alpine-pnpm
       options: --user root -v ${{ github.workspace }}:/home/node/:rw
 
     steps:
       - uses: actions/checkout@v1
-      
+
       - name: Update .npmrc with token
         run: |
           sed -i 's|${TIPTAP_PRO_TOKEN}|${{ secrets.TIPTAP_PRO_TOKEN }}|g' .npmrc

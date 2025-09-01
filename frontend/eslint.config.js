@@ -37,7 +37,7 @@ export default [
           jsx: true,
         },
         projectService: true,
-        tsconfigRootDir: ".",
+        tsconfigRootDir: __dirname,
       },
     },
     plugins: {

@@ -297,7 +297,6 @@ export const CreateMagnet: FC = () => {
 
   useEffect(() => {
     if (isEditMagnet) {
-      console.log(activeCard);
       setTitle(activeCard.title);
       setCaption(activeCard.caption);
       setCanBeIframed(activeCard.canBeIframed);
@@ -355,10 +354,6 @@ export const CreateMagnet: FC = () => {
       setSection(board.sections[0]);
     }
   }, [board.sections]);
-
-  useEffect(() => {
-    console.log(linkUrl);
-  }, [linkUrl]);
 
   return (
     <Modal

@@ -392,23 +392,6 @@ public class CardController extends ControllerHelper {
                                             .put(Field.TIMESTAMP, System.currentTimeMillis())
                                             .put(Field.CANBEIFRAMED, canBeIframed);
 
-                                    // Ajouter la raison du blocage si applicable
-                                    if (!canBeIframed && iframeBlockReason != null) {
-                                        result.put("iframeBlockReason", iframeBlockReason);
-                                    }
-
-                                    // Ajouter les headers pour debug si nécessaire
-                                    if (log.isDebugEnabled()) {
-                                        JsonObject headers = new JsonObject();
-                                        if (xFrameOptions != null) {
-                                            headers.put("X-Frame-Options", xFrameOptions);
-                                        }
-                                        if (csp != null) {
-                                            headers.put("Content-Security-Policy", csp);
-                                        }
-                                        result.put("headers", headers);
-                                    }
-
                                     renderJson(request, result);
                                 } else {
                                     renderError(request);

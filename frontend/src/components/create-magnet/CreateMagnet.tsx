@@ -23,6 +23,7 @@ import {
   SelectChangeEvent,
   Typography,
   FormControl as FormControlMUI,
+  Tooltip,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
@@ -50,6 +51,7 @@ import {
   dualButtonsSize,
   successColor,
   cancelColor,
+  tooltipStyle,
 } from "./style";
 import { CardPayload } from "./types";
 import {
@@ -456,25 +458,35 @@ export const CreateMagnet: FC = () => {
                     </Button>
                   ) : (
                     <>
-                      <Button
-                        size="medium"
-                        variant="text"
-                        sx={{ ...dualButtonsStyle, ...successColor }}
-                        onClick={handleLinkUrlChange}
+                      <Tooltip
+                        placement="top"
+                        title={t("magneto.validate")}
+                        componentsProps={tooltipStyle}
                       >
-                        <CheckCircleOutline sx={dualButtonsSize} />
-                      </Button>
-                      <Button
-                        size="medium"
-                        variant="text"
-                        sx={{ ...dualButtonsStyle, ...cancelColor }}
-                        onClick={() => {
-                          setLinkUrl(initialLinkUrl);
-                          setIsLinkInputDisabled(true);
-                        }}
+                        <IconButton
+                          size="medium"
+                          sx={{ ...dualButtonsStyle, ...successColor }}
+                          onClick={handleLinkUrlChange}
+                        >
+                          <CheckCircleOutline sx={dualButtonsSize} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        placement="top"
+                        title={t("magneto.cancel")}
+                        componentsProps={tooltipStyle}
                       >
-                        <CancelOutlined sx={dualButtonsSize} />
-                      </Button>
+                        <IconButton
+                          size="medium"
+                          sx={{ ...dualButtonsStyle, ...cancelColor }}
+                          onClick={() => {
+                            setLinkUrl(initialLinkUrl);
+                            setIsLinkInputDisabled(true);
+                          }}
+                        >
+                          <CancelOutlined sx={dualButtonsSize} />
+                        </IconButton>
+                      </Tooltip>
                     </>
                   )}
                 </Box>

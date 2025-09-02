@@ -1,4 +1,5 @@
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
+import { ScaledIframe } from "../card-content-board/CardContentBoard";
 import { CardContentImageDisplay } from "../card-content-image-display/CardContentImageDisplay";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
 import { CardContentText } from "../card-content-text/cardContentText";
@@ -33,7 +34,13 @@ export const displayContentByType = (card: Card, src?: string) => {
     case RESOURCE_TYPE.VIDEO:
       return <CardContentImageDisplay url={card.resourceUrl} />;
     case RESOURCE_TYPE.LINK:
-      return <CardContentSvgDisplay url={card.resourceUrl} extension="link" />;
+      return card.canBeIframed &&
+        (card.resourceUrl.startsWith("http://") ||
+          card.resourceUrl.startsWith("https://")) ? (
+        <ScaledIframe src={card.resourceUrl} />
+      ) : (
+        <CardContentSvgDisplay url={card.resourceUrl} extension="link" />
+      );
     case RESOURCE_TYPE.TEXT:
       return <CardContentText text={card.description} />;
     case RESOURCE_TYPE.IMAGE:

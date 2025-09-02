@@ -37,6 +37,7 @@ public class Card implements Model<Card> {
     private Integer nbOfFavorites;
     private Boolean isLiked;
     private List<Comment> comments;
+    private Boolean canBeIframed;
 
     private List<String> favoriteList;
 
@@ -78,7 +79,7 @@ public class Card implements Model<Card> {
         this.comments = card.getJsonArray(Field.COMMENTS, new JsonArray()).stream()
                 .map(obj -> new Comment((JsonObject) obj))
                 .collect(Collectors.toList());
-
+        this.canBeIframed = card.getBoolean(Field.CANBEIFRAMED, false);
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
             this.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -128,6 +129,15 @@ public class Card implements Model<Card> {
 
     public Card setCreationDate(String creationDate) {
         this.creationDate = creationDate;
+        return this;
+    }
+
+    public Boolean getCanBeIframed() {
+        return canBeIframed;
+    }
+
+    public Card setCanBeIframed(Boolean canBeIframed) {
+        this.canBeIframed = canBeIframed;
         return this;
     }
 
@@ -319,7 +329,8 @@ public class Card implements Model<Card> {
                 .put(Field.NBOFFAVORITES, this.getNbOfFavorites())
                 .put(Field.ISLIKED, this.isLiked())
                 .put(Field.LIKED, this.isLiked())
-                .put(Field.FAVORITE_LIST, this.getFavoriteList());
+                .put(Field.FAVORITE_LIST, this.getFavoriteList())
+                .put(Field.CANBEIFRAMED, this.getCanBeIframed());
 
         if (this.comments != null){
             json.put(Field.COMMENTS, this.getComments().stream()

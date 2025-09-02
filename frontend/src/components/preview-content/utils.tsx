@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 
 import { redirect } from "../card-content/utils";
 import { CardContentAudio } from "../card-content-audio/CardContentAudio";
+import { ScaledIframe } from "../card-content-board/CardContentBoard";
 import { CardContentFile } from "../card-content-file/CardContentFile";
 import { CardContentSvgDisplay } from "../card-content-svg-display/CardContentSvgDisplay";
 import CardPreviewBoard from "../card-preview-board/CardPreviewBoard";
@@ -41,11 +42,17 @@ export const displayPreviewContentByType = (card: Card) => {
           onClick={() => redirect(card.resourceUrl)}
           sx={{ cursor: "pointer" }}
         >
-          <CardContentSvgDisplay
-            url={card.resourceUrl}
-            extension="link"
-            isPreview
-          />
+          {card.canBeIframed &&
+          (card.resourceUrl.startsWith("http://") ||
+            card.resourceUrl.startsWith("https://")) ? (
+            <ScaledIframe src={card.resourceUrl} />
+          ) : (
+            <CardContentSvgDisplay
+              url={card.resourceUrl}
+              extension="link"
+              isPreview
+            />
+          )}
         </Box>
       );
     case RESOURCE_TYPE.TEXT:

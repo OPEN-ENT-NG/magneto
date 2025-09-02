@@ -95,6 +95,7 @@ export const CreateMagnet: FC = () => {
   );
   const [hasOpenMessageSent, setHasOpenMessageSent] = useState(false);
   const [description, setDescription] = useState<string>("");
+  const [canBeIframed, setCanBeIframed] = useState(false);
   const [isLinkInputDisabled, setIsLinkInputDisabled] = useState(true);
   const editorRef = useRef<EditorRef>(null);
 
@@ -133,6 +134,7 @@ export const CreateMagnet: FC = () => {
         const content = await scrape(urlToScrape);
         if (content?.cleanHtml) {
           setDescription(content.cleanHtml);
+          setCanBeIframed(content.canBeIframed);
         }
       } catch (error) {
         console.error("Erreur lors du scraping:", error);
@@ -223,6 +225,7 @@ export const CreateMagnet: FC = () => {
         : media?.url ?? null,
       title: title,
       id: isEditMagnet ? activeCard.id : undefined,
+      canBeIframed: canBeIframed,
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
     };
     if (isEditMagnet) {
@@ -291,8 +294,10 @@ export const CreateMagnet: FC = () => {
 
   useEffect(() => {
     if (isEditMagnet) {
+      console.log(activeCard);
       setTitle(activeCard.title);
       setCaption(activeCard.caption);
+      setCanBeIframed(activeCard.canBeIframed);
       // init if type link only
       if (activeCard.resourceType === RESOURCE_TYPE.LINK)
         setLinkUrl(activeCard.resourceUrl);
@@ -422,7 +427,7 @@ export const CreateMagnet: FC = () => {
           {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
           {magnetTypeHasLink && (
             <>
-              <ScaledIframe src={linkUrl} />
+              {canBeIframed && <ScaledIframe src={linkUrl} />}
               <Box sx={inputAndButtonBoxStyle}>
                 <FormControl id="url" style={{ flex: 1, marginBottom: 0 }}>
                   <Label>{t("magneto.site.address")}</Label>

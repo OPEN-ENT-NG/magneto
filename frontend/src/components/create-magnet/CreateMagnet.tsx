@@ -89,6 +89,7 @@ export const CreateMagnet: FC = () => {
 
   const [title, setTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
+  const [initialLinkUrl, setInitialLinkUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
@@ -446,7 +447,10 @@ export const CreateMagnet: FC = () => {
                       size="medium"
                       variant="text"
                       sx={buttonStyle}
-                      onClick={() => setIsLinkInputDisabled(false)}
+                      onClick={() => {
+                        setInitialLinkUrl(linkUrl);
+                        setIsLinkInputDisabled(false);
+                      }}
                     >
                       <IconEdit fontSize="large" />
                     </Button>
@@ -464,7 +468,10 @@ export const CreateMagnet: FC = () => {
                         size="medium"
                         variant="text"
                         sx={{ ...dualButtonsStyle, ...cancelColor }}
-                        onClick={() => setIsLinkInputDisabled(true)}
+                        onClick={() => {
+                          setLinkUrl(initialLinkUrl);
+                          setIsLinkInputDisabled(true);
+                        }}
                       >
                         <CancelOutlined sx={dualButtonsSize} />
                       </Button>

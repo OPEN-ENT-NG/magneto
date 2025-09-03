@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState, useCallback } from "react";
 
-import { Button } from "@cgi-learning-hub/ui";
+import { Button, IconButton } from "@cgi-learning-hub/ui";
 import {
   IconButton as EdIconButton,
   Button as EdificeButton,
@@ -15,7 +15,6 @@ import { CancelOutlined, CheckCircleOutline } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
-  IconButton,
   InputLabel,
   MenuItem,
   Modal,
@@ -23,6 +22,7 @@ import {
   SelectChangeEvent,
   Typography,
   FormControl as FormControlMUI,
+  Tooltip,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
@@ -50,6 +50,7 @@ import {
   dualButtonsSize,
   successColor,
   cancelColor,
+  tooltipStyle,
 } from "./style";
 import { CardPayload } from "./types";
 import {
@@ -89,12 +90,14 @@ export const CreateMagnet: FC = () => {
 
   const [title, setTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
+  const [initialLinkUrl, setInitialLinkUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [section, setSection] = useState<Section | null>(
     board.sections[0] ?? null,
   );
   const [hasOpenMessageSent, setHasOpenMessageSent] = useState(false);
   const [description, setDescription] = useState<string>("");
+  const [canBeIframed, setCanBeIframed] = useState(false);
   const [isLinkInputDisabled, setIsLinkInputDisabled] = useState(true);
   const editorRef = useRef<EditorRef>(null);
 
@@ -133,6 +136,7 @@ export const CreateMagnet: FC = () => {
         const content = await scrape(urlToScrape);
         if (content?.cleanHtml) {
           setDescription(content.cleanHtml);
+          setCanBeIframed(content.canBeIframed);
         }
       } catch (error) {
         console.error("Erreur lors du scraping:", error);
@@ -223,6 +227,7 @@ export const CreateMagnet: FC = () => {
         : media?.url ?? null,
       title: title,
       id: isEditMagnet ? activeCard.id : undefined,
+      canBeIframed: canBeIframed,
       ...(!isEditMagnet && section?._id ? { sectionId: section._id } : {}),
     };
     if (isEditMagnet) {
@@ -293,6 +298,7 @@ export const CreateMagnet: FC = () => {
     if (isEditMagnet) {
       setTitle(activeCard.title);
       setCaption(activeCard.caption);
+      setCanBeIframed(activeCard.canBeIframed);
       // init if type link only
       if (activeCard.resourceType === RESOURCE_TYPE.LINK)
         setLinkUrl(activeCard.resourceUrl);
@@ -347,10 +353,6 @@ export const CreateMagnet: FC = () => {
       setSection(board.sections[0]);
     }
   }, [board.sections]);
-
-  useEffect(() => {
-    console.log(linkUrl);
-  }, [linkUrl]);
 
   return (
     <Modal
@@ -422,7 +424,7 @@ export const CreateMagnet: FC = () => {
           {magnetTypeHasVideo && <VideoPlayer modifyFile={modifyFile} />}{" "}
           {magnetTypeHasLink && (
             <>
-              <ScaledIframe src={linkUrl} />
+              {canBeIframed && <ScaledIframe src={linkUrl} />}
               <Box sx={inputAndButtonBoxStyle}>
                 <FormControl id="url" style={{ flex: 1, marginBottom: 0 }}>
                   <Label>{t("magneto.site.address")}</Label>
@@ -441,28 +443,44 @@ export const CreateMagnet: FC = () => {
                       size="medium"
                       variant="text"
                       sx={buttonStyle}
-                      onClick={() => setIsLinkInputDisabled(false)}
+                      onClick={() => {
+                        setInitialLinkUrl(linkUrl);
+                        setIsLinkInputDisabled(false);
+                      }}
                     >
                       <IconEdit fontSize="large" />
                     </Button>
                   ) : (
                     <>
-                      <Button
-                        size="medium"
-                        variant="text"
-                        sx={{ ...dualButtonsStyle, ...successColor }}
-                        onClick={handleLinkUrlChange}
+                      <Tooltip
+                        placement="top"
+                        title={t("magneto.validate")}
+                        componentsProps={tooltipStyle}
                       >
-                        <CheckCircleOutline sx={dualButtonsSize} />
-                      </Button>
-                      <Button
-                        size="medium"
-                        variant="text"
-                        sx={{ ...dualButtonsStyle, ...cancelColor }}
-                        onClick={() => setIsLinkInputDisabled(true)}
+                        <IconButton
+                          size="medium"
+                          sx={{ ...dualButtonsStyle, ...successColor }}
+                          onClick={handleLinkUrlChange}
+                        >
+                          <CheckCircleOutline sx={dualButtonsSize} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        placement="top"
+                        title={t("magneto.cancel")}
+                        componentsProps={tooltipStyle}
                       >
-                        <CancelOutlined sx={dualButtonsSize} />
-                      </Button>
+                        <IconButton
+                          size="medium"
+                          sx={{ ...dualButtonsStyle, ...cancelColor }}
+                          onClick={() => {
+                            setLinkUrl(initialLinkUrl);
+                            setIsLinkInputDisabled(true);
+                          }}
+                        >
+                          <CancelOutlined sx={dualButtonsSize} />
+                        </IconButton>
+                      </Tooltip>
                     </>
                   )}
                 </Box>

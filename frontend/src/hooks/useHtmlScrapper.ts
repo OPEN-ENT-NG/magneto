@@ -16,6 +16,7 @@ export interface ScrapedContent {
   title: string;
   timestamp: number;
   contentType?: string;
+  canBeIframed: boolean;
 }
 
 export interface HtmlScrapingError {
@@ -527,6 +528,7 @@ export const useHtmlScraper = (
         title,
         timestamp: rawData.timestamp,
         contentType: rawData.contentType,
+        canBeIframed: rawData.canBeIframed,
       };
     } catch (error) {
       console.error("HTML processing error:", error);
@@ -568,6 +570,7 @@ export const useHtmlScraper = (
           title,
           timestamp: rawResult.timestamp,
           contentType: rawResult.contentType,
+          canBeIframed: rawResult.canBeIframed,
         };
       } catch (err) {
         console.error("Scraping error:", err);

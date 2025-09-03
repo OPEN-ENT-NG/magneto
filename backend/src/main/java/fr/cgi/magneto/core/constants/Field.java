@@ -276,4 +276,5 @@ public class Field {
     public static final String USERAGENT = "User-Agent";
     public static final String HTML = "html";
     public static final String TIMESTAMP = "timestamp";
+    public static final String CANBEIFRAMED = "canBeIframed";
 }

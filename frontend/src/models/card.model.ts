@@ -28,6 +28,7 @@ export interface ICardItemResponse {
   nbOfFavorites?: number;
   liked?: boolean;
   comments?: any[];
+  canBeIframed: boolean;
 }
 
 export interface ICardsResponse {
@@ -275,6 +276,7 @@ export class Card {
   private _liked?: boolean;
   private _resource?: FileViewModel;
   private _comments?: Comment[];
+  private _canBeIframed: boolean;
 
   constructor() {
     this._id = "";
@@ -309,6 +311,7 @@ export class Card {
     this._nbOfFavorites = -1;
     this._comments = [];
     this._liked = false;
+    this._canBeIframed = false;
     if (this._resourceType === "file") this._resource = this.initResource();
     return this;
   }
@@ -333,6 +336,7 @@ export class Card {
     this._parentId = data.parentId;
     this._metadata = data.metadata;
     this._nbOfComments = data.nbOfComments;
+    this._canBeIframed = data.canBeIframed;
     this._lastComment =
       data.nbOfComments != null && data.nbOfComments > 0
         ? new CardComment().build(data.lastComment)
@@ -495,6 +499,10 @@ export class Card {
 
   set liked(value: boolean) {
     this._liked = value;
+  }
+
+  get canBeIframed(): boolean {
+    return this._canBeIframed ? this._canBeIframed : false;
   }
 
   get comments(): Comment[] {

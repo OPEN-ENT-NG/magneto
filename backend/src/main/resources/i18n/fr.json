@@ -34,6 +34,7 @@
   "magneto.magnet": "aimant",
   "magneto.cancel": "Annuler",
   "magneto.save": "Enregistrer",
+  "magneto.validate": "Valider",
   "magneto.create.board.title": "Titre de mon tableau",
   "magneto.create.board.description": "Description",
   "magneto.create.board.display": "Quelle disposition des aimants souhaitez-vous ?",

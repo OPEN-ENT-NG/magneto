@@ -203,3 +203,13 @@ export const successColor = {
 export const cancelColor = {
   color: "#EB002B",
 };
+
+export const tooltipStyle = {
+  tooltip: {
+    sx: {
+      fontSize: "13px",
+      padding: "4px 7px",
+      marginBottom: "4px !important",
+    },
+  },
+};

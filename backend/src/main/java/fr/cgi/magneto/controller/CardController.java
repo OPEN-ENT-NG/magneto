@@ -336,11 +336,62 @@ public class CardController extends ControllerHelper {
                                 HttpResponse<Buffer> response = ar.result();
 
                                 if (response.statusCode() == 200) {
+                                    // Vérifier les headers pour l'iframeability
+                                    boolean canBeIframed = true;
+                                    String iframeBlockReason = null;
+
+                                    // Vérifier X-Frame-Options
+                                    String xFrameOptions = response.getHeader("X-Frame-Options");
+                                    if (xFrameOptions != null) {
+                                        String xfo = xFrameOptions.toUpperCase();
+                                        if (xfo.contains("DENY")) {
+                                            canBeIframed = false;
+                                            iframeBlockReason = "X-Frame-Options: DENY";
+                                        } else if (xfo.contains("SAMEORIGIN")) {
+                                            canBeIframed = false;
+                                            iframeBlockReason = "X-Frame-Options: SAMEORIGIN";
+                                        }
+                                    }
+
+                                    // Vérifier Content-Security-Policy pour frame-ancestors
+                                    String csp = response.getHeader("Content-Security-Policy");
+                                    if (csp != null && canBeIframed) {
+                                        if (csp.contains("frame-ancestors")) {
+                                            String[] directives = csp.split(";");
+                                            for (String directive : directives) {
+                                                String trimmedDirective = directive.trim();
+                                                if (trimmedDirective.startsWith("frame-ancestors")) {
+                                                    String value = trimmedDirective
+                                                            .substring("frame-ancestors".length())
+                                                            .trim();
+
+                                                    // Vérifier les valeurs communes qui bloquent
+                                                    if (value.equals("'none'")) {
+                                                        canBeIframed = false;
+                                                        iframeBlockReason = "CSP: frame-ancestors 'none'";
+                                                        break;
+                                                    } else if (value.equals("'self'")) {
+                                                        canBeIframed = false;
+                                                        iframeBlockReason = "CSP: frame-ancestors 'self'";
+                                                        break;
+                                                    } else if (!value.equals("*") && !value.contains("*")) {
+                                                        // Si ce n'est pas une wildcard, on suppose que notre domaine n'est pas dans la liste
+                                                        canBeIframed = false;
+                                                        iframeBlockReason = "CSP: frame-ancestors " + value;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
                                     JsonObject result = new JsonObject()
                                             .put(Field.HTML, response.bodyAsString())
                                             .put(Field.URL, url)
                                             .put(Field.CONTENTTYPE, response.getHeader("Content-Type"))
-                                            .put(Field.TIMESTAMP, System.currentTimeMillis());
+                                            .put(Field.TIMESTAMP, System.currentTimeMillis())
+                                            .put(Field.CANBEIFRAMED, canBeIframed);
+
                                     renderJson(request, result);
                                 } else {
                                     renderError(request);

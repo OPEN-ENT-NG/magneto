@@ -31,6 +31,7 @@ public class CardPayload implements Model<CardPayload> {
     private String sectionId;
     private List<String> favoriteList;
     private Boolean isFavorite;
+    private Boolean canBeIframed;
 
     public CardPayload() {
         this.id = null;
@@ -50,6 +51,7 @@ public class CardPayload implements Model<CardPayload> {
         this.parentId = "";
         this.boardId = "";
         this.sectionId = "";
+        this.canBeIframed = false;
     }
 
     public CardPayload(JsonObject card) {
@@ -74,6 +76,8 @@ public class CardPayload implements Model<CardPayload> {
             this.isFavorite = card.getBoolean(Field.ISFAVORITE);
         else if (card.getBoolean(Field.LIKED) != null)
             this.isFavorite = card.getBoolean(Field.LIKED);
+        if (card.getBoolean(Field.CANBEIFRAMED) != null)
+            this.isFavorite = card.getBoolean(Field.CANBEIFRAMED);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
@@ -100,6 +104,7 @@ public class CardPayload implements Model<CardPayload> {
         this.boardId = other.boardId;
         this.sectionId = other.sectionId;
         this.isFavorite = other.isFavorite;
+        this.canBeIframed = other.canBeIframed;
         // Create a new list to avoid sharing the reference
         this.favoriteList = other.favoriteList != null ?
                 new ArrayList<>(other.favoriteList) : new ArrayList<>();
@@ -213,6 +218,15 @@ public class CardPayload implements Model<CardPayload> {
         return this;
     }
 
+    public Boolean getCanBeIframed() {
+        return canBeIframed;
+    }
+
+    public CardPayload setCanBeIframed(Boolean canBeIframed) {
+        this.canBeIframed = canBeIframed;
+        return this;
+    }
+
     public String getResourceId() {
         return resourceId;
     }
@@ -291,7 +305,8 @@ public class CardPayload implements Model<CardPayload> {
                 .put(Field.BOARDID, this.getBoardId())
                 .put(Field.MODIFICATIONDATE, this.getModificationDate())
                 .put(Field.LASTMODIFIERID, this.getLastModifierId())
-                .put(Field.LASTMODIFIERNAME, this.getLastModifierName());
+                .put(Field.LASTMODIFIERNAME, this.getLastModifierName())
+                .put(Field.CANBEIFRAMED, this.getCanBeIframed());
 
         if (this.getFavoriteList() != null)
             json.put(Field.FAVORITE_LIST, this.getFavoriteList());

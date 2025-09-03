@@ -4,7 +4,6 @@ import { useEdificeClient, useEdificeIcons } from "@edifice.io/react";
 
 import { StyledAppIcon, StyledBoxSvg } from "./style";
 import { CardContentSvgDisplayProps } from "./types";
-import { ScaledIframe } from "../card-content-board/CardContentBoard";
 import { AudioIcon } from "../SVG/AudioIcon";
 import { DefaultIcon } from "../SVG/DefaultIcon";
 import { DefaultLinkIcon } from "../SVG/DefaultLinkIcon";
@@ -88,10 +87,6 @@ export const CardContentSvgDisplay: FC<CardContentSvgDisplayProps> = ({
         return <DefaultIcon />;
     }
   };
-
-  if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
-    return <ScaledIframe src={url} />;
-  }
 
   return (
     <StyledBoxSvg isPreview={isPreview}>

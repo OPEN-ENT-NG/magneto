@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState, useCallback } from "react";
 
-import { Button } from "@cgi-learning-hub/ui";
+import { Button, IconButton } from "@cgi-learning-hub/ui";
 import {
   IconButton as EdIconButton,
   Button as EdificeButton,
@@ -15,7 +15,6 @@ import { CancelOutlined, CheckCircleOutline } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
-  IconButton,
   InputLabel,
   MenuItem,
   Modal,

@@ -33,7 +33,9 @@ Dans le fichier 'ent-core.json.template' du projet OPEN ENT :
         "websocket-config": {
             "wsPort": 4404,
             "endpoint-proxy": "/magneto/eventbus"
-        }
+        },
+        "magnetoWebsocketMaxUsers": ${magnetoWebsocketMaxUsers},
+        "magnetoWebsocketMaxUsersPerBoard": ${magnetoWebsocketMaxUsersPerBoard}
       }
     }
 </pre>
@@ -61,19 +63,21 @@ Magneto est un outil de création permettant aux utilisateurs de créer et d’�
 Il contient des aimants, chaque aimant ayant son propre type (texte, image, lien etc..).
 
 # Installation des dépendances "module video" et "ffpmeg"
+
 Depuis sa version React, magneto a deux dépendances à rajouter à son actif afin de faire fonctionner la MediaLibrary vidéo (création d'aimant multimédia) à son plein potentiel.
-* Compiler le module video : cloner le dépot : https://github.com/edificeio/video.git. Récupérer le code via la branche dev et faire l'installation comme un module classique de l'ENT.
-* Déployer le module sur le springboard : rajouter les lignes suivantes dans les fichiers suivants :
+
+- Compiler le module video : cloner le dépot : https://github.com/edificeio/video.git. Récupérer le code via la branche dev et faire l'installation comme un module classique de l'ENT.
+- Déployer le module sur le springboard : rajouter les lignes suivantes dans les fichiers suivants :
   build.gradle : `deployment "com.opendigitaleducation:video:$videoVersion:deployment"` ;
   gradle.properties : `videoVersion=1.5-SNAPSHOT` ;
   Puis relancez votre springboard en pensant bien à effectuer un init generateConf.
-* Installer la dépendance "ffpmeg" dans votre vertx : Dans le container vertx, exécutez les commandes suivantes :
-<pre>
-    docker exec -u 0 -it <container_name> /bin/bash
-    apt update
-    apt install ffmpeg
-</pre>
-où <container_name> est le nom du container vertx, exemple : vertx
+- Installer la dépendance "ffpmeg" dans votre vertx : Dans le container vertx, exécutez les commandes suivantes :
+  <pre>
+      docker exec -u 0 -it <container_name> /bin/bash
+      apt update
+      apt install ffmpeg
+  </pre>
+  où <container_name> est le nom du container vertx, exemple : vertx
 
 # Modèle de données - base MongoDB
 

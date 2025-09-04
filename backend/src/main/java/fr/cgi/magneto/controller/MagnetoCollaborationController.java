@@ -30,8 +30,10 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
     private final List<ServerWebSocket> clients = new ArrayList<>();
     private final MagnetoCollaborationService magnetoCollaborationService;
     private final int maxConnections;
+    private final int maxConnectionsPerBoard;
+    private final double warningThreshold = 0.9;
 
-    public MagnetoCollaborationController(ServiceFactory serviceFactory, int maxConnections, JsonObject config) {
+    public MagnetoCollaborationController(ServiceFactory serviceFactory, int maxConnections, int maxConnectionsPerBoard, JsonObject config) {
         this.vertx = serviceFactory.vertx();
         this.magnetoCollaborationService = serviceFactory.magnetoCollaborationService();
         this.magnetoCollaborationService.subscribeToStatusChanges(newStatus -> {
@@ -66,6 +68,7 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
             }
         });
         this.maxConnections = maxConnections;
+        this.maxConnectionsPerBoard = maxConnectionsPerBoard;
     }
 
     @Override
@@ -152,11 +155,48 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         return wsIdToUser.size();
     }
 
+    private int getConnectedUsersCountForBoard(String boardId) {
+        Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.get(boardId);
+        return wsIdToWs != null ? wsIdToWs.size() : 0;
+    }
+
+    private boolean checkConnectionLimits(String boardId, String userId, ServerWebSocket ws) {
+        int currentPlatformConnections = getConnectedUsersCount();
+        int currentBoardConnections = getConnectedUsersCountForBoard(boardId);
+
+        // Vérifier la limite globale de la plateforme
+        double platformThreshold = maxConnections * warningThreshold;
+        if (currentPlatformConnections >= platformThreshold && currentPlatformConnections < maxConnections) {
+            log.warn("[Magneto@{}::checkConnectionLimits] Platform approaching maximum capacity ({}/{} - {}%). Connection allowed for user {}",
+                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections, Math.round((double)currentPlatformConnections / maxConnections * 100), userId);
+        }
+
+        if (currentPlatformConnections >= maxConnections) {
+            log.warn("[Magneto@{}::checkConnectionLimits] Maximum connections reached for platform ({}/{}). Rejecting connection for user {}",
+                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections, userId);
+            ws.close((short) 1013, "Platform capacity exceeded");
+            return false;
+        }
+
+        // Vérifier la limite par tableau
+        double boardThreshold = maxConnectionsPerBoard * warningThreshold;
+        if (currentBoardConnections >= boardThreshold && currentBoardConnections < maxConnectionsPerBoard) {
+            log.warn("[Magneto@{}::checkConnectionLimits] Board {} approaching maximum capacity ({}/{} - {}%). Connection allowed for user {}",
+                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard, Math.round((double)currentBoardConnections / maxConnectionsPerBoard * 100), userId);
+        }
+
+        if (currentBoardConnections >= maxConnectionsPerBoard) {
+            log.warn("[Magneto@{}::checkConnectionLimits] Maximum connections reached for board {} ({}/{}). Rejecting connection for user {}",
+                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard, userId);
+            ws.close((short) 1013, "Board capacity exceeded");
+            return false;
+        }
+
+        return true;
+    }
+
     private Future<Void> onConnect(final UserInfos user, final String boardId, final String wsId, final ServerWebSocket ws) {
-        if (getConnectedUsersCount() >= maxConnections) {
-            log.warn("Maximum connections reached ({}/{}). Rejecting connection for user {}",
-                    getConnectedUsersCount(), maxConnections, user.getUserId());
-            ws.close((short) 1013, "Server capacity exceeded");
+        if (!checkConnectionLimits(boardId, user.getUserId(), ws)) {
             return Future.failedFuture("Maximum connections exceeded");
         }
 

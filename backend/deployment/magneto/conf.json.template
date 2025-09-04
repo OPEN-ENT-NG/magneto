@@ -20,6 +20,8 @@
         },
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},
         "magnetoIsStandalone" : ${magnetoIsStandalone},
-        "theme-platform": "${themePlatform}"
+        "theme-platform": "${themePlatform}",
+        "magnetoWebsocketMaxUsers": ${magnetoWebsocketMaxUsers},
+        "magnetoWebsocketMaxUsersPerBoard": ${magnetoWebsocketMaxUsersPerBoard}
       }
     }

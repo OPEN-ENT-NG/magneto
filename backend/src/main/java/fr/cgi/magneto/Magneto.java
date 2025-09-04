@@ -66,7 +66,7 @@ public class Magneto extends BaseServer {
 
         final HttpServerOptions options = new HttpServerOptions().setMaxWebSocketFrameSize(1024 * 1024);
         vertx.createHttpServer(options)
-                .webSocketHandler(new MagnetoCollaborationController(serviceFactory, magnetoConfig.getMagnetoWebsocketMaxUsers(), config))
+                .webSocketHandler(new MagnetoCollaborationController(serviceFactory, magnetoConfig.getMagnetoWebsocketMaxUsers(), magnetoConfig.getMagnetoWebsocketMaxUsersPerBoard(), config))
                 .listen(9091, asyncResult -> {
                     if(asyncResult.succeeded()) {
                         log.info("Websocket server started and listening on port " + 9091);

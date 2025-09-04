@@ -12,9 +12,11 @@ public class MagnetoConfig {
     private final Boolean magnetoStandalone;
     private final String themePlatform;
     private final Integer magnetoWebsocketMaxUsers;
+    private final Integer magnetoWebsocketMaxUsersPerBoard;
 
     private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; //refresh every 10 seconds by default
     private final Integer DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS = 500;
+    private final Integer DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD = 100;
 
     public MagnetoConfig(JsonObject config) {
         this.host = config.getString(Field.HOST);
@@ -25,6 +27,7 @@ public class MagnetoConfig {
         this.magnetoStandalone = config.getBoolean(Field.MAGNETO_STANDALONE_CONFIG, false);
         this.themePlatform = config.getString(Field.KEBAB_THEME_PLATFORM, "default");
         this.magnetoWebsocketMaxUsers = config.getInteger(Field.MAGNETO_WEBSOCKET_MAX_USERS, DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS);
+        this.magnetoWebsocketMaxUsersPerBoard = config.getInteger(Field.MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD, DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD);
     }
 
     public String getThemePlatform() {
@@ -33,6 +36,10 @@ public class MagnetoConfig {
 
     public Integer getMagnetoWebsocketMaxUsers() {
         return this.magnetoWebsocketMaxUsers;
+    }
+
+    public Integer getMagnetoWebsocketMaxUsersPerBoard() {
+        return this.magnetoWebsocketMaxUsersPerBoard;
     }
 
     public String host() {

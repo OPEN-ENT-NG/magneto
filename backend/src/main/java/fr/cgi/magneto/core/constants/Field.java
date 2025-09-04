@@ -277,4 +277,5 @@ public class Field {
     public static final String HTML = "html";
     public static final String TIMESTAMP = "timestamp";
     public static final String CANBEIFRAMED = "canBeIframed";
+    public static final String MAGNETO_WEBSOCKET_MAX_USERS = "magnetoWebsocketMaxUsers";
 }

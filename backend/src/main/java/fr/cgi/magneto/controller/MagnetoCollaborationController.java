@@ -148,7 +148,18 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                 });
     }
 
+    private int getConnectedUsersCount() {
+        return wsIdToUser.size();
+    }
+
     private Future<Void> onConnect(final UserInfos user, final String boardId, final String wsId, final ServerWebSocket ws) {
+        if (getConnectedUsersCount() >= maxConnections) {
+            log.warn("Maximum connections reached ({}/{}). Rejecting connection for user {}",
+                    getConnectedUsersCount(), maxConnections, user.getUserId());
+            ws.close((short) 1013, "Server capacity exceeded");
+            return Future.failedFuture("Maximum connections exceeded");
+        }
+
         final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
         wsIdToWs.put(wsId, ws);
         final Promise<Void> promise = Promise.promise();

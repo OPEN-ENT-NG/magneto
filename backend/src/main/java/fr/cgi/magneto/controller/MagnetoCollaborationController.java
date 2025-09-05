@@ -167,13 +167,14 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         // Vérifier la limite globale de la plateforme
         double platformThreshold = maxConnections * warningThreshold;
         if (currentPlatformConnections >= platformThreshold && currentPlatformConnections < maxConnections) {
-            log.warn("[Magneto@{}::checkConnectionLimits] Platform approaching maximum capacity ({}/{} - {}%). Connection allowed for user {}",
-                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections, Math.round((double)currentPlatformConnections / maxConnections * 100), userId);
+            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Platform approaching maximum capacity (%d/%d - %d%%). Connection allowed for user %s",
+                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections,
+                    Math.round((double)currentPlatformConnections / maxConnections * 100), userId));
         }
 
         if (currentPlatformConnections >= maxConnections) {
-            log.warn("[Magneto@{}::checkConnectionLimits] Maximum connections reached for platform ({}/{}). Rejecting connection for user {}",
-                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections, userId);
+            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Maximum connections reached for platform (%d/%d). Rejecting connection for user %s",
+                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections, userId));
             ws.close((short) 1013, "Platform capacity exceeded");
             return false;
         }
@@ -181,13 +182,14 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         // Vérifier la limite par tableau
         double boardThreshold = maxConnectionsPerBoard * warningThreshold;
         if (currentBoardConnections >= boardThreshold && currentBoardConnections < maxConnectionsPerBoard) {
-            log.warn("[Magneto@{}::checkConnectionLimits] Board {} approaching maximum capacity ({}/{} - {}%). Connection allowed for user {}",
-                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard, Math.round((double)currentBoardConnections / maxConnectionsPerBoard * 100), userId);
+            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Board %s approaching maximum capacity (%d/%d - %d%%). Connection allowed for user %s",
+                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard,
+                    Math.round((double)currentBoardConnections / maxConnectionsPerBoard * 100), userId));
         }
 
         if (currentBoardConnections >= maxConnectionsPerBoard) {
-            log.warn("[Magneto@{}::checkConnectionLimits] Maximum connections reached for board {} ({}/{}). Rejecting connection for user {}",
-                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard, userId);
+            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Maximum connections reached for board %s (%d/%d). Rejecting connection for user %s",
+                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard, userId));
             ws.close((short) 1013, "Board capacity exceeded");
             return false;
         }

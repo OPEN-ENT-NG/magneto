@@ -13,12 +13,12 @@ import theme from "~/themes/theme";
 
 export const App = () => {
   const { id = "" } = useParams();
-  const isLocalhost = window.location.hostname === "localhost";
+  const isLocal = window.location.protocol === 'http:'
   const getSocketURL = useCallback(() => {
-    return isLocalhost
+    return isLocal
       ? `ws://${window.location.hostname}:9091/${id}`
       : `wss://${window.location.host}/magneto/ws/${id}`;
-  }, [isLocalhost]);
+  }, [isLocal]);
   const { data: actions } = useActions();
   const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
 

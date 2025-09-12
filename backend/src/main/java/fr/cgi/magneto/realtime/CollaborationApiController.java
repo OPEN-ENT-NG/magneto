@@ -1,12 +1,15 @@
 package fr.cgi.magneto.realtime;
 
 import io.vertx.core.json.Json;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.RoutingContext;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 public class CollaborationApiController {
+
+    private final Logger logger = LoggerFactory.getLogger(CollaborationApiController.class);
 
     private final CollaborationRepostiory repository;
 
@@ -16,20 +19,26 @@ public class CollaborationApiController {
 
     public void handleGetAuction(RoutingContext context) {
         String auctionId = context.request().getParam("id");
-        Optional<Collaboration> auction = this.repository.getById(auctionId);
-
-        if (auction.isPresent()) {
-            context.vertx().eventBus().publish("collaboration." + auctionId, Json.encodePrettily(auction.get()));
+        this.repository.getById(auctionId).onSuccess(auction -> {
+            if (auction.isPresent()) {
+                context.vertx().eventBus().publish("collaboration." + auctionId, Json.encodePrettily(auction.get()));
+                context.response()
+                    .putHeader("content-type", "application/json")
+                    .setStatusCode(200)
+                    .end(Json.encodePrettily(auction.get()));
+            } else {
+                context.response()
+                    .putHeader("content-type", "application/json")
+                    .setStatusCode(404)
+                    .end();
+            }
+        }).onFailure(th -> {
+            logger.error("An error occurred while getting auction id", th);
             context.response()
                 .putHeader("content-type", "application/json")
-                .setStatusCode(200)
-                .end(Json.encodePrettily(auction.get()));
-        } else {
-            context.response()
-                .putHeader("content-type", "application/json")
-                .setStatusCode(404)
+                .setStatusCode(500)
                 .end();
-        }
+        });
     }
 
     public void handleChangeAuctionPrice(RoutingContext context) {
@@ -50,11 +59,17 @@ public class CollaborationApiController {
     public void initAuctionInSharedData(RoutingContext context) {
         String auctionId = context.request().getParam("id");
 
-        Optional<Collaboration> auction = this.repository.getById(auctionId);
-        if(!auction.isPresent()) {
-            this.repository.save(new Collaboration(auctionId));
-        }
-
-        context.next();
+        this.repository.getById(auctionId).onSuccess(auction -> {
+            if(!auction.isPresent()) {
+                this.repository.save(new Collaboration(auctionId));
+            }
+            context.next();
+        }).onFailure(th -> {
+            logger.error("An error occurred while initializing auction in shared data", th);
+            context.response()
+                .putHeader("content-type", "application/json")
+                .setStatusCode(500)
+                .end();
+        });
     }
 }

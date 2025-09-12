@@ -19,6 +19,7 @@ import org.entcore.common.service.impl.MongoDbRepositoryEvents;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.entcore.common.user.ExportResourceResult;
 
 public class MagnetoRepositoryEvents extends MongoDbRepositoryEvents {
 
@@ -100,7 +101,7 @@ public class MagnetoRepositoryEvents extends MongoDbRepositoryEvents {
      * @param handler               the handler to call when the export is done
      */
     @Override
-    public void exportResources(JsonArray resourcesIds, final boolean exportDocuments, boolean exportSharedResources, String exportId, String userId, JsonArray groups, final String exportPath, final String locale, String host, final Handler<Boolean> handler) {
+    public void exportResources(JsonArray resourcesIds, final boolean exportDocuments, boolean exportSharedResources, String exportId, String userId, JsonArray groups, final String exportPath, final String locale, String host, final Handler<ExportResourceResult> handler) {
         Bson findByAuthor = Filters.eq(Field.OWNERID, userId);
         JsonObject query;
 
@@ -134,19 +135,19 @@ public class MagnetoRepositoryEvents extends MongoDbRepositoryEvents {
             // create the zip file
             createExportDirectory(exportPath, locale, path -> {
                 if (path != null) {
-                    exportFiles(exportResults, path, new HashSet<>(), exported, handler);
+                    exportFiles(exportResults, path, new HashSet<>(), exported, e -> handler.handle(new ExportResourceResult(e, path)));
                     if (exportDocuments) {
-                        exportDocumentsDependancies(exportResults, path, handler);
+                        exportDocumentsDependancies(exportResults, path, e -> handler.handle(new ExportResourceResult(e, path)));
                     } else {
-                        handler.handle(Boolean.TRUE);
+                        handler.handle(new ExportResourceResult(true, path));
                     }
                 } else {
-                    handler.handle(exported.get());
+                    handler.handle(ExportResourceResult.KO);
                 }
             });
         }).onFailure(error -> {
             log.error("Could not process query" + query.encodePrettily(), error.getCause().getMessage());
-            handler.handle(exported.get());
+            handler.handle(ExportResourceResult.KO);
         });
     }
 

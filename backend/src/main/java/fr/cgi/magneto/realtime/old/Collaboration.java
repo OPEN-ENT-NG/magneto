@@ -1,4 +1,4 @@
-package fr.cgi.magneto.realtime;
+package fr.cgi.magneto.realtime.old;
 
 import java.math.BigDecimal;
 

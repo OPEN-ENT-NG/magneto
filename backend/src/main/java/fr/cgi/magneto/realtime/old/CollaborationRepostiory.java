@@ -1,4 +1,4 @@
-package fr.cgi.magneto.realtime;
+package fr.cgi.magneto.realtime.old;
 
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;

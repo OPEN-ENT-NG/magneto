@@ -1,5 +1,6 @@
-package fr.cgi.magneto.helper;
+package fr.cgi.magneto.realtime;
 
+import fr.cgi.magneto.realtime.MagnetoMessage;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.commons.collections4.CollectionUtils;

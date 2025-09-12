@@ -42,9 +42,9 @@ public class MagnetoController extends ControllerHelper {
         @SecuredAction(Rights.VIEW)
         public void view(HttpServerRequest request) {
                 String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
-                                ? String.format(":%s%s", this.magnetoConfig.websocketConfig().port(),
-                                                this.magnetoConfig.websocketConfig().endpointProxy())
-                                : this.magnetoConfig.websocketConfig().endpointProxy();
+                                ? String.format(":%s%s", this.magnetoConfig.websocketConfig().getPort(),
+                                                this.magnetoConfig.websocketConfig().getEndpointProxy())
+                                : this.magnetoConfig.websocketConfig().getEndpointProxy();
 
                 Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
                 Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();
@@ -62,9 +62,9 @@ public class MagnetoController extends ControllerHelper {
         @SecuredAction(value = "", type = ActionType.RESOURCE)
         public void viewReact(HttpServerRequest request) {
                 String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
-                        ? String.format(":%s%s", this.magnetoConfig.websocketConfig().port(),
-                        this.magnetoConfig.websocketConfig().endpointProxy())
-                        : this.magnetoConfig.websocketConfig().endpointProxy();
+                        ? String.format(":%s%s", this.magnetoConfig.websocketConfig().getPort(),
+                        this.magnetoConfig.websocketConfig().getEndpointProxy())
+                        : this.magnetoConfig.websocketConfig().getEndpointProxy();
 
                 Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
                 Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();
@@ -93,9 +93,9 @@ public class MagnetoController extends ControllerHelper {
                 request.response().putHeader("Content-Security-Policy", "frame-ancestors *");
                 // Même code que viewReact
                 String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
-                                ? String.format(":%s%s", this.magnetoConfig.websocketConfig().port(),
-                                                this.magnetoConfig.websocketConfig().endpointProxy())
-                                : this.magnetoConfig.websocketConfig().endpointProxy();
+                                ? String.format(":%s%s", this.magnetoConfig.websocketConfig().getPort(),
+                                                this.magnetoConfig.websocketConfig().getEndpointProxy())
+                                : this.magnetoConfig.websocketConfig().getEndpointProxy();
 
                 Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
                 Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();

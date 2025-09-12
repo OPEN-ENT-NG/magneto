@@ -2,6 +2,8 @@ package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
+import fr.cgi.magneto.realtime.DefaultMagnetoCollaborationService;
+import fr.cgi.magneto.realtime.MagnetoCollaborationService;
 import fr.cgi.magneto.service.impl.*;
 import fr.wseduc.mongodb.MongoDb;
 import fr.wseduc.webutils.security.SecuredAction;

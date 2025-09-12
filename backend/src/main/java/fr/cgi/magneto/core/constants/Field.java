@@ -1,6 +1,10 @@
 package fr.cgi.magneto.core.constants;
 
 public class Field {
+    public static final String OK = "ok";
+    public static final String STATUS = "status";
+    public static final String RESULT = "result";
+    public static final String COUNT = "count";
     public static final String HOST = "host";
     public static final String WSPORT = "wsPort";
     public static final String MODE = "mode";
@@ -9,6 +13,7 @@ public class Field {
     public static final String WEBSOCKET_CONFIG_HYPHENS = "websocket-config";
     public static final String WEBSOCKETCONFIG = "websocketConfig";
     public static final String WEBSOCKETENDPOINT = "websocketEndpoint";
+    public static final String WEBSOCKETENDPORT = "websocketPort";
     public static final String ENDPOINT_PROXY_HYPHENS = "endpoint-proxy";
     public static final String PORT = "port";
     public static final String KEBAB_THEME_PLATFORM = "theme-platform";
@@ -277,7 +282,7 @@ public class Field {
     public static final String HTML = "html";
     public static final String TIMESTAMP = "timestamp";
     public static final String CANBEIFRAMED = "canBeIframed";
-    public static final String MAGNETO_WEBSOCKET_MAX_USERS = "magnetoWebsocketMaxUsers";
-    public static final String MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD = "magnetoWebsocketMaxUsersPerBoard";
-    public static final String MAGNETO_WEBSOCKET_PORT = "magnetoWebsocketPort";
+    public static final String MAX_USERS = "maxUsers";
+    public static final String MAX_USERS_PER_BOARD = "maxUsersPerBoard";
+    public static final String IS_MULTI_CLUSTER = "isMultiCluster";
 }

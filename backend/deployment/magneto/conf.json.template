@@ -15,14 +15,14 @@
         "mode" : "${mode}",
         "entcore.port" : 8009,
         "websocket-config": {
-            "wsPort": 4404,
+            "wsPort": ${magnetoWebsocketPort},
+            "maxUsers": ${magnetoWebsocketMaxUsers},
+            "maxUsersPerBoard": ${magnetoWebsocketMaxUsersPerBoard},
             "endpoint-proxy": "/magneto/eventbus"
+            "isMultiCluster": ${magnetoIsMultiCluster}
         },
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},
         "magnetoIsStandalone" : ${magnetoIsStandalone},
         "theme-platform": "${themePlatform}",
-        "magnetoWebsocketMaxUsers": ${magnetoWebsocketMaxUsers},
-        "magnetoWebsocketMaxUsersPerBoard": ${magnetoWebsocketMaxUsersPerBoard},
-        "magnetoWebsocketPort": ${magnetoWebsocketPort}
       }
     }

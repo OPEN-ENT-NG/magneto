@@ -1,10 +1,9 @@
-package fr.cgi.magneto.helper;
+package fr.cgi.magneto.realtime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.cgi.magneto.core.constants.Field;
-import fr.cgi.magneto.core.enums.MagnetoMessageType;
-import fr.cgi.magneto.core.events.CardEditingInformation;
-import fr.cgi.magneto.core.events.MagnetoUserAction;
+import fr.cgi.magneto.realtime.events.CardEditingInformation;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;

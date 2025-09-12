@@ -1,9 +1,8 @@
-package fr.cgi.magneto.realtime;
+package fr.cgi.magneto.realtime.old;
 
 import fr.cgi.magneto.config.MagnetoConfig;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.bridge.PermittedOptions;
@@ -50,11 +49,11 @@ public class RealTimeCollaboration {
 
 		SockJSBridgeOptions opts = getSockJSBridgeOptions();
 
-		this.router.mountSubRouter(magnetoConfig.websocketConfig().endpointProxy(), SockJSHandler.create(this.vertx)
+		this.router.mountSubRouter(magnetoConfig.websocketConfig().getEndpointProxy(), SockJSHandler.create(this.vertx)
 				.bridge(opts, new RealTimeController(this.vertx.eventBus())));
 		this.router.mountSubRouter("/api", auctionApiRouter());
 
-		this.vertx.createHttpServer().requestHandler(this.router).listen(magnetoConfig.websocketConfig().port());
+		this.vertx.createHttpServer().requestHandler(this.router).listen(magnetoConfig.websocketConfig().getPort());
 	}
 
 	private SockJSBridgeOptions getSockJSBridgeOptions() {

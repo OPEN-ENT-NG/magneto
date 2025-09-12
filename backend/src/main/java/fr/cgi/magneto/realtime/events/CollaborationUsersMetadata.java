@@ -1,4 +1,4 @@
-package fr.cgi.magneto.core.events;
+package fr.cgi.magneto.realtime.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * Metadata of a wall concerning the actions of the users connected to it.
+ * Metadata of a board concerning the actions of the users connected to it.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CollaborationUsersMetadata {

@@ -2,7 +2,7 @@ package fr.cgi.magneto.model.user;
 
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.UserColor;
-import fr.cgi.magneto.core.events.UserBoardRights;
+import fr.cgi.magneto.realtime.events.UserBoardRights;
 import fr.cgi.magneto.model.Model;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;

@@ -1,4 +1,4 @@
-package fr.cgi.magneto.realtime;
+package fr.cgi.magneto.realtime.old;
 
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;

@@ -1,18 +1,14 @@
-package fr.cgi.magneto.controller;
+package fr.cgi.magneto.realtime;
 
-import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
-import fr.cgi.magneto.core.events.MagnetoUserAction;
-import fr.cgi.magneto.helper.MagnetoMessage;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import fr.cgi.magneto.model.user.User;
-import fr.cgi.magneto.service.MagnetoCollaborationService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.webutils.request.CookieHelper;
 import fr.wseduc.webutils.request.filter.UserAuthFilter;
 import io.vertx.core.*;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.user.UserInfos;
@@ -21,26 +17,33 @@ import org.entcore.common.user.UserUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MagnetoCollaborationController implements Handler<ServerWebSocket> {
+import static fr.cgi.magneto.core.constants.Field.*;
+import static fr.cgi.magneto.realtime.CollaborationHelper.*;
 
-    private static final Logger log = LoggerFactory.getLogger(MagnetoCollaborationController.class);
+public class CollaborationController implements Handler<ServerWebSocket> {
+
+    private static final Logger log = LoggerFactory.getLogger(CollaborationController.class);
     private final Map<String, Map<String, ServerWebSocket>> boardIdToWSIdToWS = new HashMap<>();
     private final Map<String, User> wsIdToUser = new HashMap<>();
     private final Vertx vertx;
-    private final List<ServerWebSocket> clients = new ArrayList<>();
     private final MagnetoCollaborationService magnetoCollaborationService;
     private final int maxConnections;
     private final int maxConnectionsPerBoard;
     private final double warningThreshold = 0.9;
 
-    public MagnetoCollaborationController(ServiceFactory serviceFactory, int maxConnections, int maxConnectionsPerBoard, JsonObject config) {
+    public CollaborationController(ServiceFactory serviceFactory) {
         this.vertx = serviceFactory.vertx();
         this.magnetoCollaborationService = serviceFactory.magnetoCollaborationService();
+        this.maxConnections = serviceFactory.magnetoConfig().websocketConfig().getMaxUsers();
+        this.maxConnectionsPerBoard = serviceFactory.magnetoConfig().websocketConfig().getMaxUsersPerBoard();
+
+        // On watch le status global, s'il est mauvais on close toutes les connections
         this.magnetoCollaborationService.subscribeToStatusChanges(newStatus -> {
             if (RealTimeStatus.ERROR.equals(newStatus) || RealTimeStatus.STOPPED.equals(newStatus)) {
                 this.closeConnections();
             }
         });
+
         this.magnetoCollaborationService.subscribeToNewMessagesToSend(messages -> {
             if (messages.isNotEmpty()) {
                 List<MagnetoMessage> messageList = messages.getMessages();
@@ -48,12 +51,12 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                 // Vérifier si on a des messages avec différenciation readOnly/fullAccess
                 boolean hasReadOnlyOrFullAccess = messageList.size() > 1 &&
                         messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
-                                (msg.getActionId().equals(Field.READONLY) || msg.getActionId().equals(Field.FULLACCESS)));
+                                (Arrays.asList(READONLY,FULLACCESS).contains(msg.getActionId())));
 
                 // Vérifier si on a des messages avec différenciation actualUser/otherUsers
                 boolean hasActualUserOrOtherUsers = messageList.size() > 1 &&
                         messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
-                                (msg.getActionId().equals(Field.ACTUALUSER) || msg.getActionId().equals(Field.OTHERUSERS)));
+                                (Arrays.asList(ACTUALUSER,OTHERUSERS).contains(msg.getActionId())));
 
                 if (hasReadOnlyOrFullAccess) {
                     // Logique spéciale pour les messages readOnly/fullAccess
@@ -67,139 +70,112 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                 }
             }
         });
-        this.maxConnections = maxConnections;
-        this.maxConnectionsPerBoard = maxConnectionsPerBoard;
+
+//        if (isMultiCluster) {
+//            RedisOptions redisOptions = getRedisOptions(vertx, serviceFactory.config());
+//            redisClient = Redis.createClient(vertx, redisOptions);
+//            redisAPI = RedisAPI.api(redisClient);
+//
+//            // Subscriber
+//            redisClient.connect(onConnect -> {
+//                if (onConnect.succeeded()) {
+//                    RedisConnection conn = onConnect.result();
+//                    conn.handler(message -> {
+//                        // message reçu via Redis => redistribuer localement
+//                        String payload = message.toString();
+//                        MagnetoMessage magnetoMsg = new JsonObject(payload).mapTo(MagnetoMessage.class);
+//                        broadcastMessagesToUsers(List.of(magnetoMsg), null);
+//                    });
+//                    conn.send(Request.cmd(Command.SUBSCRIBE).arg("magneto:ws"));
+//                } else {
+//                    log.error("[Magneto@CollaborationController::CollaborationController] Could not connect to Redis", onConnect.cause());
+//                }
+//            });
+//        }
     }
 
+    /**
+     * What happen when a WS payload is received from the front
+     * @param ws  the event to handle
+     */
     @Override
     public void handle(ServerWebSocket ws) {
 
         ws.pause();
-        log.info("Handle websocket");
+        log.info("[Magneto@CollaborationController::handle] Handle websocket");
 
         final String sessionId = CookieHelper.getInstance().getSigned(UserAuthFilter.SESSION_ID, ws);
-        final Optional<String> maybeBoardId = getBoardId(ws.path());
-        if (!maybeBoardId.isPresent()) {
-            log.error("No board id");
+        final Optional<String> optionalBoardId = getBoardId(ws.path());
+        if (!optionalBoardId.isPresent()) {
+            log.error("[Magneto@CollaborationController::handle] No board id");
             return;
         }
-        final String boardId = maybeBoardId.get();
+
+        final String boardId = optionalBoardId.get();
         final String wsId = UUID.randomUUID().toString();
         UserUtils.getSession(vertx.eventBus(), sessionId, infos -> {
             try {
                 if (infos == null) {
-                    log.error("Not authenticated");
+                    log.error("[Magneto@CollaborationController::handle] Not authenticated");
                     return;
                 }
+
                 final UserInfos session = UserUtils.sessionToUserInfos(infos);
                 //TODO : check l'accès au tableau si necessaire
-
                 final String userId = session.getUserId();
                 ws.closeHandler(e -> onCloseWSConnection(boardId, userId, wsId));
-                onConnect(session, boardId, wsId, ws).onSuccess(onSuccess -> {
-                    ws.resume();
-                    ws.frameHandler(frame -> {
-                        try {
-
-                            if (frame.isBinary()) {
-                                log.warn("Binary is not handled");
-                            } else if(frame.isText()){
-                                final String message = frame.textData();
-                                final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
-                                this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false);//.onFailure(th -> this.sendError(th, ws));
-                            } else if(frame.isClose()) {
-                                log.debug("Received a close frame from the user");
-                                onCloseWSConnection(boardId, userId, wsId);
+                onConnect(session, boardId, wsId, ws)
+                    .onSuccess(onSuccess -> {
+                        ws.resume();
+                        ws.frameHandler(frame -> {
+                            try {
+                                if (frame.isBinary()) {
+                                    log.warn("[Magneto@CollaborationController::handle] Binary is not handled");
+                                }
+                                else if (frame.isText()){
+                                    final String message = frame.textData();
+                                    final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
+                                    this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false);//.onFailure(th -> this.sendError(th, ws));
+                                }
+                                else if (frame.isClose()) {
+                                    log.debug("[Magneto@CollaborationController::handle] Received a close frame from the user");
+                                    onCloseWSConnection(boardId, userId, wsId);
+                                }
+                            } catch (Exception e) {
+                                log.error("[Magneto@CollaborationController::handle] An error occured while parsing message:", e);
                             }
-                        } catch (Exception e) {
-                            log.error("An error occured while parsing message:", e);
-                        }
+                        });
+                    })
+                    .onFailure(th -> {
+                        log.error("[Magneto@CollaborationController::handle] An error occurred while opening the websocket", th);
                     });
-                }).onFailure(th -> {
-                    log.error("An error occurred while opening the websocket", th);
-                });
 
             } catch (Exception e) {
                 ws.resume();
-                log.error("An error occurred while treating ws", e);
+                log.error("[Magneto@CollaborationController::handle] An error occurred while treating ws", e);
             }
         });
 
     }
 
-    private Optional<String> getBoardId(String path) {
-        final String[] splitted = path.split("/");
-        if (splitted.length > 0) {
-            return Optional.of(splitted[splitted.length - 1].trim().toLowerCase());
-        }
-        return Optional.empty();
-    }
-
-    protected void onCloseWSConnection(final String boardId, final String userId, final String wsId) {
-        this.magnetoCollaborationService.onNewDisconnection(boardId, userId, wsId)
-                .compose(messages -> this.broadcastMessagesToUsers(messages, wsId))
-                .onComplete(e -> {
-                    final Map<String, ServerWebSocket> wss = boardIdToWSIdToWS.get(boardId);
-                    if (wss != null) {
-                        if (wss.remove(wsId) == null) {
-                            log.debug("No ws removed");
-                        } else {
-                            log.debug("WS correctly removed");
-                        }
-                    }
-                    wsIdToUser.remove(wsId);
-                });
-    }
-
-    private int getConnectedUsersCount() {
-        return wsIdToUser.size();
-    }
-
-    private int getConnectedUsersCountForBoard(String boardId) {
-        Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.get(boardId);
-        return wsIdToWs != null ? wsIdToWs.size() : 0;
-    }
-
-    private boolean checkConnectionLimits(String boardId, String userId, ServerWebSocket ws) {
-        int currentPlatformConnections = getConnectedUsersCount();
-        int currentBoardConnections = getConnectedUsersCountForBoard(boardId);
-
-        // Vérifier la limite globale de la plateforme
-        double platformThreshold = maxConnections * warningThreshold;
-        if (currentPlatformConnections >= platformThreshold && currentPlatformConnections < maxConnections) {
-            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Platform approaching maximum capacity (%d/%d - %d%%). Connection allowed for user %s",
-                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections,
-                    Math.round((double)currentPlatformConnections / maxConnections * 100), userId));
-        }
-
-        if (currentPlatformConnections >= maxConnections) {
-            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Maximum connections reached for platform (%d/%d). Rejecting connection for user %s",
-                    this.getClass().getSimpleName(), currentPlatformConnections, maxConnections, userId));
-            ws.close((short) 1013, "Platform capacity exceeded");
-            return false;
-        }
-
-        // Vérifier la limite par tableau
-        double boardThreshold = maxConnectionsPerBoard * warningThreshold;
-        if (currentBoardConnections >= boardThreshold && currentBoardConnections < maxConnectionsPerBoard) {
-            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Board %s approaching maximum capacity (%d/%d - %d%%). Connection allowed for user %s",
-                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard,
-                    Math.round((double)currentBoardConnections / maxConnectionsPerBoard * 100), userId));
-        }
-
-        if (currentBoardConnections >= maxConnectionsPerBoard) {
-            log.warn(String.format("[Magneto@%s::checkConnectionLimits] Maximum connections reached for board %s (%d/%d). Rejecting connection for user %s",
-                    this.getClass().getSimpleName(), boardId, currentBoardConnections, maxConnectionsPerBoard, userId));
-            ws.close((short) 1013, "Board capacity exceeded");
-            return false;
-        }
-
-        return true;
-    }
-
+    /***
+     * Called when a user arrives at the board -> we create a new WS connection for him, add it to the pool and inform other users of the board
+     * @param user
+     * @param boardId
+     * @param wsId
+     * @param ws
+     * @return
+     */
     private Future<Void> onConnect(final UserInfos user, final String boardId, final String wsId, final ServerWebSocket ws) {
-        if (!checkConnectionLimits(boardId, user.getUserId(), ws)) {
-            return Future.failedFuture("Maximum connections exceeded");
+        int currentPlatformConnections = wsIdToUser.size();
+        int currentBoardConnections = getConnectedUsersCountForBoard(boardIdToWSIdToWS, boardId);
+        String connectionLimitsStatus = getConnectionLimitsStatus(boardId, user.getUserId(), currentPlatformConnections,
+                currentBoardConnections, maxConnections, maxConnectionsPerBoard, warningThreshold);
+
+        // Si on a dépassé le nombre de connection limite (total ou par board)
+        if (!connectionLimitsStatus.equals(OK)) {
+            ws.close((short) 1013, connectionLimitsStatus);
+            return Future.failedFuture("[Magneto@CollaborationController::onConnect] Maximum connections exceeded");
         }
 
         final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
@@ -211,16 +187,56 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         return promise.future();
     }
 
+    /**
+     * Called when a user leaves the board -> we remove its WS connection from the pool and inform other users of the board
+     * @param boardId
+     * @param userId
+     * @param wsId
+     */
+    protected void onCloseWSConnection(final String boardId, final String userId, final String wsId) {
+        this.magnetoCollaborationService.onNewDisconnection(boardId, userId, wsId)
+            .compose(messages -> this.broadcastMessagesToUsers(messages, wsId))
+            .onComplete(e -> {
+                final Map<String, ServerWebSocket> wss = boardIdToWSIdToWS.get(boardId);
+                if (wss != null) {
+                    if (wss.remove(wsId) == null) {
+                        log.debug("[Magneto@CollaborationController::onCloseWSConnection] No ws removed");
+                    } else {
+                        log.debug("[Magneto@CollaborationController::onCloseWSConnection] WS correctly removed");
+                    }
+                }
+                wsIdToUser.remove(wsId);
+            });
+    }
+
+    // Broadcasts / closing
+
+    /**
+     * Close all WS connections from the pool
+     */
+    private void closeConnections() {
+        boardIdToWSIdToWS.values().stream().flatMap(e -> e.values().stream()).forEach(ServerWebSocket::close);
+        boardIdToWSIdToWS.clear();
+        wsIdToUser.clear();
+    }
+
+    /**
+     * ???????????????????????????
+     * @param messages
+     * @param exceptWsId
+     * @return
+     */
     private Future<Void> broadcastReadOnlyFullAccessMessages(List<MagnetoMessage> messages, String exceptWsId) {
         // Séparer les messages
         MagnetoMessage readOnlyMessage = null;
         MagnetoMessage fullAccessMessage = null;
 
+        // TODO pas compris (cf broadcast suivant)
         for (MagnetoMessage message : messages) {
             if (message.getActionId() != null) {
-                if (message.getActionId().equals(Field.READONLY)) {
+                if (message.getActionId().equals(READONLY)) {
                     readOnlyMessage = message;
-                } else if (message.getActionId().equals(Field.FULLACCESS)) {
+                } else if (message.getActionId().equals(FULLACCESS)) {
                     fullAccessMessage = message;
                 }
             }
@@ -267,17 +283,33 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         return CompositeFuture.join(futures).mapEmpty();
     }
 
-    // Fonction 2: Pour les messages actualUser/otherUsers (nouveau cas cardFavorite)
+    /**
+     * ???????????????????????????
+     * @param messages
+     * @param exceptWsId
+     * @return
+     */
     private Future<Void> broadcastActualUserOtherUsersMessages(List<MagnetoMessage> messages, String exceptWsId) {
         // Séparer les messages
         MagnetoMessage actualUserMessage = null;
         MagnetoMessage otherUsersMessage = null;
 
+        // TODO je comprends pas trop comment ça marche
+        // TODO on cherche à savoir si il y en a au moins 1 ? dans ce cas on peut factoriser par :
+        // Optional<MagnetoMessage> actualUserMessage = messages.stream()
+        //    .filter(m -> ACTUALUSER.equals(m.getActionId()))
+        //    .findFirst()
+        //    .orElse(null);
+        //
+        // Optional<MagnetoMessage> otherUsersMessage = messages.stream()
+        //    .filter(m -> OTHERUSERS.equals(m.getActionId()))
+        //    .findFirst()
+        //    .orElse(null);
         for (MagnetoMessage message : messages) {
             if (message.getActionId() != null) {
-                if (message.getActionId().equals(Field.ACTUALUSER)) {
+                if (message.getActionId().equals(ACTUALUSER)) {
                     actualUserMessage = message;
-                } else if (message.getActionId().equals(Field.OTHERUSERS)) {
+                } else if (message.getActionId().equals(OTHERUSERS)) {
                     otherUsersMessage = message;
                 }
             }
@@ -324,13 +356,19 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
         return CompositeFuture.join(futures).mapEmpty();
     }
 
-    private Future<Void> broadcastMessagesToUsers(final List<MagnetoMessage> messages,
-                                                  final String exceptWsId) {
-        final List<Future<Object>> futures = messages.stream().map(message -> {
-            final String payload = message.toJson().encode();
-            final String boardId = message.getBoardId();
-            final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
-            final List<Future<Void>> writeMessagesPromise = wsIdToWs.entrySet().stream()
+    /**
+     * Envoie un même message à tous les WS actifs du pool (= tous les users dans le board)
+     * @param messages
+     * @param exceptWsId
+     * @return
+     */
+    private Future<Void> broadcastMessagesToUsers(final List<MagnetoMessage> messages, final String exceptWsId) {
+        final List<Future<Object>> futures = messages.stream()
+            .map(message -> {
+                final String payload = message.toJson().encode();
+                final String boardId = message.getBoardId();
+                final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
+                final List<Future<Void>> writeMessagesPromise = wsIdToWs.entrySet().stream()
                     .filter(e -> !e.getKey().equals(exceptWsId))
                     .map(Map.Entry::getValue)
                     .filter(ws -> !ws.isClosed())
@@ -341,21 +379,17 @@ public class MagnetoCollaborationController implements Handler<ServerWebSocket> 
                             try {
                                 ws.writeTextMessage(payload, writeMessagePromise);
                                 writeMessagePromise.future();
-                            } catch (Throwable e) {
-                                log.warn("An exception occurred while writing to ws", e);
+                            }
+                            catch (Throwable e) {
+                                log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] An exception occurred while writing to ws", e);
                             }
                         });
                         sent = Future.succeededFuture();
                         return sent;
                     }).collect(Collectors.toList());
-            return CompositeFuture.join((List) writeMessagesPromise).mapEmpty();
-        }).collect(Collectors.toList());
-        return CompositeFuture.join((List) futures).mapEmpty();
-    }
-
-    private void closeConnections() {
-        boardIdToWSIdToWS.values().stream().flatMap(e -> e.values().stream()).forEach(ServerWebSocket::close);
-        boardIdToWSIdToWS.clear();
-        wsIdToUser.clear();
+                return Future.join((List) writeMessagesPromise).mapEmpty();
+            })
+            .collect(Collectors.toList());
+        return Future.join((List) futures).mapEmpty();
     }
 }

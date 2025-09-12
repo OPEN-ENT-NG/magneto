@@ -3,6 +3,8 @@ package fr.cgi.magneto.config;
 import fr.cgi.magneto.core.constants.Field;
 import io.vertx.core.json.JsonObject;
 
+import static fr.cgi.magneto.core.constants.Field.*;
+
 public class MagnetoConfig {
 
     private final String host;
@@ -11,13 +13,9 @@ public class MagnetoConfig {
     private final Integer magnetoUpdateFrequency;
     private final Boolean magnetoStandalone;
     private final String themePlatform;
-    private final Integer magnetoWebsocketMaxUsers;
-    private final Integer magnetoWebsocketMaxUsersPerBoard;
-    private final Integer magnetoWebsocketPort;
 
     private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; //refresh every 10 seconds by default
-    private final Integer DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS = 500;
-    private final Integer DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD = 100;
+
 
     public MagnetoConfig(JsonObject config) {
         this.host = config.getString(Field.HOST);
@@ -27,25 +25,10 @@ public class MagnetoConfig {
         this.magnetoUpdateFrequency = Math.max(tempFrequency, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
         this.magnetoStandalone = config.getBoolean(Field.MAGNETO_STANDALONE_CONFIG, false);
         this.themePlatform = config.getString(Field.KEBAB_THEME_PLATFORM, "default");
-        this.magnetoWebsocketMaxUsers = config.getInteger(Field.MAGNETO_WEBSOCKET_MAX_USERS, DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS);
-        this.magnetoWebsocketMaxUsersPerBoard = config.getInteger(Field.MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD, DEFAULT_MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD);
-        this.magnetoWebsocketPort = config.getInteger(Field.MAGNETO_WEBSOCKET_PORT, 9091);
     }
 
     public String getThemePlatform() {
         return this.themePlatform;
-    }
-
-    public Integer getMagnetoWebsocketMaxUsers() {
-        return this.magnetoWebsocketMaxUsers;
-    }
-
-    public Integer getMagnetoWebsocketMaxUsersPerBoard() {
-        return this.magnetoWebsocketMaxUsersPerBoard;
-    }
-    
-    public Integer getMagnetoWebsocketPort() {
-        return this.magnetoWebsocketPort;
     }
 
     public String host() {
@@ -69,22 +52,39 @@ public class MagnetoConfig {
     }
 
     public static class WebsocketConfig {
-        public static final int DEFAULT_PORT = 4404;
+        private static final int DEFAULT_PORT = 9091;
         public static final String DEFAULT_ENDPOINTPROXY = "/magneto/eventbus";
+        private static final int DEFAULT__MAX_USERS = 500;
+        private static final int DEFAULT_MAX_USERS_PER_BOARD = 100;
         private final Integer port;
         private final String endpointProxy;
+        private final Integer maxUsers;
+        private final Integer maxUsersPerBoard;
+        private final Boolean isMultiCluster;
 
         public WebsocketConfig(JsonObject websocketConfig) {
-            this.port = websocketConfig.getInteger(Field.WSPORT, DEFAULT_PORT);
-            this.endpointProxy = websocketConfig.getString(Field.ENDPOINT_PROXY_HYPHENS, DEFAULT_ENDPOINTPROXY);
+            this.port = websocketConfig.getInteger(WSPORT, DEFAULT_PORT);
+            this.endpointProxy = websocketConfig.getString(ENDPOINT_PROXY_HYPHENS, DEFAULT_ENDPOINTPROXY);
+            this.maxUsers = websocketConfig.getInteger(MAX_USERS, DEFAULT__MAX_USERS);
+            this.maxUsersPerBoard = websocketConfig.getInteger(MAX_USERS_PER_BOARD, DEFAULT_MAX_USERS_PER_BOARD);
+            this.isMultiCluster = websocketConfig.getBoolean(IS_MULTI_CLUSTER, false);
         }
 
-        public Integer port() {
+        public Integer getPort() {
             return this.port;
         }
-
-        public String endpointProxy() {
+        //TODO utilisation de ce endPointProxy ? (essentiellement vers le front mais vraiment used ?)
+        public String getEndpointProxy() {
             return this.endpointProxy;
+        }
+        public Integer getMaxUsers() {
+            return this.maxUsers;
+        }
+        public Integer getMaxUsersPerBoard() {
+            return this.maxUsersPerBoard;
+        }
+        public Boolean getIsMultiCluster() {
+            return this.isMultiCluster;
         }
 
     }

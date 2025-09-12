@@ -1,9 +1,7 @@
-package fr.cgi.magneto.service;
+package fr.cgi.magneto.realtime;
 
 import fr.cgi.magneto.core.enums.RealTimeStatus;
-import fr.cgi.magneto.core.events.MagnetoUserAction;
-import fr.cgi.magneto.helper.MagnetoMessage;
-import fr.cgi.magneto.helper.MagnetoMessageWrapper;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import fr.cgi.magneto.model.user.User;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -83,9 +81,9 @@ public interface MagnetoCollaborationService {
 
     Future<List<MagnetoMessage>> executeAction(MagnetoUserAction action, String boardId, String wsId, UserInfos user, boolean checkConcurency);
 
-    Future<List<MagnetoMessage>> pushEventToAllUsers(String wallId, UserInfos session, MagnetoUserAction action, boolean checkConcurency);
+    Future<List<MagnetoMessage>> pushEventToAllUsers(String boardId, UserInfos session, MagnetoUserAction action, boolean checkConcurency);
 
-    Future<List<MagnetoMessage>> pushEvent(String wallId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);
+    Future<List<MagnetoMessage>> pushEvent(String boardId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);
 
     Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId, Map<String, User> wsIdToUser);
 

@@ -1,10 +1,10 @@
-package fr.cgi.magneto.core.events;
+package fr.cgi.magneto.realtime.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.cgi.magneto.core.enums.MagnetoMessageType;
+import fr.cgi.magneto.realtime.MagnetoMessageType;
 import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;

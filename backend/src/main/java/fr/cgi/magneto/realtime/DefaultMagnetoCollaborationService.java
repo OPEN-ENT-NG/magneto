@@ -6,10 +6,6 @@ import fr.cgi.magneto.core.constants.Mongo;
 import fr.cgi.magneto.core.constants.Rights;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.core.enums.UserColor;
-import fr.cgi.magneto.realtime.events.CardEditingInformation;
-import fr.cgi.magneto.realtime.events.CollaborationUsersMetadata;
-import fr.cgi.magneto.realtime.events.MagnetoUserAction;
-import fr.cgi.magneto.realtime.events.UserBoardRights;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.WorkflowHelper;
@@ -19,6 +15,10 @@ import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.model.comments.CommentPayload;
 import fr.cgi.magneto.model.user.User;
+import fr.cgi.magneto.realtime.events.CardEditingInformation;
+import fr.cgi.magneto.realtime.events.CollaborationUsersMetadata;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
+import fr.cgi.magneto.realtime.events.UserBoardRights;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.*;
@@ -27,11 +27,9 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.redis.client.*;
-import org.checkerframework.framework.qual.Unused;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -82,7 +80,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.eventBusAddress = config.getString("eventbus-address", "magneto.collaboration");
     }
 
-    @Override
+    /*@Override
     public Future<Void> start() {
         Promise<Void> promise = Promise.promise();
         if (RealTimeStatus.STARTED.equals(this.realTimeStatus) || RealTimeStatus.LIMIT.equals(this.realTimeStatus)) {
@@ -151,7 +149,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         }
 
         return promise.future();
-    }
+    }*/
 
     /**
      * Propage le message à tous les users
@@ -225,60 +223,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     @Override
     public void subscribeToNewMessagesToSend(Handler<MagnetoMessageWrapper> messagesHandler) {
         this.messagesSubscribers.add(messagesHandler);
-    }
-
-    /**
-     * Publie un message à tous les users via l'EventBus défini dans le start()
-     * @param message Message to publish
-     * @return
-     */
-    public Future<Void> publishMessage(JsonObject message) {
-        return Future.fromCompletionStage(
-            CompletableFuture.runAsync(() -> vertx.eventBus().publish(eventBusAddress, message))
-        );
-    }
-
-    /**
-     * Publie à tous le context du board via l'EventBus définie dans le start()
-     */
-    private void publishContextLoop() {
-        vertx.setPeriodic(publishPeriodInMs, timerId -> {
-            JsonObject contextInfo = new JsonObject()
-                    .put("type", "context")
-                    .put("serverId", serverId)
-                    .put("timestamp", System.currentTimeMillis());
-
-            publishMessage(contextInfo);
-        });
-    }
-
-    /**
-     * Publie à tous les metadata du board via l'EventBus définie dans le start()
-     * @param boardId
-     * @param context
-     * @return
-     */
-    private Future<Void> publishMetadata(String boardId, CollaborationUsersMetadata context) {
-        try {
-            JsonArray connectedUsersJson = context.getConnectedUsers().stream()
-                    .map(User::toJson)
-                    .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-
-            JsonObject metadataMessage = new JsonObject()
-                    .put("type", "metadata")
-                    .put("serverId", serverId)
-                    .put("boardId", boardId)
-                    .put("timestamp", System.currentTimeMillis())
-                    .put("connectedUsers", connectedUsersJson)
-                    .put("editing", Json.encode(context.getEditing()));
-
-            return publishMessage(metadataMessage);
-        } catch (Exception e) {
-            String message = String.format("[Magneto@%s::publishMetadataViaEventBus] Error publishing metadata",
-                    this.getClass().getSimpleName());
-            log.error(message, e);
-            return Future.failedFuture(e);
-        }
     }
 
     /**
@@ -531,7 +475,8 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
                 context.getEditing().add(new CardEditingInformation(user.getUserId(), action.getCardId(), System.currentTimeMillis(), action.getIsMoving()));
 
-                return publishMetadata(boardId, context).map(published -> newArrayList(
+                return /*publishMetadata(boardId, context).map(published -> */
+                        Future.succeededFuture(newArrayList(
                         this.messageFactory.cardEditing(
                                 boardId,
                                 wsId,
@@ -544,7 +489,8 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
                 context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
 
-                return publishMetadata(boardId, context).map(published -> newArrayList(
+                return /*publishMetadata(boardId, context).map(published ->*/
+                        Future.succeededFuture(newArrayList(
                         this.messageFactory.cardEditing(
                                 boardId,
                                 wsId,
@@ -650,7 +596,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         //TODO
                         return Future.failedFuture("");
                     }
-                    else {
+                    /*else {
                         // Publier les métadonnées mises à jour via EventBus
                         return publishMetadata(boardId, context)
                             .map(v -> Arrays.asList(newUserMessage, connectedUsersMessage, cardEditingMessage))
@@ -662,6 +608,9 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
                                 return publishMessage(collaborationMessage).map(v -> messages);
                             });
+                    }*/
+                    else {
+                        return Future.succeededFuture(Arrays.asList(newUserMessage, connectedUsersMessage, cardEditingMessage));
                     }
                 });
     }
@@ -974,4 +923,62 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         });
         return promise.future();
     }
+
+
+
+    /**
+     * Publie à tous le context du board via l'EventBus définie dans le start()
+     */
+    /*private void publishContextLoop() {
+        vertx.setPeriodic(publishPeriodInMs, timerId -> {
+            JsonObject contextInfo = new JsonObject()
+                    .put("type", "context")
+                    .put("serverId", serverId)
+                    .put("timestamp", System.currentTimeMillis());
+
+            publishMessage(contextInfo);
+        });
+    }*/
+
+    /**
+     * Publie à tous les metadata du board via l'EventBus définie dans le start()
+     * @param boardId
+     * @param context
+     * @return
+     */
+    /*private Future<Void> publishMetadata(String boardId, CollaborationUsersMetadata context) {
+        try {
+            JsonArray connectedUsersJson = context.getConnectedUsers().stream()
+                    .map(User::toJson)
+                    .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+
+            JsonObject metadataMessage = new JsonObject()
+                    .put("type", "metadata")
+                    .put("serverId", serverId)
+                    .put("boardId", boardId)
+                    .put("timestamp", System.currentTimeMillis())
+                    .put("connectedUsers", connectedUsersJson)
+                    .put("editing", Json.encode(context.getEditing()));
+
+            return publishMessage(metadataMessage);
+        } catch (Exception e) {
+            String message = String.format("[Magneto@%s::publishMetadataViaEventBus] Error publishing metadata",
+                    this.getClass().getSimpleName());
+            log.error(message, e);
+            return Future.failedFuture(e);
+        }
+    }*/
+
+
+
+    /**
+     * Publie un message à tous les users via l'EventBus défini dans le start()
+     * @param message Message to publish
+     * @return
+     */
+    /*public Future<Void> publishMessage(JsonObject message) {
+        return Future.fromCompletionStage(
+            CompletableFuture.runAsync(() -> vertx.eventBus().publish(eventBusAddress, message))
+        );
+    }*/
 }

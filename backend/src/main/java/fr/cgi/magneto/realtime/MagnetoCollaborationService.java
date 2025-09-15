@@ -1,11 +1,10 @@
 package fr.cgi.magneto.realtime;
 
 import fr.cgi.magneto.core.enums.RealTimeStatus;
-import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import fr.cgi.magneto.model.user.User;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public interface MagnetoCollaborationService {
      *
      * @return Future {@link Future<Void>} indicating if the service started successfully
      */
-    Future<Void> start();
+    //Future<Void> start();
 
     /**
      * Subscribe to real-time status changes of the collaboration service
@@ -50,7 +49,7 @@ public interface MagnetoCollaborationService {
      * @param message Message to publish
      * @return Future {@link Future<Void>} indicating if the message was published successfully
      */
-    Future<Void> publishMessage(JsonObject message);
+    //Future<Void> publishMessage(JsonObject message);
 
     /**
      * Get current status of the collaboration service

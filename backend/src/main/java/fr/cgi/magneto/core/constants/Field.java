@@ -1,10 +1,6 @@
 package fr.cgi.magneto.core.constants;
 
 public class Field {
-    public static final String OK = "ok";
-    public static final String STATUS = "status";
-    public static final String RESULT = "result";
-    public static final String COUNT = "count";
     public static final String HOST = "host";
     public static final String WSPORT = "wsPort";
     public static final String MODE = "mode";

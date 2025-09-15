@@ -72,9 +72,9 @@ public class Magneto extends BaseServer {
             .listen(magnetoConfig.websocketConfig().getPort(), asyncResult -> {
                 if (asyncResult.succeeded()) {
                     log.info("[Magneto@Magneto::start] Websocket server started and listening on port " + magnetoConfig.websocketConfig().getPort());
-                    serviceFactory.magnetoCollaborationService().start()
+                    /*serviceFactory.magnetoCollaborationService().start()
                         .onSuccess(futureVoid -> log.info("[Magneto@Magneto::start] MagnetoCollaborationService started"))
-                        .onFailure(err -> log.error("[Magneto@Magneto::start] Failed to start MagnetoCollaborationService : " + err));
+                        .onFailure(err -> log.error("[Magneto@Magneto::start] Failed to start MagnetoCollaborationService : " + err));*/
                 } else {
                     log.error("[Magneto@Magneto::start] Cannot start websocket controller : " + asyncResult.cause());
                 }

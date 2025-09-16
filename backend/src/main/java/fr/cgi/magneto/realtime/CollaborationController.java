@@ -1,8 +1,8 @@
 package fr.cgi.magneto.realtime;
 
 import fr.cgi.magneto.core.enums.RealTimeStatus;
-import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import fr.cgi.magneto.model.user.User;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.webutils.request.CookieHelper;
 import fr.wseduc.webutils.request.filter.UserAuthFilter;
@@ -44,6 +44,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
             }
         });
 
+        // Subscription aux messages avec gestion des messages différenciés et Redis
         this.magnetoCollaborationService.subscribeToNewMessagesToSend(messages -> {
             if (messages.isNotEmpty()) {
                 List<MagnetoMessage> messageList = messages.getMessages();
@@ -51,52 +52,35 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 // Vérifier si on a des messages avec différenciation readOnly/fullAccess
                 boolean hasReadOnlyOrFullAccess = messageList.size() > 1 &&
                         messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
-                                (Arrays.asList(READONLY,FULLACCESS).contains(msg.getActionId())));
+                                (Arrays.asList(READONLY, FULLACCESS).contains(msg.getActionId())));
 
                 // Vérifier si on a des messages avec différenciation actualUser/otherUsers
                 boolean hasActualUserOrOtherUsers = messageList.size() > 1 &&
                         messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
-                                (Arrays.asList(ACTUALUSER,OTHERUSERS).contains(msg.getActionId())));
+                                (Arrays.asList(ACTUALUSER, OTHERUSERS).contains(msg.getActionId())));
 
                 if (hasReadOnlyOrFullAccess) {
-                    // Logique spéciale pour les messages readOnly/fullAccess
+                    // Messages avec différenciation par droits utilisateur
                     this.broadcastReadOnlyFullAccessMessages(messageList, messages.getExceptWSId());
                 } else if (hasActualUserOrOtherUsers) {
-                    // Logique spéciale pour les messages actualUser/otherUsers
+                    // Messages avec différenciation par utilisateur actuel vs autres
                     this.broadcastActualUserOtherUsersMessages(messageList, messages.getExceptWSId());
                 } else {
-                    // Logique normale
-                    this.broadcastMessagesToUsers(messageList, messages.getExceptWSId());
+                    // Messages standards - gérer aussi les messages Redis externes
+                    if (messages.isAllowExternal() && !messages.isAllowInternal()) {
+                        // Message provenant de Redis - diffuser à tous les utilisateurs locaux
+                        this.broadcastExternalMessagesToUsers(messageList, messages.getExceptWSId());
+                    } else {
+                        // Messages internes normaux
+                        this.broadcastMessagesToUsers(messageList, messages.getExceptWSId());
+                    }
                 }
             }
         });
-
-//        if (isMultiCluster) {
-//            RedisOptions redisOptions = getRedisOptions(vertx, serviceFactory.config());
-//            redisClient = Redis.createClient(vertx, redisOptions);
-//            redisAPI = RedisAPI.api(redisClient);
-//
-//            // Subscriber
-//            redisClient.connect(onConnect -> {
-//                if (onConnect.succeeded()) {
-//                    RedisConnection conn = onConnect.result();
-//                    conn.handler(message -> {
-//                        // message reçu via Redis => redistribuer localement
-//                        String payload = message.toString();
-//                        MagnetoMessage magnetoMsg = new JsonObject(payload).mapTo(MagnetoMessage.class);
-//                        broadcastMessagesToUsers(List.of(magnetoMsg), null);
-//                    });
-//                    conn.send(Request.cmd(Command.SUBSCRIBE).arg("magneto:ws"));
-//                } else {
-//                    log.error("[Magneto@CollaborationController::CollaborationController] Could not connect to Redis", onConnect.cause());
-//                }
-//            });
-//        }
     }
 
     /**
      * What happen when a WS payload is received from the front
-     * @param ws  the event to handle
      */
     @Override
     public void handle(ServerWebSocket ws) {
@@ -121,50 +105,43 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 }
 
                 final UserInfos session = UserUtils.sessionToUserInfos(infos);
-                //TODO : check l'accès au tableau si necessaire
                 final String userId = session.getUserId();
                 ws.closeHandler(e -> onCloseWSConnection(boardId, userId, wsId));
                 onConnect(session, boardId, wsId, ws)
-                    .onSuccess(onSuccess -> {
-                        ws.resume();
-                        ws.frameHandler(frame -> {
-                            try {
-                                if (frame.isBinary()) {
-                                    log.warn("[Magneto@CollaborationController::handle] Binary is not handled");
+                        .onSuccess(onSuccess -> {
+                            ws.resume();
+                            ws.frameHandler(frame -> {
+                                try {
+                                    if (frame.isBinary()) {
+                                        log.warn("[Magneto@CollaborationController::handle] Binary is not handled");
+                                    }
+                                    else if (frame.isText()){
+                                        final String message = frame.textData();
+                                        final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
+                                        this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false);
+                                    }
+                                    else if (frame.isClose()) {
+                                        log.debug("[Magneto@CollaborationController::handle] Received a close frame from the user");
+                                        onCloseWSConnection(boardId, userId, wsId);
+                                    }
+                                } catch (Exception e) {
+                                    log.error("[Magneto@CollaborationController::handle] An error occured while parsing message:", e);
                                 }
-                                else if (frame.isText()){
-                                    final String message = frame.textData();
-                                    final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
-                                    this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false);//.onFailure(th -> this.sendError(th, ws));
-                                }
-                                else if (frame.isClose()) {
-                                    log.debug("[Magneto@CollaborationController::handle] Received a close frame from the user");
-                                    onCloseWSConnection(boardId, userId, wsId);
-                                }
-                            } catch (Exception e) {
-                                log.error("[Magneto@CollaborationController::handle] An error occured while parsing message:", e);
-                            }
+                            });
+                        })
+                        .onFailure(th -> {
+                            log.error("[Magneto@CollaborationController::handle] An error occurred while opening the websocket", th);
                         });
-                    })
-                    .onFailure(th -> {
-                        log.error("[Magneto@CollaborationController::handle] An error occurred while opening the websocket", th);
-                    });
 
             } catch (Exception e) {
                 ws.resume();
                 log.error("[Magneto@CollaborationController::handle] An error occurred while treating ws", e);
             }
         });
-
     }
 
-    /***
+    /**
      * Called when a user arrives at the board -> we create a new WS connection for him, add it to the pool and inform other users of the board
-     * @param user
-     * @param boardId
-     * @param wsId
-     * @param ws
-     * @return
      */
     private Future<Void> onConnect(final UserInfos user, final String boardId, final String wsId, final ServerWebSocket ws) {
         int currentPlatformConnections = wsIdToUser.size();
@@ -189,24 +166,21 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
     /**
      * Called when a user leaves the board -> we remove its WS connection from the pool and inform other users of the board
-     * @param boardId
-     * @param userId
-     * @param wsId
      */
     protected void onCloseWSConnection(final String boardId, final String userId, final String wsId) {
         this.magnetoCollaborationService.onNewDisconnection(boardId, userId, wsId)
-            .compose(messages -> this.broadcastMessagesToUsers(messages, wsId))
-            .onComplete(e -> {
-                final Map<String, ServerWebSocket> wss = boardIdToWSIdToWS.get(boardId);
-                if (wss != null) {
-                    if (wss.remove(wsId) == null) {
-                        log.debug("[Magneto@CollaborationController::onCloseWSConnection] No ws removed");
-                    } else {
-                        log.debug("[Magneto@CollaborationController::onCloseWSConnection] WS correctly removed");
+                .compose(messages -> this.broadcastMessagesToUsers(messages, wsId))
+                .onComplete(e -> {
+                    final Map<String, ServerWebSocket> wss = boardIdToWSIdToWS.get(boardId);
+                    if (wss != null) {
+                        if (wss.remove(wsId) == null) {
+                            log.debug("[Magneto@CollaborationController::onCloseWSConnection] No ws removed");
+                        } else {
+                            log.debug("[Magneto@CollaborationController::onCloseWSConnection] WS correctly removed");
+                        }
                     }
-                }
-                wsIdToUser.remove(wsId);
-            });
+                    wsIdToUser.remove(wsId);
+                });
     }
 
     // Broadcasts / closing
@@ -221,106 +195,71 @@ public class CollaborationController implements Handler<ServerWebSocket> {
     }
 
     /**
-     * ???????????????????????????
-     * @param messages
-     * @param exceptWsId
-     * @return
+     * Diffuse les messages externes (provenant de Redis) à tous les utilisateurs locaux
      */
-    private Future<Void> broadcastReadOnlyFullAccessMessages(List<MagnetoMessage> messages, String exceptWsId) {
-        // Séparer les messages
-        MagnetoMessage readOnlyMessage = null;
-        MagnetoMessage fullAccessMessage = null;
-
-        // TODO pas compris (cf broadcast suivant)
-        for (MagnetoMessage message : messages) {
-            if (message.getActionId() != null) {
-                if (message.getActionId().equals(READONLY)) {
-                    readOnlyMessage = message;
-                } else if (message.getActionId().equals(FULLACCESS)) {
-                    fullAccessMessage = message;
-                }
-            }
-        }
-
-        if (readOnlyMessage == null || fullAccessMessage == null) {
-            return Future.succeededFuture();
-        }
-
-        String boardId = readOnlyMessage.getBoardId();
-        final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
-
+    private Future<Void> broadcastExternalMessagesToUsers(List<MagnetoMessage> messages, String exceptWsId) {
         List<Future> futures = new ArrayList<>();
 
-        for (Map.Entry<String, ServerWebSocket> entry : wsIdToWs.entrySet()) {
-            String wsId = entry.getKey();
-            ServerWebSocket ws = entry.getValue();
+        for (MagnetoMessage message : messages) {
+            final String payload = message.toJson().encode();
+            final String boardId = message.getBoardId();
+            final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
 
-            if (wsId.equals(exceptWsId) || ws.isClosed()) {
-                continue;
-            }
-
-            User user = wsIdToUser.get(wsId);
-            if (user == null) {
-                continue;
-            }
-
-            // Choisir le bon message selon le statut readOnly de l'utilisateur
-            MagnetoMessage messageToSend = user.getRights().isReadOnly() ? readOnlyMessage : fullAccessMessage;
-            String payload = messageToSend.toJson().encode();
-
-            final Promise<Void> writeMessagePromise = Promise.promise();
-            vertx.setTimer(1L, p -> {
-                try {
-                    ws.writeTextMessage(payload, writeMessagePromise);
-                    writeMessagePromise.future();
-                } catch (Throwable e) {
-                    log.warn("An exception occurred while writing to ws", e);
+            for (Map.Entry<String, ServerWebSocket> entry : wsIdToWs.entrySet()) {
+                if (entry.getKey().equals(exceptWsId) || entry.getValue().isClosed()) {
+                    continue;
                 }
-            });
-            futures.add(Future.succeededFuture());
+
+                ServerWebSocket ws = entry.getValue();
+                Promise<Void> writePromise = Promise.promise();
+
+                vertx.setTimer(1L, p -> {
+                    try {
+                        ws.writeTextMessage(payload, ar -> {
+                            if (ar.succeeded()) {
+                                log.debug("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] External message sent for board: " + boardId);
+                                writePromise.complete();
+                            } else {
+                                log.warn("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Failed to send external message", ar.cause());
+                                writePromise.fail(ar.cause());
+                            }
+                        });
+                    } catch (Throwable e) {
+                        log.warn("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Exception while writing Redis message to ws", e);
+                        writePromise.fail(e);
+                    }
+                });
+
+                futures.add(writePromise.future());
+            }
+        }
+
+        if (futures.isEmpty()) {
+            return Future.succeededFuture();
         }
 
         return CompositeFuture.join(futures).mapEmpty();
     }
 
     /**
-     * ???????????????????????????
-     * @param messages
-     * @param exceptWsId
-     * @return
+     * Gère les messages avec différenciation readOnly/fullAccess
      */
-    private Future<Void> broadcastActualUserOtherUsersMessages(List<MagnetoMessage> messages, String exceptWsId) {
+    private Future<Void> broadcastReadOnlyFullAccessMessages(List<MagnetoMessage> messages, String exceptWsId) {
         // Séparer les messages
-        MagnetoMessage actualUserMessage = null;
-        MagnetoMessage otherUsersMessage = null;
+        Optional<MagnetoMessage> readOnlyMessage = messages.stream()
+                .filter(m -> READONLY.equals(m.getActionId()))
+                .findFirst();
 
-        // TODO je comprends pas trop comment ça marche
-        // TODO on cherche à savoir si il y en a au moins 1 ? dans ce cas on peut factoriser par :
-        // Optional<MagnetoMessage> actualUserMessage = messages.stream()
-        //    .filter(m -> ACTUALUSER.equals(m.getActionId()))
-        //    .findFirst()
-        //    .orElse(null);
-        //
-        // Optional<MagnetoMessage> otherUsersMessage = messages.stream()
-        //    .filter(m -> OTHERUSERS.equals(m.getActionId()))
-        //    .findFirst()
-        //    .orElse(null);
-        for (MagnetoMessage message : messages) {
-            if (message.getActionId() != null) {
-                if (message.getActionId().equals(ACTUALUSER)) {
-                    actualUserMessage = message;
-                } else if (message.getActionId().equals(OTHERUSERS)) {
-                    otherUsersMessage = message;
-                }
-            }
-        }
+        Optional<MagnetoMessage> fullAccessMessage = messages.stream()
+                .filter(m -> FULLACCESS.equals(m.getActionId()))
+                .findFirst();
 
-        if (actualUserMessage == null || otherUsersMessage == null) {
+        if (!readOnlyMessage.isPresent() || !fullAccessMessage.isPresent()) {
+            log.warn("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] Missing readOnly or fullAccess message");
             return Future.succeededFuture();
         }
 
-        String boardId = actualUserMessage.getBoardId();
-        String actualUserId = actualUserMessage.getUserId();
+        String boardId = readOnlyMessage.get().getBoardId();
         final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
 
         List<Future> futures = new ArrayList<>();
@@ -335,22 +274,104 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
             User user = wsIdToUser.get(wsId);
             if (user == null) {
+                log.warn("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] No user found for wsId: " + wsId);
                 continue;
             }
 
-            MagnetoMessage messageToSend = user.getUserId().equals(actualUserId) ? actualUserMessage : otherUsersMessage;
+            // Choisir le bon message selon le statut readOnly de l'utilisateur
+            MagnetoMessage messageToSend = user.getRights().isReadOnly() ? readOnlyMessage.get() : fullAccessMessage.get();
             String payload = messageToSend.toJson().encode();
 
-            final Promise<Void> writeMessagePromise = Promise.promise();
+            Promise<Void> writePromise = Promise.promise();
             vertx.setTimer(1L, p -> {
                 try {
-                    ws.writeTextMessage(payload, writeMessagePromise);
-                    writeMessagePromise.future();
+                    ws.writeTextMessage(payload, ar -> {
+                        if (ar.succeeded()) {
+                            writePromise.complete();
+                        } else {
+                            log.warn("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] Failed to send message", ar.cause());
+                            writePromise.fail(ar.cause());
+                        }
+                    });
                 } catch (Throwable e) {
-                    log.warn("An exception occurred while writing to ws", e);
+                    log.warn("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] Exception while writing message", e);
+                    writePromise.fail(e);
                 }
             });
-            futures.add(Future.succeededFuture());
+            futures.add(writePromise.future());
+        }
+
+        if (futures.isEmpty()) {
+            return Future.succeededFuture();
+        }
+
+        return CompositeFuture.join(futures).mapEmpty();
+    }
+
+    /**
+     * Gère les messages avec différenciation actualUser/otherUsers
+     */
+    private Future<Void> broadcastActualUserOtherUsersMessages(List<MagnetoMessage> messages, String exceptWsId) {
+        // Séparer les messages
+        Optional<MagnetoMessage> actualUserMessage = messages.stream()
+                .filter(m -> ACTUALUSER.equals(m.getActionId()))
+                .findFirst();
+
+        Optional<MagnetoMessage> otherUsersMessage = messages.stream()
+                .filter(m -> OTHERUSERS.equals(m.getActionId()))
+                .findFirst();
+
+        if (!actualUserMessage.isPresent() || !otherUsersMessage.isPresent()) {
+            log.warn("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] Missing actualUser or otherUsers message");
+            return Future.succeededFuture();
+        }
+
+        String boardId = actualUserMessage.get().getBoardId();
+        String actualUserId = actualUserMessage.get().getUserId();
+        final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
+
+        List<Future> futures = new ArrayList<>();
+
+        for (Map.Entry<String, ServerWebSocket> entry : wsIdToWs.entrySet()) {
+            String wsId = entry.getKey();
+            ServerWebSocket ws = entry.getValue();
+
+            if (wsId.equals(exceptWsId) || ws.isClosed()) {
+                continue;
+            }
+
+            User user = wsIdToUser.get(wsId);
+            if (user == null) {
+                log.warn("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] No user found for wsId: " + wsId);
+                continue;
+            }
+
+            // Choisir le bon message selon si c'est l'utilisateur actuel ou un autre
+            MagnetoMessage messageToSend = user.getUserId().equals(actualUserId) ?
+                    actualUserMessage.get() : otherUsersMessage.get();
+            String payload = messageToSend.toJson().encode();
+
+            Promise<Void> writePromise = Promise.promise();
+            vertx.setTimer(1L, p -> {
+                try {
+                    ws.writeTextMessage(payload, ar -> {
+                        if (ar.succeeded()) {
+                            writePromise.complete();
+                        } else {
+                            log.warn("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] Failed to send message", ar.cause());
+                            writePromise.fail(ar.cause());
+                        }
+                    });
+                } catch (Throwable e) {
+                    log.warn("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] Exception while writing message", e);
+                    writePromise.fail(e);
+                }
+            });
+            futures.add(writePromise.future());
+        }
+
+        if (futures.isEmpty()) {
+            return Future.succeededFuture();
         }
 
         return CompositeFuture.join(futures).mapEmpty();
@@ -358,38 +379,40 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
     /**
      * Envoie un même message à tous les WS actifs du pool (= tous les users dans le board)
-     * @param messages
-     * @param exceptWsId
-     * @return
      */
     private Future<Void> broadcastMessagesToUsers(final List<MagnetoMessage> messages, final String exceptWsId) {
-        final List<Future<Object>> futures = messages.stream()
-            .map(message -> {
-                final String payload = message.toJson().encode();
-                final String boardId = message.getBoardId();
-                final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
-                final List<Future<Void>> writeMessagesPromise = wsIdToWs.entrySet().stream()
-                    .filter(e -> !e.getKey().equals(exceptWsId))
-                    .map(Map.Entry::getValue)
-                    .filter(ws -> !ws.isClosed())
-                    .map(ws -> {
-                        final Promise<Void> writeMessagePromise = Promise.promise();
-                        Future<Void> sent;
-                        vertx.setTimer(1L, p -> {
-                            try {
-                                ws.writeTextMessage(payload, writeMessagePromise);
-                                writeMessagePromise.future();
-                            }
-                            catch (Throwable e) {
-                                log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] An exception occurred while writing to ws", e);
-                            }
-                        });
-                        sent = Future.succeededFuture();
-                        return sent;
-                    }).collect(Collectors.toList());
-                return Future.join((List) writeMessagesPromise).mapEmpty();
-            })
-            .collect(Collectors.toList());
-        return Future.join((List) futures).mapEmpty();
+        final List<Future> futures = messages.stream()
+                .map(message -> {
+                    final String payload = message.toJson().encode();
+                    final String boardId = message.getBoardId();
+                    final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
+                    final List<Future> writeMessagesPromise = wsIdToWs.entrySet().stream()
+                            .filter(e -> !e.getKey().equals(exceptWsId))
+                            .map(Map.Entry::getValue)
+                            .filter(ws -> !ws.isClosed())
+                            .map(ws -> {
+                                final Promise<Void> writeMessagePromise = Promise.promise();
+                                vertx.setTimer(1L, p -> {
+                                    try {
+                                        ws.writeTextMessage(payload, ar -> {
+                                            if (ar.succeeded()) {
+                                                writeMessagePromise.complete();
+                                            } else {
+                                                log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] Failed to send message", ar.cause());
+                                                writeMessagePromise.fail(ar.cause());
+                                            }
+                                        });
+                                    }
+                                    catch (Throwable e) {
+                                        log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] An exception occurred while writing to ws", e);
+                                        writeMessagePromise.fail(e);
+                                    }
+                                });
+                                return writeMessagePromise.future();
+                            }).collect(Collectors.toList());
+                    return CompositeFuture.join(writeMessagesPromise).mapEmpty();
+                })
+                .collect(Collectors.toList());
+        return CompositeFuture.join(futures).mapEmpty();
     }
 }

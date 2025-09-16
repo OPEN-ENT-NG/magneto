@@ -26,7 +26,8 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.redis.client.*;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.user.UserInfos;
 
 import java.util.*;
@@ -34,10 +35,13 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static fr.cgi.magneto.core.constants.Field.*;
-import static fr.cgi.magneto.realtime.CollaborationHelper.*;
-import static io.vertx.core.http.impl.HttpClientConnection.log;
+import static fr.cgi.magneto.realtime.CollaborationHelper.assignColorToUser;
+import static fr.cgi.magneto.realtime.CollaborationHelper.calculateRights;
 
 public class DefaultMagnetoCollaborationService implements MagnetoCollaborationService {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultMagnetoCollaborationService.class);
+
     private final Vertx vertx;
     private final JsonObject config;
     private final String serverId;
@@ -54,12 +58,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     // Redis
     private final boolean isMultiCluster;
-    private RedisAPI redisPublisher;
-    private final RedisConnectionWrapper subscriberConnection = new RedisConnectionWrapper();
-    private long restartAttempt = 0;
-    private static final String channelName = "__realtime@magneto"; //TODO what is it ??
-    private static final String metadataCollectionPrefix = "rt_magneto_context_";
-    private final long reConnectionDelay;
+    private MagnetoRedisService redisService;
 
     public DefaultMagnetoCollaborationService(ServiceFactory serviceFactory) {
         this.vertx = serviceFactory.vertx();
@@ -70,17 +69,26 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.statusSubscribers = new ArrayList<>();
         this.messagesSubscribers = new ArrayList<>();
         this.metadataByBoardId = new HashMap<>();
-        this.isMultiCluster = serviceFactory.magnetoConfig().websocketConfig().getIsMultiCluster();
+        this.isMultiCluster = true;//serviceFactory.magnetoConfig().websocketConfig().getIsMultiCluster();
 
-        this.config = serviceFactory.config(); //TODO prendre le MagnetoConfig qui est typé plutôt
-        //TODO si c'est pas en conf ça sert pas à grand chose de faire ça..
-        this.reConnectionDelay = config.getLong("reconnection-delay-in-ms", 1000L);
+        this.config = serviceFactory.config();
         this.publishPeriodInMs = config.getLong("publish-context-period-in-ms", 60000L);
         this.maxConnectedUser = config.getLong("max-connected-user", 50L);
         this.eventBusAddress = config.getString("eventbus-address", "magneto.collaboration");
+
+        // Initialisation du service Redis si multi-cluster
+        if (isMultiCluster) {
+            this.redisService = new MagnetoRedisService(vertx, config, serverId, metadataByBoardId);
+            // Subscribe aux messages Redis entrants
+            this.redisService.subscribeToMessages(this::onNewRedisMessage);
+            // Subscribe aux changements de statut Redis
+            this.redisService.subscribeToStatusChanges(this::changeRealTimeStatus);
+        }
     }
 
-    /*@Override
+    /**
+     * Démarre le service collaboration (Redis ou EventBus selon la configuration)
+     */
     public Future<Void> start() {
         Promise<Void> promise = Promise.promise();
         if (RealTimeStatus.STARTED.equals(this.realTimeStatus) || RealTimeStatus.LIMIT.equals(this.realTimeStatus)) {
@@ -90,70 +98,109 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         try {
             changeRealTimeStatus(RealTimeStatus.STARTING);
 
-            // TODO ceci est un test
             if (isMultiCluster) {
-                try {
-                    final RedisOptions redisOptions = getRedisOptions(vertx, config);
-                    final Redis publisherClient = Redis.createClient(vertx, redisOptions);
-                    redisPublisher = RedisAPI.api(publisherClient);
-                    listenToRedis()
-                        .onSuccess(futureVoid -> publishContextLoop())
+                // Mode Redis multi-cluster
+                redisService.start()
+                        .onSuccess(futureVoid -> changeRealTimeStatus(RealTimeStatus.STARTED).onComplete(promise))
                         .onFailure(promise::fail);
-                }
-                catch (Exception e) {
-                    promise.fail(e);
-                }
-            }
-            // TODO fin test
-            else {
-                // Création du consumer sur l'EventBus
-                eventBusConsumer = vertx.eventBus().consumer(eventBusAddress);
-                eventBusConsumer.handler(ebMessage -> {
-                    try {
-                        JsonObject messageBody = ebMessage.body();
-                        this.onNewMessage(messageBody.encode());
-                    } catch (Exception e) {
-                        String message = String.format("[Magneto@%s::start] Cannot treat EventBus message",
-                                this.getClass().getSimpleName());
-                        log.error(message, e);
-                    }
-                });
-
-                eventBusConsumer.exceptionHandler(t -> {
-                    String message = String.format("[Magneto@%s::start] EventBus consumer error",
-                            this.getClass().getSimpleName());
-                    log.error(message, t);
-                    changeRealTimeStatus(RealTimeStatus.ERROR);
-                    // Tentative de reconnexion
-                    vertx.setTimer(1000, id -> start());
-                });
-
-                eventBusConsumer.completionHandler(ar -> {
-                    if (ar.succeeded()) {
-                        log.info("EventBus consumer registered successfully");
-                        changeRealTimeStatus(RealTimeStatus.STARTED).onComplete(promise);
-                        publishContextLoop();
-                    } else {
-                        String message = String.format("[Magneto@%s::start] EventBus consumer registration failed",
-                                this.getClass().getSimpleName());
-                        log.error(message, ar.cause());
-                        changeRealTimeStatus(RealTimeStatus.ERROR).onComplete(promise);
-                    }
-                });
+            } else {
+                // Mode EventBus local
+                startEventBusMode().onComplete(promise);
             }
         } catch (Exception e) {
-            String message = String.format("[Magneto@%s::start] Error starting VertxEventBusMagnetoCollaborationService",
+            String message = String.format("[Magneto@%s::start] Error starting collaboration service",
                     this.getClass().getSimpleName());
             log.error(message, e);
             changeRealTimeStatus(RealTimeStatus.ERROR).onComplete(promise);
         }
 
         return promise.future();
-    }*/
+    }
 
     /**
-     * Propage le message à tous les users
-     * @param receivedMessage String representation of the received message
+     * Démarre le mode EventBus (mono-instance)
+     */
+    private Future<Void> startEventBusMode() {
+        Promise<Void> promise = Promise.promise();
+
+        // Création du consumer sur l'EventBus
+        eventBusConsumer = vertx.eventBus().consumer(eventBusAddress);
+        eventBusConsumer.handler(ebMessage -> {
+            try {
+                JsonObject messageBody = ebMessage.body();
+                this.onNewMessage(messageBody.encode());
+            } catch (Exception e) {
+                String message = String.format("[Magneto@%s::startEventBusMode] Cannot treat EventBus message",
+                        this.getClass().getSimpleName());
+                log.error(message, e);
+            }
+        });
+
+        eventBusConsumer.exceptionHandler(t -> {
+            String message = String.format("[Magneto@%s::startEventBusMode] EventBus consumer error",
+                    this.getClass().getSimpleName());
+            log.error(message, t);
+            changeRealTimeStatus(RealTimeStatus.ERROR);
+            // Tentative de reconnexion
+            vertx.setTimer(1000, id -> start());
+        });
+
+        eventBusConsumer.completionHandler(ar -> {
+            if (ar.succeeded()) {
+                log.info("[Magneto@DefaultMagnetoCollaborationService::startEventBusMode] EventBus consumer registered successfully");
+                changeRealTimeStatus(RealTimeStatus.STARTED).onComplete(promise);
+            } else {
+                String message = String.format("[Magneto@%s::startEventBusMode] EventBus consumer registration failed",
+                        this.getClass().getSimpleName());
+                log.error(message, ar.cause());
+                changeRealTimeStatus(RealTimeStatus.ERROR).onComplete(promise);
+            }
+        });
+
+        return promise.future();
+    }
+
+    /**
+     * Arrête le service collaboration
+     */
+    public Future<Void> stop() {
+        Promise<Void> promise = Promise.promise();
+
+        if (isMultiCluster && redisService != null) {
+            redisService.stop().onComplete(promise);
+        } else {
+            cleanUp().onComplete(promise);
+        }
+
+        return promise.future().onComplete(e -> this.statusSubscribers.clear());
+    }
+
+    /**
+     * Traite un message Redis entrant
+     */
+    private void onNewRedisMessage(MagnetoMessage message) {
+        log.debug("[Magneto@DefaultMagnetoCollaborationService::onNewRedisMessage] Received Redis message from server: " + message.getEmittedBy());
+
+        // Créer un wrapper pour la diffusion locale uniquement (pas interne)
+        MagnetoMessageWrapper wrapper = new MagnetoMessageWrapper(
+                Collections.singletonList(message),
+                false, // pas de messages internes
+                true,  // messages externes (Redis)
+                null   // pas d'exception de wsId
+        );
+
+        // Diffuser aux subscribers locaux
+        for (Handler<MagnetoMessageWrapper> subscriber : messagesSubscribers) {
+            try {
+                subscriber.handle(wrapper);
+            } catch (Exception e) {
+                log.error("[Magneto@DefaultMagnetoCollaborationService::onNewRedisMessage] Error in message subscriber", e);
+            }
+        }
+    }
+
+    /**
+     * Propage le message à tous les users (mode EventBus)
      */
     @Override
     public void onNewMessage(String receivedMessage) {
@@ -171,12 +218,10 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     // Traitement des messages de contexte (si nécessaire)
                     break;
                 case "collaboration":
-                    // TODO que dans un case "metadata" ça non ?
                     if (jsonMessage.containsKey("connectedUsers") || jsonMessage.containsKey("editing")) {
                         String boardId = jsonMessage.getString("boardId");
                         if (boardId != null) {
                             try {
-                                // TODO mettre à jour les metadata locales (si vous avez plusieurs instances)
                                 String debugMessage = "[Magneto@%s::onNewMessage] Received collaboration message with metadata for board : %s";
                                 log.debug(String.format(debugMessage, this.getClass().getSimpleName(), boardId));
                             }
@@ -227,18 +272,12 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     /**
      * Handle user action and call {@link #executeAction(MagnetoUserAction, String, String, UserInfos, boolean)}
-     * @param action
-     * @param boardId
-     * @param wsId
-     * @param user
-     * @param checkConcurency
-     * @return
      */
     @Override
     public Future<List<MagnetoMessage>> onNewUserAction(final MagnetoUserAction action, String boardId, String wsId, final UserInfos user, final boolean checkConcurency) {
         if (action == null) {
             log.warn("[Magneto@DefaultMagnetoCollaborationService::onNewUserAction] Message does not contain a type");
-            return Future.failedFuture("wall.action.missing"); // TODO wrong key
+            return Future.failedFuture("wall.action.missing");
         }
 
         try {
@@ -253,12 +292,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     /**
      * Interact with BDD according to the type of action
-     * @param action
-     * @param boardId
-     * @param wsId
-     * @param user
-     * @param checkConcurency
-     * @return
      */
     @Override
     public Future<List<MagnetoMessage>> executeAction(final MagnetoUserAction action, String boardId, String wsId, final UserInfos user, final boolean checkConcurency) {
@@ -368,7 +401,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             case commentDeleted: {
                 return this.serviceFactory.commentService().deleteComment(user.getUserId(), action.getCardId(), action.getCommentId())
                         .onFailure(fail -> {
-                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                            String message = String.format("[Magneto@%s::deleteComment] Failed to delete comment",
                                     this.getClass().getSimpleName());
                             log.error(message);
                         })
@@ -384,7 +417,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
                 return this.serviceFactory.commentService().updateComment(commentPayload, action.getCardId())
                         .onFailure(fail -> {
-                            String message = String.format("[Magneto@%s::addComment] Failed to create comment",
+                            String message = String.format("[Magneto@%s::editComment] Failed to edit comment",
                                     this.getClass().getSimpleName());
                             log.error(message);
                         })
@@ -446,7 +479,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setLastModifierName(user.getUsername())
                         .setBoardId(newBoardId);
 
-                this.serviceFactory.cardService().processMoveCard(updateCard, oldBoardId, newBoardId, user, null)
+                return this.serviceFactory.cardService().processMoveCard(updateCard, oldBoardId, newBoardId, user, null)
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardsBoardUpdated: {
@@ -472,11 +505,16 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardEditionStarted: {
-                final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
+                final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
                 context.getEditing().add(new CardEditingInformation(user.getUserId(), action.getCardId(), System.currentTimeMillis(), action.getIsMoving()));
 
-                return /*publishMetadata(boardId, context).map(published -> */
-                        Future.succeededFuture(newArrayList(
+                // Publier les métadonnées mises à jour si multi-cluster
+                if (isMultiCluster && redisService != null) {
+                    redisService.publishBoardMetadata(boardId)
+                            .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::cardEditionStarted] Failed to publish metadata", err));
+                }
+
+                return Future.succeededFuture(newArrayList(
                         this.messageFactory.cardEditing(
                                 boardId,
                                 wsId,
@@ -486,11 +524,16 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         )));
             }
             case cardEditionEnded: {
-                final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
+                final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
                 context.getEditing().removeIf(info -> info.getUserId().equals(user.getUserId()));
 
-                return /*publishMetadata(boardId, context).map(published ->*/
-                        Future.succeededFuture(newArrayList(
+                // Publier les métadonnées mises à jour si multi-cluster
+                if (isMultiCluster && redisService != null) {
+                    redisService.publishBoardMetadata(boardId)
+                            .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::cardEditionEnded] Failed to publish metadata", err));
+                }
+
+                return Future.succeededFuture(newArrayList(
                         this.messageFactory.cardEditing(
                                 boardId,
                                 wsId,
@@ -505,10 +548,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     /**
      * Propage la liste de messages à tous les users
-     * @param messages
-     * @param allowInternalMessages
-     * @param allowExternalMessages
-     * @param exceptWsId
      */
     private void broadcastMessagesToUsers(final List<MagnetoMessage> messages,
                                           final boolean allowInternalMessages,
@@ -525,37 +564,33 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
     /**
      * Handle a user action and propagate it to all the users via {@link #broadcastMessagesToUsers(List, boolean, boolean, String)}
-     * @param boardId
-     * @param session
-     * @param action
-     * @param wsId
-     * @param checkConcurency
-     * @return
      */
     @Override
     public Future<List<MagnetoMessage>> pushEvent(final String boardId, final UserInfos session, final MagnetoUserAction action, final String wsId, final boolean checkConcurency) {
         return this.onNewUserAction(action, boardId, wsId, session, checkConcurency)
-            .onSuccess(messages -> {
-                switch (action.getType()) {
-                    case ping:
-                    case cardAdded:
-                    case cardMoved:
-                    case cardUpdated:
-                        this.broadcastMessagesToUsers(messages, true, false, null);
-                        return;
-                    default:
-                        this.broadcastMessagesToUsers(messages, true, false, null);
-                }
-            });
+                .onSuccess(messages -> {
+                    // Diffusion locale
+                    switch (action.getType()) {
+                        case ping:
+                        case cardAdded:
+                        case cardMoved:
+                        case cardUpdated:
+                            this.broadcastMessagesToUsers(messages, true, false, null);
+                            break;
+                        default:
+                            this.broadcastMessagesToUsers(messages, true, false, null);
+                    }
+
+                    // Publication Redis si multi-cluster
+                    if (isMultiCluster && redisService != null && !messages.isEmpty()) {
+                        redisService.publishMessages(messages)
+                                .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::pushEvent] Failed to publish to Redis", err));
+                    }
+                });
     }
 
     /**
      * Update context et metadata du board + publie un message pour prévenir les autres user de sa connection
-     * @param boardId
-     * @param user
-     * @param wsId
-     * @param wsIdToUser
-     * @return
      */
     @Override
     public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId, Map<String, User> wsIdToUser) {
@@ -575,60 +610,40 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
                     wsIdToUser.put(wsId, userWithColor);
 
-                    // Créer le message avec les métadonnées
+                    // Créer les messages avec les métadonnées
                     final MagnetoMessage connectedUsersMessage = this.messageFactory.connectedUsers(
-                            boardId,
-                            wsId,
-                            user.getUserId(),
-                            context.getConnectedUsers(),
-                            this.maxConnectedUser
-                    );
+                            boardId, wsId, user.getUserId(), context.getConnectedUsers(), this.maxConnectedUser);
 
                     final MagnetoMessage cardEditingMessage = this.messageFactory.cardEditing(
-                            boardId,
-                            wsId,
-                            user.getUserId(),
-                            context.getEditing(),
-                            this.maxConnectedUser
-                    );
+                            boardId, wsId, user.getUserId(), context.getEditing(), this.maxConnectedUser);
 
-                    if (isMultiCluster) {
-                        //TODO
-                        return Future.failedFuture("");
-                    }
-                    /*else {
-                        // Publier les métadonnées mises à jour via EventBus
-                        return publishMetadata(boardId, context)
-                            .map(v -> Arrays.asList(newUserMessage, connectedUsersMessage, cardEditingMessage))
-                            .compose(messages -> {
-                                JsonObject collaborationMessage = new JsonObject()
-                                        .put("type", "collaboration")
-                                        .put("serverId", serverId)
-                                        .put("messages", Json.encode(Collections.singletonList(newUserMessage)));
+                    List<MagnetoMessage> messages = Arrays.asList(newUserMessage, connectedUsersMessage, cardEditingMessage);
 
-                                return publishMessage(collaborationMessage).map(v -> messages);
-                            });
-                    }*/
-                    else {
-                        return Future.succeededFuture(Arrays.asList(newUserMessage, connectedUsersMessage, cardEditingMessage));
+                    if (isMultiCluster && redisService != null) {
+                        // Publier les métadonnées et les messages via Redis
+                        return redisService.publishBoardMetadata(boardId)
+                                .compose(v -> redisService.publishMessages(Collections.singletonList(newUserMessage)))
+                                .map(v -> messages);
+                    } else {
+                        // Mode EventBus - publier via EventBus
+                        JsonObject collaborationMessage = new JsonObject()
+                                .put("type", "collaboration")
+                                .put("serverId", serverId)
+                                .put("messages", Json.encode(Collections.singletonList(newUserMessage)));
+
+                        vertx.eventBus().publish(eventBusAddress, collaborationMessage);
+                        return Future.succeededFuture(messages);
                     }
                 });
     }
 
     /**
      * Update context et metadata du board
-     * @param boardId
-     * @param userId
-     * @param wsId
-     * @return
      */
     @Override
     public Future<List<MagnetoMessage>> onNewDisconnection(String boardId, String userId, final String wsId) {
-        Promise<List<MagnetoMessage>> promise = Promise.promise();
         final MagnetoMessage disconnectionMessage = this.messageFactory.disconnection(boardId, wsId, userId);
-
-        // Récupérer le contexte pour ce board
-        final CollaborationUsersMetadata context = metadataByBoardId.get(boardId);
+        final CollaborationUsersMetadata context = this.metadataByBoardId.get(boardId);
         List<MagnetoMessage> messages = new ArrayList<>();
         messages.add(disconnectionMessage);
 
@@ -643,32 +658,39 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             if (context.getConnectedUsers().isEmpty()) metadataByBoardId.remove(boardId);
 
             final MagnetoMessage connectedUsersMessage = this.messageFactory.connectedUsers(
-                    boardId,
-                    wsId,
-                    userId,
-                    context.getConnectedUsers(),
-                    this.maxConnectedUser
-            );
+                    boardId, wsId, userId, context.getConnectedUsers(), this.maxConnectedUser);
 
             final MagnetoMessage cardEditingMessage = this.messageFactory.cardEditing(
-                    boardId,
-                    wsId,
-                    userId,
-                    context.getEditing(),
-                    this.maxConnectedUser
-            );
+                    boardId, wsId, userId, context.getEditing(), this.maxConnectedUser);
+
             messages.add(connectedUsersMessage);
             messages.add(cardEditingMessage);
-        }
-        promise.complete(messages);
-        return promise.future();
-    }
 
+            // Publier les métadonnées mises à jour
+            if (isMultiCluster && redisService != null) {
+                redisService.publishBoardMetadata(boardId)
+                        .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewDisconnection] Failed to publish metadata", err));
+            }
+        }
+
+        // Publier le message de déconnexion
+        if (isMultiCluster && redisService != null) {
+            redisService.publishMessage(disconnectionMessage)
+                    .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewDisconnection] Failed to publish disconnection", err));
+        } else {
+            // Mode EventBus
+            JsonObject collaborationMessage = new JsonObject()
+                    .put("type", "collaboration")
+                    .put("serverId", serverId)
+                    .put("messages", Json.encode(Collections.singletonList(disconnectionMessage)));
+            vertx.eventBus().publish(eventBusAddress, collaborationMessage);
+        }
+
+        return Future.succeededFuture(messages);
+    }
 
     /**
      * Change RT status and propage information for everyone
-     * @param realTimeStatus
-     * @return
      */
     private Future<Void> changeRealTimeStatus(RealTimeStatus realTimeStatus) {
         final Promise<Void> promise = Promise.promise();
@@ -678,7 +700,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             return promise.future();
         }
 
-        log.debug("Changing real time status : " + this.realTimeStatus + " -> " + realTimeStatus);
+        log.debug("[Magneto@DefaultMagnetoCollaborationService::changeRealTimeStatus] Changing real time status : " + this.realTimeStatus + " -> " + realTimeStatus);
         this.realTimeStatus = realTimeStatus;
         final Future<Void> cleanPromise;
 
@@ -689,7 +711,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     statusSubscriber.handle(this.realTimeStatus);
                 }
                 catch (Exception exc) {
-                    log.error("Error occurred while calling status change handler", exc);
+                    log.error("[Magneto@DefaultMagnetoCollaborationService::changeRealTimeStatus] Error occurred while calling status change handler", exc);
                 }
             }
             promise.complete();
@@ -846,9 +868,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         return promise.future();
     }
 
-
-
-
     // Redis
 
     @Override
@@ -856,129 +875,18 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         return pushEvent(boardId, session, action, "", checkConcurency);
     }
 
-    private Future<Void> listenToRedis() {
-        final Promise<Void> promise = Promise.promise();
-        if (subscriberConnection.alreadyConnected()) {
-            promise.complete();
-        }
-        else {
-            log.info("[Magneto@DefaultMagnetoCollaborationService::listenToRedis] Connecting to Redis....");
-            Redis.createClient(vertx, getRedisOptions(vertx, config))
-                .connect(onConnect -> {
-                    if (onConnect.succeeded()) {
-                        log.info("[Magneto@DefaultMagnetoCollaborationService::listenToRedis] .... connection to redis established");
-                        changeRealTimeStatus(RealTimeStatus.STARTED);
-                        this.restartAttempt = 0;
-                        promise.complete();
-                        RedisConnection client = onConnect.result();
-                        subscriberConnection.connection = client;
-                        client.handler(message -> {
-                            try {
-                                if ("message".equals(message.get(0).toString())) {
-                                    String receivedMessage = message.get(2).toString();
-                                    this.onNewRedisMessage(receivedMessage);
-                                }
-                            }
-                            catch (Exception e) {
-                                log.error("[Magneto@DefaultMagnetoCollaborationService::listenToRedis] Cannot treat Redis message " + message + " : " + e.getMessage());
-                            }
-                        }).exceptionHandler(t -> {
-                            log.error("[Magneto@DefaultMagnetoCollaborationService::listenToRedis] Lost connection to redis : " + t.getMessage());
-                            this.listenToRedis();
-                        }).send(Request.cmd(Command.SUBSCRIBE).arg(channelName), subscribeResult -> {
-                            if (subscribeResult.succeeded()) {
-                                log.info("[Magneto@DefaultMagnetoCollaborationService::listenToRedis] Subscribed to channel " + channelName + " successfully !");
-                            }
-                            else {
-                                log.error("[Magneto@DefaultMagnetoCollaborationService::listenToRedis] Failed to subscribe: " + subscribeResult.cause());
-                            }
-                        });
-                    } else {
-                        this.onRedisConnectionStopped(onConnect.cause()).onComplete(promise);
-                    }
-                });
-        }
-        return promise.future();
+    /**
+     * Récupère le statut du service temps réel
+     */
+    @Override
+    public RealTimeStatus getStatus() {
+        return this.realTimeStatus;
     }
 
-    private void onNewRedisMessage(final String payload) {
-        final MagnetoMessage message = Json.decodeValue(payload, MagnetoMessage.class);
-        // We treat only messages emitted by different server
-        if (!serverId.equals(message.getEmittedBy())) {
-            final List<MagnetoMessage> messages = newArrayList(message);
-            this.broadcastMessagesToUsers(messages, false, true, null); // TODO check si fonction same
-        }
+    /**
+     * Récupère l'ID du serveur
+     */
+    public String getServerId() {
+        return serverId;
     }
-
-    private Future<Void> onRedisConnectionStopped(final Throwable cause) {
-        log.error("[Magneto@DefaultMagnetoCollaborationService::onRedisConnectionStopped] Error while subscribing to " + channelName + " : " + cause);
-        changeRealTimeStatus(RealTimeStatus.ERROR);
-        this.restartAttempt++;
-        final long factor = Math.max(0L, restartAttempt - 1);
-        final Promise<Void> promise = Promise.promise();
-        vertx.setTimer((long) (reConnectionDelay * Math.pow(2, factor)), e -> {
-            restartAttempt++;
-            log.info("[Magneto@DefaultMagnetoCollaborationService::onRedisConnectionStopped] Trying to reconnect to Redis (try n°" + restartAttempt + ") ...");
-            promise.complete();
-        });
-        return promise.future();
-    }
-
-
-
-    /**
-     * Publie à tous le context du board via l'EventBus définie dans le start()
-     */
-    /*private void publishContextLoop() {
-        vertx.setPeriodic(publishPeriodInMs, timerId -> {
-            JsonObject contextInfo = new JsonObject()
-                    .put("type", "context")
-                    .put("serverId", serverId)
-                    .put("timestamp", System.currentTimeMillis());
-
-            publishMessage(contextInfo);
-        });
-    }*/
-
-    /**
-     * Publie à tous les metadata du board via l'EventBus définie dans le start()
-     * @param boardId
-     * @param context
-     * @return
-     */
-    /*private Future<Void> publishMetadata(String boardId, CollaborationUsersMetadata context) {
-        try {
-            JsonArray connectedUsersJson = context.getConnectedUsers().stream()
-                    .map(User::toJson)
-                    .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-
-            JsonObject metadataMessage = new JsonObject()
-                    .put("type", "metadata")
-                    .put("serverId", serverId)
-                    .put("boardId", boardId)
-                    .put("timestamp", System.currentTimeMillis())
-                    .put("connectedUsers", connectedUsersJson)
-                    .put("editing", Json.encode(context.getEditing()));
-
-            return publishMessage(metadataMessage);
-        } catch (Exception e) {
-            String message = String.format("[Magneto@%s::publishMetadataViaEventBus] Error publishing metadata",
-                    this.getClass().getSimpleName());
-            log.error(message, e);
-            return Future.failedFuture(e);
-        }
-    }*/
-
-
-
-    /**
-     * Publie un message à tous les users via l'EventBus défini dans le start()
-     * @param message Message to publish
-     * @return
-     */
-    /*public Future<Void> publishMessage(JsonObject message) {
-        return Future.fromCompletionStage(
-            CompletableFuture.runAsync(() -> vertx.eventBus().publish(eventBusAddress, message))
-        );
-    }*/
 }

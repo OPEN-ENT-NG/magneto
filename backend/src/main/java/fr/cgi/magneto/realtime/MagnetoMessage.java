@@ -1,13 +1,14 @@
 package fr.cgi.magneto.realtime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
-import fr.cgi.magneto.realtime.events.CardEditingInformation;
-import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.user.User;
+import fr.cgi.magneto.realtime.events.CardEditingInformation;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -17,27 +18,51 @@ import java.util.List;
 import java.util.Set;
 
 public class MagnetoMessage {
+    @JsonProperty("boardId")
     private final String boardId;
+    @JsonProperty("emittedAt")
     private final long emittedAt;
+    @JsonProperty("emittedBy")
     private final String emittedBy;
+    @JsonProperty("websocketId")
     private final String websocketId;
+    @JsonProperty("type")
     private final MagnetoMessageType type;
+    @JsonProperty("userId")
     private final String userId;
+    @JsonProperty("cardId")
     private final String cardId;
+    @JsonProperty("board")
     private final Board board;
+    @JsonProperty("card")
     private final Card card;
+    @JsonProperty("oldCard")
     private final Card oldCard;
+    @JsonProperty("cards")
     private final List<Card> cards;
+    @JsonProperty("section")
     private final Section section;
+    @JsonProperty("sections")
     private final List<Section> sections;
+    @JsonProperty("connectedUsers")
     private final LinkedHashSet<User> connectedUsers;
+    @JsonProperty("cardEditingInformations")
     private final List<CardEditingInformation> cardEditingInformations;
+    @JsonProperty("actionType")
     private final MagnetoUserAction.ActionType actionType;
+    @JsonProperty("actionId")
     private final String actionId;
+    @JsonProperty("maxConnectedUsers")
     private final Long maxConnectedUsers;
 
     @JsonIgnore
     private Set<String> targetUserIds;
+
+    public MagnetoMessage() {
+        this(null, 0L, null, null, null, null, null, null, null, null,
+                new ArrayList<>(), null, new ArrayList<>(), new LinkedHashSet<>(),
+                new ArrayList<>(), null, null, null);
+    }
 
     public MagnetoMessage(String boardId, long emittedAt, String emittedBy, String websocketId, MagnetoMessageType type, String userId, String cardId, Board board, Card card, Card oldCard, List<Card> cards, Section section, List<Section> sections, LinkedHashSet<User> connectedUsers, List<CardEditingInformation> cardEditingInformations, MagnetoUserAction.ActionType actionType, String actionId, Long maxConnectedUsers) {
         this.boardId = boardId;

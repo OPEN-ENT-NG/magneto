@@ -1,5 +1,6 @@
 package fr.cgi.magneto.model.boards;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.ModelHelper;
@@ -22,6 +23,7 @@ public class Board implements Model<Board> {
     private String backgroundUrl;
     private String description;
     private User owner;
+    @JsonProperty("shared")
     private JsonArray shared;
     private String creationDate;
     private String modificationDate;
@@ -37,13 +39,18 @@ public class Board implements Model<Board> {
     private Boolean displayNbFavorites;
     private int nbCards;
     private int nbCardsSections;
+    @JsonProperty("rights")
     private JsonArray rights;
     private boolean isExternal;
     private List<String> sectionsIds;
     private List<String> cardIds;
 
-    public Board(){
-
+    public Board() {
+        this.shared = new JsonArray();
+        this.rights = new JsonArray();
+        this.cards = new ArrayList<>();
+        this.sections = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")

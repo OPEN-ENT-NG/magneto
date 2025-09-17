@@ -16,8 +16,8 @@
         "entcore.port" : 8009,
         "websocket-config": {
             "wsPort": ${magnetoWebsocketPort},
-            "maxUsers": ${magnetoWebsocketMaxUsers},
-            "maxUsersPerBoard": ${magnetoWebsocketMaxUsersPerBoard},
+            "maxUsers": ${maxUsers},
+            "maxUsersPerBoard": ${maxUsersPerBoard},
             "endpoint-proxy": "/magneto/eventbus"
         },
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},

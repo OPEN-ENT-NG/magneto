@@ -23,6 +23,6 @@
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},
         "magnetoIsStandalone" : ${magnetoIsStandalone},
         "theme-platform": "${themePlatform}",
-        "isMultiCluster": ${magnetoIsMultiCluster}
+        "isMultiCluster": ${isMultiCluster}
       }
     }

@@ -19,10 +19,10 @@
             "maxUsers": ${magnetoWebsocketMaxUsers},
             "maxUsersPerBoard": ${magnetoWebsocketMaxUsersPerBoard},
             "endpoint-proxy": "/magneto/eventbus"
-            "isMultiCluster": ${magnetoIsMultiCluster}
         },
         "magnetoUpdateFrequency": ${magnetoUpdateFrequency},
         "magnetoIsStandalone" : ${magnetoIsStandalone},
         "theme-platform": "${themePlatform}",
+        "isMultiCluster": ${magnetoIsMultiCluster}
       }
     }

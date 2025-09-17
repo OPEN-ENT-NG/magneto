@@ -20,7 +20,7 @@ public interface MagnetoCollaborationService {
      *
      * @return Future {@link Future<Void>} indicating if the service started successfully
      */
-    //Future<Void> start();
+    Future<Void> start();
 
     /**
      * Subscribe to real-time status changes of the collaboration service

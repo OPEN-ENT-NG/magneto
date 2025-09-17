@@ -86,9 +86,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         }
     }
 
-    /**
-     * Démarre le service collaboration (Redis ou EventBus selon la configuration)
-     */
+    @Override
     public Future<Void> start() {
         Promise<Void> promise = Promise.promise();
         if (RealTimeStatus.STARTED.equals(this.realTimeStatus) || RealTimeStatus.LIMIT.equals(this.realTimeStatus)) {

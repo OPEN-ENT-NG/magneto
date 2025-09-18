@@ -1,13 +1,10 @@
-package fr.cgi.magneto.service;
+package fr.cgi.magneto.realtime;
 
 import fr.cgi.magneto.core.enums.RealTimeStatus;
-import fr.cgi.magneto.core.events.MagnetoUserAction;
-import fr.cgi.magneto.helper.MagnetoMessage;
-import fr.cgi.magneto.helper.MagnetoMessageWrapper;
 import fr.cgi.magneto.model.user.User;
+import fr.cgi.magneto.realtime.events.MagnetoUserAction;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
 import java.util.List;
@@ -47,14 +44,6 @@ public interface MagnetoCollaborationService {
     void subscribeToNewMessagesToSend(Handler<MagnetoMessageWrapper> messagesHandler);
 
     /**
-     * Publish a message to all subscribers of the collaboration system
-     *
-     * @param message Message to publish
-     * @return Future {@link Future<Void>} indicating if the message was published successfully
-     */
-    Future<Void> publishMessage(JsonObject message);
-
-    /**
      * Get current status of the collaboration service
      *
      * @return Current {@link RealTimeStatus} of the service
@@ -83,9 +72,9 @@ public interface MagnetoCollaborationService {
 
     Future<List<MagnetoMessage>> executeAction(MagnetoUserAction action, String boardId, String wsId, UserInfos user, boolean checkConcurency);
 
-    Future<List<MagnetoMessage>> pushEventToAllUsers(String wallId, UserInfos session, MagnetoUserAction action, boolean checkConcurency);
+    Future<List<MagnetoMessage>> pushEventToAllUsers(String boardId, UserInfos session, MagnetoUserAction action, boolean checkConcurency);
 
-    Future<List<MagnetoMessage>> pushEvent(String wallId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);
+    Future<List<MagnetoMessage>> pushEvent(String boardId, UserInfos session, MagnetoUserAction action, String wsId, boolean checkConcurency);
 
     Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId, Map<String, User> wsIdToUser);
 

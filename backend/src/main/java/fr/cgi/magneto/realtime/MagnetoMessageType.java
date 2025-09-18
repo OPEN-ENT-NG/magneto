@@ -1,4 +1,4 @@
-package fr.cgi.magneto.core.enums;
+package fr.cgi.magneto.realtime;
 
 public enum MagnetoMessageType {
     connection,

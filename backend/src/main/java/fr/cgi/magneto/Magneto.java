@@ -4,6 +4,7 @@ import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.controller.*;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.realtime.CollaborationController;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.impl.MagnetoRepositoryEvents;
 import fr.wseduc.mongodb.MongoDb;
@@ -64,15 +65,19 @@ public class Magneto extends BaseServer {
         startPromise.tryComplete();
         startPromise.tryFail("[Magneto@Magneto::start] Failed to start module Magneto.");
 
+        // WebSocket
         final HttpServerOptions options = new HttpServerOptions().setMaxWebSocketFrameSize(1024 * 1024);
         vertx.createHttpServer(options)
-                .webSocketHandler(new MagnetoCollaborationController(serviceFactory, magnetoConfig.getMagnetoWebsocketMaxUsers(), magnetoConfig.getMagnetoWebsocketMaxUsersPerBoard(), config))
-                .listen(magnetoConfig.getMagnetoWebsocketPort(), asyncResult -> {
-                    if(asyncResult.succeeded()) {
-                        log.info("Websocket server started and listening on port " + magnetoConfig.getMagnetoWebsocketPort());
-                    } else {
-                        log.error("Cannot start websocket controller", asyncResult.cause());
-                    }
-                });
+            .webSocketHandler(new CollaborationController(serviceFactory))
+            .listen(magnetoConfig.websocketConfig().getPort(), asyncResult -> {
+                if (asyncResult.succeeded()) {
+                    log.info("[Magneto@Magneto::start] Websocket server started and listening on port " + magnetoConfig.websocketConfig().getPort());
+                    serviceFactory.magnetoCollaborationService().start()
+                        .onSuccess(futureVoid -> log.info("[Magneto@Magneto::start] MagnetoCollaborationService started"))
+                        .onFailure(err -> log.error("[Magneto@Magneto::start] Failed to start MagnetoCollaborationService : " + err));
+                } else {
+                    log.error("[Magneto@Magneto::start] Cannot start websocket controller : " + asyncResult.cause());
+                }
+            });
     }
 }

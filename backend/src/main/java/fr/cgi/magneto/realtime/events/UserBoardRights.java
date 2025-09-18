@@ -1,4 +1,4 @@
-package fr.cgi.magneto.core.events;
+package fr.cgi.magneto.realtime.events;
 
 import fr.cgi.magneto.core.enums.RightLevel;
 import io.vertx.core.json.JsonObject;

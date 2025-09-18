@@ -1,5 +1,7 @@
 package fr.cgi.magneto.model.boards;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.ModelHelper;
@@ -16,34 +18,86 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Board implements Model<Board> {
+    @JsonProperty("id")
     private String _id;
+    @JsonProperty("title")
     private String title;
+    @JsonProperty("imageUrl")
     private String imageUrl;
+    @JsonProperty("backgroundUrl")
     private String backgroundUrl;
+    @JsonProperty("description")
     private String description;
+    @JsonIgnore
     private User owner;
+    @JsonIgnore
     private JsonArray shared;
+    @JsonProperty("creationDate")
     private String creationDate;
+    @JsonProperty("modificationDate")
     private String modificationDate;
+    @JsonProperty("deleted")
     private boolean isDeleted;
+    @JsonProperty("public")
     private boolean isPublic;
+    @JsonProperty("locked")
     private boolean isLocked;
+    @JsonProperty("folderId")
     private String folderId;
+    @JsonProperty("cards")
     private List<Card> cards;
+    @JsonProperty("sections")
     private List<Section> sections;
+    @JsonProperty("tags")
     private List<String> tags;
+    @JsonProperty("layoutType")
     private String layoutType;
+    @JsonProperty("canComment")
     private boolean canComment;
+    @JsonProperty("displayNbFavorites")
     private Boolean displayNbFavorites;
+    @JsonProperty("nbCards")
     private int nbCards;
+    @JsonProperty("nbCardsSections")
     private int nbCardsSections;
+    @JsonIgnore
     private JsonArray rights;
+    @JsonProperty("isExternal")
     private boolean isExternal;
+    @JsonProperty("sectionIds")
     private List<String> sectionsIds;
+    @JsonProperty("cardIds")
     private List<String> cardIds;
 
-    public Board(){
+    public Board() {
+        this.owner = new User();
+        this.shared = new JsonArray();
+        this.rights = new JsonArray();
+        this.cards = new ArrayList<>();
+        this.sections = new ArrayList<>();
+        this.tags = new ArrayList<>();
+    }
 
+    // Méthodes Jackson pour shared
+    @JsonProperty("shared")
+    private void setSharedFromJson(List<Object> sharedList) {
+        this.shared = sharedList != null ? new JsonArray(sharedList) : new JsonArray();
+    }
+
+    @JsonProperty("shared")
+    private List<Object> getSharedForJson() {
+        return this.shared != null ? this.shared.getList() : new ArrayList<>();
+    }
+
+    // Méthodes Jackson pour rights
+    @JsonProperty("rights")
+    private void setRightsFromJson(List<Object> rightsList) {
+        this.rights = rightsList != null ? new JsonArray(rightsList) : new JsonArray();
+    }
+
+    @JsonProperty("rights")
+    private List<Object> getRightsForJson() {
+        return this.rights != null ? this.rights.getList() : new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -134,20 +188,30 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    @JsonProperty("ownerId")
     public String getOwnerId() {
-        return this.owner.getUserId();
+        return this.owner != null ? this.owner.getUserId() : null;
     }
 
+    @JsonProperty("ownerId")
     public Board setOwnerId(String ownerId) {
+        if (this.owner == null) {
+            this.owner = new User();
+        }
         this.owner.setUserId(ownerId);
         return this;
     }
 
+    @JsonProperty("ownerName")
     public String getOwnerName() {
-        return this.owner.getUsername();
+        return this.owner != null ? this.owner.getUsername() : null;
     }
 
+    @JsonProperty("ownerName")
     public Board setUserName(String ownerName) {
+        if (this.owner == null) {
+            this.owner = new User();
+        }
         this.owner.setUsername(ownerName);
         return this;
     }
@@ -258,6 +322,16 @@ public class Board implements Model<Board> {
         return this;
     }
 
+    @JsonProperty("layoutFree")
+    public boolean isLayoutFree() {
+        return this.layoutType != null && this.layoutType.equals(Field.FREE);
+    }
+
+    @JsonProperty("layoutFree")
+    public void setLayoutFree(boolean layoutFree) {
+        this.layoutType = layoutFree ? Field.FREE : "sections";
+    }
+
     public boolean isLocked() {
         return isLocked;
     }
@@ -283,10 +357,6 @@ public class Board implements Model<Board> {
     public Board setDisplayNbFavorites(boolean displayNbFavorites) {
         this.displayNbFavorites = displayNbFavorites;
         return this;
-    }
-
-    public boolean isLayoutFree() {
-        return this.layoutType.equals(Field.FREE);
     }
 
     public List<String> tags() {

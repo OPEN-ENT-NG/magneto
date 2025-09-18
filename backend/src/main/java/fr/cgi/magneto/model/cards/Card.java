@@ -1,5 +1,7 @@
 package fr.cgi.magneto.model.cards;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.Metadata;
@@ -16,29 +18,51 @@ import java.util.stream.Collectors;
 
 public class Card implements Model<Card> {
 
+    @JsonProperty("id")
     private String _id;
+    @JsonProperty("title")
     private String title;
+    @JsonProperty("resourceId")
     private String resourceId;
+    @JsonProperty("resourceType")
     private String resourceType;
+    @JsonProperty("resourceUrl")
     private String resourceUrl;
+    @JsonProperty("description")
     private String description;
+    @JsonIgnore
     private User owner;
+    @JsonIgnore
     private User editor;
+    @JsonProperty("creationDate")
     private String creationDate;
+    @JsonProperty("modificationDate")
     private String modificationDate;
+    @JsonProperty("caption")
     private String caption;
+    @JsonProperty("parentId")
     private String parentId;
+    @JsonProperty("boardId")
     private String boardId;
+    @JsonProperty("boardTitle")
     private String boardTitle;
+    @JsonProperty("locked")
     private boolean isLocked;
+    @JsonProperty("metadata")
     private Metadata metadata;
+    @JsonProperty("lastComment")
     private JsonObject lastComment;
+    @JsonProperty("nbOfComments")
     private Integer nbOfComments;
+    @JsonProperty("nbOfFavorites")
     private Integer nbOfFavorites;
+    @JsonProperty("liked")
     private Boolean isLiked;
+    @JsonProperty("comments")
     private List<Comment> comments;
+    @JsonProperty("canBeIframed")
     private Boolean canBeIframed;
-
+    @JsonProperty("favoriteList")
     private List<String> favoriteList;
 
     public Card() {
@@ -104,21 +128,30 @@ public class Card implements Model<Card> {
         return this;
     }
 
+    @JsonProperty("ownerId")
     public String getOwnerId() {
-        return owner.getUserId();
-
+        return owner != null ? owner.getUserId() : null;
     }
 
+    @JsonProperty("ownerId")
     public Card setOwnerId(String ownerId) {
+        if (this.owner == null) {
+            this.owner = new User();
+        }
         this.owner.setUserId(ownerId);
         return this;
     }
 
+    @JsonProperty("ownerName")
     public String getOwnerName() {
-        return owner.getUsername();
+        return owner != null ? owner.getUsername() : null;
     }
 
+    @JsonProperty("ownerName")
     public Card setOwnerName(String ownerName) {
+        if (this.owner == null) {
+            this.owner = new User();
+        }
         this.owner.setUsername(ownerName);
         return this;
     }
@@ -168,20 +201,30 @@ public class Card implements Model<Card> {
         return this;
     }
 
+    @JsonProperty("lastModifierId")
     public String getLastModifierId() {
-        return editor.getUserId();
+        return editor != null ? editor.getUserId() : null;
     }
 
+    @JsonProperty("lastModifierId")
     public Card setLastModifierId(String lastModifierId) {
+        if (this.editor == null) {
+            this.editor = new User();
+        }
         this.editor.setUserId(lastModifierId);
         return this;
     }
 
+    @JsonProperty("lastModifierName")
     public String getLastModifierName() {
-        return editor.getUsername();
+        return editor != null ? editor.getUsername() : null;
     }
 
+    @JsonProperty("lastModifierName")
     public Card setLastModifierName(String lastModifierName) {
+        if (this.editor == null) {
+            this.editor = new User();
+        }
         this.editor.setUsername(lastModifierName);
         return this;
     }
@@ -280,7 +323,7 @@ public class Card implements Model<Card> {
         this.nbOfFavorites = nbOfFavorites;
     }
 
-    public Card setIsLiked(Boolean  isLiked) {
+    public Card setIsLiked(Boolean isLiked) {
         this.isLiked = isLiked;
         return this;
     }
@@ -289,7 +332,7 @@ public class Card implements Model<Card> {
         return nbOfFavorites;
     }
 
-    public Boolean  isLiked() {
+    public Boolean isLiked() {
         return isLiked;
     }
 

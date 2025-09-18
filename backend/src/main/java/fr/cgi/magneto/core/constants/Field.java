@@ -9,6 +9,7 @@ public class Field {
     public static final String WEBSOCKET_CONFIG_HYPHENS = "websocket-config";
     public static final String WEBSOCKETCONFIG = "websocketConfig";
     public static final String WEBSOCKETENDPOINT = "websocketEndpoint";
+    public static final String WEBSOCKETENDPORT = "websocketPort";
     public static final String ENDPOINT_PROXY_HYPHENS = "endpoint-proxy";
     public static final String PORT = "port";
     public static final String KEBAB_THEME_PLATFORM = "theme-platform";
@@ -277,7 +278,17 @@ public class Field {
     public static final String HTML = "html";
     public static final String TIMESTAMP = "timestamp";
     public static final String CANBEIFRAMED = "canBeIframed";
-    public static final String MAGNETO_WEBSOCKET_MAX_USERS = "magnetoWebsocketMaxUsers";
-    public static final String MAGNETO_WEBSOCKET_MAX_USERS_PER_BOARD = "magnetoWebsocketMaxUsersPerBoard";
-    public static final String MAGNETO_WEBSOCKET_PORT = "magnetoWebsocketPort";
+    public static final String MAX_USERS = "maxUsers";
+    public static final String MAX_USERS_PER_BOARD = "maxUsersPerBoard";
+    public static final String IS_MULTI_CLUSTER = "isMultiCluster";
+    public static final String REDISCONFIG = "redisConfig";
+    public static final String SERVER = "server";
+    public static final String CONNECTION_STRING = "connection-string";
+    public static final String AUTH = "auth";
+    public static final String SELECT = "select";
+    public static final String POOL_SIZE = "pool-size";
+    public static final String MAXWAITINGHANDLERS = "maxWaitingHandlers";
+    public static final String MAXPOOLWAITING = "maxPoolWaiting";
+    public static final String RECONNECTION_DELAY_IN_MS = "reconnection-delay-in-ms";
+    public static final String PUBLISH_CONTEXT_PERIOD_IN_MS = "publish-context-period-in-ms";
 }

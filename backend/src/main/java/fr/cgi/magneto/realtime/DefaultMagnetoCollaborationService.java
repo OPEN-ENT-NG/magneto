@@ -69,7 +69,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         this.statusSubscribers = new ArrayList<>();
         this.messagesSubscribers = new ArrayList<>();
         this.metadataByBoardId = new HashMap<>();
-        this.isMultiCluster = true;//serviceFactory.magnetoConfig().websocketConfig().getIsMultiCluster();
+        this.isMultiCluster = serviceFactory.magnetoConfig().getIsMultiCluster();
 
         this.config = serviceFactory.config();
         this.publishPeriodInMs = config.getLong("publish-context-period-in-ms", 60000L);

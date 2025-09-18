@@ -50,14 +50,12 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 List<MagnetoMessage> messageList = messages.getMessages();
 
                 // Vérifier si on a des messages avec différenciation readOnly/fullAccess
-                boolean hasReadOnlyOrFullAccess = messageList.size() > 1 &&
-                        messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
-                                (Arrays.asList(READONLY, FULLACCESS).contains(msg.getActionId())));
+                boolean hasReadOnlyOrFullAccess = messageList.stream().anyMatch(msg -> msg.getActionId() != null
+                        && (Arrays.asList(READONLY, FULLACCESS).contains(msg.getActionId())));
 
                 // Vérifier si on a des messages avec différenciation actualUser/otherUsers
-                boolean hasActualUserOrOtherUsers = messageList.size() > 1 &&
-                        messageList.stream().anyMatch(msg -> msg.getActionId() != null &&
-                                (Arrays.asList(ACTUALUSER, OTHERUSERS).contains(msg.getActionId())));
+                boolean hasActualUserOrOtherUsers = messageList.stream().anyMatch(msg -> msg.getActionId() != null
+                        && (Arrays.asList(ACTUALUSER, OTHERUSERS).contains(msg.getActionId())));
 
                 if (hasReadOnlyOrFullAccess) {
                     // Messages avec différenciation par droits utilisateur

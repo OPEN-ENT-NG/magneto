@@ -2,8 +2,8 @@ package fr.cgi.magneto.model.user;
 
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.UserColor;
-import fr.cgi.magneto.realtime.events.UserBoardRights;
 import fr.cgi.magneto.model.Model;
+import fr.cgi.magneto.realtime.events.UserBoardRights;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
@@ -13,6 +13,12 @@ public class User extends UserInfos implements Model<User> {
 
     private UserBoardRights rights;
     private UserColor color;
+
+    public User() {
+        super();
+        this.rights = new UserBoardRights();
+        this.color = null;
+    }
 
     public User(String id, String name, UserBoardRights rights, UserColor color) {
         super();

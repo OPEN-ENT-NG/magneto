@@ -123,7 +123,7 @@ export const BorderedAvatar = styled(Avatar)<{
 }>`
   border: 2px solid ${({ borderColor }) => borderColor} !important;
   box-shadow: 0 0 0 2px white;
-  background-color: ${({ borderColor }) => borderColor};
+  background-color: white !important;
   width: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
   height: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")};
   font-size: 1.7rem;

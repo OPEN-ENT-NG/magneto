@@ -30,7 +30,7 @@ public class Board implements Model<Board> {
     private String description;
     @JsonIgnore
     private User owner;
-    @JsonProperty("shared")
+    @JsonIgnore
     private JsonArray shared;
     @JsonProperty("creationDate")
     private String creationDate;
@@ -60,7 +60,7 @@ public class Board implements Model<Board> {
     private int nbCards;
     @JsonProperty("nbCardsSections")
     private int nbCardsSections;
-    @JsonProperty("rights")
+    @JsonIgnore
     private JsonArray rights;
     @JsonProperty("isExternal")
     private boolean isExternal;
@@ -76,6 +76,28 @@ public class Board implements Model<Board> {
         this.cards = new ArrayList<>();
         this.sections = new ArrayList<>();
         this.tags = new ArrayList<>();
+    }
+
+    // Méthodes Jackson pour shared
+    @JsonProperty("shared")
+    private void setSharedFromJson(List<Object> sharedList) {
+        this.shared = sharedList != null ? new JsonArray(sharedList) : new JsonArray();
+    }
+
+    @JsonProperty("shared")
+    private List<Object> getSharedForJson() {
+        return this.shared != null ? this.shared.getList() : new ArrayList<>();
+    }
+
+    // Méthodes Jackson pour rights
+    @JsonProperty("rights")
+    private void setRightsFromJson(List<Object> rightsList) {
+        this.rights = rightsList != null ? new JsonArray(rightsList) : new JsonArray();
+    }
+
+    @JsonProperty("rights")
+    private List<Object> getRightsForJson() {
+        return this.rights != null ? this.rights.getList() : new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")

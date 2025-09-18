@@ -281,4 +281,14 @@ public class Field {
     public static final String MAX_USERS = "maxUsers";
     public static final String MAX_USERS_PER_BOARD = "maxUsersPerBoard";
     public static final String IS_MULTI_CLUSTER = "isMultiCluster";
+    public static final String REDISCONFIG = "redisConfig";
+    public static final String SERVER = "server";
+    public static final String CONNECTION_STRING = "connection-string";
+    public static final String AUTH = "auth";
+    public static final String SELECT = "select";
+    public static final String POOL_SIZE = "pool-size";
+    public static final String MAXWAITINGHANDLERS = "maxWaitingHandlers";
+    public static final String MAXPOOLWAITING = "maxPoolWaiting";
+    public static final String RECONNECTION_DELAY_IN_MS = "reconnection-delay-in-ms";
+    public static final String PUBLISH_CONTEXT_PERIOD_IN_MS = "publish-context-period-in-ms";
 }

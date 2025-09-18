@@ -1,5 +1,6 @@
 package fr.cgi.magneto.realtime;
 
+import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.realtime.events.CollaborationUsersMetadata;
 import fr.wseduc.webutils.Utils;
@@ -45,8 +46,8 @@ public class MagnetoRedisService {
         this.config = config;
         this.serverId = serverId;
         this.metadataByBoardId = metadataByBoardId;
-        this.reConnectionDelay = config.getLong("reconnection-delay-in-ms", 1000L);
-        this.publishPeriodInMs = config.getLong("publish-context-period-in-ms", 60000L);
+        this.reConnectionDelay = config.getLong(Field.RECONNECTION_DELAY_IN_MS, 1000L);
+        this.publishPeriodInMs = config.getLong(Field.PUBLISH_CONTEXT_PERIOD_IN_MS, 60000L);
         this.statusSubscribers = new ArrayList<>();
         this.messageHandlers = new ArrayList<>();
     }
@@ -98,7 +99,7 @@ public class MagnetoRedisService {
 
                             client.handler(message -> {
                                 try {
-                                    if ("message".equals(message.get(0).toString())) {
+                                    if (Field.MESSAGE.equals(message.get(0).toString())) {
                                         String receivedMessage = message.get(2).toString();
                                         this.onNewRedisMessage(receivedMessage);
                                     }
@@ -397,10 +398,10 @@ public class MagnetoRedisService {
      * Configuration des options Redis
      */
     private RedisOptions getRedisOptions(Vertx vertx, JsonObject conf) {
-        JsonObject redisConfig = conf.getJsonObject("redisConfig");
+        JsonObject redisConfig = conf.getJsonObject(Field.REDISCONFIG);
 
         if (redisConfig == null) {
-            final String redisConf = (String) vertx.sharedData().getLocalMap("server").get("redisConfig");
+            final String redisConf = (String) vertx.sharedData().getLocalMap(Field.SERVER).get(Field.REDISCONFIG);
             if (redisConf == null) {
                 throw new IllegalStateException("missing.redis.config");
             } else {
@@ -408,19 +409,19 @@ public class MagnetoRedisService {
             }
         }
 
-        String redisConnectionString = redisConfig.getString("connection-string");
+        String redisConnectionString = redisConfig.getString(Field.CONNECTION_STRING);
         if (Utils.isEmpty(redisConnectionString)) {
             redisConnectionString =
-                    "redis://" + (redisConfig.containsKey("auth") ? ":" + redisConfig.getString("auth") + "@" : "") +
-                            redisConfig.getString("host") + ":" + redisConfig.getInteger("port") + "/" +
-                            redisConfig.getInteger("select", 0);
+                    "redis://" + (redisConfig.containsKey(Field.AUTH) ? ":" + redisConfig.getString(Field.AUTH) + "@" : "") +
+                            redisConfig.getString(Field.HOST) + ":" + redisConfig.getInteger(Field.PORT) + "/" +
+                            redisConfig.getInteger(Field.SELECT, 0);
         }
 
         return new RedisOptions()
                 .setConnectionString(redisConnectionString)
-                .setMaxPoolSize(redisConfig.getInteger("pool-size", 32))
-                .setMaxWaitingHandlers(redisConfig.getInteger("maxWaitingHandlers", 100))
-                .setMaxPoolWaiting(redisConfig.getInteger("maxPoolWaiting", 100));
+                .setMaxPoolSize(redisConfig.getInteger(Field.POOL_SIZE, 32))
+                .setMaxWaitingHandlers(redisConfig.getInteger(Field.MAXWAITINGHANDLERS, 100))
+                .setMaxPoolWaiting(redisConfig.getInteger(Field.MAXPOOLWAITING, 100));
     }
 
     /**

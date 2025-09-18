@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 
 import { Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -24,10 +24,6 @@ export const UserAvatar: FC<UserAvatarProps> = ({
 }) => {
   const { t } = useTranslation("magneto");
   const { data: userbookData } = useGetUserbookInfosQuery({ id: user.id });
-
-  useEffect(() => {
-    console.log(userbookData);
-  }, [userbookData]);
 
   const getInitials = (username?: string): string => {
     if (!username) return "??";
@@ -68,7 +64,9 @@ export const UserAvatar: FC<UserAvatarProps> = ({
       <BorderedAvatar
         alt={user.username}
         src={
-          userbookData?.picture !== "no-avatar.svg" ? userbookData?.picture : ""
+          userbookData?.picture?.startsWith("/userbook/")
+            ? userbookData?.picture
+            : ""
         }
         borderColor={user.color}
         size={size}

@@ -23,7 +23,6 @@ import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.*;
 import io.vertx.core.eventbus.MessageConsumer;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -101,9 +100,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 redisService.start()
                         .onSuccess(futureVoid -> changeRealTimeStatus(RealTimeStatus.STARTED).onComplete(promise))
                         .onFailure(promise::fail);
-            } else {
-                // Mode EventBus local
-                startEventBusMode().onComplete(promise);
             }
         } catch (Exception e) {
             String message = String.format("[Magneto@%s::start] Error starting collaboration service",
@@ -111,49 +107,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             log.error(message, e);
             changeRealTimeStatus(RealTimeStatus.ERROR).onComplete(promise);
         }
-
-        return promise.future();
-    }
-
-    /**
-     * Démarre le mode EventBus (mono-instance)
-     */
-    private Future<Void> startEventBusMode() {
-        Promise<Void> promise = Promise.promise();
-
-        // Création du consumer sur l'EventBus
-        eventBusConsumer = vertx.eventBus().consumer(eventBusAddress);
-        eventBusConsumer.handler(ebMessage -> {
-            try {
-                JsonObject messageBody = ebMessage.body();
-                this.onNewMessage(messageBody.encode());
-            } catch (Exception e) {
-                String message = String.format("[Magneto@%s::startEventBusMode] Cannot treat EventBus message",
-                        this.getClass().getSimpleName());
-                log.error(message, e);
-            }
-        });
-
-        eventBusConsumer.exceptionHandler(t -> {
-            String message = String.format("[Magneto@%s::startEventBusMode] EventBus consumer error",
-                    this.getClass().getSimpleName());
-            log.error(message, t);
-            changeRealTimeStatus(RealTimeStatus.ERROR);
-            // Tentative de reconnexion
-            vertx.setTimer(1000, id -> start());
-        });
-
-        eventBusConsumer.completionHandler(ar -> {
-            if (ar.succeeded()) {
-                log.info("[Magneto@DefaultMagnetoCollaborationService::startEventBusMode] EventBus consumer registered successfully");
-                changeRealTimeStatus(RealTimeStatus.STARTED).onComplete(promise);
-            } else {
-                String message = String.format("[Magneto@%s::startEventBusMode] EventBus consumer registration failed",
-                        this.getClass().getSimpleName());
-                log.error(message, ar.cause());
-                changeRealTimeStatus(RealTimeStatus.ERROR).onComplete(promise);
-            }
-        });
 
         return promise.future();
     }
@@ -623,13 +576,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                 .compose(v -> redisService.publishMessages(Collections.singletonList(newUserMessage)))
                                 .map(v -> messages);
                     } else {
-                        // Mode EventBus - publier via EventBus
-                        JsonObject collaborationMessage = new JsonObject()
-                                .put("type", "collaboration")
-                                .put("serverId", serverId)
-                                .put("messages", Json.encode(Collections.singletonList(newUserMessage)));
-
-                        vertx.eventBus().publish(eventBusAddress, collaborationMessage);
+                        // Mode mono cluster
                         return Future.succeededFuture(messages);
                     }
                 });
@@ -675,13 +622,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         if (isMultiCluster && redisService != null) {
             redisService.publishMessage(disconnectionMessage)
                     .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewDisconnection] Failed to publish disconnection", err));
-        } else {
-            // Mode EventBus
-            JsonObject collaborationMessage = new JsonObject()
-                    .put("type", "collaboration")
-                    .put("serverId", serverId)
-                    .put("messages", Json.encode(Collections.singletonList(disconnectionMessage)));
-            vertx.eventBus().publish(eventBusAddress, collaborationMessage);
         }
 
         return Future.succeededFuture(messages);

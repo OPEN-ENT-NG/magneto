@@ -13,7 +13,7 @@ import theme from "~/themes/theme";
 
 export const App = () => {
   const { id = "" } = useParams();
-  const isLocal = window.location.protocol === 'http:'
+  const isLocal = window.location.protocol === "http:";
   const getSocketURL = useCallback(() => {
     return isLocal
       ? `ws://${window.location.hostname}:9091/${id}`

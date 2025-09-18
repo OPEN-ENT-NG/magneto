@@ -221,7 +221,7 @@ public class MagnetoRedisService {
         log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Received message: " + payload);
         try {
             final MagnetoMessage message = Json.decodeValue(payload, MagnetoMessage.class);
-            if (!serverId.equals(message.getEmittedBy())) {
+            if (serverId.equals(message.getEmittedBy())) { //FIXIT : remettre le !
                 // Notifier tous les handlers du message reçu
                 for (Handler<MagnetoMessage> handler : messageHandlers) {
                     try {

@@ -44,14 +44,6 @@ public interface MagnetoCollaborationService {
     void subscribeToNewMessagesToSend(Handler<MagnetoMessageWrapper> messagesHandler);
 
     /**
-     * Publish a message to all subscribers of the collaboration system
-     *
-     * @param message Message to publish
-     * @return Future {@link Future<Void>} indicating if the message was published successfully
-     */
-    //Future<Void> publishMessage(JsonObject message);
-
-    /**
      * Get current status of the collaboration service
      *
      * @return Current {@link RealTimeStatus} of the service

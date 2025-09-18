@@ -8,6 +8,7 @@ import {
   tooltipPopperModifiers,
   userTooltipStyle,
 } from "../connected-users-chip/style";
+import { useInitials } from "~/hooks/useInitials";
 import { UserCollaboration } from "~/providers/WebsocketProvider/types";
 import { useGetUserbookInfosQuery } from "~/services/api/directory.service";
 
@@ -25,21 +26,7 @@ export const UserAvatar: FC<UserAvatarProps> = ({
   const { t } = useTranslation("magneto");
   const { data: userbookData } = useGetUserbookInfosQuery({ id: user.id });
 
-  const getInitials = (username?: string): string => {
-    if (!username) return "??";
-
-    const words = username.trim().split(/\s+/);
-
-    if (words.length === 1) {
-      // 1 mot : prendre les 2 premières lettres
-      return words[0].slice(0, 2).toUpperCase();
-    } else {
-      // 2+ mots : première lettre du premier mot + première lettre du dernier mot
-      const firstLetter = words[0].charAt(0);
-      const lastLetter = words[words.length - 1].charAt(0);
-      return (firstLetter + lastLetter).toUpperCase();
-    }
-  };
+  const initials = useInitials(user.username);
 
   return (
     <Tooltip
@@ -71,7 +58,7 @@ export const UserAvatar: FC<UserAvatarProps> = ({
         borderColor={user.color}
         size={size}
       >
-        {getInitials(user.username)}
+        {initials}
       </BorderedAvatar>
     </Tooltip>
   );

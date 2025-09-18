@@ -1,5 +1,6 @@
 import { FC } from "react";
 
+import { useDirectory } from "@edifice.io/react";
 import { Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -8,9 +9,7 @@ import {
   tooltipPopperModifiers,
   userTooltipStyle,
 } from "../connected-users-chip/style";
-import { useInitials } from "~/hooks/useInitials";
 import { UserCollaboration } from "~/providers/WebsocketProvider/types";
-import { useGetUserbookInfosQuery } from "~/services/api/directory.service";
 
 interface UserAvatarProps {
   user: UserCollaboration;
@@ -24,9 +23,7 @@ export const UserAvatar: FC<UserAvatarProps> = ({
   isCurrentUser = false,
 }) => {
   const { t } = useTranslation("magneto");
-  const { data: userbookData } = useGetUserbookInfosQuery({ id: user.id });
-
-  const initials = useInitials(user.username);
+  const { getAvatarURL } = useDirectory();
 
   return (
     <Tooltip
@@ -50,16 +47,10 @@ export const UserAvatar: FC<UserAvatarProps> = ({
     >
       <BorderedAvatar
         alt={user.username}
-        src={
-          userbookData?.picture?.startsWith("/userbook/")
-            ? userbookData?.picture
-            : ""
-        }
+        src={getAvatarURL(user.id, "user")}
         borderColor={user.color}
         size={size}
-      >
-        {initials}
-      </BorderedAvatar>
+      />
     </Tooltip>
   );
 };

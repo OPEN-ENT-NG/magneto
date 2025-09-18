@@ -35,6 +35,7 @@ import {
   roleTypographyStyle,
 } from "./style";
 import { UserAvatar } from "../user-avatar/UserAvatar";
+import { MUI_CONSTANTS } from "~/core/enums/MUI-constants.enum";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 
 export const ConnectedUsersChip: FC = () => {
@@ -137,14 +138,18 @@ export const ConnectedUsersChip: FC = () => {
               </ListItemAvatar>
               <ListItemText
                 primary={
-                  <Typography variant="body1" sx={usernameTypographyStyle}>
-                    {currentUser?.username + " (vous)" || t("magneto.you")}
+                  <Typography
+                    variant={MUI_CONSTANTS.BODY1}
+                    sx={usernameTypographyStyle}
+                  >
+                    {currentUser?.username + t("magneto.(you)") ||
+                      t("magneto.you")}
                   </Typography>
                 }
                 secondary={
                   <Typography
-                    variant="body2"
-                    color="text.secondary"
+                    variant={MUI_CONSTANTS.BODY2}
+                    color={MUI_CONSTANTS.TEXT_SECONDARY}
                     sx={roleTypographyStyle}
                   >
                     {t(`magneto.user.${currentUser?.rights.maxRight}`)}
@@ -168,12 +173,15 @@ export const ConnectedUsersChip: FC = () => {
                 <ListItemText
                   primary={
                     <Box sx={userInfoBoxStyle}>
-                      <Typography variant="body1" sx={usernameTypographyStyle}>
+                      <Typography
+                        variant={MUI_CONSTANTS.BODY1}
+                        sx={usernameTypographyStyle}
+                      >
                         {user.username || t("magneto.user")}
                       </Typography>
                       <Typography
-                        variant="body2"
-                        color="text.secondary"
+                        variant={MUI_CONSTANTS.BODY2}
+                        color={MUI_CONSTANTS.TEXT_SECONDARY}
                         sx={otherUserRoleStyle}
                       >
                         {t(`magneto.user.${user.rights.maxRight}`)}

@@ -86,11 +86,17 @@ public class MagnetoController extends ControllerHelper {
         // Pas de ResourceFilter ici
         // Pas de SecuredAction ici
         public void viewPublicReact(HttpServerRequest request) {
-                request.response().headers().remove("Content-Security-Policy");
-                request.response().headers().remove("X-Content-Security-Policy");
-                request.response().headers().remove("X-WebKit-CSP");
-                request.response().headers().remove("X-Frame-Options");
-                request.response().putHeader("Content-Security-Policy", "frame-ancestors *");
+                request.response().headers().set("Content-Security-Policy",
+                        "default-src 'self'; " +
+                                "script-src 'self' 'unsafe-inline'; " +
+                                "style-src 'self' 'unsafe-inline'; " +
+                                "img-src 'self' data: https:; " +
+                                "frame-ancestors *; " +
+                                "object-src 'none'; " +
+                                "base-uri 'self';"
+                );
+                request.response().headers().set("X-Content-Type-Options", "nosniff");
+                request.response().headers().set("X-XSS-Protection", "1; mode=block");
                 // Même code que viewReact
                 String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
                                 ? String.format(":%s%s", this.magnetoConfig.websocketConfig().getPort(),

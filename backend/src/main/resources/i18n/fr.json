@@ -63,7 +63,7 @@
   "magneto.embed.modal.format": "Intégrer le tableau en iFrame",
   "magneto.embed.modal.warning": "En exportant ce tableau en iFrame, vous permettez un partage implicite de son contenu. Toute personne ayant accès à l'iFrame pourra consulter le tableau.",
   "magneto.embed.modal.copy": "Copier le code",
-  "magneto.embed.modal.switch": "Utiliser l'URL publique pour intégrer l'iFrame hors ENT",
+  "magneto.embed.modal.switch": "Utiliser l'URL publique pour intégrer l'iFrame hors ENT (affichage limité aux sites autorisés par la plateforme)",
   "magneto.export": "Exporter",
   "magneto.export.modal.format": "Exporter au format PowerPoint",
   "magneto.export.modal.informations": "Informations concernant l'export",

@@ -18,6 +18,8 @@ import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.SuperAdminFilter;
 
+import java.util.List;
+
 import static fr.cgi.magneto.core.enums.Events.ACCESS;
 
 public class MagnetoController extends ControllerHelper {
@@ -86,11 +88,14 @@ public class MagnetoController extends ControllerHelper {
         // Pas de ResourceFilter ici
         // Pas de SecuredAction ici
         public void viewPublicReact(HttpServerRequest request) {
-                request.response().headers().remove("Content-Security-Policy");
-                request.response().headers().remove("X-Content-Security-Policy");
-                request.response().headers().remove("X-WebKit-CSP");
-                request.response().headers().remove("X-Frame-Options");
-                request.response().putHeader("Content-Security-Policy", "frame-ancestors *");
+                List<String> allowedOrigins = magnetoConfig.getAllowedOrigins();
+
+                request.response()
+                        .putHeader("Content-Security-Policy",
+                                "frame-ancestors 'self' " + String.join(" ", allowedOrigins))
+                        .putHeader("X-Content-Type-Options", "nosniff")
+                        .putHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+
                 // Même code que viewReact
                 String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
                                 ? String.format(":%s%s", this.magnetoConfig.websocketConfig().port(),

@@ -1,7 +1,13 @@
 package fr.cgi.magneto.config;
 
 import fr.cgi.magneto.core.constants.Field;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static fr.cgi.magneto.core.constants.Field.*;
 
 public class MagnetoConfig {
 
@@ -11,6 +17,8 @@ public class MagnetoConfig {
     private final Integer magnetoUpdateFrequency;
     private final Boolean magnetoStandalone;
     private final String themePlatform;
+    private final Boolean isMultiCluster;
+    private final List<String> allowedOrigins;
 
     private final Integer DEFAULT_MAGNETO_UPDATE_FREQUENCY = 10 * 1000; //refresh every 10 seconds by default
 
@@ -22,6 +30,11 @@ public class MagnetoConfig {
         this.magnetoUpdateFrequency = Math.max(tempFrequency, DEFAULT_MAGNETO_UPDATE_FREQUENCY);
         this.magnetoStandalone = config.getBoolean(Field.MAGNETO_STANDALONE_CONFIG, false);
         this.themePlatform = config.getString(Field.KEBAB_THEME_PLATFORM, "default");
+        this.isMultiCluster = config.getBoolean(IS_MULTI_CLUSTER, false);
+        this.allowedOrigins = config.getJsonArray(Field.ALLOWED_ORIGINS, new JsonArray())
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
     }
 
     public String getThemePlatform() {
@@ -46,6 +59,14 @@ public class MagnetoConfig {
 
     public Boolean getMagnetoStandalone() {
         return magnetoStandalone;
+    }
+
+    public Boolean getIsMultiCluster() {
+        return this.isMultiCluster;
+    }
+
+    public List<String> getAllowedOrigins() {
+        return allowedOrigins;
     }
 
     public static class WebsocketConfig {

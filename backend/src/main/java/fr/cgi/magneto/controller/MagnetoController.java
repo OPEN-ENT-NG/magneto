@@ -18,7 +18,11 @@ import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.filter.SuperAdminFilter;
 
+import java.util.List;
+
 import static fr.cgi.magneto.core.enums.Events.ACCESS;
+import static fr.cgi.magneto.helper.SecurityHelper.isOriginAllowed;
+import static fr.cgi.magneto.helper.SecurityHelper.setIframeSecurityHeaders;
 
 public class MagnetoController extends ControllerHelper {
 
@@ -86,11 +90,6 @@ public class MagnetoController extends ControllerHelper {
         // Pas de ResourceFilter ici
         // Pas de SecuredAction ici
         public void viewPublicReact(HttpServerRequest request) {
-                request.response().headers().remove("Content-Security-Policy");
-                request.response().headers().remove("X-Content-Security-Policy");
-                request.response().headers().remove("X-WebKit-CSP");
-                request.response().headers().remove("X-Frame-Options");
-                request.response().putHeader("Content-Security-Policy", "frame-ancestors *");
                 // Même code que viewReact
                 String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
                                 ? String.format(":%s%s", this.magnetoConfig.websocketConfig().getPort(),
@@ -108,6 +107,44 @@ public class MagnetoController extends ControllerHelper {
                         .put(Field.MAGNETO_STANDALONE, isStandalone)
                         .put(Field.HOST, host)
                         .put(Field.CAMEL_THEME_PLATFORM, themePlatform);
+                renderView(request, param, "index.html", null);
+                eventStore.createAndStoreEvent(ACCESS.name(), request);
+        }
+
+        @Get("/public/embed")
+        @ApiDoc("Render public view for iframe embedding with origin validation")
+        public void viewPublicReactEmbed(HttpServerRequest request) {
+                String origin = request.getHeader("Origin");
+                String referer = request.getHeader("Referer");
+                List<String> allowedOrigins = magnetoConfig.getAllowedOrigins();
+
+                // Validation de l'origine contre la whitelist
+                if (!isOriginAllowed(origin, referer, allowedOrigins)) {
+                        request.response().setStatusCode(403).end("Iframe embedding not allowed from this origin");
+                        return;
+                }
+
+                // Headers de sécurité pour iframe
+                setIframeSecurityHeaders(request.response(), allowedOrigins);
+
+                // Configuration identique à viewPublicReact
+                String websocketEndpoint = Field.DEV.equals(this.magnetoConfig.mode())
+                        ? String.format(":%s%s", this.magnetoConfig.websocketConfig().getPort(),
+                        this.magnetoConfig.websocketConfig().getEndpointProxy())
+                        : this.magnetoConfig.websocketConfig().getEndpointProxy();
+
+                Integer updateFrequency = this.magnetoConfig.magnetoUpdateFrequency();
+                Boolean isStandalone = this.magnetoConfig.getMagnetoStandalone();
+                String themePlatform = this.magnetoConfig.getThemePlatform();
+                String host = this.magnetoConfig.host();
+
+                JsonObject param = new JsonObject()
+                        .put(Field.WEBSOCKETENDPOINT, websocketEndpoint)
+                        .put(Field.MAGNETO_UPDATE_FREQUENCY, updateFrequency)
+                        .put(Field.MAGNETO_STANDALONE, isStandalone)
+                        .put(Field.HOST, host)
+                        .put(Field.CAMEL_THEME_PLATFORM, themePlatform);
+
                 renderView(request, param, "index.html", null);
                 eventStore.createAndStoreEvent(ACCESS.name(), request);
         }

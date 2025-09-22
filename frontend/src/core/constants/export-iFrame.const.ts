@@ -11,7 +11,7 @@ export const getIframeCode = (
     <iframe src="${window.location.origin}${
       !isExternalInput
         ? `/magneto#/board/${boardId}/view`
-        : `/magneto/public#/pub/${boardId}`
+        : `/magneto/public/embed#/pub/${boardId}`
     }" 
     style="width:100%; height:70vh; display: block; border: none; margin: 0 auto;" scrolling="no" allowfullscreen></iframe>
 </div>`;

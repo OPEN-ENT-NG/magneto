@@ -24,6 +24,6 @@
         "magnetoIsStandalone" : ${magnetoIsStandalone},
         "theme-platform": "${themePlatform}",
         "isMultiCluster": true,
-        "allowedOrigins": ${allowedOrigins}
+        "allowedOrigins": []
       }
     }

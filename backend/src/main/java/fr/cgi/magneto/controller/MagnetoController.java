@@ -114,6 +114,5 @@ public class MagnetoController extends ControllerHelper {
                         .put(Field.HOST, host)
                         .put(Field.CAMEL_THEME_PLATFORM, themePlatform);
                 renderView(request, param, "index.html", null);
-                eventStore.createAndStoreEvent(ACCESS.name(), request);
         }
 }

@@ -29,6 +29,9 @@
     },
     "boardId": {
       "type": "string"
+    },
+    "canBeIframed": {
+      "type": ["boolean", "null"]
     }
   },
   "required": ["resourceType", "boardId"]

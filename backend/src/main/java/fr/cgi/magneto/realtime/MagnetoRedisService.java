@@ -14,7 +14,10 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -41,15 +44,17 @@ public class MagnetoRedisService {
     private long contextPublisherId = -1;
 
     public MagnetoRedisService(Vertx vertx, JsonObject config, String serverId,
-                               Map<String, CollaborationUsersMetadata> metadataByBoardId) {
+                               Map<String, CollaborationUsersMetadata> metadataByBoardId,
+                               List<Handler<RealTimeStatus>> statusSubscribers,
+                               List<Handler<MagnetoMessageWrapper>> messageHandlers) {
         this.vertx = vertx;
         this.config = config;
         this.serverId = serverId;
         this.metadataByBoardId = metadataByBoardId;
         this.reConnectionDelay = config.getLong(Field.RECONNECTION_DELAY_IN_MS, 1000L);
         this.publishPeriodInMs = config.getLong(Field.PUBLISH_CONTEXT_PERIOD_IN_MS, 60000L);
-        this.statusSubscribers = new ArrayList<>();
-        this.messageHandlers = new ArrayList<>();
+        this.statusSubscribers = statusSubscribers;
+        this.messageHandlers = messageHandlers;
     }
 
     /**

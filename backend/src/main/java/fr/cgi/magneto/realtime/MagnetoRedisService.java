@@ -222,14 +222,12 @@ public class MagnetoRedisService {
         log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Received message: " + payload);
         try {
             final MagnetoMessage message = Json.decodeValue(payload, MagnetoMessage.class);
-            if (!serverId.equals(message.getEmittedBy())) {
-                // Notifier tous les handlers du message reçu
-                for (Handler<MagnetoMessage> handler : messageHandlers) {
-                    try {
-                        handler.handle(message);
-                    } catch (Exception e) {
-                        log.error("[Magneto@MagnetoRedisService::onNewRedisMessage] Error in message handler", e);
-                    }
+            // Notifier tous les handlers du message reçu
+            for (Handler<MagnetoMessage> handler : messageHandlers) {
+                try {
+                    handler.handle(message);
+                } catch (Exception e) {
+                    log.error("[Magneto@MagnetoRedisService::onNewRedisMessage] Error in message handler", e);
                 }
             }
         } catch (Exception e) {

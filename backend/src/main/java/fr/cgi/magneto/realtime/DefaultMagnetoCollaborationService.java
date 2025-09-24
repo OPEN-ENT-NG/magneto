@@ -79,9 +79,9 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         if (isMultiCluster) {
             this.redisService = new MagnetoRedisService(vertx, config, serverId, metadataByBoardId);
             // Subscribe aux messages Redis entrants
-            this.redisService.subscribeToMessages(this::onNewRedisMessage);
+            //this.redisService.subscribeToMessages(this::onNewRedisMessage);
             // Subscribe aux changements de statut Redis
-            this.redisService.subscribeToStatusChanges(this::changeRealTimeStatus);
+            //this.redisService.subscribeToStatusChanges(this::changeRealTimeStatus);
         }
     }
 
@@ -124,30 +124,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         }
 
         return promise.future().onComplete(e -> this.statusSubscribers.clear());
-    }
-
-    /**
-     * Traite un message Redis entrant
-     */
-    private void onNewRedisMessage(MagnetoMessage message) {
-        log.debug("[Magneto@DefaultMagnetoCollaborationService::onNewRedisMessage] Received Redis message from server: " + message.getEmittedBy());
-
-        // Créer un wrapper pour la diffusion locale uniquement (pas interne)
-        MagnetoMessageWrapper wrapper = new MagnetoMessageWrapper(
-                Collections.singletonList(message),
-                false, // pas de messages internes
-                true,  // messages externes (Redis)
-                null   // pas d'exception de wsId
-        );
-
-        // Diffuser aux subscribers locaux
-        for (Handler<MagnetoMessageWrapper> subscriber : messagesSubscribers) {
-            try {
-                subscriber.handle(wrapper);
-            } catch (Exception e) {
-                log.error("[Magneto@DefaultMagnetoCollaborationService::onNewRedisMessage] Error in message subscriber", e);
-            }
-        }
     }
 
     /**

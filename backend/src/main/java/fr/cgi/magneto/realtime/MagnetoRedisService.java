@@ -34,7 +34,7 @@ public class MagnetoRedisService {
     private final Map<String, CollaborationUsersMetadata> metadataByBoardId;
     // Status and message handlers
     private final List<Handler<RealTimeStatus>> statusSubscribers;
-    private final List<Handler<MagnetoMessage>> messageHandlers;
+    private final List<Handler<MagnetoMessageWrapper>> messageHandlers;
     // Redis connections
     private RedisAPI redisPublisher;
     private long restartAttempt = 0;
@@ -211,7 +211,7 @@ public class MagnetoRedisService {
     /**
      * Subscribe aux messages Redis entrants
      */
-    public void subscribeToMessages(Handler<MagnetoMessage> handler) {
+    public void subscribeToMessages(Handler<MagnetoMessageWrapper> handler) {
         this.messageHandlers.add(handler);
     }
 
@@ -222,12 +222,14 @@ public class MagnetoRedisService {
         log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Received message: " + payload);
         try {
             final MagnetoMessage message = Json.decodeValue(payload, MagnetoMessage.class);
-            // Notifier tous les handlers du message reçu
-            for (Handler<MagnetoMessage> handler : messageHandlers) {
-                try {
-                    handler.handle(message);
-                } catch (Exception e) {
-                    log.error("[Magneto@MagnetoRedisService::onNewRedisMessage] Error in message handler", e);
+            if (!serverId.equals(message.getEmittedBy())) {
+                // Notifier tous les handlers du message reçu
+                for (final Handler<MagnetoMessageWrapper> messagesSubscriber : this.messageHandlers) {
+                    try {
+                        messagesSubscriber.handle(new MagnetoMessageWrapper(newArrayList(message), false, true, null));
+                    } catch (Exception e) {
+                        log.error("[Magneto@MagnetoRedisService::onNewRedisMessage] Error in message handler", e);
+                    }
                 }
             }
         } catch (Exception e) {

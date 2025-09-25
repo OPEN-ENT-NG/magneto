@@ -200,27 +200,6 @@ public class MagnetoRedisService {
     }
 
     /**
-     * Subscribe aux changements de statut
-     */
-    public void subscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
-        this.statusSubscribers.add(subscriber);
-    }
-
-    /**
-     * Unsubscribe aux changements de statut
-     */
-    public void unsubscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
-        this.statusSubscribers.remove(subscriber);
-    }
-
-    /**
-     * Subscribe aux messages Redis entrants
-     */
-    public void subscribeToMessages(Handler<MagnetoMessageWrapper> handler) {
-        this.messageHandlers.add(handler);
-    }
-
-    /**
      * Traite un nouveau message reçu de Redis
      */
     private void onNewRedisMessage(String payload) {

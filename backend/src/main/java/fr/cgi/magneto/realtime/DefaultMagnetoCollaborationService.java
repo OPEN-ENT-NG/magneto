@@ -78,10 +78,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         // Initialisation du service Redis si multi-cluster
         if (isMultiCluster) {
             this.redisService = new MagnetoRedisService(vertx, config, serverId, metadataByBoardId, statusSubscribers, messagesSubscribers);
-            // Subscribe aux messages Redis entrants
-            //this.redisService.subscribeToMessages(this::onNewRedisMessage);
-            // Subscribe aux changements de statut Redis
-            //this.redisService.subscribeToStatusChanges(this::changeRealTimeStatus);
         }
     }
 
@@ -182,19 +178,26 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         }
     }
 
-    @Override
-    public void subscribeToStatusChanges(final Handler<RealTimeStatus> subscriber) {
-        this.redisService.subscribeToStatusChanges(subscriber);
+
+    /**
+     * Subscribe aux changements de statut
+     */
+    public void subscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
+        this.statusSubscribers.add(subscriber);
     }
 
-    @Override
-    public void unsubscribeToStatusChanges(final Handler<RealTimeStatus> subscriber) {
-        this.redisService.unsubscribeToStatusChanges(subscriber);
+    /**
+     * Unsubscribe aux changements de statut
+     */
+    public void unsubscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
+        this.statusSubscribers.remove(subscriber);
     }
 
-    @Override
-    public void subscribeToNewMessagesToSend(Handler<MagnetoMessageWrapper> messagesHandler) {
-        this.redisService.subscribeToMessages(messagesHandler);
+    /**
+     * Subscribe aux messages Redis entrants
+     */
+    public void subscribeToNewMessagesToSend(Handler<MagnetoMessageWrapper> handler) {
+        this.messagesSubscribers.add(handler);
     }
 
     /**

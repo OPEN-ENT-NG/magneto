@@ -77,6 +77,7 @@ public class Card implements Model<Card> {
         this.favoriteList = new ArrayList<>();
         this.owner = new User(new JsonObject());
         this.editor = new User(new JsonObject());
+        this.canBeIframed = false;
     }
 
     public Card(JsonObject card) {

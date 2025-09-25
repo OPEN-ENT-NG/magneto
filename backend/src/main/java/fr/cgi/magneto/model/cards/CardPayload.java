@@ -77,7 +77,7 @@ public class CardPayload implements Model<CardPayload> {
         else if (card.getBoolean(Field.LIKED) != null)
             this.isFavorite = card.getBoolean(Field.LIKED);
         if (card.getBoolean(Field.CANBEIFRAMED) != null)
-            this.isFavorite = card.getBoolean(Field.CANBEIFRAMED);
+            this.canBeIframed = card.getBoolean(Field.CANBEIFRAMED);
 
         if (this.getId() == null) {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));

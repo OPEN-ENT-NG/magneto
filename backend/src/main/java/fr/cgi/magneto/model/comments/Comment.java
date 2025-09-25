@@ -1,19 +1,36 @@
 package fr.cgi.magneto.model.comments;
 
-import fr.cgi.magneto.core.constants.*;
-import fr.cgi.magneto.helper.*;
-import fr.cgi.magneto.model.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.model.Model;
 import io.vertx.core.json.JsonObject;
 
-import java.util.*;
+import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Comment implements Model<Comment> {
+    @JsonProperty("_id")
     private String _id;
+
+    @JsonProperty("ownerId")
     private String ownerId;
+
+    @JsonProperty("ownerName")
     private String ownerName;
+
+    @JsonProperty("modificationDate")
     private String modificationDate;
+
+    @JsonProperty("creationDate")
     private String creationDate;
+
+    @JsonProperty("content")
     private String content;
+
+    // Constructeur par défaut requis pour Jackson
+    public Comment() {}
 
     public Comment(JsonObject comment) {
         this._id = comment.getString(Field._ID, null);

@@ -39,7 +39,9 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
         // On watch le status global, s'il est mauvais on close toutes les connections
         this.magnetoCollaborationService.subscribeToStatusChanges(newStatus -> {
+            log.warn("[Magneto@CollaborationController] Status changed to: " + newStatus);
             if (RealTimeStatus.ERROR.equals(newStatus) || RealTimeStatus.STOPPED.equals(newStatus)) {
+                log.warn("[Magneto@CollaborationController] Closing all connections due to status: " + newStatus);
                 this.closeConnections();
             }
         });
@@ -104,6 +106,10 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
                 final UserInfos session = UserUtils.sessionToUserInfos(infos);
                 final String userId = session.getUserId();
+                ws.exceptionHandler(ex -> {
+                    log.error("[Magneto@CollaborationController::handle] WebSocket exception", ex);
+                    onCloseWSConnection(boardId, userId, wsId);
+                });
                 ws.closeHandler(e -> onCloseWSConnection(boardId, userId, wsId));
                 onConnect(session, boardId, wsId, ws)
                         .onSuccess(onSuccess -> {

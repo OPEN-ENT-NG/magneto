@@ -12,10 +12,13 @@ import java.util.List;
  */
 public class CardEditingInformation implements Model<CardEditingInformation> {
 
-    private final String userId;
-    private final String cardId;
-    private final Long since;
-    private final Boolean isMoving;
+    private String userId;
+    private String cardId;
+    private Long since;
+    private Boolean isMoving;
+
+    public CardEditingInformation() {
+    }
 
     public CardEditingInformation(String userId, String cardId, Long since, Boolean isMoving) {
         this.userId = userId;

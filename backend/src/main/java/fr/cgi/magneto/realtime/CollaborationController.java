@@ -1,6 +1,5 @@
 package fr.cgi.magneto.realtime;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.model.user.User;
 import fr.cgi.magneto.realtime.events.MagnetoUserAction;
@@ -60,11 +59,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
                 if (hasReadOnlyOrFullAccess) {
                     // Messages avec différenciation par droits utilisateur
-                    try {
-                        this.broadcastReadOnlyFullAccessMessages(messageList, messages.getExceptWSId());
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                    this.broadcastReadOnlyFullAccessMessages(messageList, messages.getExceptWSId());
                 } else if (hasActualUserOrOtherUsers) {
                     // Messages avec différenciation par utilisateur actuel vs autres
                     this.broadcastActualUserOtherUsersMessages(messageList, messages.getExceptWSId());
@@ -247,7 +242,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
     /**
      * Gère les messages avec différenciation readOnly/fullAccess
      */
-    private Future<Void> broadcastReadOnlyFullAccessMessages(List<MagnetoMessage> messages, String exceptWsId) throws JsonProcessingException {
+    private Future<Void> broadcastReadOnlyFullAccessMessages(List<MagnetoMessage> messages, String exceptWsId) {
         // Séparer les messages
         Optional<MagnetoMessage> readOnlyMessage = messages.stream()
                 .filter(m -> READONLY.equals(m.getActionId()))
@@ -256,11 +251,6 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         Optional<MagnetoMessage> fullAccessMessage = messages.stream()
                 .filter(m -> FULLACCESS.equals(m.getActionId()))
                 .findFirst();
-
-        if (!readOnlyMessage.isPresent() || !fullAccessMessage.isPresent()) {
-            log.warn("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] Missing readOnly or fullAccess message");
-            return Future.succeededFuture();
-        }
 
         String boardId = readOnlyMessage.get().getBoardId();
         final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
@@ -323,11 +313,6 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         Optional<MagnetoMessage> otherUsersMessage = messages.stream()
                 .filter(m -> OTHERUSERS.equals(m.getActionId()))
                 .findFirst();
-
-        if (!actualUserMessage.isPresent() || !otherUsersMessage.isPresent()) {
-            log.warn("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] Missing actualUser or otherUsers message");
-            return Future.succeededFuture();
-        }
 
         String boardId = actualUserMessage.get().getBoardId();
         String actualUserId = actualUserMessage.get().getUserId();

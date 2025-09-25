@@ -179,23 +179,17 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     }
 
 
-    /**
-     * Subscribe aux changements de statut
-     */
+    @Override
     public void subscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
         this.statusSubscribers.add(subscriber);
     }
 
-    /**
-     * Unsubscribe aux changements de statut
-     */
+    @Override
     public void unsubscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
         this.statusSubscribers.remove(subscriber);
     }
 
-    /**
-     * Subscribe aux messages Redis entrants
-     */
+    @Override
     public void subscribeToNewMessagesToSend(Handler<MagnetoMessageWrapper> handler) {
         this.messagesSubscribers.add(handler);
     }

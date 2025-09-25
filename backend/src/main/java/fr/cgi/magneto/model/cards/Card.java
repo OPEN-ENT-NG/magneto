@@ -53,7 +53,7 @@ public class Card implements Model<Card> {
     private Metadata metadata;
     @JsonProperty("lastComment")
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private Comment lastComment;
+    private JsonObject lastComment;
     @JsonProperty("nbOfComments")
     private Integer nbOfComments;
     @JsonProperty("nbOfFavorites")
@@ -73,7 +73,7 @@ public class Card implements Model<Card> {
         this.nbOfFavorites = 0;
         this.isLiked = false;
         this.isLocked = false;
-        this.lastComment = new Comment();
+        this.lastComment = new JsonObject();
         this.favoriteList = new ArrayList<>();
         this.owner = new User(new JsonObject());
         this.editor = new User(new JsonObject());
@@ -96,7 +96,7 @@ public class Card implements Model<Card> {
         this.modificationDate = card.getString(Field.MODIFICATIONDATE);
         this.isLocked = card.getBoolean(Field.ISLOCKED, false);
         this.metadata = null;
-        this.lastComment = new Comment(card.getJsonObject(Field.LASTCOMMENT, new JsonObject()));
+        this.lastComment = card.getJsonObject(Field.LASTCOMMENT, new JsonObject());
         this.nbOfComments = card.getInteger(Field.NBOFCOMMENTS, 0);
         JsonArray favoriteListOrNull = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray());
         this.favoriteList = (favoriteListOrNull != null) ? favoriteListOrNull.getList() : new JsonArray().getList();
@@ -231,11 +231,11 @@ public class Card implements Model<Card> {
         return this;
     }
 
-    public Comment getLastComment() {
+    public JsonObject getLastComment() {
         return lastComment;
     }
 
-    public Card setLastComment(Comment lastComment) {
+    public Card setLastComment(JsonObject lastComment) {
         this.lastComment = lastComment;
         return this;
     }

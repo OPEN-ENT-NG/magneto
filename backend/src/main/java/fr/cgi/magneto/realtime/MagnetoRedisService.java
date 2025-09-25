@@ -1,5 +1,7 @@
 package fr.cgi.magneto.realtime;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.realtime.events.CollaborationUsersMetadata;
@@ -205,7 +207,13 @@ public class MagnetoRedisService {
     private void onNewRedisMessage(String payload) {
         log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Received message: " + payload);
         try {
-            final MagnetoMessage message = Json.decodeValue(payload, MagnetoMessage.class);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+
+            final MagnetoMessage message = mapper.readValue(payload, MagnetoMessage.class);
+
             if (!serverId.equals(message.getEmittedBy())) {
                 // Notifier tous les handlers du message reçu
                 for (final Handler<MagnetoMessageWrapper> messagesSubscriber : this.messageHandlers) {

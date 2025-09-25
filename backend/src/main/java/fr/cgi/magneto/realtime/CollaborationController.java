@@ -1,5 +1,6 @@
 package fr.cgi.magneto.realtime;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.model.user.User;
 import fr.cgi.magneto.realtime.events.MagnetoUserAction;
@@ -59,7 +60,11 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
                 if (hasReadOnlyOrFullAccess) {
                     // Messages avec différenciation par droits utilisateur
-                    this.broadcastReadOnlyFullAccessMessages(messageList, messages.getExceptWSId());
+                    try {
+                        this.broadcastReadOnlyFullAccessMessages(messageList, messages.getExceptWSId());
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
                 } else if (hasActualUserOrOtherUsers) {
                     // Messages avec différenciation par utilisateur actuel vs autres
                     this.broadcastActualUserOtherUsersMessages(messageList, messages.getExceptWSId());
@@ -242,7 +247,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
     /**
      * Gère les messages avec différenciation readOnly/fullAccess
      */
-    private Future<Void> broadcastReadOnlyFullAccessMessages(List<MagnetoMessage> messages, String exceptWsId) {
+    private Future<Void> broadcastReadOnlyFullAccessMessages(List<MagnetoMessage> messages, String exceptWsId) throws JsonProcessingException {
         // Séparer les messages
         Optional<MagnetoMessage> readOnlyMessage = messages.stream()
                 .filter(m -> READONLY.equals(m.getActionId()))

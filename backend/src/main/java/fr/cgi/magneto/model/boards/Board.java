@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Board implements Model<Board> {
-    @JsonProperty("id")
+    @JsonProperty("_id")
     private String _id;
     @JsonProperty("title")
     private String title;

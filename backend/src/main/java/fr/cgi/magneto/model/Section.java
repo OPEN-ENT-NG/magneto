@@ -1,5 +1,6 @@
 package fr.cgi.magneto.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.model.cards.Card;
 import io.vertx.core.json.JsonArray;
@@ -9,11 +10,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Section implements Model {
+    @JsonProperty("_id")
     private String _id;
+
+    @JsonProperty("title")
     private String title;
+
+    @JsonProperty("cardIds")
     private List<String> cardIds;
+
+    @JsonProperty("boardId")
     private String boardId;
+
+    @JsonProperty("displayed")
     private Boolean displayed;
+
+    @JsonProperty("cards")
     private List<Card> cards;
 
     @SuppressWarnings("unchecked")

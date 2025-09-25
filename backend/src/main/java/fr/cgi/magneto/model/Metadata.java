@@ -13,6 +13,17 @@ public class Metadata implements Model {
     private final String extension;
     private final String fileOwner;
 
+    public Metadata() {
+        this.name = null;
+        this.filename = null;
+        this.contentType = null;
+        this.contentTransferEncoding = null;
+        this.charset = null;
+        this.size = null;
+        this.extension = null;
+        this.fileOwner = null;
+    }
+
     public Metadata(JsonObject metadata) {
         this.name = metadata.getString(Field.NAME, null);
         this.filename = metadata.getString(Field.FILENAME, null);

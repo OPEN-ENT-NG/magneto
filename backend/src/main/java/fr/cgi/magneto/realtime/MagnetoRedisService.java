@@ -1,5 +1,7 @@
 package fr.cgi.magneto.realtime;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.RealTimeStatus;
 import fr.cgi.magneto.realtime.events.CollaborationUsersMetadata;
@@ -14,7 +16,10 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.client.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -34,22 +39,24 @@ public class MagnetoRedisService {
     private final Map<String, CollaborationUsersMetadata> metadataByBoardId;
     // Status and message handlers
     private final List<Handler<RealTimeStatus>> statusSubscribers;
-    private final List<Handler<MagnetoMessage>> messageHandlers;
+    private final List<Handler<MagnetoMessageWrapper>> messageHandlers;
     // Redis connections
     private RedisAPI redisPublisher;
     private long restartAttempt = 0;
     private long contextPublisherId = -1;
 
     public MagnetoRedisService(Vertx vertx, JsonObject config, String serverId,
-                               Map<String, CollaborationUsersMetadata> metadataByBoardId) {
+                               Map<String, CollaborationUsersMetadata> metadataByBoardId,
+                               List<Handler<RealTimeStatus>> statusSubscribers,
+                               List<Handler<MagnetoMessageWrapper>> messageHandlers) {
         this.vertx = vertx;
         this.config = config;
         this.serverId = serverId;
         this.metadataByBoardId = metadataByBoardId;
         this.reConnectionDelay = config.getLong(Field.RECONNECTION_DELAY_IN_MS, 1000L);
         this.publishPeriodInMs = config.getLong(Field.PUBLISH_CONTEXT_PERIOD_IN_MS, 60000L);
-        this.statusSubscribers = new ArrayList<>();
-        this.messageHandlers = new ArrayList<>();
+        this.statusSubscribers = statusSubscribers;
+        this.messageHandlers = messageHandlers;
     }
 
     /**
@@ -195,38 +202,23 @@ public class MagnetoRedisService {
     }
 
     /**
-     * Subscribe aux changements de statut
-     */
-    public void subscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
-        this.statusSubscribers.add(subscriber);
-    }
-
-    /**
-     * Unsubscribe aux changements de statut
-     */
-    public void unsubscribeToStatusChanges(Handler<RealTimeStatus> subscriber) {
-        this.statusSubscribers.remove(subscriber);
-    }
-
-    /**
-     * Subscribe aux messages Redis entrants
-     */
-    public void subscribeToMessages(Handler<MagnetoMessage> handler) {
-        this.messageHandlers.add(handler);
-    }
-
-    /**
      * Traite un nouveau message reçu de Redis
      */
     private void onNewRedisMessage(String payload) {
         log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Received message: " + payload);
         try {
-            final MagnetoMessage message = Json.decodeValue(payload, MagnetoMessage.class);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+
+            final MagnetoMessage message = mapper.readValue(payload, MagnetoMessage.class);
+
             if (!serverId.equals(message.getEmittedBy())) {
                 // Notifier tous les handlers du message reçu
-                for (Handler<MagnetoMessage> handler : messageHandlers) {
+                for (final Handler<MagnetoMessageWrapper> messagesSubscriber : this.messageHandlers) {
                     try {
-                        handler.handle(message);
+                        messagesSubscriber.handle(new MagnetoMessageWrapper(newArrayList(message), false, true, null));
                     } catch (Exception e) {
                         log.error("[Magneto@MagnetoRedisService::onNewRedisMessage] Error in message handler", e);
                     }

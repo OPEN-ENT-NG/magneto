@@ -1,6 +1,7 @@
 package fr.cgi.magneto.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
@@ -51,7 +52,8 @@ public class Card implements Model<Card> {
     @JsonProperty("metadata")
     private Metadata metadata;
     @JsonProperty("lastComment")
-    private JsonObject lastComment;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private Comment lastComment;
     @JsonProperty("nbOfComments")
     private Integer nbOfComments;
     @JsonProperty("nbOfFavorites")
@@ -71,7 +73,7 @@ public class Card implements Model<Card> {
         this.nbOfFavorites = 0;
         this.isLiked = false;
         this.isLocked = false;
-        this.lastComment = new JsonObject();
+        this.lastComment = new Comment();
         this.favoriteList = new ArrayList<>();
         this.owner = new User(new JsonObject());
         this.editor = new User(new JsonObject());
@@ -94,7 +96,7 @@ public class Card implements Model<Card> {
         this.modificationDate = card.getString(Field.MODIFICATIONDATE);
         this.isLocked = card.getBoolean(Field.ISLOCKED, false);
         this.metadata = null;
-        this.lastComment = card.getJsonObject(Field.LASTCOMMENT, new JsonObject());
+        this.lastComment = new Comment(card.getJsonObject(Field.LASTCOMMENT, new JsonObject()));
         this.nbOfComments = card.getInteger(Field.NBOFCOMMENTS, 0);
         JsonArray favoriteListOrNull = card.getJsonArray(Field.FAVORITE_LIST, new JsonArray());
         this.favoriteList = (favoriteListOrNull != null) ? favoriteListOrNull.getList() : new JsonArray().getList();
@@ -229,11 +231,11 @@ public class Card implements Model<Card> {
         return this;
     }
 
-    public JsonObject getLastComment() {
+    public Comment getLastComment() {
         return lastComment;
     }
 
-    public Card setLastComment(JsonObject lastComment) {
+    public Card setLastComment(Comment lastComment) {
         this.lastComment = lastComment;
         return this;
     }

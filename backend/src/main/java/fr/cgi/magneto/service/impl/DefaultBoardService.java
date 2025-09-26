@@ -35,8 +35,10 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.utils.ResourceUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class DefaultBoardService implements BoardService {
 
@@ -194,7 +196,8 @@ public class DefaultBoardService implements BoardService {
                         // Layout libre : récupérer toutes les cartes du board
                         return serviceFactory.cardService().getAllCardsByBoard(board, user)
                                 .map(cards -> {
-                                    board.setCards(cards);
+                                    List<Card> sortedCards = sortAndFilterCards(cards, board.getCardIds());
+                                    board.setCards(sortedCards);
                                     return board;
                                 });
                     } else {
@@ -207,13 +210,11 @@ public class DefaultBoardService implements BoardService {
 
                                     return CompositeFuture.all(cardFutures)
                                             .map(result -> {
-                                                List<Section> sectionsWithCards = sections.stream()
-                                                        .map(section -> {
-                                                            List<Card> sectionCards = result.list().stream()
-                                                                    .flatMap(list -> ((List<Card>) list).stream())
-                                                                    .filter(card -> section.getCardIds().contains(card.getId()))
-                                                                    .collect(Collectors.toList());
-                                                            return section.setCards(sectionCards);
+                                                List<Section> sectionsWithCards = IntStream.range(0, sections.size())
+                                                        .mapToObj(i -> {
+                                                            List<Card> sectionCards = (List<Card>) result.resultAt(i);
+                                                            List<Card> sortedSectionCards = sortAndFilterCards(sectionCards, sections.get(i).getCardIds());
+                                                            return sections.get(i).setCards(sortedSectionCards);
                                                         })
                                                         .collect(Collectors.toList());
                                                 board.setSections(sectionsWithCards);
@@ -222,6 +223,20 @@ public class DefaultBoardService implements BoardService {
                                 });
                     }
                 });
+    }
+
+    private List<Card> sortAndFilterCards(List<Card> cards, List<String> cardIds) {
+        if (cardIds == null || cardIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Map<String, Card> cardMap = cards.stream()
+                .collect(Collectors.toMap(Card::getId, Function.identity()));
+
+        return cardIds.stream()
+                .map(cardMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")

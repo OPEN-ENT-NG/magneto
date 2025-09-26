@@ -7,6 +7,7 @@ import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.webutils.request.CookieHelper;
 import fr.wseduc.webutils.request.filter.UserAuthFilter;
 import io.vertx.core.*;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
@@ -150,17 +151,6 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                     final String userId = session.getUserId();
                     log.info("[Magneto@CollaborationController::handle] User session converted - userId: " + userId + ", username: " + session.getUsername());
 
-                    // Setup close handler
-                    AtomicBoolean connectionClosed = new AtomicBoolean(false);
-                    ws.closeHandler(e -> {
-                        if (connectionClosed.compareAndSet(false, true)) {
-                            log.info("[Magneto@CollaborationController::handle] Connection closed normally for wsId: " + wsId + ", boardId: " + boardId + ", userId: " + userId);
-                            onCloseWSConnection(boardId, userId, wsId);
-                        } else {
-                            log.info("[Magneto@CollaborationController::handle] Close handler already called for wsId: " + wsId);
-                        }
-                    });
-
                     log.info("[Magneto@CollaborationController::handle] Starting onConnect process for wsId: " + wsId);
                     onConnect(session, boardId, wsId, ws)
                             .onSuccess(onSuccess -> {
@@ -170,6 +160,32 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                                 try {
                                     ws.resume();
                                     log.info("[Magneto@CollaborationController::handle] WebSocket resumed successfully for wsId: " + wsId);
+
+                                    // Déclarer le timer ID dans un tableau pour pouvoir le modifier dans les lambdas
+                                    final long[] pingTimerId = new long[1];
+
+                                    // Setup close handler AVANT de démarrer le ping
+                                    AtomicBoolean connectionClosed = new AtomicBoolean(false);
+                                    ws.closeHandler(e -> {
+                                        if (pingTimerId[0] > 0) {
+                                            vertx.cancelTimer(pingTimerId[0]);
+                                        }
+                                        if (connectionClosed.compareAndSet(false, true)) {
+                                            log.info("[Magneto@CollaborationController::handle] Connection closed normally for wsId: " + wsId + ", boardId: " + boardId + ", userId: " + userId);
+                                            onCloseWSConnection(boardId, userId, wsId);
+                                        }
+                                    });
+
+                                    // MAINTENANT démarrer le ping
+                                    pingTimerId[0] = vertx.setPeriodic(45000, timerId -> {
+                                        if (!ws.isClosed()) {
+                                            log.debug("[Magneto@CollaborationController] Sending ping to wsId: " + wsId);
+                                            ws.writePing(Buffer.buffer("ping"));
+                                        } else {
+                                            log.debug("[Magneto@CollaborationController] WebSocket closed, cancelling ping timer for wsId: " + wsId);
+                                            vertx.cancelTimer(timerId);
+                                        }
+                                    });
 
                                     ws.frameHandler(frame -> {
                                         log.info("[Magneto@CollaborationController::handle] Frame received for wsId: " + wsId + " - type: " +

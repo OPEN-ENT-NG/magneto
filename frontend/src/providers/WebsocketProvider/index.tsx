@@ -53,26 +53,17 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     shouldConnect && !isDisconnectedForInactivity ? socketUrl : null,
     {
       onOpen: () => {
-        console.log("✅ WebSocket connected");
         setIsDisconnectedForInactivity(false);
         lastWebSocketMessageRef.current = Date.now();
         startInactivityTimer();
       },
 
-      onClose: (event) => {
-        console.log("🔴 WebSocket disconnected");
-        console.log("📊 Close code:", event.code);
-        console.log("📝 Close reason:", event.reason);
+      onClose: () => {
         stopInactivityTimer();
-      },
-
-      onError: (event: any) => {
-        console.error("❌ WebSocket error:", event);
       },
 
       shouldReconnect: () => {
         if (isDisconnectedForInactivity) {
-          console.log("🚫 Not reconnecting - disconnected for inactivity");
           return false;
         }
         return shouldConnect;
@@ -86,7 +77,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const sendMessage = useCallback(
     (message: string) => {
       lastWebSocketMessageRef.current = Date.now();
-      console.log("📤 Sending WebSocket message, resetting inactivity timer");
 
       if (isDisconnectedForInactivity) {
         setIsDisconnectedForInactivity(false);
@@ -104,32 +94,20 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
     inactivityTimerRef.current = setInterval(() => {
       const timeSinceLastMessage = Date.now() - lastWebSocketMessageRef.current;
-      const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+      const INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000; // 2h
 
       if (timeSinceLastMessage > INACTIVITY_TIMEOUT) {
-        console.log(
-          `⏰ No WebSocket messages sent for ${Math.round(
-            timeSinceLastMessage / 1000,
-          )}s - disconnecting`,
-        );
-
         setIsDisconnectedForInactivity(true);
 
         const ws = getWebSocket();
         if (ws) {
           ws.close(1000, "No activity timeout");
         }
-        toast(t("magneto.websocket.afk"));
+        toast.warning(t("magneto.websocket.afk"));
 
         stopInactivityTimer();
-      } else {
-        console.log(
-          `🕐 Time since last WebSocket message: ${Math.round(
-            timeSinceLastMessage / 1000,
-          )}s`,
-        );
       }
-    }, 30000); // Vérifier toutes les 30 secondes
+    }, 30000);
   }, [getWebSocket]);
 
   const stopInactivityTimer = useCallback(() => {

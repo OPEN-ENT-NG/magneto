@@ -35,7 +35,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     {
       onOpen: () => console.log("WebSocket connected"),
       onClose: () => console.log("WebSocket disconnected"),
-      onError: (error: any) => console.error("WebSocket error:", error),
+      onError: (event: any) => {
+        console.log("🔴 WebSocket fermé à:", new Date());
+        console.log("📊 Code de fermeture:", event.code);
+        console.log("📝 Raison:", event.reason);
+        console.log("✅ Fermeture propre:", event.wasClean);
+      },
       shouldReconnect: () => shouldConnect,
       reconnectInterval: 3000,
       reconnectAttempts: 10,

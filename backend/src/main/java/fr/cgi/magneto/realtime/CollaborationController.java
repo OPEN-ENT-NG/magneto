@@ -83,7 +83,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                     }
                 }
             } else {
-                log.debug("[Magneto@CollaborationController] No messages to broadcast");
+                log.info("[Magneto@CollaborationController] No messages to broadcast");
             }
         });
 
@@ -157,7 +157,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                             log.info("[Magneto@CollaborationController::handle] Connection closed normally for wsId: " + wsId + ", boardId: " + boardId + ", userId: " + userId);
                             onCloseWSConnection(boardId, userId, wsId);
                         } else {
-                            log.debug("[Magneto@CollaborationController::handle] Close handler already called for wsId: " + wsId);
+                            log.info("[Magneto@CollaborationController::handle] Close handler already called for wsId: " + wsId);
                         }
                     });
 
@@ -172,7 +172,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                                     log.info("[Magneto@CollaborationController::handle] WebSocket resumed successfully for wsId: " + wsId);
 
                                     ws.frameHandler(frame -> {
-                                        log.debug("[Magneto@CollaborationController::handle] Frame received for wsId: " + wsId + " - type: " +
+                                        log.info("[Magneto@CollaborationController::handle] Frame received for wsId: " + wsId + " - type: " +
                                                 (frame.isBinary() ? "BINARY" : frame.isText() ? "TEXT" : frame.isClose() ? "CLOSE" : "OTHER"));
 
                                         try {
@@ -181,10 +181,10 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                                             }
                                             else if (frame.isText()){
                                                 final String message = frame.textData();
-                                                log.debug("[Magneto@CollaborationController::handle] Text frame received for wsId: " + wsId + " - length: " + message.length());
+                                                log.info("[Magneto@CollaborationController::handle] Text frame received for wsId: " + wsId + " - length: " + message.length());
 
                                                 final MagnetoUserAction action = Json.decodeValue(message, MagnetoUserAction.class);
-                                                log.debug("[Magneto@CollaborationController::handle] Action decoded: " + action.getType() + " for wsId: " + wsId);
+                                                log.info("[Magneto@CollaborationController::handle] Action decoded: " + action.getType() + " for wsId: " + wsId);
 
                                                 this.magnetoCollaborationService.pushEvent(boardId, session, action, wsId, false);
                                             }
@@ -386,10 +386,10 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         for (MagnetoMessage message : messages) {
             final String payload = message.toJson().encode();
             final String boardId = message.getBoardId();
-            log.debug("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Message payload size: " + payload.length() + " bytes for board: " + boardId);
+            log.info("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Message payload size: " + payload.length() + " bytes for board: " + boardId);
 
             final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
-            log.debug("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Found " + wsIdToWs.size() + " connections for board: " + boardId);
+            log.info("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Found " + wsIdToWs.size() + " connections for board: " + boardId);
 
             for (Map.Entry<String, ServerWebSocket> entry : wsIdToWs.entrySet()) {
                 if (entry.getKey().equals(exceptWsId) || entry.getValue().isClosed()) {
@@ -403,7 +403,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                     try {
                         ws.writeTextMessage(payload, ar -> {
                             if (ar.succeeded()) {
-                                log.debug("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Message sent successfully to wsId: " + entry.getKey());
+                                log.info("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Message sent successfully to wsId: " + entry.getKey());
                                 writePromise.complete();
                             } else {
                                 log.warn("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] Failed to send message to wsId: " + entry.getKey() + " - " + ar.cause().getMessage());
@@ -421,7 +421,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         }
 
         if (futures.isEmpty()) {
-            log.debug("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] No messages to send");
+            log.info("[Magneto@CollaborationController::broadcastExternalMessagesToUsers] No messages to send");
             return Future.succeededFuture();
         }
 
@@ -472,7 +472,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
             MagnetoMessage messageToSend = user.getRights().isReadOnly() ?
                     readOnlyMessage.get() : fullAccessMessage.get();
             String payload = messageToSend.toJson().encode();
-            log.debug("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] Sending " +
+            log.info("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] Sending " +
                     (user.getRights().isReadOnly() ? "readOnly" : "fullAccess") + " message to wsId: " + wsId);
 
             Promise<Void> writePromise = Promise.promise();
@@ -495,7 +495,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         }
 
         if (futures.isEmpty()) {
-            log.debug("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] No messages to send");
+            log.info("[Magneto@CollaborationController::broadcastReadOnlyFullAccessMessages] No messages to send");
             return Future.succeededFuture();
         }
 
@@ -547,7 +547,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
             MagnetoMessage messageToSend = user.getUserId().equals(actualUserId) ?
                     actualUserMessage.get() : otherUsersMessage.get();
             String payload = messageToSend.toJson().encode();
-            log.debug("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] Sending " +
+            log.info("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] Sending " +
                     (user.getUserId().equals(actualUserId) ? "actualUser" : "otherUsers") + " message to wsId: " + wsId);
 
             Promise<Void> writePromise = Promise.promise();
@@ -570,7 +570,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         }
 
         if (futures.isEmpty()) {
-            log.debug("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] No messages to send");
+            log.info("[Magneto@CollaborationController::broadcastActualUserOtherUsersMessages] No messages to send");
             return Future.succeededFuture();
         }
 
@@ -587,14 +587,14 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 .map(message -> {
                     final String payload = message.toJson().encode();
                     final String boardId = message.getBoardId();
-                    log.debug("[Magneto@CollaborationController::broadcastMessagesToUsers] Processing message for board: " + boardId + ", payload size: " + payload.length() + " bytes");
+                    log.info("[Magneto@CollaborationController::broadcastMessagesToUsers] Processing message for board: " + boardId + ", payload size: " + payload.length() + " bytes");
 
                     if (payload.length() > 100000) { // Log large messages
                         log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] LARGE MESSAGE detected: " + payload.length() + " bytes for board: " + boardId);
                     }
 
                     final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
-                    log.debug("[Magneto@CollaborationController::broadcastMessagesToUsers] Found " + wsIdToWs.size() + " connections for board: " + boardId);
+                    log.info("[Magneto@CollaborationController::broadcastMessagesToUsers] Found " + wsIdToWs.size() + " connections for board: " + boardId);
 
                     final List<Future> writeMessagesPromise = wsIdToWs.entrySet().stream()
                             .filter(e -> !e.getKey().equals(exceptWsId))
@@ -602,7 +602,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                             .filter(ws -> {
                                 boolean isOpen = !ws.isClosed();
                                 if (!isOpen) {
-                                    log.debug("[Magneto@CollaborationController::broadcastMessagesToUsers] Skipping closed websocket");
+                                    log.info("[Magneto@CollaborationController::broadcastMessagesToUsers] Skipping closed websocket");
                                 }
                                 return isOpen;
                             })
@@ -612,7 +612,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                                     try {
                                         ws.writeTextMessage(payload, ar -> {
                                             if (ar.succeeded()) {
-                                                log.debug("[Magneto@CollaborationController::broadcastMessagesToUsers] Message sent successfully");
+                                                log.info("[Magneto@CollaborationController::broadcastMessagesToUsers] Message sent successfully");
                                                 writeMessagePromise.complete();
                                             } else {
                                                 log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] Failed to send message: " + ar.cause().getMessage());
@@ -629,18 +629,18 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                             }).collect(Collectors.toList());
 
                     if (writeMessagesPromise.isEmpty()) {
-                        log.debug("[Magneto@CollaborationController::broadcastMessagesToUsers] No websockets to write to for board: " + boardId);
+                        log.info("[Magneto@CollaborationController::broadcastMessagesToUsers] No websockets to write to for board: " + boardId);
                         return Future.succeededFuture();
                     }
 
                     return CompositeFuture.join(writeMessagesPromise).mapEmpty()
-                            .onSuccess(v -> log.debug("[Magneto@CollaborationController::broadcastMessagesToUsers] All writes completed for board: " + boardId))
+                            .onSuccess(v -> log.info("[Magneto@CollaborationController::broadcastMessagesToUsers] All writes completed for board: " + boardId))
                             .onFailure(err -> log.error("[Magneto@CollaborationController::broadcastMessagesToUsers] Some writes failed for board: " + boardId, err));
                 })
                 .collect(Collectors.toList());
 
         if (futures.isEmpty()) {
-            log.debug("[Magneto@CollaborationController::broadcastMessagesToUsers] No futures to join");
+            log.info("[Magneto@CollaborationController::broadcastMessagesToUsers] No futures to join");
             return Future.succeededFuture();
         }
 

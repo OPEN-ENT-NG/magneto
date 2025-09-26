@@ -141,13 +141,13 @@ public class MagnetoRedisService {
 
                             client.handler(message -> {
                                 try {
-                                    log.debug("[Magneto@MagnetoRedisService::listenToRedis] Received Redis message");
+                                    log.info("[Magneto@MagnetoRedisService::listenToRedis] Received Redis message");
                                     if (Field.MESSAGE.equals(message.get(0).toString())) {
                                         String receivedMessage = message.get(2).toString();
-                                        log.debug("[Magneto@MagnetoRedisService::listenToRedis] Processing message of length: " + receivedMessage.length());
+                                        log.info("[Magneto@MagnetoRedisService::listenToRedis] Processing message of length: " + receivedMessage.length());
                                         this.onNewRedisMessage(receivedMessage);
                                     } else {
-                                        log.debug("[Magneto@MagnetoRedisService::listenToRedis] Ignoring non-message Redis event: " + message.get(0));
+                                        log.info("[Magneto@MagnetoRedisService::listenToRedis] Ignoring non-message Redis event: " + message.get(0));
                                     }
                                 } catch (Exception e) {
                                     log.error("[Magneto@MagnetoRedisService::listenToRedis] Exception treating Redis message: " + message, e);
@@ -182,7 +182,7 @@ public class MagnetoRedisService {
      * Publie un message sur Redis pour notifier les autres instances
      */
     public Future<Void> publishMessage(MagnetoMessage message) {
-        log.debug("[Magneto@MagnetoRedisService::publishMessage] Publishing single message for board: " + message.getBoardId());
+        log.info("[Magneto@MagnetoRedisService::publishMessage] Publishing single message for board: " + message.getBoardId());
         return publishMessagesOnRedis(Collections.singletonList(message));
     }
 
@@ -198,17 +198,17 @@ public class MagnetoRedisService {
      * Publie les métadonnées d'un board spécifique
      */
     public Future<Void> publishBoardMetadata(String boardId) {
-        log.debug("[Magneto@MagnetoRedisService::publishBoardMetadata] Publishing metadata for board: " + boardId);
+        log.info("[Magneto@MagnetoRedisService::publishBoardMetadata] Publishing metadata for board: " + boardId);
         final Promise<Void> promise = Promise.promise();
         final CollaborationUsersMetadata metadata = metadataByBoardId.get(boardId);
 
         if (metadata == null) {
-            log.debug("[Magneto@MagnetoRedisService::publishBoardMetadata] No metadata found for board: " + boardId);
+            log.info("[Magneto@MagnetoRedisService::publishBoardMetadata] No metadata found for board: " + boardId);
             promise.complete();
             return promise.future();
         }
 
-        log.debug("[Magneto@MagnetoRedisService::publishBoardMetadata] Found metadata for board: " + boardId +
+        log.info("[Magneto@MagnetoRedisService::publishBoardMetadata] Found metadata for board: " + boardId +
                 " - users: " + metadata.getConnectedUsers().size() + ", editing: " + metadata.getEditing().size());
         final JsonObject payload = new JsonObject().put(boardId, JsonObject.mapFrom(metadata));
 
@@ -219,7 +219,7 @@ public class MagnetoRedisService {
                 String.valueOf(2 * publishPeriodInMs)
         ), onPublishDone -> {
             if (onPublishDone.succeeded()) {
-                log.debug("[Magneto@MagnetoRedisService::publishBoardMetadata] Board metadata published successfully for: " + boardId);
+                log.info("[Magneto@MagnetoRedisService::publishBoardMetadata] Board metadata published successfully for: " + boardId);
                 promise.complete();
             } else {
                 log.error("[Magneto@MagnetoRedisService::publishBoardMetadata] Failed to publish board metadata for: " + boardId, onPublishDone.cause());
@@ -234,7 +234,7 @@ public class MagnetoRedisService {
      * Récupère les métadonnées d'un board depuis Redis (fusion de toutes les instances)
      */
     public Future<CollaborationUsersMetadata> getBoardMetadata(String boardId) {
-        log.debug("[Magneto@MagnetoRedisService::getBoardMetadata] Getting metadata for board: " + boardId);
+        log.info("[Magneto@MagnetoRedisService::getBoardMetadata] Getting metadata for board: " + boardId);
         final Promise<CollaborationUsersMetadata> promise = Promise.promise();
 
         this.redisPublisher.keys(metadataCollectionPrefix + "*_" + boardId, e -> {
@@ -245,7 +245,7 @@ public class MagnetoRedisService {
                         .distinct()
                         .collect(Collectors.toList());
 
-                log.debug("[Magneto@MagnetoRedisService::getBoardMetadata] Found " + keys.size() + " remote metadata keys for board: " + boardId);
+                log.info("[Magneto@MagnetoRedisService::getBoardMetadata] Found " + keys.size() + " remote metadata keys for board: " + boardId);
                 getOtherInstancesMetadata(boardId, keys).onComplete(promise);
             } else {
                 log.error("[Magneto@MagnetoRedisService::getBoardMetadata] Failed to get metadata keys for board: " + boardId, e.cause());
@@ -284,16 +284,16 @@ public class MagnetoRedisService {
     private Future<Void> publishMessagesOnRedis(List<MagnetoMessage> messages, int index) {
         final Promise<Void> promise = Promise.promise();
         if (messages == null || messages.size() <= index) {
-            log.debug("[Magneto@MagnetoRedisService::publishMessagesOnRedis] All messages processed at index: " + index);
+            log.info("[Magneto@MagnetoRedisService::publishMessagesOnRedis] All messages processed at index: " + index);
             promise.complete();
         } else {
             final String payload = Json.encode(messages.get(index));
-            log.debug("[Magneto@MagnetoRedisService::publishMessagesOnRedis] Publishing message " + (index + 1) + "/" +
+            log.info("[Magneto@MagnetoRedisService::publishMessagesOnRedis] Publishing message " + (index + 1) + "/" +
                     messages.size() + " - payload size: " + payload.length() + " bytes");
 
             redisPublisher.publish(channelName, payload, e -> {
                 if (e.succeeded()) {
-                    log.debug("[Magneto@MagnetoRedisService::publishMessagesOnRedis] Message " + (index + 1) + " published successfully");
+                    log.info("[Magneto@MagnetoRedisService::publishMessagesOnRedis] Message " + (index + 1) + " published successfully");
                     publishMessagesOnRedis(messages, index + 1).onComplete(promise);
                 } else {
                     log.error("[Magneto@MagnetoRedisService::publishMessagesOnRedis] Failed to publish message " + (index + 1) +
@@ -310,19 +310,19 @@ public class MagnetoRedisService {
      * Récupère les métadonnées des autres instances Redis
      */
     private Future<CollaborationUsersMetadata> getOtherInstancesMetadata(String boardId, List<String> keys) {
-        log.debug("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Processing " + keys.size() + " keys for board: " + boardId);
+        log.info("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Processing " + keys.size() + " keys for board: " + boardId);
         final Promise<CollaborationUsersMetadata> promise = Promise.promise();
 
         if (keys.isEmpty()) {
             // Retourner les métadonnées locales uniquement
             CollaborationUsersMetadata localMetadata = metadataByBoardId.get(boardId);
-            log.debug("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] No remote keys - returning local metadata only for board: " + boardId);
+            log.info("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] No remote keys - returning local metadata only for board: " + boardId);
             promise.complete(localMetadata != null ? localMetadata : new CollaborationUsersMetadata());
         } else {
-            log.debug("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Fetching remote metadata for keys: " + keys);
+            log.info("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Fetching remote metadata for keys: " + keys);
             this.redisPublisher.mget(keys, entriesResponse -> {
                 if (entriesResponse.succeeded()) {
-                    log.debug("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Successfully fetched remote metadata entries");
+                    log.info("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Successfully fetched remote metadata entries");
 
                     final CollaborationUsersMetadata otherInstancesMetadata = entriesResponse.result().stream()
                             .map(entry -> {
@@ -352,7 +352,7 @@ public class MagnetoRedisService {
                             boardId, k -> new CollaborationUsersMetadata());
 
                     CollaborationUsersMetadata mergedMetadata = CollaborationUsersMetadata.merge(localMetadata, otherInstancesMetadata);
-                    log.debug("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Merged metadata for board " + boardId +
+                    log.info("[Magneto@MagnetoRedisService::getOtherInstancesMetadata] Merged metadata for board " + boardId +
                             " - total users: " + mergedMetadata.getConnectedUsers().size() + ", editing: " + mergedMetadata.getEditing().size());
 
                     promise.complete(mergedMetadata);
@@ -370,7 +370,7 @@ public class MagnetoRedisService {
      * Traite un nouveau message reçu de Redis
      */
     private void onNewRedisMessage(String payload) {
-        log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Processing Redis message of length: " + payload.length());
+        log.info("[Magneto@MagnetoRedisService::onNewRedisMessage] Processing Redis message of length: " + payload.length());
         final long startTime = System.currentTimeMillis();
 
         try {
@@ -382,7 +382,7 @@ public class MagnetoRedisService {
             final MagnetoMessage message = mapper.readValue(payload, MagnetoMessage.class);
 
             if (!serverId.equals(message.getEmittedBy())) {
-                log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Processing external message from server: " +
+                log.info("[Magneto@MagnetoRedisService::onNewRedisMessage] Processing external message from server: " +
                         message.getEmittedBy() + " for board: " + message.getBoardId());
 
                 // Notifier tous les handlers du message reçu
@@ -390,7 +390,7 @@ public class MagnetoRedisService {
                 for (final Handler<MagnetoMessageWrapper> messagesSubscriber : this.messageHandlers) {
                     try {
                         handlerCount++;
-                        log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Notifying handler " + handlerCount + "/" + this.messageHandlers.size());
+                        log.info("[Magneto@MagnetoRedisService::onNewRedisMessage] Notifying handler " + handlerCount + "/" + this.messageHandlers.size());
                         messagesSubscriber.handle(new MagnetoMessageWrapper(newArrayList(message), false, true, null));
                     } catch (Exception e) {
                         log.error("[Magneto@MagnetoRedisService::onNewRedisMessage] Error in message handler " + handlerCount, e);
@@ -398,10 +398,10 @@ public class MagnetoRedisService {
                 }
 
                 final long duration = System.currentTimeMillis() - startTime;
-                log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Redis message processed in " + duration +
+                log.info("[Magneto@MagnetoRedisService::onNewRedisMessage] Redis message processed in " + duration +
                         "ms - notified " + handlerCount + " handlers");
             } else {
-                log.debug("[Magneto@MagnetoRedisService::onNewRedisMessage] Ignoring message from same server: " + serverId);
+                log.info("[Magneto@MagnetoRedisService::onNewRedisMessage] Ignoring message from same server: " + serverId);
             }
         } catch (Exception e) {
             final long duration = System.currentTimeMillis() - startTime;
@@ -418,13 +418,13 @@ public class MagnetoRedisService {
         final Promise<Void> promise = Promise.promise();
 
         if (contextPublisherId >= 0) {
-            log.debug("[Magneto@MagnetoRedisService::publishContextLoop] Context publish loop already running with ID: " + contextPublisherId);
+            log.info("[Magneto@MagnetoRedisService::publishContextLoop] Context publish loop already running with ID: " + contextPublisherId);
             promise.complete();
         } else {
             this.contextPublisherId = vertx.setPeriodic(publishPeriodInMs, timerId -> {
-                log.debug("[Magneto@MagnetoRedisService::publishContextLoop] Context publish timer triggered - ID: " + timerId);
+                log.info("[Magneto@MagnetoRedisService::publishContextLoop] Context publish timer triggered - ID: " + timerId);
                 publishAllMetadata()
-                        .onSuccess(v -> log.debug("[Magneto@MagnetoRedisService::publishContextLoop] Context publish completed successfully"))
+                        .onSuccess(v -> log.info("[Magneto@MagnetoRedisService::publishContextLoop] Context publish completed successfully"))
                         .onFailure(err -> log.error("[Magneto@MagnetoRedisService::publishContextLoop] Context publish failed", err));
             });
 
@@ -440,17 +440,17 @@ public class MagnetoRedisService {
     private Future<Void> publishAllMetadata() {
         final Promise<Void> promise = Promise.promise();
         final int boardCount = metadataByBoardId.size();
-        log.debug("[Magneto@MagnetoRedisService::publishAllMetadata] Publishing metadata for " + boardCount + " active boards");
+        log.info("[Magneto@MagnetoRedisService::publishAllMetadata] Publishing metadata for " + boardCount + " active boards");
 
         if (metadataByBoardId.isEmpty()) {
-            log.debug("[Magneto@MagnetoRedisService::publishAllMetadata] No boards to publish - skipping");
+            log.info("[Magneto@MagnetoRedisService::publishAllMetadata] No boards to publish - skipping");
             promise.complete();
             return promise.future();
         }
 
         final String payload = Json.encode(metadataByBoardId);
         final String key = metadataCollectionPrefix + serverId;
-        log.debug("[Magneto@MagnetoRedisService::publishAllMetadata] Publishing to key: " + key +
+        log.info("[Magneto@MagnetoRedisService::publishAllMetadata] Publishing to key: " + key +
                 " - payload size: " + payload.length() + " bytes, TTL: " + (2 * publishPeriodInMs) + "ms");
 
         redisPublisher.set(newArrayList(
@@ -460,7 +460,7 @@ public class MagnetoRedisService {
                 String.valueOf(2 * publishPeriodInMs)
         ), onPublishDone -> {
             if (onPublishDone.succeeded()) {
-                log.debug("[Magneto@MagnetoRedisService::publishAllMetadata] Successfully published metadata for " + boardCount + " boards");
+                log.info("[Magneto@MagnetoRedisService::publishAllMetadata] Successfully published metadata for " + boardCount + " boards");
                 promise.complete();
             } else {
                 log.error("[Magneto@MagnetoRedisService::publishAllMetadata] Failed to publish metadata for " + boardCount +
@@ -511,7 +511,7 @@ public class MagnetoRedisService {
             Handler<RealTimeStatus> subscriber = statusSubscribers.get(i);
             try {
                 subscriber.handle(status);
-                log.debug("[Magneto@MagnetoRedisService::notifyStatusChange] Notified subscriber " + (i + 1) + "/" + statusSubscribers.size());
+                log.info("[Magneto@MagnetoRedisService::notifyStatusChange] Notified subscriber " + (i + 1) + "/" + statusSubscribers.size());
             } catch (Exception e) {
                 log.error("[Magneto@MagnetoRedisService::notifyStatusChange] Error in status subscriber " + (i + 1), e);
             }
@@ -550,7 +550,7 @@ public class MagnetoRedisService {
      * Configuration des options Redis
      */
     private RedisOptions getRedisOptions(Vertx vertx, JsonObject conf) {
-        log.debug("[Magneto@MagnetoRedisService::getRedisOptions] Configuring Redis options");
+        log.info("[Magneto@MagnetoRedisService::getRedisOptions] Configuring Redis options");
         JsonObject redisConfig = conf.getJsonObject(Field.REDISCONFIG);
 
         if (redisConfig == null) {
@@ -560,7 +560,7 @@ public class MagnetoRedisService {
                 throw new IllegalStateException("missing.redis.config");
             } else {
                 redisConfig = new JsonObject(redisConf);
-                log.debug("[Magneto@MagnetoRedisService::getRedisOptions] Redis config loaded from shared data");
+                log.info("[Magneto@MagnetoRedisService::getRedisOptions] Redis config loaded from shared data");
             }
         }
 

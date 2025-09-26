@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import useWebSocket from "react-use-websocket";
 
@@ -29,23 +36,84 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 }) => {
   const [connectedUsers, setConnectedUsers] = useState<UserCollaboration[]>([]);
   const [cardEditing, setCardEditing] = useState<CardEditing[]>([]);
+  const lastWebSocketMessageRef = useRef<number>(Date.now());
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(
-    shouldConnect ? socketUrl : null,
-    {
-      onOpen: () => console.log("WebSocket connected"),
-      onClose: () => console.log("WebSocket disconnected"),
-      onError: (event: any) => {
-        console.log("🔴 WebSocket fermé à:", new Date());
-        console.log("📊 Code de fermeture:", event.code);
-        console.log("📝 Raison:", event.reason);
-        console.log("✅ Fermeture propre:", event.wasClean);
-      },
-      shouldReconnect: () => shouldConnect,
-      reconnectInterval: 3000,
-      reconnectAttempts: 10,
+  const {
+    sendMessage: originalSendMessage,
+    lastMessage,
+    readyState,
+    getWebSocket,
+  } = useWebSocket(shouldConnect ? socketUrl : null, {
+    onOpen: () => {
+      console.log("✅ WebSocket connected");
+      lastWebSocketMessageRef.current = Date.now();
+      startInactivityTimer();
     },
+
+    onClose: () => {
+      console.log("🔴 WebSocket disconnected");
+      stopInactivityTimer();
+    },
+
+    shouldReconnect: () => shouldConnect,
+    reconnectInterval: 3000,
+    reconnectAttempts: 10,
+  });
+
+  // Wrapper du sendMessage pour tracker l'activité
+  const sendMessage = useCallback(
+    (message: string) => {
+      lastWebSocketMessageRef.current = Date.now(); // ← Reset timer à chaque envoi
+      console.log("📤 Sending WebSocket message, resetting inactivity timer");
+      originalSendMessage(message);
+    },
+    [originalSendMessage],
   );
+
+  const startInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearInterval(inactivityTimerRef.current);
+    }
+
+    inactivityTimerRef.current = setInterval(() => {
+      const timeSinceLastMessage = Date.now() - lastWebSocketMessageRef.current;
+      const INACTIVITY_TIMEOUT = 4.9 * 60 * 1000; // 4min54, vu qu'on check cette condition toutes les 30s ça finira à 5mins
+
+      if (timeSinceLastMessage > INACTIVITY_TIMEOUT) {
+        console.log(
+          `⏰ No WebSocket messages sent for ${Math.round(
+            timeSinceLastMessage / 1000,
+          )}s - disconnecting`,
+        );
+        const ws = getWebSocket();
+        if (ws) {
+          ws.close(1000, "No activity timeout");
+        }
+        stopInactivityTimer();
+      } else {
+        console.log(
+          `🕐 Time since last WebSocket message: ${Math.round(
+            timeSinceLastMessage / 1000,
+          )}s`,
+        );
+      }
+    }, 30000); // Vérifier toutes les 30 secondes
+  }, [getWebSocket]);
+
+  const stopInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearInterval(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
+  }, []);
+
+  // Nettoyer à la destruction
+  useEffect(() => {
+    return () => {
+      stopInactivityTimer();
+    };
+  }, [stopInactivityTimer]);
 
   useEffect(() => {
     if (lastMessage) {

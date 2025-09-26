@@ -1,5 +1,14 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 import useWebSocket from "react-use-websocket";
 
 import {
@@ -29,18 +38,90 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 }) => {
   const [connectedUsers, setConnectedUsers] = useState<UserCollaboration[]>([]);
   const [cardEditing, setCardEditing] = useState<CardEditing[]>([]);
+  const [isDisconnectedForInactivity, setIsDisconnectedForInactivity] =
+    useState(false);
+  const lastWebSocketMessageRef = useRef<number>(Date.now());
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { t } = useTranslation("magneto");
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(
-    shouldConnect ? socketUrl : null,
+  const {
+    sendMessage: originalSendMessage,
+    lastMessage,
+    readyState,
+    getWebSocket,
+  } = useWebSocket(
+    shouldConnect && !isDisconnectedForInactivity ? socketUrl : null,
     {
-      onOpen: () => console.log("WebSocket connected"),
-      onClose: () => console.log("WebSocket disconnected"),
-      onError: (error: any) => console.error("WebSocket error:", error),
-      shouldReconnect: () => shouldConnect,
+      onOpen: () => {
+        setIsDisconnectedForInactivity(false);
+        lastWebSocketMessageRef.current = Date.now();
+        startInactivityTimer();
+      },
+
+      onClose: () => {
+        stopInactivityTimer();
+      },
+
+      shouldReconnect: () => {
+        if (isDisconnectedForInactivity) {
+          return false;
+        }
+        return shouldConnect;
+      },
+
       reconnectInterval: 3000,
       reconnectAttempts: 10,
     },
   );
+
+  const sendMessage = useCallback(
+    (message: string) => {
+      lastWebSocketMessageRef.current = Date.now();
+
+      if (isDisconnectedForInactivity) {
+        setIsDisconnectedForInactivity(false);
+      }
+
+      originalSendMessage(message);
+    },
+    [originalSendMessage, isDisconnectedForInactivity],
+  );
+
+  const startInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearInterval(inactivityTimerRef.current);
+    }
+
+    inactivityTimerRef.current = setInterval(() => {
+      const timeSinceLastMessage = Date.now() - lastWebSocketMessageRef.current;
+      const INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000; // 2h
+
+      if (timeSinceLastMessage > INACTIVITY_TIMEOUT) {
+        setIsDisconnectedForInactivity(true);
+
+        const ws = getWebSocket();
+        if (ws) {
+          ws.close(1000, "No activity timeout");
+        }
+        toast.warning(t("magneto.websocket.afk"));
+
+        stopInactivityTimer();
+      }
+    }, 30000);
+  }, [getWebSocket]);
+
+  const stopInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearInterval(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopInactivityTimer();
+    };
+  }, [stopInactivityTimer]);
 
   useEffect(() => {
     if (lastMessage) {
@@ -55,12 +136,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           setCardEditing(update.cardEditingInformations);
         }
 
-        // Appeler le callback personnalisé si fourni
         if (onMessage) {
           onMessage(update);
         }
 
-        // Notifier tous les callbacks RTK Query enregistrés
         notifyCacheUpdateCallbacks(update);
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);

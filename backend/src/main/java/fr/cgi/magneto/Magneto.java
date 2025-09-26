@@ -66,7 +66,8 @@ public class Magneto extends BaseServer {
         startPromise.tryFail("[Magneto@Magneto::start] Failed to start module Magneto.");
 
         // WebSocket
-        final HttpServerOptions options = new HttpServerOptions().setMaxWebSocketFrameSize(1024 * 1024);
+        final HttpServerOptions options = new HttpServerOptions().setMaxWebSocketFrameSize(1024 * 1024)
+                .setTcpKeepAlive(true);
         vertx.createHttpServer(options)
             .webSocketHandler(new CollaborationController(serviceFactory))
             .listen(magnetoConfig.websocketConfig().getPort(), asyncResult -> {

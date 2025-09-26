@@ -62,6 +62,7 @@ export const useBoardCard = (card: Card) => {
       resourceId: card.resourceId,
       resourceType: card.resourceType,
       resourceUrl: card.resourceUrl,
+      canBeIframed: card.canBeIframed,
       title: card.title,
     }),
     [
@@ -71,6 +72,7 @@ export const useBoardCard = (card: Card) => {
       card.resourceId,
       card.resourceType,
       card.resourceUrl,
+      card.canBeIframed,
       card.title,
       board._id,
     ],

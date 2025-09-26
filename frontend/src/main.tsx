@@ -12,8 +12,10 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 import { DEFAULT_THEME } from "./core/constants/preferences.const";
+import { TOAST_CONFIG } from "./core/constants/toast-config.const";
 import { MediaLibraryProvider } from "./providers/MediaLibraryProvider";
 import { router } from "./routes";
 import { setupStore } from "./store";
@@ -62,6 +64,7 @@ root.render(
         <EdificeThemeProvider>
           <ThemeProvider themeId={themePlatform ?? "default"}>
             <MediaLibraryProvider>
+              <ToastContainer {...TOAST_CONFIG} />
               <RouterProvider router={router} />
             </MediaLibraryProvider>
           </ThemeProvider>

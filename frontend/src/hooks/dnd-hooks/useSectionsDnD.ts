@@ -340,22 +340,19 @@ export const useSectionsDnD = (board: Board) => {
         if (readyState === WebSocket.OPEN) {
           sendMessage(
             JSON.stringify({
-              type: WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED,
-              section: {
-                boardId: board._id,
-                title: newSectionTitle,
-                cardIds: [activeCardId],
-              },
-            }),
-          );
-          sendMessage(
-            JSON.stringify({
-              type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
-              section: {
-                id: originalActiveSection._id,
-                boardId: board._id,
-                cardIds: newOriginalSectionCardIds,
-              },
+              type: WEBSOCKET_MESSAGE_TYPE.SECTION_ADDED_WITH_CARD,
+              sections: [
+                {
+                  boardId: board._id,
+                  title: newSectionTitle,
+                  cardIds: [activeCardId],
+                },
+                {
+                  id: originalActiveSection._id,
+                  boardId: board._id,
+                  cardIds: newOriginalSectionCardIds,
+                },
+              ],
             }),
           );
         } else {
@@ -444,22 +441,19 @@ export const useSectionsDnD = (board: Board) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
-                section: {
-                  id: originalActiveSection._id,
-                  boardId: board._id,
-                  cardIds: originalActiveSection.cardIds,
-                },
-              }),
-            );
-            sendMessage(
-              JSON.stringify({
-                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
-                section: {
-                  id: currentOverSectionWithoutNewCard._id,
-                  boardId: board._id,
-                  cardIds: currentOverSectionWithoutNewCard.cardIds,
-                },
+                type: WEBSOCKET_MESSAGE_TYPE.SECTIONS_UPDATED,
+                sections: [
+                  {
+                    id: currentOverSectionWithoutNewCard._id,
+                    boardId: board._id,
+                    cardIds: currentOverSectionWithoutNewCard.cardIds,
+                  },
+                  {
+                    id: originalActiveSection._id,
+                    boardId: board._id,
+                    cardIds: originalActiveSection.cardIds,
+                  },
+                ],
               }),
             );
           } else {
@@ -535,22 +529,19 @@ export const useSectionsDnD = (board: Board) => {
           if (readyState === WebSocket.OPEN) {
             sendMessage(
               JSON.stringify({
-                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
-                section: {
-                  id: originalActiveSection._id,
-                  boardId: board._id,
-                  cardIds: newOriginalSectionCardIds,
-                },
-              }),
-            );
-            sendMessage(
-              JSON.stringify({
-                type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
-                section: {
-                  id: currentOverSection._id,
-                  boardId: board._id,
-                  cardIds: newOverSectionCardIds,
-                },
+                type: WEBSOCKET_MESSAGE_TYPE.SECTIONS_UPDATED,
+                sections: [
+                  {
+                    id: originalActiveSection._id,
+                    boardId: board._id,
+                    cardIds: newOriginalSectionCardIds,
+                  },
+                  {
+                    id: currentOverSection._id,
+                    boardId: board._id,
+                    cardIds: newOverSectionCardIds,
+                  },
+                ],
               }),
             );
           } else {

@@ -8,6 +8,7 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   CARD_UPDATED = "cardUpdated",
   CARDS_DELETED = "cardsDeleted",
   SECTION_UPDATED = "sectionUpdated",
+  SECTIONS_UPDATED = "sectionsUpdated",
   CARD_DUPLICATED = "cardDuplicated",
   SECTION_DUPLICATED = "sectionDuplicated",
   SECTION_ADDED = "sectionAdded",
@@ -17,4 +18,5 @@ export enum WEBSOCKET_MESSAGE_TYPE {
   BOARD_MESSAGE = "boardMessage",
   CARD_EDITION_STARTED = "cardEditionStarted",
   CARD_EDITION_ENDED = "cardEditionEnded",
+  SECTION_ADDED_WITH_CARD = "sectionAddedWithCard",
 }

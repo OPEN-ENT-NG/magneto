@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.cgi.magneto.realtime.MagnetoMessageType;
 import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.model.comments.CommentPayload;
+import fr.cgi.magneto.realtime.MagnetoMessageType;
 import org.entcore.common.validation.ValidationException;
 
 import java.util.List;
@@ -26,6 +26,7 @@ public class MagnetoUserAction {
     private final String boardId;
     private final SectionPayload section;
     private final List<String> sectionIds;
+    private final List<SectionPayload> sections;
     private final CommentPayload comment;
     private final String commentId;
     private final Boolean isMoving;
@@ -43,6 +44,7 @@ public class MagnetoUserAction {
                                        @JsonProperty("boardId") final String boardId,
                                        @JsonProperty("section") final SectionPayload section,
                                        @JsonProperty("sectionIds") final List<String> sectionIds,
+                                       @JsonProperty("sections") final List<SectionPayload> sections,
                                        @JsonProperty("comment") final CommentPayload comment,
                                        @JsonProperty("commentId") final String commentId,
                                        @JsonProperty("isMoving") final Boolean isMoving,
@@ -58,6 +60,7 @@ public class MagnetoUserAction {
         this.boardId = boardId;
         this.section = section;
         this.sectionIds = sectionIds;
+        this.sections = sections;
         this.comment = comment;
         this.commentId = commentId;
         this.isMoving = isMoving;
@@ -87,6 +90,8 @@ public class MagnetoUserAction {
     public String getBoardId() { return boardId; }
 
     public SectionPayload getSection() { return section; }
+
+    public List<SectionPayload> getSections() { return sections; }
 
     public CommentPayload getComment() { return comment; }
 
@@ -154,6 +159,13 @@ public class MagnetoUserAction {
                 }
                 break;
             }
+            case sectionsUpdated:
+            case sectionAddedWithCard:{
+                if (this.sections == null){
+                    throw new ValidationException("magneto.action.section.missing");
+                }
+                break;
+            }
             case cardMoved: {
                 if (this.boardId == null || this.card == null) {
                     throw new ValidationException("magneto.action.moved.missing");
@@ -174,6 +186,7 @@ public class MagnetoUserAction {
                 ", card=" + card +
                 ", board=" + board +
                 ", section=" + section +
+                ", sections=" + sections +
                 ", comment=" + comment +
                 ", actionType=" + actionType +
                 ", actionId='" + actionId + '\'' +

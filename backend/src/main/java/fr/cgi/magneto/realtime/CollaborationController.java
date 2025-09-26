@@ -7,6 +7,7 @@ import fr.cgi.magneto.service.ServiceFactory;
 import fr.wseduc.webutils.request.CookieHelper;
 import fr.wseduc.webutils.request.filter.UserAuthFilter;
 import io.vertx.core.*;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
@@ -15,6 +16,7 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static fr.cgi.magneto.core.constants.Field.*;
@@ -89,7 +91,12 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         final String sessionId = CookieHelper.getInstance().getSigned(UserAuthFilter.SESSION_ID, ws);
         final Optional<String> optionalBoardId = getBoardId(ws.path());
         if (!optionalBoardId.isPresent()) {
-            log.error("[Magneto@CollaborationController::handle] No board id");
+            log.error("[Magneto@CollaborationController::handle] No board id found - closing websocket");
+            try {
+                ws.close((short) 1003, "Invalid board ID");
+            } catch (Exception e) {
+                log.error("[Magneto@CollaborationController::handle] Failed to close websocket for invalid board ID", e);
+            }
             return;
         }
 
@@ -98,7 +105,12 @@ public class CollaborationController implements Handler<ServerWebSocket> {
         UserUtils.getSession(vertx.eventBus(), sessionId, infos -> {
             try {
                 if (infos == null) {
-                    log.error("[Magneto@CollaborationController::handle] Not authenticated");
+                    log.error("[Magneto@CollaborationController::handle] User not authenticated - infos is null - closing websocket");
+                    try {
+                        ws.close((short) 1008, "Authentication failed");
+                    } catch (Exception e) {
+                        log.error("[Magneto@CollaborationController::handle] Failed to close websocket for auth failure", e);
+                    }
                     return;
                 }
 
@@ -108,6 +120,30 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 onConnect(session, boardId, wsId, ws)
                         .onSuccess(onSuccess -> {
                             ws.resume();
+
+                            final long[] pingTimerId = new long[1];
+
+                            AtomicBoolean connectionClosed = new AtomicBoolean(false);
+                            ws.closeHandler(e -> {
+                                if (pingTimerId[0] > 0) {
+                                    vertx.cancelTimer(pingTimerId[0]);
+                                }
+                                if (connectionClosed.compareAndSet(false, true)) {
+                                    log.info("[Magneto@CollaborationController::handle] Connection closed normally for wsId: " + wsId + ", boardId: " + boardId + ", userId: " + userId);
+                                    onCloseWSConnection(boardId, userId, wsId);
+                                }
+                            });
+
+                            pingTimerId[0] = vertx.setPeriodic(45000, timerId -> {
+                                if (!ws.isClosed()) {
+                                    log.debug("[Magneto@CollaborationController] Sending ping to wsId: " + wsId);
+                                    ws.writePing(Buffer.buffer("ping"));
+                                } else {
+                                    log.debug("[Magneto@CollaborationController] WebSocket closed, cancelling ping timer for wsId: " + wsId);
+                                    vertx.cancelTimer(timerId);
+                                }
+                            });
+
                             ws.frameHandler(frame -> {
                                 try {
                                     if (frame.isBinary()) {
@@ -373,6 +409,12 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 .map(message -> {
                     final String payload = message.toJson().encode();
                     final String boardId = message.getBoardId();
+                    if (payload.length() > 500000) {
+                        log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] 50% of authorized message length detected: " + payload.length() + " bytes for board: " + boardId);
+                    }
+                    if (payload.length() > 900000) {
+                        log.warn("[Magneto@CollaborationController::broadcastMessagesToUsers] 90% of authorized message length detected: " + payload.length() + " bytes for board: " + boardId);
+                    }
                     final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
                     final List<Future> writeMessagesPromise = wsIdToWs.entrySet().stream()
                             .filter(e -> !e.getKey().equals(exceptWsId))

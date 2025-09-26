@@ -9,6 +9,7 @@ import fr.cgi.magneto.core.enums.UserColor;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.WorkflowHelper;
+import fr.cgi.magneto.model.SectionPayload;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.Card;
@@ -287,6 +288,23 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         })
                         .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
+            case sectionsUpdated: {
+                SectionPayload firstSectionToUpdate = action.getSections().get(0);
+                SectionPayload secondSectionToUpdate = action.getSections().get(1);
+                return serviceFactory.sectionService().update(firstSectionToUpdate)
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::updateSection] Failed to update first section : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                        })
+                        .compose(res -> serviceFactory.sectionService().update(secondSectionToUpdate))
+                        .onFailure(err -> {
+                            String message = String.format("[Magneto@%s::updateSection] Failed to update second section : %s",
+                                    this.getClass().getSimpleName(), err.getMessage());
+                            log.error(message);
+                        })
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
+            }
             case cardFavorite: {
                 String cardId = action.getCardId();
                 if(user == null){
@@ -372,6 +390,14 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .compose(res -> serviceFactory.sectionService().get(Collections.singletonList(newId)))
                         .flatMap(sections -> this.serviceFactory.cardService().getAllCardsBySectionSimple(sections.get(0), null, user)
                                 .map(cards -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), sections.get(0).setCards(cards), action.getActionType(), action.getActionId()))));
+            }
+            case sectionAddedWithCard: {
+                String newId = UUID.randomUUID().toString();
+                SectionPayload newSection = action.getSections().get(0);
+                SectionPayload sectionToUpdate = action.getSections().get(1);
+                return serviceFactory.sectionService().createSectionWithBoardUpdate(newSection, newId)
+                        .compose(res -> serviceFactory.sectionService().update(sectionToUpdate))
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case cardsDeleted: {
                 List<String> cardIds = action.getCardsIds();

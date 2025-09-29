@@ -214,6 +214,9 @@ public class MagnetoRedisService {
 
             final MagnetoMessage message = mapper.readValue(payload, MagnetoMessage.class);
 
+            log.info("Message redis reçu : ");
+            log.info(message);
+
             if (!serverId.equals(message.getEmittedBy())) {
                 // Notifier tous les handlers du message reçu
                 for (final Handler<MagnetoMessageWrapper> messagesSubscriber : this.messageHandlers) {

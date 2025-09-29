@@ -572,7 +572,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     if (isMultiCluster && redisService != null) {
                         // Publier les métadonnées et les messages via Redis
                         return redisService.publishBoardMetadata(boardId)
-                                .compose(v -> redisService.publishMessages(Collections.singletonList(newUserMessage)))
+                                .compose(v -> redisService.publishMessages(messages))
                                 .map(v -> messages);
                     } else {
                         // Mode mono cluster
@@ -619,7 +619,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
         // Publier le message de déconnexion
         if (isMultiCluster && redisService != null) {
-            redisService.publishMessage(disconnectionMessage)
+            redisService.publishMessages(messages)
                     .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewDisconnection] Failed to publish disconnection", err));
         }
 

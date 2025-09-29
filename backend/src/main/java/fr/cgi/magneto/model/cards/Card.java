@@ -1,10 +1,11 @@
 package fr.cgi.magneto.model.cards;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.DateHelper;
+import fr.cgi.magneto.helper.JsonObjectDeserializer;
 import fr.cgi.magneto.model.Metadata;
 import fr.cgi.magneto.model.Model;
 import fr.cgi.magneto.model.comments.Comment;
@@ -52,7 +53,7 @@ public class Card implements Model<Card> {
     @JsonProperty("metadata")
     private Metadata metadata;
     @JsonProperty("lastComment")
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonDeserialize(using = JsonObjectDeserializer.class)
     private JsonObject lastComment;
     @JsonProperty("nbOfComments")
     private Integer nbOfComments;

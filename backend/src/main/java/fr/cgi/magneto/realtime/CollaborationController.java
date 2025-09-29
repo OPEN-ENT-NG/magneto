@@ -288,7 +288,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 .filter(m -> FULLACCESS.equals(m.getActionId()))
                 .findFirst();
 
-        String boardId = readOnlyMessage.get().getBoardId();
+        String boardId = messages.get(0).getBoardId();
         final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
 
         List<Future> futures = new ArrayList<>();
@@ -350,8 +350,8 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                 .filter(m -> OTHERUSERS.equals(m.getActionId()))
                 .findFirst();
 
-        String boardId = actualUserMessage.get().getBoardId();
-        String actualUserId = actualUserMessage.get().getUserId();
+        String boardId = messages.get(0).getBoardId();
+        String actualUserId = messages.get(0).getUserId();
         final Map<String, ServerWebSocket> wsIdToWs = boardIdToWSIdToWS.computeIfAbsent(boardId, k -> new HashMap<>());
 
         List<Future> futures = new ArrayList<>();

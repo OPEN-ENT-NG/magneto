@@ -620,62 +620,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             return redisService.publishMessages(messages).map(messages);
         else
             return Future.succeededFuture(messages);
-        /*
-            // Si plus personne n'est connecté, on peut supprimer le contexte
-            if (localContext.getConnectedUsers().isEmpty()) {
-                metadataByBoardId.remove(boardId);
-            }
-
-            if (isMultiCluster && redisService != null) {
-                // Publier les métadonnées mises à jour puis récupérer le contexte global
-                return redisService.publishBoardMetadata(boardId)
-                        .compose(v -> redisService.getBoardMetadata(boardId))
-                        .map(globalContext -> {
-                            final MagnetoMessage connectedUsersMessage = this.messageFactory.connectedUsers(
-                                    boardId, wsId, userId, globalContext.getConnectedUsers(), this.maxConnectedUser);
-
-                            final MagnetoMessage cardEditingMessage = this.messageFactory.cardEditing(
-                                    boardId, wsId, userId, globalContext.getEditing(), this.maxConnectedUser);
-
-
-                            messages.add(disconnectionMessage);
-                            messages.add(connectedUsersMessage);
-                            messages.add(cardEditingMessage);
-
-                            // Publier les messages
-                            redisService.publishMessages(messages)
-                                    .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewDisconnection] Failed to publish messages", err));
-
-                            return messages;
-                        })
-                        .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewDisconnection] Failed to publish to Redis", err));
-            } else {
-                // Mode mono-cluster : utiliser le contexte local
-                final MagnetoMessage connectedUsersMessage = this.messageFactory.connectedUsers(
-                        boardId, wsId, userId, localContext.getConnectedUsers(), this.maxConnectedUser);
-
-                final MagnetoMessage cardEditingMessage = this.messageFactory.cardEditing(
-                        boardId, wsId, userId, localContext.getEditing(), this.maxConnectedUser);
-
-                List<MagnetoMessage> messages = new ArrayList<>();
-                messages.add(disconnectionMessage);
-                messages.add(connectedUsersMessage);
-                messages.add(cardEditingMessage);
-
-                return Future.succeededFuture(messages);
-            }
-        } else {
-            // Si pas de contexte mais mode multi-cluster, publier quand même le message de déconnexion
-            List<MagnetoMessage> messages = new ArrayList<>();
-            messages.add(disconnectionMessage);
-
-            if (isMultiCluster && redisService != null) {
-                redisService.publishMessages(messages)
-                        .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewDisconnection] Failed to publish disconnection", err));
-            }
-
-            return Future.succeededFuture(messages);
-        }*/
     }
 
     /**

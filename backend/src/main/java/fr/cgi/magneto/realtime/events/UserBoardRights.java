@@ -1,8 +1,10 @@
 package fr.cgi.magneto.realtime.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr.cgi.magneto.core.enums.RightLevel;
 import io.vertx.core.json.JsonObject;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserBoardRights {
     private RightLevel maxRight = RightLevel.NONE;
 

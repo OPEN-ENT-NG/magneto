@@ -1,5 +1,6 @@
 package fr.cgi.magneto.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.enums.UserColor;
 import fr.cgi.magneto.model.Model;
@@ -9,6 +10,7 @@ import org.entcore.common.user.UserInfos;
 
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends UserInfos implements Model<User> {
 
     private UserBoardRights rights;

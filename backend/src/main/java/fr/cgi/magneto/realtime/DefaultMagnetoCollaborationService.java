@@ -609,17 +609,20 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         final CollaborationUsersMetadata localContext = this.metadataByBoardId.get(boardId);
 
         if (localContext != null) {
-            // Retirer l'utilisateur du contexte local
             localContext.removeConnectedUser(userId);
             localContext.getEditing().removeIf(info -> info.getUserId().equals(userId));
-            if (isMultiCluster && redisService != null)
-                redisService.publishBoardMetadata(boardId);
+
+            if (isMultiCluster && redisService != null) {
+                return redisService.publishBoardMetadata(boardId)
+                        .compose(v -> {
+                            List<MagnetoMessage> messages = newArrayList(disconnectionMessage);
+                            return redisService.publishMessages(messages).map(messages);
+                        });
+            }
         }
+
         List<MagnetoMessage> messages = newArrayList(disconnectionMessage);
-        if (isMultiCluster && redisService != null)
-            return redisService.publishMessages(messages).map(messages);
-        else
-            return Future.succeededFuture(messages);
+        return Future.succeededFuture(messages);
     }
 
     /**

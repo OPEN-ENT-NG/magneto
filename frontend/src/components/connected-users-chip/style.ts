@@ -130,10 +130,10 @@ export const BorderedAvatar = styled(Avatar)<{
 `;
 
 export const BorderedAvatarPlus = styled(Avatar)<{
-  borderColor: string;
+  backgroundColor: string;
   size?: "small" | "medium";
 }>`
-  background-color: ${({ borderColor }) => borderColor};
+  background-color: ${({ backgroundColor }) => backgroundColor};
   width: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")} !important;
   height: ${({ size }) => (size === "small" ? "3.6rem" : "4.0rem")} !important;
   font-size: 1.7rem;

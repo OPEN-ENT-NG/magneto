@@ -28,11 +28,11 @@ import {
   dividerStyle,
   onlineUsersTypographyStyle,
   userListStyle,
-  BorderedAvatar,
   currentUserBoxStyle,
   userInfoBoxStyle,
   otherUserRoleStyle,
   roleTypographyStyle,
+  BorderedAvatarPlus,
 } from "./style";
 import { UserAvatar } from "../user-avatar/UserAvatar";
 import { MUI_CONSTANTS } from "~/core/enums/MUI-constants.enum";
@@ -87,12 +87,12 @@ export const ConnectedUsersChip: FC = () => {
                   },
                 }}
                 renderSurplus={(surplus) => (
-                  <BorderedAvatar
-                    borderColor="var(--theme-palette-grey-dark)"
+                  <BorderedAvatarPlus
+                    backgroundColor="var(--theme-palette-grey-dark)"
                     size="medium"
                   >
                     +{surplus}
-                  </BorderedAvatar>
+                  </BorderedAvatarPlus>
                 )}
               >
                 {otherConnectedUsers.map((user) => (

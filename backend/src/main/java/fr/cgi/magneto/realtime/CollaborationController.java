@@ -116,7 +116,6 @@ public class CollaborationController implements Handler<ServerWebSocket> {
 
                 final UserInfos session = UserUtils.sessionToUserInfos(infos);
                 final String userId = session.getUserId();
-                ws.closeHandler(e -> onCloseWSConnection(boardId, userId, wsId));
                 onConnect(session, boardId, wsId, ws)
                         .onSuccess(onSuccess -> {
                             ws.resume();

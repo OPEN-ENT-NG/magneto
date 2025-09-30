@@ -254,11 +254,6 @@ public class MagnetoRedisService {
         final Promise<Void> promise = Promise.promise();
         log.debug("[Magneto@MagnetoRedisService::publishAllMetadata] Publishing all contexts to Redis...");
 
-        if (metadataByBoardId.isEmpty()) {
-            promise.complete();
-            return promise.future();
-        }
-
         final String payload = Json.encode(metadataByBoardId);
         redisPublisher.set(newArrayList(
                 metadataCollectionPrefix + serverId,

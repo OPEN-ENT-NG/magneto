@@ -132,6 +132,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           setConnectedUsers(update.connectedUsers);
         }
 
+        if (update.type === "disconnection" && update.userId) {
+          setConnectedUsers((prevUsers) =>
+            prevUsers.filter((user) => user.id !== update.userId),
+          );
+
+          setCardEditing((prevEditing) =>
+            prevEditing.filter((editing) => editing.userId !== update.userId),
+          );
+        }
+
         if (update.type === "cardEditing" && update.cardEditingInformations) {
           setCardEditing(update.cardEditingInformations);
         }

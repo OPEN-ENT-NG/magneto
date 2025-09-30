@@ -611,10 +611,15 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         if (localContext != null) {
             // Retirer l'utilisateur du contexte local
             localContext.removeConnectedUser(userId);
-
-            // Retirer toutes les cartes en cours d'édition par cet utilisateur
             localContext.getEditing().removeIf(info -> info.getUserId().equals(userId));
-
+            redisService.publishAllMetadata();
+        }
+        List<MagnetoMessage> messages = newArrayList(disconnectionMessage);
+        if (isMultiCluster && redisService != null)
+            return redisService.publishMessages(messages).map(messages);
+        else
+            return Future.succeededFuture(messages);
+        /*
             // Si plus personne n'est connecté, on peut supprimer le contexte
             if (localContext.getConnectedUsers().isEmpty()) {
                 metadataByBoardId.remove(boardId);
@@ -631,7 +636,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                             final MagnetoMessage cardEditingMessage = this.messageFactory.cardEditing(
                                     boardId, wsId, userId, globalContext.getEditing(), this.maxConnectedUser);
 
-                            List<MagnetoMessage> messages = new ArrayList<>();
+
                             messages.add(disconnectionMessage);
                             messages.add(connectedUsersMessage);
                             messages.add(cardEditingMessage);
@@ -669,7 +674,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             }
 
             return Future.succeededFuture(messages);
-        }
+        }*/
     }
 
     /**

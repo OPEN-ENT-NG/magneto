@@ -1,5 +1,8 @@
 package fr.cgi.magneto.realtime.events;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.model.Model;
 import io.vertx.core.json.JsonArray;
@@ -10,6 +13,7 @@ import java.util.List;
 /**
  * Information about a card being edited by a user.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CardEditingInformation implements Model<CardEditingInformation> {
 
     private String userId;
@@ -20,7 +24,12 @@ public class CardEditingInformation implements Model<CardEditingInformation> {
     public CardEditingInformation() {
     }
 
-    public CardEditingInformation(String userId, String cardId, Long since, Boolean isMoving) {
+    @JsonCreator
+    public CardEditingInformation(
+            @JsonProperty("userId") String userId,
+            @JsonProperty("cardId") String cardId,
+            @JsonProperty("since") Long since,
+            @JsonProperty("isMoving") Boolean isMoving) {
         this.userId = userId;
         this.cardId = cardId;
         this.since = since;

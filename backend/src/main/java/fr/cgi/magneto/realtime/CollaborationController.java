@@ -16,7 +16,6 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static fr.cgi.magneto.core.constants.Field.*;
@@ -121,20 +120,7 @@ public class CollaborationController implements Handler<ServerWebSocket> {
                         .onSuccess(onSuccess -> {
                             ws.resume();
 
-                            final long[] pingTimerId = new long[1];
-
-                            AtomicBoolean connectionClosed = new AtomicBoolean(false);
-                            ws.closeHandler(e -> {
-                                if (pingTimerId[0] > 0) {
-                                    vertx.cancelTimer(pingTimerId[0]);
-                                }
-                                if (connectionClosed.compareAndSet(false, true)) {
-                                    log.info("[Magneto@CollaborationController::handle] Connection closed normally for wsId: " + wsId + ", boardId: " + boardId + ", userId: " + userId);
-                                    onCloseWSConnection(boardId, userId, wsId);
-                                }
-                            });
-
-                            pingTimerId[0] = vertx.setPeriodic(45000, timerId -> {
+                            vertx.setPeriodic(45000, timerId -> {
                                 if (!ws.isClosed()) {
                                     log.debug("[Magneto@CollaborationController] Sending ping to wsId: " + wsId);
                                     ws.writePing(Buffer.buffer("ping"));

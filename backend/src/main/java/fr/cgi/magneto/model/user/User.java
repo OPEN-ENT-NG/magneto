@@ -58,11 +58,7 @@ public class User extends UserInfos implements Model<User> {
         return rights;
     }
 
-    public Boolean isReadOnly() {
-        return rights.isReadOnly();
-    }
-
-    public User setReadOnly(UserBoardRights rights) {
+    public User setRights(UserBoardRights rights) {
         this.rights = rights;
         return this;
     }

@@ -2,6 +2,7 @@ package fr.cgi.magneto.realtime.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.model.user.User;
 
 import java.util.ArrayList;
@@ -23,7 +24,9 @@ public class CollaborationUsersMetadata {
     }
 
     @JsonCreator
-    public CollaborationUsersMetadata(List<CardEditingInformation> editing, LinkedHashSet<User> connectedUsers) {
+    public CollaborationUsersMetadata(
+            @JsonProperty("editing") List<CardEditingInformation> editing,
+            @JsonProperty("connectedUsers") LinkedHashSet<User> connectedUsers) {
         this.editing = editing;
         this.connectedUsers = connectedUsers;
     }

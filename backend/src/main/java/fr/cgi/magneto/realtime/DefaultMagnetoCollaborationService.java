@@ -568,7 +568,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         // Mode mono-cluster : assigner une couleur basée sur le contexte local
                         UserColor assignedColor = assignColorToUser(boardId, localContext);
                         User userWithColor = new User(user.getUserId(), user.getUsername(), rights, assignedColor);
-                        localContext.addConnectedUser(userWithColor);
 
                         return Future.succeededFuture(buildMessages(boardId, wsId, user, userWithColor, localContext, wsIdToUser));
                     }
@@ -579,6 +578,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                                CollaborationUsersMetadata context,
                                                Map<String, User> wsIdToUser) {
         wsIdToUser.put(wsId, userWithColor);
+        context.addConnectedUser(userWithColor);
 
         // Créer les messages avec les métadonnées
         final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());

@@ -612,7 +612,8 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
             // Retirer l'utilisateur du contexte local
             localContext.removeConnectedUser(userId);
             localContext.getEditing().removeIf(info -> info.getUserId().equals(userId));
-            redisService.publishAllMetadata();
+            if (isMultiCluster && redisService != null)
+                redisService.publishBoardMetadata(boardId);
         }
         List<MagnetoMessage> messages = newArrayList(disconnectionMessage);
         if (isMultiCluster && redisService != null)

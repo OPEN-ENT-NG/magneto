@@ -250,7 +250,7 @@ public class MagnetoRedisService {
     /**
      * Publie les métadonnées de tous les boards actifs
      */
-    private Future<Void> publishAllMetadata() {
+    public Future<Void> publishAllMetadata() {
         final Promise<Void> promise = Promise.promise();
         log.debug("[Magneto@MagnetoRedisService::publishAllMetadata] Publishing all contexts to Redis...");
 
@@ -275,6 +275,42 @@ public class MagnetoRedisService {
             }
         });
         return promise.future();
+    }
+
+    /**
+     * Récupère le contexte utilisateurs complet pour un board donné
+     * (fusion des métadonnées locales et des autres instances Redis)
+     */
+    private Future<CollaborationUsersMetadata> getUsersContext(final String boardId) {
+        final Promise<CollaborationUsersMetadata> promise = Promise.promise();
+
+        this.redisPublisher.keys(metadataCollectionPrefix + "*", e -> {
+            if (e.succeeded()) {
+                log.debug("[Magneto@MagnetoRedisService::getUsersContext] Fetched context keys successfully");
+
+                final List<String> keys = e.result().stream()
+                        .map(Response::toString)
+                        .filter(key -> !key.endsWith(serverId))  // Exclure notre propre serveur
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                getOtherInstancesMetadata(boardId, keys)
+                        .map(otherInstancesMetadataResult -> {
+                            // Récupérer ou créer les métadonnées locales pour ce board
+                            final CollaborationUsersMetadata localMetadata = this.metadataByBoardId.computeIfAbsent(
+                                    boardId, k -> new CollaborationUsersMetadata());
+
+                            // Fusionner les métadonnées locales avec celles des autres instances
+                            return CollaborationUsersMetadata.merge(localMetadata, otherInstancesMetadataResult);
+                        })
+                        .onComplete(promise);
+            } else {
+                log.error("[Magneto@MagnetoRedisService::getUsersContext] Cannot get context keys for board: " + boardId);
+                promise.fail(e.cause());
+            }
+        });
+
+        return promise.future().onFailure(th -> notifyStatusChange(RealTimeStatus.ERROR));
     }
 
     /**

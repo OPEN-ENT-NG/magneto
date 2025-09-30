@@ -327,11 +327,6 @@ public class Board implements Model<Board> {
         return this.layoutType != null && this.layoutType.equals(Field.FREE);
     }
 
-    @JsonProperty("layoutFree")
-    public void setLayoutFree(boolean layoutFree) {
-        this.layoutType = layoutFree ? Field.FREE : "sections";
-    }
-
     public boolean isLocked() {
         return isLocked;
     }

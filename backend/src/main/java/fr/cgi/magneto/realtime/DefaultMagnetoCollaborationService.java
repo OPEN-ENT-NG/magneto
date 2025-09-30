@@ -546,7 +546,6 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
     public Future<List<MagnetoMessage>> onNewConnection(String boardId, UserInfos user, final String wsId, Map<String, User> wsIdToUser) {
         return getBoardRights(boardId, user)
                 .compose(rights -> {
-                    final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
 
                     // Récupérer ou créer le contexte pour ce board
                     final CollaborationUsersMetadata context = metadataByBoardId.computeIfAbsent(boardId, k -> new CollaborationUsersMetadata());
@@ -560,7 +559,23 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
 
                     wsIdToUser.put(wsId, userWithColor);
 
+                    if (isMultiCluster && redisService != null) {
+                        // Mode multi-cluster : récupérer le contexte global via Redis
+                        return redisService.getBoardMetadata(boardId)
+                                .compose(globalContext -> {
+                                    // Publier nos métadonnées locales
+                                    return redisService.publishBoardMetadata(boardId)
+                                            .map(v -> globalContext);
+                                });
+                    } else {
+                        // Mode mono-cluster : utiliser le contexte local
+                        return Future.succeededFuture(context);
+                    }
+                })
+                .map(context -> {
                     // Créer les messages avec les métadonnées
+                    final MagnetoMessage newUserMessage = this.messageFactory.connection(boardId, wsId, user.getUserId());
+
                     final MagnetoMessage connectedUsersMessage = this.messageFactory.connectedUsers(
                             boardId, wsId, user.getUserId(), context.getConnectedUsers(), this.maxConnectedUser);
 
@@ -570,14 +585,12 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                     List<MagnetoMessage> messages = Arrays.asList(newUserMessage, connectedUsersMessage, cardEditingMessage);
 
                     if (isMultiCluster && redisService != null) {
-                        // Publier les métadonnées et les messages via Redis
-                        return redisService.publishBoardMetadata(boardId)
-                                .compose(v -> redisService.publishMessages(messages))
-                                .map(v -> messages);
-                    } else {
-                        // Mode mono cluster
-                        return Future.succeededFuture(messages);
+                        // Publier les messages via Redis
+                        redisService.publishMessages(messages)
+                                .onFailure(err -> log.error("[Magneto@DefaultMagnetoCollaborationService::onNewConnection] Failed to publish messages to Redis", err));
                     }
+
+                    return messages;
                 });
     }
 

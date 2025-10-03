@@ -45,7 +45,7 @@ public class BoardTest {
     @Test
     public void testBoardHasBeenInstantiated(TestContext ctx) {
         Board board = new Board(boardJsonObject);
-        ctx.assertEquals(boardJsonObject, board.toJson());
+        ctx.assertEquals(boardJsonObject.encode(), board.toJson().encode());
     }
 
     @Test

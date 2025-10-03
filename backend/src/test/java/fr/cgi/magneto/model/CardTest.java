@@ -42,7 +42,13 @@ public class CardTest {
     @Test
     public void testCardHasBeenInstantiated(TestContext ctx) {
         Card card = new Card(cardJsonObject);
-        ctx.assertEquals(cardJsonObject, card.toJson());
+        JsonObject result = card.toJson();
+
+        // Copier les dates générées dans l'objet attendu pour la comparaison
+        cardJsonObject.put("modificationDate", result.getString("modificationDate"));
+        cardJsonObject.put("creationDate", result.getString("creationDate"));
+
+        ctx.assertEquals(cardJsonObject.encode(), result.encode());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package fr.cgi.magneto.model;
 
 import fr.cgi.magneto.model.boards.Board;
-import fr.cgi.magneto.model.cards.Card;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
@@ -13,6 +12,26 @@ import java.util.ArrayList;
 
 @RunWith(VertxUnitRunner.class)
 public class BoardTest {
+
+    JsonArray cardsArray = new JsonArray()
+            .add(new JsonObject().put("id", "cardId1").put("title", null).put("resourceType", null)
+                    .put("resourceId", null).put("resourceUrl", null).put("description", null)
+                    .put("caption", null).put("isLocked", false).put("locked", false)
+                    .put("modificationDate", null).put("creationDate", null).put("lastComment", new JsonObject())
+                    .put("nbOfComments", 0).put("metadata", null).put("boardId", null)
+                    .put("parentId", null).put("nbOfFavorites", 0).put("isLiked", false)
+                    .put("liked", false).put("favoriteList", new JsonArray()).put("canBeIframed", false)
+                    .put("comments", new JsonArray()).put("ownerId", null).put("ownerName", null)
+                    .put("lastModifierId", null).put("lastModifierName", null))
+            .add(new JsonObject().put("id", "cardId2").put("title", null).put("resourceType", null)
+                    .put("resourceId", null).put("resourceUrl", null).put("description", null)
+                    .put("caption", null).put("isLocked", false).put("locked", false)
+                    .put("modificationDate", null).put("creationDate", null).put("lastComment", new JsonObject())
+                    .put("nbOfComments", 0).put("metadata", null).put("boardId", null)
+                    .put("parentId", null).put("nbOfFavorites", 0).put("isLiked", false)
+                    .put("liked", false).put("favoriteList", new JsonArray()).put("canBeIframed", false)
+                    .put("comments", new JsonArray()).put("ownerId", null).put("ownerName", null)
+                    .put("lastModifierId", null).put("lastModifierName", null));
 
     JsonObject boardJsonObject = new JsonObject()
             .put("_id", "id")
@@ -39,7 +58,7 @@ public class BoardTest {
             .put("nbCards", 0)
             .put("nbCardsSections", 0)
             .put("isExternal", false)
-            .put("cards", new ArrayList<Card>())
+            .put("cards", cardsArray)
             .put("sections", new ArrayList<Section>());
 
     @Test

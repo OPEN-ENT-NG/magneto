@@ -28,6 +28,9 @@ public class Section implements Model {
     @JsonProperty("cards")
     private List<Card> cards;
 
+    @JsonProperty("colorHex")
+    private String colorHex;
+
     @SuppressWarnings("unchecked")
     public Section(JsonObject section) {
         this._id = section.getString(Field._ID, null);
@@ -38,10 +41,11 @@ public class Section implements Model {
             this.displayed = section.getBoolean(Field.DISPLAYED);
         if (section.containsKey(Field.CARDS))
             this.cards = section.getJsonArray(Field.CARDS).getList();
+        this.colorHex = section.getString(Field.COLORHEX);
     }
 
     public Section() {
-
+        this.colorHex = Field.COLORWHITE;
     }
 
     public String getId() {
@@ -112,13 +116,23 @@ public class Section implements Model {
         return this;
     }
 
+    public String getColorHex() {
+        return colorHex;
+    }
+
+    public Section setColorHex(String colorHex) {
+        this.colorHex = colorHex;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject()
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.CARDIDS, this.getCardIds())
-                .put(Field.BOARDID, this.getBoardId());
+                .put(Field.BOARDID, this.getBoardId())
+                .put(Field.COLORHEX, this.getColorHex());
         if (this.displayed != null)
             json.put(Field.DISPLAYED, this.getDisplayed());
         if (this.cards != null) {

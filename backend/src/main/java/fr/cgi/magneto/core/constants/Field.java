@@ -292,6 +292,5 @@ public class Field {
     public static final String RECONNECTION_DELAY_IN_MS = "reconnection-delay-in-ms";
     public static final String PUBLISH_CONTEXT_PERIOD_IN_MS = "publish-context-period-in-ms";
     public static final String ALLOWED_ORIGINS = "allowedOrigins";
-    public static final String COLORHEX = "colorHex";
     public static final String COLORWHITE = "#FFFFFF";
 }

@@ -49,6 +49,7 @@ export type Section = {
   page: number;
   cards: Card[];
   displayed?: boolean;
+  color?: string;
 };
 
 export type Sections = {

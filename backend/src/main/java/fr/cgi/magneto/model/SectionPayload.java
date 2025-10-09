@@ -14,6 +14,7 @@ public class SectionPayload implements Model {
     private List<String> cardIds;
     private String boardId;
     private Boolean displayed;
+    private String color;
 
     @SuppressWarnings("unchecked")
     public SectionPayload(JsonObject section) {
@@ -23,6 +24,8 @@ public class SectionPayload implements Model {
         this.boardId = section.getString(Field.BOARDID);
         if(section.containsKey(Field.DISPLAYED))
             this.displayed = section.getBoolean(Field.DISPLAYED);
+        if(section.containsKey(Field.COLOR))
+            this.color = section.getString(Field.COLOR);
     }
 
     public SectionPayload(String boardId) {
@@ -99,6 +102,15 @@ public class SectionPayload implements Model {
         return this;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public SectionPayload setColor(String color) {
+        this.color = color;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
@@ -113,6 +125,9 @@ public class SectionPayload implements Model {
         }
         if (this.getBoardId() != null) {
             json.put(Field.BOARDID, this.getBoardId());
+        }
+        if (this.getColor() != null) {
+            json.put(Field.COLOR, this.getColor());
         }
 
         // If create

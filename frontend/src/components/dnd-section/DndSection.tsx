@@ -15,6 +15,7 @@ export const DndSection: FC<DndSectionProps> = ({
   noCards = false,
   sectionNumber,
   readOnly = false,
+  color,
 }) => {
   const {
     attributes,
@@ -40,6 +41,8 @@ export const DndSection: FC<DndSectionProps> = ({
     cursor: listeners && id !== "new-section" && !readOnly ? "move" : "default",
   };
 
+  console.log(color);
+
   return (
     <SectionWrapper
       ref={setNodeRef}
@@ -50,6 +53,7 @@ export const DndSection: FC<DndSectionProps> = ({
       sectionNumber={sectionNumber}
       sectionType={sectionType}
       isDragging={isDragging}
+      color={color}
       {...(id === "new-section" || readOnly
         ? {}
         : { ...attributes, ...listeners })}

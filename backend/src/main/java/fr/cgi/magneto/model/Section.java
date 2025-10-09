@@ -41,7 +41,8 @@ public class Section implements Model {
             this.displayed = section.getBoolean(Field.DISPLAYED);
         if (section.containsKey(Field.CARDS))
             this.cards = section.getJsonArray(Field.CARDS).getList();
-        this.color = section.getString(Field.COLOR);
+        if (section.containsKey(Field.COLOR))
+            this.color = section.getString(Field.COLOR);
     }
 
     public Section() {
@@ -131,8 +132,9 @@ public class Section implements Model {
                 .put(Field._ID, this.getId())
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.CARDIDS, this.getCardIds())
-                .put(Field.BOARDID, this.getBoardId())
-                .put(Field.COLOR, this.getColor());
+                .put(Field.BOARDID, this.getBoardId());
+        if (this.color != null)
+            json.put(Field.COLOR, this.getColor());
         if (this.displayed != null)
             json.put(Field.DISPLAYED, this.getDisplayed());
         if (this.cards != null) {

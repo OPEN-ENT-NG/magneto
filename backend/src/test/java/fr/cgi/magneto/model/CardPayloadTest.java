@@ -30,6 +30,7 @@ public class CardPayloadTest {
             .put("isLocked", false)
             .put("parentId", "parentId")
             .put("boardId", "boardId")
+            .put("canBeIframed", null)
             .put("favoriteList", new JsonArray());
 
     JsonObject cardUpdateJsonObject_1 = new JsonObject()
@@ -45,6 +46,7 @@ public class CardPayloadTest {
             .put("lastModifierId", "lastModifierId")
             .put("lastModifierName", "lastModifierName")
             .put("modificationDate", "modificationDate")
+            .put("canBeIframed", null)
             .put("favoriteList", new JsonArray().getList());
 
     @Test

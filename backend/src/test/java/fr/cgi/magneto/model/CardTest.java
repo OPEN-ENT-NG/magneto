@@ -44,9 +44,10 @@ public class CardTest {
         Card card = new Card(cardJsonObject);
         JsonObject result = card.toJson();
 
-        // Copier les dates générées dans l'objet attendu pour la comparaison
+        // Copier l'id et les dates générées dans l'objet attendu pour la comparaison
         cardJsonObject.put("modificationDate", result.getString("modificationDate"));
         cardJsonObject.put("creationDate", result.getString("creationDate"));
+        cardJsonObject.put("id", result.getValue("id"));
 
         ctx.assertEquals(cardJsonObject.encode(), result.encode());
     }

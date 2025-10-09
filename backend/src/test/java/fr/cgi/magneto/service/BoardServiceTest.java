@@ -2,6 +2,7 @@ package fr.cgi.magneto.service;
 
 import fr.cgi.magneto.service.impl.DefaultBoardService;
 import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.webutils.security.SecuredAction;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
@@ -12,6 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RunWith(VertxUnitRunner.class)
 public class BoardServiceTest {
@@ -25,7 +29,8 @@ public class BoardServiceTest {
     public void setUp() {
         vertx = Vertx.vertx();
         MongoDb.getInstance().init(vertx.eventBus(), "fr.cgi.magneto");
-        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, mongoDb, null, new JsonObject());
+        Map<String, SecuredAction> securedActions = new HashMap<>();
+        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, mongoDb, securedActions, new JsonObject());
         this.boardService = new DefaultBoardService("board", mongoDb, serviceFactory);
     }
 

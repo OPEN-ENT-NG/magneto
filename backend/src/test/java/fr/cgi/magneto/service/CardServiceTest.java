@@ -1,17 +1,26 @@
 package fr.cgi.magneto.service;
 
+import fr.cgi.magneto.config.MagnetoConfig;
 import fr.cgi.magneto.service.impl.DefaultCardService;
 import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.webutils.security.SecuredAction;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.entcore.common.neo4j.Neo4j;
+import org.entcore.common.sql.Sql;
+import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.powermock.reflect.Whitebox;
+
+import java.util.Map;
 
 @RunWith(VertxUnitRunner.class)
 public class CardServiceTest {
@@ -21,12 +30,33 @@ public class CardServiceTest {
     private ServiceFactory serviceFactory;
     private CardService cardService;
 
+    @Mock
+    private Storage storage;
+    @Mock
+    private MagnetoConfig magnetoConfig;
+    @Mock
+    private Neo4j neo4j;
+    @Mock
+    private Sql sql;
+    @Mock
+    private Map<String, SecuredAction> securedActions;
+
 
     @Before
     public void setUp() {
         vertx = Vertx.vertx();
+        MockitoAnnotations.initMocks(this);
+        JsonObject config = new JsonObject();
         MongoDb.getInstance().init(vertx.eventBus(), "fr.cgi.magneto");
-        this.serviceFactory = new ServiceFactory(vertx, null, null, null, null, mongoDb, null, new JsonObject());
+
+        this.serviceFactory = new ServiceFactory(vertx,
+                storage,
+                magnetoConfig,
+                neo4j,
+                sql,
+                mongoDb,
+                securedActions,
+                config);
         this.cardService = new DefaultCardService("card", mongoDb, serviceFactory);
     }
     @Test

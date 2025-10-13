@@ -1,3 +1,5 @@
+import { ColorPickerSlotProps } from "@cgi-learning-hub/ui/dist";
+
 export const boxStyle = {
   position: "relative",
   boxSizing: "border-box",
@@ -30,3 +32,9 @@ export const iconButtonStyle = {
 };
 
 export const iconStyle = { fontSize: "3rem" };
+
+export const colorPickerStyle: ColorPickerSlotProps = {
+  circlePicker: {
+    width: "177px",
+  },
+};

@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 
+import { HexaColor } from "@cgi-learning-hub/ui/dist";
+
 export interface DndSectionProps {
   id: string;
   children: ReactNode;
@@ -7,7 +9,7 @@ export interface DndSectionProps {
   isLast?: boolean;
   isDragging?: boolean;
   readOnly?: boolean;
-  color?: string;
+  color?: HexaColor;
 
   //horizontal
   noCards?: boolean;

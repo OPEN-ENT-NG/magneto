@@ -16,7 +16,7 @@ export const styles: Record<string, CSSProperties> = {
     marginBottom: "1em",
   },
   formControlSpacingLarge: {
-    marginBottom: "1.5em",
+    marginBottom: "1.6rm",
   },
   footerButtonContainer: {
     float: "right" as const,
@@ -72,4 +72,35 @@ export const styles: Record<string, CSSProperties> = {
     display: "flex",
     gap: ".25em",
   },
+};
+
+export const subtitleStyle = {
+  fontFamily: "Comfortaa",
+  fontSize: "1.8rem",
+  color: "black",
+};
+
+export const subsubtitleStyle = {
+  fontFamily: "Roboto",
+  fontSize: "1.6rem",
+  color: "black",
+  opacity: "60%",
+};
+
+export const organisationBoxStyle = {
+  marginTop: "1.5rem",
+  marginBottom: "0.8rem",
+};
+
+export const radioLabelStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 1,
+  fontSize: "1.4rem",
+};
+
+export const radioIconStyle = {
+  fontSize: "2.4rem",
+  opacity: "60%",
+  color: "black",
 };

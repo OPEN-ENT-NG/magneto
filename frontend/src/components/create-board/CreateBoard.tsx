@@ -3,25 +3,36 @@ import React, { FC, useEffect, useState } from "react";
 // eslint-disable-next-line import/order
 import {
   Button,
-  Checkbox,
   FormControl,
   Grid,
   Input,
   Label,
   Modal,
-  Radio,
   TextArea,
   useEdificeClient,
 } from "@edifice.io/react";
 
 import { MediaLibrary } from "@edifice.io/react/multimedia";
-import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
-import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
-import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
-import { Box } from "@mui/material";
+import { ViewModule, ViewColumn, ViewStream } from "@mui/icons-material";
+import {
+  FormControl as FormControlMUI,
+  Radio,
+  Box,
+  Typography,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { styles } from "./style";
+import {
+  organisationBoxStyle,
+  radioIconStyle,
+  radioLabelStyle,
+  styles,
+  subsubtitleStyle,
+  subtitleStyle,
+} from "./style";
 import { CreateBoardProps } from "./types";
 import { MediaProps } from "../board-view/types";
 import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
@@ -289,75 +300,86 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                       />
                     </FormControl>
                   </div>
-                  <div style={styles.formControlSpacingLarge}>
-                    <h5 style={styles.formControlSpacingMedium}>
+                  <Box sx={organisationBoxStyle}>
+                    <Typography style={subtitleStyle}>
                       {t("magneto.create.board.options")}
-                    </h5>
-                    <Checkbox
-                      checked={isCommentChecked}
-                      label={t("magneto.board.allow.comments")}
-                      onChange={() =>
-                        setIsCommentChecked(
-                          (IsCommentChecked) => !IsCommentChecked,
-                        )
-                      }
-                    />
-                    <Checkbox
-                      checked={isFavoriteChecked}
-                      label={t("magneto.board.show.favorites")}
-                      onChange={() =>
-                        setIsFavoriteChecked(
-                          (isFavoriteChecked) => !isFavoriteChecked,
-                        )
-                      }
-                    />
-                    <Checkbox
-                      checked={isLockedChecked}
-                      label={t("magneto.board.lock.position")}
-                      onChange={() => setIsLockedChecked((prev) => !prev)}
-                    />
-                  </div>
-                  <div>
-                    <h5>{t("magneto.board.layout.choose")}</h5>
-                    <div style={styles.layoutOptionsContainer}>
-                      <div style={styles.layoutOption}>
-                        <Radio
-                          model={disposition}
-                          onChange={(e) => setDisposition(e.target.value)}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ paddingLeft: "0.5rem" }}>
+                    <FormControlMUI fullWidth>
+                      <FormLabel
+                        id="row-radio-buttons-group"
+                        sx={subsubtitleStyle}
+                      >
+                        {t("magneto.board.layout.choose")}
+                      </FormLabel>
+                      <RadioGroup
+                        row
+                        aria-labelledby="row-radio-buttons-group"
+                        value={disposition}
+                        onChange={(e) => setDisposition(e.target.value)}
+                        sx={{
+                          width: "100%",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <FormControlLabel
                           value="free"
-                          checked={disposition == "free"}
+                          control={
+                            <Radio
+                              sx={{
+                                "& .MuiSvgIcon-root": {
+                                  fontSize: 20,
+                                },
+                              }}
+                            />
+                          }
+                          label={
+                            <Box sx={radioLabelStyle}>
+                              Grille
+                              <ViewModule sx={radioIconStyle} />
+                            </Box>
+                          }
                         />
-                        <span style={styles.layoutText}>
-                          {t("magneto.create.board.display.free")}
-                        </span>
-                        <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
-                      </div>
-                      <div style={styles.layoutOption}>
-                        <Radio
-                          model={disposition}
-                          onChange={(e) => setDisposition(e.target.value)}
+                        <FormControlLabel
                           value="vertical"
-                          checked={disposition == "vertical"}
+                          control={
+                            <Radio
+                              sx={{
+                                "& .MuiSvgIcon-root": {
+                                  fontSize: 20,
+                                },
+                              }}
+                            />
+                          }
+                          label={
+                            <Box sx={radioLabelStyle}>
+                              Sections verticales
+                              <ViewColumn sx={radioIconStyle} />
+                            </Box>
+                          }
                         />
-                        <span style={styles.layoutText}>
-                          {t("magneto.create.board.display.vertical")}
-                        </span>
-                        <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
-                      </div>
-                      <div style={styles.layoutOption}>
-                        <Radio
-                          model={disposition}
-                          onChange={(e) => setDisposition(e.target.value)}
+                        <FormControlLabel
                           value="horizontal"
-                          checked={disposition == "horizontal"}
+                          control={
+                            <Radio
+                              sx={{
+                                "& .MuiSvgIcon-root": {
+                                  fontSize: 20,
+                                },
+                              }}
+                            />
+                          }
+                          label={
+                            <Box sx={radioLabelStyle}>
+                              Sections horizontales
+                              <ViewStream sx={radioIconStyle} />
+                            </Box>
+                          }
                         />
-                        <span style={styles.layoutText}>
-                          {t("magneto.create.board.display.horizontal")}
-                        </span>
-                        <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
-                      </div>
-                    </div>
-                  </div>
+                      </RadioGroup>
+                    </FormControlMUI>
+                  </Box>
                   <div style={styles.formControlSpacingMedium}>
                     <FormControl id="keywords">
                       <Label>{t("magneto.board.keywords")} :</Label>

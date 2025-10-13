@@ -1,4 +1,4 @@
-import { ColorPickerSlotProps } from "@cgi-learning-hub/ui/dist";
+import { Box, ColorPickerSlotProps, styled } from "@cgi-learning-hub/ui/dist";
 
 export const boxStyle = {
   position: "relative",
@@ -38,3 +38,10 @@ export const colorPickerStyle: ColorPickerSlotProps = {
     width: "177px",
   },
 };
+
+export const ColorCircle = styled(Box)<{ color: string }>(({ color }) => ({
+  width: "1.5rem",
+  height: "1.5rem",
+  borderRadius: "50%",
+  backgroundColor: color,
+}));

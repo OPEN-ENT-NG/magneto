@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 
 import {
   boxStyle,
-  colorPickerStyle,
+  ColorCircle,
   iconButtonStyle,
   iconStyle,
   inputStyle,
@@ -84,32 +84,6 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     failureMessage: t("magneto.create.section.error"),
   });
 
-  const update = () => {
-    if (readyState === WebSocket.OPEN) {
-      sendMessage(
-        JSON.stringify({
-          type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
-          section: {
-            boardId,
-            id: section?._id,
-            title: inputValue,
-            cardIds: section.cardIds,
-            color: color,
-          },
-        }),
-      );
-      return;
-    } else {
-      return updateSectionAndToast({
-        boardId,
-        id: section?._id,
-        title: inputValue,
-        cardIds: section.cardIds,
-        color: color,
-      });
-    }
-  };
-
   const handleKeyDownAndBlur = async () => {
     if (!inputValue) {
       setInputValue(section?.title ?? "");
@@ -117,7 +91,29 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
     }
     if (section?._id !== "new-section") {
       if (section.title === inputValue) return;
-      update();
+      if (readyState === WebSocket.OPEN) {
+        sendMessage(
+          JSON.stringify({
+            type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+            section: {
+              boardId,
+              id: section?._id,
+              title: inputValue,
+              cardIds: section.cardIds,
+              color: color,
+            },
+          }),
+        );
+        return;
+      } else {
+        return updateSectionAndToast({
+          boardId,
+          id: section?._id,
+          title: inputValue,
+          cardIds: section.cardIds,
+          color: color,
+        });
+      }
     }
     try {
       if (readyState === WebSocket.OPEN) {
@@ -159,7 +155,29 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
 
   const setColorAndUpdate = (value: HexaColor) => {
     setColor(value);
-    update();
+
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+          section: {
+            boardId,
+            id: section?._id,
+            title: inputValue,
+            cardIds: section.cardIds,
+            color: value,
+          },
+        }),
+      );
+    } else {
+      updateSectionAndToast({
+        boardId,
+        id: section?._id,
+        title: inputValue,
+        cardIds: section.cardIds,
+        color: value,
+      });
+    }
   };
 
   return (
@@ -173,7 +191,12 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
           <Icon path={mdiEyeOff} size={"inherit"} />
         </Box>
       )}
-      <ColorPicker value={color} onChange={setColorAndUpdate} />
+      {section._id !== "new-section" &&
+        (hasEditRights() ? (
+          <ColorPicker value={color} onChange={setColorAndUpdate} />
+        ) : (
+          <ColorCircle color={color} />
+        ))}
       <InputBase
         data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
         sx={inputStyle}

@@ -11,3 +11,13 @@ export const SORT_ORDER_OPTIONS = [
   { value: SORT_ORDER.OLDEST_FIRST, label: "Création (ancien → récent)" },
   { value: SORT_ORDER.NEWEST_FIRST, label: "Création (récent → ancien)" },
 ] as const;
+
+export enum POSITION_MODE {
+  FREE = "free",
+  ORDERED = "ordered",
+}
+
+export enum NEW_CARD_POSITION {
+  START = "start",
+  END = "end",
+}

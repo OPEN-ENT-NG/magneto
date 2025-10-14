@@ -1,6 +1,18 @@
 import React, { FC, useEffect, useState } from "react";
 
-import { Radio, RadioGroup } from "@cgi-learning-hub/ui";
+import {
+  Radio,
+  RadioGroup,
+  FormControl as FormControlMUI,
+  Box,
+  Typography,
+  FormLabel,
+  FormControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
+  MenuItem,
+  TextField,
+} from "@cgi-learning-hub/ui";
 import {
   Button,
   Checkbox,
@@ -20,17 +32,6 @@ import {
   MoveUpOutlined,
   MoveDownOutlined,
 } from "@mui/icons-material";
-import {
-  FormControl as FormControlMUI,
-  Box,
-  Typography,
-  FormLabel,
-  FormControlLabel,
-  ToggleButtonGroup,
-  ToggleButton,
-  MenuItem,
-  TextField,
-} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -65,7 +66,12 @@ import { MediaProps } from "../board-view/types";
 import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
-import { SORT_ORDER, SORT_ORDER_OPTIONS } from "~/core/enums/sort-order";
+import {
+  NEW_CARD_POSITION,
+  POSITION_MODE,
+  SORT_ORDER,
+  SORT_ORDER_OPTIONS,
+} from "~/core/enums/sort-order";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useImageHandler } from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
@@ -99,9 +105,13 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
   const { sendMessage, readyState } = useWebSocketMagneto();
-  const [positionMode, setPositionMode] = useState("free"); // "free" ou "ordered"
-  const [newCardPosition, setNewCardPosition] = useState("start"); // "start" ou "end"
-  const [sortOrder, setSortOrder] = useState("alphabetical"); // "alphabetical", "anti-alphabetical", "newest-first", "oldest-first"
+  const [positionMode, setPositionMode] = useState<POSITION_MODE>(
+    POSITION_MODE.FREE,
+  );
+  const [newCardPosition, setNewCardPosition] = useState<NEW_CARD_POSITION>(
+    NEW_CARD_POSITION.START,
+  );
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.ALPHABETICAL);
   const { width } = useWindowDimensions();
   const {
     thumbnail,
@@ -397,13 +407,13 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                         aria-labelledby="position-mode-radio-buttons-group"
                         value={positionMode}
                         onChange={(e) => {
-                          setPositionMode(e.target.value);
+                          setPositionMode(e.target.value as POSITION_MODE);
                         }}
                         sx={positionModeContainerStyle}
                       >
                         <Box sx={positionModeBoxStyle}>
                           <FormControlLabel
-                            value="free"
+                            value={POSITION_MODE.FREE}
                             control={<Radio sx={radioStyle} />}
                             label={
                               <Box sx={radioLabelStyle}>
@@ -414,7 +424,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                         </Box>
                         <Box sx={positionModeBoxStyle}>
                           <FormControlLabel
-                            value="ordered"
+                            value={POSITION_MODE.ORDERED}
                             control={<Radio sx={radioStyle} />}
                             label={
                               <Box sx={radioLabelStyle}>
@@ -437,15 +447,21 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                             onChange={(_e, value) => {
                               if (value !== null) setNewCardPosition(value);
                             }}
-                            disabled={positionMode === "ordered"}
+                            disabled={positionMode === POSITION_MODE.ORDERED}
                             size="medium"
                             sx={toggleButtonGroupStyle}
                           >
-                            <ToggleButton value="start" sx={toggleButtonStyle}>
+                            <ToggleButton
+                              value={NEW_CARD_POSITION.START}
+                              sx={toggleButtonStyle}
+                            >
                               <MoveUpOutlined sx={iconButtonStyle} />
                               {t("magneto.board.new.cards.start")}
                             </ToggleButton>
-                            <ToggleButton value="end" sx={toggleButtonStyle}>
+                            <ToggleButton
+                              value={NEW_CARD_POSITION.END}
+                              sx={toggleButtonStyle}
+                            >
                               <MoveDownOutlined sx={iconButtonEndStyle} />
                               {t("magneto.board.new.cards.end")}
                             </ToggleButton>
@@ -461,7 +477,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                             onChange={(e) =>
                               setSortOrder(e.target.value as SORT_ORDER)
                             }
-                            disabled={positionMode === "free"}
+                            disabled={positionMode === POSITION_MODE.FREE}
                             size="medium"
                             sx={selectFieldStyle}
                             InputLabelProps={{

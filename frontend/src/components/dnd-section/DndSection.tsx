@@ -41,8 +41,6 @@ export const DndSection: FC<DndSectionProps> = ({
     cursor: listeners && id !== "new-section" && !readOnly ? "move" : "default",
   };
 
-  console.log(color);
-
   return (
     <SectionWrapper
       ref={setNodeRef}

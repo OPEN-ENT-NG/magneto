@@ -5,6 +5,7 @@ import fr.cgi.magneto.Magneto;
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.Mongo;
+import fr.cgi.magneto.core.enums.SortOrCreateByEnum;
 import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.excpetion.RessourceNotFoundException;
 import fr.cgi.magneto.helper.*;
@@ -122,7 +123,11 @@ public class DefaultCardService implements CardService {
                                         .map(Card::getId)
                                         .collect(Collectors.toList());
 
-                                notLockedCards.add(0, id);
+                                if (board.getSortOrCreateBy() == SortOrCreateByEnum.END) {
+                                    notLockedCards.add(id);
+                                } else {
+                                    notLockedCards.add(0, id);
+                                }
 
                                 sortedPositions.forEach((originalPosition, lockedCard) -> {
                                     if (originalPosition < notLockedCards.size()) {

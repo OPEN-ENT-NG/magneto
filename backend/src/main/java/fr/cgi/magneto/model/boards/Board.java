@@ -3,6 +3,7 @@ package fr.cgi.magneto.model.boards;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.enums.SortOrCreateByEnum;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.ModelHelper;
 import fr.cgi.magneto.model.Model;
@@ -68,6 +69,8 @@ public class Board implements Model<Board> {
     private List<String> sectionsIds;
     @JsonProperty("cardIds")
     private List<String> cardIds;
+    @JsonProperty("sortOrCreateBy")
+    private SortOrCreateByEnum sortOrCreateBy;
 
     public Board() {
         this.owner = new User();
@@ -76,6 +79,7 @@ public class Board implements Model<Board> {
         this.cards = new ArrayList<>();
         this.sections = new ArrayList<>();
         this.tags = new ArrayList<>();
+        this.sortOrCreateBy = SortOrCreateByEnum.START;
     }
 
     // Méthodes Jackson pour shared
@@ -141,6 +145,10 @@ public class Board implements Model<Board> {
             this.sectionsIds = board.getJsonArray(Field.SECTIONIDS, new JsonArray()).getList();
         if (board.containsKey(Field.CARDIDS))
             this.cardIds = board.getJsonArray(Field.CARDIDS, new JsonArray()).getList();
+        if (board.containsKey(Field.SORTORCREATEBY)) {
+            String value = board.getString(Field.SORTORCREATEBY);
+            this.sortOrCreateBy = SortOrCreateByEnum.fromValue(value);
+        }
     }
 
     public String getId() {
@@ -398,6 +406,15 @@ public class Board implements Model<Board> {
     public List<String> getCardIds() { return cardIds; }
 
     public void setCardIds(List<String> cardIds) { this.cardIds = cardIds; }
+
+    public SortOrCreateByEnum getSortOrCreateBy() {
+        return sortOrCreateBy;
+    }
+
+    public Board setSortOrCreateBy(SortOrCreateByEnum sortOrCreateBy) {
+        this.sortOrCreateBy = sortOrCreateBy;
+        return this;
+    }
 
     public Board reset() {
         this.setId(null);

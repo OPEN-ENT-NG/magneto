@@ -28,6 +28,9 @@ public class Section implements Model {
     @JsonProperty("cards")
     private List<Card> cards;
 
+    @JsonProperty("color")
+    private String color;
+
     @SuppressWarnings("unchecked")
     public Section(JsonObject section) {
         this._id = section.getString(Field._ID, null);
@@ -38,10 +41,12 @@ public class Section implements Model {
             this.displayed = section.getBoolean(Field.DISPLAYED);
         if (section.containsKey(Field.CARDS))
             this.cards = section.getJsonArray(Field.CARDS).getList();
+        if (section.containsKey(Field.COLOR))
+            this.color = section.getString(Field.COLOR);
     }
 
     public Section() {
-
+        this.color = Field.COLORWHITE;
     }
 
     public String getId() {
@@ -112,6 +117,15 @@ public class Section implements Model {
         return this;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public Section setColor(String color) {
+        this.color = color;
+        return this;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject()
@@ -119,6 +133,8 @@ public class Section implements Model {
                 .put(Field.TITLE, this.getTitle())
                 .put(Field.CARDIDS, this.getCardIds())
                 .put(Field.BOARDID, this.getBoardId());
+        if (this.color != null)
+            json.put(Field.COLOR, this.getColor());
         if (this.displayed != null)
             json.put(Field.DISPLAYED, this.getDisplayed());
         if (this.cards != null) {

@@ -17,6 +17,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
   isDragging = false,
   noCards = true,
   sectionNumber = 0,
+  color = "FFFFFF",
 }) => {
   switch (sectionType) {
     case "vertical":
@@ -33,6 +34,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
         overflow: "hidden",
         opacity: isDragging ? "0.5" : "1",
         cursor: isDragging ? "grabbing" : "grab",
+        backgroundColor: color,
       };
     case "horizontal":
       return {
@@ -48,6 +50,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
         height: "100%",
         overflow: "hidden",
         alignSelf: "center",
+        backgroundColor: color,
       };
   }
 });

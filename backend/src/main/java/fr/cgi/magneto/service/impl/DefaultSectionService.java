@@ -145,7 +145,8 @@ public class DefaultSectionService implements SectionService {
                         .put(Field.TITLE, 1)
                         .put(Field.BOARDID, 1)
                         .put(Field.CARDIDS, 1)
-                        .put(Field.DISPLAYED, 1))
+                        .put(Field.DISPLAYED, 1)
+                        .put(Field.COLOR, 1))
                 ;
         return query.getAggregate();
     }

@@ -7,6 +7,7 @@ import {
   FC,
 } from "react";
 
+import { ColorPicker, HexaColor } from "@cgi-learning-hub/ui";
 import { useToast } from "@edifice.io/react";
 import { mdiEyeOff } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -14,7 +15,13 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Box, InputBase, IconButton } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { boxStyle, iconButtonStyle, iconStyle, inputStyle } from "./style";
+import {
+  boxStyle,
+  ColorCircle,
+  iconButtonStyle,
+  iconStyle,
+  inputStyle,
+} from "./style";
 import { SectionNameProps } from "./types";
 import { useCreateSectionDropDownItems } from "./useCreateSectionDropDownItems";
 import { DeleteSectionModal } from "../delete-section-modal/DeleteSectionModal";
@@ -34,6 +41,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const { sendMessage, readyState } = useWebSocketMagneto();
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [color, setColor] = useState<HexaColor>(section.color || "#FFFFFF");
   const toast = useToast();
   const { t } = useTranslation("magneto");
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
@@ -92,6 +100,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
               id: section?._id,
               title: inputValue,
               cardIds: section.cardIds,
+              color: color,
             },
           }),
         );
@@ -102,6 +111,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
           id: section?._id,
           title: inputValue,
           cardIds: section.cardIds,
+          color: color,
         });
       }
     }
@@ -143,6 +153,33 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
 
   const isOpen = openDropdownId === section?._id;
 
+  const setColorAndUpdate = (value: HexaColor) => {
+    setColor(value);
+
+    if (readyState === WebSocket.OPEN) {
+      sendMessage(
+        JSON.stringify({
+          type: WEBSOCKET_MESSAGE_TYPE.SECTION_UPDATED,
+          section: {
+            boardId,
+            id: section?._id,
+            title: inputValue,
+            cardIds: section.cardIds,
+            color: value,
+          },
+        }),
+      );
+    } else {
+      updateSectionAndToast({
+        boardId,
+        id: section?._id,
+        title: inputValue,
+        cardIds: section.cardIds,
+        color: value,
+      });
+    }
+  };
+
   return (
     <Box
       sx={boxStyle}
@@ -154,6 +191,12 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
           <Icon path={mdiEyeOff} size={"inherit"} />
         </Box>
       )}
+      {section._id !== "new-section" &&
+        (hasEditRights() ? (
+          <ColorPicker value={color} onChange={setColorAndUpdate} />
+        ) : (
+          <ColorCircle color={color} />
+        ))}
       <InputBase
         data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
         sx={inputStyle}

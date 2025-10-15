@@ -1,5 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
+import { HexaColor } from "@cgi-learning-hub/ui/dist";
 import { RightRole, WorkspaceElement } from "@edifice.io/client";
 
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
@@ -49,6 +50,7 @@ export type Section = {
   page: number;
   cards: Card[];
   displayed?: boolean;
+  color?: HexaColor;
 };
 
 export type Sections = {

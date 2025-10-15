@@ -112,6 +112,7 @@ const MemoizedSection = memo(
       isLast={isLast}
       data-type={!isDraggable ? DND_ITEM_TYPE.NON_DRAGGABLE : undefined}
       readOnly={!hasManageRights}
+      color={section?.color}
     >
       <Box sx={sectionNameWrapperStyle}>
         <SectionName section={section} />

@@ -241,16 +241,8 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());
-                Future<JsonObject> updateCardFuture = this.serviceFactory.cardService().update(updateCard);
-                Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(updateCard.getBoardId()));
-                return CompositeFuture.all(updateCardFuture, getBoardFuture)
-                        .compose(result -> {
-                            Board currentBoard = getBoardFuture.result().get(0);
-                            BoardPayload boardToUpdate = new BoardPayload()
-                                    .setId(currentBoard.getId())
-                                    .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
-                            return this.serviceFactory.boardService().update(boardToUpdate);
-                        })
+
+                return this.serviceFactory.cardService().updateCardAndResort(updateCard, user)
                         .compose(saved -> this.serviceFactory.cardService().getCards(newArrayList(action.getCard().getId()), user))
                         .map(cards -> {
                             Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(updateCard.getId()) : cards.get(0);

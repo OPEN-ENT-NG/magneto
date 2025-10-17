@@ -7,8 +7,6 @@ import fr.cgi.magneto.excpetion.BadRequestException;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.HttpRequestHelper;
 import fr.cgi.magneto.helper.I18nHelper;
-import fr.cgi.magneto.model.boards.Board;
-import fr.cgi.magneto.model.boards.BoardPayload;
 import fr.cgi.magneto.model.cards.CardPayload;
 import fr.cgi.magneto.security.DuplicateCardRight;
 import fr.cgi.magneto.security.ReadBoardRight;
@@ -23,8 +21,6 @@ import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
@@ -216,21 +212,14 @@ public class CardController extends ControllerHelper {
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());
-                Future<JsonObject> updateCardFuture = cardService.update(updateCard);
-                Future<List<Board>> getBoardFuture = boardService.getBoards(Collections.singletonList(updateCard.getBoardId()));
-                CompositeFuture.all(updateCardFuture, getBoardFuture)
-                        .compose(result -> {
-                            Board currentBoard = getBoardFuture.result().get(0);
-                            BoardPayload boardToUpdate = new BoardPayload()
-                                    .setId(currentBoard.getId())
-                                    .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
-                            return boardService.update(boardToUpdate);
-                        })
+
+                cardService.updateCardAndResort(updateCard, user)
                         .onFailure(err -> renderError(request))
                         .onSuccess(res -> renderJson(request, res));
             });
         });
     }
+
     @Put("/card/:id/favorite")
     @ApiDoc("Update the favorites of a card")
     @ResourceFilter(ReadBoardRight.class)

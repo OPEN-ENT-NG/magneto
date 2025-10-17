@@ -205,4 +205,24 @@ public interface CardService {
     Future<JsonObject> duplicateSection(String boardId, List<Card> cardsFilter, SectionPayload setId, UserInfos user);
 
     Future<Void> processMoveCard(CardPayload updateCard, String oldBoardId, String newBoardId, UserInfos user, I18nHelper i18nHelper);
+
+    /**
+     * Resort cards after an update (when title changes)
+     *
+     * @param board Board containing the card
+     * @param updatedCard Updated card
+     * @param sections Sections of the board
+     * @param user User info
+     * @return Future {@link Future<JsonObject>} containing update result
+     */
+    Future<JsonObject> resortCardsAfterUpdate(Board board, CardPayload updatedCard, List<Section> sections, UserInfos user);
+
+    /**
+     * Update a card and resort if necessary based on board strategy
+     *
+     * @param updateCard Card to update
+     * @param user User info
+     * @return Future {@link Future<JsonObject>} containing board update result
+     */
+    Future<JsonObject> updateCardAndResort(CardPayload updateCard, UserInfos user);
 }

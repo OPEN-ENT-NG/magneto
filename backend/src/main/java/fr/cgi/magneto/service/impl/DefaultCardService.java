@@ -504,7 +504,7 @@ public class DefaultCardService implements CardService {
                 .compose(result -> {
                     if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
                         BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
-                        if (boardPayload.getSortOrCreateBy().isOrderedPositionStrategy()){
+                        if (boardPayload.getSortOrCreateBy() != null && boardPayload.getSortOrCreateBy().isOrderedPositionStrategy()){
                             // Mode trié : on gère tout ici
                             if (boardPayload.isLayoutFree()) {
                                 return this.getAllCardsByBoard(getBoardFuture.result().get(0), 0, user, false)

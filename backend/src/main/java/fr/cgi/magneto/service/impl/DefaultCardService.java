@@ -609,7 +609,7 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy) {
+    public List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy) {
         Comparator<Card> comparator;
 
         switch (strategy) {
@@ -1781,5 +1781,43 @@ public class DefaultCardService implements CardService {
 
                     return this.serviceFactory.boardService().update(boardToUpdate);
                 });
+    }
+
+    @Override
+    public Future<JsonObject> resortAllCardsInBoard(Board board, UserInfos user) {
+        if (board.isLayoutFree()) {
+            // Mode libre : trier les cartes du board
+            return this.getAllCardsByBoard(board, null, user, false)
+                    .compose(cardsResult -> {
+                        List<Card> cards = cardsResult.getJsonArray(Field.ALL).getList();
+                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy());
+
+                        BoardPayload boardPayload = new BoardPayload()
+                                .setId(board.getId())
+                                .setCardIds(sortedCardIds);
+
+                        return this.serviceFactory.boardService().update(boardPayload);
+                    });
+        } else {
+            // Mode section : trier les cartes de chaque section
+            return this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
+                    .compose(sections -> {
+                        List<Future> sortSectionFutures = new ArrayList<>();
+
+                        for (Section section : sections) {
+                            Future<JsonObject> sortFuture = this.fetchAllCardsBySection(section, 0, user)
+                                    .compose(cards -> {
+                                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy());
+                                        SectionPayload sectionPayload = new SectionPayload(section.toJson());
+                                        sectionPayload.setCardIds(sortedCardIds);
+                                        return this.serviceFactory.sectionService().update(sectionPayload);
+                                    });
+                            sortSectionFutures.add(sortFuture);
+                        }
+
+                        return CompositeFuture.all(sortSectionFutures)
+                                .map(new JsonObject());
+                    });
+        }
     }
 }

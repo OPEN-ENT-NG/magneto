@@ -402,7 +402,7 @@ public class BoardPayload implements Model<BoardPayload> {
             json.put(Field.ISEXTERNAL, this.getIsExternal());
         }
         if (this.getSortOrCreateBy() != null) {
-            json.put(Field.ISEXTERNAL, this.getIsExternal());
+            json.put(Field.SORTORCREATEBY, this.getSortOrCreateBy().getValue());
         }
 
         return json;

@@ -1,5 +1,6 @@
 package fr.cgi.magneto.service;
 
+import fr.cgi.magneto.core.enums.SortOrCreateByEnum;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.SectionPayload;
@@ -225,4 +226,22 @@ public interface CardService {
      * @return Future {@link Future<JsonObject>} containing board update result
      */
     Future<JsonObject> updateCardAndResort(CardPayload updateCard, UserInfos user);
+
+    /**
+     * Sort cards by strategy
+     *
+     * @param cards List of cards to sort
+     * @param strategy Sort strategy
+     * @return List of sorted card IDs
+     */
+    List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy);
+
+    /**
+     * Resort all cards in a board or its sections based on sort strategy
+     *
+     * @param board Board to resort
+     * @param user User info
+     * @return Future {@link Future<JsonObject>} containing update result
+     */
+    Future<JsonObject> resortAllCardsInBoard(Board board, UserInfos user);
 }

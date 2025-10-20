@@ -67,9 +67,8 @@ import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import {
-  NEW_CARD_POSITION,
   POSITION_MODE,
-  SORT_ORDER,
+  SORT_OR_CREATE_BY,
   SORT_ORDER_OPTIONS,
 } from "~/core/enums/sort-order";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
@@ -108,10 +107,12 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [positionMode, setPositionMode] = useState<POSITION_MODE>(
     POSITION_MODE.FREE,
   );
-  const [newCardPosition, setNewCardPosition] = useState<NEW_CARD_POSITION>(
-    NEW_CARD_POSITION.START,
+  const [newCardPosition, setNewCardPosition] = useState<SORT_OR_CREATE_BY>(
+    SORT_OR_CREATE_BY.START,
   );
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.ALPHABETICAL);
+  const [sortOrder, setSortOrder] = useState<SORT_OR_CREATE_BY>(
+    SORT_OR_CREATE_BY.ALPHABETICAL,
+  );
   const { width } = useWindowDimensions();
   const {
     thumbnail,
@@ -149,6 +150,8 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     board.isLocked = isLockedChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
+    board.sortOrCreateBy =
+      positionMode === POSITION_MODE.FREE ? newCardPosition : sortOrder;
   };
 
   const resetFields = (): void => {
@@ -162,6 +165,9 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setDisposition("free");
       setTagsTextInput("");
       setMedia(null);
+      setPositionMode(POSITION_MODE.FREE);
+      setNewCardPosition(SORT_OR_CREATE_BY.START);
+      setSortOrder(SORT_OR_CREATE_BY.ALPHABETICAL);
     }
     handleDeleteThumbnail();
     handleDeleteBackground();
@@ -239,6 +245,18 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setTagsTextInput(boardToUpdate.tagsTextInput);
       setIsLockedChecked(boardToUpdate.isLocked);
       setTags(boardToUpdate.tags);
+      if (boardToUpdate.sortOrCreateBy) {
+        if (
+          boardToUpdate.sortOrCreateBy === SORT_OR_CREATE_BY.START ||
+          boardToUpdate.sortOrCreateBy === SORT_OR_CREATE_BY.END
+        ) {
+          setPositionMode(POSITION_MODE.FREE);
+          setNewCardPosition(boardToUpdate.sortOrCreateBy);
+        } else {
+          setPositionMode(POSITION_MODE.ORDERED);
+          setSortOrder(boardToUpdate.sortOrCreateBy);
+        }
+      }
       if (boardToUpdate.imageUrl) {
         setThumbnail({
           type: MEDIA_LIBRARY_TYPE.IMAGE,
@@ -452,14 +470,14 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                             sx={toggleButtonGroupStyle}
                           >
                             <ToggleButton
-                              value={NEW_CARD_POSITION.START}
+                              value={SORT_OR_CREATE_BY.START}
                               sx={toggleButtonStyle}
                             >
                               <MoveUpOutlined sx={iconButtonStyle} />
                               {t("magneto.board.new.cards.start")}
                             </ToggleButton>
                             <ToggleButton
-                              value={NEW_CARD_POSITION.END}
+                              value={SORT_OR_CREATE_BY.END}
                               sx={toggleButtonStyle}
                             >
                               <MoveDownOutlined sx={iconButtonEndStyle} />
@@ -475,7 +493,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                             label={t("magneto.board.sort.by")}
                             value={sortOrder}
                             onChange={(e) =>
-                              setSortOrder(e.target.value as SORT_ORDER)
+                              setSortOrder(e.target.value as SORT_OR_CREATE_BY)
                             }
                             disabled={positionMode === POSITION_MODE.FREE}
                             size="medium"

@@ -1,5 +1,8 @@
 package fr.cgi.magneto.core.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum SortOrCreateByEnum {
     // Pour le mode libre (free)
     START("start"),
@@ -17,6 +20,7 @@ public enum SortOrCreateByEnum {
         this.value = value;
     }
 
+    @JsonCreator
     public static SortOrCreateByEnum fromValue(String value) {
         for (SortOrCreateByEnum strategy : SortOrCreateByEnum.values()) {
             if (strategy.value.equals(value)) {
@@ -26,6 +30,7 @@ public enum SortOrCreateByEnum {
         throw new IllegalArgumentException("Unknown SortOrCreateByEnum value: " + value);
     }
 
+    @JsonValue
     public String getValue() {
         return this.value;
     }

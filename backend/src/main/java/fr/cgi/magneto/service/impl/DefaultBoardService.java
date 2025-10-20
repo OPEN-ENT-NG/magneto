@@ -341,7 +341,7 @@ public class DefaultBoardService implements BoardService {
                         List<String> cardIds;
 
                         // Si stratégie ordonnée, trier les cartes
-                        if (updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
+                        if (updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
                             cardIds = cardService.sortCardsByStrategy(cards, updateBoard.getSortOrCreateBy());
                         } else {
                             cardIds = currentBoard.getCardIds();
@@ -365,7 +365,7 @@ public class DefaultBoardService implements BoardService {
                         List<String> cardIds;
 
                         // Si stratégie ordonnée, trier les cartes
-                        if (updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
+                        if (updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
                             cardIds = cardService.sortCardsByStrategy(cardsList, updateBoard.getSortOrCreateBy());
                         } else {
                             cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());
@@ -379,8 +379,8 @@ public class DefaultBoardService implements BoardService {
                     });
         } else {
             // Pas de changement de layout, mais vérifier si on doit trier
-            boolean needsResorting = updateBoard.getSortOrCreateBy().isOrderedPositionStrategy() &&
-                    !currentBoard.getSortOrCreateBy().equals(updateBoard.getSortOrCreateBy());
+            boolean needsResorting = updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy() &&
+                    (currentBoard.getSortOrCreateBy() == null || !currentBoard.getSortOrCreateBy().equals(updateBoard.getSortOrCreateBy()));
 
             if (needsResorting) {
                 // Créer un board temporaire avec la nouvelle stratégie pour le tri

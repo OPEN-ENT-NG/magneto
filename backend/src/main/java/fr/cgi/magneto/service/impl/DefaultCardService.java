@@ -1767,7 +1767,7 @@ public class DefaultCardService implements CardService {
                             .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
 
                     // Si le board utilise une stratégie de tri ordonnée, on doit retrier
-                    if (currentBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
+                    if (currentBoard.getSortOrCreateBy() != null && currentBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
                         // Charger les sections seulement si ce n'est pas un layout libre
                         if (!currentBoard.isLayoutFree()) {
                             return this.serviceFactory.sectionService().getSectionsByBoardId(updateCard.getBoardId())

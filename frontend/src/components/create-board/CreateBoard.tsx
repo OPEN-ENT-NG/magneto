@@ -63,6 +63,7 @@ import {
 } from "./style";
 import { CreateBoardProps } from "./types";
 import { MediaProps } from "../board-view/types";
+import { Tooltip } from "../tooltip/Tooltip";
 import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
@@ -255,6 +256,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
         } else {
           setPositionMode(POSITION_MODE.ORDERED);
           setSortOrder(boardToUpdate.sortOrCreateBy);
+          setIsLockedChecked(true);
         }
       }
       if (boardToUpdate.imageUrl) {
@@ -277,6 +279,12 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       }
     }
   }, [boardToUpdate, isOpen]);
+
+  useEffect(() => {
+    if (positionMode === POSITION_MODE.ORDERED) {
+      setIsLockedChecked(true);
+    }
+  }, [positionMode]);
 
   return (
     <>
@@ -522,16 +530,40 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     </FormControlMUI>
                   </Box>
                   <Box sx={paddingBottomTwoRemStyle}>
-                    <Checkbox
-                      checked={isLockedChecked}
-                      label={t("magneto.board.lock.position")}
-                      onChange={() => setIsLockedChecked((prev) => !prev)}
-                    />
+                    <Tooltip
+                      title={
+                        positionMode === POSITION_MODE.ORDERED
+                          ? t("magneto.board.lock.position.tooltip.ordered")
+                          : ""
+                      }
+                      placement="top-start"
+                      width="auto"
+                      offsetY={0.7}
+                      useSlotPropsOffset
+                    >
+                      <span>
+                        <Checkbox
+                          checked={isLockedChecked}
+                          label={t("magneto.board.lock.position")}
+                          onChange={() => setIsLockedChecked((prev) => !prev)}
+                          disabled={positionMode === POSITION_MODE.ORDERED}
+                        />
+                      </span>
+                    </Tooltip>
                   </Box>
                   <Box sx={optionsBoxStyle}>
                     <Typography sx={subtitleWithSpaceStyle}>
                       {t("magneto.create.board.options")}
                     </Typography>
+                    <Checkbox
+                      checked={isCommentChecked}
+                      label={t("magneto.board.allow.comments")}
+                      onChange={() =>
+                        setIsCommentChecked(
+                          (IsCommentChecked) => !IsCommentChecked,
+                        )
+                      }
+                    />
                     <Checkbox
                       checked={isFavoriteChecked}
                       label={t("magneto.board.show.favorites")}
@@ -540,11 +572,6 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                           (isFavoriteChecked) => !isFavoriteChecked,
                         )
                       }
-                    />
-                    <Checkbox
-                      checked={isLockedChecked}
-                      label={t("magneto.board.lock.position")}
-                      onChange={() => setIsLockedChecked((prev) => !prev)}
                     />
                   </Box>
                   <Box style={styles.formControlSpacingMedium}>

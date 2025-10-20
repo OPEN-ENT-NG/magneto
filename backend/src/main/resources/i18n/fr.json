@@ -124,6 +124,7 @@
   "magneto.board.new.cards.start": "Au début",
   "magneto.board.new.cards.end": "A la fin",
   "magneto.board.sort.by": "Trier par *",
+  "magneto.board.lock.position.tooltip.ordered": "Les aimants sont obligatoirement figés en cas d’ordre imposé.",
   "magneto.duplicate": "Dupliquer",
   "magneto.restore": "Restaurer",
   "magneto.move": "Déplacer",

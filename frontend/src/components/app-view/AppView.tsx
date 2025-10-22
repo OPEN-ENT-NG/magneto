@@ -40,6 +40,7 @@ export const AppView: FC = () => {
     setSelectedBoards,
     setSelectedBoardsIds,
     boardsLoading,
+    setSearchText: setProviderSearchText,
   } = useBoardsNavigation();
   const [dragAndDropBoards, setDragAndDropBoards] = useState<Board[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -167,7 +168,11 @@ export const AppView: FC = () => {
                 size="md"
                 isVariant={false}
                 key={searchBarResetter}
-                onChange={(event) => setSearchText(event.target.value)}
+                onChange={(event) => {
+                  const newSearchText = event.target.value;
+                  setSearchText(newSearchText);
+                  setProviderSearchText(newSearchText);
+                }}
               />
             </div>
             <FolderTitle

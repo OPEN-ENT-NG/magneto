@@ -521,7 +521,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                           >
                             {SORT_ORDER_OPTIONS.map((option) => (
                               <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                                {t(option.label)}
                               </MenuItem>
                             ))}
                           </TextField>

@@ -13,14 +13,20 @@ export enum SORT_OR_CREATE_BY {
 }
 
 export const SORT_ORDER_OPTIONS = [
-  { value: SORT_OR_CREATE_BY.ALPHABETICAL, label: "Titre (A → Z)" },
-  { value: SORT_OR_CREATE_BY.ANTI_ALPHABETICAL, label: "Titre (Z → A)" },
+  {
+    value: SORT_OR_CREATE_BY.ALPHABETICAL,
+    label: "magneto.sort.order.options.alphabetical",
+  },
+  {
+    value: SORT_OR_CREATE_BY.ANTI_ALPHABETICAL,
+    label: "magneto.sort.order.options.anti.alphabetical",
+  },
   {
     value: SORT_OR_CREATE_BY.OLDEST_FIRST,
-    label: "Création (ancien → récent)",
+    label: "magneto.sort.order.options.oldest.first",
   },
   {
     value: SORT_OR_CREATE_BY.NEWEST_FIRST,
-    label: "Création (récent → ancien)",
+    label: "magneto.sort.order.options.newest.first",
   },
 ] as const;

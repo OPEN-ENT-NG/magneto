@@ -499,28 +499,15 @@ public class DefaultCardService implements CardService {
         Future<JsonObject> syncDocumentRightsFuture = this.syncDocumentRights(cardPayload.getBoardId(),
                 cardPayload.getResourceId(), cardPayload.getOwnerId());
 
-        List<Future> createCardFutures = new ArrayList<>();
         CompositeFuture.all(createCardFuture, getBoardFuture, getSectionsFuture, syncDocumentRightsFuture)
                 .compose(result -> {
                     if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
                         BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
-                        if (boardPayload.getSortOrCreateBy() != null && boardPayload.getSortOrCreateBy().isOrderedPositionStrategy()){
+
+                        if (boardPayload.getSortOrCreateBy() != null && boardPayload.getSortOrCreateBy().isOrderedPositionStrategy()) {
                             // Mode trié : on gère tout ici
                             if (boardPayload.isLayoutFree()) {
-                                return this.getAllCardsByBoard(getBoardFuture.result().get(0), 0, user, false)
-                                        .compose(cardsResult -> {
-                                            List<Card> cards = cardsResult.getJsonArray(Field.ALL).getList();
-                                            cards.add(new Card(new JsonObject()
-                                                    .put(Field._ID, newId)
-                                                    .put(Field.TITLE, cardPayload.getTitle())
-                                                    .put(Field.CREATIONDATE, cardPayload.getCreationDate())));
-
-                                            List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy());
-                                            boardPayload.setCardIds(sortedCardIds);
-
-                                            createCardFutures.add(this.updateBoard(boardPayload));
-                                            return CompositeFuture.all(createCardFutures);
-                                        });
+                                return handleSortedFreeLayout(getBoardFuture.result().get(0), boardPayload, newId, cardPayload, user);
                             } else if (cardPayload.getSectionId() != null && !getSectionsFuture.result().isEmpty()) {
                                 Section targetSection = getSectionsFuture.result()
                                         .stream()
@@ -529,73 +516,24 @@ public class DefaultCardService implements CardService {
                                         .orElse(null);
 
                                 if (targetSection != null) {
-                                    return this.fetchAllCardsBySection(targetSection, 0, user)
-                                            .compose(cards -> {
-                                                cards.add(new Card(new JsonObject()
-                                                        .put(Field._ID, newId)
-                                                        .put(Field.TITLE, cardPayload.getTitle())
-                                                        .put(Field.CREATIONDATE, cardPayload.getCreationDate())));
-
-                                                List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy());
-
-                                                SectionPayload updateSection = new SectionPayload(targetSection.toJson());
-                                                updateSection.setCardIds(sortedCardIds);
-                                                createCardFutures.add(this.serviceFactory.sectionService().update(updateSection));
-                                                createCardFutures.add(this.updateBoard(boardPayload));
-
-                                                return CompositeFuture.all(createCardFutures);
-                                            });
+                                    return handleSortedSectionLayout(boardPayload, newId, cardPayload, targetSection, user);
                                 } else {
                                     String message = String.format("[Magneto%s::createCardLayout] " +
                                             "No section found with id %s", this.getClass().getSimpleName(), cardPayload.getSectionId());
                                     return Future.failedFuture(message);
                                 }
                             } else {
-                                // Créer une nouvelle section avec la carte triée
-                                SectionPayload createSection = new SectionPayload(boardPayload.getId())
-                                        .setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
-                                createSection.addCardIds(Collections.singletonList(newId));
-                                String newSectionId = UUID.randomUUID().toString();
-                                boardPayload.addSection(newSectionId);
-                                createCardFutures.add(this.serviceFactory.sectionService().create(createSection, newSectionId));
-                                createCardFutures.add(this.updateBoard(boardPayload));
-
-                                return CompositeFuture.all(createCardFutures);
+                                return handleSortedNewSection(boardPayload, newId, i18n);
                             }
                         }
 
                         // Check if layout is free = We add cards directly in cardIds property of board
                         if (boardPayload.isLayoutFree()) {
-                            boardPayload.setCardIds(createCardFuture.result());
+                            return handleUnsortedFreeLayout(boardPayload, createCardFuture.result());
                         } else {
-                            if (cardPayload.getSectionId() != null && !getSectionsFuture.result().isEmpty()) {
-                                // If layout is section = We update the section selected, and we add new card id into it
-                                Section updatedSection = getSectionsFuture.result()
-                                        .stream()
-                                        .filter(section -> section.getId().equals(cardPayload.getSectionId()))
-                                        .findFirst()
-                                        .orElse(null);
-                                if (updatedSection != null) {
-                                    SectionPayload updateSection = new SectionPayload(updatedSection.toJson());
-                                    updateSection.setCardIds(createCardFuture.result());
-                                    createCardFutures.add(this.serviceFactory.sectionService().update(updateSection));
-                                } else {
-                                    String message = String.format("[Magneto%s::createCardLayout] " +
-                                            "No card found with id %s", this.getClass().getSimpleName(), newId);
-                                    promise.fail(message);
-                                    return Future.failedFuture(message);
-                                }
-                            } else {
-                                SectionPayload createSection = new SectionPayload(boardPayload.getId())
-                                        .setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
-                                createSection.addCardIds(Collections.singletonList(newId));
-                                String newSectionId = UUID.randomUUID().toString();
-                                boardPayload.addSection(newSectionId);
-                                createCardFutures.add(this.serviceFactory.sectionService().create(createSection, newSectionId));
-                            }
+                            return handleUnsortedSectionLayout(boardPayload, cardPayload, createCardFuture.result(),
+                                    getSectionsFuture.result(), newId, i18n);
                         }
-                        createCardFutures.add(this.updateBoard(boardPayload));
-                        return CompositeFuture.all(createCardFutures);
                     } else {
                         String message = String.format("[Magneto%s::createCardLayout] " +
                                 "No card found with id %s", this.getClass().getSimpleName(), newId);
@@ -607,6 +545,99 @@ public class DefaultCardService implements CardService {
                 .onSuccess(success -> promise.complete(new JsonObject().put(Field.ID, newId)));
 
         return promise.future();
+    }
+
+    private Future<CompositeFuture> handleSortedFreeLayout(Board board, BoardPayload boardPayload, String newCardId,
+                                                           CardPayload cardPayload, UserInfos user) {
+        return this.getAllCardsByBoard(board, 0, user, false)
+                .compose(cardsResult -> {
+                    List<Card> cards = cardsResult.getJsonArray(Field.ALL).getList();
+                    cards.add(new Card(new JsonObject()
+                            .put(Field._ID, newCardId)
+                            .put(Field.TITLE, cardPayload.getTitle())
+                            .put(Field.CREATIONDATE, cardPayload.getCreationDate())));
+
+                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy());
+                    boardPayload.setCardIds(sortedCardIds);
+
+                    return CompositeFuture.all(Collections.singletonList(this.updateBoard(boardPayload)));
+                });
+    }
+
+    private Future<CompositeFuture> handleSortedSectionLayout(BoardPayload boardPayload, String newCardId,
+                                                              CardPayload cardPayload, Section targetSection,
+                                                              UserInfos user) {
+        return this.fetchAllCardsBySection(targetSection, 0, user)
+                .compose(cards -> {
+                    cards.add(new Card(new JsonObject()
+                            .put(Field._ID, newCardId)
+                            .put(Field.TITLE, cardPayload.getTitle())
+                            .put(Field.CREATIONDATE, cardPayload.getCreationDate())));
+
+                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy());
+
+                    SectionPayload updateSection = new SectionPayload(targetSection.toJson());
+                    updateSection.setCardIds(sortedCardIds);
+
+                    List<Future> futures = new ArrayList<>();
+                    futures.add(this.serviceFactory.sectionService().update(updateSection));
+                    futures.add(this.updateBoard(boardPayload));
+
+                    return CompositeFuture.all(futures);
+                });
+    }
+
+    private Future<CompositeFuture> handleSortedNewSection(BoardPayload boardPayload, String newCardId, I18nHelper i18n) {
+        SectionPayload createSection = new SectionPayload(boardPayload.getId())
+                .setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
+        createSection.addCardIds(Collections.singletonList(newCardId));
+
+        String newSectionId = UUID.randomUUID().toString();
+        boardPayload.addSection(newSectionId);
+
+        List<Future> futures = new ArrayList<>();
+        futures.add(this.serviceFactory.sectionService().create(createSection, newSectionId));
+        futures.add(this.updateBoard(boardPayload));
+
+        return CompositeFuture.all(futures);
+    }
+
+    private Future<CompositeFuture> handleUnsortedFreeLayout(BoardPayload boardPayload, List<String> createdCardIds) {
+        boardPayload.setCardIds(createdCardIds);
+        return CompositeFuture.all(Collections.singletonList(this.updateBoard(boardPayload)));
+    }
+
+    private Future<CompositeFuture> handleUnsortedSectionLayout(BoardPayload boardPayload, CardPayload cardPayload,
+                                                                List<String> createdCardIds, List<Section> sections,
+                                                                String newCardId, I18nHelper i18n) {
+        List<Future> futures = new ArrayList<>();
+
+        if (cardPayload.getSectionId() != null && !sections.isEmpty()) {
+            Section updatedSection = sections.stream()
+                    .filter(section -> section.getId().equals(cardPayload.getSectionId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (updatedSection == null) {
+                return Future.failedFuture(String.format("[Magneto%s::createCardLayout] " +
+                        "No card found with id %s", this.getClass().getSimpleName(), newCardId));
+            }
+
+            SectionPayload updateSection = new SectionPayload(updatedSection.toJson());
+            updateSection.setCardIds(createdCardIds);
+            futures.add(this.serviceFactory.sectionService().update(updateSection));
+        } else {
+            SectionPayload createSection = new SectionPayload(boardPayload.getId())
+                    .setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
+            createSection.addCardIds(Collections.singletonList(newCardId));
+
+            String newSectionId = UUID.randomUUID().toString();
+            boardPayload.addSection(newSectionId);
+            futures.add(this.serviceFactory.sectionService().create(createSection, newSectionId));
+        }
+
+        futures.add(this.updateBoard(boardPayload));
+        return CompositeFuture.all(futures);
     }
 
     public List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy) {

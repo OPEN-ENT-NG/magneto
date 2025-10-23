@@ -241,22 +241,9 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT))
                         .setLastModifierId(user.getUserId())
                         .setLastModifierName(user.getUsername());
-                Future<JsonObject> updateCardFuture = this.serviceFactory.cardService().update(updateCard);
-                Future<List<Board>> getBoardFuture = this.serviceFactory.boardService().getBoards(Collections.singletonList(updateCard.getBoardId()));
-                return CompositeFuture.all(updateCardFuture, getBoardFuture)
-                        .compose(result -> {
-                            Board currentBoard = getBoardFuture.result().get(0);
-                            BoardPayload boardToUpdate = new BoardPayload()
-                                    .setId(currentBoard.getId())
-                                    .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
-                            return this.serviceFactory.boardService().update(boardToUpdate);
-                        })
-                        .compose(saved -> this.serviceFactory.cardService().getCards(newArrayList(action.getCard().getId()), user))
-                        .map(cards -> {
-                            Card updatedCard = cards.isEmpty() ? new Card(action.getCard().toJson()).setId(updateCard.getId()) : cards.get(0);
-                            updatedCard.setIsLiked(null);
-                            return newArrayList(this.messageFactory.cardUpdated(boardId, wsId, user.getUserId(), updatedCard, action.getActionType(), action.getActionId()));
-                        });
+
+                return this.serviceFactory.cardService().updateCardAndResort(updateCard, user)
+                        .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
             }
             case boardUpdated: {
                 return this.serviceFactory.boardService().getBoards(Collections.singletonList(boardId))
@@ -274,7 +261,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                                     .setId(boardId)
                                     .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
                             Board currentBoard = boards.get(0);
-                            return this.serviceFactory.boardService().updateLayoutCards(updateBoard, currentBoard, null, user)
+                            return this.serviceFactory.boardService().updateLayoutAndSortCards(updateBoard, currentBoard, null, user)
                                     .compose(boardUpdated -> this.serviceFactory.boardService().update(new BoardPayload(boardUpdated)))
                                     .compose(res -> this.createBoardMessagesForUsers(boardId, wsId, user, action.getActionType()));
                         });

@@ -4,6 +4,7 @@ import { Card, ICardItemResponse } from "./card.model";
 import { FOLDER_TYPE } from "../core/enums/folder-type.enum";
 import {} from "@edifice.io/client";
 import { LAYOUT_TYPE } from "../core/enums/layout-type.enum";
+import { SORT_OR_CREATE_BY } from "~/core/enums/sort-order";
 import { Section } from "~/providers/BoardProvider/types";
 
 export interface IBoardItemResponse {
@@ -31,6 +32,7 @@ export interface IBoardItemResponse {
   displayNbFavorites: boolean;
   isLocked: boolean;
   isExternal: boolean;
+  sortOrCreateBy: SORT_OR_CREATE_BY;
   rights: any[];
   cards: Card[];
 }
@@ -69,6 +71,7 @@ export interface IBoardPayload {
   displayNbFavorites?: boolean;
   isLocked?: boolean;
   isExternal?: boolean;
+  sortOrCreateBy?: SORT_OR_CREATE_BY;
 }
 
 export interface SectionPayload {
@@ -107,6 +110,7 @@ export class BoardForm {
   private _displayNbFavorites: boolean;
   private _isLocked: boolean;
   private _isExternal: boolean;
+  private _sortOrCreateBy: SORT_OR_CREATE_BY;
 
   constructor() {
     this._id = "";
@@ -125,6 +129,7 @@ export class BoardForm {
     this._displayNbFavorites = false;
     this._isLocked = false;
     this._isExternal = false;
+    this._sortOrCreateBy = SORT_OR_CREATE_BY.START;
   }
 
   build(board: Board): BoardForm {
@@ -144,6 +149,7 @@ export class BoardForm {
     this._sectionIds = board.sectionsIds;
     this.isLocked = board.isLocked;
     this.isExternal = board.isExternal;
+    this.sortOrCreateBy = board.sortOrCreateBy;
     return this;
   }
 
@@ -278,6 +284,14 @@ export class BoardForm {
     this._isExternal = value;
   }
 
+  get sortOrCreateBy(): SORT_OR_CREATE_BY {
+    return this._sortOrCreateBy;
+  }
+
+  set sortOrCreateBy(value: SORT_OR_CREATE_BY) {
+    this._sortOrCreateBy = value;
+  }
+
   isLayoutFree(): boolean {
     return this.layoutType == LAYOUT_TYPE.FREE;
   }
@@ -353,6 +367,10 @@ export class BoardForm {
       payload.isExternal = this.isExternal;
     }
 
+    if (this.sortOrCreateBy != null) {
+      payload.sortOrCreateBy = this.sortOrCreateBy;
+    }
+
     return payload;
   }
 }
@@ -380,6 +398,7 @@ export class Board /*implements Shareable*/ {
   private _cards: Card[];
   private _isLocked: boolean;
   private _isExternal: boolean;
+  private _sortOrCreateBy: SORT_OR_CREATE_BY;
 
   // Share resource properties
   public shared: any[];
@@ -413,6 +432,7 @@ export class Board /*implements Shareable*/ {
     this._cards = [];
     this._isLocked = false;
     this._isExternal = false;
+    this._sortOrCreateBy = SORT_OR_CREATE_BY.START;
     return this;
   }
 
@@ -462,6 +482,7 @@ export class Board /*implements Shareable*/ {
     this._displayNbFavorites = data.displayNbFavorites;
     this._isLocked = data.isLocked;
     this._isExternal = data.isExternal;
+    this._sortOrCreateBy = data.sortOrCreateBy;
     return this;
   }
   get isLocked(): boolean {
@@ -477,6 +498,13 @@ export class Board /*implements Shareable*/ {
 
   set isExternal(value: boolean) {
     this._isExternal = value;
+  }
+  get sortOrCreateBy(): SORT_OR_CREATE_BY {
+    return this._sortOrCreateBy;
+  }
+
+  set sortOrCreateBy(value: SORT_OR_CREATE_BY) {
+    this._sortOrCreateBy = value;
   }
   get id(): string {
     return this._id;

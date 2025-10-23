@@ -11,6 +11,7 @@ import {
 import { EmptyStatePublic } from "~/components/empty-state-public/EmptyStatePublic";
 import { ReadView } from "~/components/read-view/ReadView";
 import { BoardProvider } from "~/providers/BoardProvider";
+import { WebSocketProvider } from "~/providers/WebsocketProvider";
 import { useGetIsExternalQuery } from "~/services/api/boards.service";
 import theme from "~/themes/theme";
 
@@ -51,9 +52,17 @@ export const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <BoardProvider isExternal={isExternalQueryAllowed?.isExternal}>
-        <ReadView />
-      </BoardProvider>
+      <WebSocketProvider
+        socketUrl={""}
+        onMessage={(update) => {
+          console.log("Received WebSocket update:", update);
+        }}
+        shouldConnect={false}
+      >
+        <BoardProvider isExternal={isExternalQueryAllowed?.isExternal}>
+          <ReadView />
+        </BoardProvider>
+      </WebSocketProvider>
     </ThemeProvider>
   );
 };

@@ -18,4 +18,7 @@ export interface TooltipProps {
     | "top-start"
     | "top";
   arrow?: boolean;
+  fontSize?: string;
+  offsetY?: number;
+  useSlotPropsOffset?: boolean;
 }

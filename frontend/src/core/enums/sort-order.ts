@@ -1,4 +1,11 @@
-export enum SORT_ORDER {
+export enum POSITION_MODE {
+  FREE = "free",
+  ORDERED = "ordered",
+}
+
+export enum SORT_OR_CREATE_BY {
+  START = "start",
+  END = "end",
   ALPHABETICAL = "alphabetical",
   ANTI_ALPHABETICAL = "anti-alphabetical",
   OLDEST_FIRST = "oldest-first",
@@ -6,18 +13,20 @@ export enum SORT_ORDER {
 }
 
 export const SORT_ORDER_OPTIONS = [
-  { value: SORT_ORDER.ALPHABETICAL, label: "Titre (A → Z)" },
-  { value: SORT_ORDER.ANTI_ALPHABETICAL, label: "Titre (Z → A)" },
-  { value: SORT_ORDER.OLDEST_FIRST, label: "Création (ancien → récent)" },
-  { value: SORT_ORDER.NEWEST_FIRST, label: "Création (récent → ancien)" },
+  {
+    value: SORT_OR_CREATE_BY.ALPHABETICAL,
+    label: "magneto.sort.order.options.alphabetical",
+  },
+  {
+    value: SORT_OR_CREATE_BY.ANTI_ALPHABETICAL,
+    label: "magneto.sort.order.options.anti.alphabetical",
+  },
+  {
+    value: SORT_OR_CREATE_BY.OLDEST_FIRST,
+    label: "magneto.sort.order.options.oldest.first",
+  },
+  {
+    value: SORT_OR_CREATE_BY.NEWEST_FIRST,
+    label: "magneto.sort.order.options.newest.first",
+  },
 ] as const;
-
-export enum POSITION_MODE {
-  FREE = "free",
-  ORDERED = "ordered",
-}
-
-export enum NEW_CARD_POSITION {
-  START = "start",
-  END = "end",
-}

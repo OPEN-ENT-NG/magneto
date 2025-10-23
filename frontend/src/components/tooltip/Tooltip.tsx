@@ -1,6 +1,7 @@
+// Tooltip.tsx
 import { FC } from "react";
 
-import { Tooltip as TooltipMUI } from "@mui/material";
+import { Tooltip as TooltipLIBUI } from "@cgi-learning-hub/ui";
 
 import { TooltipProps } from "./types";
 
@@ -10,19 +11,38 @@ export const Tooltip: FC<TooltipProps> = ({
   placement,
   width = "20rem",
   arrow = false,
+  fontSize = "1.4rem",
+  offsetY = -0.4,
+  useSlotPropsOffset = false,
 }) => {
   return (
-    <TooltipMUI
+    <TooltipLIBUI
       arrow={arrow}
       title={title}
       {...(placement && { placement })}
-      TransitionProps={{
-        style: { marginTop: "-0.4rem" },
-      }}
+      {...(!useSlotPropsOffset && {
+        TransitionProps: {
+          style: { marginTop: `${offsetY}rem` },
+        },
+      })}
+      {...(useSlotPropsOffset && {
+        slotProps: {
+          popper: {
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: [0, offsetY * -10],
+                },
+              },
+            ],
+          },
+        },
+      })}
       componentsProps={{
         tooltip: {
           sx: {
-            fontSize: "1.4rem",
+            fontSize: fontSize,
             width: { width },
             maxWidth: "none",
           },
@@ -30,6 +50,6 @@ export const Tooltip: FC<TooltipProps> = ({
       }}
     >
       {children}
-    </TooltipMUI>
+    </TooltipLIBUI>
   );
 };

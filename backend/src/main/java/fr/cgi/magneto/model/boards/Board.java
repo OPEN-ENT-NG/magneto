@@ -463,6 +463,9 @@ public class Board implements Model<Board> {
             this.sections().forEach(section -> sectionsJsonArray.add(section.toJson()));
             board.put(Field.SECTIONS, sectionsJsonArray);
         }
+        if (this.sortOrCreateBy != null) {
+            board.put(Field.SORTORCREATEBY, this.getSortOrCreateBy().getValue());
+        }
         return board;
     }
 

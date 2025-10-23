@@ -43,7 +43,7 @@ public interface BoardService {
      * @param user    {@link UserInfos} User info
      * @return Future {@link Future <JsonObject>} containing updated board
      */
-    Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n, UserInfos user);
+    Future<JsonObject> updateLayoutAndSortCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n, UserInfos user);
 
     /**
      * Get board with its content (cards or sections with cards)

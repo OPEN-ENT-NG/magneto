@@ -1,6 +1,7 @@
 package fr.cgi.magneto.model.boards;
 
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.enums.SortOrCreateByEnum;
 import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.model.Model;
 import io.vertx.core.json.JsonArray;
@@ -24,6 +25,7 @@ public class BoardPayload implements Model<BoardPayload> {
     private String layoutType;
     private Boolean canComment;
     private Boolean isLocked;
+    private SortOrCreateByEnum sortOrCreateBy;
 
     private Boolean displayNbFavorites;
     private List<String> cardIds;
@@ -73,6 +75,10 @@ public class BoardPayload implements Model<BoardPayload> {
         this.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
         if (board.getBoolean(Field.ISEXTERNAL) != null) {
             this.isExternal = board.getBoolean(Field.ISEXTERNAL, false);
+        }
+        if (board.containsKey(Field.SORTORCREATEBY)) {
+            String value = board.getString(Field.SORTORCREATEBY);
+            this.sortOrCreateBy = SortOrCreateByEnum.fromValue(value);
         }
 
     }
@@ -191,6 +197,15 @@ public class BoardPayload implements Model<BoardPayload> {
 
     public BoardPayload setIsExternal(Boolean isExternal) {
         this.isExternal = isExternal;
+        return this;
+    }
+
+    public SortOrCreateByEnum getSortOrCreateBy() {
+        return sortOrCreateBy;
+    }
+
+    public BoardPayload setSortOrCreateBy(SortOrCreateByEnum sortOrCreateBy) {
+        this.sortOrCreateBy = sortOrCreateBy;
         return this;
     }
 
@@ -385,6 +400,9 @@ public class BoardPayload implements Model<BoardPayload> {
 
         if (this.getIsExternal() != null) {
             json.put(Field.ISEXTERNAL, this.getIsExternal());
+        }
+        if (this.getSortOrCreateBy() != null) {
+            json.put(Field.SORTORCREATEBY, this.getSortOrCreateBy().getValue());
         }
 
         return json;

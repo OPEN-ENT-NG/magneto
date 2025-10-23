@@ -273,7 +273,7 @@ public class BoardController extends ControllerHelper {
                                         .setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
                                 Board currentBoard = boards.get(0);
                                 I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
-                                return boardService.updateLayoutCards(updateBoard, currentBoard, i18nHelper, user)
+                                return boardService.updateLayoutAndSortCards(updateBoard, currentBoard, i18nHelper, user)
                                         .compose(boardUpdated -> boardService.update(new BoardPayload(boardUpdated)));
                             } else {
                                 return Future.failedFuture(String.format("[Magneto%s::update] " +

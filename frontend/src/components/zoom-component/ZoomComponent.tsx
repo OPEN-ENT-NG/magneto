@@ -1,13 +1,20 @@
 import { FC } from "react";
 
-import { mdiMinus, mdiPlus } from "@mdi/js";
-import Icon from "@mdi/react";
-import "./ZoomComponent.scss";
+import { Add, Remove } from "@mui/icons-material";
+import { Box, IconButton, Typography } from "@mui/material";
+
+import {
+  containerStyle,
+  iconButtonStyle,
+  iconStyle,
+  labelStyle,
+  lineStyle,
+} from "./style";
 
 interface ZoomComponentProps {
   opacity?: number;
   zoomLevel: number;
-  zoomMaxLevel: number; //e.g. if zoomLevels is 3, there will be 4 zoom values accessible : 0, 1, 2, 3
+  zoomMaxLevel: number;
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
@@ -22,41 +29,23 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   zoomOut,
   resetZoom,
   label = "Zoom",
-}: ZoomComponentProps) => {
+}) => {
+  const isMinZoom = zoomLevel === 0;
+  const isMaxZoom = zoomLevel === zoomMaxLevel;
+
   return (
-    <div className={`zoom`} style={{ opacity: opacity }}>
-      <div
-        role="button"
-        className={`zoom-minus ${zoomLevel === 0 ? "zoom-minus-disabled" : ""}`}
-        onClick={zoomOut}
-        onKeyDown={() => {}}
-        tabIndex={0}
-      >
-        <Icon path={mdiMinus} size={2} />
-        <i className="magneto-minus"></i>
-      </div>
-      <div className="zoom-line1"></div>
-      <div
-        className="zoom-label"
-        role="button"
-        onClick={resetZoom}
-        onKeyDown={() => {}}
-        tabIndex={0}
-      >
+    <Box sx={containerStyle({ opacity })}>
+      <IconButton onClick={zoomOut} disabled={isMinZoom} sx={iconButtonStyle}>
+        <Remove sx={iconStyle({ disabled: isMinZoom })} />
+      </IconButton>
+      <Box sx={lineStyle} />
+      <Typography onClick={resetZoom} sx={labelStyle} component="button">
         {label}
-      </div>
-      <div className="zoom-line2"></div>
-      <div
-        role="button"
-        className={`zoom-plus ${
-          zoomLevel === zoomMaxLevel ? "zoom-plus-disabled" : ""
-        }`}
-        onClick={zoomIn}
-        onKeyDown={() => {}}
-        tabIndex={0}
-      >
-        <Icon path={mdiPlus} size={2} />
-      </div>
-    </div>
+      </Typography>
+      <Box sx={lineStyle} />
+      <IconButton onClick={zoomIn} disabled={isMaxZoom} sx={iconButtonStyle}>
+        <Add sx={iconStyle({ disabled: isMaxZoom })} />
+      </IconButton>
+    </Box>
   );
 };

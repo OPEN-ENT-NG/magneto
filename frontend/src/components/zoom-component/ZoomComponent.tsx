@@ -31,7 +31,7 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   zoomOut,
   resetZoom,
   label = "Zoom",
-}) => {
+}: ZoomComponentProps) => {
   const isMinZoom = zoomLevel === 0;
   const isMaxZoom = zoomLevel === zoomMaxLevel;
 

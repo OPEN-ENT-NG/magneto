@@ -31,7 +31,7 @@ export const containerStyle = ({
   backgroundColor: MAGNETO_GREY,
   color: MAGNETO_WHITE,
   borderRadius: "1.6rem",
-  padding: "8px",
+  padding: "0.8rem",
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "space-evenly",
@@ -61,7 +61,7 @@ export const iconStyle = ({ disabled }: IconStyle): SxProps<Theme> => ({
 });
 
 export const lineStyle: SxProps<Theme> = {
-  width: "40px",
+  width: "4rem",
   height: "1px",
   backgroundColor: MAGNETO_WHITE,
 };

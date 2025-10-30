@@ -91,7 +91,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
     },
   );
 
-  // Combiner les données : prendre celle qui est active
+  // Prendre le bon tableau selon si la recherche est active ou non
   const boardData = debouncedSearch ? searchBoardData : normalBoardData;
   const isLoading = debouncedSearch ? isLoadingSearch : isLoadingNormal;
   const isFetching = debouncedSearch ? isFetchingSearch : isFetchingNormal;
@@ -115,10 +115,6 @@ export const BoardProvider: FC<BoardProviderProps> = ({
 
   useEffect(() => {
     if (debouncedSearch && id) {
-      console.log(
-        "🔍 Registering active search in BoardProvider:",
-        debouncedSearch,
-      );
       const unregister = registerActiveSearch(
         id,
         debouncedSearch,

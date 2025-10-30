@@ -19,6 +19,7 @@ import {
   WebSocketUpdate,
 } from "./types";
 import { notifyCacheUpdateCallbacks } from "~/hooks/useApplyBoardUpdate";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 
@@ -188,14 +189,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         }
 
         if (activeSearchState.searchText && activeSearchState.refetchCallback) {
-          const shouldRefetch = ["boardMessage", "boardUpdated"].includes(
-            update.type,
-          );
+          const shouldRefetch = [
+            WEBSOCKET_MESSAGE_TYPE.BOARD_MESSAGE,
+            WEBSOCKET_MESSAGE_TYPE.BOARD_UPDATED,
+          ].includes(update.type as WEBSOCKET_MESSAGE_TYPE);
 
           if (shouldRefetch) {
-            console.log(
-              "🔍 Search active - Refetching instead of cache update",
-            );
             activeSearchState.refetchCallback();
           }
         }

@@ -141,7 +141,7 @@ public class BoardController extends ControllerHelper {
                 boardService.getBoardWithContent(boardId, user, readOnly, searchText)
                         .onSuccess(result -> renderJson(request, result.toJson()))
                         .onFailure(fail -> {
-                            String message = String.format("[Magneto@%s::getAllBoards] Failed to get all boards : %s",
+                            String message = String.format("[Magneto@%s::getBoard] Failed to get board with id : %s",
                                     this.getClass().getSimpleName(), fail.getMessage());
                             log.error(message);
                             renderError(request);

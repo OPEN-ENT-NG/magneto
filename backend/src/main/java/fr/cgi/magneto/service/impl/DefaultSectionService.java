@@ -88,7 +88,7 @@ public class DefaultSectionService implements SectionService {
                     sections.addAll(sectionsResult);
                     List<Future> futures = new ArrayList<>();
                     for (Section section : sections) {
-                        Future<List<Card>> cardsFuture = this.serviceFactory.cardService().getAllCardsBySectionSimple(section, 0, user);
+                        Future<List<Card>> cardsFuture = this.serviceFactory.cardService().getAllCardsBySectionSimple(section, 0, user, null);
                         futures.add(cardsFuture.map(cards -> {
                             section.setCards(cards);
                             return section;

@@ -39,7 +39,10 @@ export type BoardContextType = {
   openActiveCardAction: (card: Card, actionType: BOARD_MODAL_TYPE) => void;
   closeActiveCardAction: (actionType: BOARD_MODAL_TYPE) => void;
   behaviours: any;
-  boardImages: any; //TODO : type
+  boardImages: any;
+  searchText: string;
+  setSearchText: (text: string) => void;
+  hasActiveSearch: boolean;
 };
 
 export type Section = {

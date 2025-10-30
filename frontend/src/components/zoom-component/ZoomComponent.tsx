@@ -1,15 +1,17 @@
 import { FC } from "react";
 
-import { Add, Remove } from "@mui/icons-material";
-import { Box, IconButton, Typography } from "@mui/material";
+import { SearchInput, IconButton } from "@cgi-learning-hub/ui";
+import { AddRounded, RemoveRounded } from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
 
 import {
   containerStyle,
   iconButtonStyle,
   iconStyle,
   labelStyle,
-  lineStyle,
+  searchInputStyle,
 } from "./style";
+import { useBoard } from "~/providers/BoardProvider";
 
 interface ZoomComponentProps {
   opacity?: number;
@@ -33,18 +35,23 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   const isMinZoom = zoomLevel === 0;
   const isMaxZoom = zoomLevel === zoomMaxLevel;
 
+  const { searchText, setSearchText } = useBoard();
+
   return (
     <Box sx={containerStyle({ opacity })}>
+      <SearchInput
+        sx={searchInputStyle}
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+      />
       <IconButton onClick={zoomOut} disabled={isMinZoom} sx={iconButtonStyle}>
-        <Remove sx={iconStyle({ disabled: isMinZoom })} />
+        <RemoveRounded sx={iconStyle({ disabled: isMinZoom })} />
       </IconButton>
-      <Box sx={lineStyle} />
       <Typography onClick={resetZoom} sx={labelStyle} component="button">
         {label}
       </Typography>
-      <Box sx={lineStyle} />
       <IconButton onClick={zoomIn} disabled={isMaxZoom} sx={iconButtonStyle}>
-        <Add sx={iconStyle({ disabled: isMaxZoom })} />
+        <AddRounded sx={iconStyle({ disabled: isMaxZoom })} />
       </IconButton>
     </Box>
   );

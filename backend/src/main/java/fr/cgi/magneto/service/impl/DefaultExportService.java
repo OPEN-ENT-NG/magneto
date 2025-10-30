@@ -249,7 +249,7 @@ public class DefaultExportService implements ExportService {
             descriptionSlide.createApacheSlide(newDescriptionSlide);
         }
 
-        return serviceFactory.cardService().getAllCardsByBoard(board, user)
+        return serviceFactory.cardService().getAllCardsByBoardWithSearch(board, user, null)
                 .compose(fetchedCards -> {
                     Map<String, Card> cardMap = fetchedCards.stream()
                             .collect(Collectors.toMap(Card::getId, card -> card));

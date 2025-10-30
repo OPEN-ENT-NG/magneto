@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
-import { HexaColor } from "@cgi-learning-hub/ui/dist";
+import { HexaColor } from "@cgi-learning-hub/ui";
 import { RightRole, WorkspaceElement } from "@edifice.io/client";
 
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
@@ -39,7 +39,10 @@ export type BoardContextType = {
   openActiveCardAction: (card: Card, actionType: BOARD_MODAL_TYPE) => void;
   closeActiveCardAction: (actionType: BOARD_MODAL_TYPE) => void;
   behaviours: any;
-  boardImages: any; //TODO : type
+  boardImages: any;
+  searchText: string;
+  setSearchText: (text: string) => void;
+  hasActiveSearch: boolean;
 };
 
 export type Section = {

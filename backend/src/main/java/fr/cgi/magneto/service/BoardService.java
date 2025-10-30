@@ -52,7 +52,7 @@ public interface BoardService {
      * @param user    User Object containing user id and displayed name
      * @return Future {@link Future<Board>} containing board with cards or sections populated
      */
-    Future<Board> getBoardWithContent(String boardId, UserInfos user, Boolean isReadOnly);
+    Future<Board> getBoardWithContent(String boardId, UserInfos user, Boolean isReadOnly, String searchText);
 
     /**
      * Duplicate a board

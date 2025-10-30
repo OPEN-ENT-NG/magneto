@@ -183,7 +183,7 @@ public class DefaultBoardService implements BoardService {
     }
 
     @Override
-    public Future<Board> getBoardWithContent(String boardId, UserInfos user, Boolean isReadOnly) {
+    public Future<Board> getBoardWithContent(String boardId, UserInfos user, Boolean isReadOnly, String searchText) {
         return this.getBoards(Collections.singletonList(boardId))
                 .compose(boards -> {
                     if (boards.isEmpty()) {
@@ -194,7 +194,7 @@ public class DefaultBoardService implements BoardService {
 
                     if (board.isLayoutFree()) {
                         // Layout libre : récupérer toutes les cartes du board
-                        return serviceFactory.cardService().getAllCardsByBoard(board, user)
+                        return serviceFactory.cardService().getAllCardsByBoardWithSearch(board, user, searchText)
                                 .map(cards -> {
                                     List<Card> sortedCards = sortAndFilterCards(cards, board.getCardIds());
                                     board.setCards(sortedCards);
@@ -205,7 +205,7 @@ public class DefaultBoardService implements BoardService {
                         return serviceFactory.sectionService().getSectionsByBoard(board, isReadOnly)
                                 .compose(sections -> {
                                     List<Future> cardFutures = sections.stream()
-                                            .map(section -> serviceFactory.cardService().getAllCardsBySectionSimple(section, null, user))
+                                            .map(section -> serviceFactory.cardService().getAllCardsBySectionSimple(section, null, user, searchText))
                                             .collect(Collectors.toList());
 
                                     return CompositeFuture.all(cardFutures)
@@ -968,7 +968,7 @@ public class DefaultBoardService implements BoardService {
     public Future<List<String>> getAllDocumentIds(String boardId, UserInfos user) {
         Promise<List<String>> promise = Promise.promise();
 
-        this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
+        this.cardService.getAllCardsByBoardWithSearch(new Board(new JsonObject().put(Field._ID, boardId)), user, user, null)
                 .onFailure(fail -> {
                     log.error("[Magneto@%s::getAllDocumentIds] Failed to get documents ids", this.getClass().getSimpleName(),
                             fail.getMessage());
@@ -994,7 +994,7 @@ public class DefaultBoardService implements BoardService {
         List<Card> cardsList = new ArrayList<>();
         Map<String, List<String>> idsByCard = new HashMap<>();
 
-        this.cardService.getAllCardsByBoard(new Board(new JsonObject().put(Field._ID, boardId)), user, user)
+        this.cardService.getAllCardsByBoardWithSearch(new Board(new JsonObject().put(Field._ID, boardId)), user, user, null)
                 .onFailure(fail -> {
                     log.error("[Magneto@%s::getAndUpdateDescriptionDocuments] Failed to get all board cards", this.getClass().getSimpleName(),
                             fail.getMessage());

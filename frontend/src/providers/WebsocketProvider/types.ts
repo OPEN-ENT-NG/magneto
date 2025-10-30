@@ -29,6 +29,11 @@ export interface WebSocketContextValue {
   readyState: ReadyState;
   connectedUsers: UserCollaboration[];
   cardEditing: CardEditing[];
+  registerActiveSearch: (
+    boardId: string,
+    searchText: string,
+    refetchCallback: () => void,
+  ) => () => void;
 }
 
 export interface WebSocketProviderProps {

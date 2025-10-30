@@ -53,6 +53,12 @@ export interface IBoardsParamsRequest {
   allFolders?: boolean;
 }
 
+export interface IBoardParamsRequest {
+  boardId: string;
+  searchText?: string;
+  page?: number;
+}
+
 export interface IBoardPayload {
   id?: string;
   title?: string;

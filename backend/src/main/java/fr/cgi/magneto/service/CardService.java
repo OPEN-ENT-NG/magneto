@@ -103,8 +103,6 @@ public interface CardService {
 
     Future<JsonObject> getAllCards(UserInfos user, String boardId, Integer page, boolean isPublic, boolean isShared, boolean isFavorite, String searchText, String sortBy);
 
-    Future<List<Card>> getCardsOrFirstSection(Board board, UserInfos user);
-
     /**
      * Get cards by ids
      *
@@ -133,8 +131,8 @@ public interface CardService {
      * @return Future {@link Future <JsonObject>} containing the cards corresponding to the board identifier
      */
     Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage);
-    Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user);
-    Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user, UserInfos userToFetch);
+    Future<List<Card>> getAllCardsByBoardWithSearch(Board board, UserInfos user, String searchText);
+    Future<List<Card>> getAllCardsByBoardWithSearch(Board board, UserInfos user, UserInfos userToFetch, String searchText);
 
     /**
      * Get all cards by creation date
@@ -162,7 +160,7 @@ public interface CardService {
      * @param user    {@link UserInfos} User info
      * @return Future {@link Future <List<Card>>} containing the cards corresponding to the board identifier
      */
-    Future<List<Card>> getAllCardsBySectionSimple(Section section, Integer page, UserInfos user);
+    Future<List<Card>> getAllCardsBySectionSimple(Section section, Integer page, UserInfos user, String searchText);
 
     /**
      * Duplicate cards

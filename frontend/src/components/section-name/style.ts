@@ -1,4 +1,4 @@
-import { Box, ColorPickerSlotProps, styled } from "@cgi-learning-hub/ui/dist";
+import { Box, ColorPickerSlotProps, styled } from "@cgi-learning-hub/ui";
 
 export const boxStyle = {
   position: "relative",

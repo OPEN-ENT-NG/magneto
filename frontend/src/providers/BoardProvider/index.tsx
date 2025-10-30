@@ -21,11 +21,13 @@ import {
   initialDisplayModals,
   updateZoomPreference,
 } from "./utils";
+import { useWebSocketMagneto } from "../WebsocketProvider";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { useEntcoreBehaviours } from "~/hooks/useEntcoreBehaviours";
 import { Board, IBoardItemResponse } from "~/models/board.model";
 import { Card } from "~/models/card.model";
 import { useGetBoardDataQuery } from "~/services/api/boardData.service";
+import { useGetBoardByIdQuery } from "~/services/api/boards.service";
 import { useGetAllBoardImagesQuery } from "~/services/api/boards.service";
 import { useGetDocumentsQuery } from "~/services/api/workspace.service";
 
@@ -49,13 +51,51 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(3);
   const [displayModals, setDisplayModals] =
     useState<DisplayModalsState>(initialDisplayModals);
+
+  const [searchText, setSearchText] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+
   const { id = "" } = useParams();
+  const { registerActiveSearch } = useWebSocketMagneto();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchText);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchText]);
 
   const {
-    data: boardData,
-    isLoading,
-    isFetching,
-  } = useGetBoardDataQuery({ boardId: id, isExternal });
+    data: normalBoardData,
+    isLoading: isLoadingNormal,
+    isFetching: isFetchingNormal,
+  } = useGetBoardDataQuery(
+    { boardId: id, isExternal },
+    {
+      skip: !id || !!debouncedSearch,
+    },
+  );
+
+  const {
+    data: searchBoardData,
+    isLoading: isLoadingSearch,
+    isFetching: isFetchingSearch,
+    refetch: refetchSearch,
+  } = useGetBoardByIdQuery(
+    {
+      boardId: id,
+      searchText: debouncedSearch,
+    },
+    {
+      skip: !id || !debouncedSearch,
+    },
+  );
+
+  // Prendre le bon tableau selon si la recherche est active ou non
+  const boardData = debouncedSearch ? searchBoardData : normalBoardData;
+  const isLoading = debouncedSearch ? isLoadingSearch : isLoadingNormal;
+  const isFetching = debouncedSearch ? isFetchingSearch : isFetchingNormal;
+
   const { data: documentsData } = useGetDocumentsQuery("stub");
   const { behaviours, isLoading: isLoadingBehaviours } = useEntcoreBehaviours();
 
@@ -72,6 +112,17 @@ export const BoardProvider: FC<BoardProviderProps> = ({
     boolean
   > | null>(null);
   const { user } = useEdificeClient();
+
+  useEffect(() => {
+    if (debouncedSearch && id) {
+      const unregister = registerActiveSearch(
+        id,
+        debouncedSearch,
+        refetchSearch,
+      );
+      return unregister;
+    }
+  }, [id, debouncedSearch, refetchSearch, registerActiveSearch]);
 
   const zoomIn = (): void => {
     if (zoomLevel < 5) setZoomLevel(zoomLevel + 1);
@@ -132,7 +183,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
     if (boardData && !isLoading) {
       updateRights(new Board().build(boardData as IBoardItemResponse).rights);
     }
-  }, [boardData]);
+  }, [boardData, isLoading]);
 
   const isExternalView =
     board.isExternal && window.location.hash.includes("/pub/");
@@ -218,12 +269,16 @@ export const BoardProvider: FC<BoardProviderProps> = ({
       behaviours,
       boardImages,
       isExternalView,
+      searchText,
+      setSearchText,
+      hasActiveSearch: !!debouncedSearch,
     }),
     [
       board,
       documents,
       zoomLevel,
       isLoading,
+      isFetching,
       boardRights,
       displayModals,
       isFileDragging,
@@ -231,6 +286,8 @@ export const BoardProvider: FC<BoardProviderProps> = ({
       isModalDuplicate,
       behaviours,
       boardImages,
+      searchText,
+      debouncedSearch,
     ],
   );
 

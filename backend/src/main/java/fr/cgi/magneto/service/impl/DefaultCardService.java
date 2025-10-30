@@ -695,25 +695,6 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<List<Card>> getCardsOrFirstSection(Board board, UserInfos user){
-        if (board.isLayoutFree()) {
-            return this.serviceFactory.cardService().getAllCardsByBoard(board, user);
-        } else {
-            return this.serviceFactory.sectionService().getSectionsByBoardId(board.getId())
-                    .compose(sections -> {
-                        if (sections.isEmpty()) {
-                            return Future.succeededFuture(new ArrayList<>());
-                        }
-                        Section section = sections.stream()
-                                .filter(s -> s.getId().equals(board.getSectionIds().get(0)))
-                                .findFirst()
-                                .orElse(null);
-                        return this.fetchAllCardsBySection(section, 0, user);
-                    });
-        }
-    }
-
-    @Override
     public Future<List<Card>> getCards(List<String> cardIds, UserInfos user) {
         Promise<List<Card>> promise = Promise.promise();
         getCardsRequest(cardIds, user)
@@ -793,9 +774,9 @@ public class DefaultCardService implements CardService {
     public Future<JsonObject> getAllCardsByBoard(Board board, Integer page, UserInfos user, boolean fromStartPage) {
         Promise<JsonObject> promise = Promise.promise();
 
-        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsByBoardCount(board, page, user);
+        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsByBoardCount(board, page, user, null);
 
-        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page, user, fromStartPage, null);
+        Future<List<Card>> fetchAllCardsFuture = fetchAllCardsByBoard(board, page, user, fromStartPage, null, null);
 
 
         CompositeFuture.all(fetchAllCardsFuture, fetchAllCardsCountFuture)
@@ -820,15 +801,15 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user) {
-        return this.getAllCardsByBoard(board, user, null);
+    public Future<List<Card>> getAllCardsByBoardWithSearch(Board board, UserInfos user, String searchText) {
+        return this.getAllCardsByBoardWithSearch(board, user, null, searchText);
     }
 
     @Override
-    public Future<List<Card>> getAllCardsByBoard(Board board, UserInfos user, UserInfos userToFetch) {
+    public Future<List<Card>> getAllCardsByBoardWithSearch(Board board, UserInfos user, UserInfos userToFetch, String searchText) {
         Promise<List<Card>> promise = Promise.promise();
 
-        fetchAllCardsByBoard(board, null, user, true, userToFetch)
+        fetchAllCardsByBoard(board, null, user, true, userToFetch, searchText)
                 .onFailure(fail -> {
                     log.error("[Magneto@%s::getAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName(),
                             fail.getMessage());
@@ -844,7 +825,7 @@ public class DefaultCardService implements CardService {
     public Future<JsonObject> getAllCardsBySection(Section section, Integer page, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
 
-        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsBySectionCount(section, page, user);
+        Future<JsonArray> fetchAllCardsCountFuture = fetchAllCardsBySectionCount(section, page, user, null);
 
         Future<List<Card>> fetchAllCardsFuture = fetchAllCardsBySection(section, page, user);
 
@@ -871,10 +852,10 @@ public class DefaultCardService implements CardService {
     }
 
     @Override
-    public Future<List<Card>> getAllCardsBySectionSimple(Section section, Integer page, UserInfos user) {
+    public Future<List<Card>> getAllCardsBySectionSimple(Section section, Integer page, UserInfos user, String searchText) {
         Promise<List<Card>> promise = Promise.promise();
 
-        fetchAllCardsBySection(section, page, user)
+        fetchAllCardsBySection(section, page, user, searchText)
                 .compose(this::setMetadataCards)
                 .onFailure(fail -> {
                     log.error("[Magneto@%s::getAllCardsBySectionSimple] Failed to get section cards", this.getClass().getSimpleName(),
@@ -1209,9 +1190,9 @@ public class DefaultCardService implements CardService {
      * @return the list of cards
      */
     private Future<List<Card>> fetchAllCardsByBoard(Board board, Integer page, UserInfos user,
-                                                    boolean fromStartPage, UserInfos userToFetch) {
+                                                    boolean fromStartPage, UserInfos userToFetch, String searchText) {
         Promise<List<Card>> promise = Promise.promise();
-        JsonObject query = this.getAllCardsByBoardQuery(board, page, false, user, fromStartPage, userToFetch);
+        JsonObject query = this.getAllCardsByBoardQuery(board, page, false, user, fromStartPage, userToFetch, searchText);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error(String.format("[Magneto@%s::fetchAllCardsByBoard] Failed to get cards", this.getClass().getSimpleName()),
@@ -1227,9 +1208,9 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<JsonArray> fetchAllCardsByBoardCount(Board board, Integer page, UserInfos user) {
+    private Future<JsonArray> fetchAllCardsByBoardCount(Board board, Integer page, UserInfos user, String searchText) {
         Promise<JsonArray> promise = Promise.promise();
-        JsonObject query = this.getAllCardsByBoardQuery(board, page, true, user, false);
+        JsonObject query = this.getAllCardsByBoardQuery(board, page, true, user, false, searchText);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error("[Magneto@%s::fetchAllCardsByBoardCount] Failed to get cards", this.getClass().getSimpleName(),
@@ -1246,8 +1227,12 @@ public class DefaultCardService implements CardService {
     }
 
     private Future<List<Card>> fetchAllCardsBySection(Section section, Integer page, UserInfos user) {
+        return fetchAllCardsBySection(section, page, user, null);
+    }
+
+    private Future<List<Card>> fetchAllCardsBySection(Section section, Integer page, UserInfos user, String searchText) {
         Promise<List<Card>> promise = Promise.promise();
-        JsonObject query = this.getAllCardsBySectionQuery(section, page, false, user);
+        JsonObject query = this.getAllCardsBySectionQuery(section, page, false, user, searchText);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error(String.format("[Magneto@%s::fetchAllCardsBySection] Failed to get cards", this.getClass().getSimpleName()),
@@ -1263,9 +1248,9 @@ public class DefaultCardService implements CardService {
         return promise.future();
     }
 
-    private Future<JsonArray> fetchAllCardsBySectionCount(Section section, Integer page, UserInfos user) {
+    private Future<JsonArray> fetchAllCardsBySectionCount(Section section, Integer page, UserInfos user, String searchText) {
         Promise<JsonArray> promise = Promise.promise();
-        JsonObject query = this.getAllCardsBySectionQuery(section, page, true, user);
+        JsonObject query = this.getAllCardsBySectionQuery(section, page, true, user, searchText);
         mongoDb.command(query.toString(), MongoDbResult.validResultHandler(either -> {
             if (either.isLeft()) {
                 log.error("[Magneto@%s::fetchAllCardsBySectionCount] Failed to get cards", this.getClass().getSimpleName(),
@@ -1447,7 +1432,7 @@ public class DefaultCardService implements CardService {
      * @return the query to get all cards by board
      */
     private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user,
-                                               boolean fromStartPage, UserInfos userToFetch) {
+                                               boolean fromStartPage, UserInfos userToFetch, String searchText) {
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject()
                         .put(Field.BOARDID, board.getId()));
@@ -1455,6 +1440,12 @@ public class DefaultCardService implements CardService {
         if (userToFetch != null) {
             query.match(new JsonObject()
                     .put(Field.OWNERID, userToFetch.getUserId()));
+        }
+        if (searchText != null && !searchText.isEmpty()) {
+            query.matchRegex(searchText, Arrays.asList(
+                    Field.TITLE,
+                    Field.OWNERNAME
+            ));
         }
 
         if (page != null) {
@@ -1531,11 +1522,11 @@ public class DefaultCardService implements CardService {
     }
 
     private JsonObject getAllCardsByBoardQuery(Board board, Integer page, boolean getCount, UserInfos user,
-                                               boolean fromStartPage) {
-        return getAllCardsByBoardQuery(board, page, getCount, user, fromStartPage, null);
+                                               boolean fromStartPage, String searchText) {
+        return getAllCardsByBoardQuery(board, page, getCount, user, fromStartPage, null, searchText);
     }
 
-    private JsonObject getAllCardsBySectionQuery(Section section, Integer page, boolean getCount, UserInfos user) {
+    private JsonObject getAllCardsBySectionQuery(Section section, Integer page, boolean getCount, UserInfos user, String searchText) {
         MongoQuery query = new MongoQuery(this.collection)
                 .match(new JsonObject().put(Field.BOARDID, section.getBoardId()))
                 .match(new JsonObject().put(Field._ID, new JsonObject().put(Mongo.IN, section.getCardIds())))
@@ -1546,6 +1537,12 @@ public class DefaultCardService implements CardService {
                         )
                 )
                 .sort(Field.INDEX, 1);
+        if (searchText != null && !searchText.isEmpty()) {
+            query.matchRegex(searchText, Arrays.asList(
+                    Field.TITLE,
+                    Field.OWNERNAME
+            ));
+        }
         if (getCount) {
             query.count();
         } else {

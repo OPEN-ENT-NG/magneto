@@ -44,7 +44,7 @@ const Header: React.FC<HeaderProps> = ({ onClick, toggleDrawer }) => {
         <MenuIcon />
       </IconButton>
       <div className="header-left">
-        <img src={myimg} alt="Logo" className="logo" />
+        <img src={myimg} alt="Logo" className="logoMagneto" />
         <span className="header-text">{t("magneto.header.my.boards")}</span>
       </div>
       {isFolderOwnerOrSharedWithRights && (

@@ -1,33 +1,37 @@
-import { css } from "@emotion/react";
+import { SxProps, Theme } from "@mui/material";
 
-export const folderTitleWrapper = (position: "start" | "middle" | "end") => css`
-  box-sizing: border-box;
-  margin: 25px 20px 10px 0px;
-  width: 100%;
-  display: flex;
-  float: left;
-  justify-content: ${position === "start"
-    ? "flex-start"
-    : position === "middle"
-    ? "center"
-    : "flex-end"};
-`;
+export const wrapperStyles = (
+  position: "start" | "middle" | "end",
+): SxProps<Theme> => ({
+  boxSizing: "border-box",
+  margin: "25px 20px 10px 0px",
+  width: "100%",
+  display: "flex",
+  justifyContent:
+    position === "start"
+      ? "flex-start"
+      : position === "middle"
+      ? "center"
+      : "flex-end",
+});
 
-export const elementWrapper = css`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
+export const elementWrapperStyles: SxProps<Theme> = {
+  display: "flex",
+  alignItems: "center",
+  gap: 2,
+};
 
-export const SVGWrapper = css`
-  width: 20px;
-  height: 20px;
-  color: #5b6472;
-`;
+export const iconStyles: SxProps<Theme> = {
+  width: 20,
+  height: 20,
+  color: "#5b6472",
+  display: "flex",
+  alignItems: "center",
+};
 
-export const textStyle = css`
-  font-size: 20px;
-  font-family: "roboto";
-  line-height: 23px;
-  color: #5b6472;
-`;
+export const textStyles = (isTheme1d: boolean): SxProps<Theme> => ({
+  fontSize: 20,
+  fontFamily: isTheme1d ? "Arimo" : "Roboto",
+  lineHeight: "23px",
+  color: "#5b6472",
+});

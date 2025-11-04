@@ -50,9 +50,10 @@ export const listItemIconStyle = {
   height: "2rem",
 };
 
-export const listItemTextStyle = {
+export const listItemTextStyle = (isTheme1D: boolean) => ({
   "& .MuiListItemText-primary, & .MuiListItemText-secondary": {
     color: "inherit",
     fontSize: "1.5rem",
+    ...(isTheme1D && { fontFamily: "Arimo" }),
   },
-};
+});

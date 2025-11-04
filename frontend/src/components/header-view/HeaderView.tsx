@@ -29,6 +29,7 @@ import {
 } from "./style";
 import { BoardDescription } from "../board-description/BoardDescription";
 import { ConnectedUsersChip } from "../connected-users-chip/ConnectedUsersChip";
+import { useTheme } from "~/hooks/useTheme";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
@@ -49,6 +50,7 @@ export const HeaderView: FC = () => {
   };
 
   const edificeClient = useEdificeClient();
+  const { isTheme1D } = useTheme();
   const { readyState } = useWebSocketMagneto();
   const { currentApp } = isExternalView
     ? { currentApp: magnetoWebApp }
@@ -99,7 +101,7 @@ export const HeaderView: FC = () => {
             {readyState === WebSocket.OPEN ? (
               <ConnectedUsersChip />
             ) : (
-              <Box sx={toastStyle}>
+              <Box sx={toastStyle(isTheme1D)}>
                 <Icon path={mdiCheckCircle} size={1} />
                 <span>
                   {t("magneto.board.saved.at", {

@@ -13,7 +13,7 @@ export const boxStyle = {
   boxShadow: "0 0.125rem 0.25rem rgba(0,0,0,0.1)",
 };
 
-export const inputStyle = {
+export const inputStyle = (isTheme1D: boolean) => ({
   flex: 1,
   "& input": {
     textAlign: "center",
@@ -23,8 +23,9 @@ export const inputStyle = {
     padding: ".5rem 0 .5rem 1.5rem",
     boxSizing: "border-box",
     textOverflow: "ellipsis",
+    ...(isTheme1D && { fontFamily: "Arimo" }),
   },
-};
+});
 
 export const iconButtonStyle = {
   padding: "0.25rem",

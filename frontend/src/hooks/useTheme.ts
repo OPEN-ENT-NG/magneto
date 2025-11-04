@@ -1,10 +1,18 @@
+import { useEffect, useState } from "react";
+
 import { odeServices } from "@edifice.io/client";
 
 export const useTheme = () => {
-  const isTheme1d = async (): Promise<any> => {
-    const res = (await odeServices.conf().getConf("")).theme.is1d;
-    return res;
-  };
+  const [isTheme1D, setIsTheme1D] = useState(false);
 
-  return { isTheme1d };
+  useEffect(() => {
+    const getIsTheme1D = async (): Promise<void> => {
+      const res = (await odeServices.conf().getConf("")).theme.is1d;
+      setIsTheme1D(res);
+    };
+
+    void getIsTheme1D();
+  }, []);
+
+  return { isTheme1D };
 };

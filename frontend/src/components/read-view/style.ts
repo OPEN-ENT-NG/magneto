@@ -20,11 +20,12 @@ export const styledContentBox = {
   maxHeight: "100%",
 };
 
-export const retourStyle = {
-  position: "fixed",
-  right: "40px",
-  top: "80px",
-} as React.CSSProperties;
+export const retourStyle = (isTheme1D: boolean) =>
+  ({
+    position: "fixed",
+    right: isTheme1D ? "-2rem" : "4rem",
+    top: "8rem",
+  }) as React.CSSProperties;
 
 export const boxStyle = {
   padding: "1rem 0",

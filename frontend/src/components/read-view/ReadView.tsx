@@ -44,6 +44,7 @@ import { CommentPanel } from "../comment-panel/CommentPanel";
 import { PreviewContent } from "../preview-content/PreviewContent";
 import { commentButtonStyle, CommentContainer } from "../Preview-modal/style";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { useTheme } from "~/hooks/useTheme";
 import { useWindowResize } from "~/hooks/useWindowResize";
 import { Card } from "~/models/card.model";
 import { useBoard } from "~/providers/BoardProvider";
@@ -57,6 +58,7 @@ export const ReadView: FC = () => {
     isExternalView,
   } = useBoard();
   const navigate = useNavigate();
+  const { isTheme1D } = useTheme();
   const { t } = useTranslation("magneto");
   const [isRefReady, setIsRefReady] = useState(false);
   const [card, setCard] = useState<Card | null>(null);
@@ -188,6 +190,7 @@ export const ReadView: FC = () => {
   return (
     <>
       <GlobalStyles
+        key="main-style-read"
         styles={{
           "main.container-fluid": {
             width: " 65% !important",
@@ -233,7 +236,7 @@ export const ReadView: FC = () => {
         variant="filled"
         className="retour-button"
         onClick={navigateToView}
-        style={retourStyle}
+        style={retourStyle(isTheme1D)}
       >
         <ArrowBackIcon sx={whiteColor} />
         {t("magneto.previous")}

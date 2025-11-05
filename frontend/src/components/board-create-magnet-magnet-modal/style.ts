@@ -80,11 +80,13 @@ export const duplicateButtonStyle = {
 
 export const formGroupStyle = { flexDirection: "row", gap: ".5rem" };
 
-export const StyledFormControlLabel = styled(FormControlLabel)(() => ({
+export const StyledFormControlLabel = styled(FormControlLabel)<{
+  isTheme1D?: boolean;
+}>(({ isTheme1D }) => ({
   "& .MuiFormControlLabel-label": {
     fontSize: "1.5rem",
     color: "#4a4a4a",
-    fontFamily: "Roboto, sans-serif",
+    ...(isTheme1D && { fontFamily: "Arimo" }),
   },
 }));
 

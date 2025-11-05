@@ -29,6 +29,7 @@ import { initialInputvalue } from "./utils";
 import { TabList } from "../tab-list/TabList";
 import { CURRENTTAB_STATE } from "../tab-list/types";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
+import { useTheme } from "~/hooks/useTheme";
 import { useBoard } from "~/providers/BoardProvider";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import { useDuplicateCardMutation } from "~/services/api/cards.service";
@@ -37,6 +38,7 @@ export const BoardCreateMagnetMagnetModal: FC<
   BoardCreateMagnetMagnetModalProps
 > = ({ open, onClose }) => {
   const { board } = useBoard();
+  const { isTheme1D } = useTheme();
   const [inputValue, setInputValue] =
     useState<InputValueState>(initialInputvalue);
   const { currentTab, isByBoards, isByFavorite } = inputValue;
@@ -154,6 +156,7 @@ export const BoardCreateMagnetMagnetModal: FC<
               />
             }
             label={t("magneto.cards.collection.board.view")}
+            isTheme1D={isTheme1D}
           />
           {currentTab !== CURRENTTAB_STATE.FAVORTIE && (
             <StyledFormControlLabel
@@ -164,6 +167,7 @@ export const BoardCreateMagnetMagnetModal: FC<
                 />
               }
               label={t("magneto.cards.collection.favorite.view")}
+              isTheme1D={isTheme1D}
             />
           )}
         </FormGroup>

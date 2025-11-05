@@ -27,7 +27,9 @@ const handleStyledCardContentHeight = (zoomLevel: number) => {
   }
 };
 
-export const StyledCardContent = styled(CardContent)({
+export const StyledCardContent = styled(CardContent, {
+  shouldForwardProp: (prop) => prop !== "isTheme1D",
+})<{ isTheme1D?: boolean }>(({ isTheme1D }) => ({
   ...handleStyledCardContentHeight,
   flex: 1,
   overflow: "hidden",
@@ -37,7 +39,8 @@ export const StyledCardContent = styled(CardContent)({
   paddingBottom: 0,
   display: "flex",
   flexDirection: "column",
-});
+  ...(isTheme1D && { fontFamily: "Arimo" }),
+}));
 
 export const StyledContentTitleTypography = styled(Typography, {
   shouldForwardProp: (prop) => prop !== "zoomLevel",
@@ -47,6 +50,7 @@ export const StyledContentTitleTypography = styled(Typography, {
   lineHeight: "1.8rem",
   overflowWrap: "break-word",
   color: "#4B4B4B",
+  fontFamily: "inherit",
   ...(zoomLevel < 2 && {
     display: "-webkit-box",
     overflow: "hidden",
@@ -71,6 +75,7 @@ export const CardContentWrapper = styled("div")<{ resourceType: string }>(({
     overflow: "hidden",
     width: "100%",
     aspectRatio: "16 / 9",
+    fontFamily: "inherit",
     borderRadius: resourceType !== RESOURCE_TYPE.TEXT ? "1rem" : "unset",
   };
 });

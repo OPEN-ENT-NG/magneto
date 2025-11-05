@@ -14,6 +14,7 @@ import {
   titleStyle,
 } from "./style";
 import { MessageModalProps } from "./types";
+import { useTheme } from "~/hooks/useTheme";
 
 export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   isOpen,
@@ -26,6 +27,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
   onClose,
   isHard = false,
 }) => {
+  const { isTheme1D } = useTheme();
   return (
     <Modal
       open={isOpen}
@@ -63,6 +65,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
               variant="text"
               isFilled={false}
               onClick={() => onClose()}
+              isTheme1D={isTheme1D}
             >
               {cancelButtonName ? cancelButtonName : "Cancel"}
             </StyledButton>
@@ -73,6 +76,7 @@ export const MessageModal: React.FunctionComponent<MessageModalProps> = ({
                 isFilled={true}
                 onClick={() => onSubmit()}
                 disabled={!!disableSubmit && disableSubmit()}
+                isTheme1D={isTheme1D}
               >
                 {submitButtonName ? submitButtonName : "Submit"}
               </StyledButton>

@@ -29,9 +29,9 @@ export const iconStyles: SxProps<Theme> = {
   alignItems: "center",
 };
 
-export const textStyles = (isTheme1d: boolean): SxProps<Theme> => ({
+export const textStyles = (isTheme1D: boolean): SxProps<Theme> => ({
   fontSize: 20,
-  fontFamily: isTheme1d ? "Arimo" : "Roboto",
+  fontFamily: isTheme1D ? "Arimo" : "Roboto",
   lineHeight: "23px",
   color: "#5b6472",
 });

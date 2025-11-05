@@ -6,13 +6,16 @@ import { useParams } from "react-router-dom";
 
 import { BoardView } from "~/components/board-view/BoardView";
 import { workflowName } from "~/config";
+import { useTheme } from "~/hooks/useTheme";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { WebSocketProvider } from "~/providers/WebsocketProvider";
 import { useActions } from "~/services/queries";
-import theme from "~/themes/theme";
+import { createAppTheme } from "~/themes/theme";
 
 export const App = () => {
   const { id = "" } = useParams();
+  const { isTheme1D } = useTheme();
+  const theme = createAppTheme(isTheme1D);
   const isLocal = window.location.protocol === "http:";
   const getSocketURL = useCallback(() => {
     return isLocal

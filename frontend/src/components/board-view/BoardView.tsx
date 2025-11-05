@@ -28,6 +28,7 @@ import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
+import { useTheme } from "~/hooks/useTheme";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
@@ -50,6 +51,7 @@ export const BoardView: FC = () => {
     isExternalView,
   } = useBoard();
   const headerHeight = useHeaderHeight();
+  const { isTheme1D } = useTheme();
   const [, setDragCounter] = useState<number>(0);
   const {
     magnetType,
@@ -123,12 +125,23 @@ export const BoardView: FC = () => {
   ) : (
     <>
       <GlobalStyles
+        key="main-style-view"
         styles={{
           "main.container-fluid": {
             padding: "0 !important",
             width: "100%",
-            margin: hasEditRights() ? " 0 0 0 8.1rem" : "auto",
-            maxWidth: "93%",
+            margin: hasEditRights()
+              ? isTheme1D
+                ? "0 0 0 14.1rem"
+                : "0 0 0 8.1rem"
+              : "auto",
+            maxWidth: "93% !important",
+            "@media (max-width: 1280px)":
+              isTheme1D && hasEditRights()
+                ? {
+                    margin: "0 0 0 11.6rem",
+                  }
+                : {},
           },
         }}
       />

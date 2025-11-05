@@ -76,8 +76,8 @@ export const submitButtonsStyle = {
 };
 
 export const StyledButton = styled(Button, {
-  shouldForwardProp: (prop) => prop !== "isFilled",
-})<StyledButtonProps>(({ isFilled }) => {
+  shouldForwardProp: (prop) => prop !== "isFilled" && prop !== "isTheme1d",
+})<StyledButtonProps>(({ isFilled, isTheme1D }) => {
   const buttonFilledStyle = isFilled
     ? { backgroundColor: "#F17A17" }
     : { color: "#6e6e6e" };
@@ -85,7 +85,7 @@ export const StyledButton = styled(Button, {
   return {
     height: "100%",
     width: "fit-content",
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: isTheme1D ? "Arimo" : "Roboto, sans-serif",
     fontSize: "2rem",
     fontWeight: "bold",
     borderRadius: "0.8rem",

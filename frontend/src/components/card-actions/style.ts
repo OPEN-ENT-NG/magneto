@@ -1,14 +1,15 @@
 import { CardActions, styled } from "@mui/material";
 
 export const StyledCardActions = styled(CardActions, {
-  shouldForwardProp: (prop) => prop !== "zoomLevel",
-})<{ zoomLevel: number }>(({ zoomLevel }) => ({
+  shouldForwardProp: (prop) => prop !== "zoomLevel" && prop !== "isTheme1d",
+})<{ zoomLevel: number; isTheme1D?: boolean }>(({ zoomLevel, isTheme1D }) => ({
   justifyContent: "space-between",
   padding: "0",
   paddingRight: "0.4rem",
   paddingBottom: 0,
   paddingTop: zoomLevel < 2 ? 0 : "1rem",
   alignItems: "center",
+  ...(isTheme1D && { fontFamily: "Arimo" }),
 }));
 
 export const styledTypographyContainer = {
@@ -28,6 +29,7 @@ export const styledTypography = {
   borderBottomLeftRadius: "10px",
   fontSize: "14px",
   flexShrink: 0,
+  fontFamily: "inherit",
 };
 
 export const styledLegendTypography = {
@@ -37,6 +39,7 @@ export const styledLegendTypography = {
   fontStyle: "italic",
   whiteSpace: "nowrap",
   marginLeft: "1rem",
+  fontFamily: "inherit",
 };
 
 export const styledBox = {

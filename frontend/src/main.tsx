@@ -28,8 +28,6 @@ const root = createRoot(rootElement!);
 const themePlatform = (rootElement?.getAttribute("data-theme") ??
   DEFAULT_THEME) as ThemeProviderProps["themeId"];
 
-console.log(rootElement?.getAttribute("data-theme"));
-
 if (process.env.NODE_ENV !== "production") {
   import("@axe-core/react").then((axe) => {
     axe.default(React, root, 1000);

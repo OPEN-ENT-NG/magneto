@@ -23,8 +23,8 @@ export const styledContentBox = {
 export const retourStyle = (isTheme1D: boolean) =>
   ({
     position: "fixed",
-    right: isTheme1D ? "-2rem" : "4rem",
-    top: "8rem",
+    right: "4rem",
+    top: isTheme1D ? "16rem" : "8rem",
   }) as React.CSSProperties;
 
 export const boxStyle = {

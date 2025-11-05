@@ -135,8 +135,7 @@ public class BoardController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getBoard(HttpServerRequest request) {
         String boardId = request.getParam(Field.BOARDID);
-        String searchText = (request.getParam(Field.SEARCHTEXT) != null) ?
-                request.getParam(Field.SEARCHTEXT) : "";
+        String searchText = request.getParam(Field.SEARCHTEXT, "");
         UserUtils.getUserInfos(eb, request, user -> new ContribBoardRight().authorize(request, null, user, readOnly ->
                 boardService.getBoardWithContent(boardId, user, readOnly, searchText)
                         .onSuccess(result -> renderJson(request, result.toJson()))

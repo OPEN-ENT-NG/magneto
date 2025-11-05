@@ -18,8 +18,8 @@ import {
   WebSocketProviderProps,
   WebSocketUpdate,
 } from "./types";
-import { notifyCacheUpdateCallbacks } from "~/hooks/useApplyBoardUpdate";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
+import { notifyCacheUpdateCallbacks } from "~/hooks/useApplyBoardUpdate";
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
 

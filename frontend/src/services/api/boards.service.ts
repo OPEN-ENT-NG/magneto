@@ -3,6 +3,7 @@ import {
   IBoardsParamsRequest,
   IBoardPayload,
   Boards,
+  IBoardParamsRequest,
 } from "~/models/board.model";
 
 export const boardsApi = emptySplitApi.injectEndpoints({
@@ -34,6 +35,12 @@ export const boardsApi = emptySplitApi.injectEndpoints({
         }
 
         return `boards${urlParams}`;
+      },
+      providesTags: ["Boards"],
+    }),
+    getBoardById: builder.query({
+      query: (params: IBoardParamsRequest) => {
+        return `board/${params.boardId}/${params.searchText}`;
       },
       providesTags: ["Boards"],
     }),
@@ -189,6 +196,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
 export const {
   useGetBoardsQuery,
   useGetAllBoardsQuery,
+  useGetBoardByIdQuery,
   useGetBoardsByIdsQuery,
   useGetBoardsByIdsPublicQuery,
   useCreateBoardMutation,

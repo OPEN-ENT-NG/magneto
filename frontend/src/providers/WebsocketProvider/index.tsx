@@ -18,6 +18,7 @@ import {
   WebSocketProviderProps,
   WebSocketUpdate,
 } from "./types";
+import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { notifyCacheUpdateCallbacks } from "~/hooks/useApplyBoardUpdate";
 
 const WebSocketContext = createContext<WebSocketContextValue | null>(null);
@@ -43,6 +44,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const lastWebSocketMessageRef = useRef<number>(Date.now());
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { t } = useTranslation("magneto");
+
+  const [activeSearchState, setActiveSearchState] = useState<{
+    boardId: string | null;
+    searchText: string;
+    refetchCallback: (() => void) | null;
+  }>({
+    boardId: null,
+    searchText: "",
+    refetchCallback: null,
+  });
 
   const {
     sendMessage: originalSendMessage,
@@ -108,7 +119,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         stopInactivityTimer();
       }
     }, 30000);
-  }, [getWebSocket]);
+  }, [getWebSocket, t]);
 
   const stopInactivityTimer = useCallback(() => {
     if (inactivityTimerRef.current) {
@@ -116,6 +127,37 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       inactivityTimerRef.current = null;
     }
   }, []);
+
+  const registerActiveSearch = useCallback(
+    (boardId: string, searchText: string, refetchCallback: () => void) => {
+      setActiveSearchState({
+        boardId,
+        searchText,
+        refetchCallback,
+      });
+
+      return () => {
+        setActiveSearchState({
+          boardId: null,
+          searchText: "",
+          refetchCallback: null,
+        });
+      };
+    },
+    [],
+  );
+
+  const shouldBlockCacheUpdate = useCallback(
+    (update: WebSocketUpdate): boolean => {
+      if (!activeSearchState.searchText || !activeSearchState.boardId) {
+        return false;
+      }
+
+      const blockableTypes = ["boardMessage", "boardUpdated"];
+      return blockableTypes.includes(update.type);
+    },
+    [activeSearchState],
+  );
 
   useEffect(() => {
     return () => {
@@ -146,16 +188,29 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           setCardEditing(update.cardEditingInformations);
         }
 
+        if (activeSearchState.searchText && activeSearchState.refetchCallback) {
+          const shouldRefetch = [
+            WEBSOCKET_MESSAGE_TYPE.BOARD_MESSAGE,
+            WEBSOCKET_MESSAGE_TYPE.BOARD_UPDATED,
+          ].includes(update.type as WEBSOCKET_MESSAGE_TYPE);
+
+          if (shouldRefetch) {
+            activeSearchState.refetchCallback();
+          }
+        }
+
         if (onMessage) {
           onMessage(update);
         }
 
-        notifyCacheUpdateCallbacks(update);
+        if (!shouldBlockCacheUpdate(update)) {
+          notifyCacheUpdateCallbacks(update);
+        }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
       }
     }
-  }, [lastMessage, onMessage]);
+  }, [lastMessage, onMessage, activeSearchState, shouldBlockCacheUpdate]);
 
   const contextValue: WebSocketContextValue = {
     sendMessage,
@@ -163,6 +218,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     readyState,
     connectedUsers,
     cardEditing,
+    registerActiveSearch,
   };
 
   return (

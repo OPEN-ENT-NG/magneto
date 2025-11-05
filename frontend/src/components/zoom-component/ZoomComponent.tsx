@@ -1,13 +1,22 @@
 import { FC } from "react";
 
-import { mdiMinus, mdiPlus } from "@mdi/js";
-import Icon from "@mdi/react";
-import "./ZoomComponent.scss";
+import { SearchInput, IconButton } from "@cgi-learning-hub/ui";
+import { AddRounded, RemoveRounded } from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
+
+import {
+  containerStyle,
+  iconButtonStyle,
+  iconStyle,
+  labelStyle,
+  searchInputStyle,
+} from "./style";
+import { useBoard } from "~/providers/BoardProvider";
 
 interface ZoomComponentProps {
   opacity?: number;
   zoomLevel: number;
-  zoomMaxLevel: number; //e.g. if zoomLevels is 3, there will be 4 zoom values accessible : 0, 1, 2, 3
+  zoomMaxLevel: number;
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
@@ -23,40 +32,27 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   resetZoom,
   label = "Zoom",
 }: ZoomComponentProps) => {
+  const isMinZoom = zoomLevel === 0;
+  const isMaxZoom = zoomLevel === zoomMaxLevel;
+
+  const { searchText, setSearchText } = useBoard();
+
   return (
-    <div className={`zoom`} style={{ opacity: opacity }}>
-      <div
-        role="button"
-        className={`zoom-minus ${zoomLevel === 0 ? "zoom-minus-disabled" : ""}`}
-        onClick={zoomOut}
-        onKeyDown={() => {}}
-        tabIndex={0}
-      >
-        <Icon path={mdiMinus} size={2} />
-        <i className="magneto-minus"></i>
-      </div>
-      <div className="zoom-line1"></div>
-      <div
-        className="zoom-label"
-        role="button"
-        onClick={resetZoom}
-        onKeyDown={() => {}}
-        tabIndex={0}
-      >
+    <Box sx={containerStyle({ opacity })}>
+      <SearchInput
+        sx={searchInputStyle}
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+      />
+      <IconButton onClick={zoomOut} disabled={isMinZoom} sx={iconButtonStyle}>
+        <RemoveRounded sx={iconStyle({ disabled: isMinZoom })} />
+      </IconButton>
+      <Typography onClick={resetZoom} sx={labelStyle} component="button">
         {label}
-      </div>
-      <div className="zoom-line2"></div>
-      <div
-        role="button"
-        className={`zoom-plus ${
-          zoomLevel === zoomMaxLevel ? "zoom-plus-disabled" : ""
-        }`}
-        onClick={zoomIn}
-        onKeyDown={() => {}}
-        tabIndex={0}
-      >
-        <Icon path={mdiPlus} size={2} />
-      </div>
-    </div>
+      </Typography>
+      <IconButton onClick={zoomIn} disabled={isMaxZoom} sx={iconButtonStyle}>
+        <AddRounded sx={iconStyle({ disabled: isMaxZoom })} />
+      </IconButton>
+    </Box>
   );
 };

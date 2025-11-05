@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { HexaColor } from "@cgi-learning-hub/ui/dist";
+import { HexaColor } from "@cgi-learning-hub/ui";
 
 export interface DndSectionProps {
   id: string;

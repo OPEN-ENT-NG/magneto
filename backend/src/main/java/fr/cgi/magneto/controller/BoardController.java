@@ -129,6 +129,23 @@ public class BoardController extends ControllerHelper {
         });
     }
 
+    @Get("/board/:boardId/:searchText")
+    @ApiDoc("Get board with its cards")
+    @ResourceFilter(ViewRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void getBoard(HttpServerRequest request) {
+        String boardId = request.getParam(Field.BOARDID);
+        String searchText = request.getParam(Field.SEARCHTEXT, "");
+        UserUtils.getUserInfos(eb, request, user -> new ContribBoardRight().authorize(request, null, user, readOnly ->
+                boardService.getBoardWithContent(boardId, user, readOnly, searchText)
+                        .onSuccess(result -> renderJson(request, result.toJson()))
+                        .onFailure(fail -> {
+                            String message = String.format("[Magneto@%s::getBoard] Failed to get board with id : %s",
+                                    this.getClass().getSimpleName(), fail.getMessage());
+                            log.error(message);
+                            renderError(request);
+                        })));
+    }
 
     @Post("/boards")
     @ApiDoc("Get boards by ids")

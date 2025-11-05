@@ -388,7 +388,7 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
                 String newId = UUID.randomUUID().toString();
                 return serviceFactory.sectionService().createSectionWithBoardUpdate(action.getSection(), newId)
                         .compose(res -> serviceFactory.sectionService().get(Collections.singletonList(newId)))
-                        .flatMap(sections -> this.serviceFactory.cardService().getAllCardsBySectionSimple(sections.get(0), null, user)
+                        .flatMap(sections -> this.serviceFactory.cardService().getAllCardsBySectionSimple(sections.get(0), null, user, null)
                                 .map(cards -> newArrayList(this.messageFactory.sectionAdded(boardId, wsId, user.getUserId(), sections.get(0).setCards(cards), action.getActionType(), action.getActionId()))));
             }
             case sectionAddedWithCard: {
@@ -698,11 +698,11 @@ public class DefaultMagnetoCollaborationService implements MagnetoCollaborationS
         List<Future> messageFutures = new ArrayList<>();
 
         // Version readOnly
-        Future<MagnetoMessage> readOnlyMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, true)
+        Future<MagnetoMessage> readOnlyMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, true, null)
                 .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, Field.READONLY));
 
         // Version complète
-        Future<MagnetoMessage> fullMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, false)
+        Future<MagnetoMessage> fullMessageFuture = this.serviceFactory.boardService().getBoardWithContent(boardId, user, false, null)
                 .map(board -> this.messageFactory.boardMessage(boardId, wsId, user.getUserId(), board, actionType, Field.FULLACCESS));
 
         messageFutures.add(readOnlyMessageFuture);

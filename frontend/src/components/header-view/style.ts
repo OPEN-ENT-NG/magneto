@@ -76,3 +76,13 @@ export const breadcrumbTitle = {
   lineHeight: "1.2",
   fontWeight: "bold",
 };
+
+export const buttonStyle = {
+  backgroundColor: "var(--theme-palette-primary-main)",
+  fontSize: "1.6rem",
+  fontWeight: "800",
+  height: "4rem",
+  minHeight: "4rem",
+  borderRadius: "0.8rem !important",
+  padding: "0.8rem 1.6rem",
+};

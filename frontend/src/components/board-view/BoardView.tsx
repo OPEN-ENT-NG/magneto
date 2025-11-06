@@ -9,7 +9,12 @@ import Icon from "@mdi/react";
 import { Box, GlobalStyles } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { BoardBodyWrapper, BoardViewWrapper, mediaLibraryStyle } from "./style";
+import {
+  BoardBodyWrapper,
+  BoardViewWrapper,
+  getMainContainerStyles,
+  mediaLibraryStyle,
+} from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { BoardCreateMagnetBoardModal } from "../board-create-magnet-board-modal/BoardCreateMagnetBoardModal";
 import { BoardCreateMagnetMagnetModal } from "../board-create-magnet-magnet-modal/BoardCreateMagnetMagnetModal";
@@ -126,24 +131,7 @@ export const BoardView: FC = () => {
     <>
       <GlobalStyles
         key="main-style-view"
-        styles={{
-          "main.container-fluid": {
-            padding: "0 !important",
-            width: "100%",
-            margin: hasEditRights()
-              ? isTheme1D
-                ? "0 0 0 14.1rem"
-                : "0 0 0 8.1rem"
-              : "auto",
-            maxWidth: "93% !important",
-            "@media (max-width: 1280px)":
-              isTheme1D && hasEditRights()
-                ? {
-                    margin: "0 0 0 11.6rem",
-                  }
-                : {},
-          },
-        }}
+        styles={getMainContainerStyles(hasEditRights(), isTheme1D)}
       />
       <BoardViewWrapper layout={board.layoutType}>
         <HeaderView />

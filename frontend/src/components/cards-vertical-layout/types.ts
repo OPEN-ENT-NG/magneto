@@ -8,4 +8,5 @@ export type CardDisplayProps = {
   zoomLevel: number;
   canComment: boolean;
   displayNbFavorites: boolean;
+  hasBackground: boolean;
 };

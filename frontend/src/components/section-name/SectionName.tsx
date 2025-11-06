@@ -7,7 +7,11 @@ import {
   FC,
 } from "react";
 
-import { ColorPicker, HexaColor } from "@cgi-learning-hub/ui";
+import {
+  ColorPicker,
+  DEFAULT_COLOR_OPTIONS,
+  HexaColor,
+} from "@cgi-learning-hub/ui";
 import { useToast } from "@edifice.io/react";
 import { mdiEyeOff } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -74,6 +78,10 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   useEffect(() => {
     setInputValue(section?.title);
   }, [section?.title]);
+
+  useEffect(() => {
+    setColor(section.color || "#FFFFFF");
+  }, [section.color]);
 
   const updateSectionAndToast = usePredefinedToasts({
     func: updateSection,
@@ -200,6 +208,10 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
             value={color}
             onChange={setColorAndUpdate}
             useCheckmarkSwatch
+            options={[
+              ...DEFAULT_COLOR_OPTIONS,
+              { color: "#FFFFFF", showBorder: true },
+            ]}
             slotProps={{
               circlePickerBox: {
                 sx: circlePickerStyle,

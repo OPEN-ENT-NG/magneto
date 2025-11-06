@@ -34,7 +34,7 @@ export const SectionWrapper = styled("div")<SectionWrapperProps>(({
         overflow: "hidden",
         opacity: isDragging ? "0.5" : "1",
         cursor: isDragging ? "grabbing" : "grab",
-        backgroundColor: color,
+        backgroundColor: `${color}0D`,
       };
     case "horizontal":
       return {

@@ -113,7 +113,7 @@ const MemoizedSection = memo(
       isLast={isLast}
       data-type={!isDraggable ? DND_ITEM_TYPE.NON_DRAGGABLE : undefined}
       readOnly={!hasManageRights}
-      color={section?.color}
+      color={displayProps.hasBackground ? "#FFFFFF" : section?.color}
     >
       <Box sx={sectionNameWrapperStyle}>
         <SectionName section={section} />
@@ -206,8 +206,14 @@ export const CardsHorizontalLayout: FC = () => {
       zoomLevel,
       canComment: board.canComment,
       displayNbFavorites: board.displayNbFavorites,
+      hasBackground: !!board.backgroundUrl?.trim(),
     }),
-    [zoomLevel, board.canComment, board.displayNbFavorites],
+    [
+      zoomLevel,
+      board.canComment,
+      board.displayNbFavorites,
+      board.backgroundUrl,
+    ],
   );
 
   const sectionCount = useMemo(() => updatedSections.length, [updatedSections]);

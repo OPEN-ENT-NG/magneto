@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 
 import {
   boxStyle,
+  circlePickerStyle,
   ColorCircle,
   iconButtonStyle,
   iconStyle,
@@ -195,7 +196,16 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
       )}
       {section._id !== "new-section" &&
         (hasEditRights() ? (
-          <ColorPicker value={color} onChange={setColorAndUpdate} />
+          <ColorPicker
+            value={color}
+            onChange={setColorAndUpdate}
+            useCheckmarkSwatch
+            slotProps={{
+              circlePickerBox: {
+                sx: circlePickerStyle,
+              },
+            }}
+          />
         ) : (
           <ColorCircle color={color} />
         ))}

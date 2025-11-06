@@ -46,3 +46,9 @@ export const ColorCircle = styled(Box)<{ color: string }>(({ color }) => ({
   borderRadius: "50%",
   backgroundColor: color,
 }));
+
+export const circlePickerStyle = {
+  bottom: "auto",
+  top: "calc(100% + 0.5rem)",
+  right: "-10rem",
+};

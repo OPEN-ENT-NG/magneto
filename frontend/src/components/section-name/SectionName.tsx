@@ -30,6 +30,7 @@ import { useDropdown } from "../drop-down-list/useDropDown";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
+import { useTheme } from "~/hooks/useTheme";
 import { useBoard } from "~/providers/BoardProvider";
 import { useWebSocketMagneto } from "~/providers/WebsocketProvider";
 import {
@@ -44,6 +45,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const [color, setColor] = useState<HexaColor>(section.color || "#FFFFFF");
   const toast = useToast();
   const { t } = useTranslation("magneto");
+  const { isTheme1D } = useTheme();
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =
     useDropdown();
   const [createSection] = useCreateSectionMutation();
@@ -199,7 +201,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
         ))}
       <InputBase
         data-type={DND_ITEM_TYPE.NON_DRAGGABLE}
-        sx={inputStyle}
+        sx={inputStyle(isTheme1D)}
         value={inputValue}
         placeholder={
           section?._id === "new-section"

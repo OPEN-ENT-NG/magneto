@@ -1,7 +1,7 @@
 import React from "react";
 
 import "@edifice.io/bootstrap/dist/index.css";
-import { ThemeProvider, ThemeProviderProps } from "@cgi-learning-hub/theme";
+import { ThemeProviderProps } from "@cgi-learning-hub/theme";
 import { EdificeClientProvider, EdificeThemeProvider } from "@edifice.io/react";
 import {
   QueryCache,
@@ -14,6 +14,7 @@ import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
+import { ThemeWrapper } from "./components/theme-wrapper/ThemeWrapper";
 import { DEFAULT_THEME } from "./core/constants/preferences.const";
 import { TOAST_CONFIG } from "./core/constants/toast-config.const";
 import { MediaLibraryProvider } from "./providers/MediaLibraryProvider";
@@ -62,12 +63,12 @@ root.render(
         }}
       >
         <EdificeThemeProvider>
-          <ThemeProvider themeId={themePlatform ?? "default"}>
+          <ThemeWrapper themePlatform={themePlatform ?? "default"}>
             <MediaLibraryProvider>
               <ToastContainer {...TOAST_CONFIG} />
               <RouterProvider router={router} />
             </MediaLibraryProvider>
-          </ThemeProvider>
+          </ThemeWrapper>
         </EdificeThemeProvider>
       </EdificeClientProvider>
     </Provider>

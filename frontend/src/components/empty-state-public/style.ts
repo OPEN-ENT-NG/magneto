@@ -5,16 +5,16 @@ export const boxEmptyState = {
   width: "100%",
 };
 
-export const titleEmptyState = {
+export const titleEmptyState = (isTheme1D: boolean) => ({
   textAlign: "center",
   fontWeight: "bold",
-  font: "Roboto",
+  fontFamily: isTheme1D ? "Arimo" : "Roboto",
   paddingBottom: "2rem",
-};
+});
 
-export const contentEmptyState = {
-  font: "Roboto",
+export const contentEmptyState = (isTheme1D: boolean) => ({
+  fontFamily: isTheme1D ? "Arimo" : "Roboto",
   fontSize: "1.6rem",
   lineHeight: "150%",
   letterSpacing: "0.15px",
-};
+});

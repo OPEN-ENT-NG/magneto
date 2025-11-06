@@ -9,7 +9,12 @@ import Icon from "@mdi/react";
 import { Box, GlobalStyles } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { BoardBodyWrapper, BoardViewWrapper, mediaLibraryStyle } from "./style";
+import {
+  BoardBodyWrapper,
+  BoardViewWrapper,
+  getMainContainerStyles,
+  mediaLibraryStyle,
+} from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { BoardCreateMagnetBoardModal } from "../board-create-magnet-board-modal/BoardCreateMagnetBoardModal";
 import { BoardCreateMagnetMagnetModal } from "../board-create-magnet-magnet-modal/BoardCreateMagnetMagnetModal";
@@ -28,6 +33,7 @@ import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { useSideMenuData } from "~/hooks/useSideMenuData";
+import { useTheme } from "~/hooks/useTheme";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 
@@ -50,6 +56,7 @@ export const BoardView: FC = () => {
     isExternalView,
   } = useBoard();
   const headerHeight = useHeaderHeight();
+  const { isTheme1D } = useTheme();
   const [, setDragCounter] = useState<number>(0);
   const {
     magnetType,
@@ -123,14 +130,8 @@ export const BoardView: FC = () => {
   ) : (
     <>
       <GlobalStyles
-        styles={{
-          "main.container-fluid": {
-            padding: "0 !important",
-            width: "100%",
-            margin: hasEditRights() ? " 0 0 0 8.1rem" : "auto",
-            maxWidth: "93%",
-          },
-        }}
+        key="main-style-view"
+        styles={getMainContainerStyles(hasEditRights(), isTheme1D)}
       />
       <BoardViewWrapper layout={board.layoutType}>
         <HeaderView />

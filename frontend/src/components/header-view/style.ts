@@ -1,4 +1,4 @@
-export const toastStyle = {
+export const toastStyle = (isTheme1D: boolean) => ({
   display: "flex",
   alignItems: "center",
   gap: ".5rem",
@@ -8,7 +8,8 @@ export const toastStyle = {
   borderRadius: ".5rem",
   color: "#2a9cc8",
   textWrap: "nowrap",
-};
+  ...(isTheme1D && { fontFamily: "Arimo" }),
+});
 export const externalToastStyle = {
   display: "flex",
   alignItems: "center",

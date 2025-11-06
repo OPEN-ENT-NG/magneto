@@ -19,6 +19,7 @@ import {
 import { DropDownListItem, DropDownListProps } from "./types";
 import { getAnchorOrigin, getTransformOrigin } from "./utils";
 import { Tooltip } from "../tooltip/Tooltip";
+import { useTheme } from "~/hooks/useTheme";
 
 export const DropDownList: FC<DropDownListProps> = ({
   items,
@@ -29,6 +30,7 @@ export const DropDownList: FC<DropDownListProps> = ({
   menuOffset = 8,
 }) => {
   const { t } = useTranslation("magneto");
+  const { isTheme1D } = useTheme();
 
   const handleItemClick = (item: DropDownListItem) => {
     item.OnClick();
@@ -42,7 +44,10 @@ export const DropDownList: FC<DropDownListProps> = ({
       disabled={item.disabled}
     >
       <ListItemIcon sx={listItemIconStyle}>{item.primary}</ListItemIcon>
-      <ListItemText primary={item.secondary} sx={listItemTextStyle} />
+      <ListItemText
+        primary={item.secondary}
+        sx={listItemTextStyle(isTheme1D)}
+      />
     </MenuItem>
   );
 

@@ -69,3 +69,25 @@ export const mediaLibraryStyle = {
   position: "fixed",
   zIndex: 1100,
 };
+
+export const getMainContainerStyles = (
+  hasEditRights: boolean,
+  isTheme1D: boolean,
+) => ({
+  "main.container-fluid": {
+    padding: "0 !important",
+    width: "100%",
+    margin: hasEditRights
+      ? isTheme1D
+        ? "0 0 0 14.1rem"
+        : "0 0 0 8.1rem"
+      : "auto",
+    maxWidth: "93% !important",
+    "@media (max-width: 1280px)":
+      isTheme1D && hasEditRights
+        ? {
+            margin: "0 0 0 11.6rem",
+          }
+        : {},
+  },
+});

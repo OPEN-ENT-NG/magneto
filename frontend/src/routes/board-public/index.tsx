@@ -10,16 +10,19 @@ import {
   loadingTextStyle,
 } from "~/components/card-content-board/style";
 import { EmptyStatePublic } from "~/components/empty-state-public/EmptyStatePublic";
+import { useTheme } from "~/hooks/useTheme";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { WebSocketProvider } from "~/providers/WebsocketProvider";
 import { useGetIsExternalQuery } from "~/services/api/boards.service"; // Importation du hook RTK Query
-import theme from "~/themes/theme";
+import { createAppTheme } from "~/themes/theme";
 import "./removeDisconnectLightbox.scss";
 
 export const App = () => {
   // Appel au hook RTK Query
   const { id = "" } = useParams();
   const { t } = useTranslation("magneto");
+  const { isTheme1D } = useTheme();
+  const theme = createAppTheme(isTheme1D);
 
   const { data: isExternalQueryAllowed, isLoading } = useGetIsExternalQuery(id);
 

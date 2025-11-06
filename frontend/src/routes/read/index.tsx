@@ -6,13 +6,16 @@ import { useParams } from "react-router-dom";
 
 import { ReadView } from "~/components/read-view/ReadView";
 import { workflowName } from "~/config";
+import { useTheme } from "~/hooks/useTheme";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { WebSocketProvider } from "~/providers/WebsocketProvider";
 import { useActions } from "~/services/queries";
-import theme from "~/themes/theme";
+import { createAppTheme } from "~/themes/theme";
 
 export const App = () => {
   const { id = "" } = useParams();
+  const { isTheme1D } = useTheme();
+  const theme = createAppTheme(isTheme1D);
   const isLocalhost = window.location.hostname === "localhost";
   const getSocketURL = useCallback(() => {
     return isLocalhost

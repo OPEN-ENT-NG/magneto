@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 export interface StyledButtonProps {
   isFilled: boolean;
+  isTheme1D: boolean;
 }
 
 export type MessageModalProps = {

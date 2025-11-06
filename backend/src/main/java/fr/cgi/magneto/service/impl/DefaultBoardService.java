@@ -328,27 +328,49 @@ public class DefaultBoardService implements BoardService {
         return promise.future();
     }
 
-    public Future<JsonObject> updateLayoutCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n, UserInfos user) {
+    public Future<JsonObject> updateLayoutAndSortCards(BoardPayload updateBoard, Board currentBoard, I18nHelper i18n, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
         List<Future> updateBoardFutures = new ArrayList<>();
 
         // Check if we are changing the layout from free to section
         if (currentBoard.isLayoutFree() && !updateBoard.isLayoutFree()) {
-            SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(currentBoard.getCardIds());
+            // Récupérer les cartes pour potentiellement les trier
+            cardService.getAllCardsByBoard(currentBoard, null, user, false)
+                    .compose(cardsResult -> {
+                        List<Card> cards = cardsResult.getJsonArray(Field.ALL).getList();
+                        List<String> cardIds;
 
-            String sectionId = UUID.randomUUID().toString();
-            sectionPayload.setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
-            updateBoard.addSection(sectionId);
-            updateBoard.setCardIds(new ArrayList<>());
-            updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));
-            promise.complete(updateBoard.toJson());
+                        // Si stratégie ordonnée, trier les cartes
+                        if (updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
+                            cardIds = cardService.sortCardsByStrategy(cards, updateBoard.getSortOrCreateBy());
+                        } else {
+                            cardIds = currentBoard.getCardIds();
+                        }
+
+                        SectionPayload sectionPayload = new SectionPayload(updateBoard.getId()).setCardIds(cardIds);
+                        String sectionId = UUID.randomUUID().toString();
+                        sectionPayload.setTitle(i18n != null ? i18n.translate("magneto.section.default.title") : Field.DEFAULTTITLE);
+                        updateBoard.addSection(sectionId);
+                        updateBoard.setCardIds(new ArrayList<>());
+                        updateBoardFutures.add(sectionService.create(sectionPayload, sectionId));
+                        promise.complete(updateBoard.toJson());
+                        return Future.succeededFuture();
+                    });
 
             // Check if we are changing the layout from section to free
         } else if (!currentBoard.isLayoutFree() && updateBoard.isLayoutFree()) {
             cardService.getAllCardsByBoard(currentBoard, null, user, false)
-                    .compose(cards -> {
-                        List<Card> cardsList = cards.getJsonArray(Field.ALL).getList();
-                        List<String> cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());
+                    .compose(cardsResult -> {
+                        List<Card> cardsList = cardsResult.getJsonArray(Field.ALL).getList();
+                        List<String> cardIds;
+
+                        // Si stratégie ordonnée, trier les cartes
+                        if (updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
+                            cardIds = cardService.sortCardsByStrategy(cardsList, updateBoard.getSortOrCreateBy());
+                        } else {
+                            cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());
+                        }
+
                         updateBoard.setCardIds(cardIds);
                         updateBoardFutures.add(sectionService.deleteByBoards(Collections.singletonList(updateBoard.getId())));
                         updateBoard.setSectionIds(new ArrayList<>());
@@ -356,7 +378,21 @@ public class DefaultBoardService implements BoardService {
                         return Future.succeededFuture();
                     });
         } else {
-            promise.complete(updateBoard.toJson());
+            // Pas de changement de layout, mais vérifier si on doit trier
+            boolean needsResorting = updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy() &&
+                    (currentBoard.getSortOrCreateBy() == null || !currentBoard.getSortOrCreateBy().equals(updateBoard.getSortOrCreateBy()));
+
+            if (needsResorting) {
+                // Créer un board temporaire avec la nouvelle stratégie pour le tri
+                Board boardForSorting = new Board(currentBoard.toJson());
+                boardForSorting.setSortOrCreateBy(updateBoard.getSortOrCreateBy());
+
+                cardService.resortAllCardsInBoard(boardForSorting, user)
+                        .onSuccess(result -> promise.complete(updateBoard.toJson()))
+                        .onFailure(promise::fail);
+            } else {
+                promise.complete(updateBoard.toJson());
+            }
         }
         return promise.future();
     }
@@ -736,6 +772,7 @@ public class DefaultBoardService implements BoardService {
                             .put(Field.DELETED, 1)
                             .put(Field.CANCOMMENT, 1)
                             .put(Field.DISPLAY_NB_FAVORITES, 1)
+                            .put(Field.SORTORCREATEBY, 1)
                             .put(Field.ISLOCKED, 1)
                             .put(Field.ISEXTERNAL, 1)
                     )
@@ -930,6 +967,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
+                        .put(Field.SORTORCREATEBY, 1)
                         .put(Field.ISLOCKED, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISLOCKED).add(false)))
                         .put(Field.ISEXTERNAL, new JsonObject().put("$ifNull", new JsonArray().add("$" + Field.ISEXTERNAL).add(false))));
         return query.getAggregate();
@@ -1138,6 +1176,7 @@ public class DefaultBoardService implements BoardService {
                         .put(Field.PUBLIC, 1)
                         .put(Field.CANCOMMENT, 1)
                         .put(Field.DISPLAY_NB_FAVORITES, 1)
+                        .put(Field.SORTORCREATEBY, 1)
                         .put(Field.ISLOCKED, 1)
                         .put(Field.ISEXTERNAL, 1));
         return query.getAggregate();

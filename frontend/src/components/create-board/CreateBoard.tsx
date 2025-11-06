@@ -1,6 +1,18 @@
 import React, { FC, useEffect, useState } from "react";
 
-// eslint-disable-next-line import/order
+import {
+  Radio,
+  RadioGroup,
+  FormControl as FormControlMUI,
+  Box,
+  Typography,
+  FormLabel,
+  FormControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
+  MenuItem,
+  TextField,
+} from "@cgi-learning-hub/ui";
 import {
   Button,
   Checkbox,
@@ -9,24 +21,57 @@ import {
   Input,
   Label,
   Modal,
-  Radio,
   TextArea,
   useEdificeClient,
 } from "@edifice.io/react";
-
 import { MediaLibrary } from "@edifice.io/react/multimedia";
-import ViewColumnOutlinedIcon from "@mui/icons-material/ViewColumnOutlined";
-import ViewQuiltOutlinedIcon from "@mui/icons-material/ViewQuiltOutlined";
-import ViewStreamOutlinedIcon from "@mui/icons-material/ViewStreamOutlined";
-import { Box } from "@mui/material";
+import {
+  ViewModule,
+  ViewColumn,
+  ViewStream,
+  MoveUpOutlined,
+  MoveDownOutlined,
+} from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
-import { styles } from "./style";
+import {
+  iconButtonEndStyle,
+  iconButtonStyle,
+  optionsBoxStyle,
+  organisationBoxStyle,
+  paddingBottomTwoRemStyle,
+  radioIconStyle,
+  radioLabelStyle,
+  selectFieldStyle,
+  styles,
+  subsubtitleStyle,
+  subtitleStyle,
+  paddingLeftHalfRemStyle,
+  paddingBottomOneRemStyle,
+  radioGroupStyle,
+  radioStyle,
+  positionModeContainerStyle,
+  positionModeBoxStyle,
+  positionOptionsContainerStyle,
+  positionOptionBoxStyle,
+  newCardLabelStyle,
+  toggleButtonGroupStyle,
+  toggleButtonStyle,
+  selectLabelStyle,
+  selectMenuItemStyle,
+  subtitleWithSpaceStyle,
+} from "./style";
 import { CreateBoardProps } from "./types";
 import { MediaProps } from "../board-view/types";
+import { Tooltip } from "../tooltip/Tooltip";
 import { UniqueImagePicker } from "../unique-image-picker/UniqueImagePicker";
 import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
+import {
+  POSITION_MODE,
+  SORT_OR_CREATE_BY,
+  SORT_ORDER_OPTIONS,
+} from "~/core/enums/sort-order";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { useImageHandler } from "~/hooks/useImageHandler";
 import useWindowDimensions from "~/hooks/useWindowDimensions";
@@ -60,6 +105,15 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   const [createBoard] = useCreateBoardMutation();
   const [updateBoard] = useUpdateBoardMutation();
   const { sendMessage, readyState } = useWebSocketMagneto();
+  const [positionMode, setPositionMode] = useState<POSITION_MODE>(
+    POSITION_MODE.FREE,
+  );
+  const [newCardPosition, setNewCardPosition] = useState<SORT_OR_CREATE_BY>(
+    SORT_OR_CREATE_BY.START,
+  );
+  const [sortOrder, setSortOrder] = useState<SORT_OR_CREATE_BY>(
+    SORT_OR_CREATE_BY.ALPHABETICAL,
+  );
   const { width } = useWindowDimensions();
   const {
     thumbnail,
@@ -97,6 +151,8 @@ export const CreateBoard: FC<CreateBoardProps> = ({
     board.isLocked = isLockedChecked;
     board.displayNbFavorites = isFavoriteChecked;
     board.tags = tags;
+    board.sortOrCreateBy =
+      positionMode === POSITION_MODE.FREE ? newCardPosition : sortOrder;
   };
 
   const resetFields = (): void => {
@@ -110,6 +166,9 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setDisposition("free");
       setTagsTextInput("");
       setMedia(null);
+      setPositionMode(POSITION_MODE.FREE);
+      setNewCardPosition(SORT_OR_CREATE_BY.START);
+      setSortOrder(SORT_OR_CREATE_BY.ALPHABETICAL);
     }
     handleDeleteThumbnail();
     handleDeleteBackground();
@@ -187,6 +246,19 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       setTagsTextInput(boardToUpdate.tagsTextInput);
       setIsLockedChecked(boardToUpdate.isLocked);
       setTags(boardToUpdate.tags);
+      if (boardToUpdate.sortOrCreateBy) {
+        if (
+          boardToUpdate.sortOrCreateBy === SORT_OR_CREATE_BY.START ||
+          boardToUpdate.sortOrCreateBy === SORT_OR_CREATE_BY.END
+        ) {
+          setPositionMode(POSITION_MODE.FREE);
+          setNewCardPosition(boardToUpdate.sortOrCreateBy);
+        } else {
+          setPositionMode(POSITION_MODE.ORDERED);
+          setSortOrder(boardToUpdate.sortOrCreateBy);
+          setIsLockedChecked(true);
+        }
+      }
       if (boardToUpdate.imageUrl) {
         setThumbnail({
           type: MEDIA_LIBRARY_TYPE.IMAGE,
@@ -207,6 +279,12 @@ export const CreateBoard: FC<CreateBoardProps> = ({
       }
     }
   }, [boardToUpdate, isOpen]);
+
+  useEffect(() => {
+    if (positionMode === POSITION_MODE.ORDERED) {
+      setIsLockedChecked(true);
+    }
+  }, [positionMode]);
 
   return (
     <>
@@ -289,10 +367,194 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                       />
                     </FormControl>
                   </div>
-                  <div style={styles.formControlSpacingLarge}>
-                    <h5 style={styles.formControlSpacingMedium}>
+                  <Box sx={organisationBoxStyle}>
+                    <Typography sx={subtitleStyle}>
+                      {t("magneto.create.board.organisation")}
+                    </Typography>
+                  </Box>
+                  <Box sx={paddingLeftHalfRemStyle}>
+                    <FormControlMUI fullWidth sx={paddingBottomOneRemStyle}>
+                      <FormLabel
+                        id="row-radio-buttons-group"
+                        sx={subsubtitleStyle}
+                      >
+                        {t("magneto.board.layout.choose")}
+                      </FormLabel>
+                      <RadioGroup
+                        row
+                        aria-labelledby="row-radio-buttons-group"
+                        defaultValue={"free"}
+                        value={disposition}
+                        onChange={(e) => setDisposition(e.target.value)}
+                        sx={radioGroupStyle}
+                      >
+                        <FormControlLabel
+                          value="free"
+                          control={<Radio sx={radioStyle} />}
+                          label={
+                            <Box sx={radioLabelStyle}>
+                              {t("magneto.board.layout.grid")}
+                              <ViewModule sx={radioIconStyle} />
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel
+                          value="vertical"
+                          control={<Radio sx={radioStyle} />}
+                          label={
+                            <Box sx={radioLabelStyle}>
+                              {t("magneto.board.layout.vertical")}
+                              <ViewColumn sx={radioIconStyle} />
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel
+                          value="horizontal"
+                          control={<Radio sx={radioStyle} />}
+                          label={
+                            <Box sx={radioLabelStyle}>
+                              {t("magneto.board.layout.horizontal")}
+                              <ViewStream sx={radioIconStyle} />
+                            </Box>
+                          }
+                        />
+                      </RadioGroup>
+                    </FormControlMUI>
+
+                    <FormControlMUI fullWidth sx={paddingBottomOneRemStyle}>
+                      <FormLabel
+                        id="position-mode-radio-buttons-group"
+                        sx={subsubtitleStyle}
+                      >
+                        {t("magneto.board.positionning.choose")}
+                      </FormLabel>
+                      <RadioGroup
+                        row
+                        aria-labelledby="position-mode-radio-buttons-group"
+                        value={positionMode}
+                        onChange={(e) => {
+                          setPositionMode(e.target.value as POSITION_MODE);
+                        }}
+                        sx={positionModeContainerStyle}
+                      >
+                        <Box sx={positionModeBoxStyle}>
+                          <FormControlLabel
+                            value={POSITION_MODE.FREE}
+                            control={<Radio sx={radioStyle} />}
+                            label={
+                              <Box sx={radioLabelStyle}>
+                                {t("magneto.board.positionning.free")}
+                              </Box>
+                            }
+                          />
+                        </Box>
+                        <Box sx={positionModeBoxStyle}>
+                          <FormControlLabel
+                            value={POSITION_MODE.ORDERED}
+                            control={<Radio sx={radioStyle} />}
+                            label={
+                              <Box sx={radioLabelStyle}>
+                                {t("magneto.board.positionning.ordered")}
+                              </Box>
+                            }
+                          />
+                        </Box>
+                      </RadioGroup>
+
+                      <Box sx={positionOptionsContainerStyle}>
+                        {/* Position libre - ToggleButtonGroup */}
+                        <Box sx={positionOptionBoxStyle}>
+                          <Typography variant="body2" sx={newCardLabelStyle}>
+                            {t("magneto.board.new.cards.appear")}
+                          </Typography>
+                          <ToggleButtonGroup
+                            value={newCardPosition}
+                            exclusive
+                            onChange={(_e, value) => {
+                              if (value !== null) setNewCardPosition(value);
+                            }}
+                            disabled={positionMode === POSITION_MODE.ORDERED}
+                            size="medium"
+                            sx={toggleButtonGroupStyle}
+                          >
+                            <ToggleButton
+                              value={SORT_OR_CREATE_BY.START}
+                              sx={toggleButtonStyle}
+                            >
+                              <MoveUpOutlined sx={iconButtonStyle} />
+                              {t("magneto.board.new.cards.start")}
+                            </ToggleButton>
+                            <ToggleButton
+                              value={SORT_OR_CREATE_BY.END}
+                              sx={toggleButtonStyle}
+                            >
+                              <MoveDownOutlined sx={iconButtonEndStyle} />
+                              {t("magneto.board.new.cards.end")}
+                            </ToggleButton>
+                          </ToggleButtonGroup>
+                        </Box>
+
+                        {/* Ordre imposé - Select */}
+                        <Box sx={positionOptionBoxStyle}>
+                          <TextField
+                            select
+                            label={t("magneto.board.sort.by")}
+                            value={sortOrder}
+                            onChange={(e) =>
+                              setSortOrder(e.target.value as SORT_OR_CREATE_BY)
+                            }
+                            disabled={positionMode === POSITION_MODE.FREE}
+                            size="medium"
+                            sx={selectFieldStyle}
+                            InputLabelProps={{
+                              sx: selectLabelStyle,
+                            }}
+                            SelectProps={{
+                              MenuProps: {
+                                container: document.getElementById("create"),
+                                disablePortal: true,
+                                PaperProps: {
+                                  sx: selectMenuItemStyle,
+                                },
+                              },
+                            }}
+                          >
+                            {SORT_ORDER_OPTIONS.map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {t(option.label)}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                        </Box>
+                      </Box>
+                    </FormControlMUI>
+                  </Box>
+                  <Box sx={paddingBottomTwoRemStyle}>
+                    <Tooltip
+                      title={
+                        positionMode === POSITION_MODE.ORDERED
+                          ? t("magneto.board.lock.position.tooltip.ordered")
+                          : ""
+                      }
+                      placement="top-start"
+                      width="auto"
+                      offsetY={0.7}
+                      useSlotPropsOffset
+                    >
+                      <span>
+                        <Checkbox
+                          checked={isLockedChecked}
+                          label={t("magneto.board.lock.position")}
+                          onChange={() => setIsLockedChecked((prev) => !prev)}
+                          disabled={positionMode === POSITION_MODE.ORDERED}
+                        />
+                      </span>
+                    </Tooltip>
+                  </Box>
+                  <Box sx={optionsBoxStyle}>
+                    <Typography sx={subtitleWithSpaceStyle}>
                       {t("magneto.create.board.options")}
-                    </h5>
+                    </Typography>
                     <Checkbox
                       checked={isCommentChecked}
                       label={t("magneto.board.allow.comments")}
@@ -311,54 +573,8 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                         )
                       }
                     />
-                    <Checkbox
-                      checked={isLockedChecked}
-                      label={t("magneto.board.lock.position")}
-                      onChange={() => setIsLockedChecked((prev) => !prev)}
-                    />
-                  </div>
-                  <div>
-                    <h5>{t("magneto.board.layout.choose")}</h5>
-                    <div style={styles.layoutOptionsContainer}>
-                      <div style={styles.layoutOption}>
-                        <Radio
-                          model={disposition}
-                          onChange={(e) => setDisposition(e.target.value)}
-                          value="free"
-                          checked={disposition == "free"}
-                        />
-                        <span style={styles.layoutText}>
-                          {t("magneto.create.board.display.free")}
-                        </span>
-                        <ViewQuiltOutlinedIcon sx={{ fontSize: 60 }} />
-                      </div>
-                      <div style={styles.layoutOption}>
-                        <Radio
-                          model={disposition}
-                          onChange={(e) => setDisposition(e.target.value)}
-                          value="vertical"
-                          checked={disposition == "vertical"}
-                        />
-                        <span style={styles.layoutText}>
-                          {t("magneto.create.board.display.vertical")}
-                        </span>
-                        <ViewColumnOutlinedIcon sx={{ fontSize: 60 }} />
-                      </div>
-                      <div style={styles.layoutOption}>
-                        <Radio
-                          model={disposition}
-                          onChange={(e) => setDisposition(e.target.value)}
-                          value="horizontal"
-                          checked={disposition == "horizontal"}
-                        />
-                        <span style={styles.layoutText}>
-                          {t("magneto.create.board.display.horizontal")}
-                        </span>
-                        <ViewStreamOutlinedIcon sx={{ fontSize: 60 }} />
-                      </div>
-                    </div>
-                  </div>
-                  <div style={styles.formControlSpacingMedium}>
+                  </Box>
+                  <Box style={styles.formControlSpacingMedium}>
                     <FormControl id="keywords">
                       <Label>{t("magneto.board.keywords")} :</Label>
                       <Input
@@ -372,7 +588,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                         }}
                       />
                     </FormControl>
-                  </div>
+                  </Box>
                   <div>
                     <div style={styles.formControlSpacingSmall}>
                       {t("magneto.board.background.title")}

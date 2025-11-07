@@ -2,11 +2,12 @@ import { FC, useEffect, DragEvent, useState } from "react";
 
 import "./BoardView.scss";
 
+import { EmptyState } from "@cgi-learning-hub/ui";
 import { LoadingScreen, useEdificeClient } from "@edifice.io/react";
 import { MediaLibrary } from "@edifice.io/react/multimedia";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
-import { Box, GlobalStyles } from "@mui/material";
+import { Box, GlobalStyles, Paper } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -27,6 +28,7 @@ import { FileDropZone } from "../file-drop-zone/FileDropZone";
 import { HeaderView } from "../header-view/HeaderView";
 import { PreviewModal } from "../Preview-modal/PreviewModal";
 import { SideMenu } from "../side-menu/SideMenu";
+import { EmptyStateMagneto } from "../SVG/EmptyStateMagneto";
 import { ZoomComponent } from "../zoom-component/ZoomComponent";
 import { RootsConst } from "~/core/constants/roots.const";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
@@ -36,6 +38,7 @@ import { useSideMenuData } from "~/hooks/useSideMenuData";
 import { useTheme } from "~/hooks/useTheme";
 import { useBoard } from "~/providers/BoardProvider";
 import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
+import { containerStyle } from "../zoom-component/style";
 
 export const BoardView: FC = () => {
   const { t } = useTranslation("magneto");
@@ -54,6 +57,8 @@ export const BoardView: FC = () => {
     isFileDragging,
     activeCard,
     isExternalView,
+    hasNoCards,
+    searchText,
   } = useBoard();
   const headerHeight = useHeaderHeight();
   const { isTheme1D } = useTheme();
@@ -66,6 +71,14 @@ export const BoardView: FC = () => {
     mediaLibraryHandlers,
   } = useMediaLibrary();
   const { appCode } = useEdificeClient();
+
+  useEffect(() => {
+    console.log(hasNoCards);
+  }, [hasNoCards]);
+
+  useEffect(() => {
+    console.log(searchText);
+  }, [searchText]);
 
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -163,13 +176,25 @@ export const BoardView: FC = () => {
           ) : (
             <div className="no-background-image"></div>
           )}
-          {!board.cardIds?.length && !board.sections?.length && (
-            <div className="cards-empty-state">
-              <div className="card-empty-state-message">
-                {t("magneto.add.content.from.menu")}
-              </div>
-              <Icon path={mdiKeyboardBackspace} size={7} />
+          {searchText && hasNoCards ? (
+            <div className="zoom-container">
+              <Box sx={containerStyle({ opacity: 1 })}>
+                <Paper elevation={3}>
+                  Aucun résultat. Essayez une recherche par titre ou créateur
+                  d'aimant.
+                </Paper>
+              </Box>
             </div>
+          ) : (
+            !board.cardIds?.length &&
+            !board.sections?.length && (
+              <div className="cards-empty-state">
+                <div className="card-empty-state-message">
+                  {t("magneto.add.content.from.menu")}
+                </div>
+                <Icon path={mdiKeyboardBackspace} size={7} />
+              </div>
+            )
           )}
         </BoardBodyWrapper>
         {isCreateMagnetOpen && <CreateMagnet />}

@@ -51,10 +51,12 @@ public class MongoQuery {
     }
 
     public MongoQuery matchRegex(String regex, List<String> parameters) {
+        String sanitizedRegex = regex.replaceAll("([\\\\+*?\\[\\](){}|^$.])", "\\\\$1");
+
         JsonArray or = new JsonArray();
         parameters.forEach(param -> or.add(new JsonObject().put(param,
                 new JsonObject()
-                        .put(Mongo.REGEX, regex)
+                        .put(Mongo.REGEX, sanitizedRegex)
                         .put(Mongo.OPTIONS, "i"))));
         this.pipeline.add(new JsonObject()
                 .put(Mongo.MATCH, new JsonObject().put(Mongo.OR, or)));

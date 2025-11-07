@@ -43,6 +43,7 @@ export type BoardContextType = {
   searchText: string;
   setSearchText: (text: string) => void;
   hasActiveSearch: boolean;
+  hasNoCards: boolean;
 };
 
 export type Section = {

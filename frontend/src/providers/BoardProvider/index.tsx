@@ -137,10 +137,28 @@ export const BoardProvider: FC<BoardProviderProps> = ({
   };
 
   const board = useMemo(() => {
-    return boardData
-      ? new Board().build(boardData as IBoardItemResponse)
-      : new Board();
-  }, [boardData]);
+    if (!boardData) return new Board();
+
+    const builtBoard = new Board().build(boardData as IBoardItemResponse);
+
+    // Filtre les sections vides si on est en mode recherche
+    if (debouncedSearch && !builtBoard.isLayoutFree()) {
+      builtBoard.sections = builtBoard.sections.filter(
+        (section) => section.cards && section.cards.length > 0,
+      );
+    }
+
+    return builtBoard;
+  }, [boardData, debouncedSearch]);
+
+  const hasNoCards = useMemo(() => {
+    if (board.isLayoutFree()) {
+      return !board.cards || board.cards.length === 0;
+    }
+    return board.sections.every(
+      (section) => !section.cards || section.cards.length === 0,
+    );
+  }, [board]);
 
   const boardResourceIds = useMemo(() => {
     const cards = board?.isLayoutFree()
@@ -272,6 +290,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
       searchText,
       setSearchText,
       hasActiveSearch: !!debouncedSearch,
+      hasNoCards,
     }),
     [
       board,
@@ -288,6 +307,7 @@ export const BoardProvider: FC<BoardProviderProps> = ({
       boardImages,
       searchText,
       debouncedSearch,
+      hasNoCards,
     ],
   );
 

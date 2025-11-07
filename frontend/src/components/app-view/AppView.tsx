@@ -58,6 +58,7 @@ export const AppView: FC = () => {
 
   const resetBoardsAndFolders = useCallback(() => {
     setSearchText("");
+    setProviderSearchText("");
     resetSearchBar(searchBarResetter + 1);
     setSelectedBoardsIds([]);
     setSelectedFoldersIds([]);

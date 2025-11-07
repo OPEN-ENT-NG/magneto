@@ -2,13 +2,9 @@ import { FC } from "react";
 
 import "./HeaderView.scss";
 
+import { Button } from "@cgi-learning-hub/ui";
 import { IWebApp } from "@edifice.io/client";
-import {
-  AppHeader,
-  Breadcrumb,
-  Button,
-  useEdificeClient,
-} from "@edifice.io/react";
+import { AppHeader, Breadcrumb, useEdificeClient } from "@edifice.io/react";
 import { mdiCheckCircle, mdiEarth } from "@mdi/js";
 import Icon from "@mdi/react";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -18,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   breadcrumbTitle,
+  buttonStyle,
   externalToastStyle,
   externalToastTextStyle,
   isLockedToastStyle,
@@ -113,11 +110,10 @@ export const HeaderView: FC = () => {
             )}
             {boardHasCards() && (
               <Button
-                color="primary"
-                type="button"
-                variant="filled"
+                size="medium"
+                variant="contained"
+                sx={buttonStyle}
                 onClick={onClick}
-                className="button"
               >
                 {t("magneto.read")}
               </Button>

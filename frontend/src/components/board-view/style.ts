@@ -91,3 +91,16 @@ export const getMainContainerStyles = (
         : {},
   },
 });
+
+export const emptyStateStyle = {
+  alignSelf: "center",
+  bottom: "10.5rem",
+  zIndex: "2",
+  position: "fixed",
+  left: "calc(50% + 4rem)",
+  transform: "translateX(-50%)",
+};
+
+export const paperStyle = {
+  padding: "1.2rem 1.8rem",
+};

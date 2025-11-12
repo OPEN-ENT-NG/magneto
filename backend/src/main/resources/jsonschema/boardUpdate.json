@@ -74,6 +74,10 @@
     },
     "isExternal": {
       "type": "boolean"
+    },
+    "sortOrCreateBy": {
+      "type": "string",
+      "enum": ["start", "end", "alphabetical", "anti-alphabetical", "newest-first", "oldest-first"]
     }
   }
 }

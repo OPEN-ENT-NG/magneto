@@ -105,7 +105,7 @@ export const radioLabelStyle: SxProps<Theme> = {
   display: "flex",
   alignItems: "center",
   gap: 1,
-  fontSize: "1.4rem",
+  fontSize: "1.6rem",
 };
 
 export const radioIconStyle: SxProps<Theme> = {
@@ -139,7 +139,7 @@ export const positionOptionBoxStyle: SxProps<Theme> = {
 
 export const newCardLabelStyle: SxProps<Theme> = {
   marginBottom: "0.5rem",
-  fontSize: "1.2rem",
+  fontSize: "1.4rem",
 };
 
 export const toggleButtonStyle: SxProps<Theme> = {
@@ -172,7 +172,7 @@ export const iconButtonEndStyle: SxProps<Theme> = {
 export const selectFieldStyle: SxProps<Theme> = {
   minWidth: "250px",
   "& .MuiInputBase-root": {
-    fontSize: "1.3rem",
+    fontSize: "1.6rem",
   },
 };
 

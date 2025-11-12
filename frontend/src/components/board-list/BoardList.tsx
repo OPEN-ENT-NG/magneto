@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Loading } from "@edifice.io/react";
 import { animated, useSpring } from "@react-spring/web";
@@ -21,6 +21,10 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
   });
 
   const [isBoardDragged, setIsBoardDragged] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log(boards);
+  }, [boards]);
 
   return (
     <>

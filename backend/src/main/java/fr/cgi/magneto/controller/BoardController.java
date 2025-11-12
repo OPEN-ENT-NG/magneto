@@ -130,7 +130,7 @@ public class BoardController extends ControllerHelper {
         });
     }
 
-    @Get("/board/:boardId/:searchText")
+    @Get("/board/:boardId/search/:searchText")
     @ApiDoc("Get board with its cards")
     @ResourceFilter(ViewRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)

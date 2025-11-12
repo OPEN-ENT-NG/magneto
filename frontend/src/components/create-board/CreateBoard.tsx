@@ -283,6 +283,8 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   useEffect(() => {
     if (positionMode === POSITION_MODE.ORDERED) {
       setIsLockedChecked(true);
+    } else {
+      setIsLockedChecked(false);
     }
   }, [positionMode]);
 

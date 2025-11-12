@@ -7,11 +7,7 @@ import {
   FC,
 } from "react";
 
-import {
-  ColorPicker,
-  DEFAULT_COLOR_OPTIONS,
-  HexaColor,
-} from "@cgi-learning-hub/ui";
+import { ColorPicker, HexaColor } from "@cgi-learning-hub/ui";
 import { useToast } from "@edifice.io/react";
 import { mdiEyeOff } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -32,6 +28,7 @@ import { useCreateSectionDropDownItems } from "./useCreateSectionDropDownItems";
 import { DeleteSectionModal } from "../delete-section-modal/DeleteSectionModal";
 import { DropDownList } from "../drop-down-list/DropDownList";
 import { useDropdown } from "../drop-down-list/useDropDown";
+import { PICKER_COLORS_OPTIONS } from "~/core/constants/picker-colors.const";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
 import { DND_ITEM_TYPE } from "~/hooks/dnd-hooks/types";
 import { usePredefinedToasts } from "~/hooks/usePredefinedToasts";
@@ -208,10 +205,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
             value={color}
             onChange={setColorAndUpdate}
             useCheckmarkSwatch
-            options={[
-              ...DEFAULT_COLOR_OPTIONS,
-              { color: "#FFFFFF", showBorder: true },
-            ]}
+            options={PICKER_COLORS_OPTIONS}
             slotProps={{
               circlePickerBox: {
                 sx: circlePickerStyle,

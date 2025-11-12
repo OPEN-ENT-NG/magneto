@@ -22,10 +22,6 @@ export const BoardList: React.FunctionComponent<BoardListProps> = ({
 
   const [isBoardDragged, setIsBoardDragged] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log(boards);
-  }, [boards]);
-
   return (
     <>
       {boardsLoading ? (

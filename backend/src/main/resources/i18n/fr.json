@@ -100,7 +100,7 @@
   "magneto.board.owner": "Propriétaire",
   "magneto.board.size": "Taille",
   "magneto.board.type": "Type",
-  "magneto.board.locked": "Position des aimants figée",
+  "magneto.board.locked": "Ordre imposé : {{0}}",
   "magneto.board.download": "Télécharger",
   "magneto.board.preview.pdf.error": "Une erreur est survenue lors du chargement du PDF!",
   "magneto.board.edit.open.office": "Editer dans Open Office",

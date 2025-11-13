@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 
 import { SearchInput, IconButton } from "@cgi-learning-hub/ui";
 import { AddRounded, RemoveRounded } from "@mui/icons-material";
@@ -36,6 +36,19 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
   const isMaxZoom = zoomLevel === zoomMaxLevel;
 
   const { searchText, setSearchText } = useBoard();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "f") {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <Box sx={containerStyle({ opacity })}>
@@ -43,6 +56,7 @@ export const ZoomComponent: FC<ZoomComponentProps> = ({
         sx={searchInputStyle}
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
+        inputRef={searchInputRef}
       />
       <IconButton onClick={zoomOut} disabled={isMinZoom} sx={iconButtonStyle}>
         <RemoveRounded sx={iconStyle({ disabled: isMinZoom })} />

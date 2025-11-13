@@ -2,6 +2,7 @@ import { FC, useEffect, DragEvent, useState } from "react";
 
 import "./BoardView.scss";
 
+import { Paper } from "@cgi-learning-hub/ui";
 import { LoadingScreen, useEdificeClient } from "@edifice.io/react";
 import { MediaLibrary } from "@edifice.io/react/multimedia";
 import { mdiKeyboardBackspace } from "@mdi/js";
@@ -12,8 +13,10 @@ import { useTranslation } from "react-i18next";
 import {
   BoardBodyWrapper,
   BoardViewWrapper,
+  emptyStateStyle,
   getMainContainerStyles,
   mediaLibraryStyle,
+  paperStyle,
 } from "./style";
 import { useHeaderHeight } from "./useHeaderHeight";
 import { BoardCreateMagnetBoardModal } from "../board-create-magnet-board-modal/BoardCreateMagnetBoardModal";
@@ -54,6 +57,8 @@ export const BoardView: FC = () => {
     isFileDragging,
     activeCard,
     isExternalView,
+    hasNoCards,
+    searchText,
   } = useBoard();
   const headerHeight = useHeaderHeight();
   const { isTheme1D } = useTheme();
@@ -163,13 +168,22 @@ export const BoardView: FC = () => {
           ) : (
             <div className="no-background-image"></div>
           )}
-          {!board.cardIds?.length && !board.sections?.length && (
-            <div className="cards-empty-state">
-              <div className="card-empty-state-message">
-                {t("magneto.add.content.from.menu")}
+          {searchText && hasNoCards ? (
+            <Box sx={emptyStateStyle}>
+              <Paper sx={paperStyle} elevation={3}>
+                {t("magneto.board.search.emptystate")}
+              </Paper>
+            </Box>
+          ) : (
+            !board.cardIds?.length &&
+            !board.sections?.length && (
+              <div className="cards-empty-state">
+                <div className="card-empty-state-message">
+                  {t("magneto.add.content.from.menu")}
+                </div>
+                <Icon path={mdiKeyboardBackspace} size={7} />
               </div>
-              <Icon path={mdiKeyboardBackspace} size={7} />
-            </div>
+            )
           )}
         </BoardBodyWrapper>
         {isCreateMagnetOpen && <CreateMagnet />}
@@ -189,7 +203,6 @@ export const BoardView: FC = () => {
         />
         <div className="zoom-container">
           <ZoomComponent
-            opacity={0.75}
             zoomLevel={zoomLevel}
             zoomMaxLevel={5}
             zoomIn={zoomIn}

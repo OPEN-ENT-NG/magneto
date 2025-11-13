@@ -281,9 +281,7 @@ export const CreateBoard: FC<CreateBoardProps> = ({
   }, [boardToUpdate, isOpen]);
 
   useEffect(() => {
-    if (positionMode === POSITION_MODE.ORDERED) {
-      setIsLockedChecked(true);
-    }
+    setIsLockedChecked(positionMode === POSITION_MODE.ORDERED);
   }, [positionMode]);
 
   return (
@@ -543,7 +541,10 @@ export const CreateBoard: FC<CreateBoardProps> = ({
                     >
                       <span>
                         <Checkbox
-                          checked={isLockedChecked}
+                          checked={
+                            isLockedChecked ||
+                            positionMode === POSITION_MODE.ORDERED
+                          }
                           label={t("magneto.board.lock.position")}
                           onChange={() => setIsLockedChecked((prev) => !prev)}
                           disabled={positionMode === POSITION_MODE.ORDERED}

@@ -1,21 +1,16 @@
 import { useCallback } from "react";
 
 import { isActionAvailable } from "@edifice.io/client";
-import { ThemeProvider } from "@mui/material/styles";
 import { useParams } from "react-router-dom";
 
 import { BoardView } from "~/components/board-view/BoardView";
 import { workflowName } from "~/config";
-import { useTheme } from "~/hooks/useTheme";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { WebSocketProvider } from "~/providers/WebsocketProvider";
 import { useActions } from "~/services/queries";
-import { createAppTheme } from "~/themes/theme";
 
 export const App = () => {
   const { id = "" } = useParams();
-  const { isTheme1D } = useTheme();
-  const theme = createAppTheme(isTheme1D);
   const isLocal = window.location.protocol === "http:";
   const getSocketURL = useCallback(() => {
     return isLocal
@@ -26,18 +21,16 @@ export const App = () => {
   const canSynchronous = isActionAvailable(workflowName.synchronous, actions);
 
   return (
-    <ThemeProvider theme={theme}>
-      <WebSocketProvider
-        socketUrl={getSocketURL()}
-        onMessage={(update) => {
-          console.log("Received WebSocket update:", update);
-        }}
-        shouldConnect={canSynchronous}
-      >
-        <BoardProvider>
-          <BoardView />
-        </BoardProvider>
-      </WebSocketProvider>
-    </ThemeProvider>
+    <WebSocketProvider
+      socketUrl={getSocketURL()}
+      onMessage={(update) => {
+        console.log("Received WebSocket update:", update);
+      }}
+      shouldConnect={canSynchronous}
+    >
+      <BoardProvider>
+        <BoardView />
+      </BoardProvider>
+    </WebSocketProvider>
   );
 };

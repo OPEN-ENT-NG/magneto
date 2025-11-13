@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { Button } from "@edifice.io/react";
+import { Button } from "@cgi-learning-hub/ui";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -233,8 +233,7 @@ export const ReadView: FC = () => {
       <Button
         color="primary"
         type="submit"
-        variant="filled"
-        className="retour-button"
+        variant="contained"
         onClick={navigateToView}
         style={retourStyle(isTheme1D)}
       >

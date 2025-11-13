@@ -57,21 +57,26 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
     sortBy: "modificationDate",
   });
 
-  const allBoardsQuery = {
-    isPublic: false,
-    isShared: true,
-    isDeleted: false,
-    sortBy: "modificationDate",
-  };
+  const allBoardsQuery = useMemo(
+    () => ({
+      isPublic: !!currentFolder?.isPublic,
+      isShared: true,
+      isDeleted: !!currentFolder?.deleted,
+      sortBy: "modificationDate" as const,
+    }),
+    [currentFolder],
+  );
 
   const { currentData: myBoardsResult, isFetching: myBoardsLoading } =
     useGetBoardsQuery(boardsQuery, {
       refetchOnMountOrArgChange: true,
     });
+
   const { currentData: myAllBoardsResult } = useGetAllBoardsQuery(
     allBoardsQuery,
     {
       refetchOnMountOrArgChange: true,
+      skip: searchText === "",
     },
   );
 
@@ -137,10 +142,10 @@ export const BoardsNavigationProvider: FC<BoardsNavigationProviderProps> = ({
   }, [currentFolder]);
 
   useEffect(() => {
-    if (!!myBoardsResult && !!currentFolder && searchText === "") {
+    if (searchText !== "" && !!myAllBoardsResult && !!currentFolder) {
+      setBoards(prepareBoardsState(myAllBoardsResult, currentFolder.deleted));
+    } else if (searchText === "" && !!myBoardsResult && !!currentFolder) {
       setBoards(prepareBoardsState(myBoardsResult, currentFolder.deleted));
-    } else if (!!myAllBoardsResult && !!currentFolder && searchText !== "") {
-      setBoards(prepareBoardsState(myAllBoardsResult, false));
     }
   }, [myBoardsResult, myAllBoardsResult, currentFolder, searchText]);
 

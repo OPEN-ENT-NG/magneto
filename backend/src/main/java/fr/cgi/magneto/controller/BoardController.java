@@ -32,6 +32,7 @@ import org.entcore.common.http.filter.Trace;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -129,15 +130,16 @@ public class BoardController extends ControllerHelper {
         });
     }
 
-    @Get("/board/:boardId/:searchText")
+    @Get("/board/:boardId/search/:searchText")
     @ApiDoc("Get board with its cards")
     @ResourceFilter(ViewRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    public void getBoard(HttpServerRequest request) {
+    public void getBoard(HttpServerRequest request) throws UnsupportedEncodingException {
         String boardId = request.getParam(Field.BOARDID);
         String searchText = request.getParam(Field.SEARCHTEXT, "");
+        String searchTextFormatted = java.net.URLDecoder.decode(searchText, "UTF-8");
         UserUtils.getUserInfos(eb, request, user -> new ContribBoardRight().authorize(request, null, user, readOnly ->
-                boardService.getBoardWithContent(boardId, user, readOnly, searchText)
+                boardService.getBoardWithContent(boardId, user, readOnly, searchTextFormatted)
                         .onSuccess(result -> renderJson(request, result.toJson()))
                         .onFailure(fail -> {
                             String message = String.format("[Magneto@%s::getBoard] Failed to get board with id : %s",

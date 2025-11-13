@@ -40,7 +40,7 @@ export const boardsApi = emptySplitApi.injectEndpoints({
     }),
     getBoardById: builder.query({
       query: (params: IBoardParamsRequest) => {
-        return `board/${params.boardId}/${params.searchText}`;
+        return `board/${params.boardId}/search/${params.searchText}`;
       },
       providesTags: ["Boards"],
     }),

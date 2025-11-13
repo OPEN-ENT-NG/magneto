@@ -1,6 +1,6 @@
 import { SxProps, Theme } from "@mui/material";
 
-const MAGNETO_GREY = "#EEEEEEE5";
+const MAGNETO_GREY = "rgba(238, 238, 238, 0.75)";
 const MAGNETO_LIGHT_GREY = "#D6D6D6";
 const MAGNETO_WHITE = "#FFFFFF";
 

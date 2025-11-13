@@ -2,11 +2,12 @@ import { FC, useEffect, DragEvent, useState } from "react";
 
 import "./BoardView.scss";
 
+import { Paper } from "@cgi-learning-hub/ui";
 import { LoadingScreen, useEdificeClient } from "@edifice.io/react";
 import { MediaLibrary } from "@edifice.io/react/multimedia";
 import { mdiKeyboardBackspace } from "@mdi/js";
 import Icon from "@mdi/react";
-import { Box, GlobalStyles, Paper } from "@mui/material";
+import { Box, GlobalStyles } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -202,7 +203,6 @@ export const BoardView: FC = () => {
         />
         <div className="zoom-container">
           <ZoomComponent
-            opacity={0.75}
             zoomLevel={zoomLevel}
             zoomMaxLevel={5}
             zoomIn={zoomIn}

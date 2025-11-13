@@ -118,12 +118,7 @@ export const HeaderView: FC = () => {
               </Box>
             )}
             {boardHasCards() && (
-              <Button
-                size="medium"
-                variant="contained"
-                sx={buttonStyle}
-                onClick={onClick}
-              >
+              <Button variant="contained" onClick={onClick}>
                 {t("magneto.read")}
               </Button>
             )}

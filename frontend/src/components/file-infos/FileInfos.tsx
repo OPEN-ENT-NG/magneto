@@ -2,16 +2,11 @@ import React from "react";
 
 import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  CardContent,
-  Typography,
-  Box,
-  Button,
-  useMediaQuery,
-} from "@mui/material";
+import { CardContent, Typography, Box, Button } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { FileInfosStyled } from "./style";
+import { useCustomMediaQuery } from "~/common/ShareModal/utils/breakpoints";
 import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
 import { useBoard } from "~/providers/BoardProvider";
 
@@ -45,13 +40,8 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
 
   const isCommentPanelOpen = displayModals.COMMENT_PANEL;
 
-  const isPrimaryBreakpoint = useMediaQuery((theme: any) =>
-    theme.breakpoints.down(primaryBreakpoint),
-  );
-
-  const isSecondaryBreakpoint = useMediaQuery((theme: any) =>
-    theme.breakpoints.down(secondaryBreakpoint),
-  );
+  const isPrimaryBreakpoint = useCustomMediaQuery(primaryBreakpoint);
+  const isSecondaryBreakpoint = useCustomMediaQuery(secondaryBreakpoint);
 
   const isHorizontal =
     isPrimaryBreakpoint || (isCommentPanelOpen && isSecondaryBreakpoint);

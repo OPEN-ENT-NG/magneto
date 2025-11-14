@@ -177,9 +177,9 @@ export const selectFieldStyle: SxProps<Theme> = {
 };
 
 export const selectLabelStyle: SxProps<Theme> = {
-  fontSize: "1.2rem",
+  fontSize: "1.6rem",
   "&.MuiInputLabel-shrink": {
-    transform: "translate(16px, -6px) scale(0.75)",
+    transform: "translate(16px, -8px) scale(0.75)",
   },
 };
 

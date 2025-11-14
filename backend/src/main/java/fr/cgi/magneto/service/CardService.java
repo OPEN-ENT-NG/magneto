@@ -232,7 +232,7 @@ public interface CardService {
      * @param strategy Sort strategy
      * @return List of sorted card IDs
      */
-    List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy);
+    List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy, String boardCreationDate);
 
     /**
      * Resort all cards in a board or its sections based on sort strategy

@@ -135,6 +135,10 @@ public class Board implements Model<Board> {
             this.setCreationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
             this.setModificationDate(DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT));
         }
+        else {
+            this.setCreationDate(board.getString(Field.CREATIONDATE, DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT)));
+            this.setModificationDate(board.getString(Field.MODIFICATIONDATE, DateHelper.getDateString(new Date(), DateHelper.MONGO_FORMAT)));
+        }
         if (board.containsKey(Field.NBCARDS))
             this.nbCards = board.getInteger(Field.NBCARDS);
         if (board.containsKey(Field.NBCARDSSECTIONS))

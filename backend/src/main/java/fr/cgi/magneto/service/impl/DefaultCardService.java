@@ -557,7 +557,7 @@ public class DefaultCardService implements CardService {
                             .put(Field.TITLE, cardPayload.getTitle())
                             .put(Field.CREATIONDATE, cardPayload.getCreationDate())));
 
-                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy());
+                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy(), board.getCreationDate());
                     boardPayload.setCardIds(sortedCardIds);
 
                     return CompositeFuture.all(Collections.singletonList(this.updateBoard(boardPayload)));
@@ -574,7 +574,7 @@ public class DefaultCardService implements CardService {
                             .put(Field.TITLE, cardPayload.getTitle())
                             .put(Field.CREATIONDATE, cardPayload.getCreationDate())));
 
-                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy());
+                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy(), boardPayload.getCreationDate());
 
                     SectionPayload updateSection = new SectionPayload(targetSection.toJson());
                     updateSection.setCardIds(sortedCardIds);
@@ -640,7 +640,7 @@ public class DefaultCardService implements CardService {
         return CompositeFuture.all(futures);
     }
 
-    public List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy) {
+    public List<String> sortCardsByStrategy(List<Card> cards, SortOrCreateByEnum strategy, String boardCreationDate) {
         Comparator<Card> comparator;
 
         switch (strategy) {
@@ -651,10 +651,14 @@ public class DefaultCardService implements CardService {
                 comparator = Comparator.comparing(Card::getTitle, String.CASE_INSENSITIVE_ORDER).reversed();
                 break;
             case NEWEST_FIRST:
-                comparator = Comparator.comparing(Card::getCreationDate).reversed();
+                comparator = Comparator.comparing(
+                        (Card card) -> card.getCreationDate() != null ? card.getCreationDate() : boardCreationDate
+                ).reversed();
                 break;
             case OLDEST_FIRST:
-                comparator = Comparator.comparing(Card::getCreationDate);
+                comparator = Comparator.comparing(
+                        (Card card) -> card.getCreationDate() != null ? card.getCreationDate() : boardCreationDate
+                );
                 break;
             default:
                 return cards.stream().map(Card::getId).collect(Collectors.toList());
@@ -1737,7 +1741,7 @@ public class DefaultCardService implements CardService {
                                                 .put(Field.CREATIONDATE, updatedCard.getCreationDate())) : c)
                                 .collect(Collectors.toList());
 
-                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy());
+                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy(), board.getCreationDate());
 
                         BoardPayload boardPayload = new BoardPayload()
                                 .setId(board.getId())
@@ -1768,7 +1772,7 @@ public class DefaultCardService implements CardService {
                                                     .put(Field.CREATIONDATE, updatedCard.getCreationDate())) : c)
                                     .collect(Collectors.toList());
 
-                            List<String> sortedCardIds = sortCardsByStrategy(updatedCards, board.getSortOrCreateBy());
+                            List<String> sortedCardIds = sortCardsByStrategy(updatedCards, board.getSortOrCreateBy(), board.getCreationDate());
 
                             SectionPayload sectionPayload = new SectionPayload(targetSection.toJson());
                             sectionPayload.setCardIds(sortedCardIds);
@@ -1818,7 +1822,7 @@ public class DefaultCardService implements CardService {
             return this.getAllCardsByBoard(board, null, user, false)
                     .compose(cardsResult -> {
                         List<Card> cards = cardsResult.getJsonArray(Field.ALL).getList();
-                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy());
+                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy(), board.getCreationDate());
 
                         BoardPayload boardPayload = new BoardPayload()
                                 .setId(board.getId())
@@ -1835,7 +1839,7 @@ public class DefaultCardService implements CardService {
                         for (Section section : sections) {
                             Future<JsonObject> sortFuture = this.fetchAllCardsBySection(section, 0, user)
                                     .compose(cards -> {
-                                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy());
+                                        List<String> sortedCardIds = sortCardsByStrategy(cards, board.getSortOrCreateBy(), board.getCreationDate());
                                         SectionPayload sectionPayload = new SectionPayload(section.toJson());
                                         sectionPayload.setCardIds(sortedCardIds);
                                         return this.serviceFactory.sectionService().update(sectionPayload);

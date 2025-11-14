@@ -86,3 +86,7 @@ export const buttonStyle = {
   borderRadius: "0.8rem !important",
   padding: "0.8rem 1.6rem",
 };
+
+export const readButtonStyle = {
+  fontSize: "1.4rem",
+};

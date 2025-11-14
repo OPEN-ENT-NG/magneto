@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { LoadingScreen, Layout, useEdificeClient } from "@edifice.io/react";
 import { Outlet } from "react-router-dom";
 
+import { initToastFilter } from "~/common/ShareModal/utils/filterToast";
 import { ErrorBoundary } from "~/components/error-boundary";
 import PublicLayout from "~/components/public-layout/PublicLayout";
 
@@ -55,6 +56,11 @@ function Root() {
       };
     }
   }, [isInIframe]);
+
+  useEffect(() => {
+    const cleanup = initToastFilter();
+    return cleanup;
+  }, []);
 
   if (window.location.hash.includes("/pub/"))
     return (

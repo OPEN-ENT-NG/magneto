@@ -502,7 +502,8 @@ public class DefaultCardService implements CardService {
         CompositeFuture.all(createCardFuture, getBoardFuture, getSectionsFuture, syncDocumentRightsFuture)
                 .compose(result -> {
                     if (!getBoardFuture.result().isEmpty() && result.succeeded()) {
-                        BoardPayload boardPayload = new BoardPayload(getBoardFuture.result().get(0).toJson());
+                        Board board = getBoardFuture.result().get(0);
+                        BoardPayload boardPayload = new BoardPayload(board.toJson());
 
                         if (boardPayload.getSortOrCreateBy() != null && boardPayload.getSortOrCreateBy().isOrderedPositionStrategy()) {
                             // Mode trié : on gère tout ici
@@ -516,7 +517,7 @@ public class DefaultCardService implements CardService {
                                         .orElse(null);
 
                                 if (targetSection != null) {
-                                    return handleSortedSectionLayout(boardPayload, newId, cardPayload, targetSection, user);
+                                    return handleSortedSectionLayout(boardPayload, newId, cardPayload, targetSection, user, board.getCreationDate());
                                 } else {
                                     String message = String.format("[Magneto%s::createCardLayout] " +
                                             "No section found with id %s", this.getClass().getSimpleName(), cardPayload.getSectionId());
@@ -566,15 +567,15 @@ public class DefaultCardService implements CardService {
 
     private Future<CompositeFuture> handleSortedSectionLayout(BoardPayload boardPayload, String newCardId,
                                                               CardPayload cardPayload, Section targetSection,
-                                                              UserInfos user) {
+                                                              UserInfos user, String boardCreationDate) {
         return this.fetchAllCardsBySection(targetSection, 0, user)
                 .compose(cards -> {
                     cards.add(new Card(new JsonObject()
                             .put(Field._ID, newCardId)
                             .put(Field.TITLE, cardPayload.getTitle())
-                            .put(Field.CREATIONDATE, cardPayload.getCreationDate())));
+                            .put(Field.MODIFICATIONDATE, cardPayload.getCreationDate())));
 
-                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy(), boardPayload.getCreationDate());
+                    List<String> sortedCardIds = sortCardsByStrategy(cards, boardPayload.getSortOrCreateBy(), boardCreationDate);
 
                     SectionPayload updateSection = new SectionPayload(targetSection.toJson());
                     updateSection.setCardIds(sortedCardIds);
@@ -652,12 +653,12 @@ public class DefaultCardService implements CardService {
                 break;
             case NEWEST_FIRST:
                 comparator = Comparator.comparing(
-                        (Card card) -> card.getCreationDate() != null ? card.getCreationDate() : boardCreationDate
+                        (Card card) -> card.getModificationDate() != null ? card.getModificationDate() : boardCreationDate
                 ).reversed();
                 break;
             case OLDEST_FIRST:
                 comparator = Comparator.comparing(
-                        (Card card) -> card.getCreationDate() != null ? card.getCreationDate() : boardCreationDate
+                        (Card card) -> card.getModificationDate() != null ? card.getModificationDate() : boardCreationDate
                 );
                 break;
             default:

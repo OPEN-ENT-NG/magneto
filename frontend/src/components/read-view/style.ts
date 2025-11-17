@@ -24,6 +24,8 @@ export const retourStyle = (isTheme1D: boolean) =>
   ({
     position: "fixed",
     right: "4rem",
+    fontSize: isTheme1D ? "inherit" : "1.4rem",
+    paddingLeft: "1rem",
     top: isTheme1D ? "16rem" : "8rem",
   }) as React.CSSProperties;
 
@@ -42,7 +44,12 @@ export const menuItemStyle = { fontSize: "2rem" };
 
 export const blackColor = { color: "black" };
 
-export const whiteColor = { color: "white" };
+export const whiteColor = {
+  color: "white",
+  fontSize: "1.8rem",
+  marginRight: "0.4rem",
+  paddingBottom: "0.1rem",
+};
 
 export const selectStyle = {
   width: "55%",

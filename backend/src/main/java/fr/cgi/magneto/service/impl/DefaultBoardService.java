@@ -342,7 +342,7 @@ public class DefaultBoardService implements BoardService {
 
                         // Si stratégie ordonnée, trier les cartes
                         if (updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
-                            cardIds = cardService.sortCardsByStrategy(cards, updateBoard.getSortOrCreateBy());
+                            cardIds = cardService.sortCardsByStrategy(cards, updateBoard.getSortOrCreateBy(), currentBoard.getCreationDate());
                         } else {
                             cardIds = currentBoard.getCardIds();
                         }
@@ -366,7 +366,7 @@ public class DefaultBoardService implements BoardService {
 
                         // Si stratégie ordonnée, trier les cartes
                         if (updateBoard.getSortOrCreateBy() != null && updateBoard.getSortOrCreateBy().isOrderedPositionStrategy()) {
-                            cardIds = cardService.sortCardsByStrategy(cardsList, updateBoard.getSortOrCreateBy());
+                            cardIds = cardService.sortCardsByStrategy(cardsList, updateBoard.getSortOrCreateBy(), currentBoard.getCreationDate());
                         } else {
                             cardIds = cardsList.stream().map(Card::getId).collect(Collectors.toList());
                         }

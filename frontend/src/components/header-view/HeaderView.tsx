@@ -14,12 +14,12 @@ import { useNavigate } from "react-router-dom";
 
 import {
   breadcrumbTitle,
-  buttonStyle,
   externalToastStyle,
   externalToastTextStyle,
   isLockedToastStyle,
   leftWrapperStyle,
   mainWrapperStyle,
+  readButtonStyle,
   rightWrapperStyle,
   toastStyle,
   wrapperBoxStyle,
@@ -118,7 +118,11 @@ export const HeaderView: FC = () => {
               </Box>
             )}
             {boardHasCards() && (
-              <Button variant="contained" onClick={onClick}>
+              <Button
+                variant="contained"
+                onClick={onClick}
+                sx={readButtonStyle}
+              >
                 {t("magneto.read")}
               </Button>
             )}

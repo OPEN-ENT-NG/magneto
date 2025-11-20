@@ -209,6 +209,7 @@
   "magneto.user.publish": "Éditeur",
   "magneto.user.manager": "Gestionnaire",
   "magneto.user.owner": "Propriétaire",
+  "magneto.user.none": "",
   "group.HeadTeacher": "Professeurs principaux de {{0}}.",
   "group.Direction": "Directeurs de {{0}}.",
   "group.Func": "Personnels de fonction {{0}}.",

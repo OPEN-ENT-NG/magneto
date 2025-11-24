@@ -20,6 +20,7 @@ export interface WebSocketUpdate {
   board?: IBoardItemResponse;
   connectedUsers?: UserCollaboration[];
   cardEditingInformations?: CardEditing[];
+  userId: string;
   [key: string]: any;
 }
 

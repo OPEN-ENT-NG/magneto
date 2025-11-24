@@ -43,7 +43,7 @@ export const App = () => {
   }
 
   return (
-    <WebSocketProvider
+    <WebSocketProvider //Not connecting to the websocket
       socketUrl={""}
       onMessage={(update) => {
         console.log("Received WebSocket update:", update);

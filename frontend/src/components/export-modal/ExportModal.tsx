@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, MouseEvent } from "react";
 
 import {
   Alert,
@@ -62,7 +62,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   });
 
   const handleExportType = (
-    event: React.MouseEvent<HTMLElement>,
+    event: MouseEvent<HTMLElement>,
     newExportType: ExportType,
   ) => {
     setExportType(newExportType);

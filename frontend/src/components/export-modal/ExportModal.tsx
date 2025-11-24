@@ -11,6 +11,8 @@ import {
   DialogActions,
   Stack,
   Switch,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@cgi-learning-hub/ui";
 import { useToast } from "@edifice.io/react";
 import { Trans, useTranslation } from "react-i18next";
@@ -33,6 +35,7 @@ import { CURRENTTAB_STATE } from "../tab-list/types";
 import { EXPORT_TABS_CONFIG } from "../tab-list/utils";
 import { TextFieldWithCopyButton } from "../textfield-with-copy-button/TextfieldWithCopyButton";
 import { getIframeCode } from "~/core/constants/export-iFrame.const";
+import { ExportType } from "~/core/enums/export-type.enum";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useExportBoardQuery } from "~/services/api/export.service.ts";
 
@@ -47,6 +50,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   const [currentTab, setCurrentTab] = useState<CURRENTTAB_STATE>(
     CURRENTTAB_STATE.EXPORT_PPTX,
   );
+  const [exportType, setExportType] = useState<ExportType>(ExportType.PPTX);
 
   const [shouldFetch, setShouldFetch] = useState(false);
   const [isExternalInput, setIsExternalInput] = useState(false);
@@ -55,6 +59,13 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   const { data, error, isLoading } = useExportBoardQuery(selectedBoardsIds[0], {
     skip: !shouldFetch,
   });
+
+  const handleExportType = (
+    event: React.MouseEvent<HTMLElement>,
+    newExportType: ExportType,
+  ) => {
+    setExportType(newExportType);
+  };
 
   const handleConfirm = () => {
     if (currentTab === CURRENTTAB_STATE.EXPORT_PPTX) {
@@ -158,11 +169,39 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
         <Box>
           {currentTab === CURRENTTAB_STATE.EXPORT_PPTX && (
             <Box>
-              <Typography variant="h3" sx={exportTitleStyle}>
-                {t("magneto.export.modal.format")}
-              </Typography>
+              <Box>
+                <Typography variant="h3" sx={exportTitleStyle}>
+                  {t("magneto.export.modal.format")}
+                </Typography>
+                <ToggleButtonGroup
+                  value={exportType}
+                  exclusive
+                  onChange={handleExportType}
+                  aria-label="export type"
+                  sx={{
+                    "& .MuiToggleButton-root": {
+                      fontSize: "1.2rem",
+                      color: "#00000099",
+                    },
+                  }}
+                  color="primary"
+                >
+                  <ToggleButton value={ExportType.PPTX} aria-label="PPTX">
+                    {ExportType.PPTX}
+                  </ToggleButton>
+                  <ToggleButton value={ExportType.PDF} aria-label="PDF">
+                    {ExportType.PDF}
+                  </ToggleButton>
+                  <ToggleButton value={ExportType.PNG} aria-label="PNG">
+                    {ExportType.PNG}
+                  </ToggleButton>
+                  <ToggleButton value={ExportType.CSV} aria-label="CSV">
+                    {ExportType.CSV}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
               <Typography sx={exportContentStyle}>
-                {t("magneto.export.modal.content")}
+                {t(`magneto.export.modal.content.${exportType.toLowerCase()}`)}
               </Typography>
               <Alert severity="info">
                 <Box sx={alertTitleStyle}>
@@ -174,25 +213,27 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
                     <Box sx={alertListItemContentStyle}>
                       <Trans
                         ns="magneto"
-                        i18nKey="magneto.export.modal.text.1"
+                        i18nKey={`magneto.export.modal.text.${exportType.toLowerCase()}.1`}
                         components={{
                           bold: <strong />,
                         }}
                       />
                     </Box>
                   </Box>
-                  <Box component="li" sx={alertListItemStyle}>
-                    <Box sx={alertListItemBulletStyle}>•</Box>
-                    <Box sx={alertListItemContentStyle}>
-                      <Trans
-                        ns="magneto"
-                        i18nKey="magneto.export.modal.text.2"
-                        components={{
-                          bold: <strong />,
-                        }}
-                      />
+                  {exportType === ExportType.PPTX && (
+                    <Box component="li" sx={alertListItemStyle}>
+                      <Box sx={alertListItemBulletStyle}>•</Box>
+                      <Box sx={alertListItemContentStyle}>
+                        <Trans
+                          ns="magneto"
+                          i18nKey="magneto.export.modal.text.pptx.2"
+                          components={{
+                            bold: <strong />,
+                          }}
+                        />
+                      </Box>
                     </Box>
-                  </Box>
+                  )}
                 </Box>
               </Alert>
             </Box>

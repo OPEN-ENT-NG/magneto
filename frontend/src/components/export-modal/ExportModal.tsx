@@ -27,6 +27,7 @@ import {
   contentStyle,
   exportContentStyle,
   exportTitleStyle,
+  toggleButtonGroupStyle,
 } from "./style";
 import { ExportModalProps } from "./types";
 import { actionStyle, dialogStyle, titleStyle } from "../message-modal/style";
@@ -178,12 +179,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
                   exclusive
                   onChange={handleExportType}
                   aria-label="export type"
-                  sx={{
-                    "& .MuiToggleButton-root": {
-                      fontSize: "1.2rem",
-                      color: "#00000099",
-                    },
-                  }}
+                  sx={toggleButtonGroupStyle}
                   color="primary"
                 >
                   <ToggleButton value={ExportType.PPTX} aria-label="PPTX">

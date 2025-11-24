@@ -5,12 +5,14 @@ import { useParams } from "react-router-dom";
 
 import { BoardView } from "~/components/board-view/BoardView";
 import { workflowName } from "~/config";
+import { useWebSocketNotifications } from "~/hooks/useWebSocketNotifications";
 import { BoardProvider } from "~/providers/BoardProvider";
 import { WebSocketProvider } from "~/providers/WebsocketProvider";
 import { useActions } from "~/services/queries";
 
 export const App = () => {
   const { id = "" } = useParams();
+  const { handleWebSocketUpdate } = useWebSocketNotifications();
   const isLocal = window.location.protocol === "http:";
   const getSocketURL = useCallback(() => {
     return isLocal
@@ -25,6 +27,7 @@ export const App = () => {
       socketUrl={getSocketURL()}
       onMessage={(update) => {
         console.log("Received WebSocket update:", update);
+        handleWebSocketUpdate(update);
       }}
       shouldConnect={canSynchronous}
     >

@@ -24,6 +24,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
@@ -33,6 +35,8 @@ import org.entcore.common.user.UserInfos;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -730,5 +734,139 @@ public class DefaultExportService implements ExportService {
             cardsWithErrors.set(errors);
         }
         errors.add(cardTitle);
+    }
+
+
+    @Override
+    public Future<Buffer> exportBoardToCSV(String boardId, UserInfos user) {
+        Promise<Buffer> promise = Promise.promise();
+
+        this.serviceFactory.boardService().getBoardWithContent(boardId, user, false, null)
+                .onSuccess(board -> {
+                    try {
+                        List<Card> cards;
+                        Map<String, String> cardToSectionTitle = new HashMap<>();
+
+                        if (board.isLayoutFree()){
+                            cards = board.cards();
+                        } else {
+                            cards = board.sections().stream()
+                                    .flatMap(section -> {
+                                        List<Card> sectionCards = section.getCards();
+                                        sectionCards.forEach(card -> cardToSectionTitle.put(card.getId(), section.getTitle()));
+                                        return sectionCards.stream();
+                                    })
+                                    .collect(Collectors.toList());
+                        }
+
+                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+                        // Ajouter le BOM UTF-8 pour Excel
+                        outputStream.write(0xEF);
+                        outputStream.write(0xBB);
+                        outputStream.write(0xBF);
+
+                        CSVPrinter printer = new CSVPrinter(
+                                new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
+                                CSVFormat.EXCEL.builder()
+                                        .setDelimiter(';')
+                                        .build()
+                        );
+
+                        buildBoardCSV(board, cards, printer, cardToSectionTitle);
+
+                        printer.flush();
+                        printer.close();
+
+                        promise.complete(Buffer.buffer(outputStream.toByteArray()));
+
+                    } catch (IOException e) {
+                        promise.fail(e);
+                    }
+                })
+                .onFailure(promise::fail);
+
+        return promise.future();
+    }
+
+    public void buildBoardCSV(Board board, List<Card> cards, CSVPrinter printer, Map<String, String> cardToSectionTitle) throws IOException {
+
+        // Section 1 : Propriétés du tableau
+        printer.printRecord("Propriétés du tableau", "", "", "", "", "", "", "", "", "", "", "", "");
+
+        printer.printRecord(
+                "Titre",
+                "Image",
+                "Description",
+                "Disposition",
+                "Positionnement des aimants",
+                "Aimants figés ?",
+                "Commentaires activés ?",
+                "Favoris affichés ?",
+                "Mots-clés",
+                "Image d'arrière-plan",
+                "Nombre d'aimants",
+                "Date de création",
+                "Date de modification"
+        );
+
+        printer.printRecord(
+                board.getTitle(),
+                board.getImageUrl() != null ? board.getImageUrl() : "",
+                board.getDescription() != null ? board.getDescription() : "",
+                board.getLayoutType(),
+                board.getSortOrCreateBy().getValue(),
+                board.isLocked() ? "oui" : "non",
+                board.canComment() ? "oui" : "non",
+                board.displayNbFavorites() ? "oui" : "non",
+                board.tags() != null ? board.tags() : "",
+                board.getBackgroundUrl() != null ? board.getBackgroundUrl() : "",
+                String.valueOf(cards.size()),
+                board.getCreationDate(),
+                board.getModificationDate()
+        );
+
+        // Lignes vides de séparation
+        printer.printRecord("", "", "", "", "", "", "", "", "", "", "", "", "");
+        printer.printRecord("", "", "", "", "", "", "", "", "", "", "", "", "");
+        printer.printRecord("", "", "", "", "", "", "", "", "", "", "", "", "");
+
+        // Section 2 : Aimants (Cards)
+        printer.printRecord("Aimants", "", "", "", "", "", "", "", "", "", "", "", "");
+
+        printer.printRecord(
+                "Titre",
+                "Type",
+                "URL de la ressource",
+                "Légende",
+                "Description",
+                "Section",
+                "Verrouillé ?",
+                "Nombre de favoris",
+                "Nombre de commentaires",
+                "Créé par",
+                "Date de création",
+                "Modifié par",
+                "Date de modification"
+        );
+
+        // Pour chaque card
+        for (Card card : cards) {
+            printer.printRecord(
+                    card.getTitle(),
+                    card.getResourceType(),
+                    card.getResourceUrl() != null ? card.getResourceUrl() : "",
+                    card.getCaption() != null ? card.getCaption() : "",
+                    card.getDescription() != null ? card.getDescription() : "",
+                    cardToSectionTitle.getOrDefault(card.getId(), ""),
+                    card.isLocked() ? "oui" : "non",
+                    String.valueOf(card.getNbOfFavorites()),
+                    String.valueOf(card.getNbOfComments()),
+                    card.getOwnerName(),
+                    card.getCreationDate(),
+                    card.getLastModifierName() != null ? card.getLastModifierName() : "",
+                    card.getModificationDate() != null ? card.getModificationDate() : ""
+            );
+        }
     }
 }

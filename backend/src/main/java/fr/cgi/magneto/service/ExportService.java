@@ -24,5 +24,5 @@ public interface ExportService {
      * @param user User infos
      * @return Future {@link Future<Buffer>} containing the CSV completed
      */
-    Future<Buffer> exportBoardToCSV(String boardId, UserInfos user);
+    Future<Buffer> exportBoardToCSV(String boardId, UserInfos user, I18nHelper i18nHelper);
 }

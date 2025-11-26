@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static fr.cgi.magneto.core.constants.CollectionsConstant.EMPTY;
 import static fr.cgi.magneto.core.constants.Slideshow.CONTENT_TYPE_IMAGE_SVG_XML;
 import static fr.cgi.magneto.core.constants.Slideshow.MAGNETO_SVG;
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
@@ -738,7 +739,7 @@ public class DefaultExportService implements ExportService {
 
 
     @Override
-    public Future<Buffer> exportBoardToCSV(String boardId, UserInfos user) {
+    public Future<Buffer> exportBoardToCSV(String boardId, UserInfos user, I18nHelper i18nHelper) {
         Promise<Buffer> promise = Promise.promise();
 
         this.serviceFactory.boardService().getBoardWithContent(boardId, user, false, null)
@@ -773,7 +774,7 @@ public class DefaultExportService implements ExportService {
                                         .build()
                         );
 
-                        buildBoardCSV(board, cards, printer, cardToSectionTitle);
+                        buildBoardCSV(board, cards, printer, cardToSectionTitle, i18nHelper);
 
                         printer.flush();
                         printer.close();
@@ -789,65 +790,67 @@ public class DefaultExportService implements ExportService {
         return promise.future();
     }
 
-    public void buildBoardCSV(Board board, List<Card> cards, CSVPrinter printer, Map<String, String> cardToSectionTitle) throws IOException {
+    public void buildBoardCSV(Board board, List<Card> cards, CSVPrinter printer, Map<String, String> cardToSectionTitle, I18nHelper i18nHelper) throws IOException {
 
         // Section 1 : Propriétés du tableau
-        printer.printRecord("Propriétés du tableau", "", "", "", "", "", "", "", "", "", "", "", "");
+        printer.printRecord(i18nHelper.translate(CollectionsConstant.I18N_CSV_BOARD_PROPERTIES_HEADER),
+                EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
 
         printer.printRecord(
-                "Titre",
-                "Image",
-                "Description",
-                "Disposition",
-                "Positionnement des aimants",
-                "Aimants figés ?",
-                "Commentaires activés ?",
-                "Favoris affichés ?",
-                "Mots-clés",
-                "Image d'arrière-plan",
-                "Nombre d'aimants",
-                "Date de création",
-                "Date de modification"
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_TITLE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_IMAGE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_LAYOUT),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MAGNET_POSITIONING),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MAGNETS_FROZEN),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_COMMENTS_ENABLED),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_FAVORITES_DISPLAYED),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_KEYWORDS),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_BACKGROUND_IMAGE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_MAGNETS),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATION_DATE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFICATION_DATE)
         );
 
         printer.printRecord(
                 board.getTitle(),
-                board.getImageUrl() != null ? board.getImageUrl() : "",
-                board.getDescription() != null ? board.getDescription() : "",
+                board.getImageUrl() != null ? board.getImageUrl() : EMPTY,
+                board.getDescription() != null ? board.getDescription() : EMPTY,
                 board.getLayoutType(),
                 board.getSortOrCreateBy().getValue(),
-                board.isLocked() ? "oui" : "non",
-                board.canComment() ? "oui" : "non",
-                board.displayNbFavorites() ? "oui" : "non",
-                board.tags() != null ? board.tags() : "",
-                board.getBackgroundUrl() != null ? board.getBackgroundUrl() : "",
+                board.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
+                board.canComment() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
+                board.displayNbFavorites() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
+                board.tags() != null ? board.tags() : EMPTY,
+                board.getBackgroundUrl() != null ? board.getBackgroundUrl() : EMPTY,
                 String.valueOf(cards.size()),
                 board.getCreationDate(),
                 board.getModificationDate()
         );
 
         // Lignes vides de séparation
-        printer.printRecord("", "", "", "", "", "", "", "", "", "", "", "", "");
-        printer.printRecord("", "", "", "", "", "", "", "", "", "", "", "", "");
-        printer.printRecord("", "", "", "", "", "", "", "", "", "", "", "", "");
+        printer.printRecord(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+        printer.printRecord(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+        printer.printRecord(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
 
         // Section 2 : Aimants (Cards)
-        printer.printRecord("Aimants", "", "", "", "", "", "", "", "", "", "", "", "");
+        printer.printRecord(i18nHelper.translate(CollectionsConstant.I18N_CSV_MAGNETS_HEADER),
+                EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
 
         printer.printRecord(
-                "Titre",
-                "Type",
-                "URL de la ressource",
-                "Légende",
-                "Description",
-                "Section",
-                "Verrouillé ?",
-                "Nombre de favoris",
-                "Nombre de commentaires",
-                "Créé par",
-                "Date de création",
-                "Modifié par",
-                "Date de modification"
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_TITLE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_TYPE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_RESOURCE_URL),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CAPTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_LOCKED),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_FAVORITES),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_COMMENTS),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATED_BY),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATION_DATE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFIED_BY),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFICATION_DATE)
         );
 
         // Pour chaque card
@@ -855,17 +858,17 @@ public class DefaultExportService implements ExportService {
             printer.printRecord(
                     card.getTitle(),
                     card.getResourceType(),
-                    card.getResourceUrl() != null ? card.getResourceUrl() : "",
-                    card.getCaption() != null ? card.getCaption() : "",
-                    card.getDescription() != null ? card.getDescription() : "",
-                    cardToSectionTitle.getOrDefault(card.getId(), ""),
-                    card.isLocked() ? "oui" : "non",
+                    card.getResourceUrl() != null ? card.getResourceUrl() : EMPTY,
+                    card.getCaption() != null ? card.getCaption() : EMPTY,
+                    card.getDescription() != null ? card.getDescription() : EMPTY,
+                    cardToSectionTitle.getOrDefault(card.getId(), EMPTY),
+                    card.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
                     String.valueOf(card.getNbOfFavorites()),
                     String.valueOf(card.getNbOfComments()),
                     card.getOwnerName(),
                     card.getCreationDate(),
-                    card.getLastModifierName() != null ? card.getLastModifierName() : "",
-                    card.getModificationDate() != null ? card.getModificationDate() : ""
+                    card.getLastModifierName() != null ? card.getLastModifierName() : EMPTY,
+                    card.getModificationDate() != null ? card.getModificationDate() : EMPTY
             );
         }
     }

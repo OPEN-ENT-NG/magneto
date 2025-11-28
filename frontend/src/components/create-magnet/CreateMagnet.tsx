@@ -93,7 +93,7 @@ export const CreateMagnet: FC = () => {
   const [initialLinkUrl, setInitialLinkUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [section, setSection] = useState<Section | null>(
-    board.sections[0] ?? null,
+    board.sections?.[0] ?? null,
   );
   const [hasOpenMessageSent, setHasOpenMessageSent] = useState(false);
   const [description, setDescription] = useState<string>("");
@@ -185,7 +185,7 @@ export const CreateMagnet: FC = () => {
 
   const handleSectionChange = (event: SelectChangeEvent<string>) => {
     const sectionTitle = event.target.value;
-    const selectedSection = board.sections.find(
+    const selectedSection = board.sections?.find(
       (sectionSelected: Section) => sectionSelected.title === sectionTitle,
     );
     if (selectedSection) {
@@ -349,7 +349,7 @@ export const CreateMagnet: FC = () => {
   }, [isCreateMagnetOpen]);
 
   useEffect(() => {
-    if (board.sections) {
+    if (board.sections?.length > 0) {
       setSection(board.sections[0]);
     }
   }, [board.sections]);
@@ -529,7 +529,7 @@ export const CreateMagnet: FC = () => {
               <Select
                 labelId="select-section"
                 id="select-section"
-                value={section.title}
+                value={section?.title ?? ""}
                 onChange={handleSectionChange}
                 label={t("magneto.card.section")}
                 notched

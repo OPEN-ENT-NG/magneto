@@ -67,7 +67,8 @@ public class ExportController extends ControllerHelper {
             I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
             exportService.exportBoardToCSV(boardId, user, i18nHelper)
                     .onFailure(err -> {
-                        log.error("[Magneto@ExportController::exportBoardToCSV] Failed to export board to CSV", err);
+                        log.error(String.format("[Magneto@%s::exportBoardToCSV] Failed to export board to CSV : %s",
+                                this.getClass().getSimpleName(), err.getMessage()));
                         renderError(request);
                     })
                     .onSuccess(csvBuffer -> {
@@ -78,4 +79,6 @@ public class ExportController extends ControllerHelper {
                     });
         });
     }
+
+
 }

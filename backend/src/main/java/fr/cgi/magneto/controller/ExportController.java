@@ -4,6 +4,7 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.security.ContribBoardRight;
 import fr.cgi.magneto.service.ExportService;
+import fr.cgi.magneto.service.PDFExportService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.impl.DefaultExportService;
 import fr.wseduc.rs.ApiDoc;
@@ -22,9 +23,11 @@ import java.util.List;
 
 public class ExportController extends ControllerHelper {
     private final ExportService exportService;
+    private final PDFExportService pdfExportService;
 
     public ExportController(ServiceFactory serviceFactory) {
         this.exportService = serviceFactory.exportService();
+        this.pdfExportService = serviceFactory.pdfExportService();
     }
 
     @Get("/export/slide/:id")
@@ -80,5 +83,25 @@ public class ExportController extends ControllerHelper {
         });
     }
 
-
+    @Get("/export/pdf/:id")
+    @ApiDoc("Export board to PDF")
+    @ResourceFilter(ContribBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void exportBoardToPDF(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            pdfExportService.exportMultipleCards(boardId, user, request)
+                    .onFailure(err -> {
+                        log.error(String.format("[Magneto@%s::exportBoardToCSV] Failed to export board to CSV : %s",
+                                this.getClass().getSimpleName(), err.getMessage()));
+                        renderError(request);
+                    })
+                    .onSuccess(pdfBuffer -> {
+                        request.response()
+                                .putHeader("Content-Type", "text/csv; charset=UTF-8")
+                                .putHeader("Content-Disposition", "attachment; filename=\"board_" + boardId + ".pdf\"")
+                                .end(pdfBuffer);
+                    });
+        });
+    }
 }

@@ -56,4 +56,29 @@ public class ExportController extends ControllerHelper {
                     });
         });
     }
+
+    @Get("/export/csv/:id")
+    @ApiDoc("Export board to CSV")
+    @ResourceFilter(ContribBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void exportBoardToCSV(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+            exportService.exportBoardToCSV(boardId, user, i18nHelper)
+                    .onFailure(err -> {
+                        log.error(String.format("[Magneto@%s::exportBoardToCSV] Failed to export board to CSV : %s",
+                                this.getClass().getSimpleName(), err.getMessage()));
+                        renderError(request);
+                    })
+                    .onSuccess(csvBuffer -> {
+                        request.response()
+                                .putHeader("Content-Type", "text/csv; charset=UTF-8")
+                                .putHeader("Content-Disposition", "attachment; filename=\"board_" + boardId + ".csv\"")
+                                .end(csvBuffer);
+                    });
+        });
+    }
+
+
 }

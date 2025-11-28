@@ -24,6 +24,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
@@ -33,6 +35,8 @@ import org.entcore.common.user.UserInfos;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,6 +44,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static fr.cgi.magneto.core.constants.CollectionsConstant.EMPTY;
 import static fr.cgi.magneto.core.constants.Slideshow.CONTENT_TYPE_IMAGE_SVG_XML;
 import static fr.cgi.magneto.core.constants.Slideshow.MAGNETO_SVG;
 import static fr.cgi.magneto.core.enums.FileFormatManager.loadResourceForExtension;
@@ -730,5 +735,141 @@ public class DefaultExportService implements ExportService {
             cardsWithErrors.set(errors);
         }
         errors.add(cardTitle);
+    }
+
+
+    @Override
+    public Future<Buffer> exportBoardToCSV(String boardId, UserInfos user, I18nHelper i18nHelper) {
+        Promise<Buffer> promise = Promise.promise();
+
+        this.serviceFactory.boardService().getBoardWithContent(boardId, user, false, null)
+                .onSuccess(board -> {
+                    try {
+                        List<Card> cards;
+                        Map<String, String> cardToSectionTitle = new HashMap<>();
+
+                        if (board.isLayoutFree()){
+                            cards = board.cards();
+                        } else {
+                            cards = board.sections().stream()
+                                    .flatMap(section -> {
+                                        List<Card> sectionCards = section.getCards();
+                                        sectionCards.forEach(card -> cardToSectionTitle.put(card.getId(), section.getTitle()));
+                                        return sectionCards.stream();
+                                    })
+                                    .collect(Collectors.toList());
+                        }
+
+                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+                        // Ajouter le BOM UTF-8 pour Excel
+                        outputStream.write(0xEF);
+                        outputStream.write(0xBB);
+                        outputStream.write(0xBF);
+
+                        CSVPrinter printer = new CSVPrinter(
+                                new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
+                                CSVFormat.EXCEL.builder()
+                                        .setDelimiter(';')
+                                        .build()
+                        );
+
+                        buildBoardCSV(board, cards, printer, cardToSectionTitle, i18nHelper);
+
+                        printer.flush();
+                        printer.close();
+
+                        promise.complete(Buffer.buffer(outputStream.toByteArray()));
+
+                    } catch (IOException e) {
+                        promise.fail(e);
+                    }
+                })
+                .onFailure(promise::fail);
+
+        return promise.future();
+    }
+
+    public void buildBoardCSV(Board board, List<Card> cards, CSVPrinter printer, Map<String, String> cardToSectionTitle, I18nHelper i18nHelper) throws IOException {
+
+        // Section 1 : Propriétés du tableau
+        printer.printRecord(i18nHelper.translate(CollectionsConstant.I18N_CSV_BOARD_PROPERTIES_HEADER),
+                EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+
+        printer.printRecord(
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_TITLE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_IMAGE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_LAYOUT),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MAGNET_POSITIONING),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MAGNETS_FROZEN),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_COMMENTS_ENABLED),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_FAVORITES_DISPLAYED),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_KEYWORDS),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_BACKGROUND_IMAGE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_MAGNETS),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATION_DATE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFICATION_DATE)
+        );
+
+        printer.printRecord(
+                board.getTitle(),
+                board.getImageUrl() != null ? board.getImageUrl() : EMPTY,
+                board.getDescription() != null ? board.getDescription() : EMPTY,
+                board.getLayoutType(),
+                board.getSortOrCreateBy().getValue(),
+                board.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
+                board.canComment() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
+                board.displayNbFavorites() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
+                board.tags() != null ? board.tags() : EMPTY,
+                board.getBackgroundUrl() != null ? board.getBackgroundUrl() : EMPTY,
+                String.valueOf(cards.size()),
+                board.getCreationDate(),
+                board.getModificationDate()
+        );
+
+        // Lignes vides de séparation
+        printer.printRecord(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+        printer.printRecord(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+        printer.printRecord(EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+
+        // Section 2 : Aimants (Cards)
+        printer.printRecord(i18nHelper.translate(CollectionsConstant.I18N_CSV_MAGNETS_HEADER),
+                EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+
+        printer.printRecord(
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_TITLE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_TYPE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_RESOURCE_URL),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CAPTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_LOCKED),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_FAVORITES),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_COMMENTS),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATED_BY),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATION_DATE),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFIED_BY),
+                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFICATION_DATE)
+        );
+
+        // Pour chaque card
+        for (Card card : cards) {
+            printer.printRecord(
+                    card.getTitle(),
+                    card.getResourceType(),
+                    card.getResourceUrl() != null ? card.getResourceUrl() : EMPTY,
+                    card.getCaption() != null ? card.getCaption() : EMPTY,
+                    card.getDescription() != null ? card.getDescription() : EMPTY,
+                    cardToSectionTitle.getOrDefault(card.getId(), EMPTY),
+                    card.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
+                    String.valueOf(card.getNbOfFavorites()),
+                    String.valueOf(card.getNbOfComments()),
+                    card.getOwnerName(),
+                    card.getCreationDate(),
+                    card.getLastModifierName() != null ? card.getLastModifierName() : EMPTY,
+                    card.getModificationDate() != null ? card.getModificationDate() : EMPTY
+            );
+        }
     }
 }

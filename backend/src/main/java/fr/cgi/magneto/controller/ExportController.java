@@ -96,12 +96,10 @@ public class ExportController extends ControllerHelper {
                                 this.getClass().getSimpleName(), err.getMessage()));
                         renderError(request);
                     })
-                    .onSuccess(pdfBuffer -> {
-                        request.response()
-                                .putHeader("Content-Type", "text/csv; charset=UTF-8")
-                                .putHeader("Content-Disposition", "attachment; filename=\"board_" + boardId + ".pdf\"")
-                                .end(pdfBuffer);
-                    });
+                    .onSuccess(pdfBufferObject -> request.response()
+                            .putHeader("Content-Type", "application/pdf")
+                            .putHeader("Content-Disposition", "attachment; filename=\"" + pdfBufferObject.getString(Field.TITLE) + "\"")
+                            .end(pdfBufferObject.getBuffer(Field.BUFFER)));
         });
     }
 }

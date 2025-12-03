@@ -52,4 +52,56 @@ public class CollectionsConstant {
     public static final String I18N_CSV_NO = "magneto.export.csv.no";
 
     public static final String EMPTY = "";
+
+    public static final String RESOURCE_TYPE_TEXT = "text";
+    public static final String RESOURCE_TYPE_IMAGE = "image";
+    public static final String RESOURCE_TYPE_VIDEO = "video";
+    public static final String RESOURCE_TYPE_AUDIO = "audio";
+    public static final String RESOURCE_TYPE_LINK = "link";
+    public static final String RESOURCE_TYPE_FILE = "file";
+
+    public static final String SVG_CROWN = "crown";
+    public static final String SVG_USER = "user";
+    public static final String SVG_MAGNET = "magnet";
+    public static final String SVG_PUBLIC = "public";
+    public static final String SVG_CALENDAR_BLANK = "calendar-blank";
+    public static final String SVG_SHARE_VARIANT = "share-variant";
+    public static final String SVG_VIDEO = "extension/video";
+    public static final String SVG_AUDIO = "extension/audio";
+    public static final String SVG_LINK = "extension/link";
+    public static final String SVG_FILE = "extension/file";
+    public static final String SVG_BOARD_ICON = "board";
+
+    public static final String TEMPLATE_PATH = "./template/export/";
+    public static final String IMG_RESOURCES_PATH = "./img/";
+    public static final String PUBLIC_PATH = "/public/";
+    public static final String APP_ADDRESS = "app-address";
+    public static final String SCHEME = "scheme";
+
+    public static final String APPLICATION_PDF = "application/pdf";
+    public static final String DATA_IMAGE_SVG_BASE64 = "data:image/svg+xml;base64,";
+    public static final String SVG_EXTENSION = ".svg";
+
+    // Constantes pour les noms de templates
+    public static final String TEMPLATE_CARD_READ_VIEW = "card-read-view-template.xhtml";
+    public static final String TEMPLATE_BOARD_MULTI_CARDS = "board-multi-cards-export-template.xhtml";
+
+    // Constantes pour les préfixes de fichiers
+    public static final String FILE_PREFIX_CARD = "Card_";
+    public static final String FILE_PREFIX_BOARD = "Board_";
+    public static final String FILE_EXTENSION_PDF = ".pdf";
+    public static final String DEFAULT_EXPORT_FILENAME = "export";
+
+    // Constantes pour les formats de date
+    public static final String DATE_FORMAT_INPUT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_FORMAT_OUTPUT = "dd MMMM yyyy";
+
+    public static final String DEFAULT_CONTENT_TYPE = "image/jpeg";
+    public static final String DATA_PREFIX = "data:";
+    public static final String BASE64_SUFFIX = ";base64,";
+
+    // Constantes pour les caractères de remplacement
+    public static final String FILENAME_REGEX = "[^a-zA-Z0-9_\\-]";
+    public static final String FILENAME_REPLACEMENT = "_";
+
 }

@@ -65,6 +65,7 @@
 
         .created-by {
             font-style: italic;
+            margin-right: 8px;
         }
 
         .modification-time {
@@ -145,6 +146,7 @@
             word-break: break-all;
             font-size: 14px;
             text-align: center;
+            margin-top: 16px;
         }
 
         .resource-link:hover {
@@ -260,7 +262,7 @@
 
         {{#isImageResource}}
         <div class="image-content">
-            <img src="{{resourceUrl}}" alt="{{title}}" class="resource-image" />
+            <img src="{{imgSrc}}" alt="{{title}}" class="resource-image" />
         </div>
         {{/isImageResource}}
 
@@ -293,9 +295,8 @@
         {{/isFileResource}}
 
         {{#isBoardResource}}
-        <div class="media-content">
-            <img src="{{iconBoard}}" alt="Board" class="resource-icon" />
-            <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
+        <div class="image-content">
+            <img src="{{imgSrc}}" alt="{{title}}" class="resource-image" />
         </div>
         {{/isBoardResource}}
     </div>

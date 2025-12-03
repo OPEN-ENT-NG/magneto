@@ -133,6 +133,7 @@ public class DefaultPDFExportService implements PDFExportService {
      */
     private Future<JsonObject> buildMultiCardData(Board board, UserInfos user) {
         Promise<JsonObject> promise = Promise.promise();
+        List<Map<String, Object>> documents = new ArrayList<>();
         JsonObject data = new JsonObject();
         data.put(TITLE, board.getTitle());
 
@@ -140,42 +141,52 @@ public class DefaultPDFExportService implements PDFExportService {
 
         List<Card> allCards = getAllCardsFromBoard(board);
 
-        // Créer une liste de futures pour toutes les cartes
-        List<Future<JsonObject>> cardFutures = new ArrayList<>();
-        for (int i = 0; i < allCards.size(); i++) {
-            Card card = allCards.get(i);
-            final int index = i;
-
-            Future<JsonObject> cardFuture = buildCardDataForMultiExport(card, user)
-                    .compose(cardData -> {
-                        cardData.put("isLastCard", index == allCards.size() - 1);
-
-                        if (!board.isLayoutFree()) {
-                            Section section = findSectionForCard(board, card.getId());
-                            if (section != null) {
-                                cardData.put("sectionTitle", section.getTitle());
-                            }
-                        }
-
-                        return Future.succeededFuture(cardData);
-                    });
-
-            cardFutures.add(cardFuture);
-        }
-
-        // Attendre que toutes les futures se terminent
-        Future.all(cardFutures)
-                .onSuccess(futures -> {
-                    JsonArray cardsArray = new JsonArray();
-                    for (int i = 0; i < futures.size(); i++) {
-                        cardsArray.add(futures.resultAt(i));
-                    }
-                    data.put("cards", cardsArray);
-                    promise.complete(data);
+        return serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
+                .compose(documentIds -> {
+                    String imageUrl = board.getImageUrl();
+                    String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                    documentIds.add(imageId);
+                    return serviceFactory.exportService().getBoardDocuments(documentIds);
                 })
-                .onFailure(promise::fail);
+                .compose(docs -> {
+                    documents.addAll(docs);
+                    // Créer une liste de futures pour toutes les cartes
+                    List<Future<JsonObject>> cardFutures = new ArrayList<>();
+                    for (int i = 0; i < allCards.size(); i++) {
+                        Card card = allCards.get(i);
+                        final int index = i;
 
-        return promise.future();
+                        Future<JsonObject> cardFuture = buildCardDataForMultiExport(card, user, documents)
+                                .compose(cardData -> {
+                                    cardData.put("isLastCard", index == allCards.size() - 1);
+
+                                    if (!board.isLayoutFree()) {
+                                        Section section = findSectionForCard(board, card.getId());
+                                        if (section != null) {
+                                            cardData.put("sectionTitle", section.getTitle());
+                                        }
+                                    }
+
+                                    return Future.succeededFuture(cardData);
+                                });
+
+                        cardFutures.add(cardFuture);
+                    }
+
+                    // Attendre que toutes les futures se terminent
+                    Future.all(cardFutures)
+                            .onSuccess(futures -> {
+                                JsonArray cardsArray = new JsonArray();
+                                for (int i = 0; i < futures.size(); i++) {
+                                    cardsArray.add(futures.resultAt(i));
+                                }
+                                data.put("cards", cardsArray);
+                                promise.complete(data);
+                            })
+                            .onFailure(promise::fail);
+
+                    return promise.future();
+                });
     }
 
     /**
@@ -200,7 +211,7 @@ public class DefaultPDFExportService implements PDFExportService {
     /**
      * Construit les données d'une carte pour un export multi-cartes
      */
-    private Future<JsonObject> buildCardDataForMultiExport(Card card, UserInfos user) {
+    private Future<JsonObject> buildCardDataForMultiExport(Card card, UserInfos user, List<Map<String, Object>> documents) {
         Promise<JsonObject> promise = Promise.promise();
         JsonObject cardData = new JsonObject();
 
@@ -212,6 +223,7 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put("resourceType", card.getResourceType());
         cardData.put("caption", card.getCaption());
         cardData.put("description", card.getDescription());
+        cardData.put("resourceUrl", card.getResourceUrl() != null ? card.getResourceUrl() : "");
 
         addResourceTypeFlags(cardData, card);
 
@@ -219,13 +231,19 @@ public class DefaultPDFExportService implements PDFExportService {
         boolean isBoardResource = "board".equals(card.getResourceType());
         cardData.put("isBoardResource", isBoardResource);
 
+        if ("image".equals(card.getResourceType()) && card.getResourceId() != null) {
+            String imageBase64 = getDocumentAsBase64(card.getResourceId(), documents);
+            cardData.put("imgSrc", imageBase64);
+        }
+
         if (isBoardResource && card.getResourceUrl() != null) {
             serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
                     .onSuccess(boards -> {
                         if (boards != null && !boards.isEmpty()) {
                             Board referencedBoard = boards.get(0);
                             if (referencedBoard != null)
-                                addBoardInfos(cardData, referencedBoard, user);
+                                addBoardInfos(cardData, referencedBoard, user, documents);
+
                         }
                         promise.complete(cardData);
                     })
@@ -264,7 +282,7 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put("isBoardResource", isBoardResource);
 
         if (isBoardResource && referencedBoard != null) {
-            addBoardInfos(cardData, referencedBoard, user);
+            addBoardInfos(cardData, referencedBoard, user, null);
         }
 
         return cardData;
@@ -273,13 +291,17 @@ public class DefaultPDFExportService implements PDFExportService {
     /**
      * Ajoute les informations du board aux données de la carte
      */
-    private void addBoardInfos(JsonObject cardData, Board board, UserInfos user) {
+    private void addBoardInfos(JsonObject cardData, Board board, UserInfos user, List<Map<String, Object>> documents) {
         cardData.put("boardIsOwner", board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
         cardData.put("boardOwnerName", board.getOwnerName());
         cardData.put("boardNbCards", board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
         cardData.put("boardIsPublic", board.isPublic());
         cardData.put("boardModificationDate", formatDate(board.getModificationDate()));
         cardData.put("boardIsShared", board.getShared() != null && !board.getShared().isEmpty());
+
+        String imageId = board.getImageUrl().substring(board.getImageUrl().lastIndexOf('/') + 1);
+        String imageBase64 = getDocumentAsBase64(imageId, documents);
+        cardData.put("imgSrc", imageBase64);
     }
 
     private void addIcons(JsonObject data) {
@@ -290,10 +312,10 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put("iconCalendar", loadSvgAsBase64("calendar-blank"));
         data.put("iconShare", loadSvgAsBase64("share-variant"));
 
-        data.put("iconVideo", loadSvgAsBase64("video"));
-        data.put("iconAudio", loadSvgAsBase64("audio"));
-        data.put("iconLink", loadSvgAsBase64("link"));
-        data.put("iconFile", loadSvgAsBase64("file"));
+        data.put("iconVideo", loadSvgAsBase64("extension/video"));
+        data.put("iconAudio", loadSvgAsBase64("extension/audio"));
+        data.put("iconLink", loadSvgAsBase64("extension/link"));
+        data.put("iconFile", loadSvgAsBase64("extension/file"));
         data.put("iconBoard", loadSvgAsBase64("board"));
     }
 
@@ -462,5 +484,28 @@ public class DefaultPDFExportService implements PDFExportService {
             scheme = serviceFactory.config().getString("scheme", "http");
         }
         return scheme;
+    }
+
+    /**
+     * Récupère un document et le convertit en base64 avec son content-type
+     */
+    private String getDocumentAsBase64(String documentId, List<Map<String, Object>> documents) {
+        if (documentId == null || documents == null) {
+            return "";
+        }
+
+        for (Map<String, Object> doc : documents) {
+            if (documentId.equals(doc.get("documentId"))) {
+                Buffer buffer = (Buffer) doc.get("buffer");
+                String contentType = (String) doc.get("contentType");
+
+                if (buffer != null) {
+                    String base64 = Base64.getEncoder().encodeToString(buffer.getBytes());
+                    return "data:" + (contentType != null ? contentType : "image/jpeg") + ";base64," + base64;
+                }
+            }
+        }
+
+        return "";
     }
 }

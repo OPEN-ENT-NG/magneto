@@ -221,7 +221,7 @@ public class DefaultExportService implements ExportService {
                 .put(Field.SLIDE_OBJECTS, new JsonArray());
     }
 
-    private Future<List<Map<String, Object>>> getBoardDocuments(List<String> documentIds) {
+    public Future<List<Map<String, Object>>> getBoardDocuments(List<String> documentIds) {
         List<Map<String, Object>> documents = new ArrayList<>();
         List<Future> futures = new ArrayList<>();
 

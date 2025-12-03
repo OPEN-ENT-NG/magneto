@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static fr.cgi.magneto.core.constants.ConfigFields.NODE_PDF_GENERATOR;
 import static fr.cgi.magneto.core.constants.Field.BUFFER;
@@ -136,6 +137,12 @@ public class DefaultPDFExportService implements PDFExportService {
         List<Map<String, Object>> documents = new ArrayList<>();
         JsonObject data = new JsonObject();
         data.put(TITLE, board.getTitle());
+        data.put("description", board.getDescription());
+        data.put("ownerName", board.getOwnerName());
+        data.put("modificationDate", formatDate(board.getModificationDate()));
+        data.put("isPublic", board.isPublic());
+        data.put("isShared", board.getShared() != null && !board.getShared().isEmpty());
+        data.put("nbCards", board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
 
         addIcons(data);
 
@@ -150,28 +157,41 @@ public class DefaultPDFExportService implements PDFExportService {
                 })
                 .compose(docs -> {
                     documents.addAll(docs);
+
+                    // Ajouter l'image du board pour la page de garde
+                    String imageId = board.getImageUrl().substring(board.getImageUrl().lastIndexOf('/') + 1);
+                    String imageBase64 = getDocumentAsBase64(imageId, documents);
+                    data.put("boardImgSrc", imageBase64);
+
+                    // Créer un map pour retrouver rapidement l'ID de section d'une carte
+                    Map<String, String> cardToSectionMap = buildCardToSectionMap(board);
+
                     // Créer une liste de futures pour toutes les cartes
-                    List<Future<JsonObject>> cardFutures = new ArrayList<>();
-                    for (int i = 0; i < allCards.size(); i++) {
-                        Card card = allCards.get(i);
-                        final int index = i;
+                    List<Future<JsonObject>> cardFutures = IntStream.range(0, allCards.size())
+                            .mapToObj(index -> {
+                                Card card = allCards.get(index);
+                                String currentSectionId = cardToSectionMap.get(card.getId());
+                                String previousSectionId = index > 0 ? cardToSectionMap.get(allCards.get(index - 1).getId()) : null;
 
-                        Future<JsonObject> cardFuture = buildCardDataForMultiExport(card, user, documents)
-                                .compose(cardData -> {
-                                    cardData.put("isLastCard", index == allCards.size() - 1);
+                                return buildCardDataForMultiExport(card, user, documents)
+                                        .compose(cardData -> {
+                                            cardData.put("isLastCard", index == allCards.size() - 1);
 
-                                    if (!board.isLayoutFree()) {
-                                        Section section = findSectionForCard(board, card.getId());
-                                        if (section != null) {
-                                            cardData.put("sectionTitle", section.getTitle());
-                                        }
-                                    }
+                                            if (!board.isLayoutFree() && currentSectionId != null) {
+                                                Section section = findSectionById(board, currentSectionId);
+                                                if (section != null) {
+                                                    cardData.put("sectionTitle", section.getTitle());
 
-                                    return Future.succeededFuture(cardData);
-                                });
+                                                    // Afficher une page de section si c'est la première carte ou s'il y a un changement de section
+                                                    boolean showSectionPage = index == 0 || !currentSectionId.equals(previousSectionId);
+                                                    cardData.put("showSectionPage", showSectionPage);
+                                                }
+                                            }
 
-                        cardFutures.add(cardFuture);
-                    }
+                                            return Future.succeededFuture(cardData);
+                                        });
+                            })
+                            .collect(Collectors.toList());
 
                     // Attendre que toutes les futures se terminent
                     Future.all(cardFutures)
@@ -187,6 +207,30 @@ public class DefaultPDFExportService implements PDFExportService {
 
                     return promise.future();
                 });
+    }
+
+    /**
+     * Construit une map associant chaque carte à l'ID de sa section
+     */
+    private Map<String, String> buildCardToSectionMap(Board board) {
+        if (board.isLayoutFree()) {
+            return Collections.emptyMap();
+        }
+
+        return board.sections().stream()
+                .flatMap(section -> section.getCardIds().stream()
+                        .map(cardId -> new AbstractMap.SimpleEntry<>(cardId, section.getId())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    /**
+     * Trouve une section par son ID
+     */
+    private Section findSectionById(Board board, String sectionId) {
+        return board.sections().stream()
+                .filter(section -> sectionId.equals(section.getId()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

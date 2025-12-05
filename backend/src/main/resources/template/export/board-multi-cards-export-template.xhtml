@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+
+<head>
+    <title>{{title}}</title>
+    <style type="text/css">
+        body {
+            font-family: "Roboto", sans-serif;
+            color: #5b6472;
+            font-size: 13px;
+        }
+
+        .page {
+            display: block;
+            margin: 5% 3%;
+        }
+
+        @page {
+            size: A4;
+            margin: 5% 3%;
+
+            @bottom-center {
+                content: counter(page) ' / ' counter(pages);
+                font-family: "Roboto", sans-serif;
+                font-weight: bold;
+                color: #5b6472;
+                font-size: 13px;
+            }
+        }
+
+        /* Preview Wrapper */
+        .preview-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        /* Title Section */
+        .title-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .second-line {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .created-by {
+            font-style: italic;
+            margin-right: 8px;
+        }
+
+        .modification-time {
+            color: #95a5a6;
+        }
+
+        /* Content Section */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .caption {
+            font-size: 16px;
+            font-weight: 600;
+            color: #34495e;
+            margin: 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+
+        .description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #5b6472;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Preview Content */
+        .preview-content {
+            margin: 20px 0;
+            padding: 20px;
+            min-height: 100px;
+            border: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
+
+        .text-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2c3e50;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .image-content {
+            text-align: center;
+        }
+
+        .resource-image {
+            max-width: 100%;
+            max-height: 500px;
+            height: auto;
+            border: 1px solid #e0e0e0;
+        }
+
+        .media-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .resource-icon {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+        }
+
+        .resource-link {
+            color: #3498db;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Board Info Footer */
+        .board-info-footer {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .board-info-row {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .board-info-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-right: 16px;
+        }
+
+        .board-info-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .board-info-label {
+            color: #2c3e50;
+        }
+
+        .board-info-value {
+            color: #5b6472;
+        }
+
+        /* Section Header */
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        /* Page de garde */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .cover-content {
+            max-width: 800px;
+        }
+
+        .cover-image-wrapper {
+            margin-bottom: 30px;
+        }
+
+        .cover-image {
+            max-width: 100%;
+            max-height: 400px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .cover-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0;
+        }
+
+        .cover-description {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #5b6472;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .cover-info {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .cover-info-row {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Page de séparation de section */
+        .section-separator-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        .section-separator-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #3498db;
+            padding: 30px;
+            border: 3px solid #3498db;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        /* Utility Classes */
+        .nobreakpage {
+            page-break-inside: avoid;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .empty-value {
+            font-style: italic;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+
+<body class="page">
+
+<!-- Page de garde -->
+<div class="cover-page">
+    <div class="cover-content">
+        {{#boardImgSrc}}
+        <div class="cover-image-wrapper">
+            <img src="{{boardImgSrc}}" alt="{{title}}" class="cover-image" />
+        </div>
+        {{/boardImgSrc}}
+
+        <h1 class="cover-title">{{title}}</h1>
+
+        {{#description}}
+        <div class="cover-description">{{{description}}}</div>
+        {{/description}}
+
+        <div class="cover-info">
+            <div class="cover-info-row">
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconUser}}" alt="" />
+                    <span class="board-info-value">{{ownerName}}</span>
+                </div>
+
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconMagnet}}" alt="" />
+                    <span class="board-info-value">{{nbCards}} aimants</span>
+                </div>
+
+                {{#isPublic}}
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconPublic}}" alt="" />
+                    <span class="board-info-label">Tableau public</span>
+                </div>
+                {{/isPublic}}
+            </div>
+
+            <div class="cover-info-row">
+                {{#modificationDate}}
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconCalendar}}" alt="" />
+                    <span class="board-info-value">{{modificationDate}}</span>
+                </div>
+                {{/modificationDate}}
+
+                {{#isShared}}
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconShare}}" alt="" />
+                    <span class="board-info-label">Tableau partagé</span>
+                </div>
+                {{/isShared}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page-break"></div>
+
+{{#cards}}
+
+<!-- Page de séparation pour nouvelle section -->
+{{#showSectionPage}}
+<div class="section-separator-page">
+    <h2 class="section-separator-title">{{sectionTitle}}</h2>
+</div>
+<div class="page-break"></div>
+{{/showSectionPage}}
+
+<!-- Une page par carte -->
+<div class="preview-wrapper nobreakpage">
+
+    <!-- Title Section -->
+    <div class="title-wrapper">
+        <h1 class="card-title">{{title}}</h1>
+        <div class="second-line">
+            <span class="created-by">
+                {{#hasEditor}}
+                    Créé par {{ownerName}}, modifié par {{lastModifierName}}
+                {{/hasEditor}}
+                {{^hasEditor}}
+                    Créé par {{ownerName}}
+                {{/hasEditor}}
+            </span>
+            {{#modificationDate}}
+            <span class="modification-time">{{modificationDate}}</span>
+            {{/modificationDate}}
+        </div>
+    </div>
+
+    <!-- Preview Content -->
+    <div class="preview-content">
+        {{#isTextResource}}
+        <div class="text-content">
+            {{{description}}}
+        </div>
+        {{/isTextResource}}
+
+        {{#isImageResource}}
+        <div class="image-content">
+            <img src="{{imgSrc}}" alt="{{title}}" class="resource-image" />
+        </div>
+        {{/isImageResource}}
+
+        {{#isVideoResource}}
+        <div class="media-content">
+            <img src="{{iconVideo}}" alt="Video" class="resource-icon" />
+            <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
+        </div>
+        {{/isVideoResource}}
+
+        {{#isAudioResource}}
+        <div class="media-content">
+            <img src="{{iconAudio}}" alt="Audio" class="resource-icon" />
+            <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
+        </div>
+        {{/isAudioResource}}
+
+        {{#isLinkResource}}
+        <div class="media-content">
+            <img src="{{iconLink}}" alt="Link" class="resource-icon" />
+            <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
+        </div>
+        {{/isLinkResource}}
+
+        {{#isFileResource}}
+        <div class="media-content">
+            <img src="{{iconFile}}" alt="File" class="resource-icon" />
+            <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
+        </div>
+        {{/isFileResource}}
+
+        {{#isBoardResource}}
+        <div class="image-content">
+            <img src="{{imgSrc}}" alt="{{title}}" class="resource-image" />
+        </div>
+        {{/isBoardResource}}
+    </div>
+
+    <!-- Caption and Description -->
+    <div class="content-wrapper">
+        {{#caption}}
+        <p class="caption">{{caption}}</p>
+        {{/caption}}
+
+        {{#description}}
+        {{^isTextResource}}
+        <div class="description">{{{description}}}</div>
+        {{/isTextResource}}
+        {{/description}}
+        {{^description}}
+        {{^isTextResource}}
+        <div class="description empty-value">Aucune description</div>
+        {{/isTextResource}}
+        {{/description}}
+    </div>
+
+    <!-- Board Info Footer (only if resourceType is "board") -->
+    {{#isBoardResource}}
+    <div class="board-info-footer nobreakpage">
+        <h3 style="margin-top: 0; color: #2c3e50; font-size: 18px;">Informations du tableau</h3>
+
+        <div class="board-info-row">
+            {{#boardIsOwner}}
+            <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconCrown}}" alt="" />
+                <span class="board-info-label">Mon tableau</span>
+            </div>
+            {{/boardIsOwner}}
+            {{^boardIsOwner}}
+            <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconUser}}" alt="" />
+                <span class="board-info-label">Propriétaire:</span>
+                <span class="board-info-value">{{boardOwnerName}}</span>
+            </div>
+            {{/boardIsOwner}}
+
+            <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconMagnet}}" alt="" />
+                <span class="board-info-value">{{boardNbCards}} aimants</span>
+            </div>
+
+            {{#boardIsPublic}}
+            <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconPublic}}" alt="" />
+                <span class="board-info-label">Tableau public</span>
+            </div>
+            {{/boardIsPublic}}
+        </div>
+
+        <div class="board-info-row">
+            {{#boardModificationDate}}
+            <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconCalendar}}" alt="" />
+                <span class="board-info-value">{{boardModificationDate}}</span>
+            </div>
+            {{/boardModificationDate}}
+
+            {{#boardIsShared}}
+            <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconShare}}" alt="" />
+                <span class="board-info-label">Tableau partagé</span>
+            </div>
+            {{/boardIsShared}}
+        </div>
+    </div>
+    {{/isBoardResource}}
+
+</div>
+
+<!-- Saut de page après chaque carte sauf la dernière -->
+{{^isLastCard}}
+<div class="page-break"></div>
+{{/isLastCard}}
+
+{{/cards}}
+
+</body>
+
+</html>

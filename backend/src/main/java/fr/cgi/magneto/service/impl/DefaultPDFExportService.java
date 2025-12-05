@@ -155,7 +155,7 @@ public class DefaultPDFExportService implements PDFExportService {
 
         List<Card> allCards = getAllCardsFromBoard(board);
 
-        return serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
+        serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
                 .compose(documentIds -> {
                     String imageUrl = board.getImageUrl();
                     String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
@@ -166,8 +166,9 @@ public class DefaultPDFExportService implements PDFExportService {
                     String message = String.format("[Magneto@%s::buildMultiCardData] Failed to get document IDs for board %s : %s",
                             this.getClass().getSimpleName(), board.getId(), err.getMessage());
                     log.error(message);
+                    promise.fail(err.getMessage());
                 })
-                .compose(docs -> {
+                .onSuccess(docs -> {
                     documents.addAll(docs);
 
                     String imageId = board.getImageUrl().substring(board.getImageUrl().lastIndexOf('/') + 1);
@@ -183,7 +184,7 @@ public class DefaultPDFExportService implements PDFExportService {
                                 String previousSectionId = index > 0 ? cardToSectionMap.get(allCards.get(index - 1).getId()) : null;
 
                                 return buildCardDataForMultiExport(card, user, documents)
-                                        .compose(cardData -> {
+                                        .onSuccess(cardData -> {
                                             cardData.put(Field.IS_LAST_CARD, index == allCards.size() - 1);
 
                                             if (!board.isLayoutFree() && currentSectionId != null) {
@@ -195,8 +196,6 @@ public class DefaultPDFExportService implements PDFExportService {
                                                     cardData.put(Field.SHOW_SECTION_PAGE, showSectionPage);
                                                 }
                                             }
-
-                                            return Future.succeededFuture(cardData);
                                         })
                                         .onFailure(err -> {
                                             String message = String.format("[Magneto@%s::buildMultiCardData] Failed to build card data for card %s : %s",
@@ -221,9 +220,9 @@ public class DefaultPDFExportService implements PDFExportService {
                                 log.error(message);
                                 promise.fail(err.getMessage());
                             });
-
-                    return promise.future();
                 });
+
+        return promise.future();
     }
 
     /**

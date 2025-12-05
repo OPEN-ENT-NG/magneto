@@ -92,7 +92,7 @@ public class ExportController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, user -> {
             pdfExportService.exportMultipleCards(boardId, user, request)
                     .onFailure(err -> {
-                        log.error(String.format("[Magneto@%s::exportBoardToCSV] Failed to export board to CSV : %s",
+                        log.error(String.format("[Magneto@%s::exportBoardToPDF] Failed to export board to PDF : %s",
                                 this.getClass().getSimpleName(), err.getMessage()));
                         renderError(request);
                     })

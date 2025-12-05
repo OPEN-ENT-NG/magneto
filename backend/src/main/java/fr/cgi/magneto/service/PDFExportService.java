@@ -24,7 +24,7 @@ public interface PDFExportService {
     /**
      * Export all cards from a board to PDF (one page per card)
      *
-     * @param board The board containing the cards to export
+     * @param boardId The board containing the cards to export
      * @param user User infos
      * @return Future {@link Future<JsonObject>} containing PDF metadata (title, fileId)
      */
@@ -39,4 +39,9 @@ public interface PDFExportService {
      * @return Future {@link Future<JsonObject>} containing PDF metadata (title, fileId)
      */
     Future<JsonObject> exportSelectedCards(List<Card> cards, String documentTitle, UserInfos user, HttpServerRequest request);
+
+    /**
+     * Exporte les cartes d'un board sous forme de PNG dans une archive ZIP
+     */
+    Future<JsonObject> exportCardsAsPngArchive(String boardId, UserInfos user, HttpServerRequest request);
 }

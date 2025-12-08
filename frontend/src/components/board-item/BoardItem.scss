@@ -48,6 +48,7 @@
         display: flex;
         gap: 0.5rem;
         align-items: center;
+        z-index: 9999 !important;
 
         .med-resource-card-text {
           margin-top: 1px;

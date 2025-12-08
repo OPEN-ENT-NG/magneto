@@ -1,4 +1,9 @@
 import { emptySplitApi } from "./emptySplitApi.service";
+import {
+  EXPORT_ENDPOINT_MAP,
+  EXPORT_MIME_TYPE,
+} from "~/core/constants/export-type.const";
+import { ExportType } from "~/core/enums/export-type.enum";
 
 export interface ExportResponse {
   data: Blob;
@@ -7,9 +12,12 @@ export interface ExportResponse {
 
 export const exportApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
-    exportBoard: builder.query<ExportResponse, string>({
-      query: (boardId: string) => ({
-        url: `/export/slide/${boardId}`,
+    exportBoard: builder.query<
+      ExportResponse,
+      { boardId: string; exportType: ExportType }
+    >({
+      query: ({ boardId, exportType }) => ({
+        url: `/export/${EXPORT_ENDPOINT_MAP[exportType]}/${boardId}`,
         method: "GET",
         responseHandler: async (response) => {
           // Si la réponse n'est pas ok, lever une erreur
@@ -33,7 +41,7 @@ export const exportApi = emptySplitApi.injectEndpoints({
         // Désactiver le parsing par défaut
         cache: "no-cache",
         headers: {
-          Accept: "application/zip",
+          Accept: EXPORT_MIME_TYPE[exportType],
         },
       }),
       // Supprimer toute transformation de réponse

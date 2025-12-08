@@ -39,6 +39,7 @@ import { getIframeCode } from "~/core/constants/export-iFrame.const";
 import { ExportType } from "~/core/enums/export-type.enum";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useExportBoardQuery } from "~/services/api/export.service.ts";
+import { EXPORT_FILE_EXTENSION } from "~/core/constants/export-type.const";
 
 export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   isOpen,
@@ -57,15 +58,23 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   const [isExternalInput, setIsExternalInput] = useState(false);
   const [value, setValue] = useState("");
 
-  const { data, error, isLoading } = useExportBoardQuery(selectedBoardsIds[0], {
-    skip: !shouldFetch,
-  });
+  const { data, error, isLoading } = useExportBoardQuery(
+    {
+      boardId: selectedBoardsIds[0],
+      exportType: exportType,
+    },
+    {
+      skip: !shouldFetch,
+    },
+  );
 
   const handleExportType = (
     event: MouseEvent<HTMLElement>,
     newExportType: ExportType,
   ) => {
-    setExportType(newExportType);
+    if (newExportType !== null) {
+      setExportType(newExportType);
+    }
   };
 
   const handleConfirm = () => {
@@ -110,7 +119,7 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
           // Créer un élément <a> pour le téléchargement
           const link = document.createElement("a");
           link.href = url;
-          link.download = `${selectedBoards[0]._title}.zip`;
+          link.download = `${selectedBoards[0]._title}.${EXPORT_FILE_EXTENSION[exportType]}`;
 
           // Ajouter à la page et déclencher le téléchargement
           document.body.appendChild(link);
@@ -182,16 +191,32 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
                   sx={toggleButtonGroupStyle}
                   color="primary"
                 >
-                  <ToggleButton value={ExportType.PPTX} aria-label="PPTX">
+                  <ToggleButton
+                    value={ExportType.PPTX}
+                    aria-label="PPTX"
+                    key="PPTX"
+                  >
                     {ExportType.PPTX}
                   </ToggleButton>
-                  <ToggleButton value={ExportType.PDF} aria-label="PDF">
+                  <ToggleButton
+                    value={ExportType.PDF}
+                    aria-label="PDF"
+                    key="PDF"
+                  >
                     {ExportType.PDF}
                   </ToggleButton>
-                  <ToggleButton value={ExportType.PNG} aria-label="PNG">
+                  <ToggleButton
+                    value={ExportType.PNG}
+                    aria-label="PNG"
+                    key="PNG"
+                  >
                     {ExportType.PNG}
                   </ToggleButton>
-                  <ToggleButton value={ExportType.CSV} aria-label="CSV">
+                  <ToggleButton
+                    value={ExportType.CSV}
+                    aria-label="CSV"
+                    key="CSV"
+                  >
                     {ExportType.CSV}
                   </ToggleButton>
                 </ToggleButtonGroup>

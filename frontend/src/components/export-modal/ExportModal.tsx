@@ -36,10 +36,10 @@ import { CURRENTTAB_STATE } from "../tab-list/types";
 import { EXPORT_TABS_CONFIG } from "../tab-list/utils";
 import { TextFieldWithCopyButton } from "../textfield-with-copy-button/TextfieldWithCopyButton";
 import { getIframeCode } from "~/core/constants/export-iFrame.const";
+import { EXPORT_FILE_EXTENSION } from "~/core/constants/export-type.const";
 import { ExportType } from "~/core/enums/export-type.enum";
 import { useBoardsNavigation } from "~/providers/BoardsNavigationProvider";
 import { useExportBoardQuery } from "~/services/api/export.service.ts";
-import { EXPORT_FILE_EXTENSION } from "~/core/constants/export-type.const";
 
 export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   isOpen,

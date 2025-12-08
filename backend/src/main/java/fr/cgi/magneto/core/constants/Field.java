@@ -294,4 +294,39 @@ public class Field {
     public static final String ALLOWED_ORIGINS = "allowedOrigins";
     public static final String SORTORCREATEBY = "sortOrCreateBy";
     public static final String COLORWHITE = "#FFFFFF";
+
+    public static final String BOARD_IMG_SRC = "boardImgSrc";
+    public static final String IS_LAST_CARD = "isLastCard";
+    public static final String SECTION_TITLE = "sectionTitle";
+    public static final String SHOW_SECTION_PAGE = "showSectionPage";
+    public static final String HAS_EDITOR = "hasEditor";
+    public static final String IS_BOARD_RESOURCE = "isBoardResource";
+    public static final String IMG_SRC = "imgSrc";
+    public static final String BOARD_IS_OWNER = "boardIsOwner";
+    public static final String BOARD_OWNER_NAME = "boardOwnerName";
+    public static final String BOARD_NB_CARDS = "boardNbCards";
+    public static final String BOARD_IS_PUBLIC = "boardIsPublic";
+    public static final String BOARD_MODIFICATION_DATE = "boardModificationDate";
+    public static final String BOARD_IS_SHARED = "boardIsShared";
+
+    public static final String ICON_CROWN = "iconCrown";
+    public static final String ICON_USER = "iconUser";
+    public static final String ICON_MAGNET = "iconMagnet";
+    public static final String ICON_PUBLIC = "iconPublic";
+    public static final String ICON_CALENDAR = "iconCalendar";
+    public static final String ICON_SHARE = "iconShare";
+    public static final String ICON_VIDEO = "iconVideo";
+    public static final String ICON_AUDIO = "iconAudio";
+    public static final String ICON_LINK = "iconLink";
+    public static final String ICON_FILE = "iconFile";
+    public static final String ICON_BOARD = "iconBoard";
+
+    public static final String IS_TEXT_RESOURCE = "isTextResource";
+    public static final String IS_IMAGE_RESOURCE = "isImageResource";
+    public static final String IS_VIDEO_RESOURCE = "isVideoResource";
+    public static final String IS_AUDIO_RESOURCE = "isAudioResource";
+    public static final String IS_LINK_RESOURCE = "isLinkResource";
+    public static final String IS_FILE_RESOURCE = "isFileResource";
+    public static final String FILE_ID = "fileId";
+    public static final String DOCUMENT_ID = "documentId";
 }

@@ -78,3 +78,10 @@ export const alertListItemContentStyle = {};
 export const buttonStyle = {
   fontSize: "1.4rem",
 };
+
+export const toggleButtonGroupStyle = {
+  "& .MuiToggleButton-root": {
+    fontSize: "1.2rem",
+    color: "#00000099",
+  },
+};

@@ -18,20 +18,24 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.entcore.common.pdf.Pdf;
 import org.entcore.common.pdf.PdfFactory;
 import org.entcore.common.pdf.PdfGenerator;
 import org.entcore.common.user.UserInfos;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static fr.cgi.magneto.core.constants.ConfigFields.NODE_PDF_GENERATOR;
 
@@ -221,6 +225,57 @@ public class DefaultPDFExportService implements PDFExportService {
                                 promise.fail(err.getMessage());
                             });
                 });
+
+        return promise.future();
+    }
+
+    /**
+     * Construit les données d'une carte pour un export PNG individuel
+     */
+    private Future<JsonObject> buildCardDataForSingleExport(Card card, UserInfos user, List<Map<String, Object>> documents) {
+        Promise<JsonObject> promise = Promise.promise();
+        JsonObject cardData = new JsonObject();
+
+        cardData.put(Field.TITLE, card.getTitle());
+        cardData.put(Field.OWNERNAME, card.getOwnerName());
+        cardData.put(Field.LASTMODIFIERNAME, card.getLastModifierName());
+        cardData.put(Field.HAS_EDITOR, hasEditor(card));
+        cardData.put(Field.MODIFICATIONDATE, formatDate(card.getModificationDate()));
+        cardData.put(Field.RESOURCETYPE, card.getResourceType());
+        cardData.put(Field.CAPTION, card.getCaption());
+        cardData.put(Field.DESCRIPTION, card.getDescription());
+        cardData.put(Field.RESOURCEURL, card.getResourceUrl() != null ? card.getResourceUrl() : "");
+
+        addResourceTypeFlags(cardData, card);
+        addIcons(cardData);
+
+        boolean isBoardResource = Field.RESOURCE_BOARD.equals(card.getResourceType());
+        cardData.put(Field.IS_BOARD_RESOURCE, isBoardResource);
+
+        if (CollectionsConstant.RESOURCE_TYPE_IMAGE.equals(card.getResourceType()) && card.getResourceId() != null) {
+            String imageBase64 = getDocumentAsBase64(card.getResourceId(), documents);
+            cardData.put(Field.IMG_SRC, imageBase64);
+        }
+
+        if (isBoardResource && card.getResourceUrl() != null) {
+            serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
+                    .onSuccess(boards -> {
+                        if (boards != null && !boards.isEmpty()) {
+                            Board referencedBoard = boards.get(0);
+                            if (referencedBoard != null)
+                                addBoardInfos(cardData, referencedBoard, user, documents);
+                        }
+                        promise.complete(cardData);
+                    })
+                    .onFailure(err -> {
+                        String message = String.format("[Magneto@%s::buildCardDataForSingleExport] Failed to get boards for card %s : %s",
+                                this.getClass().getSimpleName(), card.getId(), err.getMessage());
+                        log.error(message);
+                        promise.fail(err.getMessage());
+                    });
+        } else {
+            promise.complete(cardData);
+        }
 
         return promise.future();
     }
@@ -569,5 +624,188 @@ public class DefaultPDFExportService implements PDFExportService {
         }
 
         return "";
+    }
+
+    @Override
+    public Future<JsonObject> exportCardsAsPngArchive(String boardId, UserInfos user, HttpServerRequest request) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        this.serviceFactory.boardService().getBoardWithContent(boardId, user, false, null)
+                .onFailure(err -> {
+                    String message = String.format("[Magneto@%s::exportCardsAsPngArchive] Failed to get board %s : %s",
+                            this.getClass().getSimpleName(), boardId, err.getMessage());
+                    log.error(message);
+                    promise.fail(err.getMessage());
+                })
+                .compose(board -> {
+                    List<Card> allCards = getAllCardsFromBoard(board);
+
+                    return serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
+                            .compose(documentIds -> {
+                                String imageUrl = board.getImageUrl();
+                                String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                                documentIds.add(imageId);
+                                return serviceFactory.exportService().getBoardDocuments(documentIds);
+                            })
+                            .compose(documents -> generatePngArchiveForCards(allCards, board, user, request, documents));
+                })
+                .onSuccess(zipBuffer -> {
+                    String filename = CollectionsConstant.FILE_PREFIX_BOARD + sanitizeFilename(boardId) + ".zip";
+                    JsonObject result = new JsonObject()
+                            .put(Field.TITLE, filename)
+                            .put(Field.BUFFER, zipBuffer);
+                    promise.complete(result);
+                })
+                .onFailure(err -> {
+                    String message = String.format("[Magneto@%s::exportCardsAsPngArchive] Failed to export PNG archive : %s",
+                            this.getClass().getSimpleName(), err.getMessage());
+                    log.error(message);
+                    promise.fail(err.getMessage());
+                });
+
+        return promise.future();
+    }
+
+    /**
+     * Génère une archive ZIP contenant les PNG de toutes les cartes
+     */
+    /**
+     * Génère une archive ZIP contenant les PNG de toutes les cartes
+     */
+    private Future<Buffer> generatePngArchiveForCards(List<Card> cards, Board board, UserInfos user,
+                                                      HttpServerRequest request, List<Map<String, Object>> documents) {
+        Promise<Buffer> promise = Promise.promise();
+
+        Map<String, String> cardToSectionMap = buildCardToSectionMap(board);
+
+        // Générer un PDF pour chaque carte
+        List<Future<PngFile>> pngFutures = IntStream.range(0, cards.size())
+                .mapToObj(index -> {
+                    Card card = cards.get(index);
+                    String currentSectionId = cardToSectionMap.get(card.getId());
+                    Section section = currentSectionId != null ? findSectionById(board, currentSectionId) : null;
+                    String sectionPrefix = section != null ? sanitizeFilename(section.getTitle()) + "_" : "";
+
+                    return buildCardDataForSingleExport(card, user, documents)
+                            .compose(cardData -> {
+                                // Ajouter les icônes nécessaires
+                                addIcons(cardData);
+                                return generatePDF(request, cardData, CollectionsConstant.TEMPLATE_CARD_READ_VIEW);
+                            })
+                            .compose(pdfBuffer -> convertPdfToPng(pdfBuffer))
+                            .map(pngBytes -> {
+                                String filename = sectionPrefix + String.format("%03d", index + 1) + "_" +
+                                        sanitizeFilename(card.getTitle()) + ".png";
+                                return new PngFile(filename, pngBytes);
+                            })
+                            .onFailure(err -> {
+                                String message = String.format("[Magneto@%s::generatePngArchiveForCards] Failed to process card %s : %s",
+                                        this.getClass().getSimpleName(), card.getId(), err.getMessage());
+                                log.error(message);
+                            });
+                })
+                .collect(Collectors.toList());
+
+        Future.all(pngFutures)
+                .onSuccess(futures -> {
+                    try {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ZipOutputStream zos = new ZipOutputStream(baos);
+
+                        for (int i = 0; i < futures.size(); i++) {
+                            PngFile pngFile = futures.resultAt(i);
+                            ZipEntry zipEntry = new ZipEntry(pngFile.filename);
+                            zos.putNextEntry(zipEntry);
+                            zos.write(pngFile.data);
+                            zos.closeEntry();
+                        }
+
+                        zos.close();
+                        promise.complete(Buffer.buffer(baos.toByteArray()));
+                    } catch (IOException e) {
+                        String message = String.format("[Magneto@%s::generatePngArchiveForCards] Failed to create ZIP : %s",
+                                this.getClass().getSimpleName(), e.getMessage());
+                        log.error(message);
+                        promise.fail(e.getMessage());
+                    }
+                })
+                .onFailure(err -> {
+                    String message = String.format("[Magneto@%s::generatePngArchiveForCards] Failed to generate PNGs : %s",
+                            this.getClass().getSimpleName(), err.getMessage());
+                    log.error(message);
+                    promise.fail(err.getMessage());
+                });
+
+        return promise.future();
+    }
+
+    /**
+     * Convertit un PDF en PNG (première page uniquement)
+     */
+    private Future<byte[]> convertPdfToPng(Buffer pdfBuffer) {
+        Promise<byte[]> promise = Promise.promise();
+
+        serviceFactory.vertx().executeBlocking(blockingPromise -> {
+            try (PDDocument document = PDDocument.load(new ByteArrayInputStream(pdfBuffer.getBytes()))) {
+                PDFRenderer renderer = new PDFRenderer(document);
+
+                // Convertir la première page en image haute résolution (300 DPI)
+                BufferedImage image = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(image, "png", baos);
+
+                blockingPromise.complete(baos.toByteArray());
+            } catch (Exception e) {
+                String message = String.format("[Magneto@%s::convertPdfToPng] Failed to convert PDF to PNG : %s",
+                        this.getClass().getSimpleName(), e.getMessage());
+                log.error(message);
+                blockingPromise.fail(e);
+            }
+        }, false, res -> {
+            if (res.succeeded()) {
+                promise.complete((byte[]) res.result());
+            } else {
+                promise.fail(res.cause());
+            }
+        });
+
+        return promise.future();
+    }
+
+    /**
+     * Upload le ZIP et retourne les informations du fichier
+     */
+    private Future<JsonObject> uploadZipAndSetFileId(String filename, Buffer zipBuffer) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        JsonObject zipInfos = new JsonObject().put(Field.TITLE, filename);
+
+        serviceFactory.storage().writeBuffer(zipBuffer, "application/zip", filename, uploadEvt -> {
+            if (!Field.OK.equals(uploadEvt.getString(Field.STATUS))) {
+                String message = String.format("[Magneto@%s::uploadZipAndSetFileId] Failed to upload ZIP : %s",
+                        this.getClass().getSimpleName(), uploadEvt.getString(Field.MESSAGE));
+                log.error(message);
+                promise.fail(uploadEvt.getString(Field.MESSAGE));
+                return;
+            }
+            zipInfos.put(Field.FILE_ID, uploadEvt.getString(Field._ID));
+            promise.complete(zipInfos);
+        });
+
+        return promise.future();
+    }
+
+    /**
+     * Classe interne pour stocker un fichier PNG
+     */
+    private static class PngFile {
+        final String filename;
+        final byte[] data;
+
+        PngFile(String filename, byte[] data) {
+            this.filename = filename;
+            this.data = data;
+        }
     }
 }

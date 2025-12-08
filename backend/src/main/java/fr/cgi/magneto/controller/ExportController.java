@@ -102,4 +102,24 @@ public class ExportController extends ControllerHelper {
                             .end(pdfBufferObject.getBuffer(Field.BUFFER)));
         });
     }
+
+    @Get("/export/png/:id")
+    @ApiDoc("Export board cards to PNG archive")
+    @ResourceFilter(ContribBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void exportBoardToPNG(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            pdfExportService.exportCardsAsPngArchive(boardId, user, request)
+                    .onFailure(err -> {
+                        log.error(String.format("[Magneto@%s::exportBoardToPNG] Failed to export board to PNG : %s",
+                                this.getClass().getSimpleName(), err.getMessage()));
+                        renderError(request);
+                    })
+                    .onSuccess(zipObject -> request.response()
+                            .putHeader("Content-Type", "application/zip")
+                            .putHeader("Content-Disposition", "attachment; filename=\"" + zipObject.getString(Field.TITLE) + "\"")
+                            .end(zipObject.getBuffer(Field.BUFFER)));
+        });
+    }
 }

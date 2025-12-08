@@ -4,6 +4,7 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.security.ContribBoardRight;
 import fr.cgi.magneto.service.ExportService;
+import fr.cgi.magneto.service.PDFExportService;
 import fr.cgi.magneto.service.ServiceFactory;
 import fr.cgi.magneto.service.impl.DefaultExportService;
 import fr.wseduc.rs.ApiDoc;
@@ -22,9 +23,11 @@ import java.util.List;
 
 public class ExportController extends ControllerHelper {
     private final ExportService exportService;
+    private final PDFExportService pdfExportService;
 
     public ExportController(ServiceFactory serviceFactory) {
         this.exportService = serviceFactory.exportService();
+        this.pdfExportService = serviceFactory.pdfExportService();
     }
 
     @Get("/export/slide/:id")
@@ -54,6 +57,69 @@ public class ExportController extends ControllerHelper {
 
                         request.response().end(Buffer.buffer(zip.toByteArray()));
                     });
+        });
+    }
+
+    @Get("/export/csv/:id")
+    @ApiDoc("Export board to CSV")
+    @ResourceFilter(ContribBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void exportBoardToCSV(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            I18nHelper i18nHelper = new I18nHelper(getHost(request), I18n.acceptLanguage(request));
+            exportService.exportBoardToCSV(boardId, user, i18nHelper)
+                    .onFailure(err -> {
+                        log.error(String.format("[Magneto@%s::exportBoardToCSV] Failed to export board to CSV : %s",
+                                this.getClass().getSimpleName(), err.getMessage()));
+                        renderError(request);
+                    })
+                    .onSuccess(csvBuffer -> {
+                        request.response()
+                                .putHeader("Content-Type", "text/csv; charset=UTF-8")
+                                .putHeader("Content-Disposition", "attachment; filename=\"board_" + boardId + ".csv\"")
+                                .end(csvBuffer);
+                    });
+        });
+    }
+
+    @Get("/export/pdf/:id")
+    @ApiDoc("Export board to PDF")
+    @ResourceFilter(ContribBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void exportBoardToPDF(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            pdfExportService.exportMultipleCards(boardId, user, request)
+                    .onFailure(err -> {
+                        log.error(String.format("[Magneto@%s::exportBoardToPDF] Failed to export board to PDF : %s",
+                                this.getClass().getSimpleName(), err.getMessage()));
+                        renderError(request);
+                    })
+                    .onSuccess(pdfBufferObject -> request.response()
+                            .putHeader("Content-Type", "application/pdf")
+                            .putHeader("Content-Disposition", "attachment; filename=\"" + pdfBufferObject.getString(Field.TITLE) + "\"")
+                            .end(pdfBufferObject.getBuffer(Field.BUFFER)));
+        });
+    }
+
+    @Get("/export/png/:id")
+    @ApiDoc("Export board cards to PNG archive")
+    @ResourceFilter(ContribBoardRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    public void exportBoardToPNG(HttpServerRequest request) {
+        String boardId = request.getParam(Field.ID);
+        UserUtils.getUserInfos(eb, request, user -> {
+            pdfExportService.exportCardsAsPngArchive(boardId, user, request)
+                    .onFailure(err -> {
+                        log.error(String.format("[Magneto@%s::exportBoardToPNG] Failed to export board to PNG : %s",
+                                this.getClass().getSimpleName(), err.getMessage()));
+                        renderError(request);
+                    })
+                    .onSuccess(zipObject -> request.response()
+                            .putHeader("Content-Type", "application/zip")
+                            .putHeader("Content-Disposition", "attachment; filename=\"" + zipObject.getString(Field.TITLE) + "\"")
+                            .end(zipObject.getBuffer(Field.BUFFER)));
         });
     }
 }

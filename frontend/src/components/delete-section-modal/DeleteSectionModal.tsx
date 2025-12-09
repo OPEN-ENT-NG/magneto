@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, useState } from "react";
 
-import { Button, useToast } from "@edifice.io/react";
+import { Button } from "@edifice.io/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import {
   closeButtonStyle,
@@ -39,7 +40,6 @@ export const DeleteSectionModal: FC<DeleteSectionModalProps> = ({
 
   const [deleteSection] = useDeleteSectionMutation();
   const { sendMessage, readyState } = useWebSocketMagneto();
-  const toast = useToast();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value === "true");

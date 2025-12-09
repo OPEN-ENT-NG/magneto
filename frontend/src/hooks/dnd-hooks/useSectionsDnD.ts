@@ -10,8 +10,8 @@ import {
   Over,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useToast } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import { CustomPointerSensor } from "./customPointer";
 import {
@@ -51,7 +51,6 @@ export const useSectionsDnD = (board: Board) => {
   const { sendMessage, readyState } = useWebSocketMagneto();
   const { isFetching } = useBoard();
   const { t } = useTranslation("magneto");
-  const toast = useToast();
 
   const lockedCardIds = useMemo(() => {
     return updatedSections.flatMap((section) =>

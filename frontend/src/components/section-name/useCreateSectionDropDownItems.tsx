@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { useToast } from "@edifice.io/react";
 import { mdiEyeOff, mdiFileMultipleOutline, mdiDelete, mdiEye } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import { DropDownListItem } from "../drop-down-list/types";
 import { WEBSOCKET_MESSAGE_TYPE } from "~/core/enums/websocket-message-type";
@@ -20,7 +20,6 @@ export const useCreateSectionDropDownItems: (
   setToggleModal: Dispatch<SetStateAction<boolean>>,
 ) => DropDownListItem[] = (section, setToggleModal) => {
   const { t } = useTranslation("magneto");
-  const toast = useToast();
   const [duplicate] = useDuplicateSectionMutation();
   const [update] = useUpdateSectionMutation();
   const { sendMessage, readyState } = useWebSocketMagneto();

@@ -7,12 +7,13 @@ import {
   memo,
 } from "react";
 
-import { useEdificeClient, useToast } from "@edifice.io/react";
+import { useEdificeClient } from "@edifice.io/react";
 import { mdiArrowUpCircle } from "@mdi/js";
 import Icon from "@mdi/react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import {
   CommentPanelItemWrapper,
@@ -91,7 +92,6 @@ const CommentPanelItemBase = memo(
     const commentWrapperRef = useRef<HTMLDivElement>(null);
     const time = useElapsedTime(modificationDate ?? creationDate).label;
     const isOpen = openDropdownId === id;
-    const toast = useToast();
 
     const handleSubmit = useCallback(async () => {
       if (!inputValue) {

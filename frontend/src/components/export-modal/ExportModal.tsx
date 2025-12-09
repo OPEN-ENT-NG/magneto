@@ -14,8 +14,8 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@cgi-learning-hub/ui";
-import { useToast } from "@edifice.io/react";
 import { Trans, useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import {
   alertListItemBulletStyle,
@@ -46,7 +46,6 @@ export const ExportModal: React.FunctionComponent<ExportModalProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation("magneto");
-  const toast = useToast();
   const { selectedBoardsIds, selectedBoards } = useBoardsNavigation();
 
   const [currentTab, setCurrentTab] = useState<CURRENTTAB_STATE>(

@@ -1,8 +1,9 @@
 import { FC, useState } from "react";
 
-import { LoadingScreen, useToast } from "@edifice.io/react";
+import { LoadingScreen } from "@edifice.io/react";
 import { Autocomplete, Box, TextField } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import {
   autocompleteInputStyles,
@@ -37,7 +38,6 @@ export const CardDuplicateOrMoveModal: FC<CardDuplicateOrMoveModalProps> = ({
   const [duplicate] = useDuplicateCardMutation();
   const [move] = useMoveCardMutation();
   const { sendMessage, readyState } = useWebSocketMagneto();
-  const toast = useToast();
   const { t } = useTranslation("magneto");
   const { title, label, button, sucess, error } =
     prepareI18nByModalType(isModalDuplicate);

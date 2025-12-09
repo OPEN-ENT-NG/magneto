@@ -8,12 +8,12 @@ import {
 } from "react";
 
 import { ColorPicker, HexaColor } from "@cgi-learning-hub/ui";
-import { useToast } from "@edifice.io/react";
 import { mdiEyeOff } from "@mdi/js";
 import Icon from "@mdi/react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Box, InputBase, IconButton } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import {
   boxStyle,
@@ -45,7 +45,6 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
   const [inputValue, setInputValue] = useState<string>(section?.title ?? "");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [color, setColor] = useState<HexaColor>(section.color || "#FFFFFF");
-  const toast = useToast();
   const { t } = useTranslation("magneto");
   const { isTheme1D } = useTheme();
   const { openDropdownId, registerDropdown, toggleDropdown, closeDropdown } =

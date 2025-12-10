@@ -5,6 +5,8 @@
 <head>
     <title>{{title}}</title>
     <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&amp;family=Comfortaa:wght@700&amp;display=swap');
+
         body {
             font-family: "Roboto", sans-serif;
             color: #5b6472;
@@ -52,6 +54,7 @@
             font-weight: bold;
             color: #2c3e50;
             margin: 0;
+            font-family: "Roboto", sans-serif;
         }
 
         .second-line {
@@ -187,10 +190,6 @@
         }
 
         .board-info-label {
-            color: #2c3e50;
-        }
-
-        .board-info-value {
             color: #5b6472;
         }
 
@@ -235,6 +234,7 @@
         .cover-title {
             font-size: 36px;
             font-weight: bold;
+            font-family: "Comfortaa", cursive;
             color: #2c3e50;
             margin: 30px 0;
         }
@@ -275,9 +275,10 @@
         .section-separator-title {
             font-size: 32px;
             font-weight: bold;
-            color: #3498db;
+            font-family: "Comfortaa", cursive;
+            color: #5b6472;
             padding: 30px;
-            border: 3px solid #3498db;
+            border: 3px solid #5b6472;
             border-radius: 8px;
             background-color: #f8f9fa;
         }
@@ -317,14 +318,23 @@
 
         <div class="cover-info">
             <div class="cover-info-row">
+                {{#boardIsOwner}}
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconCrown}}" alt="" />
+                    <span class="board-info-label">Mon tableau</span>
+                </div>
+                {{/boardIsOwner}}
+                {{^boardIsOwner}}
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconUser}}" alt="" />
-                    <span class="board-info-value">{{ownerName}}</span>
+                    <span class="board-info-label">Propriétaire:</span>
+                    <span class="board-info-label">{{ownerName}}</span>
                 </div>
+                {{/boardIsOwner}}
 
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconMagnet}}" alt="" />
-                    <span class="board-info-value">{{nbCards}} aimants</span>
+                    <span class="board-info-label">{{nbCards}} aimants</span>
                 </div>
 
                 {{#isPublic}}
@@ -339,7 +349,7 @@
                 {{#modificationDate}}
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconCalendar}}" alt="" />
-                    <span class="board-info-value">{{modificationDate}}</span>
+                    <span class="board-info-label">{{modificationDate}}</span>
                 </div>
                 {{/modificationDate}}
 
@@ -360,7 +370,7 @@
 <!-- Page de séparation pour nouvelle section -->
 {{#showSectionPage}}
 <div class="section-separator-page">
-    <h2 class="section-separator-title">{{sectionTitle}}</h2>
+    <h2 class="section-separator-title" style="border-color: {{sectionColor}};">{{sectionTitle}}</h2>
 </div>
 <div class="page-break"></div>
 {{/showSectionPage}}
@@ -436,22 +446,27 @@
     </div>
 
     <!-- Caption and Description -->
+    {{#caption}}
     <div class="content-wrapper">
-        {{#caption}}
         <p class="caption">{{caption}}</p>
-        {{/caption}}
-
-        {{#description}}
-        {{^isTextResource}}
-        <div class="description">{{{description}}}</div>
-        {{/isTextResource}}
-        {{/description}}
-        {{^description}}
-        {{^isTextResource}}
-        <div class="description empty-value">Aucune description</div>
-        {{/isTextResource}}
-        {{/description}}
     </div>
+    {{/caption}}
+
+    {{#description}}
+    {{^isTextResource}}
+    <div class="content-wrapper">
+        <div class="description">{{{description}}}</div>
+    </div>
+    {{/isTextResource}}
+    {{/description}}
+
+    {{^description}}
+    {{^isTextResource}}
+    <div class="content-wrapper">
+        <div class="description empty-value">Aucune description</div>
+    </div>
+    {{/isTextResource}}
+    {{/description}}
 
     <!-- Board Info Footer (only if resourceType is "board") -->
     {{#isBoardResource}}
@@ -469,13 +484,13 @@
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconUser}}" alt="" />
                 <span class="board-info-label">Propriétaire:</span>
-                <span class="board-info-value">{{boardOwnerName}}</span>
+                <span class="board-info-label">{{boardOwnerName}}</span>
             </div>
             {{/boardIsOwner}}
 
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconMagnet}}" alt="" />
-                <span class="board-info-value">{{boardNbCards}} aimants</span>
+                <span class="board-info-label">{{boardNbCards}} aimants</span>
             </div>
 
             {{#boardIsPublic}}
@@ -490,7 +505,7 @@
             {{#boardModificationDate}}
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconCalendar}}" alt="" />
-                <span class="board-info-value">{{boardModificationDate}}</span>
+                <span class="board-info-label">{{boardModificationDate}}</span>
             </div>
             {{/boardModificationDate}}
 

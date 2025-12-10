@@ -154,6 +154,7 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.ISPUBLIC, board.isPublic());
         data.put(Field.ISSHARED, board.getShared() != null && !board.getShared().isEmpty());
         data.put(Field.NBCARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
+        data.put(Field.BOARD_IS_OWNER, board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
 
         addIcons(data);
 
@@ -195,6 +196,7 @@ public class DefaultPDFExportService implements PDFExportService {
                                                 Section section = findSectionById(board, currentSectionId);
                                                 if (section != null) {
                                                     cardData.put(Field.SECTION_TITLE, section.getTitle());
+                                                    cardData.put(Field.SECTION_COLOR, section.getColor());
 
                                                     boolean showSectionPage = index == 0 || !currentSectionId.equals(previousSectionId);
                                                     cardData.put(Field.SHOW_SECTION_PAGE, showSectionPage);
@@ -289,6 +291,7 @@ public class DefaultPDFExportService implements PDFExportService {
         }
 
         return board.sections().stream()
+                .filter(Section::getDisplayed)
                 .flatMap(section -> section.getCardIds().stream()
                         .map(cardId -> new AbstractMap.SimpleEntry<>(cardId, section.getId())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -501,6 +504,7 @@ public class DefaultPDFExportService implements PDFExportService {
             return board.cards();
         } else {
             return board.sections().stream()
+                    .filter(Section::getDisplayed)
                     .flatMap(section -> section.getCards().stream())
                     .collect(Collectors.toList());
         }

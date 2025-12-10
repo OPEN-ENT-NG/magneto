@@ -698,7 +698,7 @@ public class DefaultPDFExportService implements PDFExportService {
                             })
                             .compose(pdfBuffer -> convertPdfToPng(pdfBuffer))
                             .map(pngBytes -> {
-                                String filename = sectionPrefix + String.format("%03d", index + 1) + "_" +
+                                String filename = card.getId() + "_" + sectionPrefix + String.format("%03d", index + 1) + "_" +
                                         sanitizeFilename(card.getTitle()) + ".png";
                                 return new PngFile(filename, pngBytes);
                             })
@@ -772,29 +772,6 @@ public class DefaultPDFExportService implements PDFExportService {
             } else {
                 promise.fail(res.cause());
             }
-        });
-
-        return promise.future();
-    }
-
-    /**
-     * Upload le ZIP et retourne les informations du fichier
-     */
-    private Future<JsonObject> uploadZipAndSetFileId(String filename, Buffer zipBuffer) {
-        Promise<JsonObject> promise = Promise.promise();
-
-        JsonObject zipInfos = new JsonObject().put(Field.TITLE, filename);
-
-        serviceFactory.storage().writeBuffer(zipBuffer, "application/zip", filename, uploadEvt -> {
-            if (!Field.OK.equals(uploadEvt.getString(Field.STATUS))) {
-                String message = String.format("[Magneto@%s::uploadZipAndSetFileId] Failed to upload ZIP : %s",
-                        this.getClass().getSimpleName(), uploadEvt.getString(Field.MESSAGE));
-                log.error(message);
-                promise.fail(uploadEvt.getString(Field.MESSAGE));
-                return;
-            }
-            zipInfos.put(Field.FILE_ID, uploadEvt.getString(Field._ID));
-            promise.complete(zipInfos);
         });
 
         return promise.future();

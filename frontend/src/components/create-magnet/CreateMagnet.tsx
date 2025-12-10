@@ -65,6 +65,7 @@ import { iconButtonStyle } from "../file-picker-workspace/style";
 import { ImageContainer } from "../image-container/ImageContainer";
 import { VideoPlayer } from "../video-player/VideoPlayer";
 import { BOARD_MODAL_TYPE } from "~/core/enums/board-modal-type";
+import { LAYOUT_TYPE } from "~/core/enums/layout-type.enum";
 import { MEDIA_LIBRARY_TYPE } from "~/core/enums/media-library-type.enum";
 import { MENU_NOT_MEDIA_TYPE } from "~/core/enums/menu-not-media-type.enum";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
@@ -521,29 +522,35 @@ export const CreateMagnet: FC = () => {
               />
             </Box>
           </FormControl>
-          {section && !isEditMagnet && (
-            <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
-              <InputLabel id="input-section" shrink={true} sx={inputLabelStyle}>
-                {t("magneto.card.section")}
-              </InputLabel>
-              <Select
-                labelId="select-section"
-                id="select-section"
-                value={section?.title ?? ""}
-                onChange={handleSectionChange}
-                label={t("magneto.card.section")}
-                notched
-                size="medium"
-                sx={selectStyle}
-              >
-                {board.sections.map((s: Section) => (
-                  <MenuItem key={s.title} value={s.title}>
-                    <Box sx={menuItemStyle}>{s.title}</Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControlMUI>
-          )}
+          {section &&
+            board.layoutType !== LAYOUT_TYPE.FREE &&
+            !isEditMagnet && (
+              <FormControlMUI variant="outlined" sx={formControlMUIStyle}>
+                <InputLabel
+                  id="input-section"
+                  shrink={true}
+                  sx={inputLabelStyle}
+                >
+                  {t("magneto.card.section")}
+                </InputLabel>
+                <Select
+                  labelId="select-section"
+                  id="select-section"
+                  value={section?.title ?? ""}
+                  onChange={handleSectionChange}
+                  label={t("magneto.card.section")}
+                  notched
+                  size="medium"
+                  sx={selectStyle}
+                >
+                  {board.sections.map((s: Section) => (
+                    <MenuItem key={s.title} value={s.title}>
+                      <Box sx={menuItemStyle}>{s.title}</Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControlMUI>
+            )}
           <Box sx={modalFooterStyle}>
             <EdificeButton
               style={footerButtonStyle}

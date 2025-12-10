@@ -72,6 +72,7 @@
   "magneto.embed.modal.copy": "Copier le code",
   "magneto.embed.modal.switch": "Utiliser l'URL publique pour intégrer l'iFrame hors ENT (affichage limité aux sites autorisés par la plateforme)",
   "magneto.export": "Télécharger",
+  "magneto.download": "Télécharger",
   "magneto.websocket.afk": "Votre session en temps réel a expiré. Actualisez la page pour reprendre.",
   "magneto.export.modal.format": "Format du fichier exporté",
   "magneto.export.modal.informations": "Informations concernant l'export",

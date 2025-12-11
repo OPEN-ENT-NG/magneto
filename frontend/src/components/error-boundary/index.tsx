@@ -1,11 +1,10 @@
 import { Component, ReactNode, useEffect } from "react";
 
-import { useToast } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ErrorToast = ({ errorMessage }: { errorMessage?: string }) => {
-  const toast = useToast();
   const { t } = useTranslation("magneto");
 
   useEffect(() => {

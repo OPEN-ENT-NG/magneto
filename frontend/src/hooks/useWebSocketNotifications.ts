@@ -1,15 +1,14 @@
 import { useCallback } from "react";
 
 import { useEdificeClient } from "@edifice.io/react";
-import { useToast } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import { MESSAGE_TYPE_TO_I18N_KEY } from "~/core/enums/websocket-message-type";
 import { WebSocketUpdate } from "~/providers/WebsocketProvider/types";
 
 export const useWebSocketNotifications = () => {
   const { t } = useTranslation("magneto");
-  const toast = useToast();
   const { user } = useEdificeClient();
 
   const handleWebSocketUpdate = useCallback(
@@ -25,7 +24,7 @@ export const useWebSocketNotifications = () => {
         toast.success(t(i18nKey));
       }
     },
-    [user?.userId, t],
+    [user?.userId, t, toast],
   );
 
   return { handleWebSocketUpdate };

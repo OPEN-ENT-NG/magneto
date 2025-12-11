@@ -51,6 +51,28 @@ public class CollectionsConstant {
     public static final String I18N_CSV_YES = "magneto.export.csv.yes";
     public static final String I18N_CSV_NO = "magneto.export.csv.no";
 
+    public static final String I18N_CSV_LAYOUT_FREE = "magneto.board.layout.grid";
+    public static final String I18N_CSV_LAYOUT_SECTION_HORIZONTAL = "magneto.board.layout.horizontal";
+    public static final String I18N_CSV_LAYOUT_SECTION_VERTICAL = "magneto.board.layout.vertical";
+
+    public static final String I18N_BOARD_POSITIONING_FREE = "magneto.board.positionning.free";
+    public static final String I18N_BOARD_POSITIONING_ORDERED = "magneto.board.positionning.ordered";
+    public static final String I18N_POSITIONING_START = "magneto.positionning.start";
+    public static final String I18N_POSITIONING_END = "magneto.positionning.end";
+    public static final String I18N_SORT_ALPHABETICAL = "magneto.sort.order.options.alphabetical";
+    public static final String I18N_SORT_ANTI_ALPHABETICAL = "magneto.sort.order.options.anti.alphabetical";
+    public static final String I18N_SORT_OLDEST_FIRST = "magneto.sort.order.options.oldest.first";
+    public static final String I18N_SORT_NEWEST_FIRST = "magneto.sort.order.options.newest.first";
+
+    public static final String I18N_CARD_TYPE_TEXT = "magneto.card.type.text";
+    public static final String I18N_CARD_TYPE_IMAGE = "magneto.card.type.image";
+    public static final String I18N_CARD_TYPE_FILE = "magneto.card.type.file";
+    public static final String I18N_CARD_TYPE_VIDEO = "magneto.card.type.video";
+    public static final String I18N_CARD_TYPE_AUDIO = "magneto.card.type.audio";
+    public static final String I18N_CARD_TYPE_LINK = "magneto.card.type.link";
+    public static final String I18N_CARD_TYPE_CARD = "magneto.card.type.card";
+    public static final String I18N_CARD_TYPE_BOARD = "magneto.card.type.board";
+
     public static final String EMPTY = "";
 
     public static final String RESOURCE_TYPE_TEXT = "text";

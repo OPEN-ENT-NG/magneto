@@ -26,7 +26,7 @@ import {
 } from "./style";
 import { BoardDescription } from "../board-description/BoardDescription";
 import { ConnectedUsersChip } from "../connected-users-chip/ConnectedUsersChip";
-import { SORT_ORDER_OPTIONS } from "~/core/enums/sort-order";
+import { SORT_OR_CREATE_BY, SORT_ORDER_OPTIONS } from "~/core/enums/sort-order";
 import { useTheme } from "~/hooks/useTheme";
 import { useBoard } from "~/providers/BoardProvider";
 import { Section } from "~/providers/BoardProvider/types";
@@ -86,13 +86,17 @@ export const HeaderView: FC = () => {
               <Box sx={isLockedToastStyle}>
                 <WarningAmberIcon color="warning" />
                 <span>
-                  {t("magneto.board.locked", {
-                    0: t(
-                      SORT_ORDER_OPTIONS.find(
-                        (opt) => opt.value === board.sortOrCreateBy,
-                      )?.label || "",
-                    ),
-                  })}
+                  {[SORT_OR_CREATE_BY.START, SORT_OR_CREATE_BY.END].includes(
+                    board.sortOrCreateBy,
+                  )
+                    ? t("magneto.board.locked")
+                    : t("magneto.board.locked.ordered", {
+                        0: t(
+                          SORT_ORDER_OPTIONS.find(
+                            (opt) => opt.value === board.sortOrCreateBy,
+                          )?.label || "",
+                        ),
+                      })}
                 </span>
               </Box>
             )}

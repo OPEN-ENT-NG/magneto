@@ -5,7 +5,9 @@ import fr.cgi.magneto.core.constants.Field;
 import fr.cgi.magneto.core.constants.MagnetoPaths;
 import fr.cgi.magneto.core.constants.Slideshow;
 import fr.cgi.magneto.core.enums.SlideResourceType;
+import fr.cgi.magneto.core.enums.SortOrCreateByEnum;
 import fr.cgi.magneto.factory.SlideFactory;
+import fr.cgi.magneto.helper.DateHelper;
 import fr.cgi.magneto.helper.I18nHelper;
 import fr.cgi.magneto.helper.SlideHelper;
 import fr.cgi.magneto.model.Section;
@@ -752,6 +754,7 @@ public class DefaultExportService implements ExportService {
                             cards = board.cards();
                         } else {
                             cards = board.sections().stream()
+                                    .filter(Section::getDisplayed)
                                     .flatMap(section -> {
                                         List<Card> sectionCards = section.getCards();
                                         sectionCards.forEach(card -> cardToSectionTitle.put(card.getId(), section.getTitle()));
@@ -771,6 +774,7 @@ public class DefaultExportService implements ExportService {
                                 new OutputStreamWriter(outputStream, StandardCharsets.UTF_8),
                                 CSVFormat.EXCEL.builder()
                                         .setDelimiter(';')
+                                        .setQuote('"')
                                         .build()
                         );
 
@@ -815,17 +819,17 @@ public class DefaultExportService implements ExportService {
         printer.printRecord(
                 board.getTitle(),
                 board.getImageUrl() != null ? board.getImageUrl() : EMPTY,
-                board.getDescription() != null ? board.getDescription() : EMPTY,
-                board.getLayoutType(),
-                board.getSortOrCreateBy().getValue(),
+                sanitizeForCSV(board.getDescription()),
+                translateLayoutType(board.getLayoutType(), i18nHelper),
+                translateSortOrCreateBy(board.getSortOrCreateBy(), i18nHelper),
                 board.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
                 board.canComment() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
                 board.displayNbFavorites() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
                 board.tags() != null ? board.tags() : EMPTY,
                 board.getBackgroundUrl() != null ? board.getBackgroundUrl() : EMPTY,
                 String.valueOf(cards.size()),
-                board.getCreationDate(),
-                board.getModificationDate()
+                formatDateWithoutSeconds(board.getCreationDate()),
+                formatDateWithoutSeconds(board.getModificationDate())
         );
 
         // Lignes vides de séparation
@@ -837,39 +841,161 @@ public class DefaultExportService implements ExportService {
         printer.printRecord(i18nHelper.translate(CollectionsConstant.I18N_CSV_MAGNETS_HEADER),
                 EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
 
-        printer.printRecord(
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_TITLE),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_TYPE),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_RESOURCE_URL),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_CAPTION),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_LOCKED),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_FAVORITES),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_COMMENTS),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATED_BY),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATION_DATE),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFIED_BY),
-                i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFICATION_DATE)
-        );
+        List<String> headers = new ArrayList<>();
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_TITLE));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_TYPE));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_RESOURCE_URL));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_CAPTION));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_LOCKED));
+
+        if (board.displayNbFavorites()) {
+            headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_FAVORITES));
+        }
+
+        if (board.canComment()) {
+            headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_NUMBER_OF_COMMENTS));
+        }
+
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATED_BY));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_CREATION_DATE));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFIED_BY));
+        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_MODIFICATION_DATE));
+
+        printer.printRecord(headers);
 
         // Pour chaque card
         for (Card card : cards) {
-            printer.printRecord(
-                    card.getTitle(),
-                    card.getResourceType(),
-                    card.getResourceUrl() != null ? card.getResourceUrl() : EMPTY,
-                    card.getCaption() != null ? card.getCaption() : EMPTY,
-                    card.getDescription() != null ? card.getDescription() : EMPTY,
-                    cardToSectionTitle.getOrDefault(card.getId(), EMPTY),
-                    card.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO),
-                    String.valueOf(card.getNbOfFavorites()),
-                    String.valueOf(card.getNbOfComments()),
-                    card.getOwnerName(),
-                    card.getCreationDate(),
-                    card.getLastModifierName() != null ? card.getLastModifierName() : EMPTY,
-                    card.getModificationDate() != null ? card.getModificationDate() : EMPTY
-            );
+            List<Object> row = new ArrayList<>();
+            row.add(card.getTitle());
+            row.add(translateCardType(card.getResourceType(), i18nHelper));
+            row.add(card.getResourceUrl() != null ? card.getResourceUrl() : EMPTY);
+            row.add(sanitizeForCSV(card.getCaption()));
+            row.add(sanitizeForCSV(card.getDescription()));
+            row.add(cardToSectionTitle.getOrDefault(card.getId(), EMPTY));
+            row.add(card.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO));
+
+            if (board.displayNbFavorites()) {
+                row.add(String.valueOf(card.getNbOfFavorites()));
+            }
+
+            if (board.canComment()) {
+                row.add(String.valueOf(card.getNbOfComments()));
+            }
+
+            row.add(card.getOwnerName());
+            row.add(formatDateWithoutSeconds(card.getCreationDate()));
+            row.add(card.getLastModifierName() != null ? card.getLastModifierName() : EMPTY);
+            row.add(formatDateWithoutSeconds(card.getModificationDate()));
+
+            printer.printRecord(row);
         }
+    }
+
+    private String translateLayoutType(String layoutType, I18nHelper i18nHelper) {
+        if (layoutType == null) {
+            return EMPTY;
+        }
+
+        switch (layoutType) {
+            case Field.FREE:
+                return i18nHelper.translate(CollectionsConstant.I18N_CSV_LAYOUT_FREE);
+            case Field.HORIZONTAL:
+                return i18nHelper.translate(CollectionsConstant.I18N_CSV_LAYOUT_SECTION_HORIZONTAL);
+            case Field.VERTICAL:
+                return i18nHelper.translate(CollectionsConstant.I18N_CSV_LAYOUT_SECTION_VERTICAL);
+            default:
+                return layoutType;
+        }
+    }
+
+    private String translateSortOrCreateBy(SortOrCreateByEnum sortOrCreateBy, I18nHelper i18nHelper) {
+        if (sortOrCreateBy == null) {
+            return EMPTY;
+        }
+
+        String positioningValue;
+        String positioningType;
+
+        if (sortOrCreateBy.isFreePositionStrategy()) {
+            positioningType = i18nHelper.translate(CollectionsConstant.I18N_BOARD_POSITIONING_FREE);
+            switch (sortOrCreateBy) {
+                case START:
+                    positioningValue = i18nHelper.translate(CollectionsConstant.I18N_POSITIONING_START);
+                    break;
+                case END:
+                    positioningValue = i18nHelper.translate(CollectionsConstant.I18N_POSITIONING_END);
+                    break;
+                default:
+                    positioningValue = sortOrCreateBy.getValue();
+            }
+        } else {
+            positioningType = i18nHelper.translate(CollectionsConstant.I18N_BOARD_POSITIONING_ORDERED);
+            switch (sortOrCreateBy) {
+                case ALPHABETICAL:
+                    positioningValue = i18nHelper.translate(CollectionsConstant.I18N_SORT_ALPHABETICAL);
+                    break;
+                case ANTI_ALPHABETICAL:
+                    positioningValue = i18nHelper.translate(CollectionsConstant.I18N_SORT_ANTI_ALPHABETICAL);
+                    break;
+                case NEWEST_FIRST:
+                    positioningValue = i18nHelper.translate(CollectionsConstant.I18N_SORT_NEWEST_FIRST);
+                    break;
+                case OLDEST_FIRST:
+                    positioningValue = i18nHelper.translate(CollectionsConstant.I18N_SORT_OLDEST_FIRST);
+                    break;
+                default:
+                    positioningValue = sortOrCreateBy.getValue();
+            }
+        }
+
+        return positioningType + " : " + positioningValue;
+    }
+
+    private String formatDateWithoutSeconds(String mongoDate) {
+        if (mongoDate == null) {
+            return EMPTY;
+        }
+        try {
+            Date date = DateHelper.parseDate(mongoDate, DateHelper.MONGO_FORMAT);
+            return DateHelper.getDateString(date, "dd/MM/yyyy HH:mm");
+        } catch (Exception e) {
+            return mongoDate;
+        }
+    }
+
+    private String translateCardType(String resourceType, I18nHelper i18nHelper) {
+        if (resourceType == null) {
+            return EMPTY;
+        }
+
+        switch (resourceType.toLowerCase()) {
+            case "text":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_TEXT).toLowerCase();
+            case "image":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_IMAGE).toLowerCase();
+            case "file":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_FILE).toLowerCase();
+            case "video":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_VIDEO).toLowerCase();
+            case "audio":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_AUDIO).toLowerCase();
+            case "link":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_LINK).toLowerCase();
+            case "card":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_CARD).toLowerCase();
+            case "board":
+                return i18nHelper.translate(CollectionsConstant.I18N_CARD_TYPE_BOARD).toLowerCase();
+            default:
+                return resourceType.toLowerCase();
+        }
+    }
+
+    private String sanitizeForCSV(String text) {
+        if (text == null || text.trim().isEmpty() || text.equals("<p></p>")) {
+            return EMPTY;
+        }
+        return text;
     }
 }

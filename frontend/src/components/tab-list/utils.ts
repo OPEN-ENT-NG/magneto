@@ -51,7 +51,7 @@ export const BOARD_TABS_CONFIG: TabConfig[] = [
 export const EXPORT_TABS_CONFIG: TabConfig[] = [
   {
     tabValue: CURRENTTAB_STATE.EXPORT_PPTX,
-    translationKey: "magneto.export",
+    translationKey: "magneto.download",
     icon: DownloadIcon,
   },
   {

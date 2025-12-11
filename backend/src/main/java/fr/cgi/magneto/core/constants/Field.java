@@ -298,6 +298,7 @@ public class Field {
     public static final String BOARD_IMG_SRC = "boardImgSrc";
     public static final String IS_LAST_CARD = "isLastCard";
     public static final String SECTION_TITLE = "sectionTitle";
+    public static final String SECTION_STYLE = "sectionStyle";
     public static final String SHOW_SECTION_PAGE = "showSectionPage";
     public static final String HAS_EDITOR = "hasEditor";
     public static final String IS_BOARD_RESOURCE = "isBoardResource";
@@ -329,4 +330,5 @@ public class Field {
     public static final String IS_FILE_RESOURCE = "isFileResource";
     public static final String FILE_ID = "fileId";
     public static final String DOCUMENT_ID = "documentId";
+    public static final String SECTION_COLOR = "sectionColor";
 }

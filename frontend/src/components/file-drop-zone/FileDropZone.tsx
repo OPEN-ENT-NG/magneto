@@ -1,9 +1,10 @@
 import { FC, DragEvent } from "react";
 
-import { useToast, useWorkspaceFile } from "@edifice.io/react";
+import { useWorkspaceFile } from "@edifice.io/react";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import {
   cloudIconStyle,
@@ -23,7 +24,6 @@ import { useMediaLibrary } from "~/providers/MediaLibraryProvider";
 export const FileDropZone: FC<FileDropZoneProps> = ({ handleResetdrag }) => {
   const { isFileDragging } = useBoard();
   const { setWorkspaceElement } = useMediaLibrary();
-  const toast = useToast();
   const { create } = useWorkspaceFile();
   const {
     board: { title },

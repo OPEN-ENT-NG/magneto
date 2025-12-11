@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { useToast } from "@edifice.io/react";
+import { toast } from "react-toastify";
 
 interface UsePredefinedToastsProps {
   func: (...args: any[]) => Promise<any>;
@@ -13,8 +13,6 @@ export const usePredefinedToasts = ({
   successMessage,
   failureMessage,
 }: UsePredefinedToastsProps) => {
-  const toast = useToast();
-
   const executeFunction = useCallback(
     async (parameter: any) => {
       try {

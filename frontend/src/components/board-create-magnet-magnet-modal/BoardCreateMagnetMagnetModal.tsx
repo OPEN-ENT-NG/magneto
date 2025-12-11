@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 
-import { Button, SearchBar, useToast } from "@edifice.io/react";
+import { Button, SearchBar } from "@edifice.io/react";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import {
   closeButtonStyle,
@@ -45,7 +46,6 @@ export const BoardCreateMagnetMagnetModal: FC<
   const { sendMessage, readyState } = useWebSocketMagneto();
   const { t } = useTranslation("magneto");
   const [duplicateCard] = useDuplicateCardMutation();
-  const toast = useToast();
 
   const handleSwitchChange = (key: "isByBoards" | "isByFavorite") => {
     setInputValue((prevState) => ({

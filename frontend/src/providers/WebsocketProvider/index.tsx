@@ -114,7 +114,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         if (ws) {
           ws.close(1000, "No activity timeout");
         }
-        toast.warning(t("magneto.websocket.afk"));
+        toast.warning(t("magneto.websocket.afk"), {
+          autoClose: 3600000,
+        });
 
         stopInactivityTimer();
       }

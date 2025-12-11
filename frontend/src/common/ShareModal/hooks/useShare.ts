@@ -8,9 +8,10 @@ import {
   type ShareRightActionDisplayName,
   type ShareRightWithVisibles,
 } from "@edifice.io/client";
-import { useUser, useToast } from "@edifice.io/react";
+import { useUser } from "@edifice.io/react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
 import { ShareOptions, ShareResourceMutation } from "../ShareModal";
 import { boardsApi } from "~/services/api/boards.service.ts";
@@ -87,7 +88,6 @@ export default function useShare({
 }: UseShareResourceModalProps) {
   const { user, avatar } = useUser();
 
-  const toast = useToast();
   const { t } = useTranslation();
 
   const [state, dispatch] = useReducer(reducer, initialState);

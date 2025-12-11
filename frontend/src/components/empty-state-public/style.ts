@@ -10,6 +10,7 @@ export const titleEmptyState = (isTheme1D: boolean) => ({
   fontWeight: "bold",
   fontFamily: isTheme1D ? "Arimo" : "Roboto",
   paddingBottom: "2rem",
+  fontSize: "2rem",
 });
 
 export const contentEmptyState = (isTheme1D: boolean) => ({

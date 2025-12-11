@@ -111,6 +111,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
             },
           }),
         );
+        toast.success("magneto.update.section.confirm");
         return;
       } else {
         return updateSectionAndToast({
@@ -176,6 +177,7 @@ export const SectionName: FC<SectionNameProps> = ({ section }) => {
           },
         }),
       );
+      toast.success("magneto.update.section.confirm");
     } else {
       updateSectionAndToast({
         boardId,

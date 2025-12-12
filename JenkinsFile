@@ -33,7 +33,7 @@ pipeline {
           sh 'mv ./src/main/resources/*.html ./src/main/resources/view'
           sh 'cp -R ./src/main/resources/view-src/notify/ ./src/main/resources/view/notify'
           sh 'cp -R ../frontend/public/* ./src/main/resources/public'
-          sh 'chmod +x build.sh && ./build.sh clean build publish'
+          sh 'chmod +x build.sh && ./build.sh init clean build publish'
           sh 'rm -rf ../frontend/dist'
         }
       }

@@ -1,0 +1,28 @@
+{
+  "name": "fr.cgi~magneto",
+  "config": {
+		"main" : "fr.cgi.magneto.Magneto",
+		"port" : 8205,
+		"app-name" : "Magneto",
+		"app-address" : "/magneto",
+	  "app-icon" : "https://{{host}}/magneto/public/img/uni-magneto.png",
+	  "host": "https://{{ host }}",
+	  "ssl" : true,
+	  "auto-redeploy": false,
+	  "userbook-host": "https://{{ host }}",
+		"integration-mode": "{{ integration_mode|default('HTTP') }}",
+	  "app-registry.port" : 8012,
+	  "mode" : "prod",
+	  "entcore.port" : 8009,
+		"magnetoUpdateFrequency" : {{ magnetoUpdateFrequency|default('10000') }},
+		"theme-platform": "{{ cgiTheme | default('ent-default') }}",
+		"isMultiCluster": true,
+		"allowedOrigins": {{ magnetoAllowedOrigins|default([]) }},
+		"websocket-config": {
+			"wsPort": {{ magnetoWebsocketPort|default('9092') }},
+			"maxUsers": {{ magnetoMaxUsers|default('5000') }},
+			"maxUsersPerBoard": {{ magnetoMaxUsersPerBoard|default('500') }},
+			"endpoint-proxy": "/magneto/eventbus"
+		}
+  }
+}

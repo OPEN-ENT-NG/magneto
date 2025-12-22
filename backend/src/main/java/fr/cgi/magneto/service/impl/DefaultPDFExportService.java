@@ -166,6 +166,18 @@ public class DefaultPDFExportService implements PDFExportService {
                     String imageUrl = board.getImageUrl();
                     String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
                     documentIds.add(imageId);
+
+                    for (Card card : allCards) {
+                        if (card.getDescription() != null && !card.getDescription().isEmpty()) {
+                            List<String> descriptionImageIds = extractDocumentIdsFromHtml(card.getDescription());
+                            for (String id : descriptionImageIds) {
+                                if (!documentIds.contains(id)) {
+                                    documentIds.add(id);
+                                }
+                            }
+                        }
+                    }
+
                     return serviceFactory.exportService().getBoardDocuments(documentIds);
                 })
                 .onFailure(err -> {
@@ -660,6 +672,17 @@ public class DefaultPDFExportService implements PDFExportService {
                                 String imageUrl = board.getImageUrl();
                                 String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
                                 documentIds.add(imageId);
+
+                                for (Card card : allCards) {
+                                    if (card.getDescription() != null && !card.getDescription().isEmpty()) {
+                                        List<String> descriptionImageIds = extractDocumentIdsFromHtml(card.getDescription());
+                                        for (String id : descriptionImageIds) {
+                                            if (!documentIds.contains(id)) {
+                                                documentIds.add(id);
+                                            }
+                                        }
+                                    }
+                                }
                                 return serviceFactory.exportService().getBoardDocuments(documentIds);
                             })
                             .compose(documents -> generatePngArchiveForCards(allCards, board, user, request, documents));
@@ -862,9 +885,8 @@ public class DefaultPDFExportService implements PDFExportService {
                 }
                 imagePromise.complete();
             }
-            // Image externe (avec ou sans protocole)
+            // Image externe (garder le code existant qui fonctionne)
             else if (imgUrl.startsWith("http://") || imgUrl.startsWith("https://") || imgUrl.startsWith("//")) {
-                // Ajouter le protocole si manquant
                 String fullUrl = imgUrl;
                 if (imgUrl.startsWith("//")) {
                     fullUrl = "https:" + imgUrl;
@@ -872,7 +894,7 @@ public class DefaultPDFExportService implements PDFExportService {
                 }
 
                 log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Downloading external image: " + fullUrl);
-                String finalImgUrl = imgUrl; // URL originale pour le remplacement
+                String finalImgUrl = imgUrl;
                 downloadAndConvertImageToBase64(fullUrl)
                         .onSuccess(base64 -> {
                             if (base64 != null && !base64.isEmpty()) {
@@ -903,18 +925,11 @@ public class DefaultPDFExportService implements PDFExportService {
                     .onSuccess(v -> {
                         String processedHtml = htmlContent;
 
-                        // Juste avant la boucle de remplacement, ajoute :
-                        log.info("[Magneto@DefaultPDFExportService::processHtmlImages] HTML BEFORE replacement, first 500 chars: " + processedHtml.substring(0, Math.min(500, processedHtml.length())));
-
-// Dans la boucle, ajoute plus de détails :
                         for (Map.Entry<String, String> entry : urlToBase64.entrySet()) {
                             String oldUrl = entry.getKey();
                             String newUrl = entry.getValue();
 
                             log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Replacing URL: " + oldUrl);
-                            log.info("[Magneto@DefaultPDFExportService::processHtmlImages] With base64 (first 100 chars): " + newUrl.substring(0, Math.min(100, newUrl.length())));
-
-                            int beforeLength = processedHtml.length();
 
                             // Remplacer avec guillemets doubles
                             processedHtml = processedHtml.replace(
@@ -927,14 +942,7 @@ public class DefaultPDFExportService implements PDFExportService {
                                     "src='" + oldUrl + "'",
                                     "src='" + newUrl + "'"
                             );
-
-                            int afterLength = processedHtml.length();
-                            log.info("[Magneto@DefaultPDFExportService::processHtmlImages] HTML length changed from " + beforeLength + " to " + afterLength);
                         }
-
-// Après la boucle :
-                        log.info("[Magneto@DefaultPDFExportService::processHtmlImages] HTML AFTER replacement, first 500 chars: " + processedHtml.substring(0, Math.min(500, processedHtml.length())));
-                        log.info("[Magneto@DefaultPDFExportService::processHtmlImages] HTML AFTER replacement, last 500 chars: " + processedHtml.substring(Math.max(0, processedHtml.length() - 500)));
 
                         log.info("[Magneto@DefaultPDFExportService::processHtmlImages] HTML processing complete");
                         promise.complete(processedHtml);
@@ -1037,5 +1045,35 @@ public class DefaultPDFExportService implements PDFExportService {
         }
 
         return promise.future();
+    }
+
+    /**
+     * Extrait tous les IDs de documents (images) présents dans le HTML
+     */
+    private List<String> extractDocumentIdsFromHtml(String htmlContent) {
+        List<String> documentIds = new ArrayList<>();
+        if (htmlContent == null || htmlContent.isEmpty()) {
+            return documentIds;
+        }
+
+        // Pattern pour trouver les URLs du workspace dans les balises img
+        Pattern workspacePattern = Pattern.compile("/workspace/document/([a-f0-9\\-]+)", Pattern.CASE_INSENSITIVE);
+        java.util.regex.Matcher matcher = workspacePattern.matcher(htmlContent);
+
+        while (matcher.find()) {
+            String documentId = matcher.group(1);
+            // Enlever les query params si présents
+            if (documentId.contains("?")) {
+                documentId = documentId.substring(0, documentId.indexOf("?"));
+            }
+            if (!documentIds.contains(documentId)) {
+                documentIds.add(documentId);
+            }
+        }
+
+        log.info(String.format("[Magneto@%s::extractDocumentIdsFromHtml] Found %d document IDs in HTML",
+                this.getClass().getSimpleName(), documentIds.size()));
+
+        return documentIds;
     }
 }

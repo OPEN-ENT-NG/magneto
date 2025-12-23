@@ -832,7 +832,7 @@ public class DefaultPDFExportService implements PDFExportService {
             return Future.succeededFuture(htmlContent);
         }
 
-        log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Processing HTML content, length: " + htmlContent.length());
+        log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] Processing HTML content, length: " + htmlContent.length());
 
         Promise<String> promise = Promise.promise();
 
@@ -843,22 +843,18 @@ public class DefaultPDFExportService implements PDFExportService {
         List<Future<Void>> imageFutures = new ArrayList<>();
         Map<String, String> urlToBase64 = new HashMap<>();
 
-        int imageCount = 0;
         while (matcher.find()) {
             String imgUrl = matcher.group(1);
-            imageCount++;
-
-            log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Found image #" + imageCount + ": " + imgUrl);
 
             // Ignorer si déjà en base64
             if (imgUrl.startsWith("data:")) {
-                log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Image already in base64, skipping");
+                log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] Image already in base64, skipping");
                 continue;
             }
 
             // Ne traiter qu'une fois chaque URL unique
             if (urlToBase64.containsKey(imgUrl)) {
-                log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Image already processed, skipping");
+                log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] Image already processed, skipping");
                 continue;
             }
 
@@ -867,7 +863,6 @@ public class DefaultPDFExportService implements PDFExportService {
 
             // Vérifier si c'est une image du workspace
             if (imgUrl.contains("/workspace/document/")) {
-                log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Processing workspace image");
                 String documentId = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
 
                 // Enlever les query params si présents
@@ -875,11 +870,9 @@ public class DefaultPDFExportService implements PDFExportService {
                     documentId = documentId.substring(0, documentId.indexOf("?"));
                 }
 
-                log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Document ID: " + documentId);
                 String base64 = getDocumentAsBase64(documentId, documents);
                 if (!base64.isEmpty()) {
                     urlToBase64.put(imgUrl, base64);
-                    log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Workspace image converted to base64");
                 } else {
                     log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] Workspace image not found in documents");
                 }
@@ -890,16 +883,13 @@ public class DefaultPDFExportService implements PDFExportService {
                 String fullUrl = imgUrl;
                 if (imgUrl.startsWith("//")) {
                     fullUrl = "https:" + imgUrl;
-                    log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Added https: protocol to URL");
                 }
 
-                log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Downloading external image: " + fullUrl);
-                String finalImgUrl = imgUrl;
                 downloadAndConvertImageToBase64(fullUrl)
                         .onSuccess(base64 -> {
                             if (base64 != null && !base64.isEmpty()) {
-                                urlToBase64.put(finalImgUrl, base64);
-                                log.info("[Magneto@DefaultPDFExportService::processHtmlImages] External image downloaded and converted");
+                                urlToBase64.put(imgUrl, base64);
+                                log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] External image downloaded and converted");
                             } else {
                                 log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] External image download returned empty");
                             }
@@ -915,10 +905,7 @@ public class DefaultPDFExportService implements PDFExportService {
             }
         }
 
-        log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Total images found: " + imageCount + ", to process: " + imageFutures.size());
-
         if (imageFutures.isEmpty()) {
-            log.info("[Magneto@DefaultPDFExportService::processHtmlImages] No images to process, returning original HTML");
             promise.complete(htmlContent);
         } else {
             Future.all(imageFutures)
@@ -928,8 +915,6 @@ public class DefaultPDFExportService implements PDFExportService {
                         for (Map.Entry<String, String> entry : urlToBase64.entrySet()) {
                             String oldUrl = entry.getKey();
                             String newUrl = entry.getValue();
-
-                            log.info("[Magneto@DefaultPDFExportService::processHtmlImages] Replacing URL: " + oldUrl);
 
                             // Remplacer avec guillemets doubles
                             processedHtml = processedHtml.replace(
@@ -944,7 +929,6 @@ public class DefaultPDFExportService implements PDFExportService {
                             );
                         }
 
-                        log.info("[Magneto@DefaultPDFExportService::processHtmlImages] HTML processing complete");
                         promise.complete(processedHtml);
                     })
                     .onFailure(err -> {
@@ -983,7 +967,6 @@ public class DefaultPDFExportService implements PDFExportService {
             client.request(io.vertx.core.http.HttpMethod.GET, port, host, requestURI)
                     .compose(request -> {
                         request.setTimeout(10000);
-                        // AJOUT: User-Agent pour Wikipedia et autres sites
                         request.putHeader("User-Agent", "Mozilla/5.0 (compatible; MagnetoBot/1.0)");
 
                         return request.send()
@@ -992,7 +975,6 @@ public class DefaultPDFExportService implements PDFExportService {
                                     if (response.statusCode() == 301 || response.statusCode() == 302) {
                                         String location = response.getHeader("Location");
                                         if (location != null) {
-                                            log.info("[Magneto@DefaultPDFExportService::downloadAndConvertImageToBase64] Following redirect to: " + location);
                                             client.close();
                                             return downloadAndConvertImageToBase64(location);
                                         }
@@ -1071,7 +1053,7 @@ public class DefaultPDFExportService implements PDFExportService {
             }
         }
 
-        log.info(String.format("[Magneto@%s::extractDocumentIdsFromHtml] Found %d document IDs in HTML",
+        log.debug(String.format("[Magneto@%s::extractDocumentIdsFromHtml] Found %d document IDs in HTML",
                 this.getClass().getSimpleName(), documentIds.size()));
 
         return documentIds;

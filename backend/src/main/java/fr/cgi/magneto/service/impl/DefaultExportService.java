@@ -828,8 +828,8 @@ public class DefaultExportService implements ExportService {
                 board.tags() != null ? board.tags() : EMPTY,
                 board.getBackgroundUrl() != null ? board.getBackgroundUrl() : EMPTY,
                 String.valueOf(cards.size()),
-                formatDateWithoutSeconds(board.getCreationDate()),
-                formatDateWithoutSeconds(board.getModificationDate())
+                formatDateCSV(board.getCreationDate()),
+                formatDateCSV(board.getModificationDate())
         );
 
         // Lignes vides de séparation
@@ -885,9 +885,9 @@ public class DefaultExportService implements ExportService {
             }
 
             row.add(card.getOwnerName());
-            row.add(formatDateWithoutSeconds(card.getCreationDate()));
+            row.add(formatDateCSV(card.getCreationDate()));
             row.add(card.getLastModifierName() != null ? card.getLastModifierName() : EMPTY);
-            row.add(formatDateWithoutSeconds(card.getModificationDate()));
+            row.add(formatDateCSV(card.getModificationDate()));
 
             printer.printRecord(row);
         }
@@ -953,13 +953,13 @@ public class DefaultExportService implements ExportService {
         return positioningType + " : " + positioningValue;
     }
 
-    private String formatDateWithoutSeconds(String mongoDate) {
+    private String formatDateCSV(String mongoDate) {
         if (mongoDate == null) {
             return EMPTY;
         }
         try {
             Date date = DateHelper.parseDate(mongoDate, DateHelper.MONGO_FORMAT);
-            return DateHelper.getDateString(date, "dd/MM/yyyy HH:mm");
+            return DateHelper.getDateString(date, DateHelper.MONGO_FORMAT);
         } catch (Exception e) {
             return mongoDate;
         }

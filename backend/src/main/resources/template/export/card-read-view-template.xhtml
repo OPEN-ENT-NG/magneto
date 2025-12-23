@@ -303,19 +303,11 @@
         <h3 style="margin-top: 0; color: #2c3e50; font-size: 18px;">Informations du tableau</h3>
 
         <div class="board-info-row">
-            {{#boardIsOwner}}
-            <div class="board-info-item">
-                <img class="board-info-icon" src="{{iconCrown}}" alt="" />
-                <span class="board-info-label">Mon tableau</span>
-            </div>
-            {{/boardIsOwner}}
-            {{^boardIsOwner}}
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconUser}}" alt="" />
                 <span class="board-info-label">Propriétaire:</span>
                 <span class="board-info-value">{{boardOwnerName}}</span>
             </div>
-            {{/boardIsOwner}}
 
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconMagnet}}" alt="" />

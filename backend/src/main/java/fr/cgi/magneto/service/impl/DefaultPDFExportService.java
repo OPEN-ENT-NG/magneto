@@ -158,7 +158,6 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.ISPUBLIC, board.isPublic());
         data.put(Field.ISSHARED, board.getShared() != null && !board.getShared().isEmpty());
         data.put(Field.NBCARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
-        data.put(Field.BOARD_IS_OWNER, board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
 
         addIcons(data);
 
@@ -213,9 +212,6 @@ public class DefaultPDFExportService implements PDFExportService {
                                                 if (section != null) {
                                                     cardData.put(Field.SECTION_TITLE, section.getTitle());
                                                     cardData.put(Field.SECTION_COLOR, section.getColor());
-
-                                                    boolean showSectionPage = index == 0 || !currentSectionId.equals(previousSectionId);
-                                                    cardData.put(Field.SHOW_SECTION_PAGE, showSectionPage);
                                                 }
                                             }
                                         })
@@ -362,8 +358,9 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.HAS_EDITOR, hasEditor(card));
         cardData.put(Field.MODIFICATIONDATE, formatDate(card.getModificationDate()));
         cardData.put(Field.RESOURCETYPE, card.getResourceType());
-        cardData.put(Field.CAPTION, card.getCaption());
         cardData.put(Field.RESOURCEURL, card.getResourceUrl() != null ? card.getResourceUrl() : "");
+        if (card.getCaption() != null && !card.getCaption().trim().isEmpty())
+            cardData.put(Field.CAPTION, card.getCaption());
 
         addResourceTypeFlags(cardData, card);
 
@@ -435,7 +432,6 @@ public class DefaultPDFExportService implements PDFExportService {
      * Ajoute les informations du board aux données de la carte
      */
     private void addBoardInfos(JsonObject cardData, Board board, UserInfos user, List<Map<String, Object>> documents) {
-        cardData.put(Field.BOARD_IS_OWNER, board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
         cardData.put(Field.BOARD_OWNER_NAME, board.getOwnerName());
         cardData.put(Field.BOARD_NB_CARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
         cardData.put(Field.BOARD_IS_PUBLIC, board.isPublic());
@@ -737,7 +733,7 @@ public class DefaultPDFExportService implements PDFExportService {
                             })
                             .compose(pdfBuffer -> convertPdfToPng(pdfBuffer))
                             .map(pngBytes -> {
-                                String filename = card.getId() + "_" + sectionPrefix + String.format("%03d", index + 1) + "_" +
+                                String filename =  String.format("%03d", index + 1) + "_" + sectionPrefix + "_" +
                                         sanitizeFilename(card.getTitle()) + ".png";
                                 return new PngFile(filename, pngBytes);
                             })

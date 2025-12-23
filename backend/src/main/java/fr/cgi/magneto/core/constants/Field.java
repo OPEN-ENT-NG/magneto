@@ -299,11 +299,9 @@ public class Field {
     public static final String IS_LAST_CARD = "isLastCard";
     public static final String SECTION_TITLE = "sectionTitle";
     public static final String SECTION_STYLE = "sectionStyle";
-    public static final String SHOW_SECTION_PAGE = "showSectionPage";
     public static final String HAS_EDITOR = "hasEditor";
     public static final String IS_BOARD_RESOURCE = "isBoardResource";
     public static final String IMG_SRC = "imgSrc";
-    public static final String BOARD_IS_OWNER = "boardIsOwner";
     public static final String BOARD_OWNER_NAME = "boardOwnerName";
     public static final String BOARD_NB_CARDS = "boardNbCards";
     public static final String BOARD_IS_PUBLIC = "boardIsPublic";

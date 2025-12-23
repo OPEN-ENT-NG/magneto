@@ -126,4 +126,6 @@ public class CollectionsConstant {
     public static final String FILENAME_REGEX = "[^a-zA-Z0-9_\\-]";
     public static final String FILENAME_REPLACEMENT = "_";
 
+    public static final int MAX_IMAGES_PER_DESCRIPTION = 100;
+
 }

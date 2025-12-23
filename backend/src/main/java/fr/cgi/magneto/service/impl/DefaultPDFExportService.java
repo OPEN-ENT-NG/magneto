@@ -25,6 +25,8 @@ import org.entcore.common.pdf.Pdf;
 import org.entcore.common.pdf.PdfFactory;
 import org.entcore.common.pdf.PdfGenerator;
 import org.entcore.common.user.UserInfos;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -32,11 +34,13 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static fr.cgi.magneto.core.constants.CollectionsConstant.MAX_IMAGES_PER_DESCRIPTION;
 import static fr.cgi.magneto.core.constants.ConfigFields.NODE_PDF_GENERATOR;
 
 /**
@@ -154,7 +158,6 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.ISPUBLIC, board.isPublic());
         data.put(Field.ISSHARED, board.getShared() != null && !board.getShared().isEmpty());
         data.put(Field.NBCARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
-        data.put(Field.BOARD_IS_OWNER, board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
 
         addIcons(data);
 
@@ -165,6 +168,18 @@ public class DefaultPDFExportService implements PDFExportService {
                     String imageUrl = board.getImageUrl();
                     String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
                     documentIds.add(imageId);
+
+                    for (Card card : allCards) {
+                        if (card.getDescription() != null && !card.getDescription().isEmpty()) {
+                            List<String> descriptionImageIds = extractDocumentIdsFromHtml(card.getDescription());
+                            for (String id : descriptionImageIds) {
+                                if (!documentIds.contains(id)) {
+                                    documentIds.add(id);
+                                }
+                            }
+                        }
+                    }
+
                     return serviceFactory.exportService().getBoardDocuments(documentIds);
                 })
                 .onFailure(err -> {
@@ -197,9 +212,6 @@ public class DefaultPDFExportService implements PDFExportService {
                                                 if (section != null) {
                                                     cardData.put(Field.SECTION_TITLE, section.getTitle());
                                                     cardData.put(Field.SECTION_COLOR, section.getColor());
-
-                                                    boolean showSectionPage = index == 0 || !currentSectionId.equals(previousSectionId);
-                                                    cardData.put(Field.SHOW_SECTION_PAGE, showSectionPage);
                                                 }
                                             }
                                         })
@@ -245,7 +257,6 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.MODIFICATIONDATE, formatDate(card.getModificationDate()));
         cardData.put(Field.RESOURCETYPE, card.getResourceType());
         cardData.put(Field.CAPTION, card.getCaption());
-        cardData.put(Field.DESCRIPTION, card.getDescription());
         cardData.put(Field.RESOURCEURL, card.getResourceUrl() != null ? card.getResourceUrl() : "");
 
         addResourceTypeFlags(cardData, card);
@@ -259,25 +270,33 @@ public class DefaultPDFExportService implements PDFExportService {
             cardData.put(Field.IMG_SRC, imageBase64);
         }
 
-        if (isBoardResource && card.getResourceUrl() != null) {
-            serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
-                    .onSuccess(boards -> {
-                        if (boards != null && !boards.isEmpty()) {
-                            Board referencedBoard = boards.get(0);
-                            if (referencedBoard != null)
-                                addBoardInfos(cardData, referencedBoard, user, documents);
-                        }
-                        promise.complete(cardData);
-                    })
-                    .onFailure(err -> {
-                        String message = String.format("[Magneto@%s::buildCardDataForSingleExport] Failed to get boards for card %s : %s",
-                                this.getClass().getSimpleName(), card.getId(), err.getMessage());
-                        log.error(message);
-                        promise.fail(err.getMessage());
-                    });
-        } else {
-            promise.complete(cardData);
-        }
+        // Traiter la description pour convertir les images en base64
+        String sanitizedDescription = sanitizeHtml(card.getDescription());
+        processHtmlImages(sanitizedDescription, documents)
+                .compose(processedDescription -> {
+                    cardData.put(Field.DESCRIPTION, processedDescription);
+
+                    if (isBoardResource && card.getResourceUrl() != null) {
+                        return serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
+                                .map(boards -> {
+                                    if (boards != null && !boards.isEmpty()) {
+                                        Board referencedBoard = boards.get(0);
+                                        if (referencedBoard != null)
+                                            addBoardInfos(cardData, referencedBoard, user, documents);
+                                    }
+                                    return cardData;
+                                });
+                    } else {
+                        return Future.succeededFuture(cardData);
+                    }
+                })
+                .onSuccess(promise::complete)
+                .onFailure(err -> {
+                    String message = String.format("[Magneto@%s::buildCardDataForSingleExport] Failed to build card data for card %s : %s",
+                            this.getClass().getSimpleName(), card.getId(), err.getMessage());
+                    log.error(message);
+                    promise.fail(err.getMessage());
+                });
 
         return promise.future();
     }
@@ -339,9 +358,9 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.HAS_EDITOR, hasEditor(card));
         cardData.put(Field.MODIFICATIONDATE, formatDate(card.getModificationDate()));
         cardData.put(Field.RESOURCETYPE, card.getResourceType());
-        cardData.put(Field.CAPTION, card.getCaption());
-        cardData.put(Field.DESCRIPTION, card.getDescription());
         cardData.put(Field.RESOURCEURL, card.getResourceUrl() != null ? card.getResourceUrl() : "");
+        if (card.getCaption() != null && !card.getCaption().trim().isEmpty())
+            cardData.put(Field.CAPTION, card.getCaption());
 
         addResourceTypeFlags(cardData, card);
 
@@ -353,27 +372,33 @@ public class DefaultPDFExportService implements PDFExportService {
             cardData.put(Field.IMG_SRC, imageBase64);
         }
 
-        if (isBoardResource && card.getResourceUrl() != null) {
-            serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
-                    .onSuccess(boards -> {
-                        if (boards != null && !boards.isEmpty()) {
-                            Board referencedBoard = boards.get(0);
-                            if (referencedBoard != null)
-                                addBoardInfos(cardData, referencedBoard, user, documents);
+        // Traiter la description pour convertir les images en base64
+        String sanitizedDescription = sanitizeHtml(card.getDescription());
+        processHtmlImages(sanitizedDescription, documents)
+                .compose(processedDescription -> {
+                    cardData.put(Field.DESCRIPTION, processedDescription);
 
-                        }
-                        promise.complete(cardData);
-                    })
-                    .onFailure(err -> {
-                        String message = String.format("[Magneto@%s::buildCardDataForMultiExport] Failed to get boards for card %s : %s",
-                                this.getClass().getSimpleName(), card.getId(), err.getMessage());
-                        log.error(message);
-                        promise.fail(err.getMessage());
-                    });
-
-        } else {
-            promise.complete(cardData);
-        }
+                    if (isBoardResource && card.getResourceUrl() != null) {
+                        return serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
+                                .map(boards -> {
+                                    if (boards != null && !boards.isEmpty()) {
+                                        Board referencedBoard = boards.get(0);
+                                        if (referencedBoard != null)
+                                            addBoardInfos(cardData, referencedBoard, user, documents);
+                                    }
+                                    return cardData;
+                                });
+                    } else {
+                        return Future.succeededFuture(cardData);
+                    }
+                })
+                .onSuccess(promise::complete)
+                .onFailure(err -> {
+                    String message = String.format("[Magneto@%s::buildCardDataForMultiExport] Failed to build card data for card %s : %s",
+                            this.getClass().getSimpleName(), card.getId(), err.getMessage());
+                    log.error(message);
+                    promise.fail(err.getMessage());
+                });
 
         return promise.future();
     }
@@ -407,7 +432,6 @@ public class DefaultPDFExportService implements PDFExportService {
      * Ajoute les informations du board aux données de la carte
      */
     private void addBoardInfos(JsonObject cardData, Board board, UserInfos user, List<Map<String, Object>> documents) {
-        cardData.put(Field.BOARD_IS_OWNER, board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
         cardData.put(Field.BOARD_OWNER_NAME, board.getOwnerName());
         cardData.put(Field.BOARD_NB_CARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
         cardData.put(Field.BOARD_IS_PUBLIC, board.isPublic());
@@ -649,6 +673,17 @@ public class DefaultPDFExportService implements PDFExportService {
                                 String imageUrl = board.getImageUrl();
                                 String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
                                 documentIds.add(imageId);
+
+                                for (Card card : allCards) {
+                                    if (card.getDescription() != null && !card.getDescription().isEmpty()) {
+                                        List<String> descriptionImageIds = extractDocumentIdsFromHtml(card.getDescription());
+                                        for (String id : descriptionImageIds) {
+                                            if (!documentIds.contains(id)) {
+                                                documentIds.add(id);
+                                            }
+                                        }
+                                    }
+                                }
                                 return serviceFactory.exportService().getBoardDocuments(documentIds);
                             })
                             .compose(documents -> generatePngArchiveForCards(allCards, board, user, request, documents));
@@ -698,7 +733,7 @@ public class DefaultPDFExportService implements PDFExportService {
                             })
                             .compose(pdfBuffer -> convertPdfToPng(pdfBuffer))
                             .map(pngBytes -> {
-                                String filename = card.getId() + "_" + sectionPrefix + String.format("%03d", index + 1) + "_" +
+                                String filename =  String.format("%03d", index + 1) + "_" + sectionPrefix + "_" +
                                         sanitizeFilename(card.getTitle()) + ".png";
                                 return new PngFile(filename, pngBytes);
                             })
@@ -788,5 +823,259 @@ public class DefaultPDFExportService implements PDFExportService {
             this.filename = filename;
             this.data = data;
         }
+    }
+
+    /**
+     * Traite le contenu HTML pour convertir les images en base64
+     */
+    private Future<String> processHtmlImages(String htmlContent, List<Map<String, Object>> documents) {
+        if (htmlContent == null || htmlContent.isEmpty()) {
+            return Future.succeededFuture(htmlContent);
+        }
+
+        log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] Processing HTML content, length: " + htmlContent.length());
+
+        Promise<String> promise = Promise.promise();
+
+        // Pattern pour trouver les balises img avec src
+        Pattern imgPattern = Pattern.compile("<img[^>]*?src=[\"']([^\"']+)[\"'][^>]*?>", Pattern.CASE_INSENSITIVE);
+        java.util.regex.Matcher matcher = imgPattern.matcher(htmlContent);
+
+        List<Future<Void>> imageFutures = new ArrayList<>();
+        Map<String, String> urlToBase64 = new HashMap<>();
+
+        int processedImageCount = 0;
+
+        while (matcher.find()) {
+            if (processedImageCount >= MAX_IMAGES_PER_DESCRIPTION) {
+                log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] Max images limit reached");
+                break;
+            }
+
+            String imgUrl = matcher.group(1);
+
+            // Ignorer si déjà en base64
+            if (imgUrl.startsWith("data:")) {
+                log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] Image already in base64, skipping");
+                continue;
+            }
+
+            // Ne traiter qu'une fois chaque URL unique
+            if (urlToBase64.containsKey(imgUrl)) {
+                log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] Image already processed, skipping");
+                continue;
+            }
+
+            Promise<Void> imagePromise = Promise.promise();
+            imageFutures.add(imagePromise.future());
+            processedImageCount++;
+
+            // Vérifier si c'est une image du workspace
+            if (imgUrl.contains("/workspace/document/")) {
+                String documentId = imgUrl.substring(imgUrl.lastIndexOf('/') + 1);
+
+                // Enlever les query params si présents
+                if (documentId.contains("?")) {
+                    documentId = documentId.substring(0, documentId.indexOf("?"));
+                }
+
+                String base64 = getDocumentAsBase64(documentId, documents);
+                if (!base64.isEmpty()) {
+                    urlToBase64.put(imgUrl, base64);
+                } else {
+                    log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] Workspace image not found in documents");
+                }
+                imagePromise.complete();
+            }
+            // Image externe (garder le code existant qui fonctionne)
+            else if (imgUrl.startsWith("http://") || imgUrl.startsWith("https://") || imgUrl.startsWith("//")) {
+                String fullUrl = imgUrl;
+                if (imgUrl.startsWith("//")) {
+                    fullUrl = "https:" + imgUrl;
+                }
+
+                downloadAndConvertImageToBase64(fullUrl)
+                        .onSuccess(base64 -> {
+                            if (base64 != null && !base64.isEmpty()) {
+                                urlToBase64.put(imgUrl, base64);
+                                log.debug("[Magneto@DefaultPDFExportService::processHtmlImages] External image downloaded and converted");
+                            } else {
+                                log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] External image download returned empty");
+                            }
+                            imagePromise.complete();
+                        })
+                        .onFailure(err -> {
+                            log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] Failed to download image ", err);
+                            imagePromise.complete();
+                        });
+            } else {
+                log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] Unknown image URL format: " + imgUrl);
+                imagePromise.complete();
+            }
+        }
+
+        if (imageFutures.isEmpty()) {
+            promise.complete(htmlContent);
+        } else {
+            Future.all(imageFutures)
+                    .onSuccess(v -> {
+                        String processedHtml = htmlContent;
+
+                        for (Map.Entry<String, String> entry : urlToBase64.entrySet()) {
+                            String oldUrl = entry.getKey();
+                            String newUrl = entry.getValue();
+
+                            // Remplacer avec guillemets doubles
+                            processedHtml = processedHtml.replace(
+                                    "src=\"" + oldUrl + "\"",
+                                    "src=\"" + newUrl + "\""
+                            );
+
+                            // Remplacer avec guillemets simples
+                            processedHtml = processedHtml.replace(
+                                    "src='" + oldUrl + "'",
+                                    "src='" + newUrl + "'"
+                            );
+                        }
+
+                        promise.complete(processedHtml);
+                    })
+                    .onFailure(err -> {
+                        log.error("[Magneto@DefaultPDFExportService::processHtmlImages] Failed to process all images", err);
+                        promise.fail(err);
+                    });
+        }
+
+        return promise.future();
+    }
+
+    private Future<String> downloadAndConvertImageToBase64(String imageUrl) {
+        Promise<String> promise = Promise.promise();
+
+        try {
+            java.net.URI uri = new java.net.URI(imageUrl);
+            String host = uri.getHost();
+            int port = uri.getPort();
+            if (port == -1) {
+                port = "https".equals(uri.getScheme()) ? 443 : 80;
+            }
+            String requestURI = uri.getRawPath();
+            if (uri.getRawQuery() != null) {
+                requestURI += "?" + uri.getRawQuery();
+            }
+            boolean ssl = "https".equals(uri.getScheme());
+
+            io.vertx.core.http.HttpClientOptions options = new io.vertx.core.http.HttpClientOptions()
+                    .setConnectTimeout(10000)
+                    .setSsl(ssl)
+                    .setTrustAll(true)
+                    .setVerifyHost(false);
+
+            io.vertx.core.http.HttpClient client = serviceFactory.vertx().createHttpClient(options);
+
+            client.request(io.vertx.core.http.HttpMethod.GET, port, host, requestURI)
+                    .compose(request -> {
+                        request.setTimeout(10000);
+                        request.putHeader("User-Agent", "Mozilla/5.0 (compatible; MagnetoBot/1.0)");
+
+                        return request.send()
+                                .compose(response -> {
+                                    // Gérer les redirections 301/302
+                                    if (response.statusCode() == 301 || response.statusCode() == 302) {
+                                        String location = response.getHeader("Location");
+                                        if (location != null) {
+                                            client.close();
+                                            return downloadAndConvertImageToBase64(location);
+                                        }
+                                    }
+
+                                    if (response.statusCode() != 200) {
+                                        log.warn("[Magneto@DefaultPDFExportService::downloadAndConvertImageToBase64] Bad status code " + response.statusCode() + " for: " + imageUrl);
+                                        client.close();
+                                        return Future.succeededFuture("");
+                                    }
+
+                                    String contentType = response.getHeader("Content-Type");
+                                    if (contentType == null || !contentType.startsWith("image/")) {
+                                        log.warn("[Magneto@DefaultPDFExportService::downloadAndConvertImageToBase64] Not an image, content-type: " + contentType + " for: " + imageUrl);
+                                        client.close();
+                                        return Future.succeededFuture("");
+                                    }
+
+                                    return response.body()
+                                            .compose(buffer -> {
+                                                try {
+                                                    if (buffer.length() > 1024 * 1024) {
+                                                        log.warn("[Magneto@DefaultPDFExportService::downloadAndConvertImageToBase64] Image too large: " + imageUrl);
+                                                        client.close();
+                                                        return Future.succeededFuture("");
+                                                    }
+
+                                                    String base64 = Base64.getEncoder().encodeToString(buffer.getBytes());
+                                                    String dataUrl = "data:" + contentType + ";base64," + base64;
+                                                    client.close();
+                                                    return Future.succeededFuture(dataUrl);
+                                                } catch (Exception e) {
+                                                    log.error("[Magneto@DefaultPDFExportService::downloadAndConvertImageToBase64] Error processing response", e);
+                                                    client.close();
+                                                    return Future.succeededFuture("");
+                                                }
+                                            });
+                                });
+                    })
+                    .onSuccess(promise::complete)
+                    .onFailure(err -> {
+                        log.error("[Magneto@DefaultPDFExportService::downloadAndConvertImageToBase64] Request failed: " + imageUrl, err);
+                        client.close();
+                        promise.complete("");
+                    });
+
+        } catch (Exception e) {
+            log.error("[Magneto@DefaultPDFExportService::downloadAndConvertImageToBase64] Invalid URL: " + imageUrl, e);
+            promise.complete("");
+        }
+
+        return promise.future();
+    }
+
+    /**
+     * Extrait tous les IDs de documents (images) présents dans le HTML
+     */
+    private List<String> extractDocumentIdsFromHtml(String htmlContent) {
+        List<String> documentIds = new ArrayList<>();
+        if (htmlContent == null || htmlContent.isEmpty()) {
+            return documentIds;
+        }
+
+        // Pattern pour trouver les URLs du workspace dans les balises img
+        Pattern workspacePattern = Pattern.compile("/workspace/document/([a-f0-9\\-]+)", Pattern.CASE_INSENSITIVE);
+        java.util.regex.Matcher matcher = workspacePattern.matcher(htmlContent);
+
+        while (matcher.find()) {
+            String documentId = matcher.group(1);
+            // Enlever les query params si présents
+            if (documentId.contains("?")) {
+                documentId = documentId.substring(0, documentId.indexOf("?"));
+            }
+            if (!documentIds.contains(documentId)) {
+                documentIds.add(documentId);
+            }
+        }
+
+        log.debug(String.format("[Magneto@%s::extractDocumentIdsFromHtml] Found %d document IDs in HTML",
+                this.getClass().getSimpleName(), documentIds.size()));
+
+        return documentIds;
+    }
+
+    private String sanitizeHtml(String html) {
+        if (html == null) return null;
+
+        PolicyFactory policy = Sanitizers.FORMATTING
+                .and(Sanitizers.BLOCKS)
+                .and(Sanitizers.IMAGES)
+                .and(Sanitizers.LINKS);
+
+        return policy.sanitize(html);
     }
 }

@@ -25,6 +25,8 @@ import org.entcore.common.pdf.Pdf;
 import org.entcore.common.pdf.PdfFactory;
 import org.entcore.common.pdf.PdfGenerator;
 import org.entcore.common.user.UserInfos;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -38,6 +40,7 @@ import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static fr.cgi.magneto.core.constants.CollectionsConstant.MAX_IMAGES_PER_DESCRIPTION;
 import static fr.cgi.magneto.core.constants.ConfigFields.NODE_PDF_GENERATOR;
 
 /**
@@ -272,7 +275,8 @@ public class DefaultPDFExportService implements PDFExportService {
         }
 
         // Traiter la description pour convertir les images en base64
-        processHtmlImages(card.getDescription(), documents)
+        String sanitizedDescription = sanitizeHtml(card.getDescription());
+        processHtmlImages(sanitizedDescription, documents)
                 .compose(processedDescription -> {
                     cardData.put(Field.DESCRIPTION, processedDescription);
 
@@ -372,7 +376,8 @@ public class DefaultPDFExportService implements PDFExportService {
         }
 
         // Traiter la description pour convertir les images en base64
-        processHtmlImages(card.getDescription(), documents)
+        String sanitizedDescription = sanitizeHtml(card.getDescription());
+        processHtmlImages(sanitizedDescription, documents)
                 .compose(processedDescription -> {
                     cardData.put(Field.DESCRIPTION, processedDescription);
 
@@ -843,7 +848,14 @@ public class DefaultPDFExportService implements PDFExportService {
         List<Future<Void>> imageFutures = new ArrayList<>();
         Map<String, String> urlToBase64 = new HashMap<>();
 
+        int processedImageCount = 0;
+
         while (matcher.find()) {
+            if (processedImageCount >= MAX_IMAGES_PER_DESCRIPTION) {
+                log.warn("[Magneto@DefaultPDFExportService::processHtmlImages] Max images limit reached");
+                break;
+            }
+
             String imgUrl = matcher.group(1);
 
             // Ignorer si déjà en base64
@@ -860,6 +872,7 @@ public class DefaultPDFExportService implements PDFExportService {
 
             Promise<Void> imagePromise = Promise.promise();
             imageFutures.add(imagePromise.future());
+            processedImageCount++;
 
             // Vérifier si c'est une image du workspace
             if (imgUrl.contains("/workspace/document/")) {
@@ -1057,5 +1070,16 @@ public class DefaultPDFExportService implements PDFExportService {
                 this.getClass().getSimpleName(), documentIds.size()));
 
         return documentIds;
+    }
+
+    private String sanitizeHtml(String html) {
+        if (html == null) return null;
+
+        PolicyFactory policy = Sanitizers.FORMATTING
+                .and(Sanitizers.BLOCKS)
+                .and(Sanitizers.IMAGES)
+                .and(Sanitizers.LINKS);
+
+        return policy.sanitize(html);
     }
 }

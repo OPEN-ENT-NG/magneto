@@ -352,10 +352,12 @@
 {{#cards}}
 
 <!-- Page de séparation pour nouvelle section -->
+{{#showSection}}
 <div class="section-separator-page">
     <h2 class="section-separator-title" style="border-color: {{sectionColor}};">{{sectionTitle}}</h2>
 </div>
 <div class="page-break"></div>
+{{/showSection}}
 
 <!-- Une page par carte -->
 <div class="preview-wrapper nobreakpage">
@@ -415,7 +417,30 @@
 
         {{#isFileResource}}
         <div class="media-content">
+            {{#isTextFormat}}
+            <img src="{{iconText}}" alt="Text File" class="resource-icon" />
+            {{/isTextFormat}}
+            {{#isImageFormat}}
+            <img src="{{iconImage}}" alt="Image File" class="resource-icon" />
+            {{/isImageFormat}}
+            {{#isVideoFormat}}
+            <img src="{{iconVideo}}" alt="Video File" class="resource-icon" />
+            {{/isVideoFormat}}
+            {{#isAudioFormat}}
+            <img src="{{iconAudio}}" alt="Audio File" class="resource-icon" />
+            {{/isAudioFormat}}
+            {{#isSheetFormat}}
+            <img src="{{iconSheet}}" alt="Spreadsheet" class="resource-icon" />
+            {{/isSheetFormat}}
+            {{#isSlideFormat}}
+            <img src="{{iconSlide}}" alt="Presentation" class="resource-icon" />
+            {{/isSlideFormat}}
+            {{#isPdfFormat}}
+            <img src="{{iconPdf}}" alt="PDF File" class="resource-icon" />
+            {{/isPdfFormat}}
+            {{#isDefaultFormat}}
             <img src="{{iconFile}}" alt="File" class="resource-icon" />
+            {{/isDefaultFormat}}
             <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
         </div>
         {{/isFileResource}}
@@ -458,7 +483,7 @@
         <div class="board-info-row">
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconUser}}" alt="" />
-                <span class="board-info-label">Propriétaire:</span>
+                <span class="board-info-label">Propriétaire: </span>
                 <span class="board-info-label">{{boardOwnerName}}</span>
             </div>
 

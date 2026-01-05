@@ -318,7 +318,10 @@ public class Field {
     public static final String ICON_AUDIO = "iconAudio";
     public static final String ICON_LINK = "iconLink";
     public static final String ICON_FILE = "iconFile";
-    public static final String ICON_BOARD = "iconBoard";
+    public static final String ICON_TEXT = "iconText";
+    public static final String ICON_IMAGE = "iconImage";
+    public static final String ICON_SHEET = "iconSheet";
+    public static final String ICON_PDF = "iconPdf";
 
     public static final String IS_TEXT_RESOURCE = "isTextResource";
     public static final String IS_IMAGE_RESOURCE = "isImageResource";
@@ -329,4 +332,17 @@ public class Field {
     public static final String FILE_ID = "fileId";
     public static final String DOCUMENT_ID = "documentId";
     public static final String SECTION_COLOR = "sectionColor";
+
+    public static final String FILE_FORMAT = "fileFormat";
+
+    public static final String SHOW_SECTION = "showSection";
+    public static final String IS_LAYOUT_FREE = "isLayoutFree";
+
+    public static final String IS_TEXT_FORMAT = "isTextFormat";
+    public static final String IS_IMAGE_FORMAT = "isImageFormat";
+    public static final String IS_VIDEO_FORMAT = "isVideoFormat";
+    public static final String IS_AUDIO_FORMAT = "isAudioFormat";
+    public static final String IS_SHEET_FORMAT = "isSheetFormat";
+    public static final String IS_PDF_FORMAT = "isPdfFormat";
+    public static final String IS_DEFAULT_FORMAT = "isDefaultFormat";
 }

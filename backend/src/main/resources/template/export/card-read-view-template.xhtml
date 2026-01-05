@@ -267,7 +267,30 @@
 
         {{#isFileResource}}
         <div class="media-content">
+            {{#isTextFormat}}
+            <img src="{{iconText}}" alt="Text File" class="resource-icon" />
+            {{/isTextFormat}}
+            {{#isImageFormat}}
+            <img src="{{iconImage}}" alt="Image File" class="resource-icon" />
+            {{/isImageFormat}}
+            {{#isVideoFormat}}
+            <img src="{{iconVideo}}" alt="Video File" class="resource-icon" />
+            {{/isVideoFormat}}
+            {{#isAudioFormat}}
+            <img src="{{iconAudio}}" alt="Audio File" class="resource-icon" />
+            {{/isAudioFormat}}
+            {{#isSheetFormat}}
+            <img src="{{iconSheet}}" alt="Spreadsheet" class="resource-icon" />
+            {{/isSheetFormat}}
+            {{#isSlideFormat}}
+            <img src="{{iconSlide}}" alt="Presentation" class="resource-icon" />
+            {{/isSlideFormat}}
+            {{#isPdfFormat}}
+            <img src="{{iconPdf}}" alt="PDF File" class="resource-icon" />
+            {{/isPdfFormat}}
+            {{#isDefaultFormat}}
             <img src="{{iconFile}}" alt="File" class="resource-icon" />
+            {{/isDefaultFormat}}
             <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
         </div>
         {{/isFileResource}}

@@ -2,6 +2,7 @@ package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.FileFormatConstants;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
@@ -42,6 +43,7 @@ import java.util.zip.ZipOutputStream;
 
 import static fr.cgi.magneto.core.constants.CollectionsConstant.MAX_IMAGES_PER_DESCRIPTION;
 import static fr.cgi.magneto.core.constants.ConfigFields.NODE_PDF_GENERATOR;
+import static fr.cgi.magneto.core.constants.FileFormatConstants.getFileFormat;
 
 /**
  * Export PDF des cartes en mode lecture (Read View)
@@ -158,6 +160,8 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.ISPUBLIC, board.isPublic());
         data.put(Field.ISSHARED, board.getShared() != null && !board.getShared().isEmpty());
         data.put(Field.NBCARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
+        data.put("boardIsOwner", board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
+        data.put(Field.IS_LAYOUT_FREE, board.isLayoutFree());
 
         addIcons(data);
 
@@ -207,11 +211,12 @@ public class DefaultPDFExportService implements PDFExportService {
                                         .onSuccess(cardData -> {
                                             cardData.put(Field.IS_LAST_CARD, index == allCards.size() - 1);
 
-                                            if (!board.isLayoutFree() && currentSectionId != null) {
+                                            if (!board.isLayoutFree() && currentSectionId != null && !currentSectionId.equals(previousSectionId)) {
                                                 Section section = findSectionById(board, currentSectionId);
                                                 if (section != null) {
                                                     cardData.put(Field.SECTION_TITLE, section.getTitle());
                                                     cardData.put(Field.SECTION_COLOR, section.getColor());
+                                                    cardData.put(Field.SHOW_SECTION, true);
                                                 }
                                             }
                                         })
@@ -455,7 +460,10 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.ICON_AUDIO, loadSvgAsBase64(CollectionsConstant.SVG_AUDIO));
         data.put(Field.ICON_LINK, loadSvgAsBase64(CollectionsConstant.SVG_LINK));
         data.put(Field.ICON_FILE, loadSvgAsBase64(CollectionsConstant.SVG_FILE));
-        data.put(Field.ICON_BOARD, loadSvgAsBase64(CollectionsConstant.SVG_BOARD_ICON));
+        data.put(Field.ICON_TEXT, loadSvgAsBase64(CollectionsConstant.SVG_TEXT));
+        data.put(Field.ICON_IMAGE, loadSvgAsBase64(CollectionsConstant.SVG_IMAGE));
+        data.put(Field.ICON_SHEET, loadSvgAsBase64(CollectionsConstant.SVG_SHEET));
+        data.put(Field.ICON_PDF, loadSvgAsBase64(CollectionsConstant.SVG_PDF));
     }
 
     private void addResourceTypeFlags(JsonObject cardData, Card card) {
@@ -467,6 +475,18 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.IS_LINK_RESOURCE, CollectionsConstant.RESOURCE_TYPE_LINK.equals(resourceType));
         cardData.put(Field.IS_FILE_RESOURCE, CollectionsConstant.RESOURCE_TYPE_FILE.equals(resourceType));
         cardData.put(Field.IS_BOARD_RESOURCE, Field.RESOURCE_BOARD.equals(resourceType));
+
+        if (CollectionsConstant.RESOURCE_TYPE_FILE.equals(resourceType)) {
+            String fileFormat = getFileFormat(card.getMetadata().getExtension());
+
+            cardData.put(Field.IS_TEXT_FORMAT, FileFormatConstants.FORMAT_TEXT.equals(fileFormat));
+            cardData.put(Field.IS_IMAGE_FORMAT, FileFormatConstants.FORMAT_IMAGE.equals(fileFormat));
+            cardData.put(Field.IS_VIDEO_FORMAT, FileFormatConstants.FORMAT_VIDEO.equals(fileFormat));
+            cardData.put(Field.IS_AUDIO_FORMAT, FileFormatConstants.FORMAT_AUDIO.equals(fileFormat));
+            cardData.put(Field.IS_SHEET_FORMAT, FileFormatConstants.FORMAT_SHEET.equals(fileFormat));
+            cardData.put(Field.IS_PDF_FORMAT, FileFormatConstants.FORMAT_PDF.equals(fileFormat));
+            cardData.put(Field.IS_DEFAULT_FORMAT, FileFormatConstants.FORMAT_DEFAULT.equals(fileFormat));
+        }
     }
 
     /**

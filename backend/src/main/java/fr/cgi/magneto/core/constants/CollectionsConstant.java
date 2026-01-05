@@ -92,6 +92,10 @@ public class CollectionsConstant {
     public static final String SVG_AUDIO = "extension/audio";
     public static final String SVG_LINK = "extension/link";
     public static final String SVG_FILE = "extension/file";
+    public static final String SVG_TEXT = "extension/text";
+    public static final String SVG_IMAGE = "extension/image";
+    public static final String SVG_SHEET = "extension/sheet";
+    public static final String SVG_PDF = "extension/pdf";
     public static final String SVG_BOARD_ICON = "board";
 
     public static final String TEMPLATE_PATH = "./template/export/";
@@ -127,5 +131,7 @@ public class CollectionsConstant {
     public static final String FILENAME_REPLACEMENT = "_";
 
     public static final int MAX_IMAGES_PER_DESCRIPTION = 100;
+
+    // Noms des fichiers SVG pour les icônes de fichiers
 
 }

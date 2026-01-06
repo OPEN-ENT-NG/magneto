@@ -10,6 +10,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.web.client.HttpResponse;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -141,14 +142,10 @@ public class DefaultImageService implements ImageService {
                 .onSuccess(base64 -> {
                     if (base64 != null && !base64.isEmpty()) {
                         urlToBase64.put(imgUrl, base64);
-                        log.debug("[Magneto@DefaultImageService::processExternalImage] External image downloaded and converted");
-                    } else {
-                        log.warn("[Magneto@DefaultImageService::processExternalImage] External image download returned empty");
                     }
                     promise.complete();
                 })
                 .onFailure(err -> {
-                    log.warn("[Magneto@DefaultImageService::processExternalImage] Failed to download image ", err);
                     promise.complete();
                 });
 
@@ -183,32 +180,15 @@ public class DefaultImageService implements ImageService {
         Promise<String> promise = Promise.promise();
 
         try {
-            java.net.URI uri = new java.net.URI(imageUrl);
-            String host = uri.getHost();
-            int port = uri.getPort();
-            if (port == -1) {
-                port = Field.HTTPS.equals(uri.getScheme()) ? 443 : 80;
-            }
-            String requestURI = uri.getRawPath();
-            if (uri.getRawQuery() != null) {
-                requestURI += "?" + uri.getRawQuery();
-            }
-            boolean ssl = Field.HTTPS.equals(uri.getScheme());
-
-            io.vertx.core.http.HttpClient client = serviceFactory.vertx().createHttpClient(buildHttpClientOptions(ssl));
-
-            client.request(io.vertx.core.http.HttpMethod.GET, port, host, requestURI)
-                    .compose(request -> {
-                        request.setTimeout(10000);
-                        request.putHeader("User-Agent", "Mozilla/5.0 (compatible; MagnetoBot/1.0)");
-                        return request.send();
-                    })
-                    .compose(response -> handleImageResponse(response, imageUrl, client))
+            serviceFactory.webClient().getAbs(imageUrl)
+                    .timeout(10000)
+                    .putHeader("User-Agent", "Mozilla/5.0 (compatible; MagnetoBot/1.0)")
+                    .send()
+                    .compose(response -> handleImageResponse(response, imageUrl))
                     .onSuccess(promise::complete)
                     .onFailure(err -> {
                         String message = String.format("Request failed: %s", imageUrl);
                         LogHelper.logError(this, "downloadAndConvertImageToBase64", message, err.getMessage());
-                        client.close();
                         promise.complete("");
                     });
 
@@ -222,72 +202,50 @@ public class DefaultImageService implements ImageService {
     }
 
     /**
-     * Construit les options du client HTTP pour le téléchargement d'images
-     */
-    private io.vertx.core.http.HttpClientOptions buildHttpClientOptions(boolean ssl) {
-        return new io.vertx.core.http.HttpClientOptions()
-                .setConnectTimeout(10000)
-                .setSsl(ssl)
-                .setTrustAll(true)
-                .setVerifyHost(false);
-    }
-
-    /**
      * Gère la réponse HTTP et convertit l'image en base64
      */
-    private Future<String> handleImageResponse(io.vertx.core.http.HttpClientResponse response,
-                                               String imageUrl, io.vertx.core.http.HttpClient client) {
+    private Future<String> handleImageResponse(HttpResponse<Buffer> response,
+                                               String imageUrl) {
         if (response.statusCode() == 301 || response.statusCode() == 302) {
             //Redirection, on prend donc l'url de cette dernière pour chercher l'image
             String location = response.getHeader("Location");
             if (location != null) {
-                client.close();
                 return downloadAndConvertImageToBase64(location);
             }
         }
 
         if (response.statusCode() != 200) {
             log.warn("[Magneto@DefaultImageService::handleImageResponse] Bad status code " + response.statusCode() + " for: " + imageUrl);
-            client.close();
             return Future.succeededFuture("");
         }
 
         String contentType = response.getHeader("Content-Type");
         if (contentType == null || !contentType.startsWith("image/")) {
             log.warn("[Magneto@DefaultImageService::handleImageResponse] Not an image, content-type: " + contentType + " for: " + imageUrl);
-            client.close();
             return Future.succeededFuture("");
         }
 
-        return convertBufferToBase64(response, contentType, imageUrl, client);
+        return convertBufferToBase64(response.body(), contentType, imageUrl);
     }
 
     /**
      * Convertit le buffer de l'image en base64
      */
-    private Future<String> convertBufferToBase64(io.vertx.core.http.HttpClientResponse response,
-                                                 String contentType, String imageUrl,
-                                                 io.vertx.core.http.HttpClient client) {
-        return response.body()
-                .compose(buffer -> {
-                    try {
-                        if (buffer.length() > 1024 * 1024) {
-                            log.warn("[Magneto@DefaultImageService::convertBufferToBase64] Image too large: " + imageUrl);
-                            client.close();
-                            return Future.succeededFuture("");
-                        }
+    private Future<String> convertBufferToBase64(Buffer buffer, String contentType, String imageUrl) {
+        try {
+            if (buffer.length() > 1024 * 1024) {
+                log.warn("[Magneto@DefaultImageService::convertBufferToBase64] Image too large: " + imageUrl);
+                return Future.succeededFuture("");
+            }
 
-                        String base64 = Base64.getEncoder().encodeToString(buffer.getBytes());
-                        String dataUrl = "data:" + contentType + ";base64," + base64;
-                        client.close();
-                        return Future.succeededFuture(dataUrl);
-                    } catch (Exception e) {
-                        String message = "Error processing response";
-                        LogHelper.logError(this, "convertBufferToBase64", message, e.getMessage());
-                        client.close();
-                        return Future.succeededFuture("");
-                    }
-                });
+            String base64 = Base64.getEncoder().encodeToString(buffer.getBytes());
+            String dataUrl = "data:" + contentType + ";base64," + base64;
+            return Future.succeededFuture(dataUrl);
+        } catch (Exception e) {
+            String message = "Error processing response";
+            LogHelper.logError(this, "convertBufferToBase64", message, e.getMessage());
+            return Future.succeededFuture("");
+        }
     }
 
     /**

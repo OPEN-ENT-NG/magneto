@@ -493,7 +493,8 @@ public class DefaultPDFExportService implements PDFExportService {
             Date date = inputFormat.parse(dateString);
             return outputFormat.format(date);
         } catch (Exception e) {
-            log.warn("[Magneto@DefaultPDFExportService::formatDate] Failed to format date: " + dateString, e);
+            String message = String.format("Failed to format date %s", dateString);
+            LogHelper.logError(this, "formatDate", message, e.getMessage());
             return dateString;
         }
     }

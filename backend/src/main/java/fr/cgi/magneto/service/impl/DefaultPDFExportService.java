@@ -19,7 +19,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -60,21 +59,6 @@ public class DefaultPDFExportService implements PDFExportService {
         this.serviceFactory = serviceFactory;
         this.renders = new Renders(serviceFactory.vertx(), serviceFactory.config());
         this.pdfFactory = new PdfFactory(serviceFactory.vertx(), new JsonObject().put(NODE_PDF_GENERATOR, serviceFactory.config().getJsonObject(NODE_PDF_GENERATOR, new JsonObject())));
-    }
-
-    public static String loadSvgAsBase64(String iconName) {
-        try (InputStream is = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream(CollectionsConstant.IMG_RESOURCES_PATH + iconName + CollectionsConstant.SVG_EXTENSION)) {
-            if (is == null) {
-                return "";
-            }
-            byte[] bytes = IOUtils.toByteArray(is);
-            String base64 = Base64.getEncoder().encodeToString(bytes);
-            return CollectionsConstant.DATA_IMAGE_SVG_BASE64 + base64;
-        } catch (IOException e) {
-            log.error("[Magneto@DefaultPDFExportService::loadSvgAsBase64] Failed to load SVG icon: " + iconName, e);
-            return "";
-        }
     }
 
     @Override
@@ -445,21 +429,21 @@ public class DefaultPDFExportService implements PDFExportService {
     }
 
     private void addIcons(JsonObject data) {
-        data.put(Field.ICON_CROWN, loadSvgAsBase64(CollectionsConstant.SVG_CROWN));
-        data.put(Field.ICON_USER, loadSvgAsBase64(CollectionsConstant.SVG_USER));
-        data.put(Field.ICON_MAGNET, loadSvgAsBase64(CollectionsConstant.SVG_MAGNET));
-        data.put(Field.ICON_PUBLIC, loadSvgAsBase64(CollectionsConstant.SVG_PUBLIC));
-        data.put(Field.ICON_CALENDAR, loadSvgAsBase64(CollectionsConstant.SVG_CALENDAR_BLANK));
-        data.put(Field.ICON_SHARE, loadSvgAsBase64(CollectionsConstant.SVG_SHARE_VARIANT));
+        data.put(Field.ICON_CROWN, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_CROWN));
+        data.put(Field.ICON_USER, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_USER));
+        data.put(Field.ICON_MAGNET, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_MAGNET));
+        data.put(Field.ICON_PUBLIC, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_PUBLIC));
+        data.put(Field.ICON_CALENDAR, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_CALENDAR_BLANK));
+        data.put(Field.ICON_SHARE, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_SHARE_VARIANT));
 
-        data.put(Field.ICON_VIDEO, loadSvgAsBase64(CollectionsConstant.SVG_VIDEO));
-        data.put(Field.ICON_AUDIO, loadSvgAsBase64(CollectionsConstant.SVG_AUDIO));
-        data.put(Field.ICON_LINK, loadSvgAsBase64(CollectionsConstant.SVG_LINK));
-        data.put(Field.ICON_FILE, loadSvgAsBase64(CollectionsConstant.SVG_FILE));
-        data.put(Field.ICON_TEXT, loadSvgAsBase64(CollectionsConstant.SVG_TEXT));
-        data.put(Field.ICON_IMAGE, loadSvgAsBase64(CollectionsConstant.SVG_IMAGE));
-        data.put(Field.ICON_SHEET, loadSvgAsBase64(CollectionsConstant.SVG_SHEET));
-        data.put(Field.ICON_PDF, loadSvgAsBase64(CollectionsConstant.SVG_PDF));
+        data.put(Field.ICON_VIDEO, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_VIDEO));
+        data.put(Field.ICON_AUDIO, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_AUDIO));
+        data.put(Field.ICON_LINK, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_LINK));
+        data.put(Field.ICON_FILE, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_FILE));
+        data.put(Field.ICON_TEXT, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_TEXT));
+        data.put(Field.ICON_IMAGE, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_IMAGE));
+        data.put(Field.ICON_SHEET, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_SHEET));
+        data.put(Field.ICON_PDF, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_PDF));
     }
 
     private void addResourceTypeFlags(JsonObject cardData, Card card) {

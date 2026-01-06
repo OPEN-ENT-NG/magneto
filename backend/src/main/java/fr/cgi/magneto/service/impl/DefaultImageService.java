@@ -10,7 +10,10 @@ import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -308,5 +311,20 @@ public class DefaultImageService implements ImageService {
         }
 
         return "";
+    }
+
+    public String loadSvgAsBase64(String iconName) {
+        try (InputStream is = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(CollectionsConstant.IMG_RESOURCES_PATH + iconName + CollectionsConstant.SVG_EXTENSION)) {
+            if (is == null) {
+                return "";
+            }
+            byte[] bytes = IOUtils.toByteArray(is);
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            return CollectionsConstant.DATA_IMAGE_SVG_BASE64 + base64;
+        } catch (IOException e) {
+            log.error("[Magneto@DefaultPDFExportService::loadSvgAsBase64] Failed to load SVG icon: " + iconName, e);
+            return "";
+        }
     }
 }

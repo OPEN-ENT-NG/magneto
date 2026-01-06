@@ -23,4 +23,12 @@ public interface ImageService {
      * @return {@link String} the base64 code of the converted document
      */
     String getDocumentAsBase64(String documentId, List<Map<String, Object>> documents);
+
+    /**
+     * Load SVG as base64
+     *
+     * @param iconName name of the icon in magneto
+     * @return {@link String} the base64 code of the converted icon
+     */
+    String loadSvgAsBase64(String iconName);
 }

@@ -259,7 +259,7 @@ public class DefaultPDFExportService implements PDFExportService {
                 .compose(processedDescription -> {
                     cardData.put(Field.DESCRIPTION, processedDescription);
 
-                    return getCardDate(card, user, documents, isBoardResource, cardData);
+                    return getCardData(card, user, documents, isBoardResource, cardData);
                 })
                 .onSuccess(promise::complete)
                 .onFailure(err -> {
@@ -271,7 +271,7 @@ public class DefaultPDFExportService implements PDFExportService {
         return promise.future();
     }
 
-    private Future<JsonObject> getCardDate(Card card, UserInfos user, List<Map<String, Object>> documents, boolean isBoardResource, JsonObject cardData) {
+    private Future<JsonObject> getCardData(Card card, UserInfos user, List<Map<String, Object>> documents, boolean isBoardResource, JsonObject cardData) {
         if (isBoardResource && card.getResourceUrl() != null) {
             return serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
                     .map(boards -> {
@@ -364,19 +364,7 @@ public class DefaultPDFExportService implements PDFExportService {
                 .compose(processedDescription -> {
                     cardData.put(Field.DESCRIPTION, processedDescription);
 
-                    if (isBoardResource && card.getResourceUrl() != null) {
-                        return serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
-                                .map(boards -> {
-                                    if (boards != null && !boards.isEmpty()) {
-                                        Board referencedBoard = boards.get(0);
-                                        if (referencedBoard != null)
-                                            addBoardInfos(cardData, referencedBoard, user, documents);
-                                    }
-                                    return cardData;
-                                });
-                    } else {
-                        return Future.succeededFuture(cardData);
-                    }
+                    return getCardData(card, user, documents, isBoardResource, cardData);
                 })
                 .onSuccess(promise::complete)
                 .onFailure(err -> {

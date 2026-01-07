@@ -412,6 +412,8 @@ public class Board implements Model<Board> {
     public void setCardIds(List<String> cardIds) { this.cardIds = cardIds; }
 
     public SortOrCreateByEnum getSortOrCreateBy() {
+        if (sortOrCreateBy == null)
+            return SortOrCreateByEnum.START;
         return sortOrCreateBy;
     }
 

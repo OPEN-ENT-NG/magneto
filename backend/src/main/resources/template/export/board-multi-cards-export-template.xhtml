@@ -21,14 +21,6 @@
         @page {
             size: A4;
             margin: 5% 3%;
-
-            @bottom-center {
-                content: counter(page) ' / ' counter(pages);
-                font-family: "Roboto", sans-serif;
-                font-weight: bold;
-                color: #5b6472;
-                font-size: 13px;
-            }
         }
 
         /* Preview Wrapper */
@@ -318,34 +310,34 @@
 
         <div class="cover-info">
             <div class="cover-info-row">
-                {{#boardIsOwner}}
-                <div class="board-info-item">
-                    <img class="board-info-icon" src="{{iconCrown}}" alt="" />
-                    <span class="board-info-label">Mon tableau</span>
-                </div>
-                {{/boardIsOwner}}
-                {{^boardIsOwner}}
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconUser}}" alt="" />
                     <span class="board-info-label">Propriétaire:</span>
                     <span class="board-info-label">{{ownerName}}</span>
                 </div>
-                {{/boardIsOwner}}
 
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconMagnet}}" alt="" />
                     <span class="board-info-label">{{nbCards}} aimants</span>
                 </div>
 
-                {{#isPublic}}
+                {{#isExternal}}
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconPublic}}" alt="" />
                     <span class="board-info-label">Tableau public</span>
                 </div>
-                {{/isPublic}}
+                {{/isExternal}}
             </div>
 
             <div class="cover-info-row">
+
+                {{#isPublic}}
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconPlatform}}" alt="" />
+                    <span class="board-info-label">Tableau de la plateforme</span>
+                </div>
+                {{/isPublic}}
+
                 {{#modificationDate}}
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconCalendar}}" alt="" />
@@ -368,12 +360,14 @@
 {{#cards}}
 
 <!-- Page de séparation pour nouvelle section -->
-{{#showSectionPage}}
+{{#showSection}}
 <div class="section-separator-page">
     <h2 class="section-separator-title" style="border-color: {{sectionColor}};">{{sectionTitle}}</h2>
 </div>
 <div class="page-break"></div>
-{{/showSectionPage}}
+{{/showSection}}
+
+{{^isEmptySection}}
 
 <!-- Une page par carte -->
 <div class="preview-wrapper nobreakpage">
@@ -433,7 +427,30 @@
 
         {{#isFileResource}}
         <div class="media-content">
+            {{#isTextFormat}}
+            <img src="{{iconText}}" alt="Text File" class="resource-icon" />
+            {{/isTextFormat}}
+            {{#isImageFormat}}
+            <img src="{{iconImage}}" alt="Image File" class="resource-icon" />
+            {{/isImageFormat}}
+            {{#isVideoFormat}}
+            <img src="{{iconVideo}}" alt="Video File" class="resource-icon" />
+            {{/isVideoFormat}}
+            {{#isAudioFormat}}
+            <img src="{{iconAudio}}" alt="Audio File" class="resource-icon" />
+            {{/isAudioFormat}}
+            {{#isSheetFormat}}
+            <img src="{{iconSheet}}" alt="Spreadsheet" class="resource-icon" />
+            {{/isSheetFormat}}
+            {{#isSlideFormat}}
+            <img src="{{iconSlide}}" alt="Presentation" class="resource-icon" />
+            {{/isSlideFormat}}
+            {{#isPdfFormat}}
+            <img src="{{iconPdf}}" alt="PDF File" class="resource-icon" />
+            {{/isPdfFormat}}
+            {{#isDefaultFormat}}
             <img src="{{iconFile}}" alt="File" class="resource-icon" />
+            {{/isDefaultFormat}}
             <a href="{{resourceUrl}}" class="resource-link">{{resourceUrl}}</a>
         </div>
         {{/isFileResource}}
@@ -474,19 +491,11 @@
         <h3 style="margin-top: 0; color: #2c3e50; font-size: 18px;">Informations du tableau</h3>
 
         <div class="board-info-row">
-            {{#boardIsOwner}}
-            <div class="board-info-item">
-                <img class="board-info-icon" src="{{iconCrown}}" alt="" />
-                <span class="board-info-label">Mon tableau</span>
-            </div>
-            {{/boardIsOwner}}
-            {{^boardIsOwner}}
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconUser}}" alt="" />
-                <span class="board-info-label">Propriétaire:</span>
+                <span class="board-info-label">Propriétaire: </span>
                 <span class="board-info-label">{{boardOwnerName}}</span>
             </div>
-            {{/boardIsOwner}}
 
             <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconMagnet}}" alt="" />
@@ -495,10 +504,17 @@
 
             {{#boardIsPublic}}
             <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconPlatform}}" alt="" />
+                <span class="board-info-label">Tableau de la plateforme</span>
+            </div>
+            {{/boardIsPublic}}
+
+            {{#boardIsExternal}}
+            <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconPublic}}" alt="" />
                 <span class="board-info-label">Tableau public</span>
             </div>
-            {{/boardIsPublic}}
+            {{/boardIsExternal}}
         </div>
 
         <div class="board-info-row">
@@ -525,6 +541,8 @@
 {{^isLastCard}}
 <div class="page-break"></div>
 {{/isLastCard}}
+
+{{/isEmptySection}}
 
 {{/cards}}
 

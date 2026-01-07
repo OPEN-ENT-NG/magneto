@@ -2,6 +2,8 @@ package fr.cgi.magneto.service.impl;
 
 import fr.cgi.magneto.core.constants.CollectionsConstant;
 import fr.cgi.magneto.core.constants.Field;
+import fr.cgi.magneto.core.constants.FileFormatConstants;
+import fr.cgi.magneto.helper.LogHelper;
 import fr.cgi.magneto.model.Section;
 import fr.cgi.magneto.model.boards.Board;
 import fr.cgi.magneto.model.cards.Card;
@@ -17,7 +19,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -25,6 +26,8 @@ import org.entcore.common.pdf.Pdf;
 import org.entcore.common.pdf.PdfFactory;
 import org.entcore.common.pdf.PdfGenerator;
 import org.entcore.common.user.UserInfos;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -32,12 +35,14 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static fr.cgi.magneto.core.constants.ConfigFields.NODE_PDF_GENERATOR;
+import static fr.cgi.magneto.core.constants.FileFormatConstants.getFileFormat;
 
 /**
  * Export PDF des cartes en mode lecture (Read View)
@@ -56,21 +61,6 @@ public class DefaultPDFExportService implements PDFExportService {
         this.pdfFactory = new PdfFactory(serviceFactory.vertx(), new JsonObject().put(NODE_PDF_GENERATOR, serviceFactory.config().getJsonObject(NODE_PDF_GENERATOR, new JsonObject())));
     }
 
-    public static String loadSvgAsBase64(String iconName) {
-        try (InputStream is = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream(CollectionsConstant.IMG_RESOURCES_PATH + iconName + CollectionsConstant.SVG_EXTENSION)) {
-            if (is == null) {
-                return "";
-            }
-            byte[] bytes = IOUtils.toByteArray(is);
-            String base64 = Base64.getEncoder().encodeToString(bytes);
-            return CollectionsConstant.DATA_IMAGE_SVG_BASE64 + base64;
-        } catch (IOException e) {
-            log.error("[Magneto@DefaultPDFExportService::loadSvgAsBase64] Failed to load SVG icon: " + iconName, e);
-            return "";
-        }
-    }
-
     @Override
     public Future<JsonObject> exportSingleCard(Card card, Board referencedBoard, UserInfos user, HttpServerRequest request) {
         Promise<JsonObject> promise = Promise.promise();
@@ -85,9 +75,8 @@ public class DefaultPDFExportService implements PDFExportService {
                 })
                 .onSuccess(promise::complete)
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::exportSingleCard] Failed to export PDF for card %s : %s",
-                            this.getClass().getSimpleName(), card.getId(), err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to export PDF for card %s : %s", card.getId(), err.getMessage());
+                    LogHelper.logError(this, "exportSingleCard", message, err.getMessage());
                     promise.fail(err.getMessage());
                 });
 
@@ -108,9 +97,8 @@ public class DefaultPDFExportService implements PDFExportService {
                 })
                 .onSuccess(promise::complete)
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::exportSelectedCards] Failed to export PDF : %s",
-                            this.getClass().getSimpleName(), err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to export PDF : %s", err.getMessage());
+                    LogHelper.logError(this, "exportSelectedCards", message, err.getMessage());
                     promise.fail(err.getMessage());
                 });
 
@@ -123,17 +111,15 @@ public class DefaultPDFExportService implements PDFExportService {
 
         this.serviceFactory.boardService().getBoardWithContent(boardId, user, false, null)
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::exportMultipleCards] Failed to get board %s : %s",
-                            this.getClass().getSimpleName(), boardId, err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to get board %s : %s", boardId, err.getMessage());
+                    LogHelper.logError(this, "exportMultipleCards", message, err.getMessage());
                 })
                 .compose(board -> buildMultiCardData(board, user))
                 .compose(templateData -> generatePDF(request, templateData, CollectionsConstant.TEMPLATE_BOARD_MULTI_CARDS))
                 .onSuccess(buffer -> promise.complete(new JsonObject().put(Field.TITLE, CollectionsConstant.FILE_PREFIX_BOARD + sanitizeFilename(boardId)).put(Field.BUFFER, buffer)))
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::exportMultipleCards] Failed to export PDF for board %s : %s",
-                            this.getClass().getSimpleName(), boardId, err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to export PDF for board %s : %s", boardId, err.getMessage());
+                    LogHelper.logError(this, "exportMultipleCards", message, err.getMessage());
                     promise.fail(err.getMessage());
                 });
 
@@ -153,82 +139,126 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.MODIFICATIONDATE, formatDate(board.getModificationDate()));
         data.put(Field.ISPUBLIC, board.isPublic());
         data.put(Field.ISSHARED, board.getShared() != null && !board.getShared().isEmpty());
+        data.put(Field.ISEXTERNAL, board.getIsExternal());
         data.put(Field.NBCARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
-        data.put(Field.BOARD_IS_OWNER, board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
+        data.put("boardIsOwner", board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
+        data.put(Field.IS_LAYOUT_FREE, board.isLayoutFree());
 
         addIcons(data);
 
         List<Card> allCards = getAllCardsFromBoard(board);
 
-        serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
-                .compose(documentIds -> {
-                    String imageUrl = board.getImageUrl();
-                    String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-                    documentIds.add(imageId);
-                    return serviceFactory.exportService().getBoardDocuments(documentIds);
-                })
+        getAllExportDocuments(board, allCards, user)
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::buildMultiCardData] Failed to get document IDs for board %s : %s",
-                            this.getClass().getSimpleName(), board.getId(), err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to get document IDs for board %s : %s", board.getId(), err.getMessage());
+                    LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
                     promise.fail(err.getMessage());
                 })
                 .onSuccess(docs -> {
                     documents.addAll(docs);
 
                     String imageId = board.getImageUrl().substring(board.getImageUrl().lastIndexOf('/') + 1);
-                    String imageBase64 = getDocumentAsBase64(imageId, documents);
+                    String imageBase64 = serviceFactory.imageService().getDocumentAsBase64(imageId, documents);
                     data.put(Field.BOARD_IMG_SRC, imageBase64);
 
-                    Map<String, String> cardToSectionMap = buildCardToSectionMap(board);
+                    List<Future<JsonObject>> itemFutures = new ArrayList<>();
 
-                    List<Future<JsonObject>> cardFutures = IntStream.range(0, allCards.size())
-                            .mapToObj(index -> {
-                                Card card = allCards.get(index);
-                                String currentSectionId = cardToSectionMap.get(card.getId());
-                                String previousSectionId = index > 0 ? cardToSectionMap.get(allCards.get(index - 1).getId()) : null;
+                    if (!board.isLayoutFree()) {
+                        // Traiter chaque section
+                        for (Section section : board.sections()) {
+                            if (!section.getDisplayed()) continue;
 
-                                return buildCardDataForMultiExport(card, user, documents)
-                                        .onSuccess(cardData -> {
-                                            cardData.put(Field.IS_LAST_CARD, index == allCards.size() - 1);
+                            List<Card> sectionCards = section.getCards();
 
-                                            if (!board.isLayoutFree() && currentSectionId != null) {
-                                                Section section = findSectionById(board, currentSectionId);
-                                                if (section != null) {
+                            if (sectionCards == null || sectionCards.isEmpty()) {
+                                // Section vide : créer un élément de séparation
+                                JsonObject sectionSeparator = new JsonObject()
+                                        .put(Field.SHOW_SECTION, true)
+                                        .put(Field.SECTION_TITLE, section.getTitle())
+                                        .put(Field.SECTION_COLOR, section.getColor())
+                                        .put(Field.IS_EMPTY_SECTION, true);
+                                itemFutures.add(Future.succeededFuture(sectionSeparator));
+                            } else {
+                                // Section avec cartes
+                                for (int i = 0; i < sectionCards.size(); i++) {
+                                    Card card = sectionCards.get(i);
+                                    boolean isFirstCardOfSection = i == 0;
+
+                                    Future<JsonObject> cardFuture = buildCardDataForMultiExport(card, user, documents)
+                                            .onSuccess(cardData -> {
+                                                if (isFirstCardOfSection) {
                                                     cardData.put(Field.SECTION_TITLE, section.getTitle());
                                                     cardData.put(Field.SECTION_COLOR, section.getColor());
-
-                                                    boolean showSectionPage = index == 0 || !currentSectionId.equals(previousSectionId);
-                                                    cardData.put(Field.SHOW_SECTION_PAGE, showSectionPage);
+                                                    cardData.put(Field.SHOW_SECTION, true);
                                                 }
-                                            }
-                                        })
-                                        .onFailure(err -> {
-                                            String message = String.format("[Magneto@%s::buildMultiCardData] Failed to build card data for card %s : %s",
-                                                    this.getClass().getSimpleName(), card.getId(), err.getMessage());
-                                            log.error(message);
-                                        });
-                            })
-                            .collect(Collectors.toList());
+                                            })
+                                            .onFailure(err -> {
+                                                String message = String.format("Failed to build card data for card %s : %s", card.getId(), err.getMessage());
+                                                LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
+                                            });
 
-                    Future.all(cardFutures)
-                            .onSuccess(futures -> {
-                                JsonArray cardsArray = new JsonArray();
-                                for (int i = 0; i < futures.size(); i++) {
-                                    cardsArray.add(futures.resultAt(i));
+                                    itemFutures.add(cardFuture);
                                 }
-                                data.put(Field.CARDS, cardsArray);
+                            }
+                        }
+                    } else {
+                        // Layout libre : fonctionnement actuel
+                        Map<String, String> cardToSectionMap = buildCardToSectionMap(board);
+
+                        for (int index = 0; index < allCards.size(); index++) {
+                            Card card = allCards.get(index);
+                            String currentSectionId = cardToSectionMap.get(card.getId());
+                            String previousSectionId = index > 0 ? cardToSectionMap.get(allCards.get(index - 1).getId()) : null;
+
+                            Future<JsonObject> cardFuture = buildCardDataForMultiExport(card, user, documents)
+                                    .onSuccess(cardData -> {
+                                        if (!board.isLayoutFree() && currentSectionId != null && !currentSectionId.equals(previousSectionId)) {
+                                            Section section = findSectionById(board, currentSectionId);
+                                            if (section != null) {
+                                                cardData.put(Field.SECTION_TITLE, section.getTitle());
+                                                cardData.put(Field.SECTION_COLOR, section.getColor());
+                                                cardData.put(Field.SHOW_SECTION, true);
+                                            }
+                                        }
+                                    })
+                                    .onFailure(err -> {
+                                        String message = String.format("Failed to build card data for card %s : %s", card.getId(), err.getMessage());
+                                        LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
+                                    });
+
+                            itemFutures.add(cardFuture);
+                        }
+                    }
+
+                    Future.all(itemFutures)
+                            .onSuccess(futures -> {
+                                JsonArray itemsArray = new JsonArray();
+                                for (int i = 0; i < futures.size(); i++) {
+                                    JsonObject item = futures.resultAt(i);
+                                    item.put(Field.IS_LAST_CARD, i == futures.size() - 1);
+                                    itemsArray.add(item);
+                                }
+                                data.put(Field.CARDS, itemsArray);
                                 promise.complete(data);
                             })
                             .onFailure(err -> {
-                                String message = String.format("[Magneto@%s::buildMultiCardData] Failed to build all cards data for board %s : %s",
-                                        this.getClass().getSimpleName(), board.getId(), err.getMessage());
-                                log.error(message);
+                                String message = String.format("Failed to build all cards data for board %s : %s", board.getId(), err.getMessage());
+                                LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
                                 promise.fail(err.getMessage());
                             });
                 });
 
         return promise.future();
+    }
+
+    private void findReferencedDocumentIdsInCards(List<String> documentIds, List<Card> allCards) {
+        allCards.stream()
+                .map(Card::getDescription)
+                .filter(Objects::nonNull)
+                .filter(desc -> !desc.isEmpty())
+                .flatMap(desc -> extractDocumentIdsFromHtml(desc).stream())
+                .filter(id -> !documentIds.contains(id))
+                .forEach(documentIds::add);
     }
 
     /**
@@ -244,8 +274,8 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.HAS_EDITOR, hasEditor(card));
         cardData.put(Field.MODIFICATIONDATE, formatDate(card.getModificationDate()));
         cardData.put(Field.RESOURCETYPE, card.getResourceType());
-        cardData.put(Field.CAPTION, card.getCaption());
-        cardData.put(Field.DESCRIPTION, card.getDescription());
+        if (card.getCaption() != null && !card.getCaption().trim().isEmpty())
+            cardData.put(Field.CAPTION, card.getCaption());
         cardData.put(Field.RESOURCEURL, card.getResourceUrl() != null ? card.getResourceUrl() : "");
 
         addResourceTypeFlags(cardData, card);
@@ -255,31 +285,42 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.IS_BOARD_RESOURCE, isBoardResource);
 
         if (CollectionsConstant.RESOURCE_TYPE_IMAGE.equals(card.getResourceType()) && card.getResourceId() != null) {
-            String imageBase64 = getDocumentAsBase64(card.getResourceId(), documents);
+            String imageBase64 = serviceFactory.imageService().getDocumentAsBase64(card.getResourceId(), documents);
             cardData.put(Field.IMG_SRC, imageBase64);
         }
 
+        // Traiter la description pour convertir les images en base64
+        String sanitizedDescription = sanitizeHtml(card.getDescription());
+        serviceFactory.imageService().processHtmlImages(sanitizedDescription, documents)
+                .compose(processedDescription -> {
+                    cardData.put(Field.DESCRIPTION, processedDescription);
+
+                    return getCardData(card, user, documents, isBoardResource, cardData);
+                })
+                .onSuccess(promise::complete)
+                .onFailure(err -> {
+                    String message = String.format("Failed to build card data for card %s : %s", card.getId(), err.getMessage());
+                    LogHelper.logError(this, "buildCardDataForSingleExport", message, err.getMessage());
+                    promise.fail(err.getMessage());
+                });
+
+        return promise.future();
+    }
+
+    private Future<JsonObject> getCardData(Card card, UserInfos user, List<Map<String, Object>> documents, boolean isBoardResource, JsonObject cardData) {
         if (isBoardResource && card.getResourceUrl() != null) {
-            serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
-                    .onSuccess(boards -> {
+            return serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
+                    .map(boards -> {
                         if (boards != null && !boards.isEmpty()) {
                             Board referencedBoard = boards.get(0);
                             if (referencedBoard != null)
                                 addBoardInfos(cardData, referencedBoard, user, documents);
                         }
-                        promise.complete(cardData);
-                    })
-                    .onFailure(err -> {
-                        String message = String.format("[Magneto@%s::buildCardDataForSingleExport] Failed to get boards for card %s : %s",
-                                this.getClass().getSimpleName(), card.getId(), err.getMessage());
-                        log.error(message);
-                        promise.fail(err.getMessage());
+                        return cardData;
                     });
         } else {
-            promise.complete(cardData);
+            return Future.succeededFuture(cardData);
         }
-
-        return promise.future();
     }
 
     /**
@@ -339,9 +380,9 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.HAS_EDITOR, hasEditor(card));
         cardData.put(Field.MODIFICATIONDATE, formatDate(card.getModificationDate()));
         cardData.put(Field.RESOURCETYPE, card.getResourceType());
-        cardData.put(Field.CAPTION, card.getCaption());
-        cardData.put(Field.DESCRIPTION, card.getDescription());
         cardData.put(Field.RESOURCEURL, card.getResourceUrl() != null ? card.getResourceUrl() : "");
+        if (card.getCaption() != null && !card.getCaption().trim().isEmpty())
+            cardData.put(Field.CAPTION, card.getCaption());
 
         addResourceTypeFlags(cardData, card);
 
@@ -349,31 +390,24 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.IS_BOARD_RESOURCE, isBoardResource);
 
         if (CollectionsConstant.RESOURCE_TYPE_IMAGE.equals(card.getResourceType()) && card.getResourceId() != null) {
-            String imageBase64 = getDocumentAsBase64(card.getResourceId(), documents);
+            String imageBase64 = serviceFactory.imageService().getDocumentAsBase64(card.getResourceId(), documents);
             cardData.put(Field.IMG_SRC, imageBase64);
         }
 
-        if (isBoardResource && card.getResourceUrl() != null) {
-            serviceFactory.boardService().getBoards(Collections.singletonList(card.getResourceUrl()))
-                    .onSuccess(boards -> {
-                        if (boards != null && !boards.isEmpty()) {
-                            Board referencedBoard = boards.get(0);
-                            if (referencedBoard != null)
-                                addBoardInfos(cardData, referencedBoard, user, documents);
+        // Traiter la description pour convertir les images en base64
+        String sanitizedDescription = sanitizeHtml(card.getDescription());
+        serviceFactory.imageService().processHtmlImages(sanitizedDescription, documents)
+                .compose(processedDescription -> {
+                    cardData.put(Field.DESCRIPTION, processedDescription);
 
-                        }
-                        promise.complete(cardData);
-                    })
-                    .onFailure(err -> {
-                        String message = String.format("[Magneto@%s::buildCardDataForMultiExport] Failed to get boards for card %s : %s",
-                                this.getClass().getSimpleName(), card.getId(), err.getMessage());
-                        log.error(message);
-                        promise.fail(err.getMessage());
-                    });
-
-        } else {
-            promise.complete(cardData);
-        }
+                    return getCardData(card, user, documents, isBoardResource, cardData);
+                })
+                .onSuccess(promise::complete)
+                .onFailure(err -> {
+                    String message = String.format("Failed to build card data for card %s", card.getId());
+                    LogHelper.logError(this, "buildCardDataForMultiExport", message, err.getMessage());
+                    promise.fail(err.getMessage());
+                });
 
         return promise.future();
     }
@@ -407,31 +441,35 @@ public class DefaultPDFExportService implements PDFExportService {
      * Ajoute les informations du board aux données de la carte
      */
     private void addBoardInfos(JsonObject cardData, Board board, UserInfos user, List<Map<String, Object>> documents) {
-        cardData.put(Field.BOARD_IS_OWNER, board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
         cardData.put(Field.BOARD_OWNER_NAME, board.getOwnerName());
         cardData.put(Field.BOARD_NB_CARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
         cardData.put(Field.BOARD_IS_PUBLIC, board.isPublic());
         cardData.put(Field.BOARD_MODIFICATION_DATE, formatDate(board.getModificationDate()));
         cardData.put(Field.BOARD_IS_SHARED, board.getShared() != null && !board.getShared().isEmpty());
+        cardData.put(Field.BOARD_IS_EXTERNAL, board.getIsExternal());
 
         String imageId = board.getImageUrl().substring(board.getImageUrl().lastIndexOf('/') + 1);
-        String imageBase64 = getDocumentAsBase64(imageId, documents);
+        String imageBase64 = serviceFactory.imageService().getDocumentAsBase64(imageId, documents);
         cardData.put(Field.IMG_SRC, imageBase64);
     }
 
     private void addIcons(JsonObject data) {
-        data.put(Field.ICON_CROWN, loadSvgAsBase64(CollectionsConstant.SVG_CROWN));
-        data.put(Field.ICON_USER, loadSvgAsBase64(CollectionsConstant.SVG_USER));
-        data.put(Field.ICON_MAGNET, loadSvgAsBase64(CollectionsConstant.SVG_MAGNET));
-        data.put(Field.ICON_PUBLIC, loadSvgAsBase64(CollectionsConstant.SVG_PUBLIC));
-        data.put(Field.ICON_CALENDAR, loadSvgAsBase64(CollectionsConstant.SVG_CALENDAR_BLANK));
-        data.put(Field.ICON_SHARE, loadSvgAsBase64(CollectionsConstant.SVG_SHARE_VARIANT));
+        data.put(Field.ICON_CROWN, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_CROWN));
+        data.put(Field.ICON_USER, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_USER));
+        data.put(Field.ICON_MAGNET, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_MAGNET));
+        data.put(Field.ICON_PUBLIC, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_PUBLIC));
+        data.put(Field.ICON_CALENDAR, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_CALENDAR_BLANK));
+        data.put(Field.ICON_SHARE, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_SHARE_VARIANT));
+        data.put(Field.ICON_PLATFORM, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_ACCOUNT_GROUP));
 
-        data.put(Field.ICON_VIDEO, loadSvgAsBase64(CollectionsConstant.SVG_VIDEO));
-        data.put(Field.ICON_AUDIO, loadSvgAsBase64(CollectionsConstant.SVG_AUDIO));
-        data.put(Field.ICON_LINK, loadSvgAsBase64(CollectionsConstant.SVG_LINK));
-        data.put(Field.ICON_FILE, loadSvgAsBase64(CollectionsConstant.SVG_FILE));
-        data.put(Field.ICON_BOARD, loadSvgAsBase64(CollectionsConstant.SVG_BOARD_ICON));
+        data.put(Field.ICON_VIDEO, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_VIDEO));
+        data.put(Field.ICON_AUDIO, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_AUDIO));
+        data.put(Field.ICON_LINK, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_LINK));
+        data.put(Field.ICON_FILE, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_FILE));
+        data.put(Field.ICON_TEXT, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_TEXT));
+        data.put(Field.ICON_IMAGE, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_IMAGE));
+        data.put(Field.ICON_SHEET, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_SHEET));
+        data.put(Field.ICON_PDF, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_PDF));
     }
 
     private void addResourceTypeFlags(JsonObject cardData, Card card) {
@@ -443,6 +481,18 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.IS_LINK_RESOURCE, CollectionsConstant.RESOURCE_TYPE_LINK.equals(resourceType));
         cardData.put(Field.IS_FILE_RESOURCE, CollectionsConstant.RESOURCE_TYPE_FILE.equals(resourceType));
         cardData.put(Field.IS_BOARD_RESOURCE, Field.RESOURCE_BOARD.equals(resourceType));
+
+        if (CollectionsConstant.RESOURCE_TYPE_FILE.equals(resourceType)) {
+            String fileFormat = getFileFormat(card.getMetadata().getExtension());
+
+            cardData.put(Field.IS_TEXT_FORMAT, FileFormatConstants.FORMAT_TEXT.equals(fileFormat));
+            cardData.put(Field.IS_IMAGE_FORMAT, FileFormatConstants.FORMAT_IMAGE.equals(fileFormat));
+            cardData.put(Field.IS_VIDEO_FORMAT, FileFormatConstants.FORMAT_VIDEO.equals(fileFormat));
+            cardData.put(Field.IS_AUDIO_FORMAT, FileFormatConstants.FORMAT_AUDIO.equals(fileFormat));
+            cardData.put(Field.IS_SHEET_FORMAT, FileFormatConstants.FORMAT_SHEET.equals(fileFormat));
+            cardData.put(Field.IS_PDF_FORMAT, FileFormatConstants.FORMAT_PDF.equals(fileFormat));
+            cardData.put(Field.IS_DEFAULT_FORMAT, FileFormatConstants.FORMAT_DEFAULT.equals(fileFormat));
+        }
     }
 
     /**
@@ -481,7 +531,8 @@ public class DefaultPDFExportService implements PDFExportService {
             Date date = inputFormat.parse(dateString);
             return outputFormat.format(date);
         } catch (Exception e) {
-            log.warn("[Magneto@DefaultPDFExportService::formatDate] Failed to format date: " + dateString, e);
+            String message = String.format("Failed to format date %s", dateString);
+            LogHelper.logError(this, "formatDate", message, e.getMessage());
             return dateString;
         }
     }
@@ -519,16 +570,16 @@ public class DefaultPDFExportService implements PDFExportService {
             PdfGenerator pdfGenerator = pdfFactory.getPdfGenerator();
             pdfGenerator.generatePdfFromTemplate(filename, buffer, ar -> {
                 if (ar.failed()) {
-                    log.error(String.format("[Magneto@%s::generatePDFFromTemplate] Failed: %s",
-                            this.getClass().getSimpleName(), ar.cause().getMessage()));
+                    String message = String.format("Failed: %s", ar.cause().getMessage());
+                    LogHelper.logError(this, "generatePDFFromTemplate", message, ar.cause().getMessage());
                     promise.fail(ar.cause().getMessage());
                 } else {
                     promise.complete(ar.result());
                 }
             });
         } catch (Exception e) {
-            log.error(String.format("[Magneto@%s::generatePDFFromTemplate] Exception: %s",
-                    this.getClass().getSimpleName(), e.getMessage()));
+            String message = String.format("Exception: %s", e.getMessage());
+            LogHelper.logError(this, "generatePDFFromTemplate", message, e.getMessage());
             promise.fail(e.getMessage());
         }
         return promise.future();
@@ -544,9 +595,8 @@ public class DefaultPDFExportService implements PDFExportService {
 
         serviceFactory.vertx().fileSystem().readFile(path, result -> {
             if (!result.succeeded()) {
-                String message = String.format("[Magneto@%s::generatePDF] Failed to read template file: %s",
-                        this.getClass().getSimpleName(), templateName);
-                log.error(message, result.cause());
+                String message = String.format("Failed to read template file: %s", templateName);
+                LogHelper.logError(this, "generatePDF", message, result.cause().getMessage());
                 promise.fail(message);
                 return;
             }
@@ -555,9 +605,8 @@ public class DefaultPDFExportService implements PDFExportService {
             renders.processTemplate(request, templateProps, templateName, reader, writer -> {
                 String processedTemplate = ((StringWriter) writer).getBuffer().toString();
                 if (processedTemplate.isEmpty()) {
-                    String message = String.format("[Magneto@%s::generatePDF] Failed to process template: %s",
-                            this.getClass().getSimpleName(), templateName);
-                    log.error(message);
+                    String message = String.format("Failed to process template: %s", templateName);
+                    LogHelper.logError(this, "generatePDF", message, templateName);
                     promise.fail(message);
                     return;
                 }
@@ -566,9 +615,8 @@ public class DefaultPDFExportService implements PDFExportService {
                 generatePDFFromTemplate(pdfTitle, processedTemplate)
                         .onSuccess(res -> promise.complete(res.getContent()))
                         .onFailure(error -> {
-                            String message = String.format("[Magneto@%s::generatePDF] Failed to generate PDF: %s",
-                                    this.getClass().getSimpleName(), error.getMessage());
-                            log.error(message, error);
+                            String message = String.format("Failed to generate PDF: %s", error.getMessage());
+                            LogHelper.logError(this, "generatePDF", message, error.getMessage());
                             promise.fail(error.getMessage());
                         });
             });
@@ -584,9 +632,8 @@ public class DefaultPDFExportService implements PDFExportService {
         Promise<JsonObject> promise = Promise.promise();
         serviceFactory.storage().writeBuffer(buffer, CollectionsConstant.APPLICATION_PDF, pdfInfos.getString(Field.TITLE), uploadEvt -> {
             if (!Field.OK.equals(uploadEvt.getString(Field.STATUS))) {
-                String message = String.format("[Magneto@%s::uploadPdfAndSetFileId] Failed to upload PDF: %s",
-                        this.getClass().getSimpleName(), uploadEvt.getString(Field.MESSAGE));
-                log.error(message);
+                String message = String.format("Failed to upload PDF: %s", uploadEvt.getString(Field.MESSAGE));
+                LogHelper.logError(this, "uploadPdfAndSetFileId", message, uploadEvt.getString(Field.MESSAGE));
                 promise.fail(uploadEvt.getString(Field.MESSAGE));
                 return;
             }
@@ -607,50 +654,19 @@ public class DefaultPDFExportService implements PDFExportService {
         return scheme;
     }
 
-    /**
-     * Récupère un document et le convertit en base64 avec son content-type
-     */
-    private String getDocumentAsBase64(String documentId, List<Map<String, Object>> documents) {
-        if (documentId == null || documents == null) {
-            return "";
-        }
-
-        for (Map<String, Object> doc : documents) {
-            if (documentId.equals(doc.get(Field.DOCUMENT_ID))) {
-                Buffer buffer = (Buffer) doc.get(Field.BUFFER);
-                String contentType = (String) doc.get(Field.CONTENTTYPE);
-
-                if (buffer != null) {
-                    String base64 = Base64.getEncoder().encodeToString(buffer.getBytes());
-                    return CollectionsConstant.DATA_PREFIX + (contentType != null ? contentType : CollectionsConstant.DEFAULT_CONTENT_TYPE) + CollectionsConstant.BASE64_SUFFIX + base64;
-                }
-            }
-        }
-
-        return "";
-    }
-
     @Override
     public Future<JsonObject> exportCardsAsPngArchive(String boardId, UserInfos user, HttpServerRequest request) {
         Promise<JsonObject> promise = Promise.promise();
 
         this.serviceFactory.boardService().getBoardWithContent(boardId, user, false, null)
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::exportCardsAsPngArchive] Failed to get board %s : %s",
-                            this.getClass().getSimpleName(), boardId, err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to get board %s : %s", boardId, err.getMessage());
+                    LogHelper.logError(this, "exportCardsAsPngArchive", message, err.getMessage());
                     promise.fail(err.getMessage());
                 })
                 .compose(board -> {
                     List<Card> allCards = getAllCardsFromBoard(board);
-
-                    return serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
-                            .compose(documentIds -> {
-                                String imageUrl = board.getImageUrl();
-                                String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-                                documentIds.add(imageId);
-                                return serviceFactory.exportService().getBoardDocuments(documentIds);
-                            })
+                    return getAllExportDocuments(board, allCards, user)
                             .compose(documents -> generatePngArchiveForCards(allCards, board, user, request, documents));
                 })
                 .onSuccess(zipBuffer -> {
@@ -661,9 +677,8 @@ public class DefaultPDFExportService implements PDFExportService {
                     promise.complete(result);
                 })
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::exportCardsAsPngArchive] Failed to export PNG archive : %s",
-                            this.getClass().getSimpleName(), err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to export PNG archive : %s", err.getMessage());
+                    LogHelper.logError(this, "exportCardsAsPngArchive", message, err.getMessage());
                     promise.fail(err.getMessage());
                 });
 
@@ -698,14 +713,13 @@ public class DefaultPDFExportService implements PDFExportService {
                             })
                             .compose(pdfBuffer -> convertPdfToPng(pdfBuffer))
                             .map(pngBytes -> {
-                                String filename = card.getId() + "_" + sectionPrefix + String.format("%03d", index + 1) + "_" +
+                                String filename =  String.format("%03d", index + 1) + "_" + sectionPrefix + "_" +
                                         sanitizeFilename(card.getTitle()) + ".png";
                                 return new PngFile(filename, pngBytes);
                             })
                             .onFailure(err -> {
-                                String message = String.format("[Magneto@%s::generatePngArchiveForCards] Failed to process card %s : %s",
-                                        this.getClass().getSimpleName(), card.getId(), err.getMessage());
-                                log.error(message);
+                                String message = String.format("Failed to process card %s : %s", card.getId(), err.getMessage());
+                                LogHelper.logError(this, "generatePngArchiveForCards", message, err.getMessage());
                             });
                 })
                 .collect(Collectors.toList());
@@ -727,16 +741,14 @@ public class DefaultPDFExportService implements PDFExportService {
                         zos.close();
                         promise.complete(Buffer.buffer(baos.toByteArray()));
                     } catch (IOException e) {
-                        String message = String.format("[Magneto@%s::generatePngArchiveForCards] Failed to create ZIP : %s",
-                                this.getClass().getSimpleName(), e.getMessage());
-                        log.error(message);
+                        String message = String.format("Failed to create ZIP : %s", e.getMessage());
+                        LogHelper.logError(this, "generatePngArchiveForCards", message, e.getMessage());
                         promise.fail(e.getMessage());
                     }
                 })
                 .onFailure(err -> {
-                    String message = String.format("[Magneto@%s::generatePngArchiveForCards] Failed to generate PNGs : %s",
-                            this.getClass().getSimpleName(), err.getMessage());
-                    log.error(message);
+                    String message = String.format("Failed to generate PNGs : %s", err.getMessage());
+                    LogHelper.logError(this, "generatePngArchiveForCards", message, err.getMessage());
                     promise.fail(err.getMessage());
                 });
 
@@ -761,9 +773,8 @@ public class DefaultPDFExportService implements PDFExportService {
 
                 blockingPromise.complete(baos.toByteArray());
             } catch (Exception e) {
-                String message = String.format("[Magneto@%s::convertPdfToPng] Failed to convert PDF to PNG : %s",
-                        this.getClass().getSimpleName(), e.getMessage());
-                log.error(message);
+                String message = String.format("Failed to convert PDF to PNG : %s", e.getMessage());
+                LogHelper.logError(this, "convertPdfToPng", message, e.getMessage());
                 blockingPromise.fail(e);
             }
         }, false, res -> {
@@ -788,5 +799,93 @@ public class DefaultPDFExportService implements PDFExportService {
             this.filename = filename;
             this.data = data;
         }
+    }
+
+    /**
+     * Extrait tous les IDs de documents (images) présents dans le HTML
+     */
+    private List<String> extractDocumentIdsFromHtml(String htmlContent) {
+        List<String> documentIds = new ArrayList<>();
+        if (htmlContent == null || htmlContent.isEmpty()) {
+            return documentIds;
+        }
+
+        // Pattern pour trouver les URLs du workspace dans les balises img
+        Pattern workspacePattern = Pattern.compile("/workspace/document/([a-f0-9\\-]+)", Pattern.CASE_INSENSITIVE);
+        java.util.regex.Matcher matcher = workspacePattern.matcher(htmlContent);
+
+        while (matcher.find()) {
+            String documentId = matcher.group(1);
+            // Enlever les query params si présents
+            if (documentId.contains("?")) {
+                documentId = documentId.substring(0, documentId.indexOf("?"));
+            }
+            if (!documentIds.contains(documentId)) {
+                documentIds.add(documentId);
+            }
+        }
+
+        log.debug(String.format("[Magneto@%s::extractDocumentIdsFromHtml] Found %d document IDs in HTML",
+                this.getClass().getSimpleName(), documentIds.size()));
+
+        return documentIds;
+    }
+
+    private String sanitizeHtml(String html) {
+        if (html == null) return null;
+
+        PolicyFactory policy = Sanitizers.FORMATTING
+                .and(Sanitizers.BLOCKS)
+                .and(Sanitizers.IMAGES)
+                .and(Sanitizers.LINKS);
+
+        return policy.sanitize(html);
+    }
+
+    /**
+     * Extrait les IDs des boards référencés dans les cartes
+     */
+    private List<String> extractBoardResourceIds(List<Card> cards) {
+        return cards.stream()
+                .filter(card -> Field.RESOURCE_BOARD.equals(card.getResourceType()))
+                .map(Card::getResourceUrl)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Récupère tous les documents nécessaires pour l'export (images du board, images dans les descriptions, images des boards référencés)
+     */
+    private Future<List<Map<String, Object>>> getAllExportDocuments(Board board, List<Card> allCards, UserInfos user) {
+        return serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
+                .compose(documentIds -> {
+                    String imageUrl = board.getImageUrl();
+                    String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                    documentIds.add(imageId);
+
+                    findReferencedDocumentIdsInCards(documentIds, allCards);
+
+                    // Récupérer les IDs des boards référencés
+                    List<String> boardResourceIds = extractBoardResourceIds(allCards);
+
+                    if (boardResourceIds.isEmpty()) {
+                        return serviceFactory.exportService().getBoardDocuments(documentIds);
+                    }
+
+                    // Récupérer les images des boards référencés
+                    return serviceFactory.boardService().getAllBoardImages(boardResourceIds)
+                            .compose(boardImages -> {
+                                // Ajouter les IDs d'images des boards à la liste des documents
+                                boardImages.stream()
+                                        .filter(JsonObject.class::isInstance)
+                                        .map(JsonObject.class::cast)
+                                        .map(boardImage -> boardImage.getString(Field.IMAGEURL))
+                                        .filter(Objects::nonNull)
+                                        .map(imageUrl1 -> imageUrl1.substring(imageUrl1.lastIndexOf('/') + 1))
+                                        .forEach(documentIds::add);
+
+                                return serviceFactory.exportService().getBoardDocuments(documentIds);
+                            });
+                });
     }
 }

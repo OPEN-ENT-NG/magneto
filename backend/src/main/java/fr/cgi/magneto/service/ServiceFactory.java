@@ -38,6 +38,7 @@ public class ServiceFactory {
     private final CardService cardService;
     private final ExportService exportService;
     private final PDFExportService pdfExportService;
+    private final ImageService imageService;
     private final MagnetoCollaborationService magnetoCollaborationService;
     private final Map<String, SecuredAction> securedActions;
     private final ShareNormalizer shareNormalizer;
@@ -59,6 +60,7 @@ public class ServiceFactory {
         this.boardService = new DefaultBoardService(CollectionsConstant.BOARD_COLLECTION, mongoDb, this);
         this.exportService = new DefaultExportService(this);
         this.pdfExportService = new DefaultPDFExportService(this);
+        this.imageService = new DefaultImageService(this);
         this.magnetoCollaborationService = new DefaultMagnetoCollaborationService(this);
 
     }
@@ -101,6 +103,10 @@ public class ServiceFactory {
 
     public PDFExportService pdfExportService() {
         return this.pdfExportService;
+    }
+
+    public ImageService imageService() {
+        return this.imageService;
     }
 
     public WorkspaceService workSpaceService() {

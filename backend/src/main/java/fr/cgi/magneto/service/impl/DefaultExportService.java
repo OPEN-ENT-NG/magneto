@@ -828,8 +828,8 @@ public class DefaultExportService implements ExportService {
                 board.tags() != null ? board.tags() : EMPTY,
                 board.getBackgroundUrl() != null ? board.getBackgroundUrl() : EMPTY,
                 String.valueOf(cards.size()),
-                formatDateWithoutSeconds(board.getCreationDate()),
-                formatDateWithoutSeconds(board.getModificationDate())
+                formatDateCSV(board.getCreationDate()),
+                formatDateCSV(board.getModificationDate())
         );
 
         // Lignes vides de séparation
@@ -847,7 +847,8 @@ public class DefaultExportService implements ExportService {
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_RESOURCE_URL));
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_CAPTION));
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION));
-        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION));
+        if (!board.isLayoutFree())
+            headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION));
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_LOCKED));
 
         if (board.displayNbFavorites()) {
@@ -873,7 +874,8 @@ public class DefaultExportService implements ExportService {
             row.add(card.getResourceUrl() != null ? card.getResourceUrl() : EMPTY);
             row.add(sanitizeForCSV(card.getCaption()));
             row.add(sanitizeForCSV(card.getDescription()));
-            row.add(cardToSectionTitle.getOrDefault(card.getId(), EMPTY));
+            if (!board.isLayoutFree())
+                row.add(cardToSectionTitle.getOrDefault(card.getId(), EMPTY));
             row.add(card.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO));
 
             if (board.displayNbFavorites()) {
@@ -885,9 +887,9 @@ public class DefaultExportService implements ExportService {
             }
 
             row.add(card.getOwnerName());
-            row.add(formatDateWithoutSeconds(card.getCreationDate()));
+            row.add(formatDateCSV(card.getCreationDate()));
             row.add(card.getLastModifierName() != null ? card.getLastModifierName() : EMPTY);
-            row.add(formatDateWithoutSeconds(card.getModificationDate()));
+            row.add(formatDateCSV(card.getModificationDate()));
 
             printer.printRecord(row);
         }
@@ -953,13 +955,13 @@ public class DefaultExportService implements ExportService {
         return positioningType + " : " + positioningValue;
     }
 
-    private String formatDateWithoutSeconds(String mongoDate) {
+    private String formatDateCSV(String mongoDate) {
         if (mongoDate == null) {
             return EMPTY;
         }
         try {
             Date date = DateHelper.parseDate(mongoDate, DateHelper.MONGO_FORMAT);
-            return DateHelper.getDateString(date, "dd/MM/yyyy HH:mm");
+            return DateHelper.getDateString(date, DateHelper.MONGO_FORMAT);
         } catch (Exception e) {
             return mongoDate;
         }

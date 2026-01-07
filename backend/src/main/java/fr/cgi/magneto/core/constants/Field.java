@@ -299,28 +299,31 @@ public class Field {
     public static final String IS_LAST_CARD = "isLastCard";
     public static final String SECTION_TITLE = "sectionTitle";
     public static final String SECTION_STYLE = "sectionStyle";
-    public static final String SHOW_SECTION_PAGE = "showSectionPage";
     public static final String HAS_EDITOR = "hasEditor";
     public static final String IS_BOARD_RESOURCE = "isBoardResource";
     public static final String IMG_SRC = "imgSrc";
-    public static final String BOARD_IS_OWNER = "boardIsOwner";
     public static final String BOARD_OWNER_NAME = "boardOwnerName";
     public static final String BOARD_NB_CARDS = "boardNbCards";
     public static final String BOARD_IS_PUBLIC = "boardIsPublic";
     public static final String BOARD_MODIFICATION_DATE = "boardModificationDate";
     public static final String BOARD_IS_SHARED = "boardIsShared";
+    public static final String BOARD_IS_EXTERNAL = "boardIsExternal";
 
     public static final String ICON_CROWN = "iconCrown";
     public static final String ICON_USER = "iconUser";
     public static final String ICON_MAGNET = "iconMagnet";
     public static final String ICON_PUBLIC = "iconPublic";
+    public static final String ICON_PLATFORM = "iconPlatform";
     public static final String ICON_CALENDAR = "iconCalendar";
     public static final String ICON_SHARE = "iconShare";
     public static final String ICON_VIDEO = "iconVideo";
     public static final String ICON_AUDIO = "iconAudio";
     public static final String ICON_LINK = "iconLink";
     public static final String ICON_FILE = "iconFile";
-    public static final String ICON_BOARD = "iconBoard";
+    public static final String ICON_TEXT = "iconText";
+    public static final String ICON_IMAGE = "iconImage";
+    public static final String ICON_SHEET = "iconSheet";
+    public static final String ICON_PDF = "iconPdf";
 
     public static final String IS_TEXT_RESOURCE = "isTextResource";
     public static final String IS_IMAGE_RESOURCE = "isImageResource";
@@ -331,4 +334,18 @@ public class Field {
     public static final String FILE_ID = "fileId";
     public static final String DOCUMENT_ID = "documentId";
     public static final String SECTION_COLOR = "sectionColor";
+
+    public static final String FILE_FORMAT = "fileFormat";
+
+    public static final String SHOW_SECTION = "showSection";
+    public static final String IS_LAYOUT_FREE = "isLayoutFree";
+
+    public static final String IS_TEXT_FORMAT = "isTextFormat";
+    public static final String IS_IMAGE_FORMAT = "isImageFormat";
+    public static final String IS_VIDEO_FORMAT = "isVideoFormat";
+    public static final String IS_AUDIO_FORMAT = "isAudioFormat";
+    public static final String IS_SHEET_FORMAT = "isSheetFormat";
+    public static final String IS_PDF_FORMAT = "isPdfFormat";
+    public static final String IS_DEFAULT_FORMAT = "isDefaultFormat";
+    public static final String IS_EMPTY_SECTION = "isEmptySection";
 }

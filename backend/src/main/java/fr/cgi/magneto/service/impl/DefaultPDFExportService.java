@@ -161,41 +161,84 @@ public class DefaultPDFExportService implements PDFExportService {
                     String imageBase64 = serviceFactory.imageService().getDocumentAsBase64(imageId, documents);
                     data.put(Field.BOARD_IMG_SRC, imageBase64);
 
-                    Map<String, String> cardToSectionMap = buildCardToSectionMap(board);
+                    List<Future<JsonObject>> itemFutures = new ArrayList<>();
 
-                    List<Future<JsonObject>> cardFutures = IntStream.range(0, allCards.size())
-                            .mapToObj(index -> {
-                                Card card = allCards.get(index);
-                                String currentSectionId = cardToSectionMap.get(card.getId());
-                                String previousSectionId = index > 0 ? cardToSectionMap.get(allCards.get(index - 1).getId()) : null;
+                    if (!board.isLayoutFree()) {
+                        // Traiter chaque section
+                        for (Section section : board.sections()) {
+                            if (!section.getDisplayed()) continue;
 
-                                return buildCardDataForMultiExport(card, user, documents)
-                                        .onSuccess(cardData -> {
-                                            cardData.put(Field.IS_LAST_CARD, index == allCards.size() - 1);
+                            List<Card> sectionCards = section.getCards();
 
-                                            if (!board.isLayoutFree() && currentSectionId != null && !currentSectionId.equals(previousSectionId)) {
-                                                Section section = findSectionById(board, currentSectionId);
-                                                if (section != null) {
+                            if (sectionCards == null || sectionCards.isEmpty()) {
+                                // Section vide : créer un élément de séparation
+                                JsonObject sectionSeparator = new JsonObject()
+                                        .put(Field.SHOW_SECTION, true)
+                                        .put(Field.SECTION_TITLE, section.getTitle())
+                                        .put(Field.SECTION_COLOR, section.getColor())
+                                        .put(Field.IS_EMPTY_SECTION, true);
+                                itemFutures.add(Future.succeededFuture(sectionSeparator));
+                            } else {
+                                // Section avec cartes
+                                for (int i = 0; i < sectionCards.size(); i++) {
+                                    Card card = sectionCards.get(i);
+                                    boolean isFirstCardOfSection = i == 0;
+
+                                    Future<JsonObject> cardFuture = buildCardDataForMultiExport(card, user, documents)
+                                            .onSuccess(cardData -> {
+                                                if (isFirstCardOfSection) {
                                                     cardData.put(Field.SECTION_TITLE, section.getTitle());
                                                     cardData.put(Field.SECTION_COLOR, section.getColor());
                                                     cardData.put(Field.SHOW_SECTION, true);
                                                 }
-                                            }
-                                        })
-                                        .onFailure(err -> {
-                                            String message = String.format("Failed to build card data for card %s : %s", card.getId(), err.getMessage());
-                                            LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
-                                        });
-                            })
-                            .collect(Collectors.toList());
+                                            })
+                                            .onFailure(err -> {
+                                                String message = String.format("Failed to build card data for card %s : %s", card.getId(), err.getMessage());
+                                                LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
+                                            });
 
-                    Future.all(cardFutures)
-                            .onSuccess(futures -> {
-                                JsonArray cardsArray = new JsonArray();
-                                for (int i = 0; i < futures.size(); i++) {
-                                    cardsArray.add(futures.resultAt(i));
+                                    itemFutures.add(cardFuture);
                                 }
-                                data.put(Field.CARDS, cardsArray);
+                            }
+                        }
+                    } else {
+                        // Layout libre : fonctionnement actuel
+                        Map<String, String> cardToSectionMap = buildCardToSectionMap(board);
+
+                        for (int index = 0; index < allCards.size(); index++) {
+                            Card card = allCards.get(index);
+                            String currentSectionId = cardToSectionMap.get(card.getId());
+                            String previousSectionId = index > 0 ? cardToSectionMap.get(allCards.get(index - 1).getId()) : null;
+
+                            Future<JsonObject> cardFuture = buildCardDataForMultiExport(card, user, documents)
+                                    .onSuccess(cardData -> {
+                                        if (!board.isLayoutFree() && currentSectionId != null && !currentSectionId.equals(previousSectionId)) {
+                                            Section section = findSectionById(board, currentSectionId);
+                                            if (section != null) {
+                                                cardData.put(Field.SECTION_TITLE, section.getTitle());
+                                                cardData.put(Field.SECTION_COLOR, section.getColor());
+                                                cardData.put(Field.SHOW_SECTION, true);
+                                            }
+                                        }
+                                    })
+                                    .onFailure(err -> {
+                                        String message = String.format("Failed to build card data for card %s : %s", card.getId(), err.getMessage());
+                                        LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
+                                    });
+
+                            itemFutures.add(cardFuture);
+                        }
+                    }
+
+                    Future.all(itemFutures)
+                            .onSuccess(futures -> {
+                                JsonArray itemsArray = new JsonArray();
+                                for (int i = 0; i < futures.size(); i++) {
+                                    JsonObject item = futures.resultAt(i);
+                                    item.put(Field.IS_LAST_CARD, i == futures.size() - 1);
+                                    itemsArray.add(item);
+                                }
+                                data.put(Field.CARDS, itemsArray);
                                 promise.complete(data);
                             })
                             .onFailure(err -> {
@@ -231,7 +274,8 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.HAS_EDITOR, hasEditor(card));
         cardData.put(Field.MODIFICATIONDATE, formatDate(card.getModificationDate()));
         cardData.put(Field.RESOURCETYPE, card.getResourceType());
-        cardData.put(Field.CAPTION, card.getCaption());
+        if (card.getCaption() != null && !card.getCaption().trim().isEmpty())
+            cardData.put(Field.CAPTION, card.getCaption());
         cardData.put(Field.RESOURCEURL, card.getResourceUrl() != null ? card.getResourceUrl() : "");
 
         addResourceTypeFlags(cardData, card);

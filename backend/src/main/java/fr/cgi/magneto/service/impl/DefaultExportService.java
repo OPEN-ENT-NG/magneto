@@ -847,7 +847,8 @@ public class DefaultExportService implements ExportService {
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_RESOURCE_URL));
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_CAPTION));
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_DESCRIPTION));
-        headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION));
+        if (!board.isLayoutFree())
+            headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_SECTION));
         headers.add(i18nHelper.translate(CollectionsConstant.I18N_CSV_LOCKED));
 
         if (board.displayNbFavorites()) {
@@ -873,7 +874,8 @@ public class DefaultExportService implements ExportService {
             row.add(card.getResourceUrl() != null ? card.getResourceUrl() : EMPTY);
             row.add(sanitizeForCSV(card.getCaption()));
             row.add(sanitizeForCSV(card.getDescription()));
-            row.add(cardToSectionTitle.getOrDefault(card.getId(), EMPTY));
+            if (!board.isLayoutFree())
+                row.add(cardToSectionTitle.getOrDefault(card.getId(), EMPTY));
             row.add(card.isLocked() ? i18nHelper.translate(CollectionsConstant.I18N_CSV_YES) : i18nHelper.translate(CollectionsConstant.I18N_CSV_NO));
 
             if (board.displayNbFavorites()) {

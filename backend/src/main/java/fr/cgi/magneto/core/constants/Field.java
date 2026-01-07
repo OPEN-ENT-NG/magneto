@@ -347,4 +347,5 @@ public class Field {
     public static final String IS_SHEET_FORMAT = "isSheetFormat";
     public static final String IS_PDF_FORMAT = "isPdfFormat";
     public static final String IS_DEFAULT_FORMAT = "isDefaultFormat";
+    public static final String IS_EMPTY_SECTION = "isEmptySection";
 }

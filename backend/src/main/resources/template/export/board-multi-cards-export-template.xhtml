@@ -321,15 +321,23 @@
                     <span class="board-info-label">{{nbCards}} aimants</span>
                 </div>
 
-                {{#isPublic}}
+                {{#isExternal}}
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconPublic}}" alt="" />
                     <span class="board-info-label">Tableau public</span>
                 </div>
-                {{/isPublic}}
+                {{/isExternal}}
             </div>
 
             <div class="cover-info-row">
+
+                {{#isPublic}}
+                <div class="board-info-item">
+                    <img class="board-info-icon" src="{{iconPlatform}}" alt="" />
+                    <span class="board-info-label">Tableau de la plateforme</span>
+                </div>
+                {{/isPublic}}
+
                 {{#modificationDate}}
                 <div class="board-info-item">
                     <img class="board-info-icon" src="{{iconCalendar}}" alt="" />
@@ -494,10 +502,17 @@
 
             {{#boardIsPublic}}
             <div class="board-info-item">
+                <img class="board-info-icon" src="{{iconPlatform}}" alt="" />
+                <span class="board-info-label">Tableau de la plateforme</span>
+            </div>
+            {{/boardIsPublic}}
+
+            {{#boardIsExternal}}
+            <div class="board-info-item">
                 <img class="board-info-icon" src="{{iconPublic}}" alt="" />
                 <span class="board-info-label">Tableau public</span>
             </div>
-            {{/boardIsPublic}}
+            {{/boardIsExternal}}
         </div>
 
         <div class="board-info-row">

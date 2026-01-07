@@ -307,11 +307,13 @@ public class Field {
     public static final String BOARD_IS_PUBLIC = "boardIsPublic";
     public static final String BOARD_MODIFICATION_DATE = "boardModificationDate";
     public static final String BOARD_IS_SHARED = "boardIsShared";
+    public static final String BOARD_IS_EXTERNAL = "boardIsExternal";
 
     public static final String ICON_CROWN = "iconCrown";
     public static final String ICON_USER = "iconUser";
     public static final String ICON_MAGNET = "iconMagnet";
     public static final String ICON_PUBLIC = "iconPublic";
+    public static final String ICON_PLATFORM = "iconPlatform";
     public static final String ICON_CALENDAR = "iconCalendar";
     public static final String ICON_SHARE = "iconShare";
     public static final String ICON_VIDEO = "iconVideo";

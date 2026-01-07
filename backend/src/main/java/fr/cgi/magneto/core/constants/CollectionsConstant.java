@@ -90,6 +90,7 @@ public class CollectionsConstant {
     public static final String SVG_PUBLIC = "public";
     public static final String SVG_CALENDAR_BLANK = "calendar-blank";
     public static final String SVG_SHARE_VARIANT = "share-variant";
+    public static final String SVG_ACCOUNT_GROUP = "account-group";
     public static final String SVG_VIDEO = "extension/video";
     public static final String SVG_AUDIO = "extension/audio";
     public static final String SVG_LINK = "extension/link";

@@ -139,6 +139,7 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.MODIFICATIONDATE, formatDate(board.getModificationDate()));
         data.put(Field.ISPUBLIC, board.isPublic());
         data.put(Field.ISSHARED, board.getShared() != null && !board.getShared().isEmpty());
+        data.put(Field.ISEXTERNAL, board.getIsExternal());
         data.put(Field.NBCARDS, board.isLayoutFree() ? board.getNbCards() : board.getNbCardsSections());
         data.put("boardIsOwner", board.getOwnerId() != null && board.getOwnerId().equals(user.getUserId()));
         data.put(Field.IS_LAYOUT_FREE, board.isLayoutFree());
@@ -401,6 +402,7 @@ public class DefaultPDFExportService implements PDFExportService {
         cardData.put(Field.BOARD_IS_PUBLIC, board.isPublic());
         cardData.put(Field.BOARD_MODIFICATION_DATE, formatDate(board.getModificationDate()));
         cardData.put(Field.BOARD_IS_SHARED, board.getShared() != null && !board.getShared().isEmpty());
+        cardData.put(Field.BOARD_IS_EXTERNAL, board.getIsExternal());
 
         String imageId = board.getImageUrl().substring(board.getImageUrl().lastIndexOf('/') + 1);
         String imageBase64 = serviceFactory.imageService().getDocumentAsBase64(imageId, documents);
@@ -414,6 +416,7 @@ public class DefaultPDFExportService implements PDFExportService {
         data.put(Field.ICON_PUBLIC, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_PUBLIC));
         data.put(Field.ICON_CALENDAR, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_CALENDAR_BLANK));
         data.put(Field.ICON_SHARE, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_SHARE_VARIANT));
+        data.put(Field.ICON_PLATFORM, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_ACCOUNT_GROUP));
 
         data.put(Field.ICON_VIDEO, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_VIDEO));
         data.put(Field.ICON_AUDIO, serviceFactory.imageService().loadSvgAsBase64(CollectionsConstant.SVG_AUDIO));

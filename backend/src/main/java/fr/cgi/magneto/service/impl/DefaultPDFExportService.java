@@ -147,16 +147,7 @@ public class DefaultPDFExportService implements PDFExportService {
 
         List<Card> allCards = getAllCardsFromBoard(board);
 
-        serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
-                .compose(documentIds -> {
-                    String imageUrl = board.getImageUrl();
-                    String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-                    documentIds.add(imageId);
-
-                    findReferencedDocumentIdsInCards(documentIds, allCards);
-
-                    return serviceFactory.exportService().getBoardDocuments(documentIds);
-                })
+        getAllExportDocuments(board, allCards, user)
                 .onFailure(err -> {
                     String message = String.format("Failed to get document IDs for board %s : %s", board.getId(), err.getMessage());
                     LogHelper.logError(this, "buildMultiCardData", message, err.getMessage());
@@ -628,16 +619,7 @@ public class DefaultPDFExportService implements PDFExportService {
                 })
                 .compose(board -> {
                     List<Card> allCards = getAllCardsFromBoard(board);
-
-                    return serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
-                            .compose(documentIds -> {
-                                String imageUrl = board.getImageUrl();
-                                String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-                                documentIds.add(imageId);
-
-                                findReferencedDocumentIdsInCards(documentIds, allCards);
-                                return serviceFactory.exportService().getBoardDocuments(documentIds);
-                            })
+                    return getAllExportDocuments(board, allCards, user)
                             .compose(documents -> generatePngArchiveForCards(allCards, board, user, request, documents));
                 })
                 .onSuccess(zipBuffer -> {
@@ -811,5 +793,52 @@ public class DefaultPDFExportService implements PDFExportService {
                 .and(Sanitizers.LINKS);
 
         return policy.sanitize(html);
+    }
+
+    /**
+     * Extrait les IDs des boards référencés dans les cartes
+     */
+    private List<String> extractBoardResourceIds(List<Card> cards) {
+        return cards.stream()
+                .filter(card -> Field.RESOURCE_BOARD.equals(card.getResourceType()))
+                .map(Card::getResourceUrl)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Récupère tous les documents nécessaires pour l'export (images du board, images dans les descriptions, images des boards référencés)
+     */
+    private Future<List<Map<String, Object>>> getAllExportDocuments(Board board, List<Card> allCards, UserInfos user) {
+        return serviceFactory.boardService().getAllDocumentIds(board.getId(), user)
+                .compose(documentIds -> {
+                    String imageUrl = board.getImageUrl();
+                    String imageId = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+                    documentIds.add(imageId);
+
+                    findReferencedDocumentIdsInCards(documentIds, allCards);
+
+                    // Récupérer les IDs des boards référencés
+                    List<String> boardResourceIds = extractBoardResourceIds(allCards);
+
+                    if (boardResourceIds.isEmpty()) {
+                        return serviceFactory.exportService().getBoardDocuments(documentIds);
+                    }
+
+                    // Récupérer les images des boards référencés
+                    return serviceFactory.boardService().getAllBoardImages(boardResourceIds)
+                            .compose(boardImages -> {
+                                // Ajouter les IDs d'images des boards à la liste des documents
+                                boardImages.stream()
+                                        .filter(JsonObject.class::isInstance)
+                                        .map(JsonObject.class::cast)
+                                        .map(boardImage -> boardImage.getString(Field.IMAGEURL))
+                                        .filter(Objects::nonNull)
+                                        .map(imageUrl1 -> imageUrl1.substring(imageUrl1.lastIndexOf('/') + 1))
+                                        .forEach(documentIds::add);
+
+                                return serviceFactory.exportService().getBoardDocuments(documentIds);
+                            });
+                });
     }
 }

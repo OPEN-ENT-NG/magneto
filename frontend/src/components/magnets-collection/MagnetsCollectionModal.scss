@@ -95,6 +95,10 @@ ul {
   list-style-type: none;
 }
 
+.tiptap.ProseMirror ul {
+    list-style-type: disc !important;
+}
+
 .magnet-board {
   padding-bottom: 2rem;
   padding-top: 2rem;

@@ -1,6 +1,6 @@
 {
   "name": "Magneto",
-  "version": "2.9.4-%branch%.%generateVersion%",
+  "version": "2.9-%branch%.%generateVersion%",
   "description": "Magneto",
   "homepage": "https://github.com/OPEN-ENT-NG/magneto#readme",
   "bugs": {

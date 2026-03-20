@@ -30,7 +30,9 @@ public class Magneto extends BaseServer {
     public void start(Promise<Void> startPromise) throws Exception {
         final Promise<Void> promise = Promise.promise();
         super.start(promise);
-        promise.future().compose(e -> this.initMagneto());
+        promise.future()
+            .compose(e -> this.initMagneto())
+            .onComplete(startPromise);
     }
 
     public Future<Void> initMagneto() {

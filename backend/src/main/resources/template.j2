@@ -2,6 +2,11 @@
   "name": "fr.cgi~magneto",
   "config": {
 		"main" : "fr.cgi.magneto.Magneto",
+		"probes": [
+			"org.entcore.common.http.health.Neo4jProbe",
+			"org.entcore.common.http.health.MongoProbe",
+			"fr.wseduc.webutils.metrics.EventBusProbe"
+		],
 		"port" : 8205,
 		"app-name" : "Magneto",
 		"app-address" : "/magneto",

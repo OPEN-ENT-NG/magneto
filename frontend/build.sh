@@ -115,7 +115,7 @@ build () {
   if [ "$NO_DOCKER" = "true" ] ; then
     pnpm run build
   else
-    docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "pnpm build"
+    docker-compose run --rm -u "$USER_UID:$GROUP_GID" node sh -c "NODE_OPTIONS='--max-old-space-size=8192' pnpm build"
   fi
   status=$?
   if [ $status != 0 ];

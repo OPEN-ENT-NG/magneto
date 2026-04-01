@@ -13,6 +13,7 @@ import {
 import { Icon } from "@mdi/react";
 import { Box } from "@mui/material";
 import dayjs from "dayjs";
+import "dayjs/locale/fr";
 import { useDrag } from "react-dnd";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -158,10 +159,7 @@ export const BoardItem: React.FunctionComponent<BoardItemProps> = ({
                 <Icon path={mdiCalendarBlank} size={1} />
               </Tooltip>
               <Card.Text className="med-resource-card-text">
-                {dayjs(board.modificationDate, {
-                  locale: "fr",
-                  format: "YYYY-MM-DD HH:mm:ss",
-                }).format("DD MMMM YYYY")}
+                {dayjs(board.modificationDate, "YYYY-MM-DD HH:mm:ss").locale("fr").format("DD MMMM YYYY")}
               </Card.Text>
             </div>
             <div className="board-about-right-content">

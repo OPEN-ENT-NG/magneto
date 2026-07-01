@@ -15,6 +15,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.client.*;
+import org.entcore.common.redis.RedisClient;
 
 import java.util.Collections;
 import java.util.List;
@@ -433,20 +434,7 @@ public class MagnetoRedisService {
                 redisConfig = new JsonObject(redisConf);
             }
         }
-
-        String redisConnectionString = redisConfig.getString(Field.CONNECTION_STRING);
-        if (Utils.isEmpty(redisConnectionString)) {
-            redisConnectionString =
-                    "redis://" + (redisConfig.containsKey(Field.AUTH) ? ":" + redisConfig.getString(Field.AUTH) + "@" : "") +
-                            redisConfig.getString(Field.HOST) + ":" + redisConfig.getInteger(Field.PORT) + "/" +
-                            redisConfig.getInteger(Field.SELECT, 0);
-        }
-
-        return new RedisOptions()
-                .setConnectionString(redisConnectionString)
-                .setMaxPoolSize(redisConfig.getInteger(Field.POOL_SIZE, 32))
-                .setMaxWaitingHandlers(redisConfig.getInteger(Field.MAXWAITINGHANDLERS, 100))
-                .setMaxPoolWaiting(redisConfig.getInteger(Field.MAXPOOLWAITING, 100));
+        return RedisClient.getOptions(redisConfig);
     }
 
     /**

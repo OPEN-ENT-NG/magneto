@@ -384,7 +384,7 @@ export const CreateMagnet: FC = () => {
         <Box sx={contentContainerStyle}>
           {magnetTypeHasFilePickerWorkspace &&
             (activeCard ? (
-              <CardContentFile card={activeCard} />
+              <CardContentFile card={activeCard} allowOnlyOfficeView />
             ) : (
               <FilePickerWorkspace
                 modifyFile={modifyFile}

@@ -3,6 +3,7 @@ import { FC } from "react";
 import { filesize } from "filesize";
 
 import { CardContentFileProps } from "./types";
+import { canViewInOnlyOffice } from "./utils";
 import CSVParser from "../csv-viewer/CSVViewer";
 import { FileInfos } from "../file-infos/FileInfos";
 import { PDFUploadViewer } from "../PdfUploadViewer/PdfUploadViewer";
@@ -13,8 +14,12 @@ import { ThemeBreakpoint } from "~/core/enums/theme-breakpoints.enum";
 import { useFileExtensionDescription } from "~/hooks/useFileExtensionDescription";
 import { useBoard } from "~/providers/BoardProvider";
 import { useCanEditDocumentQuery } from "~/services/api/magnetoWorkspace.service";
+import { useLoolOpenRight, useLoolProviderContext } from "~/services/queries";
 
-export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
+export const CardContentFile: FC<CardContentFileProps> = ({
+  card,
+  allowOnlyOfficeView = false,
+}) => {
   const {
     documents,
     displayModals,
@@ -31,6 +36,10 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     card.resourceId,
   );
   const size = filesize(card.metadata.size);
+  const isLoolContextNeeded = allowOnlyOfficeView && !isExternalView;
+  const { data: hasLoolOpenRight } = useLoolOpenRight(isLoolContextNeeded);
+  const { data: loolProviderContext } =
+    useLoolProviderContext(isLoolContextNeeded);
 
   const isOfficePdf = () => {
     const ext = [
@@ -110,6 +119,12 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
     return !!canEditDocument && isoffice && canBeOpenOnLool;
   };
 
+  const isEditable = canEdit();
+
+  const viewInOnlyOffice = (): void => {
+    window.open(`/lool/documents/${card.resourceId}/open`, "_blank");
+  };
+
   return (
     <>
       <FileInfos
@@ -119,8 +134,22 @@ export const CardContentFile: FC<CardContentFileProps> = ({ card }) => {
         fileType={extensionText}
         canDownload={canDownload}
         onDownload={download}
-        canEdit={canEdit()}
+        canEdit={isEditable}
         onEdit={edit}
+        canViewInOnlyOffice={canViewInOnlyOffice({
+          allowOnlyOfficeView,
+          isExternalView,
+          hasLoolOpenRight,
+          providerContext: loolProviderContext,
+          contentType:
+            card.metadata.contentType ??
+            cardDocument?.metadata?.["content-type"],
+          extension: card.metadata.extension,
+          canEdit: isEditable,
+          isEditDecisionPending: canEditDocument === undefined,
+          isDocumentAccessible: cardDocument !== undefined,
+        })}
+        onViewInOnlyOffice={viewInOnlyOffice}
         secondaryBreakpoint={
           displayModals.CARD_PREVIEW
             ? ThemeBreakpoint.MDCOMMENT

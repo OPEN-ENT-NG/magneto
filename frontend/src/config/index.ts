@@ -6,6 +6,7 @@ export const workflows = {
   favorites: "fr.cgi.magneto.controller.FakeRight|boardFavorites",
   publicBoard: "fr.cgi.magneto.controller.FakeRight|boardPublic",
   synchronous: "fr.cgi.magneto.controller.FakeRight|boardSynchronous",
+  loolOpen: "fr.openent.lool.controller.LoolController|open",
 };
 
 export const workflowName = {

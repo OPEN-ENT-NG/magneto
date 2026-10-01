@@ -2,6 +2,7 @@ import React from "react";
 
 import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { CardContent, Typography, Box, Button } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -19,6 +20,8 @@ interface FileInfoCardProps {
   canDownload: boolean;
   onEdit: () => void;
   canEdit: boolean;
+  onViewInOnlyOffice: () => void;
+  canViewInOnlyOffice: boolean;
   primaryBreakpoint?: ThemeBreakpoint;
   secondaryBreakpoint?: ThemeBreakpoint;
 }
@@ -32,6 +35,8 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
   canDownload,
   onEdit,
   canEdit,
+  onViewInOnlyOffice,
+  canViewInOnlyOffice,
   primaryBreakpoint = ThemeBreakpoint.MD,
   secondaryBreakpoint = ThemeBreakpoint.MDCOMMENT,
 }) => {
@@ -90,6 +95,16 @@ export const FileInfos: React.FC<FileInfoCardProps> = ({
               >
                 <EditIcon />
                 {t("magneto.board.edit.open.office")}
+              </Button>
+            )}
+            {canViewInOnlyOffice && (
+              <Button
+                className="download-btn"
+                variant="outlined"
+                onClick={onViewInOnlyOffice}
+              >
+                <VisibilityIcon />
+                {t("magneto.board.view.open.onlyoffice")}
               </Button>
             )}
           </Box>

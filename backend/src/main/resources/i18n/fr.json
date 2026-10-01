@@ -115,6 +115,7 @@
   "magneto.board.download": "Télécharger",
   "magneto.board.preview.pdf.error": "Une erreur est survenue lors du chargement du PDF!",
   "magneto.board.edit.open.office": "Editer dans Open Office",
+  "magneto.board.view.open.onlyoffice": "Visualiser dans OnlyOffice",
   "magneto.board.import.file": "Importer un nouveau fichier",
   "magneto.board.date.update": "Date de dernière modification",
   "magneto.public.share": "Partager à toute la plateforme",

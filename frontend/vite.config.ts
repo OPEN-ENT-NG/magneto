@@ -48,6 +48,8 @@ export default ({ mode }: { mode: string }) => {
     "/explorer": proxyObj,
     "/todoapp": proxyObj,
     "/magneto": proxyObj,
+    "/lool": proxyObj,
+    "/workspace": proxyObj,
   };
 
   const base = mode === "production" ? "/magneto" : "";

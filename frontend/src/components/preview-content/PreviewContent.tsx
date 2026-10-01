@@ -10,7 +10,10 @@ import { PreviewCaptionAndDesc } from "../preview-caption-and-desc/PreviewCaptio
 import { PreviewTitle } from "../preview-title/PreviewTitle";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 
-export const PreviewContent: FC<PreviewContentProps> = ({ card }) => {
+export const PreviewContent: FC<PreviewContentProps> = ({
+  card,
+  isInCardPreview = false,
+}) => {
   return (
     <Box sx={previewWrapper}>
       <PreviewTitle
@@ -20,7 +23,7 @@ export const PreviewContent: FC<PreviewContentProps> = ({ card }) => {
         ownerName={card.ownerName}
         lastModifierName={card.lastModifierName}
       />
-      {displayPreviewContentByType(card)}
+      {displayPreviewContentByType(card, isInCardPreview)}
       <PreviewCaptionAndDesc
         caption={card.caption}
         description={card.description}

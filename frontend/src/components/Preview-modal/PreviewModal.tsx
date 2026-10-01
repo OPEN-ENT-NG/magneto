@@ -134,7 +134,9 @@ export const PreviewModal: FC = () => {
               isCommentOpen={COMMENT_PANEL}
               data-scrollable="true"
             >
-              {activeCard && <PreviewContent card={activeCard} />}
+              {activeCard && (
+                <PreviewContent card={activeCard} isInCardPreview />
+              )}
             </StyledContentBox>
             <CommentContainer isVisible={COMMENT_PANEL} />
             {canComment && !COMMENT_PANEL && !isExternalView && (

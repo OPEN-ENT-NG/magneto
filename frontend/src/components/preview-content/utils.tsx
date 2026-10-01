@@ -14,7 +14,10 @@ import { RootsConst } from "~/core/constants/roots.const";
 import { RESOURCE_TYPE } from "~/core/enums/resource-type.enum";
 import { Card } from "~/models/card.model";
 
-export const displayPreviewContentByType = (card: Card) => {
+export const displayPreviewContentByType = (
+  card: Card,
+  isInCardPreview = false,
+) => {
   const cardType = card.resourceType as RESOURCE_TYPE;
 
   const finalResourceUrl =
@@ -68,7 +71,9 @@ export const displayPreviewContentByType = (card: Card) => {
         />
       );
     case RESOURCE_TYPE.FILE:
-      return <CardContentFile card={card} />;
+      return (
+        <CardContentFile card={card} allowOnlyOfficeView={isInCardPreview} />
+      );
     case RESOURCE_TYPE.BOARD:
       if (window.location.hash.includes("/pub/")) {
         return <></>;

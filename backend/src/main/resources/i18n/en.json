@@ -66,6 +66,7 @@
   "magneto.board.size": "Taille",
   "magneto.board.type": "Type",
   "magneto.board.locked": "Position des aimants figée",
+  "magneto.board.view.open.onlyoffice": "View in OnlyOffice",
   "magneto.board.date.update": "Date de dernière modification",
   "magneto.public.share": "Share to the platform",
   "magneto.public.unshare": "Delete share from the platform",
